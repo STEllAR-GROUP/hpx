@@ -1106,51 +1106,51 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            if (0 != component_ini && "0" != component_ini->get_entry("no_factory", "0"))
-                return false;
+            if (0 == component_ini || "0" == component_ini->get_entry("no_factory", "0"))
+            {
+                // get the factory
+                hpx::util::plugin::plugin_factory<component_factory_base> pf (d,
+                    "factory");
 
-            // get the factory
-            hpx::util::plugin::plugin_factory<component_factory_base> pf (d,
-                "factory");
+                // create the component factory object, if not disabled
+                boost::shared_ptr<component_factory_base> factory (
+                    pf.create(instance, glob_ini, component_ini, isenabled));
 
-            // create the component factory object, if not disabled
-            boost::shared_ptr<component_factory_base> factory (
-                pf.create(instance, glob_ini, component_ini, isenabled));
-
-            component_type t = factory->get_component_type(
-                prefix, agas_client);
-            if (0 == t) {
-                LRT_(info) << "component refused to load: "  << instance;
-                return false;   // module refused to load
-            }
-
-            // store component factory and module for later use
-            component_factory_type data(factory, d, isenabled);
-            std::pair<component_map_type::iterator, bool> p =
-                components_.insert(component_map_type::value_type(t, data));
-
-            if (components::get_derived_type(t) != 0) {
-            // insert three component types, the base type, the derived
-            // type and the combined one.
-                if (p.second) {
-                    p = components_.insert(component_map_type::value_type(
-                            components::get_derived_type(t), data));
+                component_type t = factory->get_component_type(
+                    prefix, agas_client);
+                if (0 == t) {
+                    LRT_(info) << "component refused to load: "  << instance;
+                    return false;   // module refused to load
                 }
-                if (p.second) {
-                    components_.insert(component_map_type::value_type(
-                            components::get_base_type(t), data));
+
+                // store component factory and module for later use
+                component_factory_type data(factory, d, isenabled);
+                std::pair<component_map_type::iterator, bool> p =
+                    components_.insert(component_map_type::value_type(t, data));
+
+                if (components::get_derived_type(t) != 0) {
+                // insert three component types, the base type, the derived
+                // type and the combined one.
+                    if (p.second) {
+                        p = components_.insert(component_map_type::value_type(
+                                components::get_derived_type(t), data));
+                    }
+                    if (p.second) {
+                        components_.insert(component_map_type::value_type(
+                                components::get_base_type(t), data));
+                    }
                 }
-            }
 
-            if (!p.second) {
-                LRT_(fatal) << "duplicate component id: " << instance
-                    << ": " << components::get_component_type_name(t);
-                return false;   // duplicate component id?
-            }
+                if (!p.second) {
+                    LRT_(fatal) << "duplicate component id: " << instance
+                        << ": " << components::get_component_type_name(t);
+                    return false;   // duplicate component id?
+                }
 
-            LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                        << ": " << instance << ": "
-                        << components::get_component_type_name(t);
+                LRT_(info) << "dynamic loading succeeded: " << lib.string()
+                            << ": " << instance << ": "
+                            << components::get_component_type_name(t);
+            }
 
             // make sure startup/shutdown registration is called once for each
             // module, same for plugins

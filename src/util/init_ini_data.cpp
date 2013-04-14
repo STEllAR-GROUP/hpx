@@ -180,7 +180,7 @@ namespace hpx { namespace util
     // iterate over all shared libraries in the given directory and construct
     // default ini settings assuming all of those are components
     void load_component_factory(hpx::util::plugin::dll& d, util::section& ini,
-        std::string const& curr, std::string const& name)
+        std::string const& curr, std::string name)
     {
         hpx::util::plugin::plugin_factory<components::component_registry_base>
             pf(d, "registry");
@@ -195,6 +195,11 @@ namespace hpx { namespace util
             // might export startup/shutdown functions. Create some
             // default configuration data.
             using namespace boost::assign;
+#if defined(HPX_DEBUG)
+            // unmangle the name in debug mode
+            if (name[name.size()-1] == 'd')
+                name.resize(name.size()-1);
+#endif
             ini_data += std::string("[hpx.components.") + name + "]";
             ini_data += "name = " + name;
             ini_data += "path = " + curr;
