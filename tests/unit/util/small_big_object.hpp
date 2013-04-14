@@ -10,7 +10,7 @@
 
 #include <boost/serialization/access.hpp>
 
-#define DEBUG true
+#define ENABLE_DEBUG true
 
 ///////////////////////////////////////////////////////////////////////////////
 struct small_object
@@ -25,7 +25,7 @@ struct small_object
     {
         ar & x_;
 
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: serialize(" << x_ << ")\n";
         }
@@ -34,7 +34,7 @@ struct small_object
   public:
     small_object() : x_(0)
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: default ctor\n";
         }
@@ -42,7 +42,7 @@ struct small_object
 
     small_object(boost::uint64_t x) : x_(x)
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: ctor(" << x << ")\n";
         }
@@ -50,7 +50,7 @@ struct small_object
 
     small_object(small_object const& o) : x_(o.x_)
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: copy(" << o.x_ << ")\n";
         }
@@ -59,7 +59,7 @@ struct small_object
     small_object& operator=(small_object const& o)
     {
         x_ = o.x_;
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: assign(" << o.x_ << ")\n";
         }
@@ -68,7 +68,7 @@ struct small_object
 
     bool operator==(small_object const& o) const
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: equal(" << o.x_ << ")\n";
         }
@@ -77,7 +77,7 @@ struct small_object
 
     ~small_object()
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: dtor(" << x_ << ")\n";
         }
@@ -85,7 +85,7 @@ struct small_object
 
     boost::uint64_t operator()(boost::uint64_t const& z_)
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: call(" << x_ << ", " << z_ << ")\n";
         }
@@ -96,7 +96,7 @@ struct small_object
     friend inline std::istream& operator>> (std::istream& in, small_object& obj)
     {
         in >> obj.x_;
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: istream ("<< obj.x_ << ")\n";
         }
@@ -107,7 +107,7 @@ struct small_object
     friend inline std::ostream& operator<< (std::ostream& out, small_object const& obj)
     {
         out << obj.x_;
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "small_object: ostream ("<< obj.x_ << ")\n";
         }
@@ -130,7 +130,7 @@ struct big_object
     {
         ar & x_;
         ar & y_;
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: serialize(" << x_ << ", " << y_ << ")\n";
         }
@@ -139,7 +139,7 @@ struct big_object
   public:
     big_object() : x_(0), y_(0)
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: default ctor\n";
         }
@@ -148,7 +148,7 @@ struct big_object
     big_object(boost::uint64_t x, boost::uint64_t y)
       : x_(x), y_(y)
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: ctor(" << x << ", " << y << ")\n";
         }
@@ -157,7 +157,7 @@ struct big_object
     big_object(big_object const& o)
       : x_(o.x_), y_(o.y_)
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: copy(" << o.x_ << ", " << o.y_ << ")\n";
         }
@@ -167,7 +167,7 @@ struct big_object
     {
         x_ = o.x_;
         y_ = o.y_;
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: assign(" << o.x_ << ", " << o.y_ << ")\n";
         }
@@ -176,7 +176,7 @@ struct big_object
 
     bool operator==(big_object const& o) const
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: equal(" << o.x_ << ", " << o.y_ << ")\n";
         }
@@ -185,7 +185,7 @@ struct big_object
 
     ~big_object()
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: dtor(" << x_ << ", " << y_ << ")\n";
         }
@@ -196,7 +196,7 @@ struct big_object
       , boost::uint64_t const& w_
         )
     {
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: call(" << x_ << ", " << y_
                   << ", " << z_ << ", " << w_ << ")\n";
@@ -209,7 +209,7 @@ struct big_object
     {
         in >> obj.x_;
         in >> obj.y_;
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: istream ("<< obj.x_ <<", "<< obj.y_ << ")\n";
         }
@@ -222,7 +222,7 @@ struct big_object
     {
         out << obj.x_;
         out << obj.y_;
-        if(DEBUG)
+        if(ENABLE_DEBUG)
         {
             std::cout << "big_object: ostream ("<< obj.x_ <<", "<< obj.y_ << ")\n";
         }
