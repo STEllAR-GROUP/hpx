@@ -279,10 +279,19 @@ namespace hpx { namespace components { namespace detail
                 // if some other thread has already set the base GID for this 
                 // heap, we ignore the result
                 if (!base_gid_)
+                {
+                    // this is the first thread succeeding in binding the new gid range
                     base_gid_ = base_gid;
+                }
+                else
+                {
+                    // unbind the range which is not needed anymore
+                    applier::unbind_range(base_gid, step_);
+                }
             }
 
-            return base_gid_ + static_cast<boost::uint64_t>((static_cast<value_type*>(p) - addr));
+            return base_gid_ + static_cast<boost::uint64_t>(
+                static_cast<value_type*>(p) - addr);
         }
 
         void set_gid(naming::gid_type const& g)
@@ -315,10 +324,7 @@ namespace hpx { namespace components { namespace detail
                 naming::gid_type base_gid = base_gid_;
                 base_gid_ = naming::invalid_gid;
 
-                {
-                    hpx::util::unlock_the_lock<scoped_lock> ul(lk);
-                    applier::unbind_range(base_gid, step_);
-                }
+                applier::unbind_range(base_gid, step_);
             }
 
             tidy();
