@@ -16,13 +16,24 @@
 
 [heading General Changes]
 
-TBD
+The major new fetures in this release are:
+
+* We implemented a firstversion of a distributed AGAS service which essentially
+  eliminates all explicit AGAS network traffic.
+* We created a native ibverbs parcelport allowing to take advantage of the
+  superior latency and bandwidth characteristics of Infiniband networks.
+* We successfully ported HPX to the Xeon Phi platform.
+* Support for the SLURM scheduling system was implemented.
+* Major efforts have been dedicated to improving the performance counter
+  framework, numerous new counters were implemented and new APIs were added.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the tickets we closed for this release.
 
-* [issue 747] - Create performance counters exposing arithmetic operations 
+* [issue 749] - Thread phase counter is not reset
+* [issue 748] - Memory performance counter are not registered
+* [issue 747] - Create performance counters exposing arithmetic operations
 * [issue 745] - apply_callback needs to invoke callback when applied locally
 * [issue 744] - CMake fixes
 * [issue 743] - Problem Building github version of HPX
@@ -78,7 +89,9 @@ Here is a list of the tickets we closed for this release.
 * [issue 696] - Distributed problem
 * [issue 695] - Bad perf counter time printed
 * [issue 693] - `--help` doesn't print component specific command line options
+* [issue 692] - SLURM support broken
 * [issue 691] - exception while executing any application linked with hwloc
+* [issue 690] - thread_id_test and thread_launcher_test failing
 * [issue 689] - Make the buildbots use hwloc
 * [issue 687] - compilation error fix (hwloc_topology)
 * [issue 686] - Linker Error for Applications
@@ -104,12 +117,14 @@ Here is a list of the tickets we closed for this release.
 * [issue 643] - Error parsing host file
 * [issue 642] - HWLoc issue with TAU
 * [issue 634] - Improve error reporting from parcel layer
+* [issue 627] - Add tests for async and apply overloads that accept regular
+                C++ functions
 * [issue 626] - hpx/future.hpp header
 * [issue 557] - Remove action codes
 * [issue 531] - AGAS request and response classes should use switch statements
 * [issue 529] - Investigate the state of hwloc support
 * [issue 526] - Make HPX aware of hyper-threading
-* [issue 518] - Create facilities allowing to use plain arrays as action 
+* [issue 518] - Create facilities allowing to use plain arrays as action
                 arguments
 * [issue 473] - hwloc thread binding is broken on CPUs with hyperthreading
 * [issue 383] - Change result type detection for hpx::util::bind to use
