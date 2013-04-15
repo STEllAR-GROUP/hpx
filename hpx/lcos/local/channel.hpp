@@ -137,7 +137,7 @@ struct channel
     {
         BOOST_ASSERT(data_);
         return lcos::detail::make_future_from_data<T>(data_).then
-            (boost::forward<completed_callback_type>(f));
+            (boost::forward<F>(f));
     }
 
     bool ready() const
@@ -158,7 +158,7 @@ struct channel<void>
     BOOST_COPYABLE_AND_MOVABLE(vector3d);
 
   public:
-    typedef typename future_data::completed_callback_type
+    typedef future_data::completed_callback_type
         completed_callback_type;
 
     channel() : data_(new future_data()) {}

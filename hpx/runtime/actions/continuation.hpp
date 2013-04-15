@@ -17,7 +17,7 @@
 #include <hpx/util/serialize_empty_type.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
-#include <hpx/traits/supports_result_of.hpp>
+#include <hpx/traits/is_callable.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -46,7 +46,7 @@ namespace hpx
     // forward declaration
     template <typename F, typename Arg1, typename Arg2>
     inline typename boost::enable_if<
-        traits::supports_result_of<F>, bool
+        traits::is_callable<F>, bool
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
 
