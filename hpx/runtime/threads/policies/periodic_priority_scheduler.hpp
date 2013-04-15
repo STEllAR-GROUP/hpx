@@ -561,7 +561,7 @@ namespace hpx { namespace threads { namespace policies
                     for (std::size_t i = 0; (0 == added) && i < queues_size;
                          ++i)
                     {
-                        if (i == num_thread || !test(node_mask, i)))
+                        if (i == num_thread || !test(node_mask, i))
                             continue;         // don't steal from ourselves
 
                         result = queues_[num_thread]->wait_or_add_new(i,
