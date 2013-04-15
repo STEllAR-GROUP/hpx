@@ -16,7 +16,7 @@
 #include <boost/mpl/or.hpp>
 #include <boost/mpl/has_xxx.hpp>
 
-#include <hpx/traits/has_call_operator.hpp>
+//#include <hpx/traits/has_call_operator.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 
 namespace hpx { namespace traits
@@ -35,15 +35,15 @@ namespace hpx { namespace traits
 
         BOOST_MPL_HAS_XXX_TRAIT_DEF(result_type)
 
-        template <typename T, typename Signature>
-        struct is_function_object
-          : boost::mpl::and_<
-                boost::is_class<T>
-              , boost::mpl::bool_<has_call_operator<T, Signature>::value>
-            >
-        {
-            typedef is_function_object<T, Signature> type;
-        };
+//         template <typename T, typename Signature>
+//         struct is_function_object
+//           : boost::mpl::and_<
+//                 boost::is_class<T>
+//               , boost::mpl::bool_<has_call_operator<T, Signature>::value>
+//             >
+//         {
+//             typedef is_function_object<T, Signature> type;
+//         };
     }
 
     template <typename T/*, typename Signature*/>
