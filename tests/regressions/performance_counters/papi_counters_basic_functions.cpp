@@ -63,9 +63,9 @@ int hpx_main(boost::program_options::variables_map&)
                   << n << " uncounted store instructions, result: " << cnt2-cnt1 << std::endl
                   << 2*n << " store instructions, count after reset: " << cnt3 << std::endl;
 
-        pass &= close_enough(cnt1, n, 1.0);
-        pass &= (cnt2 >= cnt1) && close_enough(cnt1, cnt2, 1.0);
-        pass &= close_enough(cnt3, 2.0*cnt1, 1.0);
+        pass = pass && close_enough(cnt1, n, 1.0);
+        pass = pass && (cnt2 >= cnt1) && close_enough(cnt1, cnt2, 1.0);
+        pass = pass && close_enough(cnt3, 2.0*cnt1, 1.0);
     }
     std::cout << (pass? "PASSED": "FAILED") << ".\n";
 
