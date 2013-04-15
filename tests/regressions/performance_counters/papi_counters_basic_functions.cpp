@@ -58,7 +58,7 @@ int hpx_main(boost::program_options::variables_map&)
         boost::uint64_t cnt1 = value1.get_value<boost::uint64_t>();
         boost::uint64_t cnt2 = value2.get_value<boost::uint64_t>();
         boost::uint64_t cnt3 = value3.get_value<boost::uint64_t>();
-        // assume cache line on any architecture doesn't exceed 1KB
+
         std::cout << n << " counted store instructions, result: " << cnt1 << std::endl
                   << n << " uncounted store instructions, result: " << cnt2-cnt1 << std::endl
                   << 2*n << " store instructions, count after reset: " << cnt3 << std::endl;
