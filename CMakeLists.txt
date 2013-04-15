@@ -1219,6 +1219,7 @@ if(HPX_BUILD_TESTS)
   add_custom_command(TARGET tests POST_BUILD
     COMMAND ${CMAKE_SOURCE_DIR}/python/scripts/hpx_run_tests.py
     ARGS --prefix=${CMAKE_BINARY_DIR}/bin/
+         --args=\${HPX_TEST_ARGUMENTS}
          --log-stdout
          --no-exit-code
          ${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
