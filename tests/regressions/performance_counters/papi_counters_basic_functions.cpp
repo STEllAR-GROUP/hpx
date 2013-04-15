@@ -42,7 +42,7 @@ int hpx_main(boost::program_options::variables_map&)
 
     // perform n stores (should be uncounted)
     for (i = 0; i < n; i++) ;
-    // get value and reset and start
+    // get value and reset, and start again
     counter_value value2 = performance_counter::get_value(id, true);
     performance_counter::start(id);
 
@@ -55,9 +55,9 @@ int hpx_main(boost::program_options::variables_map&)
                 status_is_valid(value3.status_);
     if (pass)
     {
-        boost::uint64_t cnt1 = value1.get_value<double>();
-        boost::uint64_t cnt2 = value2.get_value<double>();
-        boost::uint64_t cnt3 = value3.get_value<double>();
+        boost::uint64_t cnt1 = value1.get_value<boost::uint64_t>();
+        boost::uint64_t cnt2 = value2.get_value<boost::uint64_t>();
+        boost::uint64_t cnt3 = value3.get_value<boost::uint64_t>();
         // assume cache line on any architecture doesn't exceed 1KB
         std::cout << n << " counted store instructions, result: " << cnt1 << std::endl
                   << n << " uncounted store instructions, result: " << cnt2-cnt1 << std::endl
