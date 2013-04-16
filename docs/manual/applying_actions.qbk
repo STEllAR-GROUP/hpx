@@ -79,8 +79,8 @@ demonstrating this. The first snippet has to go into the header file:
 
     namespace app
     {
-        struct HPX_COMPONENT_EXPORT some_component
-          : hpx::components::simple_component<some_component>
+        struct some_component
+          : hpx::components::simple_component_base<some_component>
         {
             int some_member_function(std::string s)
             {
@@ -97,13 +97,20 @@ demonstrating this. The first snippet has to go into the header file:
 
     // Note: The second arguments to the macro below have to be systemwide-unique
     //       C++ identifiers
-    ``[macroref HPX_REGISTER_ACTION_DECLARATION `HPX_REGISTER_ACTION_DECLARATION`]``(app::some_component::some_member_action);
+    ``[macroref HPX_REGISTER_ACTION_DECLARATION
+    `HPX_REGISTER_ACTION_DECLARATION`]``(app::some_component::some_member_action , some_component_some_action );
 
-The next snippet belongs to the source file:
+The next snippet belongs to the source file (e.g. the main application in the most simple case:
+
+    typedef hpx::components::simple_component< app::some_component > component_type;
+    typedef app::some_component some_component;
+
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY( component_type, some_component );
 
     // The parameters for this macro have to be the same as used in the corresponding
     // HPX_REGISTER_ACTION_DECLARATION() macro invocation above
-    ``[macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]``(app::some_component::some_member_action);
+    typedef some_component::some_member_action some_component_some_action;
+    HPX_REGISTER_ACTION( some_component_some_action );
 
 Granted, these macro invocations are a bit more complex than for simple global
 functions, however we believe they are still manageable.
@@ -111,7 +118,8 @@ functions, however we believe they are still manageable.
 The most important macro invocation is the
 [macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]
 in the header file as this defines the action type we need to invoke the
-member function.
+member function. For a complete example of a simple component action see 
+[hpx_link examples/quickstart/component_in_executable.cpp..component_in_executable.cpp]
 
 [endsect] [/ Action Type Definition]
 
