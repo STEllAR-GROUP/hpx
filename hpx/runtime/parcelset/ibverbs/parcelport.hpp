@@ -140,7 +140,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             parcelport_connection_ptr const& client_connection);
 
     private:
-        int io_service_index();
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool io_service_pool_;
         int io_service_index_;

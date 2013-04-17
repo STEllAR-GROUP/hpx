@@ -71,14 +71,14 @@ namespace hpx { namespace parcelset { namespace tcp
 
         using boost::asio::ip::tcp;
         if (NULL == acceptor_)
-            acceptor_ = new tcp::acceptor(io_service_pool_.get_io_service());
+            acceptor_ = new tcp::acceptor(io_service_pool_.get_io_service(0));
 
         // initialize network
         std::size_t tried = 0;
         exception_list errors;
         naming::locality::iterator_type end = accept_end(here_);
         for (naming::locality::iterator_type it =
-                accept_begin(here_, io_service_pool_.get_io_service());
+                accept_begin(here_, io_service_pool_.get_io_service(0));
              it != end; ++it, ++tried)
         {
             try {
@@ -515,10 +515,15 @@ namespace hpx { namespace parcelset { namespace tcp
         // Check if we need to create the new connection.
         if (!client_connection)
         {
+            // Use the same io_service for connecting as for the connection itself
+            // this will make sure that not all connections will get the same
+            // io_service if the number of threads is 2.
+            boost::asio::io_service& io_service = io_service_pool_.get_io_service();
+
             // The parcel gets serialized inside the connection constructor, no
             // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                io_service_pool_.get_io_service(), l, parcels_sent_));
+                io_service, l, parcels_sent_));
 
             // Connect to the target locality, retry if needed
             boost::system::error_code error = boost::asio::error::try_again;
@@ -527,7 +532,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 try {
                     naming::locality::iterator_type end = connect_end(l);
                     for (naming::locality::iterator_type it =
-                            connect_begin(l, io_service_pool_.get_io_service());
+                            connect_begin(l, io_service);
                          it != end; ++it)
                     {
                         boost::asio::ip::tcp::socket& s = client_connection->socket();

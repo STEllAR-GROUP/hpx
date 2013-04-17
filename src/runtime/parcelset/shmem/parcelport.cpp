@@ -74,7 +74,7 @@ namespace hpx { namespace parcelset { namespace shmem
             try {
                 server::shmem::parcelport_connection_ptr conn(
                     new server::shmem::parcelport_connection(
-                        io_service_pool_.get_io_service(1), here(), *this));
+                        io_service_pool_.get_io_service(), here(), *this));
 
                 boost::asio::ip::tcp::endpoint ep = *it;
 
@@ -158,7 +158,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
             // create new connection waiting for next incoming parcel
             conn.reset(new server::shmem::parcelport_connection(
-                io_service_pool_.get_io_service(1), here(), *this));
+                io_service_pool_.get_io_service(), here(), *this));
 
             acceptor_->async_accept(conn->window(),
                 boost::bind(&parcelport::handle_accept, this,
@@ -336,10 +336,15 @@ namespace hpx { namespace parcelset { namespace shmem
         // Check if we need to create the new connection.
         if (!client_connection)
         {
+            // Use the same io_service for connecting as for the connection itself
+            // this will make sure that not all connections will get the same
+            // io_service if the number of threads is 2.
+            boost::asio::io_service& io_service = io_service_pool_.get_io_service();
+
             // The parcel gets serialized inside the connection constructor, no
             // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                io_service_pool_.get_io_service(1), here_, l,
+                io_service, here_, l,
                 data_buffer_cache_, parcels_sent_, ++connection_count_));
 
             // Connect to the target locality, retry if needed
@@ -349,7 +354,7 @@ namespace hpx { namespace parcelset { namespace shmem
                 try {
                     naming::locality::iterator_type end = connect_end(l);
                     for (naming::locality::iterator_type it =
-                            connect_begin(l, io_service_pool_.get_io_service(0));
+                            connect_begin(l, io_service);
                          it != end; ++it)
                     {
                         boost::asio::ip::tcp::endpoint const& ep = *it;

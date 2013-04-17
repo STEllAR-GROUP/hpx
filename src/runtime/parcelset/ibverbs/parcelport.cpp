@@ -37,7 +37,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
       : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_ibverbs", "-ibverbs"),
-        io_service_index_(1),
         acceptor_(NULL),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
@@ -79,7 +78,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             try {
                 server::ibverbs::parcelport_connection_ptr conn(
                     new server::ibverbs::parcelport_connection(
-                        io_service_pool_.get_io_service(io_service_index()), *this));
+                        io_service_pool_.get_io_service(), *this));
 
                 boost::asio::ip::tcp::endpoint ep = *it;
 
@@ -155,8 +154,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
             // create new connection waiting for next incoming parcel
             conn.reset(new server::ibverbs::parcelport_connection(
-                io_service_pool_.get_io_service(io_service_index()), *this));
-        
+                io_service_pool_.get_io_service(), *this));
+
             acceptor_->async_accept(conn->context(),
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
@@ -291,7 +290,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
     ///////////////////////////////////////////////////////////////////////////
     void parcelport::send_parcels_or_reclaim_connection(
-        naming::locality const& locality_id, 
+        naming::locality const& locality_id,
         parcelport_connection_ptr const& client_connection)
     {
         typedef pending_parcels_map::iterator iterator;
@@ -412,7 +411,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         return get_connection(l, client_connection, ec);
     }
-    
+
     parcelport_connection_ptr parcelport::get_connection(
         naming::locality const& l, error_code& ec)
     {
@@ -438,10 +437,15 @@ namespace hpx { namespace parcelset { namespace ibverbs
         // Check if we need to create the new connection.
         if (!client_connection)
         {
+            // Use the same io_service for connecting as for the connection itself
+            // this will make sure that not all connections will get the same
+            // io_service if the number of threads is 2.
+            boost::asio::io_service& io_service = io_service_pool_.get_io_service();
+
             // The parcel gets serialized inside the connection constructor, no
             // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                io_service_pool_.get_io_service(io_service_index()), l, parcels_sent_));
+                io_service, l, parcels_sent_));
 
             // Connect to the target locality, retry if needed
             boost::system::error_code error = boost::asio::error::try_again;
@@ -450,7 +454,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 try {
                     naming::locality::iterator_type end = connect_end(l);
                     for (naming::locality::iterator_type it =
-                            connect_begin(l, io_service_pool_.get_io_service(0));
+                            connect_begin(l, io_service);
                          it != end; ++it)
                     {
                         boost::asio::ip::tcp::endpoint const& ep = *it;
@@ -530,17 +534,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
             "ibverbs::parcelport::get_connection_cache_statistics",
             "invalid connection cache statistics type");
         return 0;
-    }
-    
-    int parcelport::io_service_index()
-    {
-        lcos::local::spinlock::scoped_lock l(mtx_);
-        io_service_index_++;
-        if(static_cast<std::size_t>(io_service_index_) == io_service_pool_.size())
-        {
-            io_service_index_ = 1;
-        }
-        return io_service_index_;
     }
 
     ///////////////////////////////////////////////////////////////////////////

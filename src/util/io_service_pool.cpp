@@ -193,10 +193,13 @@ namespace hpx { namespace util
     {
         if (index == -1) {
             boost::mutex::scoped_lock l(mtx_);
-            // Use a round-robin scheme to choose the next io_service to use.
-            index = static_cast<int>(next_io_service_++);
-            if (next_io_service_ == pool_size_)
+            if (++next_io_service_ == pool_size_)
                 next_io_service_ = 0;
+            // Use a round-robin scheme to choose the next io_service to use.
+            index = static_cast<int>(next_io_service_);
+        }
+        else {
+            next_io_service_ = index;
         }
 
         return *io_services_[index]; //-V108
