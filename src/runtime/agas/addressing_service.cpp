@@ -527,14 +527,14 @@ boost::uint32_t addressing_service::get_num_overall_threads(
             rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
-            return boost::uint32_t(-1);
+            return boost::uint32_t(0);
 
         return rep.get_num_overall_threads();
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::get_num_overall_threads");
     }
-    return boost::uint32_t(-1);
+    return boost::uint32_t(0);
 } // }}}
 
 lcos::future<boost::uint32_t> addressing_service::get_num_overall_threads_async()
