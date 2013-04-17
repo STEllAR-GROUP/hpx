@@ -176,6 +176,15 @@ else()
 endif()
 
 ###############################################################################
+# Configure upper limit for number of threads, this is important for XeonPhi
+###############################################################################
+hpx_option(HPX_USE_MORE_THAN_64_THREADS BOOL
+    "HPX applications will use more than 64 threads (default: OFF)." OFF ADVANCED)
+if(HPX_USE_MORE_THAN_64_THREADS)
+  hpx_add_definitions(-DHPX_HAVE_MORE_THAN_64_THREADS)
+endif()
+
+###############################################################################
 # Configure compression and other plugins
 ###############################################################################
 add_hpx_pseudo_target(plugins)
@@ -1210,6 +1219,7 @@ if(HPX_BUILD_TESTS)
   add_custom_command(TARGET tests POST_BUILD
     COMMAND ${CMAKE_SOURCE_DIR}/python/scripts/hpx_run_tests.py
     ARGS --prefix=${CMAKE_BINARY_DIR}/bin/
+         --args=\${HPX_TEST_ARGUMENTS}
          --log-stdout
          --no-exit-code
          ${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests

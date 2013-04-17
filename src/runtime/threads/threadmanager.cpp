@@ -1806,7 +1806,7 @@ namespace hpx { namespace threads
 
         // set affinity on Linux systems or when using HWLOC
         topology const& topology_ = get_topology();
-        threads::mask_type mask = get_pu_mask(topology_, num_thread);
+        threads::mask_cref_type mask = get_pu_mask(topology_, num_thread);
 
         LTM_(info) << "tfunc(" << num_thread
             << "): will run on one processing unit within this mask: "
@@ -1993,7 +1993,8 @@ namespace hpx { namespace threads
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         run(std::size_t num_threads)
     {
-        LTM_(info) << "run: " << threads::hardware_concurrency() << " number of cores available";
+        LTM_(info) << "run: " << threads::hardware_concurrency() 
+                   << " number of cores available";
         LTM_(info) << "run: creating " << num_threads << " OS thread(s)";
 
         if (0 == num_threads) {
@@ -2024,7 +2025,7 @@ namespace hpx { namespace threads
 
             std::size_t thread_num = num_threads;
             while (thread_num-- != 0) {
-                threads::mask_type mask = get_pu_mask(topology_, thread_num);
+                threads::mask_cref_type mask = get_pu_mask(topology_, thread_num);
 
                 LTM_(info) << "run: create OS thread " << thread_num
                     << ": will run on one processing unit within this mask: "

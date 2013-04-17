@@ -16,7 +16,7 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/protect.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
-#include <hpx/traits/supports_result_of.hpp>
+#include <hpx/traits/is_callable.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
@@ -91,12 +91,8 @@ namespace hpx
 #define HPX_UTIL_BOUND_FUNCTION_ASYNC(Z, N, D)                                \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
     typename boost::lazy_enable_if<                                           \
-        traits::supports_result_of<F>                                         \
-      , detail::create_future<                                                \
-            typename boost::remove_reference<F>::type(                        \
-                BOOST_PP_ENUM_PARAMS(N, A)                                    \
-            )                                                                 \
-        >                                                                     \
+        traits::is_callable<F>                                                \
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>                  \
     >::type                                                                   \
     async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,              \
         HPX_ENUM_FWD_ARGS(N, A, a))                                           \
@@ -112,12 +108,8 @@ namespace hpx
     }                                                                         \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
     typename boost::lazy_enable_if<                                           \
-        traits::supports_result_of<F>                                         \
-      , detail::create_future<                                                \
-            typename boost::remove_reference<F>::type(                        \
-                BOOST_PP_ENUM_PARAMS(N, A)                                    \
-            )                                                                 \
-        >                                                                     \
+        traits::is_callable<F>                                                \
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>                  \
     >::type                                                                   \
     async (BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                    \
     {                                                                         \
@@ -379,7 +371,7 @@ namespace hpx
         typename F
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
-    typename detail::create_future<F()>::type
+    typename detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
     async(BOOST_SCOPED_ENUM(launch) policy,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
@@ -388,8 +380,10 @@ namespace hpx
             >
         ))) bound)
     {
-        typedef typename detail::create_future<F()>::type result_type;
-        lcos::local::futures_factory<typename result_type::result_type()>
+        typedef typename boost::result_of<
+            F(BOOST_PP_ENUM_PARAMS(N, Arg))
+        >::type result_type;
+        lcos::local::futures_factory<result_type()>
             p(boost::move(bound));
         if (policy & launch::async)
             p.apply();
@@ -400,7 +394,7 @@ namespace hpx
         typename F
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
-    typename detail::create_future<F()>::type
+    typename detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
     async(
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
@@ -412,7 +406,7 @@ namespace hpx
         return async(launch::all, boost::move(bound));
     }
 
-    // define async() overloads for n-nary bound member functions
+    // define async() overloads for n-nary bound function objects
 #define HPX_UTIL_BOUND_MEMBER_FUNCTOR_ASYNC(Z, N, D)                          \
     template <                                                                \
         typename F                                                            \
@@ -420,7 +414,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     typename detail::create_future<                                           \
-        F(BOOST_PP_ENUM_PARAMS(N, A))                                         \
+        F(BOOST_PP_ENUM_PARAMS(NN, Arg))                                      \
     >::type                                                                   \
     async(BOOST_SCOPED_ENUM(launch) policy,                                   \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
@@ -431,10 +425,10 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        typedef typename detail::create_future<                               \
-                F(BOOST_PP_ENUM_PARAMS(N, A))                                 \
+        typedef typename boost::result_of<                                    \
+                F(BOOST_PP_ENUM_PARAMS(NN, Arg))                              \
             >::type result_type;                                              \
-        lcos::local::futures_factory<typename result_type::result_type()> p(  \
+        lcos::local::futures_factory<result_type()> p(                        \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
               , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
@@ -447,7 +441,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     typename detail::create_future<                                           \
-        F(BOOST_PP_ENUM_PARAMS(N, A))                                         \
+        F(BOOST_PP_ENUM_PARAMS(NN, Arg))                                      \
     >::type                                                                   \
     async(                                                                    \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \

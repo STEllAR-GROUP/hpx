@@ -41,29 +41,29 @@ namespace hpx { namespace threads
           , error_code& ec = throws
             ) const;
 
-        mask_type get_machine_affinity_mask(
+        mask_cref_type get_machine_affinity_mask(
             error_code& ec = throws
             ) const;
 
-        mask_type get_socket_affinity_mask(
+        mask_cref_type get_socket_affinity_mask(
             std::size_t num_thread
           , bool numa_sensitive
           , error_code& ec = throws
             ) const;
 
-        mask_type get_numa_node_affinity_mask(
+        mask_cref_type get_numa_node_affinity_mask(
             std::size_t num_thread
           , bool numa_sensitive
           , error_code& ec = throws
             ) const;
 
-        mask_type get_core_affinity_mask(
+        mask_cref_type get_core_affinity_mask(
             std::size_t num_thread
           , bool numa_sensitive
           , error_code& ec = throws
             ) const;
 
-        mask_type get_thread_affinity_mask(
+        mask_cref_type get_thread_affinity_mask(
             std::size_t num_thread
           , bool numa_sensitive
           , error_code& ec = throws
@@ -71,16 +71,16 @@ namespace hpx { namespace threads
 
         void set_thread_affinity_mask(
             boost::thread&
-          , mask_type const & //mask
+          , mask_cref_type //mask
           , error_code& ec = throws
             ) const;
 
         void set_thread_affinity_mask(
-            mask_type const & mask
+            mask_cref_type mask
           , error_code& ec = throws
             ) const;
 
-        mask_type get_thread_affinity_mask_from_lva(
+        mask_cref_type get_thread_affinity_mask_from_lva(
             naming::address::address_type
           , error_code& ec = throws
             ) const;
@@ -93,7 +93,7 @@ namespace hpx { namespace threads
             std::size_t num_numa_node
             ) const;
         mask_type init_core_affinity_mask_from_core(
-            std::size_t num_core, mask_type const & default_mask
+            std::size_t num_core, mask_cref_type default_mask
             ) const;
         mask_type init_thread_affinity_mask(std::size_t num_thread) const;
 
@@ -116,6 +116,8 @@ namespace hpx { namespace threads
             ) const;
 
     private:
+        static mask_type empty_mask;
+
         std::size_t init_node_number(
             std::size_t num_thread, hwloc_obj_type_t type
             );

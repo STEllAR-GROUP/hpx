@@ -63,7 +63,7 @@ namespace hpx { namespace util { namespace detail
             typedef typename boost::result_of<F()>::type type;
         };
 
-        BOOST_FORCEINLINE 
+        BOOST_FORCEINLINE
         typename boost::result_of<F()>::type operator()()
         {
             return f_();
@@ -95,7 +95,7 @@ namespace hpx { namespace util { namespace detail
         typename boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type          \
         operator()(HPX_ENUM_FWD_ARGS(N, A, a))                                  \
         {                                                                       \
-          return f_(HPX_ENUM_FORWARD_ARGS(N, A, a));                            \
+            return f_(HPX_ENUM_FORWARD_ARGS(N, A, a));                          \
         }                                                                       \
                                                                                 \
         template <typename This, BOOST_PP_ENUM_PARAMS(N, typename A)>           \
@@ -113,10 +113,10 @@ namespace hpx { namespace util { namespace detail
         typename boost::result_of<F const (BOOST_PP_ENUM_PARAMS(N, A))>::type   \
         operator()(HPX_ENUM_FWD_ARGS(N, A, a)) const                            \
         {                                                                       \
-          return f_(HPX_ENUM_FORWARD_ARGS(N, A, a));                            \
+            return f_(HPX_ENUM_FORWARD_ARGS(N, A, a));                          \
         }                                                                       \
     /**/
-        
+
         BOOST_PP_REPEAT_FROM_TO(1, HPX_FUNCTION_ARGUMENT_LIMIT,
                 HPX_UTIL_PROTECT_OPERATOR, _)
 

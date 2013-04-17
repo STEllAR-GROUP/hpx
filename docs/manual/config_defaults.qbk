@@ -256,7 +256,7 @@ sections, one for each component.
       constant `HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY` (`4`)]]
 ]
 
-The following setting relate to the shared memory parcelport (which is usable 
+The following setting relate to the shared memory parcelport (which is usable
 for communication between two localities on the same node). These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` is set
 (the equivalent cmake variable has the same name, and has to be set to `ON`).
@@ -272,19 +272,19 @@ effect only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` is set
 [table:ini_hpx_parcel_shmem
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.parcel.shmem.enable`]
-     [Enable the use of the shared memory parcelport for connections between 
-      localities running on the same node. Note that the initial bootstrap 
-      of the overall __hpx__ application will still be performed using the 
+     [Enable the use of the shared memory parcelport for connections between
+      localities running on the same node. Note that the initial bootstrap
+      of the overall __hpx__ application will still be performed using the
       default TCP connections.]
      [static information, the connections are disabled by default.]]
     [[`hpx.parcel.shmem.data_buffer_cache_size`]
-     [This property specifies the number of cached data buffers used for 
+     [This property specifies the number of cached data buffers used for
       interprocess communication between localities on the same node.]
      [static information, the default depends on the compile time preprocessor
       constant `HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE` (`512`)]]
 ]
 
-The following setting relate to the shared memory parcelport (which is usable 
+The following setting relate to the Infiniband parcelport (which is usable
 for cmmunication between two localities on the same node). These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` is set
 (the equivalent cmake variable has the same name, and has to be set to `ON`).
@@ -293,25 +293,24 @@ effect only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` is set
 ``
     [hpx.parcel.ibverbs]
     enable = ${HPX_USE_IBVERBS_PARCELPORT:0}
-    buffer_size=${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
+    buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
 ``
 [c++]
 
 [table:ini_hpx_parcel_ibverbs
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.parcel.ibverbs.enable`]
-     [Enable the use of the ibverbs parcelport for connections between 
+     [Enable the use of the ibverbs parcelport for connections between
       localities running on a node with infiniband capable hardware. Note
       that the initial bootstrap of the overall __hpx__ application will
       still be performed using the default TCP connections.]
      [static information, the connections are disabled by default.]]
     [[`hpx.parcel.ibverbs.buffer_size`]
      [This property specifies the size in bytes of the buffers registered to
-     the infiniband hardware. Parcels which are smaller than this will be
-     serialized and sent over the network in a zero-copy fashion. Parcels
-     bigger than this will be transparently copied to a big enough temporary
-     buffer]
-     ]
+      the infiniband hardware. Parcels which are smaller than this will be
+      serialized and sent over the network in a zero-copy fashion. Parcels
+      bigger than this will be transparently copied to a big enough temporary
+      buffer.]]
 ]
 
 
@@ -325,10 +324,10 @@ effect only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` is set
     service_mode = hosted
     dedicated_server = 0
     max_pending_refcnt_requests = ${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:<hpx_initial_agas_max_pending_refcnt_requests>}
+    use_caching = ${HPX_AGAS_USE_CACHING:1}
+    use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}
     local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:<hpx_initial_agas_local_cache_size>}
     local_cache_size_per_thread = ${HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD:<hpx_initial_agas_local_cache_size_per_thread>}
-    use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}
-    use_caching = ${HPX_AGAS_USE_CACHING:1}
 ``
 [c++]
 

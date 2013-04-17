@@ -265,25 +265,33 @@ namespace hpx { namespace components { namespace detail
                     base_gid = ids.get_id(appl.here(), appl.get_agas_client(), step_);
                 }
 
+                // register the global ids and the base address of this heap
+                // with the AGAS
+                if (!applier::bind_range(base_gid, step_,
+                        naming::address(appl.here(),
+                            components::get_component_type<typename value_type::type_holder>(),
+                            addr),
+                        sizeof(value_type)))
+                {
+                    return naming::invalid_gid;
+                }
+
                 // if some other thread has already set the base GID for this 
                 // heap, we ignore the result
-                if (!base_gid_) {
+                if (!base_gid_)
+                {
+                    // this is the first thread succeeding in binding the new gid range
                     base_gid_ = base_gid;
-
-                    // register the global ids and the base address of this heap
-                    // with the AGAS
-                    if (!applier::bind_range(base_gid_, step_,
-                          naming::address(appl.here(),
-                              components::get_component_type<typename value_type::type_holder>(),
-                              addr),
-                          sizeof(value_type)))
-                    {
-                        return naming::invalid_gid;
-                    }
+                }
+                else
+                {
+                    // unbind the range which is not needed anymore
+                    applier::unbind_range(base_gid, step_);
                 }
             }
 
-            return base_gid_ + static_cast<boost::uint64_t>((static_cast<value_type*>(p) - addr));
+            return base_gid_ + static_cast<boost::uint64_t>(
+                static_cast<value_type*>(p) - addr);
         }
 
         void set_gid(naming::gid_type const& g)
@@ -316,10 +324,7 @@ namespace hpx { namespace components { namespace detail
                 naming::gid_type base_gid = base_gid_;
                 base_gid_ = naming::invalid_gid;
 
-                {
-                    hpx::util::unlock_the_lock<scoped_lock> ul(lk);
-                    applier::unbind_range(base_gid_, step_);
-                }
+                applier::unbind_range(base_gid, step_);
             }
 
             tidy();

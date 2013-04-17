@@ -44,7 +44,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
         hpx::threads::topology const& t = hpx::get_runtime().get_topology();
         hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
 
-        std::size_t idx = desired_mask.find_first();
+        std::size_t idx = hpx::threads::find_first(desired_mask);
 
 #if defined(HPX_HAVE_HWLOC)
         hwloc_topology_t topo;

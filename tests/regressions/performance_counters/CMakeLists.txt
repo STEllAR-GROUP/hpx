@@ -7,7 +7,9 @@
 set(tests)
 
 if(PAPI_FOUND)
-  set(tests ${tests} papi_counters_basic_functions)
+  set(tests ${tests}
+    papi_counters_basic_functions
+    papi_counters_active_interface)
 endif()
 
 foreach(test ${tests})

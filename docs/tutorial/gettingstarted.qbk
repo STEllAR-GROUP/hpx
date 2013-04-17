@@ -77,6 +77,8 @@ a build system.
     [[__eglibc__ (Debian, Ubuntu)][2.11               ][2.7             ]]
     [[__glibc__ (Redhat)         ][2.11               ][2.7             ]]
     [[__libstdcxx__              ][4.6.3              ][4.4.5           ]]
+    [[__hwloc__                  ][1.4                ][1.2             ]
+        [Used for OS-thread pinning and NUMA awareness.]]
 ]
 
 [table Software Prerequisites for __hpx__ on Windows systems
@@ -90,6 +92,8 @@ a build system.
 
     [[[*Required Libraries]]]
     [[__boost__                  ][1.48.0 or newer    ][1.43.0          ]]
+    [[__hwloc__                  ][1.5                ][1.5             ]
+        [Used for OS-thread pinning and NUMA awareness.]]
 ]
 
 [note You need to build the following Boost libraries for __hpx__: 
@@ -104,8 +108,6 @@ listed below.
 [table Highly Recommended Optional Software Prerequisites for __hpx__ on Linux systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
-    [[__hwloc__                  ][1.4                ][1.2             ]
-        [Used for OS-thread pinning and NUMA awareness.]]
     [[__hdf5__                   ][1.8.7              ][1.6.7           ]
         [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
          and interpolate3d applications. See important note below.]]

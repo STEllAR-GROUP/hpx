@@ -6,8 +6,8 @@
 set(tests
     bind_action
     function
-    hold_any
-    hold_any_serialization
+    any
+    any_serialization
     merging_map
     parse_slurm_nodelist
    )

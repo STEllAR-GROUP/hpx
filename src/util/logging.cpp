@@ -220,7 +220,7 @@ namespace hpx { namespace util
                 std::size_t phase = self->get_thread_phase();
                 if (0 != phase) {
                     std::stringstream out;
-                    out << std::hex << std::setw(2) << std::setfill('0')
+                    out << std::hex << std::setw(4) << std::setfill('0')
                         << self->get_thread_phase();
                     str.prepend_string(out.str());
                     return;
@@ -228,7 +228,7 @@ namespace hpx { namespace util
             }
 
             // called from outside a HPX thread or no phase given
-            str.prepend_string("--");
+            str.prepend_string("----");
         }
     };
 

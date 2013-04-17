@@ -509,14 +509,14 @@ namespace hpx { namespace threads
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
-        mask_type get_pu_mask(topology const& topology, std::size_t num_thread) const
+        mask_cref_type get_pu_mask(topology const& topology, std::size_t num_thread) const
         {
             return scheduler_.get_pu_mask(topology, num_thread);
         }
 
         // Returns the mask identifying all processing units used by this
         // thread manager.
-        mask_type get_used_processing_units() const
+        mask_cref_type get_used_processing_units() const
         {
             return used_processing_units_;
         }

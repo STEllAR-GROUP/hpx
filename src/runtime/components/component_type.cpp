@@ -22,6 +22,7 @@ namespace hpx { namespace components
             "component_base_lco_with_value",
             "component_barrier",
             "component_promise",
+            "component_agas_locality_namespace",
             "component_agas_primary_namespace",
             "component_agas_component_namespace",
             "component_agas_symbol_namespace"

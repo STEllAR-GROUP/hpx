@@ -82,6 +82,11 @@ if __name__ == '__main__':
                     dest="prefix", default=exe_dir,
                     help="Prefix added to test names [default: %default]") 
 
+  parser.add_option("--args",
+                    action="store", type="string",
+                    dest="args", default="",
+                    help="Command line arguments to add tests [default: %default]") 
+
   parser.add_option("--log",
                     action="store", type="string",
                     dest="log", default="fail",
@@ -153,10 +158,17 @@ if __name__ == '__main__':
       continue 
 
     for node in range(nodes):
-      cmd = quote_options([ full_name 
-                          , '-t' + str(threads_per_node)
-                          , '-l' + str(nodes)
-                          , '-' + str(node)] + args)
+      cmd = [ full_name 
+            , '-t' + str(threads_per_node)
+            , '-l' + str(nodes)
+            , '-' + str(node)]
+
+      if options.args:
+        cmd += [options.args]
+
+      cmd += args
+
+      cmd = quote_options(cmd)
 
       cmds[pg.create_process(cmd).fileno()] = cmd
 

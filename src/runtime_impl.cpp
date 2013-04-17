@@ -510,7 +510,7 @@ namespace hpx {
 
         // if this is a service thread, set its service affinity
         if (service_thread) {
-            threads::mask_type used_processing_units =
+            threads::mask_cref_type used_processing_units =
                 thread_manager_->get_used_processing_units();
 
             this->topology_->set_thread_affinity_mask(
