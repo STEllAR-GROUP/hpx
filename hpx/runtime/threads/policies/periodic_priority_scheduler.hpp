@@ -55,6 +55,10 @@ namespace hpx { namespace threads { namespace policies
 
         typedef boost::mpl::true_ has_periodic_maintenance;
 
+        enum maintenance_interval {
+            value = 1000            // call periodic_maintenance every 1000ms
+        };
+
         // the scheduler type takes two initialization parameters:
         //    the number of queues
         //    the number of high priority queues
