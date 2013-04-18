@@ -16,6 +16,11 @@
 #include <cpu-features.h>
 #endif
 
+#if defined(_POSIX_VERSION)
+#include <sys/syscall.h>
+#include <sys/resource.h>
+#endif
+
 #if !defined(HPX_HAVE_HWLOC)
 
 namespace hpx { namespace threads

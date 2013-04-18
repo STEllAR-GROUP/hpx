@@ -30,11 +30,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#if defined(_POSIX_VERSION)
-#include <sys/syscall.h>
-#include <sys/resource.h>
-#endif
-
 #include <numeric>
 
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
