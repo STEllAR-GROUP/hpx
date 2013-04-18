@@ -237,7 +237,7 @@ if(NOT MSVC)
 else()
   if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
     set_target_properties(hpx_serialization PROPERTIES LINK_FLAGS "/include:__tcmalloc")
-    hpx_info("malloc" "hpx_serialization: forcing linking to __tcmalloc")
+    hpx_debug("malloc" "hpx_serialization: forcing linking to __tcmalloc")
   endif()
 endif()
 
@@ -330,7 +330,7 @@ if(MSVC)
   set(hpx_link_flag_properties)
   if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
     set(hpx_link_flag_properties "${hpx_link_flag_properties} /include:__tcmalloc")
-    hpx_info("malloc" "hpx: forcing linking to __tcmalloc")
+    hpx_debug("malloc" "hpx: forcing linking to __tcmalloc")
   endif()
 else()
   set_target_properties(hpx PROPERTIES
@@ -344,14 +344,12 @@ if(NOT MSVC)
                                    BUILD_WITH_INSTALL_RPATH TRUE
                                    INSTALL_RPATH_USE_LINK_PATH TRUE
                                    INSTALL_RPATH ${HPX_RPATH})
-endif()
-
-if(MSVC) 
+else()
   if(HPX_EMULATE_SWAP_CONTEXT)
     set(hpx_link_flag_properties "${hpx_link_flag_properties} /EXPORT:switch_to_fiber")
   endif()
   set_target_properties(hpx PROPERTIES LINK_FLAGS ${hpx_link_flag_properties})
-  hpx_info("hpx_link_flag_properties" "hpx: ${hpx_link_flag_properties}")
+  hpx_debug("hpx_link_flag_properties" "hpx: ${hpx_link_flag_properties}")
 endif()
 
 target_link_libraries(hpx
@@ -373,13 +371,6 @@ set_property(TARGET hpx APPEND
   "HPX_FUNCTION_ARGUMENT_LIMIT=7"
   "BOOST_ENABLE_ASSERT_HANDLER"
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
-
-#if(HPX_USE_PARCELPORT_SHMEM)
-#  set_property(TARGET hpx APPEND
-#    PROPERTY COMPILE_DEFINITIONS
-#    "BOOST_INTERPROCESS_ENABLE_TIMEOUT_WHEN_LOCKING"
-#    "BOOST_INTERPROCESS_TIMEOUT_WHEN_LOCKING_DURATION_MS=10")
-#endif()
 
 if(NOT HPX_NO_INSTALL)
   hpx_library_install(hpx lib/hpx)
