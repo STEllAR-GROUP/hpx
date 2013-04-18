@@ -234,6 +234,11 @@ if(NOT MSVC)
                                    BUILD_WITH_INSTALL_RPATH TRUE
                                    INSTALL_RPATH_USE_LINK_PATH TRUE
                                    INSTALL_RPATH ${HPX_RPATH})
+else()
+  if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
+    set_target_properties(hpx_serialization PROPERTIES LINK_FLAGS "/include:__tcmalloc")
+    hpx_info("malloc" "hpx_serialization: forcing linking to __tcmalloc")
+  endif()
 endif()
 
 set_target_properties(hpx_serialization PROPERTIES
@@ -321,6 +326,12 @@ if(MSVC)
     LIBRARY_OUTPUT_DIRECTORY_DEBUG ${HPX_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
     LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
     LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+
+  set(hpx_link_flag_properties)
+  if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
+    set(hpx_link_flag_properties "${hpx_link_flag_properties} /include:__tcmalloc")
+    hpx_info("malloc" "hpx: forcing linking to __tcmalloc")
+  endif()
 else()
   set_target_properties(hpx PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${HPX_RUNTIME_OUTPUT_DIRECTORY}
@@ -335,8 +346,12 @@ if(NOT MSVC)
                                    INSTALL_RPATH ${HPX_RPATH})
 endif()
 
-if(MSVC AND HPX_EMULATE_SWAP_CONTEXT)
-  set_target_properties(hpx PROPERTIES LINK_FLAGS "/EXPORT:switch_to_fiber")
+if(MSVC) 
+  if(HPX_EMULATE_SWAP_CONTEXT)
+    set(hpx_link_flag_properties "${hpx_link_flag_properties} /EXPORT:switch_to_fiber")
+  endif()
+  set_target_properties(hpx PROPERTIES LINK_FLAGS ${hpx_link_flag_properties})
+  hpx_info("hpx_link_flag_properties" "hpx: ${hpx_link_flag_properties}")
 endif()
 
 target_link_libraries(hpx
