@@ -823,9 +823,9 @@ if(MSVC)
       hpx_info("malloc" "Using tcmalloc allocator.")
       set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
       set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
+      set(HPX_LINK_FLAG_TARGET_PROPERTIES "/INCLUDE:__tcmalloc")
       hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
       hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
-
       hpx_add_definitions(-DHPX_TCMALLOC)
     endif()
   else()
@@ -1558,6 +1558,11 @@ if(HPX_NO_INSTALL)
   set(external_cmake_path ${hpx_SOURCE_DIR}/cmake)
 else()
   set(external_cmake_path ${HPX_PREFIX}/share/hpx-${HPX_VERSION}/cmake)
+endif()
+
+set(hpx_link_flag_target_properties "")
+if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
+  set(hpx_link_flag_target_properties "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
 endif()
 
 configure_file(${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in

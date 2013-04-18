@@ -150,8 +150,8 @@ macro(add_hpx_library name)
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME ${name})
 
-  if(MSVC AND (NOT ${${name}_STATIC}) AND TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
-    set_target_properties(${name}_lib PROPERTIES LINK_FLAGS "/include:__tcmalloc")
+  if(MSVC AND (NOT ${${name}_STATIC}) AND HPX_LINK_FLAG_TARGET_PROPERTIES)
+    set_target_properties(${name}_lib PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
   endif()
 
   if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)

@@ -11,7 +11,7 @@ if(UNIX)
     hpx_use_flag_if_available(-Wextra)
 
     # We never want trampolines
-    hpx_use_flag_if_available(-Wtrampolines)
+    hpx_use_flag_if_available(-Wt)
 
     # These are usually benign and can't be suppressed because of
     # interface requirements

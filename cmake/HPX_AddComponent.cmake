@@ -156,8 +156,8 @@ macro(add_hpx_component name)
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME ${lib_name})
 
-  if(MSVC AND TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
-    set_target_properties(${name}_component PROPERTIES LINK_FLAGS "/include:__tcmalloc")
+  if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
+    set_target_properties(${name}_component PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
   endif()
 
   if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)
