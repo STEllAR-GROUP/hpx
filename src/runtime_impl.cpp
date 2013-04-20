@@ -98,17 +98,17 @@ namespace hpx {
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             util::runtime_configuration const& rtcfg,
-            runtime_mode locality_mode, 
+            runtime_mode locality_mode,
             std::size_t num_threads, init_scheduler_type const& init)
       : runtime(rtcfg),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
-        main_pool_(1,
+        main_pool_(1, 1,
             boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2, false),
             boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
-        io_pool_(rtcfg.get_thread_pool_size("io_pool"),
+        io_pool_(rtcfg.get_thread_pool_size("io_pool"), 1,
             boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
-        timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
+        timer_pool_(rtcfg.get_thread_pool_size("timer_pool"), 1,
             boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcelset::parcelport::create(
@@ -476,7 +476,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
-        char const* context, std::size_t num, char const* postfix, 
+        char const* context, std::size_t num, char const* postfix,
         bool service_thread)
     {
         // initialize our TSS
@@ -489,7 +489,7 @@ namespace hpx {
         BOOST_ASSERT(NULL == runtime::thread_name_.get());    // shouldn't be initialized yet
 
         std::string* fullname = new std::string(context);
-        if (postfix && *postfix) 
+        if (postfix && *postfix)
             *fullname += postfix;
         *fullname += "#" + boost::lexical_cast<std::string>(num);
         runtime::thread_name_.reset(fullname);

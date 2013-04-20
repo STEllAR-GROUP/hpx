@@ -37,6 +37,12 @@ namespace hpx { namespace parcelset { namespace tcp
     /// to receive parcels.
     class HPX_EXPORT parcelport : public parcelset::parcelport
     {
+        enum io_service_group
+        {
+            io_service_group_read = 0,
+            io_service_group_write = 1
+        };
+
     public:
         /// Construct the parcelport on the given locality.
         ///

@@ -29,13 +29,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace tcp
 {
-
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
-        io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
+        io_service_pool_(2*ini.get_thread_pool_size("parcel_pool"), 2,
             on_start_thread, on_stop_thread, "parcel_pool_tcp", "-tcp"),
         acceptor_(NULL),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
@@ -70,21 +69,23 @@ namespace hpx { namespace parcelset { namespace tcp
         io_service_pool_.run(false);    // start pool
 
         using boost::asio::ip::tcp;
+        boost::asio::io_service& io_service = 
+            io_service_pool_.get_grouped_io_service(io_service_group_read);
         if (NULL == acceptor_)
-            acceptor_ = new tcp::acceptor(io_service_pool_.get_io_service(0));
+            acceptor_ = new tcp::acceptor(io_service);
 
         // initialize network
         std::size_t tried = 0;
         exception_list errors;
         naming::locality::iterator_type end = accept_end(here_);
-        for (naming::locality::iterator_type it =
-                accept_begin(here_, io_service_pool_.get_io_service(0));
+        for (naming::locality::iterator_type it = accept_begin(here_, io_service);
              it != end; ++it, ++tried)
         {
             try {
                 server::tcp::parcelport_connection_ptr conn(
                     new server::tcp::parcelport_connection(
-                        io_service_pool_.get_io_service(), *this));
+                        io_service_pool_.get_grouped_io_service(io_service_group_read), 
+                        *this));
 
                 tcp::endpoint ep = *it;
                 acceptor_->open(ep.protocol());
@@ -163,7 +164,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
             // create new connection waiting for next incoming parcel
             conn.reset(new server::tcp::parcelport_connection(
-                io_service_pool_.get_io_service(), *this));
+                io_service_pool_.get_grouped_io_service(io_service_group_read), *this));
 
             acceptor_->async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
@@ -515,10 +516,8 @@ namespace hpx { namespace parcelset { namespace tcp
         // Check if we need to create the new connection.
         if (!client_connection)
         {
-            // Use the same io_service for connecting as for the connection itself
-            // this will make sure that not all connections will get the same
-            // io_service if the number of threads is 2.
-            boost::asio::io_service& io_service = io_service_pool_.get_io_service();
+            boost::asio::io_service& io_service = 
+                io_service_pool_.get_grouped_io_service(io_service_group_write);
 
             // The parcel gets serialized inside the connection constructor, no
             // need to keep the original parcel alive after this call returned.

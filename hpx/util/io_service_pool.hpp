@@ -34,7 +34,7 @@ namespace hpx { namespace util
         ///                 requests
         /// \param start_thread
         ///                 [in]
-        explicit io_service_pool(std::size_t pool_size = 2,
+        explicit io_service_pool(std::size_t pool_size = 2, std::size_t groups = 1,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread = 
                 HPX_STD_FUNCTION<void(std::size_t, char const*)>(),
             HPX_STD_FUNCTION<void()> const& on_stop_thread = HPX_STD_FUNCTION<void()>(),
@@ -65,6 +65,7 @@ namespace hpx { namespace util
 
         /// \brief Get an io_service to use.
         boost::asio::io_service& get_io_service(int index = -1);
+        boost::asio::io_service& get_grouped_io_service(std::size_t group, int index = -1);
 
         /// \brief Get number of threads associated with this I/O service.
         std::size_t size() const { return pool_size_; }
@@ -107,6 +108,7 @@ namespace hpx { namespace util
 
         /// initial number of OS threads to execute in this pool
         std::size_t const pool_size_;
+        std::size_t const groups_;
 
         /// call this for each thread start/stop
         HPX_STD_FUNCTION<void(std::size_t, char const*)> on_start_thread_;

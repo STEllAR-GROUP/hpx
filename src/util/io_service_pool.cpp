@@ -21,11 +21,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    io_service_pool::io_service_pool(std::size_t pool_size,
+    io_service_pool::io_service_pool(std::size_t pool_size, std::size_t groups,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread,
             char const* pool_name, char const* name_postfix)
-      : next_io_service_(0), stopped_(false), pool_size_(pool_size),
+      : next_io_service_(0), stopped_(false),
+        pool_size_(pool_size), groups_(groups),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
         pool_name_(pool_name), pool_name_postfix_(name_postfix)
     {
@@ -34,6 +35,15 @@ namespace hpx { namespace util
             HPX_THROW_EXCEPTION(bad_parameter,
                 "io_service_pool::io_service_pool",
                 "io_service_pool size is 0");
+            return;
+        }
+
+        if (groups > 1 && groups >= pool_size)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "io_service_pool::io_service_pool",
+                "number of groups is larger than pool size");
+            return;
         }
 
         // Give all the io_services work to do so that their run() functions
@@ -49,9 +59,10 @@ namespace hpx { namespace util
 
     io_service_pool::io_service_pool(
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread, 
+            HPX_STD_FUNCTION<void()> const& on_stop_thread,
             char const* pool_name, char const* name_postfix)
-      : next_io_service_(0), stopped_(false), pool_size_(2),
+      : next_io_service_(0), stopped_(false),
+        pool_size_(2), groups_(1),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
         pool_name_(pool_name), pool_name_postfix_(name_postfix)
     {
@@ -189,12 +200,48 @@ namespace hpx { namespace util
         }
     }
 
+    boost::asio::io_service& 
+    io_service_pool::get_grouped_io_service(std::size_t group, int index)
+    {
+        boost::mutex::scoped_lock l(mtx_);
+        std::size_t next_io_service = next_io_service_;
+        std::size_t pool_size = pool_size_;
+
+        if (groups_ > 1) {
+            // calculate dthe index adjusted for the number of groups
+            BOOST_ASSERT(group < groups_);
+            next_io_service = (next_io_service_ * (group+1)) / groups_;
+            pool_size = (pool_size_ * (group+1)) / groups_;
+        }
+
+        if (index == -1) {
+            if (++next_io_service == pool_size)
+                next_io_service = 0;
+
+            // Use a round-robin scheme to choose the next io_service to use.
+            index = static_cast<int>(next_io_service);
+        }
+        else {
+            next_io_service = index;
+        }
+
+        next_io_service_ = next_io_service;
+        return *io_services_[index]; //-V108
+    }
+
     boost::asio::io_service& io_service_pool::get_io_service(int index)
     {
+        // use this function for single group io_service pools only
+        BOOST_ASSERT(groups_ == 1);
+
+        boost::mutex::scoped_lock l(mtx_);
+        std::size_t next_io_service = next_io_service_;
+        std::size_t pool_size = pool_size_;
+
         if (index == -1) {
-            boost::mutex::scoped_lock l(mtx_);
-            if (++next_io_service_ == pool_size_)
+            if (++next_io_service_ == pool_size)
                 next_io_service_ = 0;
+
             // Use a round-robin scheme to choose the next io_service to use.
             index = static_cast<int>(next_io_service_);
         }
@@ -204,7 +251,5 @@ namespace hpx { namespace util
 
         return *io_services_[index]; //-V108
     }
-
-///////////////////////////////////////////////////////////////////////////////
 }}  // namespace hpx::util
 

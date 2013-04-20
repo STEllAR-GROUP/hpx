@@ -30,7 +30,7 @@ namespace hpx { namespace parcelset { namespace shmem
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
-        io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
+        io_service_pool_(ini.get_thread_pool_size("parcel_pool"), 1,
             on_start_thread, on_stop_thread, "parcel_pool_shmem", "-shmem"),
         acceptor_(NULL), connection_count_(0),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc()),
