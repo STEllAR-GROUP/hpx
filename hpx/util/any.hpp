@@ -417,11 +417,7 @@ namespace hpx { namespace util
         {
         }
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-        basic_any(basic_any& x)
-#else
         basic_any(basic_any const& x)
-#endif
           : table(detail::any::get_table<detail::any::empty>::
                 template get<IArchive, OArchive, Char>()),
             object(0)
@@ -430,7 +426,38 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        basic_any(BOOST_FWD_REF(T) x)
+        basic_any(T const& x)
+          : table(detail::any::get_table<
+                      typename boost::remove_const<
+                          typename util::detail::remove_reference<T>::type
+                      >::type
+                  >::template get<IArchive, OArchive, Char>()),
+            object(0)
+        {
+            typedef typename boost::remove_const<
+                typename util::detail::remove_reference<T>::type
+            >::type value_type;
+
+            if (detail::any::get_table<value_type>::is_small::value)
+                new (&object) value_type(x);
+            else
+                object = new value_type(x);
+        }
+
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+        // Move constructor
+        basic_any(basic_any&& x) BOOST_NOEXCEPT
+          : table(x.table),
+            object(x.object)
+        {
+            x.table = detail::any::get_table<detail::any::empty>::
+                template get<IArchive, OArchive, Char>();
+            x.object = 0;
+        }
+
+        // Perfect forwarding of T
+        template <typename T>
+        basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -447,16 +474,7 @@ namespace hpx { namespace util
             else
                 object = new value_type(boost::forward<T>(x));
         }
-
-        // Move constructor
-        basic_any(BOOST_RV_REF(basic_any) x) BOOST_NOEXCEPT
-          : table(x.table),
-            object(x.object)
-        {
-            x.table = detail::any::get_table<detail::any::empty>::
-                template get<IArchive, OArchive, Char>();
-            x.object = 0;
-        }
+#endif
 
         ~basic_any()
         {
@@ -465,11 +483,7 @@ namespace hpx { namespace util
 
     private:
         // assignment
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-        basic_any& assign(basic_any& x)
-#else
         basic_any& assign(basic_any const& x)
-#endif
         {
             if (&x != this) {
                 // are we copying between the same type?
@@ -486,72 +500,45 @@ namespace hpx { namespace util
             return *this;
         }
 
-        template <typename T>
-        basic_any& assign(BOOST_FWD_REF(T) x)
-        {
-            typedef typename boost::remove_const<
-                typename util::detail::remove_reference<T>::type
-            >::type value_type;
-
-            // are we copying between the same type?
-            detail::any::fxn_ptr_table<IArchive, OArchive, Char>* x_table =
-                detail::any::get_table<value_type>::
-                    template get<IArchive, OArchive, Char>();
-
-            if (table == x_table) {
-            // if so, we can avoid deallocating and re-use memory
-                table->destruct(&object);    // first destruct the old content
-                if (detail::any::get_table<T>::is_small::value) {
-                    // create copy on-top of object pointer itself
-                    new (&object) value_type(boost::forward<T>(x));
-                }
-                else {
-                    // create copy on-top of old version
-                    new (object) value_type(boost::forward<T>(x));
-                }
-            }
-            else {
-                if (detail::any::get_table<T>::is_small::value) {
-                    // create copy on-top of object pointer itself
-                    table->destruct(&object); // first destruct the old content
-                    new (&object) value_type(boost::forward<T>(x));
-                }
-                else {
-                    reset();                  // first delete the old content
-                    object = new value_type(boost::forward<T>(x));
-                }
-                table = x_table;      // update table pointer
-            }
-            return *this;
-        }
-
     public:
+#ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
         // copy assignment operator
-        basic_any& operator=(BOOST_COPY_ASSIGN_REF(basic_any) x)
+        basic_any& operator=(basic_any x)
         {
             basic_any(x).swap(*this);
             return *this;
         }
 
-        // move assignment
-        basic_any& operator=(BOOST_RV_REF(basic_any) x) BOOST_NOEXCEPT
+        template <typename T>
+        basic_any& operator=(T const& rhs)
         {
-            if (&x != this) {
-                table->static_delete(&object);
-                table = x.table;
-                object = x.object;
-                x.table = detail::any::get_table<detail::any::empty>::
-                    template get<IArchive, OArchive, Char>();
-                x.object = 0;
-            }
+            basic_any(rhs).swap(*this);
+            return *this;
+        }
+#else
+        // copy assignment operator
+        basic_any& operator=(basic_any const& x)
+        {
+            basic_any(x).swap(*this);
             return *this;
         }
 
-        template <typename T>
-        basic_any& operator=(BOOST_FWD_REF(T) x)
+        // move assignement
+        basic_any& operator=(basic_any&& rhs) BOOST_NOEXCEPT
         {
-            return assign(boost::forward<T>(x));
+            rhs.swap(*this);
+            basic_any().swap(rhs);
+            return *this;
         }
+
+        // Perfect forwarding of T
+        template <typename T>
+        basic_any& operator=(T&& rhs)
+        {
+            basic_any(boost::forward<T>(rhs)).swap(*this);
+            return *this;
+        }
+#endif
 
         // equality operator
         friend bool operator==(basic_any const& x, basic_any const& y)
@@ -731,11 +718,7 @@ namespace hpx { namespace util
         {
         }
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-        basic_any(basic_any& x)
-#else
         basic_any(basic_any const& x)
-#endif
           : table(detail::any::get_table<
                 detail::any::empty>::template get<void, void, Char>()),
             object(0)
@@ -743,8 +726,9 @@ namespace hpx { namespace util
             assign(x);
         }
 
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
         // Move constructor
-        basic_any(BOOST_RV_REF(basic_any) x) BOOST_NOEXCEPT
+        basic_any(basic_any&& x) BOOST_NOEXCEPT
           : table(x.table),
             object(x.object)
         {
@@ -753,8 +737,9 @@ namespace hpx { namespace util
                 template get<void, void, Char>();
         }
 
+        // Perfect forwarding of T
         template <typename T>
-        explicit basic_any(BOOST_FWD_REF(T) x)
+        explicit basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -771,6 +756,7 @@ namespace hpx { namespace util
             else
                 object = new value_type(boost::forward<T>(x));
         }
+#endif
 
         ~basic_any()
         {
@@ -778,12 +764,7 @@ namespace hpx { namespace util
         }
 
     private:
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-        // assignment
-        basic_any& assign(basic_any& x)
-#else
         basic_any& assign(basic_any const& x)
-#endif
         {
             if (&x != this) {
                 // are we copying between the same type?
@@ -800,70 +781,45 @@ namespace hpx { namespace util
             return *this;
         }
 
-        template <typename T>
-        basic_any& assign(BOOST_FWD_REF(T) x)
+    public:
+#ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
+        // copy assignment operator
+        basic_any& operator=(basic_any x)
         {
-            typedef typename boost::remove_const<
-                typename util::detail::remove_reference<T>::type
-            >::type value_type;
-
-            // are we copying between the same type?
-            detail::any::fxn_ptr_table<void, void, Char>* x_table =
-                detail::any::get_table<value_type>::template get<void, void, Char>();
-            if (table == x_table) {
-            // if so, we can avoid deallocating and re-use memory
-                table->destruct(&object);    // first destruct the old content
-                if (detail::any::get_table<T>::is_small::value) {
-                    // create copy on-top of object pointer itself
-                    new (&object) value_type(boost::forward<T>(x));
-                }
-                else {
-                    // create copy on-top of old version
-                    new (object) value_type(boost::forward<T>(x));
-                }
-            }
-            else {
-                if (detail::any::get_table<T>::is_small::value) {
-                    // create copy on-top of object pointer itself
-                    table->destruct(&object); // first destruct the old content
-                    new (&object) value_type(boost::forward<T>(x));
-                }
-                else {
-                    reset();                  // first delete the old content
-                    object = new value_type(boost::forward<T>(x));
-                }
-                table = x_table;      // update table pointer
-            }
+            basic_any(x).swap(*this);
             return *this;
         }
 
-    public:
+        template <typename T>
+        basic_any& operator=(T const& rhs)
+        {
+            basic_any(rhs).swap(*this);
+            return *this;
+        }
+#else
         // copy assignment operator
-        basic_any& operator=(BOOST_COPY_ASSIGN_REF(basic_any) x)
+        basic_any& operator=(basic_any const& x)
         {
             basic_any(x).swap(*this);
             return *this;
         }
 
         // move assignment
-        basic_any& operator=(BOOST_RV_REF(basic_any) x)
+        basic_any& operator=(basic_any&& rhs)
         {
-            if (&x != this) {
-                table->static_delete(&object);
-                table = x.table;
-                object = x.object;
-                x.table = detail::any::get_table<detail::any::empty>::
-                    template get<void, void, Char>();
-                x.object = 0;
-            }
+            rhs.swap(*this);
+            basic_any().swap(rhs);
             return *this;
         }
 
+        // Perfect forwarding of T
         template <typename T>
-        basic_any& operator=(BOOST_FWD_REF(T) x)
+        basic_any& operator=(T&& rhs)
         {
-            return assign(boost::forward<T>(x));
+            basic_any(boost::forward<T>(rhs)).swap(*this);
+            return *this;
         }
+#endif
 
         // equality operator
         friend bool operator==(basic_any const& x, basic_any const& y)
@@ -879,7 +835,6 @@ namespace hpx { namespace util
             }
 
             return false;
-
         }
 
         template <typename T>
@@ -900,13 +855,13 @@ namespace hpx { namespace util
         // inequality operator
         friend bool operator!=(basic_any const& x, basic_any const& y)
         {
-            return !(x==y);
+            return !(x == y);
         }
 
         template <typename T>
         friend bool operator!=(basic_any const& b, T const& x)
         {
-            return !(b==x);
+            return !(b == x);
         }
 
         // utility functions
