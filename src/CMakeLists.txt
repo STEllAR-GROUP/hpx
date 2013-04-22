@@ -348,7 +348,7 @@ else()
   if(HPX_EMULATE_SWAP_CONTEXT)
     set(hpx_link_flag_properties "${hpx_link_flag_properties} /EXPORT:switch_to_fiber")
   endif()
-  set_target_properties(hpx PROPERTIES LINK_FLAGS ${hpx_link_flag_properties})
+  set_target_properties(hpx PROPERTIES LINK_FLAGS "${hpx_link_flag_properties}")
   hpx_debug("hpx_link_flag_properties" "hpx: ${hpx_link_flag_properties}")
 endif()
 
