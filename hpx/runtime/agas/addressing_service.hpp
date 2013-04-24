@@ -371,7 +371,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
-    void increment_refcnt_requests(
+    void send_refcnt_requests(
         mutex_type::scoped_lock& l
       , error_code& ec
         );
@@ -1185,21 +1185,36 @@ public:
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
-    /// \returns          The global reference count after the increment.
+    /// \returns          Whether the operation was successful.
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    void incref(
+    lcos::future<bool> incref_async(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , boost::int64_t credits = 1
+        );
+
+    void incref_apply(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , boost::int64_t credits = 1
+        );
+
+    bool incref(
         naming::gid_type const& lower
       , naming::gid_type const& upper
       , boost::int64_t credits = 1
       , error_code& ec = throws
-        );
+        )
+    {
+        return incref_async(lower, upper, credits).get(ec);
+    }
 
-    void incref(
+    bool incref(
         naming::gid_type const& id
       , boost::int64_t credits = 1
       , error_code& ec = throws

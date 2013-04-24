@@ -10,6 +10,7 @@
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/register_locks.hpp>
 
 #include <boost/config.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -65,6 +66,9 @@ namespace hpx { namespace util
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
+#if HPX_VERIFY_LOCKS
+            "lock_detection = ${HPX_LOCK_DETECTION:0}",
+#endif
 
             // add placeholders for keys to be added by command line handling
             "os_threads = 1",
@@ -283,6 +287,10 @@ namespace hpx { namespace util
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
+#if HPX_VERIFY_LOCKS
+        if (enable_lock_detection())
+            util::enable_lock_detection();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -324,6 +332,10 @@ namespace hpx { namespace util
 
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
+#endif
+#if HPX_VERIFY_LOCKS
+        if (enable_lock_detection())
+            util::enable_lock_detection();
 #endif
     }
 
@@ -576,6 +588,21 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
                     sec->get_entry("use_itt_notify", "0")) ? true : false;
+            }
+        }
+#endif
+        return false;
+    }
+
+    // Enable lock detection during suspension
+    bool runtime_configuration::enable_lock_detection() const
+    {
+#if HPX_VERIFY_LOCKS
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return boost::lexical_cast<int>(
+                    sec->get_entry("lock_detection", "0")) ? true : false;
             }
         }
 #endif

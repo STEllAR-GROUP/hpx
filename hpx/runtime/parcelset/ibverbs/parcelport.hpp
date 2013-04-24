@@ -130,14 +130,17 @@ namespace hpx { namespace parcelset { namespace ibverbs
         /// \brief Retrieve a new connection
         parcelport_connection_ptr get_connection(naming::locality const& l,
             error_code& ec = throws);
-        parcelport_connection_ptr get_connection_wait(naming::locality const& l,
-            error_code& ec = throws);
+//        parcelport_connection_ptr get_connection_wait(naming::locality const& l,
+//            error_code& ec = throws);
 
-        parcelport_connection_ptr get_connection(naming::locality const& l,
-            parcelport_connection_ptr client_connection, error_code& ec = throws);
+        parcelport_connection_ptr create_connection(naming::locality const& l,
+            error_code& ec = throws);
 
         void send_parcels_or_reclaim_connection(naming::locality const& locality_id,
             parcelport_connection_ptr const& client_connection);
+        void retry_sending_parcels(naming::locality const& locality_id);
+        void get_connection_and_send_parcels(naming::locality const& locality_id, 
+            naming::gid_type const& parcel_id);
 
     private:
         /// The pool of io_service objects used to perform asynchronous operations.

@@ -102,13 +102,13 @@ namespace hpx {
             std::size_t num_threads, init_scheduler_type const& init)
       : runtime(rtcfg),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
-        main_pool_(1, 1,
+        main_pool_(1,
             boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2, false),
             boost::bind(&runtime_impl::deinit_tss, This()), "main_pool"),
-        io_pool_(rtcfg.get_thread_pool_size("io_pool"), 1,
+        io_pool_(rtcfg.get_thread_pool_size("io_pool"),
             boost::bind(&runtime_impl::init_tss, This(), "io-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
-        timer_pool_(rtcfg.get_thread_pool_size("timer_pool"), 1,
+        timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
             boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcelset::parcelport::create(

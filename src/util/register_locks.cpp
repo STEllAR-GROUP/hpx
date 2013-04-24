@@ -29,6 +29,8 @@ namespace hpx { namespace util
         struct tls_tag {};
         static hpx::util::thread_specific_ptr<held_locks_map, tls_tag> held_locks_;
 
+        static bool lock_detection_enabled_;
+
         static held_locks_map& get_lock_map()
         {
             if (NULL == held_locks_.get())
@@ -43,11 +45,18 @@ namespace hpx { namespace util
 
     hpx::util::thread_specific_ptr<register_locks::held_locks_map, register_locks::tls_tag>
         register_locks::held_locks_;
+    bool register_locks::lock_detection_enabled_ = false;
+
+    ///////////////////////////////////////////////////////////////////////////
+    void enable_lock_detection()
+    {
+        register_locks::lock_detection_enabled_ = true;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     bool register_lock(void const* lock, util::register_lock_data* data)
     {
-        if (LHPX_ENABLED(debug) && 0 != threads::get_self_ptr())
+        if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -71,7 +80,7 @@ namespace hpx { namespace util
     // unregister the given lock from this HPX-thread
     bool unregister_lock(void const* lock)
     {
-        if (LHPX_ENABLED(debug) && 0 != threads::get_self_ptr())
+        if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
@@ -88,7 +97,7 @@ namespace hpx { namespace util
     // verify that no locks are held by this HPX-thread
     void verify_no_locks()
     {
-        if (LHPX_ENABLED(debug) && 0 != threads::get_self_ptr())
+        if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map const& held_locks =
                 register_locks::get_lock_map();
@@ -118,19 +127,18 @@ namespace hpx { namespace util
         // acquired in a different OS thread.
         verify_no_locks();
 
-//         if (0 != threads::get_self_ptr())
-//         {
-//             register_locks::held_locks_map const& held_locks =
-//                 register_locks::get_lock_map();
+//        {
+//            register_locks::held_locks_map const& held_locks =
+//               register_locks::get_lock_map();
 //
-//             // we throw an error if there are still registered locks for
-//             // this OS-thread
-//             if (!held_locks.empty()) {
-//                 HPX_THROW_EXCEPTION(invalid_status, "force_error_on_lock",
-//                     "At least one lock is held while thread is being terminated "
-//                     "or interrupted.");
-//             }
-//         }
+//            // we throw an error if there are still registered locks for
+//            // this OS-thread
+//            if (!held_locks.empty()) {
+//                HPX_THROW_EXCEPTION(invalid_status, "force_error_on_lock",
+//                    "At least one lock is held while thread is being terminated "
+//                    "or interrupted.");
+//            }
+//        }
     }
 #else
     bool register_lock(void const*, util::register_lock_data*)

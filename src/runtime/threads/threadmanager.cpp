@@ -1973,7 +1973,7 @@ namespace hpx { namespace threads
         tfunc_time = util::hardware::timestamp() - overall_timestamp;
 
 #if HPX_DEBUG != 0
-        // the last OS thread is allowed to exit only if no more PX threads exist
+        // the OS thread is allowed to exit only if no more HPX threads exist
         BOOST_ASSERT(!scheduler_.get_thread_count(
             unknown, thread_priority_default, num_thread));
 #endif

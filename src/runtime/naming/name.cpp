@@ -162,7 +162,7 @@ namespace hpx { namespace naming
                     // handle this problem.
                     naming::resolver_client& resolver =
                         naming::get_agas_client();
-                    resolver.incref(*this, HPX_INITIAL_GLOBALCREDIT * 2);
+                    resolver.incref_apply(*this, *this, HPX_INITIAL_GLOBALCREDIT * 2);
                 }
                 return newid;
             }

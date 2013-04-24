@@ -37,12 +37,6 @@ namespace hpx { namespace parcelset { namespace tcp
     /// to receive parcels.
     class HPX_EXPORT parcelport : public parcelset::parcelport
     {
-        enum io_service_group
-        {
-            io_service_group_read = 0,
-            io_service_group_write = 1
-        };
-
     public:
         /// Construct the parcelport on the given locality.
         ///
@@ -153,11 +147,14 @@ namespace hpx { namespace parcelset { namespace tcp
         parcelport_connection_ptr get_connection_wait(naming::locality const& l,
             error_code& ec = throws);
 
-        parcelport_connection_ptr get_connection(naming::locality const& l,
-            parcelport_connection_ptr client_connection, error_code& ec = throws);
+        parcelport_connection_ptr create_connection(naming::locality const& l,
+            error_code& ec = throws);
 
         void send_parcels_or_reclaim_connection(naming::locality const& locality_id,
             parcelport_connection_ptr const& client_connection);
+        void retry_sending_parcels(naming::locality const& locality_id);
+        void get_connection_and_send_parcels(naming::locality const& locality_id, 
+            naming::gid_type const& parcel_id);
 
     private:
         /// The pool of io_service objects used to perform asynchronous operations.
@@ -170,8 +167,15 @@ namespace hpx { namespace parcelset { namespace tcp
         util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
 
         /// The list of accepted connections
+        mutable lcos::local::spinlock connections_mtx_;
+
         typedef std::set<server::tcp::parcelport_connection_ptr> accepted_connections_set;
         accepted_connections_set accepted_connections_;
+
+#if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
+        typedef std::set<tcp::parcelport_connection_weak_ptr> write_connections_set;
+        write_connections_set write_connections_;
+#endif
     };
 }}}
 

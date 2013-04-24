@@ -109,6 +109,12 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         }
 
     protected:
+        template <typename Handler>
+        void async_restart_read(boost::tuple<Handler> handler)
+        {
+            async_read(boost::get<0>(handler));
+        }
+
         /// Handle a completed read of the message priority and size from the
         /// message header.
         /// The handler is passed using a tuple since boost::bind seems to have
@@ -122,7 +128,10 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                async_read(boost::get<0>(handler));
+                void (parcelport_connection::*f)(boost::tuple<Handler>) = 
+                        &parcelport_connection::async_restart_read<Handler>;
+                socket_.get_io_service().post(
+                    boost::bind(f, shared_from_this(), handler));
             }
             else {
                 // Determine the length of the serialized data.
@@ -157,7 +166,10 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                async_read(boost::get<0>(handler));
+                void (parcelport_connection::*f)(boost::tuple<Handler>) = 
+                        &parcelport_connection::async_restart_read<Handler>;
+                socket_.get_io_service().post(
+                    boost::bind(f, shared_from_this(), handler));
             }
             else {
                 // complete data point and pass it along
@@ -174,18 +186,15 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 performance_counters::parcels::data_point receive_data = 
                     receive_data_;
 
+                // add parcel data to incoming parcel queue
+                boost::uint64_t inbound_data_size = in_data_size_;
+                decode_message(parcelport_, data, inbound_data_size, receive_data);
+
                 ack_ = true;
                 boost::asio::async_write(socket_,
                     boost::asio::buffer(&ack_, sizeof(ack_)),
                     boost::bind(f, shared_from_this(), 
                         boost::asio::placeholders::error, handler));
-
-                // add parcel data to incoming parcel queue
-                boost::uint64_t inbound_data_size = in_data_size_;
-                decode_message(parcelport_, data, inbound_data_size, receive_data);
-
-                // Inform caller that data has been received ok.
-                boost::get<0>(handler)(e);
             }
         }
 
@@ -193,8 +202,14 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         void handle_write_ack(boost::system::error_code const& e,
             boost::tuple<Handler> handler)
         {
+            // Inform caller that data has been received ok.
+            boost::get<0>(handler)(e);
+
             // Issue a read operation to read the next parcel.
-            async_read(boost::get<0>(handler));
+            void (parcelport_connection::*f)(boost::tuple<Handler>) = 
+                    &parcelport_connection::async_restart_read<Handler>;
+            socket_.get_io_service().post(
+                boost::bind(f, shared_from_this(), handler));
         }
 
     private:
