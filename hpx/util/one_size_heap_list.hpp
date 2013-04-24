@@ -119,7 +119,7 @@ namespace hpx { namespace util
                     size = heap_list_.size();
                     for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
                     {
-                        list_type::value_type heap = *it;
+                        typename list_type::value_type heap = *it;
                         bool allocated = false;
 
                         {
@@ -165,7 +165,7 @@ namespace hpx { namespace util
 #endif
 
                 iterator itnew = heap_list_.begin();
-                list_type::value_type heap = *itnew;
+                typename list_type::value_type heap = *itnew;
                 bool result = false;
 
                 {
@@ -268,7 +268,7 @@ namespace hpx { namespace util
             // Find the heap which allocated this pointer.
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
             {
-                list_type::value_type heap = *it;
+                typename list_type::value_type heap = *it;
                 bool did_allocate = false;
 
                 {
@@ -299,7 +299,7 @@ namespace hpx { namespace util
             unique_lock_type ul(mtx_);
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
             {
-                list_type::value_type heap = *it;
+                typename list_type::value_type heap = *it;
                 bool did_allocate = false;
 
                 {
