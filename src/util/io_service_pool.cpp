@@ -208,7 +208,7 @@ namespace hpx { namespace util
         std::size_t pool_size = pool_size_;
 
         if (groups_ > 1) {
-            // calculate dthe index adjusted for the number of groups
+            // calculate the index adjusted for the number of groups
             BOOST_ASSERT(group < groups_);
             next_io_service = (next_io_service_ * (group+1)) / groups_;
             pool_size = (pool_size_ * (group+1)) / groups_;
@@ -235,11 +235,9 @@ namespace hpx { namespace util
         BOOST_ASSERT(groups_ == 1);
 
         boost::mutex::scoped_lock l(mtx_);
-        std::size_t next_io_service = next_io_service_;
-        std::size_t pool_size = pool_size_;
 
         if (index == -1) {
-            if (++next_io_service_ == pool_size)
+            if (++next_io_service_ == pool_size_)
                 next_io_service_ = 0;
 
             // Use a round-robin scheme to choose the next io_service to use.
