@@ -9,5 +9,5 @@ int main()
 {
     hpx::util::batch_environment env(true);
 
-    std::cout << env.init_from_environment("");
+    std::cout << env.init_from_environment("") << "\n";
 }
