@@ -48,6 +48,11 @@ int hpx_main(boost::program_options::variables_map&)
     for (i = 0; i < 2*nstores; i++) ;
     hpx::evaluate_active_counters();
 
+    // perform another n stores, counted from 0 (or close to it)
+    hpx::reset_active_counters();
+    for (i = 0; i < nstores; i++) ;
+    hpx::evaluate_active_counters();
+
     return hpx::finalize();
 }
 
@@ -73,7 +78,7 @@ int check(int fd)
                     size_t cpos = out.rfind(',', pos);
                     std::cerr << out.substr(0, pos+1);
                     cnt.push_back(boost::lexical_cast<double>(out.substr(cpos+1, pos-cpos-1)));
-                    if (cnt.size() == 4) break;
+                    if (cnt.size() == 5) break;
                     out.erase(0, pos+1);
                 }
             }
@@ -86,7 +91,8 @@ int check(int fd)
     // increased compared to the "basic_functions" test
     bool pass = close_enough(cnt[0], nstores, 5.0) &&
         (cnt[1] >= cnt[0]) && close_enough(cnt[0], cnt[1], 5.0) &&
-        close_enough(cnt[2], 2.0*cnt[0], 5.0);
+        close_enough(cnt[2], 2.0*cnt[0], 5.0) &&
+        close_enough(cnt[3], cnt[0], 5.0);
 
     std::cerr << (pass? "PASSED": "FAILED") << ".\n";
 

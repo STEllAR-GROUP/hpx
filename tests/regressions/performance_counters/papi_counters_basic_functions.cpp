@@ -49,23 +49,33 @@ int hpx_main(boost::program_options::variables_map&)
     // perform 2*n stores, counted from 0 (or close to it)
     for (i = 0; i < 2*n; i++) ;
     counter_value value3 = performance_counter::get_value(id);
+    // reset counter using reset-only interface
+    performance_counter::reset(id);
+
+    // perform n stores, counted from 0 (or close to it)
+    for (i = 0; i < n; i++) ;
+    counter_value value4 = performance_counter::get_value(id);
 
     bool pass = status_is_valid(value1.status_) &&
                 status_is_valid(value2.status_) &&
-                status_is_valid(value3.status_);
+                status_is_valid(value3.status_) &&
+                status_is_valid(value4.status_);
     if (pass)
     {
         boost::uint64_t cnt1 = value1.get_value<boost::uint64_t>();
         boost::uint64_t cnt2 = value2.get_value<boost::uint64_t>();
         boost::uint64_t cnt3 = value3.get_value<boost::uint64_t>();
+        boost::uint64_t cnt4 = value4.get_value<boost::uint64_t>();
 
         std::cout << n << " counted store instructions, result: " << cnt1 << std::endl
                   << n << " uncounted store instructions, result: " << cnt2-cnt1 << std::endl
-                  << 2*n << " store instructions, count after reset: " << cnt3 << std::endl;
+                  << 2*n << " store instructions, count after reset: " << cnt3 << std::endl
+		  << n << " store instructions, count after explicit reset: " << cnt4 << std::endl;
 
-        pass = pass && close_enough(cnt1, n, 1.0);
-        pass = pass && (cnt2 >= cnt1) && close_enough(cnt1, cnt2, 1.0);
-        pass = pass && close_enough(cnt3, 2.0*cnt1, 1.0);
+        pass = pass && close_enough(cnt1, n, 1.0) &&
+	       (cnt2 >= cnt1) && close_enough(cnt1, cnt2, 1.0) &&
+	       close_enough(cnt3, 2.0*cnt1, 1.0) &&
+	       close_enough(cnt4, cnt1, 1.0);
     }
     std::cout << (pass? "PASSED": "FAILED") << ".\n";
 
