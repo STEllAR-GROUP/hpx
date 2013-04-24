@@ -670,7 +670,7 @@ namespace hpx { namespace actions
         >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
-            return hpx::async(*this, id).get(ec);
+            return boost::move(hpx::async(*this, id).move(ec));
         }
 
         #include <hpx/runtime/actions/define_function_operators.hpp>
