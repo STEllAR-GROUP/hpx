@@ -60,7 +60,7 @@ if("${HPX_BUILD_TYPE}" STREQUAL "Debug")
     set(HPX_POSTFIX ${HPX_DEBUG_POSTFIX})
 endif()
 
-hpx_include(SetOutputPaths)
+include(HPX_SetOutputPaths)
 
 mark_as_advanced(FORCE HPX_C_COMPILER HPX_CXX_COMPILER HPX_Fortran_COMPILER) 
 mark_as_advanced(FORCE HPX_C_COMPILE_FLAGS HPX_CXX_COMPILE_FLAGS HPX_Fortran_COMPILE_FLAGS) 
