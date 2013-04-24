@@ -233,7 +233,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         if (timestamp_ != -1) copy_value(value);
         else value.status_ = hpx::performance_counters::status_invalid_data;
 
-        if (reset) value_ = 0;
+        if (reset) reset_counter();
 
         value.count_ = ++invocation_count_;
 
@@ -259,6 +259,13 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
 
         return stop_counter();
+    }
+
+    void papi_counter::reset_counter_value()
+    {
+        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
+
+        reset_counter();
     }
 
     bool papi_counter::stop_counter()

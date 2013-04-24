@@ -175,7 +175,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         virtual bool start();
         // stop the counter
         virtual bool stop();
-
+	// reset
+	virtual void reset_counter_value();
+	
         // get the current value of this performance counter
         hpx::performance_counters::counter_value get_counter_value(bool reset=false);
 
@@ -228,6 +230,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
         // stop low level counter
         bool stop_counter();
+	// reset counter
+	void reset_counter() {value_ = 0;}
     };
 
 }}}}
