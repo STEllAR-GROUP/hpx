@@ -1064,7 +1064,7 @@ namespace hpx
     HPX_API_EXPORT std::string const* get_thread_name();
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return tthe number of worker OS- threads used to execute HPX 
+    /// \brief Return the number of worker OS- threads used to execute HPX 
     ///        threads
     ///
     /// This function returns the number of OS-threads used to execute HPX 
