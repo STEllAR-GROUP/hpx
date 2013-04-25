@@ -592,6 +592,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Make sure we have support for more than 64 threads for Xeon Phi
+#if defined(__MIC__) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
+#  define HPX_HAVE_MORE_THAN_64_THREADS
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_AGAS_BOOTSTRAP_PREFIX   0U
 
 #define HPX_AGAS_NS_MSB             0x0000000000000001ULL
