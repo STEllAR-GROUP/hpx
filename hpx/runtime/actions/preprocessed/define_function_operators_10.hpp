@@ -15,7 +15,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 1>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0,
         error_code& ec = throws) const
@@ -30,8 +30,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 1>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0,
         error_code& ec = throws) const
@@ -46,7 +46,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 2>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1,
         error_code& ec = throws) const
@@ -61,8 +61,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 2>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1,
         error_code& ec = throws) const
@@ -77,7 +77,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 3>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2,
         error_code& ec = throws) const
@@ -92,8 +92,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 3>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2,
         error_code& ec = throws) const
@@ -108,7 +108,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 4>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3,
         error_code& ec = throws) const
@@ -123,8 +123,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 4>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3,
         error_code& ec = throws) const
@@ -139,7 +139,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 5>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4,
         error_code& ec = throws) const
@@ -154,8 +154,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 5>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4,
         error_code& ec = throws) const
@@ -170,7 +170,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 6>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5,
         error_code& ec = throws) const
@@ -185,8 +185,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 6>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5,
         error_code& ec = throws) const
@@ -201,7 +201,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 7>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6,
         error_code& ec = throws) const
@@ -216,8 +216,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 7>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6,
         error_code& ec = throws) const
@@ -232,7 +232,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 8>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7,
         error_code& ec = throws) const
@@ -247,8 +247,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 8>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7,
         error_code& ec = throws) const
@@ -263,7 +263,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 9>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8,
         error_code& ec = throws) const
@@ -278,8 +278,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 9>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8,
         error_code& ec = throws) const
@@ -294,7 +294,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 10>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9,
         error_code& ec = throws) const
@@ -309,8 +309,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == 10>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9,
         error_code& ec = throws) const

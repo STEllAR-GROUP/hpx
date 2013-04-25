@@ -50,7 +50,7 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == N>,
             boost::is_same<IdType, naming::id_type>,
-            boost::is_same<Result, void> >
+            boost::is_same<local_result_type, void> >
     >::type
     operator()(IdType const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         error_code& ec = throws) const
@@ -66,8 +66,8 @@
             boost::mpl::bool_<
                 boost::fusion::result_of::size<arguments_type>::value == N>,
             boost::is_same<IdType, naming::id_type>,
-            boost::mpl::not_<boost::is_same<Result, void> > >,
-        typename traits::promise_local_result<Result>::type
+            boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+        local_result_type
     >::type
     operator()(IdType const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         error_code& ec = throws) const

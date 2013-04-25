@@ -660,6 +660,8 @@ namespace hpx { namespace actions
         //    construct_continuation_thread_object_function()
         #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
+        typedef typename traits::promise_local_result<Result>::type local_result_type;
+
         // bring in the definition for all overloads for operator()
         template <typename IdType>
         BOOST_FORCEINLINE typename boost::enable_if<
@@ -667,7 +669,7 @@ namespace hpx { namespace actions
                 boost::mpl::bool_<
                     boost::fusion::result_of::size<arguments_type>::value == 0>,
                 boost::is_same<IdType, naming::id_type>,
-                boost::is_same<Result, void> >
+                boost::is_same<local_result_type, void> >
         >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
@@ -680,8 +682,8 @@ namespace hpx { namespace actions
                 boost::mpl::bool_<
                     boost::fusion::result_of::size<arguments_type>::value == 0>,
                 boost::is_same<IdType, naming::id_type>,
-                boost::mpl::not_<boost::is_same<Result, void> > >,
-            typename traits::promise_local_result<Result>::type
+                boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+            local_result_type
         >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
