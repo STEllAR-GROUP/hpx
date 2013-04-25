@@ -45,7 +45,7 @@ namespace sheneos { namespace server
         inline std::size_t get_index(dimension::type d, double value);
 
         /// Tri-linear interpolation routine.
-        inline double interpolate(double* values,
+        inline double tl_interpolate(double* values,
             std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
             double delta_ye, double delta_logtemp, double delta_logrho);
 

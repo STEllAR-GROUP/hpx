@@ -138,7 +138,7 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline double partition3d::interpolate(double* values,
+    inline double partition3d::tl_interpolate(double* values,
         std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
         double delta_ye, double delta_logtemp, double delta_logrho)
     {
@@ -185,44 +185,44 @@ namespace sheneos { namespace server
 
         // Calculate all required values.
         if (eosvalues & logpress) {
-            double value = interpolate(logpress_values_.get(),
+            double value = tl_interpolate(logpress_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho);
             results.push_back(std::pow(10., value));
         }
         if (eosvalues & logenergy) {
-            double value = interpolate(logenergy_values_.get(),
+            double value = tl_interpolate(logenergy_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho);
             results.push_back(std::pow(10., value) - energy_shift_);
         }
         if (eosvalues & entropy) {
-            results.push_back(interpolate(entropy_values_.get(),
+            results.push_back(tl_interpolate(entropy_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho));
         }
         if (eosvalues & munu) {
-            results.push_back(interpolate(munu_values_.get(),
+            results.push_back(tl_interpolate(munu_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho));
         }
         if (eosvalues & cs2) {
-            results.push_back(interpolate(cs2_values_.get(),
+            results.push_back(tl_interpolate(cs2_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho));
         }
         if (eosvalues & dedt) {
-            results.push_back(interpolate(dedt_values_.get(),
+            results.push_back(tl_interpolate(dedt_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho));
         }
         if (eosvalues & dpdrhoe) {
-            results.push_back(interpolate(dpdrhoe_values_.get(),
+            results.push_back(tl_interpolate(dpdrhoe_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho));
         }
         if (eosvalues & dpderho) {
-            results.push_back(interpolate(dpderho_values_.get(),
+            results.push_back(tl_interpolate(dpderho_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho));
         }
@@ -272,45 +272,45 @@ namespace sheneos { namespace server
         switch (eosvalue) {
         case logpress:
             {
-                double value = interpolate(logpress_values_.get(),
+                double value = tl_interpolate(logpress_values_.get(),
                     idx_ye, idx_logtemp, idx_logrho,
                     delta_ye, delta_logtemp, delta_logrho);
                 return std::pow(10., value);
             }
         case logenergy:
             {
-                double value = interpolate(logenergy_values_.get(),
+                double value = tl_interpolate(logenergy_values_.get(),
                     idx_ye, idx_logtemp, idx_logrho,
                     delta_ye, delta_logtemp, delta_logrho);
                 return std::pow(10., value) - energy_shift_;
             }
         case entropy:
-            return interpolate(entropy_values_.get(),
+            return tl_interpolate(entropy_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho);
 
         case munu:
-            return interpolate(munu_values_.get(),
+            return tl_interpolate(munu_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho);
 
         case cs2:
-            return interpolate(cs2_values_.get(),
+            return tl_interpolate(cs2_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho);
 
         case dedt:
-            return interpolate(dedt_values_.get(),
+            return tl_interpolate(dedt_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho);
 
         case dpdrhoe:
-            return interpolate(dpdrhoe_values_.get(),
+            return tl_interpolate(dpdrhoe_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho);
 
         case dpderho:
-            return interpolate(dpderho_values_.get(),
+            return tl_interpolate(dpderho_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
                 delta_ye, delta_logtemp, delta_logrho);
 
