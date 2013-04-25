@@ -60,6 +60,7 @@ by section basis below.
     localities = 1
     program_name =
     cmd_line =
+    lock_detection = 0
 
     [hpx.stacks]
     small_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
@@ -107,6 +108,12 @@ by section basis below.
      [This setting reflects the actual command line used to launch this
       application instance.]
      [dynamic information, initialized from command line (argc/argv)]]
+    [[`hpx.lock_detection`]
+     [This setting allows to enable to verify that no locks are being held 
+      while a __hpx__ thread is suspended.]
+     [dynamic information, by default this is set to '0', this setting is
+      effective only if `HPX_VERIFY_LOCKS` is set during configuration in 
+      cmake.]]
     [[`hpx.stacks.small_size`]
      [This is initialized to the small stack size to be used by __hpx__-threads]
      [static information, depends on the compile time preprocessor constant
