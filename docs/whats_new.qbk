@@ -31,6 +31,11 @@ The major new fetures in this release are:
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 757] - copy paste error; unsupported function overloading
+* [issue 755] - Papi counters don't work with reset and evaluate API's
+* [issue 753] - cmake bugfix and improved component action docs
+* [issue 752] - hpx simple component docs
+* [issue 750] - Add hpx::util::any
 * [issue 749] - Thread phase counter is not reset
 * [issue 748] - Memory performance counter are not registered
 * [issue 747] - Create performance counters exposing arithmetic operations
@@ -116,10 +121,12 @@ Here is a list of the tickets we closed for this release.
 * [issue 655] - Make HPX work with the "decltype" result_of
 * [issue 643] - Error parsing host file
 * [issue 642] - HWLoc issue with TAU
+* [issue 639] - Logging potentially suspends a running thread
 * [issue 634] - Improve error reporting from parcel layer
 * [issue 627] - Add tests for async and apply overloads that accept regular
                 C++ functions
 * [issue 626] - hpx/future.hpp header
+* [issue 601] - Intel support
 * [issue 557] - Remove action codes
 * [issue 531] - AGAS request and response classes should use switch statements
 * [issue 529] - Investigate the state of hwloc support
@@ -350,6 +357,7 @@ HPX' releases so far.
 * [issue 349] - Commandline option `--localities=N/-lN` should be necessary
                 only on AGAS locality
 * [issue 334] - Add auto_index support to cmake based documentation toolchain
+* [issue 318] - Network benchmarks
 * [issue 317] - Implement network performance counters
 * [issue 310] - Duplicate logging entries
 * [issue 230] - Add compile time option to disable thread debugging info
