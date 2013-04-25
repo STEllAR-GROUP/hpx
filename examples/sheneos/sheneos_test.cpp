@@ -102,7 +102,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     hpx::lcos::wait(tests);
 }
 
-HPX_PLAIN_ACTION(test, test_action);
+HPX_PLAIN_ACTION(test_sheneos, test_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -196,7 +196,7 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     std::vector<double> results = hpx::lcos::wait(bulk_one_tests);
 }
 
-HPX_PLAIN_ACTION(test_one_bulk, test_one_bulk_action);
+HPX_PLAIN_ACTION(test_sheneos_one_bulk, test_one_bulk_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_one_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -290,7 +290,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     std::vector<std::vector<double> > results = hpx::lcos::wait(bulk_tests);
 }
 
-HPX_PLAIN_ACTION(test_bulk, test_bulk_action);
+HPX_PLAIN_ACTION(test_sheneos_bulk, test_bulk_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
