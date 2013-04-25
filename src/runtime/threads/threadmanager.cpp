@@ -1125,7 +1125,7 @@ namespace hpx { namespace threads
 
         // Setting priority of worker threads to a lower priority, this needs to
         // be done in order to give the parcel pool threads higher priority
-        if (mask & get_used_processing_units())
+        if (any(mask & get_used_processing_units()))
         {
             topology_.reduce_thread_priority(ec);
             if (ec)
