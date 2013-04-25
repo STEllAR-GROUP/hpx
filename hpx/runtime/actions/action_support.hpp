@@ -38,6 +38,7 @@
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/and.hpp>
+#include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
 #if defined(BOOST_NO_DECLTYPE)
 #  include <boost/typeof/typeof.hpp>
@@ -665,7 +666,21 @@ namespace hpx { namespace actions
             boost::mpl::and_<
                 boost::mpl::bool_<
                     boost::fusion::result_of::size<arguments_type>::value == 0>,
-                boost::is_same<IdType, naming::id_type> >,
+                boost::is_same<IdType, naming::id_type>,
+                boost::is_same<Result, void> >
+        >::type
+        operator()(IdType const& id, error_code& ec = throws) const
+        {
+            hpx::async(*this, id).get(ec);
+        }
+
+        template <typename IdType>
+        BOOST_FORCEINLINE typename boost::enable_if<
+            boost::mpl::and_<
+                boost::mpl::bool_<
+                    boost::fusion::result_of::size<arguments_type>::value == 0>,
+                boost::is_same<IdType, naming::id_type>,
+                boost::mpl::not_<boost::is_same<Result, void> > >,
             typename traits::promise_local_result<Result>::type
         >::type
         operator()(IdType const& id, error_code& ec = throws) const
