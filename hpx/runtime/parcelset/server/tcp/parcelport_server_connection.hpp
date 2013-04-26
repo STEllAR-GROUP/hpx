@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011 Katelyn Kufahl
 //  Copyright (c) 2011 Bryce Lelbach
 //

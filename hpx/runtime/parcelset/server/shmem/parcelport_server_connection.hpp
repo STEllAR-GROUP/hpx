@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -88,6 +88,12 @@ namespace hpx { namespace parcelset { namespace server { namespace shmem
         }
 
     protected:
+        template <typename Handler>
+        void async_restart_read(boost::tuple<Handler> handler)
+        {
+            async_read(boost::get<0>(handler));
+        }
+
         /// Handle a completed read of message data.
         template <typename Handler>
         void handle_read_data(boost::system::error_code const& e,
@@ -97,7 +103,10 @@ namespace hpx { namespace parcelset { namespace server { namespace shmem
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                async_read(boost::get<0>(handler));
+                void (parcelport_connection::*f)(boost::tuple<Handler>) = 
+                        &parcelport_connection::async_restart_read<Handler>;
+                window_.get_io_service().post(
+                    boost::bind(f, shared_from_this(), handler));
             }
             else {
                 // complete data point and pass it along
@@ -114,15 +123,13 @@ namespace hpx { namespace parcelset { namespace server { namespace shmem
                 performance_counters::parcels::data_point receive_data = 
                     receive_data_;
 
-                window_.async_write_ack(
-                    boost::bind(f, shared_from_this(), 
-                        boost::asio::placeholders::error, handler));
-
                 // add parcel data to incoming parcel queue
                 decode_message(parcelport_, data, receive_data);
 
-                // Inform caller that data has been received ok.
-                boost::get<0>(handler)(e);
+                // acknowledge to have received the parcel
+                window_.async_write_ack(
+                    boost::bind(f, shared_from_this(), 
+                        boost::asio::placeholders::error, handler));
             }
         }
 
@@ -130,8 +137,14 @@ namespace hpx { namespace parcelset { namespace server { namespace shmem
         void handle_write_ack(boost::system::error_code const& e,
             boost::tuple<Handler> handler)
         {
+            // Inform caller that data has been received ok.
+            boost::get<0>(handler)(e);
+
             // Issue a read operation to handle the next parcel.
-            async_read(boost::get<0>(handler));
+            void (parcelport_connection::*f)(boost::tuple<Handler>) = 
+                    &parcelport_connection::async_restart_read<Handler>;
+            window_.get_io_service().post(
+                boost::bind(f, shared_from_this(), handler));
         }
 
     private:
