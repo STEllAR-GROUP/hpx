@@ -177,7 +177,7 @@ namespace hpx { namespace util
                     if (!line.empty()) {
                         if (debug_)
                             std::cerr << "read: '" << line << "'" << std::endl;
-
+            
                         boost::asio::ip::tcp::endpoint ep =
                             util::resolve_hostname(line, 0, io_service);
 
@@ -262,7 +262,7 @@ namespace hpx { namespace util
             if (!s.empty()) {
                 if (debug_)
                     std::cerr << "extracted: '" << s << "'" << std::endl;
-
+        
                 boost::asio::ip::tcp::endpoint ep =
                     util::resolve_hostname(s, 0, io_service);
 
@@ -382,22 +382,24 @@ namespace hpx { namespace util
             namespace phoenix = boost::phoenix;
 
             qi::rule<std::string::iterator, std::string()>
-                prefix = +(qi::print - qi::char_("[,"));
+                prefix;
+            prefix %= +(qi::print - (qi::char_("[") | qi::char_(",")));
+
+            qi::rule<std::string::iterator, std::string()>
+                range_str;
+            range_str %= +(qi::print - (qi::char_("]") | qi::char_( ",") | qi::char_("-")));
+
             qi::rule<std::string::iterator, std::vector<std::string>()>
-                range = qi::as_string[*(qi::print - qi::char_("],-"))] % '-';
+                range;
+            range %= range_str >> *('-' >> range_str);
 
             qi::rule<std::string::iterator,
                     boost::fusion::vector<
                         std::string,
                         boost::optional<std::vector<std::vector<std::string> > >
                     >()>
-                ranges = (prefix >> -(
-                        "["
-                            >> (
-                               range % ','
-                               ) >>
-                        "]"))
-                        ;
+                ranges;
+            ranges %= prefix >> -(qi::lit("[") >> (range % ',') >> qi::lit("]"));
 
             qi::rule<std::string::iterator>
                 hostlist = (+ranges)[
@@ -416,6 +418,7 @@ namespace hpx { namespace util
             );
 
             /*
+            std::cout << nodelist_str << "\n";
             std::cout << "---\n";
             for(std::string const & s: nodes) std::cout << s << "\n";
             std::cout << "---\n";

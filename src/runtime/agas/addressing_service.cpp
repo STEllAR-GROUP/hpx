@@ -527,14 +527,14 @@ boost::uint32_t addressing_service::get_num_overall_threads(
             rep = hosted->locality_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
-            return boost::uint32_t(-1);
+            return boost::uint32_t(0);
 
         return rep.get_num_overall_threads();
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::get_num_overall_threads");
     }
-    return boost::uint32_t(-1);
+    return boost::uint32_t(0);
 } // }}}
 
 lcos::future<boost::uint32_t> addressing_service::get_num_overall_threads_async()
@@ -1359,31 +1359,52 @@ void addressing_service::route(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void addressing_service::incref(
+void addressing_service::incref_apply(
     naming::gid_type const& lower
   , naming::gid_type const& upper
   , boost::int64_t credit
-  , error_code& ec
     )
 { // {{{ incref implementation
     if (HPX_UNLIKELY(0 >= credit))
     {
-        HPX_THROWS_IF(ec, bad_parameter
-          , "addressing_service::incref"
+        HPX_THROW_EXCEPTION(bad_parameter
+          , "addressing_service::incref_apply"
           , boost::str(boost::format("invalid credit count of %1%") % credit));
         return;
     }
 
-    request req(primary_ns_change_credit_non_blocking
-                , lower, upper, credit);
-
+    request req(primary_ns_change_credit_non_blocking, lower, upper, credit);
     naming::id_type target(
         stubs::primary_namespace::get_service_instance(lower)
-        , naming::id_type::unmanaged);
+      , naming::id_type::unmanaged);
 
-    stubs::primary_namespace::service(target, req, action_priority_);
+    stubs::primary_namespace::service_non_blocking(target, req, action_priority_);
 } // }}}
 
+///////////////////////////////////////////////////////////////////////////////
+lcos::future<bool> addressing_service::incref_async(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , boost::int64_t credit
+    )
+{ // {{{ incref implementation
+    if (HPX_UNLIKELY(0 >= credit))
+    {
+        HPX_THROW_EXCEPTION(bad_parameter
+          , "addressing_service::incref_async"
+          , boost::str(boost::format("invalid credit count of %1%") % credit));
+        return lcos::future<bool>();
+    }
+
+    request req(primary_ns_change_credit_non_blocking, lower, upper, credit);
+    naming::id_type target(
+        stubs::primary_namespace::get_service_instance(lower)
+      , naming::id_type::unmanaged);
+
+    return stubs::primary_namespace::service_async<bool>(target, req);
+} // }}}
+
+///////////////////////////////////////////////////////////////////////////////
 void addressing_service::decref(
     naming::gid_type const& lower
   , naming::gid_type const& upper
@@ -1391,6 +1412,16 @@ void addressing_service::decref(
   , error_code& ec
     )
 { // {{{ decref implementation
+    if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+    {
+        // reschedule this call as an HPX thread
+        threads::register_thread_nullary(
+            HPX_STD_BIND(&addressing_service::decref, this,
+                lower, upper, credit, boost::ref(throws)), 
+                "addressing_service::decref");
+        return;
+    }
+
     if (HPX_UNLIKELY(0 >= credit))
     {
         HPX_THROWS_IF(ec, bad_parameter
@@ -1403,9 +1434,9 @@ void addressing_service::decref(
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         refcnt_requests_->apply(lower, upper
-                              , util::incrementer<boost::int64_t>(-credit));
+          , util::incrementer<boost::int64_t>(-credit));
 
-        increment_refcnt_requests(l, ec);
+        send_refcnt_requests(l, ec);
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::decref");
@@ -1991,7 +2022,7 @@ void addressing_service::garbage_collect(
     send_refcnt_requests_sync(l, ec);
 }
 
-void addressing_service::increment_refcnt_requests(
+void addressing_service::send_refcnt_requests(
     addressing_service::mutex_type::scoped_lock& l
   , error_code& ec
     )
@@ -1999,7 +2030,7 @@ void addressing_service::increment_refcnt_requests(
     if (!l.owns_lock())
     {
         HPX_THROWS_IF(ec, lock_error
-          , "addressing_service::increment_refcnt_requests"
+          , "addressing_service::send_refcnt_requests"
           , "mutex is not locked");
         return;
     }
@@ -2027,10 +2058,11 @@ void addressing_service::send_refcnt_requests_non_blocking(
         BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
         {
             naming::gid_type lower(boost::icl::lower(e.key()));
-            request const req(primary_ns_change_credit_non_blocking
-                            , lower
-                            , boost::icl::upper(e.key())
-                            , e.data());
+            request const req(
+                primary_ns_change_credit_non_blocking
+              , lower
+              , boost::icl::upper(e.key())
+              , e.data());
 
             naming::id_type target(
                 stubs::primary_namespace::get_service_instance(lower)
@@ -2044,7 +2076,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
             ec = make_success_code();
     }
     catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::increment_refcnt_requests");
+        HPX_RETHROWS_IF(ec, e, "addressing_service::send_refcnt_requests");
     }
 }
 

@@ -65,6 +65,7 @@ namespace hpx { namespace util
           , evictions_(0)
           , hits_(0)
           , misses_(0)
+          , reclaims_(0)
         {
             if (max_connections_per_locality_ > max_connections_)
             {
@@ -164,6 +165,9 @@ namespace hpx { namespace util
                     conn = boost::get<0>(it->second).front();
                     boost::get<0>(it->second).pop_front();
 
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+                    conn->set_state(Connection::state_reinitialized);
+#endif
                     ++hits_;
                     check_invariants();
                     return true;
@@ -263,6 +267,11 @@ namespace hpx { namespace util
                 // Add the connection to the entry.
                 boost::get<0>(ct->second).push_back(conn);
 
+                ++reclaims_;
+
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+                conn->set_state(Connection::state_reclaimed);
+#endif
                 // FIXME: Again, this should probably throw instead of asserting,
                 // as invariants could be invalidated here due to caller error.
                 check_invariants();
@@ -313,13 +322,14 @@ namespace hpx { namespace util
             evictions_ = 0;
             hits_ = 0;
             misses_ = 0;
+            reclaims_ = 0;
 
             // FIXME: This should probably throw instead of asserting, as it
             // can be triggered by caller error.
             check_invariants();
         }
 
-        /// Destroys all connections for the give locality in the cache, reset
+        /// Destroys all connections for the given locality in the cache, reset
         /// all associated counts.
         ///
         /// \note Calling this function while connections are still checked out
@@ -372,6 +382,12 @@ namespace hpx { namespace util
         {
             mutex_type::scoped_lock lock(mtx_);
             return util::get_and_reset_value(misses_, reset);
+        }
+
+        boost::int64_t get_cache_reclaims(bool reset)
+        {
+            mutex_type::scoped_lock lock(mtx_);
+            return util::get_and_reset_value(reclaims_, reset);
         }
 
     private:
@@ -485,6 +501,7 @@ namespace hpx { namespace util
         boost::int64_t evictions_;
         boost::int64_t hits_;
         boost::int64_t misses_;
+        boost::int64_t reclaims_;
     };
 }}
 

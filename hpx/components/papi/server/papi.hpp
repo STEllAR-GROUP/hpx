@@ -100,7 +100,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // remove an event from the event set
         bool remove_event(papi_counter *cnt);
         // obtain current value for active counter i
-        bool read_value(papi_counter *);
+        bool read_value(papi_counter *, bool reset);
 
         // terminate counting due to thread going out of scope;
         // this is the only explicitly locked function
@@ -175,7 +175,10 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         virtual bool start();
         // stop the counter
         virtual bool stop();
-
+	// various reset flavors
+	virtual void reset();
+	virtual void reset_counter_value() {reset();}
+	
         // get the current value of this performance counter
         hpx::performance_counters::counter_value get_counter_value(bool reset=false);
 
@@ -227,7 +230,23 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         }
 
         // stop low level counter
-        bool stop_counter();
+        bool stop_counter()
+	{
+	    if (status_ == PAPI_COUNTER_ACTIVE)
+	    {
+		if (!counters_->remove_event(this)) return false;
+	    }
+	    return true;
+	}
+	// reset counter
+	void reset_counter()
+	{
+	    // if active, clear the previous contents of low level counter
+	    if (status_ == PAPI_COUNTER_ACTIVE)
+		counters_->read_value(this, true);
+
+	    value_ = 0;
+	}
     };
 
 }}}}

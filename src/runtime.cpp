@@ -621,6 +621,15 @@ namespace hpx
         return rt->get_thread_manager().get_worker_thread_num();
     }
 
+    std::size_t get_num_worker_threads()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL == rt)
+            return std::size_t(0);
+        error_code ec(lightweight);
+        return rt->get_agas_client().get_num_overall_threads();
+    }
+
     bool is_scheduler_numa_sensitive()
     {
         runtime* rt = get_runtime_ptr();

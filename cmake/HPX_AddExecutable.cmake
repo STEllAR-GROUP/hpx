@@ -147,6 +147,10 @@ macro(add_hpx_executable name)
     target_link_libraries(${name}_exe ${${name}_DEPENDENCIES})
   endif()
 
+  if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
+    set_target_properties(${name}_exe PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
+  endif()
+
   if(NOT HPX_NO_INSTALL)
     if(${name}_INSTALL_SUFFIX)
       hpx_executable_install(${name}_exe ${${name}_INSTALL_SUFFIX})

@@ -16,6 +16,11 @@
 #include <cpu-features.h>
 #endif
 
+#if defined(_POSIX_VERSION)
+#include <sys/syscall.h>
+#include <sys/resource.h>
+#endif
+
 #if !defined(HPX_HAVE_HWLOC)
 
 namespace hpx { namespace threads
@@ -78,6 +83,28 @@ namespace hpx { namespace threads
         mask_type res = ~used_processing_units & machine_mask;
 
         return (!any(res)) ? machine_mask : res;
+    }
+
+    bool topology::reduce_thread_priority(error_code& ec) const
+    {
+#if defined(_POSIX_VERSION)
+        pid_t tid;
+        tid = syscall(SYS_gettid);
+        if (setpriority(PRIO_PROCESS, tid, 19))
+        {
+            HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc",
+                "setpriority returned an error");
+            return false;
+        }
+#elif defined(BOOST_MSVC)
+        if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST))
+        {
+            HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc", 
+                "SetThreadPriority returned an error");
+            return false;
+        }
+#endif
+        return true;
     }
 
     topology const& get_topology()

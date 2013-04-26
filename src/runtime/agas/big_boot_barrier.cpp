@@ -368,6 +368,14 @@ void notify_console(notification_header const& header)
     agas_client.component_ns_addr_ = header.component_ns_address;
     agas_client.symbol_ns_addr_ = header.symbol_ns_address;
 
+    // register runtime support component
+    naming::gid_type const runtime_support_gid(header.prefix.get_msb()
+      , 0);
+    naming::address runtime_support_address(rt.here()
+      , components::get_component_type<components::server::runtime_support>()
+      , rt.get_runtime_support_lva());
+    agas_client.bind(runtime_support_gid, runtime_support_address);
+
     // register local primary namespace component
     naming::gid_type const primary_gid = 
         stubs::primary_namespace::get_service_instance(
@@ -553,6 +561,14 @@ void notify_worker(notification_header const& header)
     agas_client.primary_ns_addr_ = header.primary_ns_address;
     agas_client.component_ns_addr_ = header.component_ns_address;
     agas_client.symbol_ns_addr_ = header.symbol_ns_address;
+
+    // register runtime support component
+    naming::gid_type const runtime_support_gid(header.prefix.get_msb()
+      , rt.get_runtime_support_lva());
+    naming::address runtime_support_address(rt.here()
+      , components::get_component_type<components::server::runtime_support>()
+      , rt.get_runtime_support_lva());
+    agas_client.bind(runtime_support_gid, runtime_support_address);
 
     // register local primary namespace component
     naming::gid_type const primary_gid = 

@@ -439,7 +439,7 @@ namespace hpx { namespace threads
 
     protected:
         // this is the thread function executing the work items in the queue
-        void tfunc(std::size_t num_thread);
+        void tfunc(std::size_t num_thread, topology const& topology_);
         void tfunc_impl(std::size_t num_thread);
 
         // thread function registered for set_state if thread is currently

@@ -21,6 +21,7 @@ namespace hpx { namespace util
     HPX_API_EXPORT bool unregister_lock(void const* lock);
     HPX_API_EXPORT void verify_no_locks();
     HPX_API_EXPORT void force_error_on_lock();
+    HPX_API_EXPORT void enable_lock_detection();
 #else
     inline bool register_lock(void const*, util::register_lock_data* = 0)
     {
@@ -34,6 +35,9 @@ namespace hpx { namespace util
     {
     }
     inline void force_error_on_lock()
+    {
+    }
+    inline void enable_lock_detection()
     {
     }
 #endif

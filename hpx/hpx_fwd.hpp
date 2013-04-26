@@ -1064,6 +1064,15 @@ namespace hpx
     HPX_API_EXPORT std::string const* get_thread_name();
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of worker OS- threads used to execute HPX 
+    ///        threads
+    ///
+    /// This function returns the number of OS-threads used to execute HPX 
+    /// threads. If the function is called while no HPX runtime system is active, 
+    /// it will return zero.
+    HPX_API_EXPORT std::size_t get_num_worker_threads();
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the system uptime measure on the thread executing this call.
     ///
     /// This function returns the system uptime measured in nanoseconds for the
@@ -1207,7 +1216,6 @@ namespace hpx
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,
         std::size_t interval, error_code& ec = throws);
-
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a binary filter plugin

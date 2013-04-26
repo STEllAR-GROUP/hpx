@@ -60,7 +60,7 @@ namespace hpx { namespace util
             , max_alloc_count_(0L)
 #endif
         {
-            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == heap_size);
+            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == uint64_t(heap_size));
         }
 
         explicit one_size_heap_list(std::string const& class_name)
@@ -72,7 +72,7 @@ namespace hpx { namespace util
             , max_alloc_count_(0L)
 #endif
         {
-            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == heap_size);
+            BOOST_ASSERT(sizeof(typename heap_type::storage_type) == uint64_t(heap_size));
         }
 
         ~one_size_heap_list()
@@ -119,7 +119,15 @@ namespace hpx { namespace util
                     size = heap_list_.size();
                     for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
                     {
-                        if ((*it)->alloc(&p, count))
+                        typename list_type::value_type heap = *it;
+                        bool allocated = false;
+
+                        {
+                            util::unlock_the_lock<unique_lock_type> ul(guard);
+                            allocated = heap->alloc(&p, count);
+                        }
+
+                        if (allocated)
                         {
 #if defined(HPX_DEBUG)
                             // Allocation succeeded, update statistics.
@@ -157,7 +165,13 @@ namespace hpx { namespace util
 #endif
 
                 iterator itnew = heap_list_.begin();
-                bool result = (*itnew)->alloc(&p, count);
+                typename list_type::value_type heap = *itnew;
+                bool result = false;
+
+                {
+                    util::unlock_the_lock<unique_lock_type> ul(guard);
+                    result = heap->alloc(&p, count);
+                }
 
                 if (HPX_UNLIKELY(!result || NULL == p))
                 {
@@ -254,12 +268,18 @@ namespace hpx { namespace util
             // Find the heap which allocated this pointer.
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
             {
-                if ((*it)->did_alloc(p))
+                typename list_type::value_type heap = *it;
+                bool did_allocate = false;
+
                 {
-                    {
-                        util::unlock_the_lock<unique_lock_type> ull(ul);
-                        (*it)->free(p, count);
-                    }
+                    util::unlock_the_lock<unique_lock_type> ull(ul);
+                    did_allocate = heap->did_alloc(p);
+                    if (did_allocate)
+                        heap->free(p, count);
+                }
+
+                if (did_allocate)
+                {
 #if defined(HPX_DEBUG)
                     free_count_ += count;
 #endif
@@ -279,7 +299,15 @@ namespace hpx { namespace util
             unique_lock_type ul(mtx_);
             for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
             {
-                if ((*it)->did_alloc(p))
+                typename list_type::value_type heap = *it;
+                bool did_allocate = false;
+
+                {
+                    util::unlock_the_lock<unique_lock_type> ull(ul);
+                    did_allocate = heap->did_alloc(p);
+                }
+
+                if (did_allocate)
                     return true;
             }
             return false;

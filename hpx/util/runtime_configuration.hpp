@@ -88,6 +88,9 @@ namespace hpx { namespace util
         // Can be set to true if we want to use the ITT notify tools API.
         bool get_itt_notify_mode() const;
 
+        // Enable lock detection during suspension
+        bool enable_lock_detection() const;
+
         // Returns the number of OS threads this locality is running.
         std::size_t get_os_thread_count() const;
 

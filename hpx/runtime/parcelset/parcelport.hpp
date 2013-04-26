@@ -138,7 +138,8 @@ namespace hpx { namespace parcelset
             connection_cache_insertions = 0,
             connection_cache_evictions = 1,
             connection_cache_hits = 2,
-            connection_cache_misses = 3
+            connection_cache_misses = 3,
+            connection_cache_reclaims = 4
         };
 
         virtual boost::int64_t

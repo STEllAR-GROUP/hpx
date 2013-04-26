@@ -146,6 +146,7 @@ macro(add_hpx_component name)
   else()
     set(lib_name ${name})
   endif()
+
   # set properties of generated shared library
   set_target_properties(${name}_component PROPERTIES
     # create *nix style library versions + symbolic links
@@ -154,6 +155,10 @@ macro(add_hpx_component name)
     # allow creating static and shared libs without conflicts
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME ${lib_name})
+
+  if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
+    set_target_properties(${name}_component PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
+  endif()
 
   if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)
     if(MSVC)

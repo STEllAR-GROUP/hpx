@@ -56,7 +56,6 @@ int hpx_main(variables_map& vm)
             HPX_TEST_NEQ(any1, any4);
         }
 
-
         {
             if (sizeof(small_object) <= sizeof(void*))
                 std::cout << "object is small\n";
@@ -90,6 +89,26 @@ int hpx_main(variables_map& vm)
             HPX_TEST_EQ((any_cast<big_object>(any1)) (0, 1), uint64_t(5+12+0+1));
             HPX_TEST_EQ((any_cast<big_object>(any2)) (1, 0), uint64_t(5+12+1+0));
             HPX_TEST_EQ((any_cast<big_object>(any3)) (1, 1), uint64_t(5+12+1+1));
+        }
+
+        // move semantics
+        {
+            any any1(5);
+            HPX_TEST(!any1.empty());
+            any any2(boost::move(any1));
+            HPX_TEST(!any2.empty());
+            HPX_TEST(any1.empty());
+        }
+
+        {
+            any any1(5);
+            HPX_TEST(!any1.empty());
+            any any2;
+            HPX_TEST(any2.empty());
+
+            any2 = boost::move(any1);
+            HPX_TEST(!any2.empty());
+            HPX_TEST(any1.empty());
         }
     }
     // non serializable version
@@ -156,6 +175,26 @@ int hpx_main(variables_map& vm)
             HPX_TEST_EQ((any_cast<big_object>(any1_nonser)) (3,4), uint64_t(5+12+3+4));
             HPX_TEST_EQ((any_cast<big_object>(any2_nonser)) (5,6), uint64_t(5+12+5+6));
             HPX_TEST_EQ((any_cast<big_object>(any3_nonser)) (7,8), uint64_t(5+12+7+8));
+        }
+
+        // move semantics
+        {
+            any_nonser any1(5);
+            HPX_TEST(!any1.empty());
+            any_nonser any2(boost::move(any1));
+            HPX_TEST(!any2.empty());
+            HPX_TEST(any1.empty());
+        }
+
+        {
+            any_nonser any1(5);
+            HPX_TEST(!any1.empty());
+            any_nonser any2;
+            HPX_TEST(any2.empty());
+
+            any2 = boost::move(any1);
+            HPX_TEST(!any2.empty());
+            HPX_TEST(any1.empty());
         }
     }
 

@@ -30,11 +30,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#if defined(_POSIX_VERSION)
-#include <sys/syscall.h>
-#include <sys/resource.h>
-#endif
-
 #include <numeric>
 
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
@@ -109,10 +104,12 @@ namespace hpx { namespace threads
         set_state_logger_("threadmanager_impl::set_state"),
         scheduler_(scheduler),
         notifier_(notifier),
-        used_processing_units_(hardware_concurrency())
+        used_processing_units_()
     {
+        topology const& topology_ = get_topology();
+        resize(used_processing_units_, hardware_concurrency());
         for (std::size_t i = 0; i < num_threads; ++i)
-            used_processing_units_ |= scheduler_.get_pu_mask(get_topology(), i);
+            used_processing_units_ |= scheduler_.get_pu_mask(topology_, i);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -1109,25 +1106,36 @@ namespace hpx { namespace threads
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        tfunc(std::size_t num_thread)
+        tfunc(std::size_t num_thread, topology const& topology_)
     {
-        
+        // Set the affinity for the current thread.
+        threads::mask_cref_type mask = get_pu_mask(topology_, num_thread);
+
+        LTM_(info) << "tfunc(" << num_thread
+            << "): will run on one processing unit within this mask: "
+            << std::hex << "0x" << mask;
+
+        error_code ec(lightweight);
+        topology_.set_thread_affinity_mask(mask, ec);
+        if (ec)
+        {
+            LTM_(warning) << "run: setting thread affinity on OS thread "
+                << num_thread << " failed with: " << ec.get_message();
+        }
+
         // Setting priority of worker threads to a lower priority, this needs to
         // be done in order to give the parcel pool threads higher priority
-#if defined(_POSIX_VERSION)
+        if (any(mask & get_used_processing_units()))
         {
-            pid_t tid;
-            tid = syscall(SYS_gettid);
-            int ret = setpriority(PRIO_PROCESS, tid, 19);
-            if(ret != 0)
+            topology_.reduce_thread_priority(ec);
+            if (ec)
             {
-                HPX_THROW_EXCEPTION(no_success,
-                    "threadmanager_impl::run", "setpriority returned an error");
+                LTM_(warning) << "run: reducing thread priority on OS thread "
+                    << num_thread << " failed with: " << ec.get_message();
             }
         }
-#endif
 
-        // wait for all threads to start up before before starting px work
+        // wait for all threads to start up before before starting HPX work
         startup_->wait();
 
         // manage the number of this thread in its TSS
@@ -1414,7 +1422,7 @@ namespace hpx { namespace threads
             if (!status_is_valid(status) || !f(i, ec) || ec)
                 return false;
         }
-        else if (p.instancename_ == "allocator#*") 
+        else if (p.instancename_ == "allocator#*")
         {
             for (std::size_t t = 0; t < HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
             {
@@ -1804,23 +1812,6 @@ namespace hpx { namespace threads
         boost::int64_t idle_loop_count = 0;
         boost::int64_t busy_loop_count = 0;
 
-        // set affinity on Linux systems or when using HWLOC
-        topology const& topology_ = get_topology();
-        threads::mask_cref_type mask = get_pu_mask(topology_, num_thread);
-
-        LTM_(info) << "tfunc(" << num_thread
-            << "): will run on one processing unit within this mask: "
-            << std::hex << "0x" << mask;
-
-        error_code ec(lightweight);
-        topology_.set_thread_affinity_mask(mask, ec);
-
-        if (ec)
-        {
-            LTM_(warning) << "run: setting thread affinity on OS thread "
-                << num_thread << " failed with: " << ec.get_message();
-        }
-
         // run the work queue
         hpx::util::coroutines::prepare_main_thread main_thread;
 
@@ -1982,7 +1973,7 @@ namespace hpx { namespace threads
         tfunc_time = util::hardware::timestamp() - overall_timestamp;
 
 #if HPX_DEBUG != 0
-        // the last OS thread is allowed to exit only if no more PX threads exist
+        // the OS thread is allowed to exit only if no more HPX threads exist
         BOOST_ASSERT(!scheduler_.get_thread_count(
             unknown, thread_priority_default, num_thread));
 #endif
@@ -1993,7 +1984,7 @@ namespace hpx { namespace threads
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         run(std::size_t num_threads)
     {
-        LTM_(info) << "run: " << threads::hardware_concurrency() 
+        LTM_(info) << "run: " << threads::hardware_concurrency()
                    << " number of cores available";
         LTM_(info) << "run: creating " << num_threads << " OS thread(s)";
 
@@ -2001,7 +1992,6 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(bad_parameter,
                 "threadmanager_impl::run", "number of threads is zero");
         }
-
 
         mutex_type::scoped_lock lk(mtx_);
         if (!threads_.empty() || (state_.load() == running))
@@ -2033,12 +2023,11 @@ namespace hpx { namespace threads
 
                 // create a new thread
                 threads_.push_back(new boost::thread(boost::bind(
-                    &threadmanager_impl::tfunc, this, thread_num)));
+                    &threadmanager_impl::tfunc, this, thread_num, boost::ref(topology_))));
 
                 // set the new threads affinity (on Windows systems)
                 error_code ec(lightweight);
                 topology_.set_thread_affinity_mask(threads_.back(), mask, ec);
-
                 if (ec)
                 {
                     LTM_(warning) << "run: setting thread affinity on OS "
@@ -2178,7 +2167,8 @@ namespace hpx { namespace threads
     {
         scheduler_.periodic_maintenance(state_.load() == running);
 
-        boost::posix_time::milliseconds expire(1000);
+        boost::posix_time::milliseconds expire(SchedulingPolicy::value);
+
         // create timer firing in correspondence with given time
         boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
 
@@ -2197,7 +2187,8 @@ namespace hpx { namespace threads
 
         if(state_.load() == running)
         {
-            boost::posix_time::milliseconds expire(1000);
+            boost::posix_time::milliseconds expire(SchedulingPolicy::value);
+
             // create timer firing in correspondence with given time
             boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
 

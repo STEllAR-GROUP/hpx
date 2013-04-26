@@ -156,7 +156,7 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        virtual mask_cref_type get_service_affinity_mask(
+        virtual mask_type get_service_affinity_mask(
             mask_cref_type used_processing_units, error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
@@ -233,6 +233,13 @@ namespace hpx { namespace threads
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_thread_affinity_mask_from_lva(
             naming::address::address_type, error_code& ec = throws) const = 0;
+
+        /// \brief Reduce thread priority of the current thread.
+        ///
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual bool reduce_thread_priority(error_code& ec = throws) const;
     };
 
     HPX_API_EXPORT std::size_t hardware_concurrency();

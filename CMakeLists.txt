@@ -794,6 +794,44 @@ if(MSVC)
   hpx_add_definitions(-DHPX_COROUTINE_USE_FIBERS)
   hpx_add_definitions(-DPSAPI_VERSION=1)
 
+  hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
+             "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
+
+  if(HPX_GOOGLE_PERFTOOLS)
+    find_package(HPX_GooglePerftools)
+    if(GOOGLE_PERFTOOLS_FOUND)
+      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
+      hpx_include_sys_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+      hpx_link_sys_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
+      hpx_add_definitions(-DHPX_GOOGLE_PERFTOOLS)
+    endif()
+  endif()
+
+  if(NOT HPX_MALLOC)
+    set(HPX_MALLOC "TCMalloc")
+  endif()
+  find_package(HPX_TCMalloc)
+
+  if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC" AND NOT TCMALLOC_FOUND)
+    hpx_warn("malloc" "tcmalloc allocator not found.")
+  endif()
+
+  set(hpx_MALLOC_LIBRARY "")
+
+  if(NOT "${HPX_MALLOC}" MATCHES "system|System|SYSTEM")
+    if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
+      hpx_info("malloc" "Using tcmalloc allocator.")
+      set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
+      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
+      set(HPX_LINK_FLAG_TARGET_PROPERTIES "/INCLUDE:__tcmalloc")
+      hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
+      hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
+      hpx_add_definitions(-DHPX_TCMALLOC)
+    endif()
+  else()
+    hpx_info("malloc" "Using system allocator.")
+  endif()
+
 ################################################################################
 # GCC-compatible compiler configuration
 ################################################################################
@@ -1004,9 +1042,9 @@ else()
       #hpx_use_flag_if_available(-opt-class-analysis)
       #hpx_use_flag_if_available(-opt-multi-version-aggressive)
       #hpx_use_flag_if_available(-xHost)
-      #hpx_use_flag_if_available(-fno-alias)
-      #hpx_use_flag_if_available(-fbuiltin)
-      #hpx_use_flag_if_available(-finline)
+      hpx_use_flag_if_available(-fno-alias)
+      hpx_use_flag_if_available(-fbuiltin)
+      hpx_use_flag_if_available(-finline)
       #hpx_use_flag_if_available(-fma)
       #hpx_use_flag_if_available(-fno-implicit-inline-templates)
       #hpx_use_flag_if_available(-fno-implicit-templates)
@@ -1520,6 +1558,11 @@ if(HPX_NO_INSTALL)
   set(external_cmake_path ${hpx_SOURCE_DIR}/cmake)
 else()
   set(external_cmake_path ${HPX_PREFIX}/share/hpx-${HPX_VERSION}/cmake)
+endif()
+
+set(hpx_link_flag_target_properties "")
+if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
+  set(hpx_link_flag_target_properties "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
 endif()
 
 configure_file(${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in

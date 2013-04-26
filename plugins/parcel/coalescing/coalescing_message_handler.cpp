@@ -4,6 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/runtime/parcelset/parcelport.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>
@@ -147,3 +149,5 @@ namespace hpx { namespace plugins { namespace parcel
         buff(pp_);                   // 'invoke' the buffer
     }
 }}}
+
+#endif

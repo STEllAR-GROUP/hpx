@@ -38,6 +38,7 @@
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/and.hpp>
+#include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
 #if defined(BOOST_NO_DECLTYPE)
 #  include <boost/typeof/typeof.hpp>
@@ -659,18 +660,34 @@ namespace hpx { namespace actions
         //    construct_continuation_thread_object_function()
         #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
+        typedef typename traits::promise_local_result<Result>::type local_result_type;
+
         // bring in the definition for all overloads for operator()
         template <typename IdType>
         BOOST_FORCEINLINE typename boost::enable_if<
             boost::mpl::and_<
                 boost::mpl::bool_<
                     boost::fusion::result_of::size<arguments_type>::value == 0>,
-                boost::is_same<IdType, naming::id_type> >,
-            typename traits::promise_local_result<Result>::type
+                boost::is_same<IdType, naming::id_type>,
+                boost::is_same<local_result_type, void> >
         >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
-            return hpx::async(*this, id).get(ec);
+            hpx::async(*this, id).get(ec);
+        }
+
+        template <typename IdType>
+        BOOST_FORCEINLINE typename boost::enable_if<
+            boost::mpl::and_<
+                boost::mpl::bool_<
+                    boost::fusion::result_of::size<arguments_type>::value == 0>,
+                boost::is_same<IdType, naming::id_type>,
+                boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+            local_result_type
+        >::type
+        operator()(IdType const& id, error_code& ec = throws) const
+        {
+            return boost::move(hpx::async(*this, id).move(ec));
         }
 
         #include <hpx/runtime/actions/define_function_operators.hpp>
