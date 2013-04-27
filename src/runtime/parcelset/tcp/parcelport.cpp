@@ -83,9 +83,7 @@ namespace hpx { namespace parcelset { namespace tcp
         {
             try {
                 server::tcp::parcelport_connection_ptr conn(
-                    new server::tcp::parcelport_connection(
-                        io_service_pool_.get_io_service(), 
-                        *this));
+                    new server::tcp::parcelport_connection(io_service, *this));
 
                 tcp::endpoint ep = *it;
                 acceptor_->open(ep.protocol());
@@ -93,7 +91,8 @@ namespace hpx { namespace parcelset { namespace tcp
                 acceptor_->bind(ep);
                 acceptor_->listen();
                 acceptor_->async_accept(conn->socket(),
-                    boost::bind(&parcelport::handle_accept, this,
+                    boost::bind(&parcelport::handle_accept, 
+                        this->shared_from_this(),
                         boost::asio::placeholders::error, conn));
             }
             catch (boost::system::system_error const& e) {
@@ -133,9 +132,12 @@ namespace hpx { namespace parcelset { namespace tcp
                 {
                     boost::system::error_code ec;
                     boost::asio::ip::tcp::socket& s = c->socket();
-                    s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-                    s.close(ec);    // close the socket to give it back to the OS
+                    if (s.is_open()) {
+                        s.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                        s.close(ec);    // close the socket to give it back to the OS
+                    }
                 }
+
                 accepted_connections_.clear();
 #if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
                 write_connections_.clear();
@@ -170,7 +172,8 @@ namespace hpx { namespace parcelset { namespace tcp
                 io_service_pool_.get_io_service(), *this));
 
             acceptor_->async_accept(conn->socket(),
-                boost::bind(&parcelport::handle_accept, this,
+                boost::bind(&parcelport::handle_accept, 
+                    this->shared_from_this(),
                     boost::asio::placeholders::error, conn));
 
             {
@@ -187,7 +190,8 @@ namespace hpx { namespace parcelset { namespace tcp
             // now accept the incoming connection by starting to read from the
             // socket
             c->async_read(
-                boost::bind(&parcelport::handle_read_completion, this,
+                boost::bind(&parcelport::handle_read_completion, 
+                    this->shared_from_this(),
                     boost::asio::placeholders::error, c));
         }
         else {
@@ -403,8 +407,8 @@ namespace hpx { namespace parcelset { namespace tcp
 
         // Create a new HPX thread which sends parcels that are still pending.
         hpx::applier::register_thread_nullary(
-            HPX_STD_BIND(&parcelport::retry_sending_parcels, this,
-                locality_id), "retry_sending_parcels",
+            HPX_STD_BIND(&parcelport::retry_sending_parcels, 
+                this->shared_from_this(), locality_id), "retry_sending_parcels",
                 threads::pending, true, threads::thread_priority_critical);
     }
 
@@ -438,7 +442,8 @@ namespace hpx { namespace parcelset { namespace tcp
         // ... start an asynchronous write operation now.
         client_connection->async_write(
             hpx::parcelset::detail::call_for_each(handlers),
-            boost::bind(&parcelport::send_pending_parcels_trampoline, this,
+            boost::bind(&parcelport::send_pending_parcels_trampoline, 
+                this->shared_from_this(),
                 boost::asio::placeholders::error, ::_2, ::_3));
     }
 

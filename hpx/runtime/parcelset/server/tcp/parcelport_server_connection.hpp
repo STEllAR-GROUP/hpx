@@ -62,9 +62,11 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         ~parcelport_connection()
         {
             // gracefully and portably shutdown the socket
-            boost::system::error_code ec;
-            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-            socket_.close(ec);    // close the socket to give it back to the OS
+            if (socket_.is_open()) {
+                boost::system::error_code ec;
+                socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                socket_.close(ec);    // close the socket to give it back to the OS
+            }
         }
 
         /// Get the socket associated with the parcelport_connection.

@@ -126,6 +126,19 @@ namespace hpx { namespace parcelset { namespace tcp
         boost::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type t, bool reset);
 
+        /// support enable_shared_from_this
+        boost::shared_ptr<parcelport> shared_from_this()
+        {
+            return boost::static_pointer_cast<parcelport>(
+                parcelset::parcelport::shared_from_this());
+        }
+
+        boost::shared_ptr<parcelport const> shared_from_this() const
+        {
+            return boost::static_pointer_cast<parcelport const>(
+                parcelset::parcelport::shared_from_this());
+        }
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
