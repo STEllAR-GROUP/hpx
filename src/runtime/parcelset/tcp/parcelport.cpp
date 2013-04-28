@@ -69,8 +69,7 @@ namespace hpx { namespace parcelset { namespace tcp
         io_service_pool_.run(false);    // start pool
 
         using boost::asio::ip::tcp;
-        boost::asio::io_service& io_service = 
-            io_service_pool_.get_io_service();
+        boost::asio::io_service& io_service = io_service_pool_.get_io_service();
         if (NULL == acceptor_)
             acceptor_ = new tcp::acceptor(io_service);
 

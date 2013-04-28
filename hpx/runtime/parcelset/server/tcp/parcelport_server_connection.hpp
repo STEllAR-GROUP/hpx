@@ -111,12 +111,6 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         }
 
     protected:
-        template <typename Handler>
-        void async_restart_read(boost::tuple<Handler> handler)
-        {
-            async_read(boost::get<0>(handler));
-        }
-
         /// Handle a completed read of the message priority and size from the
         /// message header.
         /// The handler is passed using a tuple since boost::bind seems to have
@@ -130,10 +124,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                void (parcelport_connection::*f)(boost::tuple<Handler>) = 
-                        &parcelport_connection::async_restart_read<Handler>;
-                socket_.get_io_service().post(
-                    boost::bind(f, shared_from_this(), handler));
+                async_read(boost::get<0>(handler));
             }
             else {
                 // Determine the length of the serialized data.
@@ -168,10 +159,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                void (parcelport_connection::*f)(boost::tuple<Handler>) = 
-                        &parcelport_connection::async_restart_read<Handler>;
-                socket_.get_io_service().post(
-                    boost::bind(f, shared_from_this(), handler));
+                async_read(boost::get<0>(handler));
             }
             else {
                 // complete data point and pass it along
@@ -208,10 +196,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
             boost::get<0>(handler)(e);
 
             // Issue a read operation to read the next parcel.
-            void (parcelport_connection::*f)(boost::tuple<Handler>) = 
-                    &parcelport_connection::async_restart_read<Handler>;
-            socket_.get_io_service().post(
-                boost::bind(f, shared_from_this(), handler));
+            async_read(boost::get<0>(handler));
         }
 
     private:
