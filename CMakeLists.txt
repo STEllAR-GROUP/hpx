@@ -476,6 +476,17 @@ if(HWLOC_FOUND)
 endif()
 
 ################################################################################
+# libsodium: P(ortable|ackageable) NaCl
+################################################################################
+find_package(HPX_SODIUM)
+if(SODIUM_FOUND)
+  hpx_include_sys_directories(${SODIUM_INCLUDE_DIR})
+  hpx_link_sys_directories(${SODIUM_LIBRARY_DIR})
+  hpx_add_definitions(-DHPX_HAVE_SODIUM)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${SODIUM_LIBRARY})
+endif()
+
+################################################################################
 # Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
 ################################################################################
 hpx_include(Documentation)
