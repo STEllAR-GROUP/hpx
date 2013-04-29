@@ -16,7 +16,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 
-#define TS_DEBUG
+// #define TS_DEBUG
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace examples { namespace server
@@ -71,7 +71,7 @@ namespace examples { namespace server
             typedef boost::unordered_multimap<key_type, tuple_type> tuples_type;
             typedef tuples_type::iterator tuples_iterator_type;
 
-            static char * mutex_desc;
+            static char const* mutex_desc;
 
             // pre-defined timeout values
             enum {
@@ -80,7 +80,7 @@ namespace examples { namespace server
             };
 
             //[simple_central_tuplespace_server_ctor
-            simple_central_tuplespace() : mutex_(mutex_desc) {}
+            simple_central_tuplespace() /*: mutex_(mutex_desc)*/ {}
             //]
 
             ///////////////////////////////////////////////////////////////////////
@@ -104,13 +104,13 @@ namespace examples { namespace server
                 std::cerr<< " trying MUTEX_LOCK: in write.\n";
 #endif
 
-                mutex_.lock();
+//                 mutex_.lock();
                 tuples_.insert(std::pair<key_type, tuple_type>(key, tuple));
 
 #if defined(TS_DEBUG)
                 std::cerr<< " trying MUTEX_UNLOCK: in write.\n";
 #endif
-                mutex_.unlock();
+//                 mutex_.unlock();
 
                 return 0;
             }
@@ -133,14 +133,14 @@ namespace examples { namespace server
 #if defined(TS_DEBUG)
                 std::cerr<< " trying MUTEX_LOCK: in read.\n";
 #endif
-                    mutex_.lock();
+//                     mutex_.lock();
 
                     if(tuples_.empty())
                     {
 #if defined(TS_DEBUG)
                         std::cerr<< " trying MUTEX_UNLOCK: in read (empty tuples_).\n";
 #endif
-                        mutex_.unlock();
+//                         mutex_.unlock();
                         continue; 
                     }
 
@@ -151,7 +151,7 @@ namespace examples { namespace server
 #if defined(TS_DEBUG)
                         std::cerr<< " trying MUTEX_UNLOCK: in read (unfound).\n";
 #endif
-                        mutex_.unlock();
+//                         mutex_.unlock();
                         continue; // not found
                     }
 
@@ -159,7 +159,7 @@ namespace examples { namespace server
 #if defined(TS_DEBUG)
                         std::cerr<< " trying MUTEX_UNLOCK: in read (found).\n";
 #endif
-                    mutex_.unlock();
+//                     mutex_.unlock();
 
                     break; // found
                 } while((timeout < 0) || (timeout > t.elapsed()));
@@ -184,14 +184,14 @@ namespace examples { namespace server
 #if defined(TS_DEBUG)
                     std::cerr<< " trying MUTEX_LOCK: in take.\n";
 #endif
-                    mutex_.lock();
+//                     mutex_.lock();
 
                     if(tuples_.empty())
                     {
 #if defined(TS_DEBUG)
                         std::cerr<< " trying MUTEX_UNLOCK: in take (empty tuples).\n";
 #endif
-                        mutex_.unlock();
+//                         mutex_.unlock();
                         continue; 
                     }
 
@@ -201,7 +201,7 @@ namespace examples { namespace server
 #if defined(TS_DEBUG)
                         std::cerr<< " trying MUTEX_UNLOCK: in take (unfound).\n";
 #endif
-                        mutex_.unlock();
+//                         mutex_.unlock();
                         continue; // not found
                     }
 
@@ -210,7 +210,7 @@ namespace examples { namespace server
 #if defined(TS_DEBUG)
                         std::cerr<< " trying MUTEX_UNLOCK: in take (found).\n";
 #endif
-                    mutex_.unlock();
+//                     mutex_.unlock();
 
                     break; // found
                 } while((timeout < 0) || (timeout > t.elapsed()));
@@ -236,12 +236,13 @@ namespace examples { namespace server
             //[simple_central_tuplespace_server_data_member
         private:
             tuples_type tuples_;
-            mutex_type mutex_;
+//             mutex_type mutex_;
             //]
     };
 }} // examples::server
 
-char * examples::server::simple_central_tuplespace::mutex_desc = (char*)"simple_central_tuplespace_mutex";
+char const* examples::server::simple_central_tuplespace::mutex_desc = 
+    "simple_central_tuplespace_mutex";
 
 //[simple_central_tuplespace_registration_declarations
 HPX_REGISTER_ACTION_DECLARATION(
