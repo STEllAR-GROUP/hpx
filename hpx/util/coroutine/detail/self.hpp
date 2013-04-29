@@ -108,6 +108,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #else
 
     typedef typename yield_traits::arg0_type arg0_type;
+    typedef util::function_nonser<yield_result_type(arg0_type)> 
+        yield_decorator_type;
 
     yield_result_type yield(arg0_type arg0 = arg0_type())
     {
@@ -128,9 +130,31 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 
     template <typename F>
-    void decorate_yield(BOOST_FWD_REF(F) f)
+    yield_decorator_type decorate_yield(BOOST_FWD_REF(F) f)
     {
-        yield_decorator_ = boost::forward<F>(f);
+        yield_decorator_type tmp(boost::forward<F>(f));
+        std::swap(tmp, yield_decorator_);
+        return boost::move(tmp);
+    }
+
+    yield_decorator_type decorate_yield(yield_decorator_type const& f)
+    {
+        yield_decorator_type tmp(f);
+        std::swap(tmp, yield_decorator_);
+        return boost::move(tmp);
+    }
+
+    yield_decorator_type decorate_yield(BOOST_RV_REF(yield_decorator_type) f)
+    {
+        std::swap(f, yield_decorator_);
+        return boost::move(f);
+    }
+
+    yield_decorator_type undecorate_yield()
+    {
+        yield_decorator_type tmp;
+        std::swap(tmp, yield_decorator_);
+        return boost::move(tmp);
     }
 
 #endif
@@ -226,8 +250,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #else
 
   private:
-    typedef util::function_nonser<yield_result_type(arg0_type)> 
-        yield_decorator_type;
     yield_decorator_type yield_decorator_;
 
 #endif
