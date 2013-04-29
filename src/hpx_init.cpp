@@ -1163,19 +1163,44 @@ namespace hpx
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
 
-        p->terminate_all();
+        if (0 == p) {
+            components::stubs::runtime_support::terminate_all(
+                naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+            return;
+        }
 
+        p->terminate_all();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int stop()
+    int stop(error_code& ec)
     {
         HPX_STD_UNIQUE_PTR<runtime> rt(get_runtime_ptr());    // take ownership!
+        if (0 == rt.get()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
 
         int result = rt->wait();
         rt->stop();
 
         return result;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    int wait(error_code& ec)
+    {
+        runtime* rt(get_runtime_ptr());
+        if (0 == rt) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::wait",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
+
+        return rt->wait();
     }
 }
 
