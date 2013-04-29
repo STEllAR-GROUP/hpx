@@ -6,6 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/iostreams.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -26,17 +27,17 @@ void print_tuple(const tuple_type& tuple)
 {
     if(tuple.empty())
     {
-        std::cout<<"()";
+        hpx::cout<<"()";
         return;
     }
 
     tuple_type::const_iterator it = tuple.begin();
-    std::cout<<"("<<*it;
+    hpx::cout<<"("<<*it;
     for(++it; it != tuple.end(); ++it)
     {
-        std::cout<<", "<<*it;
+        hpx::cout<<", "<<*it;
     }
-    std::cout<<")";
+    hpx::cout<<")";
 }
 
 
@@ -49,24 +50,24 @@ void simple_central_tuplespace_test(const std::string& tuplespace_symbol_name, c
    examples::simple_central_tuplespace central_tuplespace(ts_gid);
 
    int ret = central_tuplespace.write_sync(tuple);
-   std::cout << "locality " << hpx::get_locality_id() << ": " << "write_sync ";
+   hpx::cout << "locality " << hpx::get_locality_id() << ": " << "write_sync ";
    print_tuple(tuple);
-   std::cout<<" returns " << ret << std::endl;
+   hpx::cout<<" returns " << ret << hpx::endl;
 
    tuple_type return_tuple = central_tuplespace.read_sync(key, 0);
-   std::cout<< "locality " << hpx::get_locality_id() << ": " <<"read_sync tuple with key="<<key<<" returns ";
+   hpx::cout<< "locality " << hpx::get_locality_id() << ": " <<"read_sync tuple with key="<<key<<" returns ";
    print_tuple(return_tuple);
-   std::cout<<std::endl;
+   hpx::cout<<hpx::endl;
 
    return_tuple = central_tuplespace.take_sync(key, 0);
-   std::cout<< "locality " << hpx::get_locality_id() << ": " <<"take_sync tuple with key="<<key<<" (1st) returns ";
+   hpx::cout<< "locality " << hpx::get_locality_id() << ": " <<"take_sync tuple with key="<<key<<" (1st) returns ";
    print_tuple(return_tuple);
-   std::cout<<std::endl;
+   hpx::cout<<hpx::endl;
 
    return_tuple = central_tuplespace.take_sync(key, 0);
-   std::cout<< "locality " << hpx::get_locality_id() << ": " <<"take_sync tuple with key="<<key<<" (2nd) returns ";
+   hpx::cout<< "locality " << hpx::get_locality_id() << ": " <<"take_sync tuple with key="<<key<<" (2nd) returns ";
    print_tuple(return_tuple);
-   std::cout<<std::endl;
+   hpx::cout<<hpx::endl<<hpx::flush;
 }
 
 HPX_PLAIN_ACTION(simple_central_tuplespace_test, simple_central_tuplespace_test_action);
