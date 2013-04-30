@@ -252,7 +252,9 @@ namespace hpx { namespace actions
 
         void trigger_value(BOOST_RV_REF(Result) result) const
         {
-            LLCO_(info) << "continuation::trigger(" << this->get_gid() << ")";
+            LLCO_(info) 
+                << "typed_continuation<Result>::trigger_value(" 
+                << this->get_gid() << ")";
             if (f_.empty()) {
                 if (!this->get_gid()) {
                     HPX_THROW_EXCEPTION(invalid_status,

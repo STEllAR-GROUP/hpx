@@ -294,13 +294,13 @@ namespace hpx { namespace util
             if (0 != parent_phase) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(2) << std::setfill('0')
+                out << std::hex << std::setw(4) << std::setfill('0')
                     << parent_phase;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string("--");
+                str.prepend_string("----");
             }
         }
     };
