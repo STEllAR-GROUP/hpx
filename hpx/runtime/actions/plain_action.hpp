@@ -411,6 +411,50 @@ namespace hpx { namespace traits
     HPX_REGISTER_PLAIN_ACTION_(__VA_ARGS__)                                   \
 /**/
 
+/// \def HPX_REGISTER_PLAIN_ACTION_TEMPLATE(template_, action_type)
+/// \brief Registers an existing template-free function as a plain action with HPX
+///
+/// The macro \a HPX_REGISTER_PLAIN_ACTION can be used to register an existing
+/// template-free function as a plain action. It relies on a separately defined 
+/// action type named \a action_type.
+///
+/// The parameter \p action_type is the name of the action type to register
+/// with HPX.
+///
+/// \par Example:
+///
+/// \code
+///       namespace app
+///       {
+///           template <typename T>
+///           void some_global_function(T d)
+///           {
+///               cout << d;
+///           }
+///
+///           // define a new template action type named some_global_action
+///           template <typename T>
+///           struct some_global_action
+///             : hpx::actions::make_action<
+///                     void (*)(T), &some_global_function<T>, 
+///                     some_global_action<T> >
+///           {};
+///       }
+///
+///       // The following macro expands to a series of definitions of global objects
+///       // which are needed for proper serialization and initialization support
+///       // enabling the remote invocation of the function `app::some_global_function`.
+///       //
+///       // Please note the extra parenthesis around both macro arguments.
+///       HPX_REGISTER_PLAIN_ACTION_TEMPLATE((<typename T>), (app::some_global_action<T>));
+/// \endcode
+///
+#define HPX_REGISTER_PLAIN_ACTION_TEMPLATE(template_, action_type)            \
+    HPX_REGISTER_ACTION_DECLARATION_TEMPLATE(template_, action_type);         \
+    HPX_DEFINE_GET_COMPONENT_TYPE_TEMPLATE(template_,                         \
+        (hpx::components::server::plain_function<HPX_UTIL_STRIP(action_type)>)) \
+/**/
+
 /// \def HPX_DEFINE_PLAIN_ACTION(func, name)
 /// \brief Defines a plain action type
 ///

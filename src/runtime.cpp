@@ -490,6 +490,30 @@ namespace hpx
             naming::id_type::unmanaged);
     }
 
+    naming::id_type find_root_locality(error_code& ec)
+    {
+        runtime* rt = hpx::get_runtime_ptr();
+        if (NULL == rt)
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
+                "the runtime system is not available at this time");
+            return naming::invalid_id;
+        }
+
+        naming::gid_type console_locality;
+        if (!rt->get_agas_client().get_console_locality(console_locality))
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
+                "the root locality is not available at this time");
+            return naming::invalid_id;
+        }
+
+        if (&ec != &throws) 
+            ec = make_success_code();
+
+        return naming::id_type(console_locality, naming::id_type::unmanaged);
+    }
+
     std::vector<naming::id_type>
     find_all_localities(components::component_type type, error_code& ec)
     {

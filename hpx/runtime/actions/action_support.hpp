@@ -894,6 +894,14 @@ namespace hpx { namespace actions
 #include <hpx/config/warnings_suffix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
+        hpx::actions::detail::register_base_helper<action>                    \
+            BOOST_PP_CAT(                                                     \
+                BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
+                _##actionname);                                               \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
@@ -922,14 +930,6 @@ namespace hpx { namespace actions
     HPX_REGISTER_BASE_HELPER(hpx::actions::transfer_action<action>, actionname) \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
 /**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
-        hpx::actions::detail::register_base_helper<action>                    \
-            BOOST_PP_CAT(                                                     \
-                BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
-                _##actionname);                                               \
-    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1(action)              \
@@ -971,6 +971,12 @@ namespace hpx { namespace actions
         BOOST_PP_STRINGIZE(actionname))                                       \
     HPX_REGISTER_ACTION_DECLARATION_GUID(hpx::actions::transfer_action<action>) \
 /**/
+
+///////////////////////////////////////////////////////////////////////////////
+// Register the action templates with serialization.
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Action>), (hpx::actions::transfer_action<Action>)
+)
 
 #if 0 //WIP
 ///////////////////////////////////////////////////////////////////////////////

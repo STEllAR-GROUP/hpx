@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/traits/component_type_database.hpp>
+#include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
@@ -107,7 +108,27 @@ namespace hpx { namespace components
         void component_type_database<component>::set(                         \
             components::component_type t) { value = t; }                      \
     }}                                                                        \
-    /**/
+/**/
+
+#define HPX_DEFINE_GET_COMPONENT_TYPE_TEMPLATE(template_, component)          \
+    namespace hpx { namespace traits                                          \
+    {                                                                         \
+        HPX_UTIL_STRIP(template_)                                             \
+        struct component_type_database<HPX_UTIL_STRIP(component) >            \
+        {                                                                     \
+            static components::component_type value;                          \
+                                                                              \
+            HPX_ALWAYS_EXPORT static components::component_type get()         \
+                { return value; }                                             \
+            HPX_ALWAYS_EXPORT static void set(components::component_type t)   \
+                { value = t; }                                                \
+        };                                                                    \
+                                                                              \
+        HPX_UTIL_STRIP(template_) components::component_type                  \
+        component_type_database<HPX_UTIL_STRIP(component) >::value =          \
+            components::component_invalid;                                    \
+    }}                                                                        \
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                 \
@@ -120,7 +141,7 @@ namespace hpx { namespace components
         void component_type_database<component>::set(components::component_type) \
             { BOOST_ASSERT(false); }                                          \
     }}                                                                        \
-    /**/
+/**/
 
 #endif
 

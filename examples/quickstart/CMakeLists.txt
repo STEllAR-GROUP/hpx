@@ -20,6 +20,7 @@ set(example_programs
     interest_calculator
     non_atomic_rma
     pingpong
+    print_to_console
     quicksort
     simplest_hello_world
     timed_wake
