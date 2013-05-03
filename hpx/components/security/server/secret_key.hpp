@@ -15,14 +15,11 @@
 namespace hpx { namespace components { namespace security { namespace server
 {
     class secret_key
-      : boost::array<
-            unsigned char, crypto_sign_SECRETKEYBYTES
-        >
     {
     public:
         secret_key(public_key & public_key)
         {
-            crypto_sign_keypair(public_key.c_array(), c_array());
+            crypto_sign_keypair(public_key.bytes_.c_array(), bytes_.c_array());
         }
 
         template <typename T>
@@ -35,8 +32,13 @@ namespace hpx { namespace components { namespace security { namespace server
                 &signed_type_length,
                 reinterpret_cast<unsigned char const *>(&type),
                 sizeof(type),
-                data()) == 0;
+                bytes_.data()) == 0;
         }
+
+    private:
+        boost::array<
+            unsigned char, crypto_sign_SECRETKEYBYTES
+        > bytes_;
     };
 }}}}
 
