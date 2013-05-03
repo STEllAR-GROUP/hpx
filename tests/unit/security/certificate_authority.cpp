@@ -5,16 +5,29 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/components/security/certificate_authority.hpp>
+#include <hpx/components/security/certificate_authority_base.hpp>
+#include <hpx/components/security/server/root_certificate_authority.hpp>
+#include <hpx/components/security/server/subordinate_certificate_authority.hpp>
 
 int hpx_main(boost::program_options::variables_map &)
 {
     {
-        hpx::components::security::certificate_authority certificate_authority;
+        using namespace hpx::components::security;
 
-        certificate_authority.create(hpx::find_here());
+        certificate_authority_base root_ca(
+            hpx::components::new_<
+                server::root_certificate_authority
+            >(hpx::find_here()));
 
-        certificate_authority.get_certificate_signing_request();
+        // root_ca.test();
+
+
+        certificate_authority_base subordinate_ca(
+            hpx::components::new_<
+                server::subordinate_certificate_authority
+            >(hpx::find_here(), root_ca.get_gid()));
+
+        subordinate_ca.test();
     }
 
     return hpx::finalize();
