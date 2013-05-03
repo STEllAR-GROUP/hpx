@@ -14,9 +14,6 @@
 namespace hpx { namespace components { namespace security { namespace server
 {
     class public_key
-      : boost::array<
-            unsigned char, crypto_sign_PUBLICKEYBYTES
-        >
     {
     public:
         template <typename T>
@@ -30,23 +27,23 @@ namespace hpx { namespace components { namespace security { namespace server
                 &type_length,
                 reinterpret_cast<unsigned char const *>(&signed_type),
                 sizeof(signed_type),
-                data()) == 0;
+                bytes_.data()) == 0;
         }
 
     private:
-        friend class secret_key;
-
         friend class boost::serialization::access;
 
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int)
         {
-            typedef boost::array<
-                unsigned char, crypto_sign_PUBLICKEYBYTES
-            > base_type;
-
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & bytes_;
         }
+
+        friend class secret_key;
+
+        boost::array<
+            unsigned char, crypto_sign_PUBLICKEYBYTES
+        > bytes_;
     };
 }}}}
 

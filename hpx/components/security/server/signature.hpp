@@ -8,15 +8,11 @@
 
 #include <boost/array.hpp>
 #include <boost/serialization/serialization.hpp>
-// #include <boost/serialization/array.hpp>
 #include <sodium.h>
 
 namespace hpx { namespace components { namespace security { namespace server
 {
     class signature
-      : public boost::array<
-            unsigned char, crypto_sign_BYTES
-        >
     {
     private:
         friend class boost::serialization::access;
@@ -24,12 +20,12 @@ namespace hpx { namespace components { namespace security { namespace server
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int)
         {
-            typedef boost::array<
-                unsigned char, crypto_sign_BYTES
-            > base_type;
-
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & bytes_;
         }
+
+        boost::array<
+            unsigned char, crypto_sign_BYTES
+        > bytes_;
     };
 }}}}
 
