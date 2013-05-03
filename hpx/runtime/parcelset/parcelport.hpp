@@ -17,6 +17,8 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/enable_shared_from_this.hpp>
+
 #include <string>
 #include <map>
 #include <vector>
