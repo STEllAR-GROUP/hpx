@@ -1,4 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +22,10 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/int.hpp>
+#include <boost/mpl/fold.hpp>
+#include <boost/mpl/and.hpp>
+
+#include <boost/serialization/is_bitwise_serializable.hpp>
 
 #define M0(Z, N, D)                                                           \
     typedef BOOST_PP_CAT(A, N) BOOST_PP_CAT(member_type, N);                  \
@@ -95,6 +100,22 @@ namespace hpx { namespace util
             typedef T & type;
         };
 #endif
+
+        ///////////////////////////////////////////////////////////////////////
+        struct compute_seqence_is_bitwise_serializable
+        {
+            template <typename State, typename T>
+            struct apply
+              : boost::mpl::and_<
+                    boost::serialization::is_bitwise_serializable<T>, State>
+            {};
+        };
+
+        template <typename Seq>
+        struct seqence_is_bitwise_serializable
+          : boost::mpl::fold<
+                Seq, boost::mpl::true_, compute_seqence_is_bitwise_serializable>
+        {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -167,42 +188,56 @@ namespace hpx { namespace util
     namespace detail
     {
         template <typename T>
-        struct tuple_element_access 
+        struct tuple_element_access
         {
             typedef const T& ctype;
             typedef T& type;
         };
 
         template <typename T>
-        struct tuple_element_access<T&> 
+        struct tuple_element_access<T&>
         {
             typedef T& ctype;
             typedef T& type;
         };
 
-        template <int E, typename Tuple> 
+        template <int E, typename Tuple>
         struct tuple_element;
     }
 
     template <int N, typename Tuple>
-    BOOST_FORCEINLINE 
+    BOOST_FORCEINLINE
     typename detail::tuple_element<N, Tuple>::rtype
-    get(Tuple& t) 
+    get(Tuple& t)
     {
         return t.template get<N>();
     }
 
     template <int N, typename Tuple>
-    BOOST_FORCEINLINE 
+    BOOST_FORCEINLINE
     typename detail::tuple_element<N, Tuple>::crtype
-    get(Tuple const& t) 
+    get(Tuple const& t)
     {
         return t.template get<N>();
     }
 }}
 
-namespace boost {
-    namespace fusion {
+namespace boost
+{
+    namespace serialization
+    {
+        template <>
+        struct is_bitwise_serializable<hpx::util::tuple0<> >
+          : boost::mpl::true_
+        {};
+
+        template <>
+        struct is_bitwise_serializable<hpx::util::tuple<> >
+          : boost::mpl::true_
+        {};
+    }
+    namespace fusion
+    {
         namespace traits
         {
             template <>
@@ -343,7 +378,7 @@ namespace hpx { namespace util
 
         template <int E>
         typename detail::tuple_element<E, HPX_UTIL_TUPLE_NAME>::rtype
-        get() 
+        get()
         {
             return detail::tuple_element<E, HPX_UTIL_TUPLE_NAME>::get(*this);
         }
@@ -435,7 +470,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    BOOST_FORCEINLINE 
+    BOOST_FORCEINLINE
     HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>
     forward_as_tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
@@ -448,8 +483,8 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>
-    struct tuple<BOOST_PP_ENUM_PARAMS(N, A)> 
-      : HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, A)> 
+    struct tuple<BOOST_PP_ENUM_PARAMS(N, A)>
+      : HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, A)>
     {
         typedef HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, A)> base_tuple;
 
@@ -548,6 +583,23 @@ BOOST_FUSION_ADAPT_TPL_STRUCT(
   , (BOOST_PP_CAT(hpx::util::tuple, N))BOOST_PP_REPEAT(N, M1, _)
   , BOOST_PP_REPEAT(N, M3, _)
 )
+
+namespace boost { namespace serialization
+{
+    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    struct is_bitwise_serializable<
+            HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)> >
+       : hpx::util::detail::seqence_is_bitwise_serializable<
+            HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)> >
+    {};
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    struct is_bitwise_serializable<
+            hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)>
+      : hpx::util::detail::seqence_is_bitwise_serializable<
+            hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
+    {};
+}}
 
 #undef N
 #undef HPX_UTIL_TUPLE_NAME
