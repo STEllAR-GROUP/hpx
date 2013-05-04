@@ -525,7 +525,7 @@ namespace hpx { namespace threads { namespace policies
                 }
 #endif
 
-                bool finish = count == ++new_tasks_count_
+                bool finish = count == ++new_tasks_count_;
                 if (new_tasks_.enqueue(task))
                 {
                     if (finish)
