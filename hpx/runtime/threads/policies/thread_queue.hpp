@@ -467,6 +467,8 @@ namespace hpx { namespace threads { namespace policies
 
             // do not execute the work, but register a task description for
             // later thread creation
+            ++new_tasks_count_;
+
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             new_tasks_.enqueue(new task_description(
                 boost::move(data), initial_state,
@@ -476,8 +478,6 @@ namespace hpx { namespace threads { namespace policies
             new_tasks_.enqueue(new task_description(
                 boost::move(data), initial_state));
 #endif
-            ++new_tasks_count_;
-
             if (&ec != &throws)
                 ec = make_success_code();
 
@@ -525,10 +525,15 @@ namespace hpx { namespace threads { namespace policies
                 }
 #endif
 
+                bool finish = count == ++new_tasks_count_
                 if (new_tasks_.enqueue(task))
                 {
-                    if (count == ++new_tasks_count_)
+                    if (finish)
                         break;
+                }
+                else
+                {
+                    --new_tasks_count;
                 }
             }
         }
@@ -736,6 +741,10 @@ namespace hpx { namespace threads { namespace policies
         // this thread acquired the lock, do maintenance, if needed
         if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
 
+            thread_queue* addfrom = addfrom_ ? addfrom_ : this;
+            if (running && 0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
+                return false;       // no task descriptions available
+
             // No obvious work has to be done, so a lock won't hurt too much
             // but we lock only one of the threads, assuming this thread
             // will do the maintenance
@@ -755,7 +764,6 @@ namespace hpx { namespace threads { namespace policies
 //                        << ", threads left: " << thread_map_.size();
 
             // stop running after all PX threads have been terminated
-            thread_queue* addfrom = addfrom_ ? addfrom_ : this;
             bool added_new = add_new_always(added, addfrom, num_thread);
             if (!added_new) {
                 // Before exiting each of the OS threads deletes the
