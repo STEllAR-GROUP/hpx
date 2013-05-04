@@ -533,7 +533,7 @@ namespace hpx { namespace threads { namespace policies
                 }
                 else
                 {
-                    --new_tasks_count;
+                    --new_tasks_count_;
                 }
             }
         }
