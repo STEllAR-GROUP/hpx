@@ -37,6 +37,20 @@ boost::uint64_t add(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+struct when_all_wrapper
+{
+    typedef boost::uint64_t result_type;
+
+    boost::uint64_t operator()(
+        hpx::lcos::future<std::vector<hpx::lcos::future<uint64_t> > > data
+    ) const
+    {
+        std::vector<hpx::lcos::future<uint64_t> > v = data.move();
+        return v[0].get() + v[1].get();
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////
 hpx::future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n);
 
 struct fibonacci_future_one_continuation
@@ -105,10 +119,27 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
     hpx::future<hpx::future<boost::uint64_t> > f =
-        hpx::async(hpx::launch::deferred, &fibonacci_future, n-1);
+        hpx::async(&fibonacci_future, n-1);
     hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
 
     return hpx::async(&add, f.get(), r);
+}
+
+hpx::future<boost::uint64_t> fibonacci_future_when_all(boost::uint64_t n)
+{
+    // if we know the answer, we return a future encapsulating the final value
+    if (n < 2)
+        return hpx::lcos::make_future(n);
+    if (n < threshold)
+        return hpx::lcos::make_future(fibonacci_serial(n));
+
+    // asynchronously launch the creation of one of the sub-terms of the
+    // execution graph
+    hpx::future<hpx::future<boost::uint64_t> > f =
+        hpx::async(&fibonacci_future, n-1);
+    hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
+
+    return hpx::when_all(f.get(), r).then(when_all_wrapper());
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -130,6 +161,27 @@ hpx::future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
     // attach a continuation to this future which is called asynchronously on
     // its completion and which calculates the the final result
     return hpx::async(&add, f1, f2);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+hpx::future<boost::uint64_t> fibonacci_future_all_when_all(boost::uint64_t n)
+{
+    // if we know the answer, we return a future encapsulating the final value
+    if (n < 2)
+        return hpx::lcos::make_future(n);
+    if (n < threshold)
+        return hpx::lcos::make_future(fibonacci_serial(n));
+
+    using hpx::future;
+
+    // asynchronously launch the calculation of both of the sub-terms
+    future<boost::uint64_t> f1 = fibonacci_future_all(n - 1);
+    future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
+
+    // create a future representing the successful calculation of both sub-terms
+    // attach a continuation to this future which is called asynchronously on
+    // its completion and which calculates the the final result
+    return hpx::when_all(f1, f2).then(when_all_wrapper());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -236,6 +288,27 @@ int hpx_main(boost::program_options::variables_map& vm)
         executed_one = true;
     }
 
+    if (test == "all" || test == "6")
+    {
+        // Keep track of the time required to execute.
+        //hpx::util::high_resolution_timer t;
+        boost::uint64_t start = hpx::util::high_resolution_clock::now();
+
+        for (int i = 0; i != max_runs; ++i) 
+        {
+            // Create a Future for the whole calculation, execute it locally, and
+            // wait for it.
+            r = fibonacci_future_when_all(n).get();
+        }
+
+        //d = t.elapsed();
+        double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
+        char const* fmt = "fibonacci_future_when_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
+        std::cout << (boost::format(fmt) % n % r % (d / max_runs));
+
+        executed_one = true;
+    }
+
     if (test == "all" || test == "4")
     {
         // Keep track of the time required to execute.
@@ -256,11 +329,30 @@ int hpx_main(boost::program_options::variables_map& vm)
         executed_one = true;
     }
 
+    if (test == "all" || test == "5")
+    {
+        // Keep track of the time required to execute.
+        hpx::util::high_resolution_timer t;
+
+        for (int i = 0; i != max_runs; ++i) 
+        {
+            // Create a Future for the whole calculation, execute it locally, and
+            // wait for it.
+            r = fibonacci_future_all_when_all(n).get();
+        }
+
+        double d = t.elapsed();
+        char const* fmt = "fibonacci_future_all_when_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
+        std::cout << (boost::format(fmt) % n % r % (d / max_runs));
+
+        executed_one = true;
+    }
+
     if (!executed_one)
     {
         std::cerr << "fibonacci_futures: wrong command line argument value for "
             "option 'tests', should be either 'all' or a number between zero "
-            "and 4, value specified: " << test << std::endl;
+            "and 6, value specified: " << test << std::endl;
     }
 
     return hpx::finalize(); // Handles HPX shutdown
@@ -282,7 +374,7 @@ int main(int argc, char* argv[])
         ( "threshold", value<unsigned int>()->default_value(2),
           "threshold for switching to serial code")
         ( "test", value<std::string>()->default_value("all"),
-          "select tests to execute (0-4, default: all)")
+          "select tests to execute (0-6, default: all)")
     ;
 
     // Initialize and run HPX
