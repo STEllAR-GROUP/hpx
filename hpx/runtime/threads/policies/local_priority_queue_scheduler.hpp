@@ -629,17 +629,16 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            // if nothing found ask everybody else
+            // if nothing found, ask everybody else
             if (test(steals_outside_numa_domain_, num_thread)) {
                 mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
-                for (std::size_t i = 1; i < queues_size; ++i)
+                for (std::size_t i = 0; i < queues_size; ++i)
                 {
-                    std::size_t idx = (i + num_thread) % queues_size;
-                    if (idx == num_thread || !test(numa_domain, idx))
+                    if (i == num_thread || !test(numa_domain, i))
                         continue;         // don't steal from ourselves
 
-                    result = queues_[num_thread]->wait_or_add_new(idx, running,
-                        idle_loop_count, added, queues_[idx]) && result;
+                    result = queues_[num_thread]->wait_or_add_new(i, running,
+                        idle_loop_count, added, queues_[i]) && result;
                     if (0 != added)
                     {
                         queues_[num_thread]->increment_num_stolen_threads(added);

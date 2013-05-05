@@ -16,7 +16,8 @@ namespace hpx { namespace components
     class simple_component;
 
     template <typename Component>
-    class abstract_simple_component_base
+    class abstract_simple_component_base 
+      : private detail::simple_component_tag
     {
     public:
         virtual ~abstract_simple_component_base() {}

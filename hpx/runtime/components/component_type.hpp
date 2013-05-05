@@ -80,7 +80,7 @@ namespace hpx { namespace components
     template <typename Component>
     inline void set_component_type(component_type type)
     {
-        return traits::component_type_database<Component>::set(type);
+        traits::component_type_database<Component>::set(type);
     }
 
     ///////////////////////////////////////////////////////////////////////////

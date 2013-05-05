@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2013 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@ set(example_programs
     component_ctors
     component_in_executable
     component_inheritance
+    component_inheritance_simple
     error_handling
     event_synchronization 
     factorial
@@ -48,6 +49,7 @@ endif()
 set(1d_wave_equation_FLAGS DEPENDENCIES iostreams_component)
 set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
 set(component_inheritance_FLAGS DEPENDENCIES iostreams_component)
+set(component_inheritance_simple_FLAGS DEPENDENCIES iostreams_component)
 set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
 
 foreach(example_program ${example_programs})
