@@ -104,11 +104,15 @@ macro(add_hpx_library name)
     set(${name}_lib_linktype SHARED)
   endif()
 
+  if(NOT HPX_EXTERNAL_CMAKE)
+    set(exclude_from_all EXCLUDE_FROM_ALL)
+  endif()
+
   if(${${name}_ESSENTIAL})
     add_library(${name}_lib ${${name}_lib_linktype}
       ${${name}_SOURCES} ${${name}_HEADERS})
   else()
-    add_library(${name}_lib ${${name}_lib_linktype} EXCLUDE_FROM_ALL
+    add_library(${name}_lib ${${name}_lib_linktype} ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
