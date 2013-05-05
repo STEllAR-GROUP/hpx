@@ -468,12 +468,6 @@ namespace hpx { namespace actions
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/gcc44/component_action_implementations.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-// Register the action templates with serialization.
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Action>), (hpx::actions::transfer_action<Action>)
-)
-
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
