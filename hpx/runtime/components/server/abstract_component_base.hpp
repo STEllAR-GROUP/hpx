@@ -19,20 +19,22 @@ namespace hpx { namespace components
     class abstract_simple_component_base 
       : private detail::simple_component_tag
     {
+    private:
+        typedef simple_component<Component> outer_wrapping_type;
+
     public:
         virtual ~abstract_simple_component_base() {}
 
-        typedef simple_component<Component> wrapping_type;
         typedef Component base_type_holder;
 
         static component_type get_component_type()
         {
-            return hpx::components::get_component_type<wrapping_type>();
+            return hpx::components::get_component_type<outer_wrapping_type>();
         }
 
         static void set_component_type(component_type t)
         {
-            hpx::components::set_component_type<wrapping_type>(t);
+            hpx::components::set_component_type<outer_wrapping_type>(t);
         }
 
         /// This is the default hook implementation for decorate_action which 
@@ -51,20 +53,22 @@ namespace hpx { namespace components
     template <typename Component, typename Wrapper>
     class abstract_managed_component_base
     {
+    private:
+        typedef managed_component<Component, Wrapper> outer_wrapping_type;
+
     public:
         virtual ~abstract_managed_component_base() {}
 
-        typedef managed_component<Component, Wrapper> wrapping_type;
         typedef Component base_type_holder;
 
         static component_type get_component_type()
         {
-            return hpx::components::get_component_type<wrapping_type>();
+            return hpx::components::get_component_type<outer_wrapping_type>();
         }
 
         static void set_component_type(component_type t)
         {
-            hpx::components::set_component_type<wrapping_type>(t);
+            hpx::components::set_component_type<outer_wrapping_type>(t);
         }
 
         /// This is the default hook implementation for decorate_action which 
