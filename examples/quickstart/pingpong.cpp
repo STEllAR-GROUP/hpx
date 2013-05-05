@@ -61,6 +61,7 @@ int hpx_main(boost::program_options::variables_map &b_arg)
 {
     std::size_t const vsize = b_arg["vsize"].as<std::size_t>();
     std::size_t const numiter = b_arg["numiter"].as<std::size_t>() * 2;
+    bool verbose = b_arg["verbose"].as<bool>();
 
     std::vector<hpx::naming::id_type> localities = hpx::find_remote_localities();
 
@@ -87,13 +88,22 @@ int hpx_main(boost::program_options::variables_map &b_arg)
         }
 
         double time = timer1.elapsed();
-
-        std::cout << "[hpx_pingpong]"
-                  << ":total_time(secs)=" << time
-                  << ":vsize=" << vsize
-                  << ":bandwidth(GB/s)=" << (((vsize * sizeof(double) * numiter) / time) / 1024) / 1024
-                  << ":localities=" << localities.size()
-                  << ":numiter=" << numiter << std::endl;
+     
+        if(verbose) {
+          std::cout << "[hpx_pingpong]" << std::endl
+                    << "total_time(secs)=" << time << std::endl
+                    << "vsize=" << vsize
+                    << "bandwidth(GB/s)=" << (((vsize * sizeof(double) * numiter) / time) / 1024) / 1024 << std::endl
+                    << "localities=" << localities.size() << std::endl
+                    << "numiter=" << numiter << std::endl;
+        }
+       if(!verbose) {
+          std::cout << "[hpx_pingpong]"
+                    << ":total_time(secs)=" << time
+                    << ":vsize=" << vsize
+                    << ":bandwidth(GB/s)=" << (((vsize * sizeof(double) * numiter) / time) / 1024) / 1024
+                    << ":localities=" << localities.size()
+                    << ":numiter=" << numiter << std::endl;
     }
 
     // do the same but with a wrapped vector
@@ -134,6 +144,8 @@ int main(int argc, char* argv[])
           "number of elements (doubles) to send/receive  (integer)")
         ( "numiter", po::value<std::size_t>()->default_value(numiter_default),
           "number of ping-pong iterations")
+        ( "verbose", po::value<bool>()->default_value(true),
+         "verbosity of output,if false output is for awk")
         ;
 
     return hpx::init(description, argc, argv);
