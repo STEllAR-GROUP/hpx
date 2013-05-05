@@ -42,23 +42,36 @@ struct B : A, hpx::components::simple_component_base<B>
     typedef B type_holder;
     typedef A base_type_holder;
 
-    B() { hpx::cout << "B::B\n" << hpx::flush; }
-    B(int i) { hpx::cout << "B::B(int) " << i << "\n" << hpx::flush; }
-    ~B() { hpx::cout << "B::~B\n" << hpx::flush; }
+    B() : value_(0)
+    {
+        hpx::cout << "B::B\n" << hpx::flush;
+    }
+
+    B(int i) : value_(i)
+    {
+        hpx::cout << "B::B(int) " << i << "\n" << hpx::flush;
+    }
+
+    ~B()
+    {
+        hpx::cout << "B::~B\n" << hpx::flush;
+    }
 
     void print() const
     {
         hpx::cout << "B::print from locality: "
-            << hpx::find_here() << "\n"
+            << hpx::find_here() << ", value: " << value_ << "\n"
             << hpx::flush;
     }
+
+    int value_;
 };
 
 typedef hpx::components::simple_component<B> server_type;
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(server_type, B, "A");
 
 ///////////////////////////////////////////////////////////////////////////////
-// Define a client side representation for a remote component instance 'B',
+// Define a client side representation for a remote component instance 'A',
 // Note: this client has no notion of using 'B', but wraps the base 'A' only.
 struct client : hpx::components::client_base<client, A>
 {
@@ -83,12 +96,12 @@ int main()
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     BOOST_FOREACH(hpx::id_type id, localities)
     {
-        client hw(hpx::components::new_<B>(id));
-        hw.print();
-    }
+        client hw1(hpx::components::new_<B>(id));
+        hw1.print();
 
-    hpx::future<naming::id_type> b =
-        hpx::components::new_<B>(hpx::find_here(), 1);
+        client hw2(hpx::components::new_<B>(id, 1));
+        hw2.print();
+    }
 
     return 0;
 }
