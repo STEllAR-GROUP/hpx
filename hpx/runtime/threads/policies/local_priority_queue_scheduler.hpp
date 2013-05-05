@@ -702,10 +702,14 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // we allow the thread on the boundary of the NUMA domain to steal
-            std::size_t first = find_first(node_mask);
             mask_type first_mask = mask_type();
             resize(first_mask, mask_size(core_mask));
-            set(first_mask, first);
+
+            std::size_t first = find_first(node_mask);
+            if (first != std::size_t(-1))
+                set(first_mask, first);
+            else
+                first_mask = core_mask;
 
             if (any(first_mask & core_mask)) {
                 set(steals_outside_numa_domain_, num_thread);
