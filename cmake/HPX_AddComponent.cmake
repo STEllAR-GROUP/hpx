@@ -106,11 +106,15 @@ macro(add_hpx_component name)
   hpx_print_list("DEBUG" "add_component.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
 
+  if(NOT HPX_EXTERNAL_CMAKE)
+    set(exclude_from_all EXCLUDE_FROM_ALL)
+  endif()
+
   if(${${name}_ESSENTIAL})
     add_library(${name}_component SHARED
       ${${name}_SOURCES} ${${name}_HEADERS})
   else()
-    add_library(${name}_component SHARED EXCLUDE_FROM_ALL
+    add_library(${name}_component SHARED ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
