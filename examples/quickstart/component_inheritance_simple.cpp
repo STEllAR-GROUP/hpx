@@ -43,13 +43,14 @@ struct B : A, hpx::components::simple_component_base<B>
     typedef A base_type_holder;
 
     B() { hpx::cout << "B::B\n" << hpx::flush; }
+    B(int i) { hpx::cout << "B::B(int) " << i << "\n" << hpx::flush; }
     ~B() { hpx::cout << "B::~B\n" << hpx::flush; }
 
-    void print() const 
+    void print() const
     {
-        hpx::cout << "B::print from locality: " 
+        hpx::cout << "B::print from locality: "
             << hpx::find_here() << "\n"
-            << hpx::flush; 
+            << hpx::flush;
     }
 };
 
@@ -85,6 +86,9 @@ int main()
         client hw(hpx::components::new_<B>(id));
         hw.print();
     }
+
+    hpx::future<naming::id_type> b =
+        hpx::components::new_<B>(hpx::find_here(), 1);
 
     return 0;
 }
