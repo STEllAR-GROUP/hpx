@@ -710,7 +710,7 @@ namespace hpx { namespace threads { namespace policies
 
             if (any(first_mask & core_mask)) {
                 set(steals_outside_numa_domain_, num_thread);
-                outside_numa_domain_masks_[num_thread] = not(node_mask) & machine_mask;
+                outside_numa_domain_masks_[num_thread] = not_(node_mask) & machine_mask;
             }
         }
 

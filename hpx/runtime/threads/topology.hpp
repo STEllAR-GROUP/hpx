@@ -53,7 +53,7 @@ namespace hpx { namespace threads
         return (mask != 0) ? true : false;
     }
 
-    inline mask_type not(mask_cref_type mask)
+    inline mask_type not_(mask_cref_type mask)
     {
         return ~mask;
     }
@@ -103,7 +103,7 @@ namespace hpx { namespace threads
         return mask.any();
     }
 
-    inline mask_type not(mask_cref_type mask)
+    inline mask_type not_(mask_cref_type mask)
     {
         return ~mask;
     }
