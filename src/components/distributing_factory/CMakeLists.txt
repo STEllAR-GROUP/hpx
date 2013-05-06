@@ -7,10 +7,18 @@
 ###############################################################################
 set(root "${hpx_SOURCE_DIR}/hpx/components/distributing_factory")
 
-add_hpx_component(distributing_factory
-  FOLDER "Core/Components"
-  HEADER_ROOT ${root}
-  AUTOGLOB)
+if(HPX_DEFAULT_BUILD_TARGETS)
+  add_hpx_component(distributing_factory
+    FOLDER "Core/Components"
+    HEADER_ROOT ${root}
+    AUTOGLOB
+    ESSENTIAL)
+else()
+  add_hpx_component(distributing_factory
+    FOLDER "Core/Components"
+    HEADER_ROOT ${root}
+    AUTOGLOB)
+endif()
 
 add_hpx_pseudo_dependencies(components.distributing_factory
                             distributing_factory_component)

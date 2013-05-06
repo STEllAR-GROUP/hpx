@@ -9,11 +9,20 @@ set(root "${hpx_SOURCE_DIR}/hpx/components/papi_counters")
 
 include_directories(${PAPI_INCLUDE_DIR})
 
-add_hpx_component(papi_counters
-  FOLDER "Core/Components"
-  HEADER_ROOT ${root}
-  DEPENDENCIES ${PAPI_LIBRARY}
-  AUTOGLOB)
+if(HPX_DEFAULT_BUILD_TARGETS)
+  add_hpx_component(papi_counters
+    FOLDER "Core/Components"
+    HEADER_ROOT ${root}
+    DEPENDENCIES ${PAPI_LIBRARY}
+    AUTOGLOB
+    ESSENTIAL)
+else()
+  add_hpx_component(papi_counters
+    FOLDER "Core/Components"
+    HEADER_ROOT ${root}
+    DEPENDENCIES ${PAPI_LIBRARY}
+    AUTOGLOB)
+endif()
 
 add_hpx_pseudo_dependencies(
   components.papi_counters papi_counters_component)
