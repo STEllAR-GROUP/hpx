@@ -39,6 +39,11 @@ namespace hpx { namespace components { namespace security
         {
             return this->base_type::test(this->get_gid());
         }
+
+        server::signed_type<server::certificate> get_certificate() const
+        {
+            return this->base_type::get_certificate(this->get_gid());
+        }
     };
 }}}
 

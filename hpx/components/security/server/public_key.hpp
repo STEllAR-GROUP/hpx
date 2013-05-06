@@ -19,14 +19,14 @@ namespace hpx { namespace components { namespace security { namespace server
         template <typename T>
         bool verify(signed_type<T> const & signed_type) const
         {
-            unsigned char type[sizeof(signed_type)];
+            unsigned char type[sizeof signed_type];
             unsigned long long type_length;
 
             return crypto_sign_open(
                 type,
                 &type_length,
                 reinterpret_cast<unsigned char const *>(&signed_type),
-                sizeof(signed_type),
+                sizeof signed_type,
                 bytes_.data()) == 0;
         }
 

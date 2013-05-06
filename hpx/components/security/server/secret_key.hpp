@@ -23,16 +23,19 @@ namespace hpx { namespace components { namespace security { namespace server
         }
 
         template <typename T>
-        bool sign(T const & type, signed_type<T> & signed_type) const
+        signed_type<T> sign(T const & type) const
         {
+            signed_type<T> signed_type;
             unsigned long long signed_type_length;
 
-            return crypto_sign(
+            crypto_sign(
                 reinterpret_cast<unsigned char *>(&signed_type),
                 &signed_type_length,
                 reinterpret_cast<unsigned char const *>(&type),
-                sizeof(type),
-                bytes_.data()) == 0;
+                sizeof type,
+                bytes_.data());
+
+            return signed_type;
         }
 
     private:

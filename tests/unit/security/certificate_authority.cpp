@@ -9,6 +9,8 @@
 #include <hpx/components/security/server/root_certificate_authority.hpp>
 #include <hpx/components/security/server/subordinate_certificate_authority.hpp>
 
+#include <iostream>
+
 int hpx_main(boost::program_options::variables_map &)
 {
     {
@@ -18,6 +20,16 @@ int hpx_main(boost::program_options::variables_map &)
             hpx::components::new_<
                 server::root_certificate_authority
             >(hpx::find_here()));
+
+        server::signed_type<server::certificate> const & root_ca_certificate =
+            root_ca.get_certificate();
+
+        server::public_key const & root_ca_public_key =
+            root_ca_certificate.get_type().get_subject_public_key();
+
+        std::cout << std::boolalpha
+                  << root_ca_public_key.verify(root_ca_certificate)
+                  << std::endl;
 
         // root_ca.test();
 
