@@ -10,8 +10,10 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 
+#include "certificate.hpp"
 #include "public_key.hpp"
 #include "secret_key.hpp"
+#include "signed_type.hpp"
 
 namespace hpx { namespace components { namespace security { namespace server
 {
@@ -33,14 +35,28 @@ namespace hpx { namespace components { namespace security { namespace server
             test_nonvirt,
             test_action);
 
+        signed_type<certificate> get_certificate() const
+        {
+            return certificate_;
+        }
+        HPX_DEFINE_COMPONENT_CONST_ACTION(
+            certificate_authority_base,
+            get_certificate);
+
     protected:
         public_key public_key_;
         secret_key secret_key_;
+
+        signed_type<certificate> certificate_;
     };
 }}}}
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::security::server::certificate_authority_base::test_action
   , certificate_authority_base_test_action);
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::security::server::certificate_authority_base::get_certificate_action
+  , certificate_authority_base_get_certificate_action);
 
 #endif

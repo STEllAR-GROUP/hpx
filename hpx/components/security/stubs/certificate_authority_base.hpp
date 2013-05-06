@@ -24,6 +24,14 @@ namespace hpx { namespace components { namespace security { namespace stubs
                 server::certificate_authority_base::test_action
             >(gid).get();
         }
+
+        static server::signed_type<server::certificate> get_certificate(
+            hpx::naming::id_type const & gid)
+        {
+            return hpx::async<
+                server::certificate_authority_base::get_certificate_action
+            >(gid).get();
+        }
     };
 }}}}
 

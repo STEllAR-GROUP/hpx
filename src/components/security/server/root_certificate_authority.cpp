@@ -12,6 +12,8 @@ namespace hpx { namespace components { namespace security { namespace server
     root_certificate_authority::root_certificate_authority()
       : certificate_authority_base()
     {
+        certificate_ = secret_key_.sign(
+            certificate(get_gid(), get_gid(), public_key_));
     }
 
     void root_certificate_authority::test() const

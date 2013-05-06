@@ -17,3 +17,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(certificate_authority_base_type);
 HPX_REGISTER_ACTION(
     certificate_authority_base_type::test_action
   , certificate_authority_base_test_action);
+
+HPX_REGISTER_ACTION(
+    certificate_authority_base_type::get_certificate_action
+  , certificate_authority_base_get_certificate_action);
