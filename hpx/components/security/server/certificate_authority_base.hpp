@@ -11,6 +11,7 @@
 #include <hpx/include/components.hpp>
 
 #include "certificate.hpp"
+#include "certificate_signing_request.hpp"
 #include "public_key.hpp"
 #include "secret_key.hpp"
 #include "signed_type.hpp"
@@ -24,24 +25,25 @@ namespace hpx { namespace components { namespace security { namespace server
         certificate_authority_base();
         virtual ~certificate_authority_base();
 
-        virtual void test() const = 0;
+        virtual signed_type<certificate> sign_certificate_signing_request(
+            signed_type<certificate_signing_request> const &) const = 0;
 
-        void test_nonvirt() const
+        signed_type<certificate> sign_certificate_signing_request_nonvirt(
+            signed_type<certificate_signing_request> const & signed_csr)
         {
-            test();
+            return sign_certificate_signing_request(signed_csr);
         }
-        HPX_DEFINE_COMPONENT_CONST_ACTION(
-            certificate_authority_base,
-            test_nonvirt,
-            test_action);
 
-        signed_type<certificate> get_certificate() const
-        {
-            return certificate_;
-        }
+        signed_type<certificate> get_certificate() const;
+
         HPX_DEFINE_COMPONENT_CONST_ACTION(
-            certificate_authority_base,
-            get_certificate);
+            certificate_authority_base
+          , sign_certificate_signing_request_nonvirt
+          , sign_certificate_signing_request_action);
+
+        HPX_DEFINE_COMPONENT_CONST_ACTION(
+            certificate_authority_base
+          , get_certificate);
 
     protected:
         public_key public_key_;
@@ -52,8 +54,8 @@ namespace hpx { namespace components { namespace security { namespace server
 }}}}
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::security::server::certificate_authority_base::test_action
-  , certificate_authority_base_test_action);
+    hpx::components::security::server::certificate_authority_base::sign_certificate_signing_request_action
+  , certificate_authority_base_sign_certificate_signing_request_action);
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::security::server::certificate_authority_base::get_certificate_action

@@ -18,11 +18,13 @@ namespace hpx { namespace components { namespace security { namespace stubs
         >
     {
     public:
-        static void test(hpx::naming::id_type const & gid)
+        static server::signed_type<server::certificate> sign_certificate_signing_request(
+            hpx::naming::id_type const & gid
+          , server::signed_type<server::certificate_signing_request> const & signed_csr)
         {
             return hpx::async<
-                server::certificate_authority_base::test_action
-            >(gid).get();
+                server::certificate_authority_base::sign_certificate_signing_request_action
+            >(gid, signed_csr).get();
         }
 
         static server::signed_type<server::certificate> get_certificate(

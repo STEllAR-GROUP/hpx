@@ -5,6 +5,8 @@
 
 #include <hpx/components/security/server/certificate_authority_base.hpp>
 
+#include <iostream>
+
 namespace hpx { namespace components { namespace security { namespace server
 {
     certificate_authority_base::certificate_authority_base()
@@ -14,5 +16,11 @@ namespace hpx { namespace components { namespace security { namespace server
 
     certificate_authority_base::~certificate_authority_base()
     {
+    }
+
+    signed_type<certificate>
+    certificate_authority_base::get_certificate() const
+    {
+        return certificate_;
     }
 }}}}

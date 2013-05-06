@@ -35,9 +35,11 @@ namespace hpx { namespace components { namespace security
         {
         }
 
-        void test() const
+        server::signed_type<server::certificate> sign_certificate_signing_request(
+            server::signed_type<server::certificate_signing_request> const & signed_csr) const
         {
-            return this->base_type::test(this->get_gid());
+            return this->base_type::sign_certificate_signing_request(
+                this->get_gid(), signed_csr);
         }
 
         server::signed_type<server::certificate> get_certificate() const

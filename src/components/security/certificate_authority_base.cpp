@@ -15,8 +15,8 @@ typedef hpx::components::security::server::certificate_authority_base
 HPX_DEFINE_GET_COMPONENT_TYPE(certificate_authority_base_type);
 
 HPX_REGISTER_ACTION(
-    certificate_authority_base_type::test_action
-  , certificate_authority_base_test_action);
+    certificate_authority_base_type::sign_certificate_signing_request_action
+  , certificate_authority_base_sign_certificate_signing_request_action);
 
 HPX_REGISTER_ACTION(
     certificate_authority_base_type::get_certificate_action
