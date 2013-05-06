@@ -223,7 +223,6 @@ namespace hpx { namespace parcelset { namespace tcp
     void parcelport::put_parcels(std::vector<parcel> const & parcels,
         std::vector<write_handler_type> const& handlers)
     {
-        typedef pending_parcels_map::iterator iterator;
         typedef pending_parcels_map::mapped_type mapped_type;
 
         if (parcels.size() != handlers.size())
@@ -271,7 +270,6 @@ namespace hpx { namespace parcelset { namespace tcp
 
     void parcelport::put_parcel(parcel const& p, write_handler_type f)
     {
-        typedef pending_parcels_map::iterator iterator;
         typedef pending_parcels_map::mapped_type mapped_type;
 
         naming::locality locality_id = p.get_destination_locality();

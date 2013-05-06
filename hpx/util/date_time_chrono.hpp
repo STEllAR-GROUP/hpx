@@ -17,7 +17,6 @@ namespace hpx { namespace util
     boost::posix_time::ptime
     to_ptime(boost::chrono::time_point<Clock, Duration> const& from)
     {
-        typedef boost::chrono::time_point<Clock, Duration> time_point_type;
         typedef boost::chrono::nanoseconds duration_type;
         typedef duration_type::rep rep_type;
         rep_type d = boost::chrono::duration_cast<duration_type>(

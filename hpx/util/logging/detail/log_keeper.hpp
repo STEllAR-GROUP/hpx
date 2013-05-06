@@ -65,7 +65,6 @@ protected:
 
     void init(type * log) {
         m_log = log;
-        typedef typename type::write_type write_type;
         m_base = m_log->common_base();
     }
 private:
