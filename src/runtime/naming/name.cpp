@@ -262,7 +262,7 @@ namespace hpx { namespace naming
 
     inline lcos::future<naming::id_type> get_colocation_id_async(naming::id_type id)
     {
-        return lcos::make_future(naming::get_colocation_id(id, throws));
+        return lcos::make_ready_future(naming::get_colocation_id(id, throws));
     }
 }}
 

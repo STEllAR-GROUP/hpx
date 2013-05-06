@@ -306,7 +306,7 @@ namespace hpx
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "hpx::lcos::when_any",
                 "empty container passed to when_any");
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
         }
 
         lcos::local::futures_factory<return_type()> p(
@@ -327,7 +327,7 @@ namespace hpx
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "hpx::lcos::when_any",
                 "empty container passed to when_any");
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
         }
 
         lcos::local::futures_factory<return_type()> p(
@@ -347,7 +347,7 @@ namespace hpx
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "hpx::lcos::when_any",
                 "empty container passed to when_any");
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
         }
 
         lcos::local::futures_factory<return_type()> p =

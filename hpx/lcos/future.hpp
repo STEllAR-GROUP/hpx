@@ -228,7 +228,7 @@ namespace hpx { namespace lcos
 
     // extension: create a pre-initialized future object
     template <typename Result>
-    future<Result> make_future(Result const& init)
+    future<Result> make_ready_future(Result const& init)
     {
         return future<Result>(init);
     }
@@ -259,7 +259,7 @@ namespace hpx { namespace lcos
             detail::get_future_data(lcos::future<Result_> const&);
 
         // make_future uses the dummy argument constructor below
-        friend future<void> make_future();
+        friend future<void> make_ready_future();
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
@@ -428,7 +428,7 @@ namespace hpx { namespace lcos
     };
 
     // extension: create a pre-initialized future object
-    inline future<void> make_future()
+    inline future<void> make_ready_future()
     {
         return future<void>(1);   // dummy argument
     }

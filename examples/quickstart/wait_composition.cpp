@@ -24,9 +24,9 @@ struct cout_continuation
 int hpx_main(boost::program_options::variables_map& vm)
 {
     {
-        hpx::future<int> a = hpx::lcos::make_future<int>(17);
-        hpx::future<int> b = hpx::lcos::make_future<int>(42);
-        hpx::future<int> c = hpx::lcos::make_future<int>(-1);
+        hpx::future<int> a = hpx::lcos::make_ready_future<int>(17);
+        hpx::future<int> b = hpx::lcos::make_ready_future<int>(42);
+        hpx::future<int> c = hpx::lcos::make_ready_future<int>(-1);
 
         hpx::when_all(a, b, c).then(cout_continuation());
     }
