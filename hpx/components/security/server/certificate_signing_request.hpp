@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <boost/serialization/serialization.hpp>
 
+#include "identity.hpp"
 #include "public_key.hpp"
 
 namespace hpx { namespace components { namespace security { namespace server
@@ -20,14 +21,14 @@ namespace hpx { namespace components { namespace security { namespace server
         {
         }
 
-        certificate_signing_request(naming::id_type const & subject,
+        certificate_signing_request(identity const & subject,
                                     public_key const & subject_public_key)
           : subject_(subject)
           , subject_public_key_(subject_public_key)
         {
         }
 
-        naming::id_type const & get_subject() const
+        identity const & get_subject() const
         {
             return subject_;
         }
@@ -47,7 +48,7 @@ namespace hpx { namespace components { namespace security { namespace server
             ar & subject_public_key_;
         }
 
-        naming::id_type subject_;
+        identity subject_;
         public_key subject_public_key_;
     };
 }}}}

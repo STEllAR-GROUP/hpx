@@ -31,15 +31,18 @@ int hpx_main(boost::program_options::variables_map &)
                   << root_ca_public_key.verify(root_ca_certificate)
                   << std::endl;
 
-        // root_ca.test();
-
 
         certificate_authority_base subordinate_ca(
             hpx::components::new_<
                 server::subordinate_certificate_authority
             >(hpx::find_here(), root_ca.get_gid()));
 
-        subordinate_ca.test();
+        server::signed_type<server::certificate> const & subordinate_ca_certificate =
+            subordinate_ca.get_certificate();
+
+        std::cout << std::boolalpha
+                  << root_ca_public_key.verify(subordinate_ca_certificate)
+                  << std::endl;
     }
 
     return hpx::finalize();

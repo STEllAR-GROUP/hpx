@@ -23,7 +23,8 @@ namespace hpx { namespace components { namespace security { namespace server
 
         root_certificate_authority();
 
-        void test() const;
+        signed_type<certificate> sign_certificate_signing_request(
+            signed_type<certificate_signing_request> const &) const;
 
     private:
     };
