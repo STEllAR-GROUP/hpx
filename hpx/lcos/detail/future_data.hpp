@@ -228,7 +228,8 @@ namespace detail
         typedef typename base_type::completed_callback_type
             completed_callback_type;
 
-        friend class lcos::future<Result>;
+        template <typename T>
+        friend class lcos::future;
 
         template <typename T>
         friend struct local::channel;
@@ -440,7 +441,7 @@ namespace detail
         completed_callback_type
         set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
         {
-            // this future coincidentally instance keeps us alive
+            // this future instance coincidentally keeps us alive
             lcos::future<Result> f =
                 lcos::detail::make_future_from_data<Result>(this);
 
@@ -454,7 +455,7 @@ namespace detail
                 on_completed_ = boost::move(data_sink);
             }
 
-            return retval;
+            return boost::move(retval);
         }
 
         void reset_on_completed()

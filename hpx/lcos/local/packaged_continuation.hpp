@@ -448,6 +448,7 @@ namespace hpx { namespace lcos
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // attach a local continuation to this future instance
     template <typename Result>
     template <typename F>
@@ -460,7 +461,7 @@ namespace hpx { namespace lcos
         typedef lcos::detail::continuation_base<result_type> cont_impl_type;
         boost::intrusive_ptr<cont_impl_type> p(
             detail::make_continuation_base<result_type, Result>(
-                util::bind(util::protect(boost::forward<F>(f)), util::placeholders::_1)));
+                boost::forward<F>(f)));
 
         // bind an on_completed handler to this future which will invoke the
         // continuation
@@ -481,7 +482,7 @@ namespace hpx { namespace lcos
         typedef lcos::detail::continuation_base<result_type> cont_impl_type;
         boost::intrusive_ptr<cont_impl_type> p(
             detail::make_continuation_base<result_type, void>(
-                util::bind(util::protect(boost::forward<F>(f)), util::placeholders::_1)));
+                boost::forward<F>(f)));
 
         // bind an on_completed handler to this future which will invoke the
         // continuation
@@ -490,6 +491,74 @@ namespace hpx { namespace lcos
         future_data_->set_on_completed(util::bind(cb, p, *this));
 
         return lcos::detail::make_future_from_data<result_type>(boost::move(p));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    future<typename future_traits<
+        typename boost::mpl::if_<
+            traits::is_future<Result>, Result, future<void>
+        >::type
+    >::value_type>
+    future<Result>::unwrap(error_code& ec)
+    {
+        BOOST_STATIC_ASSERT_MSG(
+            traits::is_future<Result>::value, "invalid use of unwrap");
+
+        typedef typename future_traits<Result>::value_type result_type;
+        typedef lcos::detail::future_data<result_type> future_data_type;
+
+        if (!valid()) {
+            HPX_THROWS_IF(ec, future_uninitialized,
+                "future<Result>::unwrap",
+                "this future has not been initialized");
+            return future<result_type>();
+        }
+
+        // create a continuation
+        boost::intrusive_ptr<future_data_type> p(new future_data_type());
+
+        // Bind an on_completed handler to this future which will wait for
+        // the inner future and will transfer its result to the new future.
+        void (future::*outer_ready)(boost::intrusive_ptr<future_data_type>) =
+                &future::on_outer_ready<result_type>;
+        future_data_->set_on_completed(util::bind(outer_ready, *this, p));
+
+        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
+    }
+
+    template <typename Result>
+    template <typename InnerResult, typename UnwrapResult>
+    void future<Result>::on_inner_ready(future<InnerResult> const& inner,
+        boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
+    {
+        try {
+            detail::transfer_result(inner, *p);
+        }
+        catch (...) {
+            p->set_exception(boost::current_exception());
+        }
+    }
+
+    template <typename Result>
+    template <typename UnwrapResult>
+    void future<Result>::on_outer_ready(
+        boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
+    {
+        typedef typename future_traits<Result>::value_type inner_result_type;
+
+        void (future::*inner_ready)(future<inner_result_type> const&,
+            boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> >) =
+                &future::on_inner_ready<inner_result_type, UnwrapResult>;
+
+        try {
+            // if we get here, this future is ready
+            using util::placeholders::_1;
+            get().then(util::bind(inner_ready, *this, _1, boost::move(p)));
+        }
+        catch(...) {
+            p->set_exception(boost::current_exception());
+        }
     }
 }}
 
