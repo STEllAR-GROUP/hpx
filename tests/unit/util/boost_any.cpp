@@ -1,13 +1,9 @@
 // Copyright Kevlin Henney, 2000, 2001. All rights reserved.
+// Copyright (c) 2013 Hartmut Kaiser.
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-
-// what:  unit tests for variant type boost::any
-// who:   contributed by Kevlin Henney
-// when:  July 2001
-// where: tested with BCC 5.5, MSVC 6.0, and g++ 2.95
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/util/any.hpp>
