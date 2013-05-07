@@ -426,7 +426,7 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        explicit basic_any(T const& x)
+        basic_any(T const& x)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -457,7 +457,7 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        explicit basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
+        basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -727,7 +727,7 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        explicit basic_any(T const& x)
+        basic_any(T const& x)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -758,7 +758,7 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        explicit basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
+        basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -965,7 +965,7 @@ namespace hpx { namespace util
     };
     ///////////////////////////////////////////////////////////////////////////
 
-    template <typename T, typename IArchive, typename OArchive, typename Char>
+    template <typename IArchive, typename OArchive, typename Char>
     void swap(basic_any<IArchive, OArchive, Char>& lhs,
         basic_any<IArchive, OArchive, Char>& rhs) BOOST_NOEXCEPT
     {
@@ -978,8 +978,8 @@ namespace hpx { namespace util
     {
         if (operand && operand->type() == BOOST_SP_TYPEID(T)) {
             return hpx::util::detail::any::get_table<T>::is_small::value ?
-                reinterpret_cast<T*>(&operand->object) :
-                reinterpret_cast<T*>(operand->object);
+                reinterpret_cast<T*>(reinterpret_cast<void*>(&operand->object)) :
+                reinterpret_cast<T*>(reinterpret_cast<void*>(operand->object));
         }
         return 0;
     }
@@ -1008,7 +1008,7 @@ namespace hpx { namespace util
         nonref* result = any_cast<nonref>(&operand);
         if(!result)
             boost::throw_exception(bad_any_cast(operand.type(), BOOST_SP_TYPEID(T)));
-        return *result;
+        return static_cast<T>(*result);
     }
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
