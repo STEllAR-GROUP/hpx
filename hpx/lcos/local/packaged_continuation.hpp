@@ -164,7 +164,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // cancellation support
-        bool is_cancelable() const
+        bool cancelable() const
         {
             return true;
         }
@@ -180,7 +180,7 @@ namespace hpx { namespace lcos { namespace detail
                     return;
                 }
 
-                if (this->is_ready())
+                if (this->ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {
@@ -308,6 +308,29 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Source, typename Destination>
+        void transfer_result(Source& src, Destination& dest, boost::mpl::false_)
+        {
+            dest.set_data(src.get());
+        }
+
+        template <typename Source, typename Destination>
+        void transfer_result(Source& src, Destination& dest, boost::mpl::true_)
+        {
+            src.get();
+            dest.set_data();
+        }
+
+        template <typename Source, typename Destination>
+        void transfer_result(Source& src, Destination& dest)
+        {
+            typedef typename boost::is_void<
+                typename future_traits<Source>::value_type
+            >::type predicate;
+            transfer_result(src, dest, predicate());
+        }
     }
 
 //     ///////////////////////////////////////////////////////////////////////////
@@ -533,7 +556,7 @@ namespace hpx { namespace lcos
         boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
     {
         try {
-            detail::transfer_result(inner, *p);
+            local::detail::transfer_result(inner, *p);
         }
         catch (...) {
             p->set_exception(boost::current_exception());

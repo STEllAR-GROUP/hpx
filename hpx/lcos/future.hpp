@@ -56,31 +56,6 @@ namespace hpx { namespace lcos
     {
     };
 
-    namespace detail
-    {
-        template <typename Source, typename Destination>
-        void transfer_result(Source& src, Destination& dest, boost::mpl::false_)
-        {
-            dest.set_data(src.get());
-        }
-
-        template <typename Source, typename Destination>
-        void transfer_result(Source& src, Destination& dest, boost::mpl::true_)
-        {
-            src.get();
-            dest.set_data();
-        }
-
-        template <typename Source, typename Destination>
-        void transfer_result(Source& src, Destination& dest)
-        {
-            typedef typename boost::is_void<
-                typename future_traits<Source>::value_type
-            >::type predicate;
-            transfer_result(src, dest, predicate());
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     class future
@@ -200,9 +175,9 @@ namespace hpx { namespace lcos
         }
 
         // state introspection
-        bool is_ready() const
+        bool ready() const
         {
-            return future_data_ && future_data_->is_ready();
+            return future_data_ && future_data_->ready();
         }
 
         bool has_value() const
@@ -224,9 +199,9 @@ namespace hpx { namespace lcos
         }
 
         // cancellation support
-        bool is_cancelable() const
+        bool cancelable() const
         {
-            return future_data_->is_cancelable();
+            return future_data_->cancelable();
         }
 
         void cancel()
@@ -417,9 +392,9 @@ namespace hpx { namespace lcos
         }
 
         // state introspection
-        bool is_ready() const
+        bool ready() const
         {
-            return future_data_->is_ready();
+            return future_data_->ready();
         }
 
         bool has_value() const
@@ -441,9 +416,9 @@ namespace hpx { namespace lcos
         }
 
         // cancellation support
-        bool is_cancelable() const
+        bool cancelable() const
         {
-            return future_data_->is_cancelable();
+            return future_data_->cancelable();
         }
 
         void cancel()

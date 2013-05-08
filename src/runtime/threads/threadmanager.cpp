@@ -1019,7 +1019,7 @@ namespace hpx { namespace threads
                 store_state(prev_state_);
         }
 
-        bool is_valid() const { return need_restore_state_; }
+        bool valid() const { return need_restore_state_; }
 
         // allow to change the state the thread will be switched to after
         // execution
@@ -1849,7 +1849,7 @@ namespace hpx { namespace threads
                         // tries to set state to active (only if state is still
                         // the same as 'state')
                         switch_status thrd_stat (thrd, state);
-                        if (thrd_stat.is_valid() && thrd_stat.get_previous() == pending) {
+                        if (thrd_stat.valid() && thrd_stat.get_previous() == pending) {
                             // thread returns new required state
                             // store the returned state in the thread
                             {

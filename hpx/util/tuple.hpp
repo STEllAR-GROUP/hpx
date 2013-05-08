@@ -588,14 +588,14 @@ namespace boost { namespace serialization
 {
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     struct is_bitwise_serializable<
-            HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)> >
+            hpx::util::HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)> >
        : hpx::util::detail::seqence_is_bitwise_serializable<
-            HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)> >
+            hpx::util::HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)> >
     {};
 
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     struct is_bitwise_serializable<
-            hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)>
+            hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
       : hpx::util::detail::seqence_is_bitwise_serializable<
             hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
     {};
