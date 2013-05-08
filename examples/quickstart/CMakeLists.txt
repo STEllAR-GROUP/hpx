@@ -13,6 +13,7 @@ set(example_programs
     event_synchronization 
     factorial
     fibonacci
+    fibonacci_await
     fibonacci_one
     fibonacci_futures
     fractals
@@ -21,7 +22,7 @@ set(example_programs
     interest_calculator
     non_atomic_rma
     pingpong
-    print_to_console
+    print_to_console 
     quicksort
     simplest_hello_world
     timed_wake

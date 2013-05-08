@@ -33,6 +33,13 @@ HPX_NO_INLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
     return fibonacci_serial(n-1) + fibonacci_serial(n-2);
 }
 
+HPX_NO_INLINE boost::uint64_t fibonacci_serial_wrapper(boost::uint64_t n)
+{
+    if (n < 2)
+        return n;
+    return fibonacci_serial(n-1) + fibonacci_serial(n-2);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t add(
     hpx::future<boost::uint64_t> const& f1,
@@ -100,7 +107,7 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     if (n < 2)
         return n;
     if (n < threshold)
-        return fibonacci_serial(n);
+        return fibonacci_serial_wrapper(n);
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
