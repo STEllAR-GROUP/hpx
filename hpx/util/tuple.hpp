@@ -185,6 +185,12 @@ namespace hpx { namespace util
         {}
     };
 
+    BOOST_FORCEINLINE tuple<>
+    make_tuple()
+    {
+        return tuple<>();
+    }
+
     namespace detail
     {
         template <typename T>
@@ -251,6 +257,18 @@ namespace boost
             {
                 typedef struct_tag type;
             };
+
+            template <>
+            struct tag_of<hpx::util::tuple<> >
+            {
+                typedef struct_tag type;
+            };
+
+            template <>
+            struct tag_of<hpx::util::tuple<> const>
+            {
+                typedef struct_tag type;
+            };
         }
 
         namespace extension
@@ -270,6 +288,22 @@ namespace boost
 
             template<>
             struct struct_is_view<hpx::util::tuple0<> > : mpl::false_ {};
+
+            template<int I>
+            struct access::struct_member<hpx::util::tuple<>, I>
+            {
+                template<typename Seq> struct apply;
+            };
+
+            template<int I>
+            struct struct_member_name<hpx::util::tuple<>, I>
+            {};
+
+            template<>
+            struct struct_size<hpx::util::tuple<> > : mpl::int_<0> {};
+
+            template<>
+            struct struct_is_view<hpx::util::tuple<> > : mpl::false_ {};
         }
     }
     namespace mpl
@@ -282,7 +316,20 @@ namespace boost
             typedef fusion::fusion_sequence_tag type;
         };
         template<>
-        struct sequence_tag<hpx::util::tuple0<> const >
+        struct sequence_tag<hpx::util::tuple0<> const>
+        {
+            typedef fusion::fusion_sequence_tag type;
+        };
+
+        template<typename>
+        struct sequence_tag;
+        template<>
+        struct sequence_tag<hpx::util::tuple<> >
+        {
+            typedef fusion::fusion_sequence_tag type;
+        };
+        template<>
+        struct sequence_tag<hpx::util::tuple<> const>
         {
             typedef fusion::fusion_sequence_tag type;
         };
@@ -563,7 +610,9 @@ namespace hpx { namespace util
     };
 
 #define HPX_UTIL_MAKE_TUPLE_ARG(Z, N, D)                                      \
-    typename detail::remove_reference<BOOST_PP_CAT(D, N)>::type               \
+    typename boost::remove_const<                                             \
+        typename detail::remove_reference<BOOST_PP_CAT(D, N)>::type           \
+    >::type                                                                   \
 /**/
 
     ///////////////////////////////////////////////////////////////////////////
@@ -581,6 +630,12 @@ namespace hpx { namespace util
 BOOST_FUSION_ADAPT_TPL_STRUCT(
     BOOST_PP_REPEAT(N, M1, _)
   , (BOOST_PP_CAT(hpx::util::tuple, N))BOOST_PP_REPEAT(N, M1, _)
+  , BOOST_PP_REPEAT(N, M3, _)
+)
+
+BOOST_FUSION_ADAPT_TPL_STRUCT(
+    BOOST_PP_REPEAT(N, M1, _)
+  , (hpx::util::tuple)BOOST_PP_REPEAT(N, M1, _)
   , BOOST_PP_REPEAT(N, M3, _)
 )
 
