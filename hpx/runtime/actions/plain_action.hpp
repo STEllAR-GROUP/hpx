@@ -487,6 +487,14 @@ namespace hpx { namespace traits
     typedef HPX_MAKE_ACTION(func)::type name                                  \
     /**/
 
+/// \cond NOINTERNAL
+
+#define HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name)                            \
+    typedef HPX_MAKE_DIRECT_ACTION(func)::type name                           \
+    /**/
+
+/// \endcond
+
 /// \def HPX_PLAIN_ACTION(func, name)
 /// \brief Defines a plain action type based on the given function \a func and registers it with HPX.
 ///
@@ -531,11 +539,20 @@ namespace hpx { namespace traits
     HPX_PLAIN_ACTION_(__VA_ARGS__)                                            \
 /**/
 
+/// \cond NOINTERNAL
+
+#define HPX_PLAIN_DIRECT_ACTION(...)                                          \
+    HPX_PLAIN_DIRECT_ACTION_(__VA_ARGS__)                                     \
+/**/
+
+/// \endcond
+
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/plain_action_implementations.hpp>
 
 /// \cond NOINTERNAL
 
+// macros for plain actions
 #define HPX_PLAIN_ACTION_(...)                                                \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_PLAIN_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                      \
@@ -551,6 +568,25 @@ namespace hpx { namespace traits
 /**/
 #define HPX_PLAIN_ACTION_3(func, name, state)                                 \
     HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
+    HPX_REGISTER_PLAIN_ACTION_3(name, name, state)                            \
+/**/
+
+// same for direct actions
+#define HPX_PLAIN_DIRECT_ACTION_(...)                                         \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_PLAIN_DIRECT_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)               \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_PLAIN_DIRECT_ACTION_1(func)                                       \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION(func, BOOST_PP_CAT(func, _action));        \
+    HPX_REGISTER_PLAIN_ACTION_1(BOOST_PP_CAT(func, _action))                  \
+/**/
+#define HPX_PLAIN_DIRECT_ACTION_2(func, name)                                 \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                               \
+    HPX_REGISTER_PLAIN_ACTION_1(name)                                         \
+/**/
+#define HPX_PLAIN_DIRECT_ACTION_3(func, name, state)                          \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                               \
     HPX_REGISTER_PLAIN_ACTION_3(name, name, state)                            \
 /**/
 
