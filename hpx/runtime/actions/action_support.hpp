@@ -46,6 +46,9 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <hpx/config/bind.hpp>
+#include <hpx/config/tuple.hpp>
+#include <hpx/config/function.hpp>
 #include <hpx/traits/needs_guid_initialization.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -58,9 +61,6 @@
 #include <hpx/util/void_cast.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
-#include <hpx/config/bind.hpp>
-#include <hpx/config/tuple.hpp>
-#include <hpx/config/function.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

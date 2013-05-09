@@ -10,6 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
