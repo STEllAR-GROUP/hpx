@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // When using the dataflow component we have to define the following constant
-// as this component uses up to 6 arguments for one of its components.
+// as this example uses up to 6 arguments for one of its components.
 #define HPX_LIMIT 6
 
 #include <iostream>
@@ -47,7 +47,7 @@ double add(double principal, double interest)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action Declarations
-HPX_PLAIN_ACTION(calc, calc_action);
+HPX_PLAIN_DIRECT_ACTION(calc, calc_action);
 HPX_PLAIN_ACTION(add, add_action);
 //]
 

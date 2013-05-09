@@ -28,8 +28,8 @@
             
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
-            hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, 
+            hpx::applier::detail::apply_c_cb<action_type>(addr,
+                this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -66,8 +66,8 @@
             
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
-            hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, 
+            hpx::applier::detail::apply_c_cb<action_type>(addr,
+                this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -104,8 +104,8 @@
             
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
-            hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, 
+            hpx::applier::detail::apply_c_cb<action_type>(addr,
+                this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -142,8 +142,8 @@
             
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
-            hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, 
+            hpx::applier::detail::apply_c_cb<action_type>(addr,
+                this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
@@ -180,8 +180,8 @@
             
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
-            hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, 
+            hpx::applier::detail::apply_c_cb<action_type>(addr,
+                this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
         }
@@ -218,8 +218,8 @@
             
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
-            hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, 
+            hpx::applier::detail::apply_c_cb<action_type>(addr,
+                this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
         }
@@ -256,8 +256,8 @@
             
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
-            hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, 
+            hpx::applier::detail::apply_c_cb<action_type>(addr,
+                this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
         }
@@ -294,8 +294,8 @@
             
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
-            hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, 
+            hpx::applier::detail::apply_c_cb<action_type>(addr,
+                this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
         }
@@ -332,8 +332,8 @@
             
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
-            hpx::applier::detail::apply_c<action_type>(addr,
-                this->get_gid(), gid, 
+            hpx::applier::detail::apply_c_cb<action_type>(addr,
+                this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
         }
