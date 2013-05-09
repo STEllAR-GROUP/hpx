@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This is a purely local version demonstrating the proposed extension to
-// C++ implementing resumable functions (see N3564, 
+// C++ implementing resumable functions (see N3564,
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3564.pdf). The
 // necessary transformations are performed by hand.
 
@@ -41,18 +41,22 @@ namespace hpx { namespace lcos { namespace local {
             typedef typename hpx::util::detail::remove_reference<Func>::type func_type;
             typedef typename hpx::util::detail::remove_reference<F1>::type f1_type;
             typedef typename hpx::util::detail::remove_reference<F2>::type f2_type;
-            
+
             typedef decltype(std::declval<F1>().get()) f1_result_type;
             typedef decltype(std::declval<F2>().get()) f2_result_type;
 
             template <typename FFunc, typename FF1, typename FF2>
             dataflow_frame(BOOST_FWD_REF(FFunc) func, BOOST_FWD_REF(FF1) f1, BOOST_FWD_REF(FF2) f2)
-              : func_(func)
-              , f1_(f1)
-              , f2_(f2)
+              : func_(boost::forward<FFunc>(func))
+              , f1_(boost::forward<FF1>(f1))
+              , f2_(boost::forward<FF2>(f2))
               , state_(0)
             {}
 
+            // This is the equivalent of:
+            //
+            //     return func(await f1, await f2);
+            //
             void await()
             {
                 switch (state_)
