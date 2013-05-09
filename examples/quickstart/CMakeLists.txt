@@ -10,7 +10,7 @@ set(example_programs
     component_inheritance
     component_inheritance_simple
     error_handling
-    event_synchronization 
+    event_synchronization
     factorial
     fibonacci
     fibonacci_await
@@ -22,7 +22,7 @@ set(example_programs
     interest_calculator
     non_atomic_rma
     pingpong
-    print_to_console 
+    print_to_console
     quicksort
     simplest_hello_world
     timed_wake
