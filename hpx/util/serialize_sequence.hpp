@@ -97,7 +97,7 @@ namespace hpx { namespace util
         inline void
         serialize_sequence(Archive& ar, Sequence& seq, boost::mpl::true_)
         {
-            ar & boost::serialization::make_array(&seq, sizeof(seq));
+            ar & boost::serialization::make_array(&seq, 1);
         }
     }
 
@@ -107,7 +107,8 @@ namespace hpx { namespace util
     serialize_sequence(Archive& ar, Sequence& seq)
     {
         typedef typename 
-            boost::serialization::is_bitwise_serializable<Sequence>::type
+//            boost::serialization::is_bitwise_serializable<Sequence>::type
+            boost::mpl::false_      // for now, until we figure out the problems
         predicate;
         detail::serialize_sequence(ar, seq, predicate());
     }
