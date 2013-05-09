@@ -34,6 +34,7 @@ if(HPX_HAVE_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
       hello_world
       1d_wave_equation
+      fibonacci_dataflow
      )
 endif()
 
