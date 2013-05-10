@@ -25,7 +25,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
-#include <boost/fusion/at_c.hpp>
+#include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/value_at.hpp>
 
 // The number of types that the request's variant can represent.
