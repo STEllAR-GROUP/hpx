@@ -81,8 +81,9 @@ namespace hpx
             >
         {};
 
+        template <typename Address>
         static Component const*
-        call(naming::address::address_type lva, boost::mpl::false_)
+        call(Address lva, boost::mpl::false_)
         {
             typedef typename boost::add_const<
                 typename Component::wrapping_type
@@ -90,8 +91,9 @@ namespace hpx
             return reinterpret_cast<wrapping_type*>(lva)->get_checked();
         }
 
+        template <typename Address>
         static Component const*
-        call(naming::address::address_type lva, boost::mpl::true_)
+        call(Address lva, boost::mpl::true_)
         {
             return reinterpret_cast<Component const*>(lva);
         }
