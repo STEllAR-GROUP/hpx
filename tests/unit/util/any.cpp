@@ -46,7 +46,7 @@ int hpx_main(variables_map& vm)
             index_type id = 1;
 
             std::pair<elem_type, index_type> pp=std::make_pair(elem,id);
-            it = field_index_map_.insert(pp); // seg fault here
+            it = field_index_map_.insert(pp);
 
 #if 0
 			// unordered_multimap with any as value succeeds

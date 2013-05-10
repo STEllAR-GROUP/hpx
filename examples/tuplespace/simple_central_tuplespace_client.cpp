@@ -19,7 +19,6 @@
 
 typedef examples::server::simple_central_tuplespace central_tuplespace_type;
 typedef central_tuplespace_type::tuple_type tuple_type;
-typedef central_tuplespace_type::key_type key_type;
 typedef central_tuplespace_type::elem_type elem_type;
 
 
@@ -42,7 +41,7 @@ void print_tuple(const tuple_type& tuple)
 
 
 
-void simple_central_tuplespace_test(const std::string& tuplespace_symbol_name, const key_type& key, const tuple_type& tuple)
+void simple_central_tuplespace_test(const std::string& tuplespace_symbol_name, const tuple_type tuple)
 {
    hpx::naming::id_type ts_gid;                                     
    hpx::agas::resolve_name(tuplespace_symbol_name, ts_gid);  
@@ -54,18 +53,36 @@ void simple_central_tuplespace_test(const std::string& tuplespace_symbol_name, c
    print_tuple(tuple);
    hpx::cout<<" returns " << ret << hpx::endl;
 
-   tuple_type return_tuple = central_tuplespace.read_sync(key, 0);
-   hpx::cout<< "locality " << hpx::get_locality_id() << ": " <<"read_sync tuple with key="<<key<<" returns ";
+   tuple_type partial_tuple;
+
+   if(tuple.size() > 1) // use second field
+   {
+       partial_tuple.push_back_empty()
+           .push_back(*(tuple.begin() + 1));
+   }
+   else
+   {
+       partial_tuple.push_back(*(tuple.begin()));
+   }
+
+   tuple_type return_tuple = central_tuplespace.read_sync(partial_tuple, 0);
+   hpx::cout<< "locality " << hpx::get_locality_id() << ": " <<"read_sync tuple with ";
+   print_tuple(partial_tuple);
+   hpx::cout<<" returns ";
    print_tuple(return_tuple);
    hpx::cout<<hpx::endl;
 
-   return_tuple = central_tuplespace.take_sync(key, 0);
-   hpx::cout<< "locality " << hpx::get_locality_id() << ": " <<"take_sync tuple with key="<<key<<" (1st) returns ";
+   return_tuple = central_tuplespace.take_sync(partial_tuple, 0);
+   hpx::cout<< "locality " << hpx::get_locality_id() << ": " <<"take_sync tuple with ";
+   print_tuple(partial_tuple);
+   hpx::cout<<" (1st) returns ";
    print_tuple(return_tuple);
    hpx::cout<<hpx::endl;
 
-   return_tuple = central_tuplespace.take_sync(key, 0);
-   hpx::cout<< "locality " << hpx::get_locality_id() << ": " <<"take_sync tuple with key="<<key<<" (2nd) returns ";
+   return_tuple = central_tuplespace.take_sync(partial_tuple, 0);
+   hpx::cout<< "locality " << hpx::get_locality_id() << ": " <<"take_sync tuple with ";
+   print_tuple(partial_tuple);
+   hpx::cout<<" (2nd) returns ";
    print_tuple(return_tuple);
    hpx::cout<<hpx::endl<<hpx::flush;
 }
@@ -91,15 +108,13 @@ int hpx_main()
 
 
         tuple_type tuple1;
-        key_type key1="first";
-        tuple1.push_back(key1)
+        tuple1.push_back(std::string("first"))
             .push_back(10) // first elem: int
             .push_back(small_object(20)) // second elem: small_object
             .push_back(big_object(30, 40)); // third elem: big_object
 
         tuple_type tuple2;
-        key_type key2="second";
-        tuple2.push_back(key2)
+        tuple2.push_back(std::string("second"))
             .push_back(std::string("string")) // first elem: string
             .push_back(small_object(50)) // second elem: small_object
             .push_back(big_object(60, 70)); // third elem: big_object
@@ -113,9 +128,9 @@ int hpx_main()
             // completed.
             typedef simple_central_tuplespace_test_action action_type;
             futures.push_back(hpx::async<action_type>
-                    (node, tuplespace_symbol_name, key1, tuple1));
+                    (node, tuplespace_symbol_name, tuple1));
             futures.push_back(hpx::async<action_type>
-                    (node, tuplespace_symbol_name, key2, tuple2));
+                    (node, tuplespace_symbol_name, tuple2));
         }
         hpx::lcos::wait(futures);
     }

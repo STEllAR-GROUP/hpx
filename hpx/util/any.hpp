@@ -426,7 +426,7 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        basic_any(T const& x)
+        explicit basic_any(T const& x)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -457,7 +457,7 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        basic_any(T&& x, 
+        explicit basic_any(T&& x, 
             typename boost::disable_if<
                 boost::is_same<
                     basic_any, 
@@ -743,7 +743,7 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        basic_any(T const& x)
+        explicit basic_any(T const& x)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -774,7 +774,7 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        basic_any(T&& x, 
+        explicit basic_any(T&& x, 
             typename boost::disable_if<
                 boost::is_same<
                     basic_any, 
@@ -1064,7 +1064,6 @@ namespace hpx { namespace util
                 portable_binary_oarchive ar (
                         data, 0, boost::archive::no_header);
                 ar << elem;
-
             }  // let archive go out of scope
 
             // now 'data' has the serialized binary byte stream
