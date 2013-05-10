@@ -101,6 +101,8 @@ namespace hpx { namespace util
         };
 #endif
 
+// gcc 4.4.x is not able to cope this this, thus we disable the optimization
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500
         ///////////////////////////////////////////////////////////////////////
         struct compute_seqence_is_bitwise_serializable
         {
@@ -116,6 +118,13 @@ namespace hpx { namespace util
           : boost::mpl::fold<
                 Seq, boost::mpl::true_, compute_seqence_is_bitwise_serializable>
         {};
+#else
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Seq>
+        struct seqence_is_bitwise_serializable
+          : boost::mpl::false_
+        {};
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
