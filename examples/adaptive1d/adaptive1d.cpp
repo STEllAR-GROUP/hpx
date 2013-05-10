@@ -202,7 +202,7 @@ int hpx_main(variables_map& vm)
     std::cout << " id_sigma      : " << par->id_sigma << std::endl;
 
     // number stencils
-    std::size_t number_stencils = par->nx0/par->grain_size;
+    //std::size_t number_stencils = par->nx0/par->grain_size;
 
     // compute derived parameters
     par->minx0 = par->Rmin;
