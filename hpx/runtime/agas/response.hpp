@@ -25,6 +25,8 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
+#include <boost/fusion/at_c.hpp>
+#include <boost/fusion/include/value_at.hpp>
 
 #include <numeric>
 
