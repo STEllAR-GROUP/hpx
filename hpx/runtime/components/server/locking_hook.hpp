@@ -12,6 +12,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/preprocessor/control/iif.hpp>
 #include <boost/scope_exit.hpp>
 
 namespace hpx { namespace components
