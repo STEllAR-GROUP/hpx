@@ -52,6 +52,7 @@ namespace hpx { namespace components
 
     template <typename Component, typename Wrapper>
     class abstract_managed_component_base
+      : private detail::managed_component_tag
     {
     public:
         typedef managed_component<Component, Wrapper> wrapping_type;
