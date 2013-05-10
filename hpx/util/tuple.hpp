@@ -151,7 +151,7 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
 
-    inline tuple0<> forward_as_tuple()
+    inline tuple0<> forward_as_tuple() BOOST_NOEXCEPT
     {
         return tuple0<>();
     }
@@ -212,17 +212,17 @@ namespace hpx { namespace util
     }
 
     template <int N, typename Tuple>
-    BOOST_FORCEINLINE
+    BOOST_FORCEINLINE BOOST_CONSTEXPR
     typename detail::tuple_element<N, Tuple>::rtype
-    get(Tuple& t)
+    get(Tuple& t) BOOST_NOEXCEPT
     {
         return t.template get<N>();
     }
 
     template <int N, typename Tuple>
-    BOOST_FORCEINLINE
+    BOOST_FORCEINLINE BOOST_CONSTEXPR
     typename detail::tuple_element<N, Tuple>::crtype
-    get(Tuple const& t)
+    get(Tuple const& t) BOOST_NOEXCEPT
     {
         return t.template get<N>();
     }
@@ -353,8 +353,10 @@ namespace boost
         typedef typename detail::tuple_element_access<type>::type rtype;      \
         typedef typename detail::tuple_element_access<type>::ctype crtype;    \
                                                                               \
-        static rtype get(Tuple& t) { return t.BOOST_PP_CAT(a, N); }           \
-        static crtype get(Tuple const& t) { return t.BOOST_PP_CAT(a, N); }    \
+        static BOOST_CONSTEXPR rtype get(Tuple& t) BOOST_NOEXCEPT             \
+            { return t.BOOST_PP_CAT(a, N); }                                  \
+        static BOOST_CONSTEXPR crtype get(Tuple const& t) BOOST_NOEXCEPT      \
+            { return t.BOOST_PP_CAT(a, N); }                                  \
     };                                                                        \
 /**/
 
@@ -424,15 +426,17 @@ namespace hpx { namespace util
         BOOST_PP_REPEAT(N, M0, _)
 
         template <int E>
+        BOOST_CONSTEXPR 
         typename detail::tuple_element<E, HPX_UTIL_TUPLE_NAME>::rtype
-        get()
+        get() BOOST_NOEXCEPT
         {
             return detail::tuple_element<E, HPX_UTIL_TUPLE_NAME>::get(*this);
         }
 
         template <int E>
+        BOOST_CONSTEXPR
         typename detail::tuple_element<E, HPX_UTIL_TUPLE_NAME>::crtype
-        get() const
+        get() const BOOST_NOEXCEPT
         {
             return detail::tuple_element<E, HPX_UTIL_TUPLE_NAME>::get(*this);
         }
@@ -519,7 +523,7 @@ namespace hpx { namespace util
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     BOOST_FORCEINLINE
     HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>
-    forward_as_tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    forward_as_tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg)) BOOST_NOEXCEPT
     {
         return HPX_UTIL_TUPLE_NAME<
                 BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>(
