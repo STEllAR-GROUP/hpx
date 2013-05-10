@@ -95,9 +95,9 @@ namespace bcast { namespace server
       receive_array = (double *) malloc(sizeof(double)*sendbuf2);
 
       int dest = item_ + 1; 
-      if ( dest >= numberpe ) dest = 0;
+      if ( dest >= int(numberpe) ) dest = 0;
 
-      for (int i=0;i<sendbuf2;i++) {
+      for (std::size_t i=0;i<sendbuf2;i++) {
         send_array[i] = item_*1000.0 + i; 
       }
 
@@ -107,7 +107,7 @@ namespace bcast { namespace server
       // Validate the send/receive
       int origin = item_-1;
       if ( origin < 0 ) origin = numberpe-1;
-      for (int i=0;i<sendbuf2;i++) {
+      for (std::size_t i=0;i<sendbuf2;i++) {
         if ( floatcmp(receive_array[i],origin*1000.0+i) != 1 ) {
           std::cout << " Problem in send receive! " << receive_array[i] << " mype " << mype << " i " << i << std::endl;
         }
@@ -125,11 +125,11 @@ namespace bcast { namespace server
         f.get();
 
         // Copy the parameters to the fortran arrays
-        BOOST_ASSERT(intparams_.size() == nint);
+        BOOST_ASSERT(intparams_.size() == std::size_t(nint));
         for (std::size_t i=0;i<intparams_.size();i++) {
           integer_params[i] = intparams_[i];
         }
-        BOOST_ASSERT(realparams_.size() == nreal);
+        BOOST_ASSERT(realparams_.size() == std::size_t(nreal));
         for (std::size_t i=0;i<realparams_.size();i++) {
           real_params[i] = realparams_[i];
         }
@@ -210,7 +210,7 @@ namespace bcast { namespace server
       f.get();
 
       mutex_type::scoped_lock l(mtx_);
-      BOOST_ASSERT(sndrecv_.size() == receive_size);
+      BOOST_ASSERT(sndrecv_.size() == std::size_t(receive_size));
       for (std::size_t i=0;i<sndrecv_.size();i++) {
         creceive[i] = sndrecv_[i];
       }

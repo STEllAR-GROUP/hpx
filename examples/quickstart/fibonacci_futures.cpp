@@ -240,7 +240,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (int i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i) 
         {
             // Create a Future for the whole calculation, execute it locally, 
             // and wait for it.
@@ -261,7 +261,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (int i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i) 
         {
             // Create a Future for the whole calculation, execute it locally, 
             // and wait for it.
@@ -282,7 +282,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (int i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i) 
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
@@ -302,7 +302,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (int i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i) 
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
@@ -322,7 +322,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (int i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i) 
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
@@ -342,7 +342,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (int i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i) 
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
@@ -362,7 +362,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (int i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i) 
         {
             // Create a future for the whole calculation, execute it locally, and
             // wait for it.
@@ -382,7 +382,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (int i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i) 
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
