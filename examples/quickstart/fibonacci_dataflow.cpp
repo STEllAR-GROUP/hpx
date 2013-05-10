@@ -67,7 +67,7 @@ namespace hpx { namespace lcos { namespace local {
                     goto L2;
                 }
 
-                if(!f1_.is_ready())
+                if(!f1_.ready())
                 {
                     state_ = 1;
                     if(!result_.valid())
@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace local {
 L1:
                 f1_result_ = f1_.get();
 
-                if(!f2_.is_ready())
+                if(!f2_.ready())
                 {
                     state_ = 2;
                     if(!result_.valid())
