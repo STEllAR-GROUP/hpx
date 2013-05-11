@@ -12,9 +12,6 @@
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/preprocessor/control/iif.hpp>
-#include <boost/scope_exit.hpp>
-
 namespace hpx { namespace components
 {
     /// This hook can be inserted into the derivation chain of any component
@@ -55,6 +52,14 @@ namespace hpx { namespace components
             threads::thread_state_ex_enum(threads::thread_state_enum)
         > yield_decorator_type;
 
+        struct undecorate_wrapper
+        {
+            ~undecorate_wrapper()
+            {
+                threads::get_self().undecorate_yield();
+            }
+        };
+
         // Execute the wrapped action. This locks the mutex ensuring a thread
         // safe action invocation.
         threads::thread_state_enum thread_function(
@@ -73,30 +78,35 @@ namespace hpx { namespace components
                 threads::get_self().decorate_yield(
                     HPX_STD_BIND(&locking_hook::yield_function, this, _1));
 
-                BOOST_SCOPE_EXIT_TPL(void) {
-                    threads::get_self().undecorate_yield();
-                } BOOST_SCOPE_EXIT_END
-
+                undecorate_wrapper yield_undecorator;
                 result = f(state);
             }
 
             return result;
         }
 
+        struct decorate_wrapper
+        {
+            decorate_wrapper()
+              : yield_decorator_(boost::move(threads::get_self().undecorate_yield()))
+            {}
+
+            ~decorate_wrapper()
+            {
+                threads::get_self().decorate_yield(boost::move(yield_decorator_));
+            }
+
+            yield_decorator_type yield_decorator_;
+        };
+
         // The yield decorator unlocks the mutex and calls the system yield
         // which gives up control back to the thread manager.
         threads::thread_state_ex_enum yield_function(
             threads::thread_state_enum state)
         {
-            // We un-decorate the yield function as the lock handling may 
+            // We un-decorate the yield function as the lock handling may
             // suspend, which causes an infinite recursion otherwise.
-            yield_decorator_type yield_decorator(
-                boost::move(threads::get_self().undecorate_yield()));
-
-            BOOST_SCOPE_EXIT_TPL(&yield_decorator) {
-                threads::get_self().decorate_yield(boost::move(yield_decorator));
-            } BOOST_SCOPE_EXIT_END
-
+            decorate_wrapper yield_decorator;
             threads::thread_state_ex_enum result = threads::wait_unknown;
 
             {
