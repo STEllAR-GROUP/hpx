@@ -24,6 +24,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    namespace detail
+    {
+        BOOST_FORCEINLINE bool has_async_policy(BOOST_SCOPED_ENUM(launch) policy)
+        {
+            return (static_cast<int>(policy) &
+                (static_cast<int>(launch::async)|static_cast<int>(launch::task))) ?
+                    true : false;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     lcos::future<
@@ -39,7 +49,7 @@ namespace hpx
         >::type result_type;
 
         lcos::packaged_action<action_type, result_type> p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid);
         return p.get_future();
     }
@@ -129,7 +139,7 @@ namespace hpx
             packaged_action_type;
 
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         return p.get_future();
     }

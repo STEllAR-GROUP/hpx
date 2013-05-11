@@ -43,7 +43,7 @@ namespace hpx
             remote_result_type>::type result_type;
 
         lcos::packaged_action<action_type, result_type> p;
-        if (policy & launch::async) {
+        if (detail::has_async_policy(policy)) {
             apply<Action>(
                 new hpx::actions::typed_continuation<remote_result_type>(
                     p.get_gid(), boost::forward<F>(f))
@@ -148,7 +148,7 @@ namespace hpx
             remote_result_type>::type result_type;
 
         lcos::packaged_action<action_type, result_type> p;
-        if (policy & launch::async) {
+        if (detail::has_async_policy(policy)) {
             apply<Action>(
                 new hpx::actions::typed_continuation<remote_result_type>(
                     p.get_gid(), boost::forward<F>(f))

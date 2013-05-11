@@ -27,7 +27,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ));
         return p.get_future();
     }
@@ -85,7 +85,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         return p.get_future();
     }
@@ -143,7 +143,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         return p.get_future();
     }
@@ -201,7 +201,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         return p.get_future();
     }
@@ -259,7 +259,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         return p.get_future();
     }
@@ -317,7 +317,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
         return p.get_future();
     }
@@ -375,7 +375,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
         return p.get_future();
     }
@@ -433,7 +433,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
         return p.get_future();
     }
@@ -491,7 +491,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
         return p.get_future();
     }
@@ -549,7 +549,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
         return p.get_future();
     }
@@ -607,7 +607,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
         return p.get_future();
     }
@@ -665,7 +665,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
         return p.get_future();
     }
@@ -723,7 +723,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
         return p.get_future();
     }
@@ -781,7 +781,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ));
         return p.get_future();
     }
@@ -839,7 +839,7 @@ namespace hpx
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ));
         return p.get_future();
     }

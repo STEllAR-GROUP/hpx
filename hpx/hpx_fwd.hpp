@@ -636,7 +636,9 @@ namespace hpx
     {
         async = 0x01,
         deferred = 0x02,
-        all = 0x03        // async | deferred
+        task = 0x04,        // see N3632
+        sync = 0x08,
+        all = 0x0f          // async | deferred | task | sync
     };
     BOOST_SCOPED_ENUM_END
 
