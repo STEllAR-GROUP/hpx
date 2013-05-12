@@ -127,6 +127,12 @@ namespace hpx { namespace lcos
             future_data_.swap(p);
         }
 
+        // accept wrapped future
+        future(BOOST_RV_REF(future<future>) other)
+        {
+            future_data_.swap(other.unwrap().future_data_);
+        }
+
         explicit future(BOOST_RV_REF(Result) init)
         {
             typedef lcos::detail::future_data<Result> impl_type;
@@ -219,6 +225,10 @@ namespace hpx { namespace lcos
         future<typename boost::result_of<F(future)>::type>
         then(BOOST_FWD_REF(F) f);
 
+        template <typename F>
+        future<typename boost::result_of<F(future)>::type>
+        then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
+
         // reset any pending continuation function
         void then()
         {
@@ -264,7 +274,7 @@ namespace hpx { namespace lcos
 
     private:
         template <typename InnerResult, typename UnwrapResult>
-        void on_inner_ready(future<InnerResult> const& inner,
+        void on_inner_ready(future<InnerResult>& inner,
             boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p);
 
         template <typename UnwrapResult>
@@ -358,6 +368,12 @@ namespace hpx { namespace lcos
             future_data_.swap(other.future_data_);
         }
 
+        // accept wrapped future
+        future(BOOST_RV_REF(future<future>) other)
+        {
+            future_data_.swap(other.unwrap().future_data_);
+        }
+
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
             if (this != &other)
@@ -435,6 +451,10 @@ namespace hpx { namespace lcos
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
         then(BOOST_FWD_REF(F) f);
+
+        template <typename F>
+        future<typename boost::result_of<F(future)>::type>
+        then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         // reset any pending continuation function
         void then()
