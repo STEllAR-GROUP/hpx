@@ -130,7 +130,8 @@ namespace hpx { namespace lcos
         // accept wrapped future
         future(BOOST_RV_REF(future<future>) other)
         {
-            future_data_.swap(other.unwrap().future_data_);
+            future f = boost::move(other.unwrap());
+            (*this).swap(f);
         }
 
         explicit future(BOOST_RV_REF(Result) init)
