@@ -477,7 +477,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     typename detail::create_future<                                           \
-        F(BOOST_PP_ENUM_PARAMS(NN, Arg))                                      \
+        F(BOOST_PP_ENUM_PARAMS(N, A))                                         \
     >::type                                                                   \
     async(BOOST_SCOPED_ENUM(launch) policy,                                   \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
@@ -489,7 +489,7 @@ namespace hpx
     )                                                                         \
     {                                                                         \
         typedef typename boost::result_of<                                    \
-            F(BOOST_PP_ENUM_PARAMS(NN, Arg))                                  \
+            F(BOOST_PP_ENUM_PARAMS(N, A))                                     \
         >::type result_type;                                                  \
         if (policy == launch::sync) {                                         \
             typedef typename boost::is_void<result_type>::type predicate;     \
@@ -511,7 +511,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     typename detail::create_future<                                           \
-        F(BOOST_PP_ENUM_PARAMS(NN, Arg))                                      \
+        F(BOOST_PP_ENUM_PARAMS(N, A))                                         \
     >::type                                                                   \
     async(                                                                    \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \

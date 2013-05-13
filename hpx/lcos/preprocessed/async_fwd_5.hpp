@@ -17,7 +17,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid);
+        > const & , naming::id_type const& gid);
 }
 namespace hpx
 {
@@ -29,7 +29,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0);
+        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0);
 }
 namespace hpx
 {
@@ -41,7 +41,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1);
+        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1);
 }
 namespace hpx
 {
@@ -53,7 +53,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2);
+        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2);
 }
 namespace hpx
 {
@@ -65,7 +65,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3);
+        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3);
 }
 namespace hpx
 {
@@ -77,5 +77,5 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4);
+        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4);
 }

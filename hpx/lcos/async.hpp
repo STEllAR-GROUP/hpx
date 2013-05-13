@@ -83,7 +83,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid)
+        > const & /*act*/, naming::id_type const& gid)
     {
         return async<Derived>(launch::all, gid);
     }
@@ -163,7 +163,7 @@ namespace hpx
     async (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        > const & /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return async<Derived>(policy, gid,
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
@@ -175,7 +175,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        > /*act*/ const &, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return async<Derived>(launch::all, gid,
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
