@@ -10,7 +10,7 @@
 
 namespace hpx { namespace util { namespace detail
 {
-    template <typename Tuple> struct tuple_element< 0, Tuple> { typedef typename Tuple::member_type0 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a0; } static constexpr crtype get(Tuple const& t) noexcept { return t.a0; } }; template <typename Tuple> struct tuple_element< 1, Tuple> { typedef typename Tuple::member_type1 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a1; } static constexpr crtype get(Tuple const& t) noexcept { return t.a1; } }; template <typename Tuple> struct tuple_element< 2, Tuple> { typedef typename Tuple::member_type2 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a2; } static constexpr crtype get(Tuple const& t) noexcept { return t.a2; } }; template <typename Tuple> struct tuple_element< 3, Tuple> { typedef typename Tuple::member_type3 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a3; } static constexpr crtype get(Tuple const& t) noexcept { return t.a3; } }; template <typename Tuple> struct tuple_element< 4, Tuple> { typedef typename Tuple::member_type4 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a4; } static constexpr crtype get(Tuple const& t) noexcept { return t.a4; } }; template <typename Tuple> struct tuple_element< 5, Tuple> { typedef typename Tuple::member_type5 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a5; } static constexpr crtype get(Tuple const& t) noexcept { return t.a5; } }; template <typename Tuple> struct tuple_element< 6, Tuple> { typedef typename Tuple::member_type6 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a6; } static constexpr crtype get(Tuple const& t) noexcept { return t.a6; } }; template <typename Tuple> struct tuple_element< 7, Tuple> { typedef typename Tuple::member_type7 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a7; } static constexpr crtype get(Tuple const& t) noexcept { return t.a7; } };
+    template <typename Tuple> struct tuple_element< 0, Tuple> { typedef typename Tuple::member_type0 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static BOOST_CONSTEXPR rtype get(Tuple& t) noexcept { return t.a0; } static BOOST_CONSTEXPR crtype get(Tuple const& t) noexcept { return t.a0; } }; template <typename Tuple> struct tuple_element< 1, Tuple> { typedef typename Tuple::member_type1 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static BOOST_CONSTEXPR rtype get(Tuple& t) noexcept { return t.a1; } static BOOST_CONSTEXPR crtype get(Tuple const& t) noexcept { return t.a1; } }; template <typename Tuple> struct tuple_element< 2, Tuple> { typedef typename Tuple::member_type2 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static BOOST_CONSTEXPR rtype get(Tuple& t) noexcept { return t.a2; } static BOOST_CONSTEXPR crtype get(Tuple const& t) noexcept { return t.a2; } }; template <typename Tuple> struct tuple_element< 3, Tuple> { typedef typename Tuple::member_type3 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static BOOST_CONSTEXPR rtype get(Tuple& t) noexcept { return t.a3; } static BOOST_CONSTEXPR crtype get(Tuple const& t) noexcept { return t.a3; } }; template <typename Tuple> struct tuple_element< 4, Tuple> { typedef typename Tuple::member_type4 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static BOOST_CONSTEXPR rtype get(Tuple& t) noexcept { return t.a4; } static BOOST_CONSTEXPR crtype get(Tuple const& t) noexcept { return t.a4; } }; template <typename Tuple> struct tuple_element< 5, Tuple> { typedef typename Tuple::member_type5 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static BOOST_CONSTEXPR rtype get(Tuple& t) noexcept { return t.a5; } static BOOST_CONSTEXPR crtype get(Tuple const& t) noexcept { return t.a5; } }; template <typename Tuple> struct tuple_element< 6, Tuple> { typedef typename Tuple::member_type6 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static BOOST_CONSTEXPR rtype get(Tuple& t) noexcept { return t.a6; } static BOOST_CONSTEXPR crtype get(Tuple const& t) noexcept { return t.a6; } }; template <typename Tuple> struct tuple_element< 7, Tuple> { typedef typename Tuple::member_type7 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static BOOST_CONSTEXPR rtype get(Tuple& t) noexcept { return t.a7; } static BOOST_CONSTEXPR crtype get(Tuple const& t) noexcept { return t.a7; } };
 }}}
 namespace hpx { namespace util
 {
@@ -25,7 +25,7 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple1>::get(*this);
         }
         template <int E>
-        constexpr
+        BOOST_CONSTEXPR
         typename detail::tuple_element<E, tuple1>::crtype
         get() const noexcept
         {
@@ -195,7 +195,7 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple2>::get(*this);
         }
         template <int E>
-        constexpr
+        BOOST_CONSTEXPR
         typename detail::tuple_element<E, tuple2>::crtype
         get() const noexcept
         {
@@ -366,7 +366,7 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple3>::get(*this);
         }
         template <int E>
-        constexpr
+        BOOST_CONSTEXPR
         typename detail::tuple_element<E, tuple3>::crtype
         get() const noexcept
         {
@@ -537,7 +537,7 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple4>::get(*this);
         }
         template <int E>
-        constexpr
+        BOOST_CONSTEXPR
         typename detail::tuple_element<E, tuple4>::crtype
         get() const noexcept
         {
@@ -708,7 +708,7 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple5>::get(*this);
         }
         template <int E>
-        constexpr
+        BOOST_CONSTEXPR
         typename detail::tuple_element<E, tuple5>::crtype
         get() const noexcept
         {
@@ -879,7 +879,7 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple6>::get(*this);
         }
         template <int E>
-        constexpr
+        BOOST_CONSTEXPR
         typename detail::tuple_element<E, tuple6>::crtype
         get() const noexcept
         {
@@ -1050,7 +1050,7 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple7>::get(*this);
         }
         template <int E>
-        constexpr
+        BOOST_CONSTEXPR
         typename detail::tuple_element<E, tuple7>::crtype
         get() const noexcept
         {
@@ -1221,7 +1221,7 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple8>::get(*this);
         }
         template <int E>
-        constexpr
+        BOOST_CONSTEXPR
         typename detail::tuple_element<E, tuple8>::crtype
         get() const noexcept
         {
