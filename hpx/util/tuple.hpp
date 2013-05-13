@@ -435,7 +435,6 @@ namespace hpx { namespace util
         BOOST_PP_REPEAT(N, M0, _)
 
         template <int E>
-        BOOST_CONSTEXPR 
         typename detail::tuple_element<E, HPX_UTIL_TUPLE_NAME>::rtype
         get() BOOST_NOEXCEPT
         {

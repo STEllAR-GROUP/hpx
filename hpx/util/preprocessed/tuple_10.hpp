@@ -10,7 +10,7 @@
 
 namespace hpx { namespace util { namespace detail
 {
-    template <typename Tuple> struct tuple_element< 0, Tuple> { typedef typename Tuple::member_type0 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a0; } static crtype get(Tuple const& t) { return t.a0; } }; template <typename Tuple> struct tuple_element< 1, Tuple> { typedef typename Tuple::member_type1 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a1; } static crtype get(Tuple const& t) { return t.a1; } }; template <typename Tuple> struct tuple_element< 2, Tuple> { typedef typename Tuple::member_type2 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a2; } static crtype get(Tuple const& t) { return t.a2; } }; template <typename Tuple> struct tuple_element< 3, Tuple> { typedef typename Tuple::member_type3 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a3; } static crtype get(Tuple const& t) { return t.a3; } }; template <typename Tuple> struct tuple_element< 4, Tuple> { typedef typename Tuple::member_type4 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a4; } static crtype get(Tuple const& t) { return t.a4; } }; template <typename Tuple> struct tuple_element< 5, Tuple> { typedef typename Tuple::member_type5 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a5; } static crtype get(Tuple const& t) { return t.a5; } }; template <typename Tuple> struct tuple_element< 6, Tuple> { typedef typename Tuple::member_type6 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a6; } static crtype get(Tuple const& t) { return t.a6; } }; template <typename Tuple> struct tuple_element< 7, Tuple> { typedef typename Tuple::member_type7 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a7; } static crtype get(Tuple const& t) { return t.a7; } }; template <typename Tuple> struct tuple_element< 8, Tuple> { typedef typename Tuple::member_type8 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a8; } static crtype get(Tuple const& t) { return t.a8; } }; template <typename Tuple> struct tuple_element< 9, Tuple> { typedef typename Tuple::member_type9 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a9; } static crtype get(Tuple const& t) { return t.a9; } }; template <typename Tuple> struct tuple_element< 10, Tuple> { typedef typename Tuple::member_type10 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a10; } static crtype get(Tuple const& t) { return t.a10; } }; template <typename Tuple> struct tuple_element< 11, Tuple> { typedef typename Tuple::member_type11 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a11; } static crtype get(Tuple const& t) { return t.a11; } }; template <typename Tuple> struct tuple_element< 12, Tuple> { typedef typename Tuple::member_type12 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static rtype get(Tuple& t) { return t.a12; } static crtype get(Tuple const& t) { return t.a12; } };
+    template <typename Tuple> struct tuple_element< 0, Tuple> { typedef typename Tuple::member_type0 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a0; } static constexpr crtype get(Tuple const& t) noexcept { return t.a0; } }; template <typename Tuple> struct tuple_element< 1, Tuple> { typedef typename Tuple::member_type1 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a1; } static constexpr crtype get(Tuple const& t) noexcept { return t.a1; } }; template <typename Tuple> struct tuple_element< 2, Tuple> { typedef typename Tuple::member_type2 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a2; } static constexpr crtype get(Tuple const& t) noexcept { return t.a2; } }; template <typename Tuple> struct tuple_element< 3, Tuple> { typedef typename Tuple::member_type3 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a3; } static constexpr crtype get(Tuple const& t) noexcept { return t.a3; } }; template <typename Tuple> struct tuple_element< 4, Tuple> { typedef typename Tuple::member_type4 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a4; } static constexpr crtype get(Tuple const& t) noexcept { return t.a4; } }; template <typename Tuple> struct tuple_element< 5, Tuple> { typedef typename Tuple::member_type5 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a5; } static constexpr crtype get(Tuple const& t) noexcept { return t.a5; } }; template <typename Tuple> struct tuple_element< 6, Tuple> { typedef typename Tuple::member_type6 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a6; } static constexpr crtype get(Tuple const& t) noexcept { return t.a6; } }; template <typename Tuple> struct tuple_element< 7, Tuple> { typedef typename Tuple::member_type7 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a7; } static constexpr crtype get(Tuple const& t) noexcept { return t.a7; } }; template <typename Tuple> struct tuple_element< 8, Tuple> { typedef typename Tuple::member_type8 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a8; } static constexpr crtype get(Tuple const& t) noexcept { return t.a8; } }; template <typename Tuple> struct tuple_element< 9, Tuple> { typedef typename Tuple::member_type9 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a9; } static constexpr crtype get(Tuple const& t) noexcept { return t.a9; } }; template <typename Tuple> struct tuple_element< 10, Tuple> { typedef typename Tuple::member_type10 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a10; } static constexpr crtype get(Tuple const& t) noexcept { return t.a10; } }; template <typename Tuple> struct tuple_element< 11, Tuple> { typedef typename Tuple::member_type11 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a11; } static constexpr crtype get(Tuple const& t) noexcept { return t.a11; } }; template <typename Tuple> struct tuple_element< 12, Tuple> { typedef typename Tuple::member_type12 type; typedef typename detail::tuple_element_access<type>::type rtype; typedef typename detail::tuple_element_access<type>::ctype crtype; static constexpr rtype get(Tuple& t) noexcept { return t.a12; } static constexpr crtype get(Tuple const& t) noexcept { return t.a12; } };
 }}}
 namespace hpx { namespace util
 {
@@ -19,16 +19,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0;
         template <int E>
-         
         typename detail::tuple_element<E, tuple1>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple1>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple1>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple1>::get(*this);
         }
@@ -79,7 +78,7 @@ namespace hpx { namespace util
     template <typename Arg0>
     BOOST_FORCEINLINE
     tuple1<typename detail::env_value_type<Arg0>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) noexcept
     {
         return tuple1<
                 typename detail::env_value_type<Arg0>::type>(
@@ -190,16 +189,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1;
         template <int E>
-         
         typename detail::tuple_element<E, tuple2>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple2>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple2>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple2>::get(*this);
         }
@@ -251,7 +249,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
     tuple2<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) noexcept
     {
         return tuple2<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type>(
@@ -362,16 +360,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2;
         template <int E>
-         
         typename detail::tuple_element<E, tuple3>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple3>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple3>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple3>::get(*this);
         }
@@ -423,7 +420,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
     tuple3<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) noexcept
     {
         return tuple3<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type>(
@@ -534,16 +531,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3;
         template <int E>
-         
         typename detail::tuple_element<E, tuple4>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple4>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple4>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple4>::get(*this);
         }
@@ -595,7 +591,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
     tuple4<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) noexcept
     {
         return tuple4<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type>(
@@ -706,16 +702,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3; typedef A4 member_type4; A4 a4;
         template <int E>
-         
         typename detail::tuple_element<E, tuple5>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple5>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple5>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple5>::get(*this);
         }
@@ -767,7 +762,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
     tuple5<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) noexcept
     {
         return tuple5<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type>(
@@ -878,16 +873,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3; typedef A4 member_type4; A4 a4; typedef A5 member_type5; A5 a5;
         template <int E>
-         
         typename detail::tuple_element<E, tuple6>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple6>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple6>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple6>::get(*this);
         }
@@ -939,7 +933,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
     tuple6<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) noexcept
     {
         return tuple6<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type>(
@@ -1050,16 +1044,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3; typedef A4 member_type4; A4 a4; typedef A5 member_type5; A5 a5; typedef A6 member_type6; A6 a6;
         template <int E>
-         
         typename detail::tuple_element<E, tuple7>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple7>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple7>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple7>::get(*this);
         }
@@ -1111,7 +1104,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
     tuple7<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) noexcept
     {
         return tuple7<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type>(
@@ -1222,16 +1215,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3; typedef A4 member_type4; A4 a4; typedef A5 member_type5; A5 a5; typedef A6 member_type6; A6 a6; typedef A7 member_type7; A7 a7;
         template <int E>
-         
         typename detail::tuple_element<E, tuple8>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple8>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple8>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple8>::get(*this);
         }
@@ -1283,7 +1275,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
     tuple8<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) noexcept
     {
         return tuple8<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type>(
@@ -1394,16 +1386,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3; typedef A4 member_type4; A4 a4; typedef A5 member_type5; A5 a5; typedef A6 member_type6; A6 a6; typedef A7 member_type7; A7 a7; typedef A8 member_type8; A8 a8;
         template <int E>
-         
         typename detail::tuple_element<E, tuple9>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple9>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple9>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple9>::get(*this);
         }
@@ -1455,7 +1446,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     BOOST_FORCEINLINE
     tuple9<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) noexcept
     {
         return tuple9<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type>(
@@ -1566,16 +1557,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3; typedef A4 member_type4; A4 a4; typedef A5 member_type5; A5 a5; typedef A6 member_type6; A6 a6; typedef A7 member_type7; A7 a7; typedef A8 member_type8; A8 a8; typedef A9 member_type9; A9 a9;
         template <int E>
-         
         typename detail::tuple_element<E, tuple10>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple10>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple10>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple10>::get(*this);
         }
@@ -1627,7 +1617,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     BOOST_FORCEINLINE
     tuple10<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) noexcept
     {
         return tuple10<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type>(
@@ -1738,16 +1728,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3; typedef A4 member_type4; A4 a4; typedef A5 member_type5; A5 a5; typedef A6 member_type6; A6 a6; typedef A7 member_type7; A7 a7; typedef A8 member_type8; A8 a8; typedef A9 member_type9; A9 a9; typedef A10 member_type10; A10 a10;
         template <int E>
-         
         typename detail::tuple_element<E, tuple11>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple11>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple11>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple11>::get(*this);
         }
@@ -1799,7 +1788,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     BOOST_FORCEINLINE
     tuple11<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) noexcept
     {
         return tuple11<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type>(
@@ -1910,16 +1899,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3; typedef A4 member_type4; A4 a4; typedef A5 member_type5; A5 a5; typedef A6 member_type6; A6 a6; typedef A7 member_type7; A7 a7; typedef A8 member_type8; A8 a8; typedef A9 member_type9; A9 a9; typedef A10 member_type10; A10 a10; typedef A11 member_type11; A11 a11;
         template <int E>
-         
         typename detail::tuple_element<E, tuple12>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple12>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple12>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple12>::get(*this);
         }
@@ -1971,7 +1959,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     BOOST_FORCEINLINE
     tuple12<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type , typename detail::env_value_type<Arg11>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) noexcept
     {
         return tuple12<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type , typename detail::env_value_type<Arg11>::type>(
@@ -2082,16 +2070,15 @@ namespace hpx { namespace util
     {
         typedef A0 member_type0; A0 a0; typedef A1 member_type1; A1 a1; typedef A2 member_type2; A2 a2; typedef A3 member_type3; A3 a3; typedef A4 member_type4; A4 a4; typedef A5 member_type5; A5 a5; typedef A6 member_type6; A6 a6; typedef A7 member_type7; A7 a7; typedef A8 member_type8; A8 a8; typedef A9 member_type9; A9 a9; typedef A10 member_type10; A10 a10; typedef A11 member_type11; A11 a11; typedef A12 member_type12; A12 a12;
         template <int E>
-         
         typename detail::tuple_element<E, tuple13>::rtype
-        get() 
+        get() noexcept
         {
             return detail::tuple_element<E, tuple13>::get(*this);
         }
         template <int E>
-        
+        constexpr
         typename detail::tuple_element<E, tuple13>::crtype
-        get() const 
+        get() const noexcept
         {
             return detail::tuple_element<E, tuple13>::get(*this);
         }
@@ -2143,7 +2130,7 @@ namespace hpx { namespace util
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     BOOST_FORCEINLINE
     tuple13<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type , typename detail::env_value_type<Arg11>::type , typename detail::env_value_type<Arg12>::type>
-    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) noexcept
     {
         return tuple13<
                 typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type , typename detail::env_value_type<Arg11>::type , typename detail::env_value_type<Arg12>::type>(
