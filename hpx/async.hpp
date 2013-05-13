@@ -75,7 +75,10 @@ namespace hpx
     // Launch the given function or function object asynchronously and return a
     // future allowing to synchronize with the returned result.
     template <typename F>
-    typename detail::create_future<F()>::type
+    typename boost::lazy_enable_if<
+        traits::is_callable<F>
+      , detail::create_future<F()>
+    >::type
     async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
@@ -93,7 +96,10 @@ namespace hpx
     }
 
     template <typename F>
-    typename detail::create_future<F()>::type
+    typename boost::lazy_enable_if<
+        traits::is_callable<F>
+      , detail::create_future<F()>
+    >::type
     async (BOOST_FWD_REF(F) f)
     {
         return async(launch::all, boost::forward<F>(f));

@@ -49,7 +49,12 @@ namespace hpx { namespace traits
     template <typename T/*, typename Signature*/>
     struct is_callable
       : boost::mpl::or_<
-            detail::has_result_type<T>
+            boost::mpl::and_<
+                detail::has_result_type<T>
+              , boost::mpl::not_<
+                    traits::is_action<T>
+                >
+            >
           , detail::is_function_pointer<T>
           , boost::is_member_function_pointer<T>
           , boost::is_function<typename util::detail::remove_reference<T>::type>

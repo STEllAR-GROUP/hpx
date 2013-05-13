@@ -224,7 +224,6 @@ hpx_add_definitions(-DHPX_LOG_NO_TSS)
 hpx_add_definitions(-DHPX_LOG_NO_TS)
 hpx_add_definitions(-DHPX_PLUGIN_SYMBOLS_PREFIX=hpx)
 hpx_add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
-hpx_add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
 if(${BOOST_MINOR_VERSION} LESS 53)
@@ -732,6 +731,7 @@ if(MSVC)
     hpx_option(HPX_HAVE_CXX11_DECLTYPE BOOL "Compiler supports C++11 decltype keyword (default: ON)." ON ADVANCED)
     if(HPX_HAVE_CXX11_DECLTYPE)
       hpx_add_definitions(-DHPX_HAVE_CXX11_DECLTYPE)
+      hpx_add_definitions(-DBOOST_RESULT_OF_USE_DECLTYPE)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_UNIQUE_PTR BOOL "Compiler supports C++11 std::unique_ptr (default: ON)." ON ADVANCED)
@@ -920,7 +920,8 @@ else()
 
     hpx_check_for_cxx11_auto(HPX_HAVE_CXX11_AUTO DEFINITIONS HPX_HAVE_CXX11_AUTO)
 
-    hpx_check_for_cxx11_decltype(HPX_HAVE_CXX11_DECLTYPE DEFINITIONS HPX_HAVE_CXX11_DECLTYPE)
+    hpx_check_for_cxx11_decltype(HPX_HAVE_CXX11_DECLTYPE
+      DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
 
     hpx_check_for_cxx11_std_unique_ptr(HPX_HAVE_CXX11_STD_UNIQUE_PTR
       DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
