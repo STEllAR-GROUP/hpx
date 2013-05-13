@@ -44,6 +44,7 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/packaged_action_constructors_direct.hpp"
   "hpx/lcos/deferred_packaged_task_constructors.hpp"
   "hpx/lcos/deferred_packaged_task_constructors_direct.hpp"
+  "hpx/lcos/local/dataflow.hpp"
   "hpx/runtime/actions/component_action_implementations.hpp"
   "hpx/runtime/actions/gcc44/component_action_implementations.hpp"
   "hpx/runtime/actions/component_const_action_implementations.hpp"

@@ -14,6 +14,8 @@
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <hpx/lcos/local/dataflow.hpp>
+
 #include <iostream>
 
 #include <boost/cstdint.hpp>
@@ -25,6 +27,7 @@
 #define HPX_NO_INLINE
 #endif
 
+/*
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
         template <typename Func, typename F1, typename F2>
@@ -134,6 +137,8 @@ L2:
     }
 
 }}}
+
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t threshold = 2;
