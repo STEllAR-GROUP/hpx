@@ -1025,6 +1025,7 @@ namespace hpx { namespace util
         return any_cast<nonref const&>(const_cast<basic_any<IArchive, OArchive, Char> &>(operand));
     }
 
+
     ///////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
     typedef basic_any<portable_binary_iarchive, portable_binary_oarchive> any;
@@ -1032,6 +1033,28 @@ namespace hpx { namespace util
 
     typedef basic_any<void, void, char> any_nonser;
     typedef basic_any<void, void, wchar_t> wany_nonser;
+
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    struct hash_any
+    {
+        size_t operator()(const any &elem ) const
+        {
+            std::vector<char> data;
+
+            {
+                portable_binary_oarchive ar (
+                        data, 0, boost::archive::no_header);
+                ar << elem;
+
+            }  // let archive go out of scope
+
+            // now 'data' has the serialized binary byte stream
+
+            return std::hash<std::string>()(std::string(data.begin(), data.end()));
+        }
+    };
 
 }}    // namespace hpx::util
 
