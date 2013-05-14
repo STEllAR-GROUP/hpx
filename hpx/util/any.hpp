@@ -637,20 +637,14 @@ namespace hpx { namespace util
         // because hpx::uti::any is used only in contexts where these operators
         // do exist
         template <typename IArchive_, typename OArchive_, typename Char_>
-        friend inline std::basic_istream<Char_>&
+        friend std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
-            basic_any<IArchive_, OArchive_, Char_>& obj)
-        {
-            return obj.table->stream_in(i, &obj.object);
-        }
+            basic_any<IArchive_, OArchive_, Char_>& obj);
 
         template <typename IArchive_, typename OArchive_, typename Char_>
-        friend inline std::basic_ostream<Char_>&
+        friend std::basic_ostream<Char_>&
         operator<< (std::basic_ostream<Char_>& o,
-            basic_any<IArchive_, OArchive_, Char_> const& obj)
-        {
-            return obj.table->stream_out(o, &obj.object);
-        }
+            basic_any<IArchive_, OArchive_, Char_> const& obj);
 
     private:
 
@@ -700,6 +694,21 @@ namespace hpx { namespace util
         void* object;
     };
 
+    template <typename IArchive_, typename OArchive_, typename Char_>
+    std::basic_istream<Char_>&
+        operator>> (std::basic_istream<Char_>& i,
+        basic_any<IArchive_, OArchive_, Char_>& obj)
+    {
+        return obj.table->stream_in(i, &obj.object);
+    }
+
+    template <typename IArchive_, typename OArchive_, typename Char_>
+    std::basic_ostream<Char_>&
+        operator<< (std::basic_ostream<Char_>& o,
+        basic_any<IArchive_, OArchive_, Char_> const& obj)
+    {
+        return obj.table->stream_out(o, &obj.object);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Char> // default is char
@@ -932,25 +941,19 @@ namespace hpx { namespace util
             }
         }
 
-    // these functions have been added in the assumption that the embedded
-    // type has a corresponding operator defined, which is completely safe
-    // because hpx::util::any is used only in contexts where these operators
-    // do exist
-        template <typename Char_>
-        friend inline std::basic_istream<Char_>&
+        // these functions have been added in the assumption that the embedded
+        // type has a corresponding operator defined, which is completely safe
+        // because hpx::util::any is used only in contexts where these operators
+        // do exist
+        template <typename IArchive_, typename OArchive_, typename Char_>
+        friend std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
-            basic_any<void, void, Char_>& obj)
-        {
-            return obj.table->stream_in(i, &obj.object);
-        }
+            basic_any<IArchive_, OArchive_, Char_>& obj);
 
-        template <typename Char_>
-        friend inline std::basic_ostream<Char_>&
+        template <typename IArchive_, typename OArchive_, typename Char_>
+        friend std::basic_ostream<Char_>&
         operator<< (std::basic_ostream<Char_>& o,
-            basic_any<void, void, Char_> const& obj)
-        {
-            return obj.table->stream_out(o, &obj.object);
-        }
+            basic_any<IArchive_, OArchive_, Char_> const& obj);
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
