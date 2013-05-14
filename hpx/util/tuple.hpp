@@ -104,7 +104,7 @@ namespace hpx { namespace util
 // gcc 4.4.x is not able to cope this this, thus we disable the optimization
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500
         ///////////////////////////////////////////////////////////////////////
-        struct compute_seqence_is_bitwise_serializable
+        struct compute_sequence_is_bitwise_serializable
         {
             template <typename State, typename T>
             struct apply
@@ -114,14 +114,14 @@ namespace hpx { namespace util
         };
 
         template <typename Seq>
-        struct seqence_is_bitwise_serializable
+        struct sequence_is_bitwise_serializable
           : boost::mpl::fold<
-                Seq, boost::mpl::true_, compute_seqence_is_bitwise_serializable>
+                Seq, boost::mpl::true_, compute_sequence_is_bitwise_serializable>
         {};
 #else
         ///////////////////////////////////////////////////////////////////////
         template <typename Seq>
-        struct seqence_is_bitwise_serializable
+        struct sequence_is_bitwise_serializable
           : boost::mpl::false_
         {};
 #endif
@@ -656,14 +656,14 @@ namespace boost { namespace serialization
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     struct is_bitwise_serializable<
             hpx::util::HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)> >
     {};
 
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     struct is_bitwise_serializable<
             hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
     {};
 }}

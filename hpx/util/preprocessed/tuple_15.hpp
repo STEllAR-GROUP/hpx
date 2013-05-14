@@ -172,13 +172,13 @@ namespace boost { namespace serialization
     template <typename T0>
     struct is_bitwise_serializable<
             hpx::util::tuple1<T0> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple1<T0> >
     {};
     template <typename T0>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0> >
     {};
 }}
@@ -343,13 +343,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1>
     struct is_bitwise_serializable<
             hpx::util::tuple2<T0 , T1> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple2<T0 , T1> >
     {};
     template <typename T0 , typename T1>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1> >
     {};
 }}
@@ -514,13 +514,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2>
     struct is_bitwise_serializable<
             hpx::util::tuple3<T0 , T1 , T2> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple3<T0 , T1 , T2> >
     {};
     template <typename T0 , typename T1 , typename T2>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2> >
     {};
 }}
@@ -685,13 +685,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3>
     struct is_bitwise_serializable<
             hpx::util::tuple4<T0 , T1 , T2 , T3> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple4<T0 , T1 , T2 , T3> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3> >
     {};
 }}
@@ -856,13 +856,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     struct is_bitwise_serializable<
             hpx::util::tuple5<T0 , T1 , T2 , T3 , T4> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple5<T0 , T1 , T2 , T3 , T4> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4> >
     {};
 }}
@@ -1027,13 +1027,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     struct is_bitwise_serializable<
             hpx::util::tuple6<T0 , T1 , T2 , T3 , T4 , T5> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple6<T0 , T1 , T2 , T3 , T4 , T5> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5> >
     {};
 }}
@@ -1198,13 +1198,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     struct is_bitwise_serializable<
             hpx::util::tuple7<T0 , T1 , T2 , T3 , T4 , T5 , T6> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple7<T0 , T1 , T2 , T3 , T4 , T5 , T6> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6> >
     {};
 }}
@@ -1369,13 +1369,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     struct is_bitwise_serializable<
             hpx::util::tuple8<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple8<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7> >
     {};
 }}
@@ -1540,13 +1540,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
     struct is_bitwise_serializable<
             hpx::util::tuple9<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple9<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8> >
     {};
 }}
@@ -1711,13 +1711,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
     struct is_bitwise_serializable<
             hpx::util::tuple10<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple10<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9> >
     {};
 }}
@@ -1882,13 +1882,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
     struct is_bitwise_serializable<
             hpx::util::tuple11<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple11<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10> >
     {};
 }}
@@ -2053,13 +2053,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
     struct is_bitwise_serializable<
             hpx::util::tuple12<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple12<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11> >
     {};
 }}
@@ -2224,13 +2224,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
     struct is_bitwise_serializable<
             hpx::util::tuple13<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple13<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12> >
     {};
 }}
@@ -2395,13 +2395,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
     struct is_bitwise_serializable<
             hpx::util::tuple14<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple14<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13> >
     {};
 }}
@@ -2566,13 +2566,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
     struct is_bitwise_serializable<
             hpx::util::tuple15<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple15<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14> >
     {};
 }}
@@ -2737,13 +2737,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
     struct is_bitwise_serializable<
             hpx::util::tuple16<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple16<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15> >
     {};
 }}
@@ -2908,13 +2908,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
     struct is_bitwise_serializable<
             hpx::util::tuple17<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple17<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16> >
     {};
 }}
@@ -3079,13 +3079,13 @@ namespace boost { namespace serialization
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
     struct is_bitwise_serializable<
             hpx::util::tuple18<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17> >
-       : hpx::util::detail::seqence_is_bitwise_serializable<
+       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple18<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17> >
     {};
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
     struct is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17> >
-      : hpx::util::detail::seqence_is_bitwise_serializable<
+      : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17> >
     {};
 }}
