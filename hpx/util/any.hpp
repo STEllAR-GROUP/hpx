@@ -457,7 +457,14 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
+        basic_any(T&& x, 
+            typename boost::disable_if<
+                boost::is_same<
+                    basic_any, 
+                    typename boost::remove_const<
+                        typename util::detail::remove_reference<T>::type
+                    >::type
+                > >::type* = 0)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
