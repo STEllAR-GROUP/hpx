@@ -1858,9 +1858,6 @@ namespace hpx { namespace threads
                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
 #endif
-#if defined(HPX_HAVE_APEX)
-                                util::apex_wrapper apex("hpx-user-level-thread");
-#endif
 
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.

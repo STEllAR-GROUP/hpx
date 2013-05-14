@@ -120,7 +120,7 @@ namespace hpx { namespace util
         double val = value.get_value<double>(ec);
 
 #ifdef HPX_HAVE_APEX
-        apex_sample_value(name.c_str(), val);
+        apex::sample_value(name.c_str(), val);
 #endif
 
         out << performance_counters::remove_counter_prefix(name) << ",";

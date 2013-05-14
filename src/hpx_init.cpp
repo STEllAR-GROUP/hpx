@@ -504,8 +504,6 @@ namespace hpx
         {
             add_startup_functions(rt, vm, mode, startup, shutdown);
 
-            util::apex_wrapper apex("hpx-application");
-
             // Run this runtime instance using the given function f.
             if (0 != f)
                 return rt.run(boost::bind(f, vm));
@@ -938,16 +936,14 @@ namespace hpx
         shutdown_function_type const& shutdown, hpx::runtime_mode mode,
         bool blocking)
     {
-#ifdef HPX_HAVE_APEX
-        apex_init(argc, argv);
-#endif
-
         int result = 0;
         set_error_handlers();
 
         try {
             // handle all common command line switches
             util::command_line_handling cfg(mode, f, ini_config);
+
+            util::apex_wrapper_init(argc, argv);
 
             result = cfg.call(desc_cmdline, argc, argv);
             if (result != 0) {
@@ -1113,6 +1109,7 @@ namespace hpx
                   get_runtime().get_runtime_support_lva());
 
         p->shutdown_all(shutdown_timeout);
+        util::apex_finalize();
 
         return 0;
     }
