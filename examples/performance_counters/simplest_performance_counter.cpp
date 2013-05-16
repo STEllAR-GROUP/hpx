@@ -17,10 +17,7 @@ boost::atomic<boost::int64_t> counter(0);
 
 boost::int64_t some_performance_data(bool reset)
 {
-    boost::int64_t result = ++counter;
-    if (reset)
-        counter.store(0);
-    return result;
+    return hpx::util::get_and_reset_value(counter, reset);
 }
 
 void register_counter_type()

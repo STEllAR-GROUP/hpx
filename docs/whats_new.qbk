@@ -8,16 +8,73 @@
 [section:whats_new What's New]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_1_0_0 __hpx__ V1.0.0]
+[/ section:hpx_1_0_0 __hpx__ V1.0.0]
+[/ endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_9_6 __hpx__ V0.9.6]
 
 [heading General Changes]
 
-TBD
+The major new fetures in this release are:
+
+* We implemented a firstversion of a distributed AGAS service which essentially
+  eliminates all explicit AGAS network traffic.
+* We created a native ibverbs parcelport allowing to take advantage of the
+  superior latency and bandwidth characteristics of Infiniband networks.
+* We successfully ported HPX to the Xeon Phi platform.
+* Support for the SLURM scheduling system was implemented.
+* Major efforts have been dedicated to improving the performance counter
+  framework, numerous new counters were implemented and new APIs were added.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 765] - Align hpx::any with N3508: Any Library Proposal (Revision 2)
+* [issue 764] - Align hpx::future with newest N3558: A Standardized Representation
+                of Asynchronous Operations
+* [issue 762] - added a human readable output for the ping pong example
+* [issue 761] - Ambiguous typename when constructing derived component
+* [issue 760] - Simple components can not be derived
+* [issue 759] - make install doesn't give a complete install
+* [issue 758] - Stack overflow when using locking_hook<>
+* [issue 757] - copy paste error; unsupported function overloading
+* [issue 755] - Papi counters don't work with reset and evaluate API's
+* [issue 753] - cmake bugfix and improved component action docs
+* [issue 752] - hpx simple component docs
+* [issue 750] - Add hpx::util::any
+* [issue 749] - Thread phase counter is not reset
+* [issue 748] - Memory performance counter are not registered
+* [issue 747] - Create performance counters exposing arithmetic operations
+* [issue 745] - apply_callback needs to invoke callback when applied locally
+* [issue 744] - CMake fixes
+* [issue 743] - Problem Building github version of HPX
+* [issue 742] - Remove HPX_STD_BIND
+* [issue 741] - assertion 'px != 0' failed: HPX(assertion_failure) for low
+                numbers of OS threads
+* [issue 739] - Performance counters do not count to the end of the program
+                or evalution
+* [issue 738] - Dedicated AGAS server runs don't work; console ignores -a option.
+* [issue 737] - Missing bind overloads
+* [issue 736] - Performance counter wildcards do not always work
+* [issue 735] - Creat native ibverbs parcelport based on rdma operations
+* [issue 734] - Threads stolen performance counter total is incorrect
+* [issue 733] - Test benchmarks need to be checked and fixed
+* [issue 732] - Build fails with Mac, using mac ports clang-3.3 on latest git
+                branch
+* [issue 731] - Add global start/stop API for performance counters
+* [issue 730] - Performance counter values are apparently incorrect
+* [issue 729] - Unhandled switch
+* [issue 728] - Serialization of hpx::util::function between two localities
+                causes seg faults
+* [issue 727] - Memory counters on Mac OS X
+* [issue 725] - Restore original thread priority on resume
+* [issue 724] - Performance benchmarks do not depend on main HPX libraries
+* [issue 723] - --hpx:nodes=`cat $PBS_NODEFILE` works; --hpx:nodefile=$PBS_NODEFILE
+                does not.
+* [issue 722] - Fix binding const member functions as actions
+* [issue 719] - Create performance counter exposing compression ratio
 * [issue 718] - Add possibility to compress parcel data
 * [issue 717] - strip_credit_from_gid has misleading semantics
 * [issue 716] - Non-option arguments to programs run using `pbsdsh` must be
@@ -46,7 +103,9 @@ Here is a list of the tickets we closed for this release.
 * [issue 696] - Distributed problem
 * [issue 695] - Bad perf counter time printed
 * [issue 693] - `--help` doesn't print component specific command line options
+* [issue 692] - SLURM support broken
 * [issue 691] - exception while executing any application linked with hwloc
+* [issue 690] - thread_id_test and thread_launcher_test failing
 * [issue 689] - Make the buildbots use hwloc
 * [issue 687] - compilation error fix (hwloc_topology)
 * [issue 686] - Linker Error for Applications
@@ -67,17 +126,29 @@ Here is a list of the tickets we closed for this release.
 * [issue 669] - Links in docs to source files broken if not installed
 * [issue 667] - Not reading ini file properly
 * [issue 664] - Adapt new meanings of 'const' and 'mutable'
+* [issue 661] - Implement BTL Parcel port
 * [issue 655] - Make HPX work with the "decltype" result_of
 * [issue 643] - Error parsing host file
 * [issue 642] - HWLoc issue with TAU
+* [issue 639] - Logging potentially suspends a running thread
+* [issue 634] - Improve error reporting from parcel layer
+* [issue 627] - Add tests for async and apply overloads that accept regular
+                C++ functions
 * [issue 626] - hpx/future.hpp header
+* [issue 601] - Intel support
 * [issue 557] - Remove action codes
+* [issue 531] - AGAS request and response classes should use switch statements
 * [issue 529] - Investigate the state of hwloc support
 * [issue 526] - Make HPX aware of hyper-threading
+* [issue 518] - Create facilities allowing to use plain arrays as action
+                arguments
 * [issue 473] - hwloc thread binding is broken on CPUs with hyperthreading
 * [issue 383] - Change result type detection for hpx::util::bind to use
                 result_of protocol
+* [issue 341] - Consolidate route code
 * [issue 219] - Only copy arguments into actions once
+* [issue 177] - Implement distributed AGAS
+* [issue 43]  - Support for Darwin (Xcode + Clang)
 
 [endsect]
 
@@ -295,6 +366,7 @@ HPX' releases so far.
 * [issue 349] - Commandline option `--localities=N/-lN` should be necessary
                 only on AGAS locality
 * [issue 334] - Add auto_index support to cmake based documentation toolchain
+* [issue 318] - Network benchmarks
 * [issue 317] - Implement network performance counters
 * [issue 310] - Duplicate logging entries
 * [issue 230] - Add compile time option to disable thread debugging info

@@ -10,7 +10,7 @@
     [quickbook 1.6]
     [id hpx]
     [authors [STE||AR Group, The]]
-    [version 1.0.0]
+    [version 0.9.6]
     [copyright 2011 2012 2013 The STE||AR Group, Louisiana State University]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
@@ -30,9 +30,10 @@
 [def __0_8_1__                  [link hpx.whats_new.hpx_previous.hpx_0_8_1 V0.8.1]]
 [def __0_9_0__                  [link hpx.whats_new.hpx_previous.hpx_0_9_0 V0.9.0]]
 [def __0_9_5__                  [link hpx.whats_new.hpx_previous.hpx_0_9_5 V0.9.5]]
+[def __0_9_6__                  [link hpx.whats_new.hpx_0_9_6 V0.9.6]]
 [def __1_0_0__                  [link hpx.whats_new.hpx_1_0_0 V1.0.0]]
 
-[def __version__                __1_0_0__]
+[def __version__                __0_9_6__]
 
 [def __hpx__                    /HPX/]
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
@@ -86,9 +87,13 @@
 [def __blas__                   [@http://math-atlas.sourceforge.net/ Basic Linear Algebra Subroutines 3 (BLAS)]]
 [def __gsl__                    [@http://www.gnu.org/software/gsl/ GNU Scientific Library (GSL)]]
 [def __zlib__                   [@http://www.zlib.net/ ZLib]]
+[def __bzip2__                  [@http://www.bzip.org/ BZip2]]
+[def __snappy__                 [@http://code.google.com/p/snappy/ Snappy]]
 [def __qsub__                   [@http://www.clusterresources.com/torquedocs21/commands/qsub.shtml qsub]]
 [def __qstat__                  [@http://www.clusterresources.com/torquedocs21/commands/qstat.shtml qstat]]
 [def __pbsdsh__                 [@http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml pbsdsh]]
+[def __pgas__                   [@http://www.pgas.org/]]
+[def __apgas__                  [@https://researcher.ibm.com/researcher/files/us-groved/amp2010.pdf]]
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]
 

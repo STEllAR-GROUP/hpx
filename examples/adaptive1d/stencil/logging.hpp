@@ -40,10 +40,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         ///
         /// \param Result [in] The type of the result to be transferred back to
         ///               this LCO instance.
-        typedef hpx::actions::action4<
-            logging, stencil_data const&, int,int,parameter const&,
-            &logging::logentry
-        > logentry_action;
+        HPX_DEFINE_COMPONENT_ACTION(logging, logentry);
 
     private:
         typedef lcos::local::mutex mutex_type;

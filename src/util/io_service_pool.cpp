@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Parts of this code were taken from the Boost.Asio library
@@ -25,7 +25,8 @@ namespace hpx { namespace util
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread,
             char const* pool_name, char const* name_postfix)
-      : next_io_service_(0), stopped_(false), pool_size_(pool_size),
+      : next_io_service_(0), stopped_(false),
+        pool_size_(pool_size),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
         pool_name_(pool_name), pool_name_postfix_(name_postfix)
     {
@@ -34,6 +35,7 @@ namespace hpx { namespace util
             HPX_THROW_EXCEPTION(bad_parameter,
                 "io_service_pool::io_service_pool",
                 "io_service_pool size is 0");
+            return;
         }
 
         // Give all the io_services work to do so that their run() functions
@@ -49,9 +51,10 @@ namespace hpx { namespace util
 
     io_service_pool::io_service_pool(
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
-            HPX_STD_FUNCTION<void()> const& on_stop_thread, 
+            HPX_STD_FUNCTION<void()> const& on_stop_thread,
             char const* pool_name, char const* name_postfix)
-      : next_io_service_(0), stopped_(false), pool_size_(2),
+      : next_io_service_(0), stopped_(false),
+        pool_size_(2),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
         pool_name_(pool_name), pool_name_postfix_(name_postfix)
     {
@@ -191,18 +194,21 @@ namespace hpx { namespace util
 
     boost::asio::io_service& io_service_pool::get_io_service(int index)
     {
+        // use this function for single group io_service pools only
         boost::mutex::scoped_lock l(mtx_);
 
         if (index == -1) {
-            // Use a round-robin scheme to choose the next io_service to use.
-            index = static_cast<int>(next_io_service_++);
-            if (next_io_service_ == pool_size_)
+            if (++next_io_service_ == pool_size_)
                 next_io_service_ = 0;
+
+            // Use a round-robin scheme to choose the next io_service to use.
+            index = static_cast<int>(next_io_service_);
+        }
+        else {
+            next_io_service_ = index;
         }
 
         return *io_services_[index]; //-V108
     }
-
-///////////////////////////////////////////////////////////////////////////////
 }}  // namespace hpx::util
 

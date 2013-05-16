@@ -5,7 +5,11 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    apply_local
+    apply_remote
     async_continue
+    async_local
+    async_remote
     barrier
     dataflow
     deferred_packaged_task

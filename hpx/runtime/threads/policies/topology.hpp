@@ -10,13 +10,6 @@
 
 #if defined(HPX_HAVE_HWLOC)
 #  include <hpx/runtime/threads/policies/hwloc_topology.hpp>
-#elif defined(BOOST_WINDOWS)
-#  include <hpx/runtime/threads/policies/windows_topology.hpp>
-#elif defined(__APPLE__)
-#  include <hpx/runtime/threads/policies/macosx_topology.hpp>
-#elif (defined(__linux) || defined(linux) || defined(__linux__)) && \
-      !defined(__ANDROID__) && !defined(ANDROID)
-#  include <hpx/runtime/threads/policies/linux_topology.hpp>
 #else
 #  include <hpx/runtime/threads/policies/noop_topology.hpp>
 #endif

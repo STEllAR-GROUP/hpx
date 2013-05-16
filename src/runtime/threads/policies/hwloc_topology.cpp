@@ -20,6 +20,8 @@
 
 namespace hpx { namespace threads
 {
+    mask_type hwloc_topology::empty_mask = mask_type();
+
     hwloc_topology::hwloc_topology()
       : topo(0), machine_affinity_mask_(0)
     { // {{{
@@ -47,7 +49,7 @@ namespace hpx { namespace threads
         // routines rely on access to other pieces of topology data. The
         // compiler will optimize the loops where possible anyways.
 
-        std::size_t num_of_sockets = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET);
+        std::size_t num_of_sockets = std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET));
         if (num_of_sockets == 0) num_of_sockets = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
@@ -56,7 +58,7 @@ namespace hpx { namespace threads
             socket_numbers_.push_back(socket);
         }
 
-        std::size_t num_of_nodes = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
+        std::size_t num_of_nodes = std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE));
         if (num_of_nodes == 0) num_of_nodes = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
@@ -65,7 +67,7 @@ namespace hpx { namespace threads
             numa_node_numbers_.push_back(numa_node);
         }
 
-        std::size_t num_of_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+        std::size_t num_of_cores = std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE));
         if (num_of_cores == 0) num_of_cores = 1;
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
@@ -177,7 +179,7 @@ namespace hpx { namespace threads
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_type hwloc_topology::get_machine_affinity_mask(
+    mask_cref_type hwloc_topology::get_machine_affinity_mask(
         error_code& ec
         ) const
     {
@@ -187,7 +189,7 @@ namespace hpx { namespace threads
         return machine_affinity_mask_;
     }
 
-    mask_type hwloc_topology::get_socket_affinity_mask(
+    mask_cref_type hwloc_topology::get_socket_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -208,10 +210,10 @@ namespace hpx { namespace threads
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
-        return 0;
+        return empty_mask;
     } // }}}
 
-    mask_type hwloc_topology::get_numa_node_affinity_mask(
+    mask_cref_type hwloc_topology::get_numa_node_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -232,10 +234,10 @@ namespace hpx { namespace threads
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
-        return 0;
+        return empty_mask;
     } // }}}
 
-    mask_type hwloc_topology::get_core_affinity_mask(
+    mask_cref_type hwloc_topology::get_core_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -256,10 +258,10 @@ namespace hpx { namespace threads
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
-        return 0;
+        return empty_mask;
     }
 
-    mask_type hwloc_topology::get_thread_affinity_mask(
+    mask_cref_type hwloc_topology::get_thread_affinity_mask(
         std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec
@@ -280,13 +282,13 @@ namespace hpx { namespace threads
           , boost::str(boost::format(
                 "thread number %1% is out of range")
                 % num_thread));
-        return 0;
+        return empty_mask;
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
     void hwloc_topology::set_thread_affinity_mask(
         boost::thread&
-      , mask_type //mask
+      , mask_cref_type //mask
       , error_code& ec
         ) const
     {
@@ -295,15 +297,15 @@ namespace hpx { namespace threads
     }
 
     void hwloc_topology::set_thread_affinity_mask(
-        mask_type mask
+        mask_cref_type mask
       , error_code& ec
         ) const
     { // {{{
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 
-        for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
+        for (std::size_t i = 0; i < mask_size(mask); ++i)
         {
-            if (mask & (static_cast<std::size_t>(1) << i))
+            if (test(mask, i))
             {
                 hwloc_bitmap_set(cpuset, static_cast<unsigned int>(i));
             }
@@ -341,15 +343,45 @@ namespace hpx { namespace threads
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_type hwloc_topology::get_thread_affinity_mask_from_lva(
-        naming::address::address_type
+    mask_cref_type hwloc_topology::get_thread_affinity_mask_from_lva(
+        naming::address::address_type lva
       , error_code& ec
         ) const
     { // {{{
         if (&ec != &throws)
             ec = make_success_code();
 
-        return 0;
+//        hwloc_membind_policy_t policy = HWLOC_MEMBIND_DEFAULT;
+//        hwloc_nodeset_t nodeset = hwloc_bitmap_alloc();
+//
+//        {
+//             scoped_lock lk(topo_mtx);
+//             int ret = hwloc_get_area_membind_nodeset(topo,
+//                 reinterpret_cast<void const*>(lva), 1, nodeset, &policy, 0);
+// 
+//             if (-1 != ret)
+//             {
+//                 hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+//                 hwloc_cpuset_from_nodeset(topo, cpuset, nodeset);
+//                 lk.unlock();
+// 
+//                 hwloc_bitmap_free(nodeset);
+// 
+//                 mask_type mask = mask_type();
+//                 resize(mask, hardware_concurrency());
+// 
+//                 for (unsigned int i = 0; i != num_of_pus_; ++i)
+//                 {
+//                     set(mask, hwloc_bitmap_isset(cpuset, i) != 0);
+//                 }
+// 
+//                 hwloc_bitmap_free(cpuset);
+//                 return mask;
+//             }
+//        }
+//
+//        hwloc_bitmap_free(nodeset);
+        return empty_mask;
     } // }}}
 
     std::size_t hwloc_topology::init_node_number(
@@ -383,6 +415,7 @@ namespace hpx { namespace threads
                 obj = obj->parent;
             }
         }
+
         return 0;
     } // }}}
 
@@ -403,7 +436,7 @@ namespace hpx { namespace threads
             if (hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0)
             {
                 do {
-                    mask |= (static_cast<mask_type>(1) << obj->os_index);
+                    set(mask, obj->os_index);
                     {
                         scoped_lock lk(topo_mtx);
                         obj = hwloc_get_next_child(topo, parent, obj);
@@ -474,7 +507,7 @@ namespace hpx { namespace threads
             return extract_node_count(socket_obj, HWLOC_OBJ_PU, pu_count);
         }
 
-        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+        return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU));
     }
 
     std::size_t hwloc_topology::get_number_of_numa_node_pus(
@@ -495,7 +528,7 @@ namespace hpx { namespace threads
             return extract_node_count(node_obj, HWLOC_OBJ_PU, pu_count);
         }
 
-        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+        return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU));
     }
 
     std::size_t hwloc_topology::get_number_of_core_pus(
@@ -516,7 +549,7 @@ namespace hpx { namespace threads
             return extract_node_count(core_obj, HWLOC_OBJ_PU, pu_count);
         }
 
-        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+        return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU));
     }
 
     std::size_t hwloc_topology::get_number_of_socket_cores(
@@ -558,12 +591,13 @@ namespace hpx { namespace threads
             return extract_node_count(node_obj, HWLOC_OBJ_CORE, pu_count);
         }
 
-        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+        return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE));
     }
 
     mask_type hwloc_topology::init_machine_affinity_mask() const
     { // {{{
-        mask_type machine_affinity_mask = 0;
+        mask_type machine_affinity_mask = mask_type();
+        resize(machine_affinity_mask, hardware_concurrency());
 
         hwloc_obj_t machine_obj;
         {
@@ -579,7 +613,7 @@ namespace hpx { namespace threads
         HPX_THROW_EXCEPTION(kernel_error
           , "hpx::threads::hwloc_topology::init_machine_affinity_mask"
           , "failed to initialize machine affinity mask");
-        return 0;
+        return empty_mask;
     } // }}}
 
     mask_type hwloc_topology::init_socket_affinity_mask_from_socket(
@@ -601,7 +635,9 @@ namespace hpx { namespace threads
 
         if (socket_obj)
         {
-            mask_type socket_affinity_mask = 0;
+            mask_type socket_affinity_mask = mask_type();
+            resize(socket_affinity_mask, hardware_concurrency());
+
             extract_node_mask(socket_obj, socket_affinity_mask);
             return socket_affinity_mask;
         }
@@ -630,7 +666,9 @@ namespace hpx { namespace threads
 
         if (numa_node_obj)
         {
-            mask_type node_affinity_mask = 0;
+            mask_type node_affinity_mask = mask_type();
+            resize(node_affinity_mask, hardware_concurrency());
+
             extract_node_mask(numa_node_obj, node_affinity_mask);
             return node_affinity_mask;
         }
@@ -639,7 +677,7 @@ namespace hpx { namespace threads
     } // }}}
 
     mask_type hwloc_topology::init_core_affinity_mask_from_core(
-        std::size_t core, mask_type default_mask
+        std::size_t core, mask_cref_type default_mask
         ) const
     { // {{{
         if (std::size_t(-1) == core)
@@ -655,7 +693,9 @@ namespace hpx { namespace threads
 
         if (core_obj)
         {
-            mask_type core_affinity_mask = 0;
+            mask_type core_affinity_mask = mask_type();
+            resize(core_affinity_mask, hardware_concurrency());
+
             extract_node_mask(core_obj, core_affinity_mask);
             return core_affinity_mask;
         }
@@ -688,9 +728,10 @@ namespace hpx { namespace threads
             return get_core_affinity_mask(num_thread, false);
         }
 
-        mask_type mask = 0x0u;
+        mask_type mask = mask_type();
+        resize(mask, hardware_concurrency());
 
-        mask |= (static_cast<mask_type>(1) << obj->os_index);
+        set(mask, obj->os_index);
 
         return mask;
     } // }}}

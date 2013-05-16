@@ -49,16 +49,8 @@ namespace interpolate3d { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action3<
-            configuration,
-            std::string const&, std::string const&, std::size_t,
-            &configuration::init
-        > init_action;
-
-        typedef hpx::actions::result_action0<
-            configuration const, config_data,
-            &configuration::get
-        > get_action;
+        HPX_DEFINE_COMPONENT_ACTION(configuration, init);
+        HPX_DEFINE_COMPONENT_ACTION(configuration, get);
 
     private:
         config_data data_;

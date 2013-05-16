@@ -4,11 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    any
+    any_serialization
+    boost_any
     bind_action
     function
-    hold_any
-    hold_any_serialization
     merging_map
+    parse_slurm_nodelist
    )
 
 set(merging_map_FLAGS NOLIBS)

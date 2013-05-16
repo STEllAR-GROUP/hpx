@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +8,9 @@
 #include <hpx/runtime/parcelset/tcp/parcelport.hpp>
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
 #  include <hpx/runtime/parcelset/shmem/parcelport.hpp>
+#endif
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+#  include <hpx/runtime/parcelset/ibverbs/parcelport.hpp>
 #endif
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -45,7 +49,24 @@ namespace hpx { namespace parcelset
                     "unsupported connection type 'connection_shmem'");
             }
             break;
+        case connection_ibverbs:
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+            {
+                // Create ibverbs based parcelport only if allowed by the
+                // configuration info.
+                std::string enable_ibverbs =
+                    cfg.get_entry("hpx.parcel.ibverbs.enable", "0");
 
+                if(boost::lexical_cast<int>(enable_ibverbs))
+                {
+                    return boost::make_shared<parcelset::ibverbs::parcelport>(
+                        cfg, on_start_thread, on_stop_thread);
+                }
+            }
+#endif
+            HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
+                "unsupported connection type 'connection_ibverbs'");
+            break;
         case connection_portals4:
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                 "unsupported connection type 'connection_portals4'");
@@ -89,7 +110,7 @@ namespace hpx { namespace parcelset
         // to be sent anymore (some other thread already picked them up)
         // or if there are parcels, but the parcel we were about to sent
         // has been already processed.
-        util::spinlock::scoped_lock l(mtx_);
+        lcos::local::spinlock::scoped_lock l(mtx_);
 
         iterator it = pending_parcels_.find(locality_id);
         if (it != pending_parcels_.end())

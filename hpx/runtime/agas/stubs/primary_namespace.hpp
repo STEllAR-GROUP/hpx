@@ -21,9 +21,7 @@ struct HPX_EXPORT primary_namespace
     typedef server::primary_namespace server_component_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Result
-    >
+    template <typename Result>
     static lcos::future<Result> service_async(
         naming::id_type const& gid
       , request const& req
@@ -43,6 +41,13 @@ struct HPX_EXPORT primary_namespace
     static void service_non_blocking(
         naming::id_type const& gid
       , request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
+        );
+
+    static void service_non_blocking(
+        naming::id_type const& gid
+      , request const& req
+      , HPX_STD_FUNCTION<void(boost::system::error_code const&, std::size_t)> const& f
       , threads::thread_priority priority = threads::thread_priority_default
         );
 
@@ -89,30 +94,18 @@ struct HPX_EXPORT primary_namespace
         return bulk_service_async(gid, reqs, priority).get(ec);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    static lcos::future<bool> route_async(
-        naming::id_type const& gid
-      , parcelset::parcel const& pcl
-      , threads::thread_priority priority = threads::thread_priority_default
-        )
+    static naming::gid_type get_service_instance(naming::gid_type const& dest)
     {
-        typedef server_type::route_action action_type;
-
-        lcos::packaged_action<action_type> p;
-        p.apply_p(gid, priority, pcl);
-        return p.get_future();
+        boost::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
+        naming::gid_type service(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB);
+        return naming::replace_locality_id(service, service_locality_id);
     }
 
-    static bool route(
-        naming::id_type const& gid
-      , parcelset::parcel const& p
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
+    static bool is_service_instance(naming::gid_type const& gid)
     {
-        return route_async(gid, p, priority).get(ec);
+        return gid.get_lsb() == HPX_AGAS_PRIMARY_NS_LSB &&
+            (gid.get_msb() & ~naming::gid_type::locality_id_mask) == HPX_AGAS_NS_MSB;
     }
-
 };
 
 }}}

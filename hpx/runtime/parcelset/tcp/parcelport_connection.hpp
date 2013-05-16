@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach 
 //  Copyright (c) 2011 Katelyn Kufahl
 //
@@ -41,6 +41,22 @@ namespace hpx { namespace parcelset { namespace tcp
       : public boost::enable_shared_from_this<parcelport_connection>,
         private boost::noncopyable
     {
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+    public:
+        enum state
+        {
+            state_initialized,
+            state_reinitialized,
+            state_set_parcel,
+            state_async_write,
+            state_handle_write,
+            state_handle_read_ack,
+            state_scheduled_thread,
+            state_send_pending,
+            state_reclaimed
+        };
+#endif
+
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
@@ -50,9 +66,11 @@ namespace hpx { namespace parcelset { namespace tcp
         ~parcelport_connection()
         {
             // gracefully and portably shutdown the socket
-            boost::system::error_code ec;
-            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-            socket_.close(ec);    // close the socket to give it back to the OS
+            if (socket_.is_open()) {
+                boost::system::error_code ec;
+                socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                socket_.close(ec);    // close the socket to give it back to the OS
+            }
         }
 
         void set_parcel (parcel const& p)
@@ -69,6 +87,9 @@ namespace hpx { namespace parcelset { namespace tcp
         template <typename Handler, typename ParcelPostprocess>
         void async_write(Handler handler, ParcelPostprocess parcel_postprocess)
         {
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+            state_ = state_async_write;
+#endif
             /// Increment sends and begin timer.
             send_data_.time_ = timer_.elapsed_nanoseconds();
 
@@ -104,6 +125,9 @@ namespace hpx { namespace parcelset { namespace tcp
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
             boost::tuple<Handler, ParcelPostprocess> handler)
         {
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+            state_ = state_handle_write;
+#endif
             // just call initial handler
             boost::get<0>(handler)(e, bytes);
 
@@ -142,11 +166,22 @@ namespace hpx { namespace parcelset { namespace tcp
         void handle_read_ack(boost::system::error_code const& e, 
             boost::tuple<Handler, ParcelPostprocess> handler) 
         {
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+            state_ = state_handle_read_ack;
+#endif
             // Call post-processing handler, which will send remaining pending 
             // parcels. Pass along the connection so it can be reused if more 
             // parcels have to be sent.
             boost::get<1>(handler)(e, there_, shared_from_this());
         }
+
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+    public:
+        void set_state(state newstate)
+        {
+            state_ = newstate;
+        }
+#endif
 
     private:
         /// Socket for the parcelport_connection.
@@ -169,9 +204,16 @@ namespace hpx { namespace parcelset { namespace tcp
 
         // archive flags
         int archive_flags_;
+
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+        state state_;
+#endif
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
+#if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
+    typedef boost::weak_ptr<parcelport_connection> parcelport_connection_weak_ptr;
+#endif
 }}}
 
 #endif

@@ -18,7 +18,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
-#include <hpx/traits/supports_result_of.hpp>
+#include <hpx/traits/is_callable.hpp>
 
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
@@ -64,7 +64,7 @@ namespace hpx
 #define HPX_UTIL_BOUND_FUNCTION_APPLY(Z, N, D)                                \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
     typename boost::enable_if<                                                \
-        traits::supports_result_of<F>                                         \
+        traits::is_callable<F>                                                \
       , bool                                                                  \
     >::type                                                                   \
     apply(threads::executor sched, BOOST_FWD_REF(F) f,                        \
@@ -159,7 +159,7 @@ namespace hpx
         return false;   // executed locally
     }
 
-    // define apply() overloads for n-nary bound actions
+    // define apply() overloads for n-nary bound functions
 #define HPX_UTIL_BOUND_FUNCTION_APPLY(Z, N, D)                                \
     template <                                                                \
         typename R                                                            \
@@ -197,7 +197,7 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        threads::register_thread(util::bind(boost::move(bound),               \
+        threads::register_thread(util::bind(util::protect(boost::move(bound)),\
             HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
         return false;                                                         \
     }                                                                         \
@@ -303,7 +303,7 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        threads::register_thread(util::bind(boost::move(bound),               \
+        threads::register_thread(util::bind(util::protect(boost::move(bound)),\
             HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
         return false;                                                         \
     }                                                                         \
@@ -385,7 +385,7 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        threads::register_thread(util::bind(boost::move(bound),               \
+        threads::register_thread(util::bind(util::protect(boost::move(bound)),\
             HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
         return false;                                                         \
     }                                                                         \

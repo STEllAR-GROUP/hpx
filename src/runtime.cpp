@@ -235,11 +235,27 @@ namespace hpx
             active_counters_->reset_counters(ec);
     }
 
-    void runtime::evaluate_active_counters(bool reset, 
+    void runtime::evaluate_active_counters(bool reset,
         char const* description, error_code& ec)
     {
         if (active_counters_.get())
             active_counters_->evaluate_counters(reset, description, ec);
+    }
+
+    parcelset::policies::message_handler* runtime::create_message_handler(
+        char const* message_handler_type, char const* action,
+        parcelset::parcelport* pp, std::size_t num_messages,
+        std::size_t interval, error_code& ec)
+    {
+        return runtime_support_.create_message_handler(message_handler_type, 
+            action, pp, num_messages, interval, ec);
+    }
+
+    util::binary_filter* runtime::create_binary_filter(
+        char const* binary_filter_type, bool compress, error_code& ec)
+    {
+        return runtime_support_.create_binary_filter(binary_filter_type, 
+            compress, ec);
     }
 
     /// \brief Register all performance counter types related to this runtime
@@ -254,7 +270,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/average",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -265,7 +281,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/stddev",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -276,7 +292,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/rolling_averaging",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -287,7 +303,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/median",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -298,7 +314,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/max",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer,
               ""
             },
@@ -309,7 +325,7 @@ namespace hpx
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/min",
               HPX_PERFORMANCE_COUNTER_V1,
-               &performance_counters::detail::aggregating_counter_creator,
+               &performance_counters::detail::statistics_counter_creator,
                &performance_counters::default_counter_discoverer,
               ""
             },
@@ -337,6 +353,53 @@ namespace hpx
         performance_counters::install_counter_types(
             statistic_counter_types,
             sizeof(statistic_counter_types)/sizeof(statistic_counter_types[0]));
+
+        performance_counters::generic_counter_type_data arithmetic_counter_types[] =
+        {
+            // adding counter
+            { "/arithmetics/add", performance_counters::counter_aggregating,
+              "returns the sum of the values of the specified base counters; "
+              "pass required base counters as the parameters: "
+              "/arithmetics/add@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // minus counter
+            { "/arithmetics/subtract", performance_counters::counter_aggregating,
+              "returns the difference of the values of the specified base counters; "
+              "pass the required base counters as the parameters: "
+              "/arithmetics/subtract@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // multiply counter
+            { "/arithmetics/multiply", performance_counters::counter_aggregating,
+              "returns the product of the values of the specified base counters; "
+              "pass the required base counters as the parameters: "
+              "/arithmetics/multiply@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+            // divide counter
+            { "/arithmetics/divide", performance_counters::counter_aggregating,
+              "returns the result of division of the values of the specified "
+              "base counters; pass the required base counters as the parameters: "
+              "/arithmetics/divide@<base_counter_name1>,<base_counter_name2>",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::arithmetics_counter_creator,
+              &performance_counters::default_counter_discoverer,
+              ""
+            },
+        };
+        performance_counters::install_counter_types(
+            arithmetic_counter_types,
+            sizeof(arithmetic_counter_types)/sizeof(arithmetic_counter_types[0]));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -427,6 +490,30 @@ namespace hpx
             naming::id_type::unmanaged);
     }
 
+    naming::id_type find_root_locality(error_code& ec)
+    {
+        runtime* rt = hpx::get_runtime_ptr();
+        if (NULL == rt)
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
+                "the runtime system is not available at this time");
+            return naming::invalid_id;
+        }
+
+        naming::gid_type console_locality;
+        if (!rt->get_agas_client().get_console_locality(console_locality))
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
+                "the root locality is not available at this time");
+            return naming::invalid_id;
+        }
+
+        if (&ec != &throws) 
+            ec = make_success_code();
+
+        return naming::id_type(console_locality, naming::id_type::unmanaged);
+    }
+
     std::vector<naming::id_type>
     find_all_localities(components::component_type type, error_code& ec)
     {
@@ -515,7 +602,7 @@ namespace hpx
     lcos::future<boost::uint32_t> get_num_localities_async()
     {
         if (NULL == hpx::get_runtime_ptr())
-            return lcos::make_future<boost::uint32_t>(0);
+            return lcos::make_ready_future<boost::uint32_t>(0);
 
         return get_runtime().get_agas_client().get_num_localities_async();
     }
@@ -524,7 +611,7 @@ namespace hpx
         components::component_type type)
     {
         if (NULL == hpx::get_runtime_ptr())
-            return lcos::make_future<boost::uint32_t>(0);
+            return lcos::make_ready_future<boost::uint32_t>(0);
 
         return get_runtime().get_agas_client().get_num_localities_async(type);
     }
@@ -556,6 +643,15 @@ namespace hpx
         if (NULL == rt)
             return std::size_t(-1);
         return rt->get_thread_manager().get_worker_thread_num();
+    }
+
+    std::size_t get_num_worker_threads()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL == rt)
+            return std::size_t(0);
+        error_code ec(lightweight);
+        return rt->get_agas_client().get_num_overall_threads();
     }
 
     bool is_scheduler_numa_sensitive()
@@ -617,6 +713,15 @@ namespace hpx { namespace naming
     resolver_client& get_agas_client()
     {
         return get_runtime().get_agas_client();
+    }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace parcelset
+{
+    void flush_buffers()
+    {
+        get_runtime().get_parcel_handler().flush_buffers();
     }
 }}
 
@@ -717,6 +822,38 @@ namespace hpx
             HPX_THROWS_IF(ec, invalid_status, "evaluate_active_counters",
                 "the runtime system is not available at this time");
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a message handler plugin
+    parcelset::policies::message_handler* create_message_handler(
+        char const* message_handler_type, char const* action,
+        parcelset::parcelport* pp, std::size_t num_messages,
+        std::size_t interval, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            return rt->create_message_handler(message_handler_type, action,
+                pp, num_messages, interval, ec);
+        }
+
+        HPX_THROWS_IF(ec, invalid_status, "create_message_handler",
+            "the runtime system is not available at this time");
+        return 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a binary filter plugin
+    util::binary_filter* create_binary_filter(char const* binary_filter_type,
+        bool compress, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt)
+            return rt->create_binary_filter(binary_filter_type, compress, ec);
+
+        HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
+            "the runtime system is not available at this time");
+        return 0;
     }
 }
 

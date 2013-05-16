@@ -285,7 +285,7 @@ namespace hpx { namespace util
             ::new (get_value_address()) value_type(v);
         }
 
-        void construct_value(BOOST_RV_REF(value_type) v)
+        void construct_value(BOOST_RV_REF(value_type) v) //-V659
         {
             ::new (get_error_address()) value_type(boost::move(v));
         }
@@ -301,7 +301,7 @@ namespace hpx { namespace util
             *get_value_address() = v;
         }
 
-        void assign_value(BOOST_RV_REF(value_type) v)
+        void assign_value(BOOST_RV_REF(value_type) v) //-V659
         {
             *get_value_address() = boost::move(v);
         }

@@ -24,8 +24,6 @@
 using hpx::naming::id_type;
 using hpx::naming::invalid_id;
 
-using hpx::actions::plain_result_action2;
-
 using hpx::lcos::future;
 using hpx::lcos::wait;
 using hpx::async;
@@ -226,20 +224,7 @@ cell initial_sod(boost::uint64_t location);
 double get_pressure(cell input);
 
 // Wrapping in plain_action
-typedef plain_result_action2<
-  // result type
-  cell,
-
-  // arguments
-  boost::uint64_t,
-  boost::uint64_t,
-
-  // function
-  compute
-  > compute_action;
-
-// This generates the required boilerplate we need for remote invocation.
-HPX_REGISTER_PLAIN_ACTION(compute_action);
+HPX_PLAIN_ACTION(compute);
 
 typedef hpx::lcos::future<cell> compute_future;
 

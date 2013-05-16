@@ -1,60 +1,104 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Vinay C Amatya
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime.hpp>
 
-#include <boost/assert.hpp>
+#include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/at_c.hpp>
+#include <boost/fusion/include/make_vector.hpp>
+#include <boost/format.hpp>
 
 namespace hpx { namespace agas { namespace server
 {
+    response primary_namespace::route(request const& req, error_code& ec)
+    { // {{{ route implementation
+        parcelset::parcel p = req.get_parcel();
 
-bool primary_namespace::route(
-    parcelset::parcel const& p
-  , error_code& ec
-    )
-{
-    // For now we just make sure that this function is not called.
-    BOOST_ASSERT(false);
+        std::vector<naming::gid_type> const& gids = p.get_destinations();
+        std::vector<naming::address>& addrs = p.get_destination_addrs();
+        std::vector<boost::fusion::vector2<naming::gid_type, gva> > cache_addresses;
 
-//    // TODO: protection of parcel's content?
-//     naming::gid_type id = p.get_destination();
-//     naming::detail::strip_credit_from_gid(id);
-//
-//     request req(primary_ns_resolve_gid, id);
-//
-//     response rep = service(req, ec);
-//
-//     if (ec || success != rep.get_status())
-//         return false;
-//
-//     // Resolve the gva to the real resolved address (which is just a gva
-//     // with as fully resolved LVA and an offset of zero).
-//     gva const g = rep.get_gva().resolve(p.get_destination()
-//                                       , rep.get_base_gid());
-//
-//     naming::address addr;
-//
-//     addr.locality_ = g.endpoint;
-//     addr.type_ = g.type;
-//     addr.address_ = g.lva();
-//
-//     parcelset::parcel p_temp = p;
-//     p_temp.set_destination(id);
-//     p_temp.set_destination_addr(addr);
-//
-//     // Assign the parcel to parcelhandler.
-//     get_runtime().get_parcel_handler().put_parcel(p_temp);
+        // resolve destination addresses, we should be able to resolve all of
+        // them, otherwise it's an error
+        {
+            mutex_type::scoped_lock l(mutex_);
 
-    // TODO: update sender's cache for the destination id resolution
-    return true;
-}
+            if (!locality_)
+                locality_ = get_runtime().here();
 
+            cache_addresses.reserve(gids.size());
+            for (std::size_t i = 0; i != gids.size(); ++i)
+            {
+                if (!addrs[i])
+                {
+                    cache_addresses.push_back(resolve_gid_locked(gids[i], ec));
+                    boost::fusion::vector2<naming::gid_type, gva> const& r =
+                        cache_addresses.back();
+
+                    if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
+                    {
+                        HPX_THROWS_IF(ec, no_success,
+                            "primary_namespace::route",
+                            boost::str(boost::format(
+                                    "can't route parcel to unknown gid: %s"
+                                ) % gids[i]));
+                        return response(primary_ns_route, naming::invalid_gid,
+                            gva(), no_success);
+                    }
+
+                    gva const g = boost::fusion::at_c<1>(r).resolve(
+                        gids[i], boost::fusion::at_c<0>(r));
+
+                    addrs[i].locality_ = g.endpoint;
+                    addrs[i].type_ = g.type;
+                    addrs[i].address_ = g.lva();
+                }
+                else
+                {
+                    cache_addresses.push_back(
+                        boost::fusion::make_vector(naming::gid_type(), gva()));
+                }
+            }
+        }
+
+        // either send the parcel on its way or execute actions locally
+        if (addrs[0].locality_ == locality_)
+        {
+            // destination is local
+            get_runtime().get_applier().schedule_action(p);
+        }
+        else
+        {
+            // destination is remote
+            get_runtime().get_parcel_handler().put_parcel(p);
+        }
+
+        // asynchronously update cache on source locality
+        naming::id_type source = get_colocation_id(p.get_source());
+        for (std::size_t i = 0; i != gids.size(); ++i)
+        {
+            boost::fusion::vector2<naming::gid_type, gva> const& r =
+                cache_addresses[i];
+
+            if (boost::fusion::at_c<0>(r))
+            {
+                gva const& g = boost::fusion::at_c<1>(r);
+                naming::address addr(g.endpoint, g.type, g.lva());
+
+                components::stubs::runtime_support::update_agas_cache_entry(
+                    source, boost::fusion::at_c<0>(r), addr, g.count, g.offset);
+            }
+        }
+
+        return response(primary_ns_route, success);
+    } // }}}
 }}}
 

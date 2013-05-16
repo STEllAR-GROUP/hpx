@@ -72,13 +72,20 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
       , runtime_mode runtime_type_
         );
 
+    ~big_boot_barrier()
+    {
+        HPX_STD_FUNCTION<void()>* f;
+        while (thunks.dequeue(f))
+            delete f;
+    }
+
     void apply(
         boost::uint32_t prefix
       , naming::address const& addr
       , actions::base_action* act
         );
 
-    void wait();
+    void wait(void* primary_ns_ptr = 0);
 
     // no-op on non-bootstrap localities
     void trigger();

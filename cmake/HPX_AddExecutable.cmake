@@ -30,11 +30,15 @@ macro(add_hpx_executable name)
   endif()
 
   # add the executable build target
+  if(NOT HPX_EXTERNAL_CMAKE)
+    set(exclude_from_all EXCLUDE_FROM_ALL)
+  endif()
+
   if(${${name}_ESSENTIAL})
     add_executable(${name}_exe
       ${${name}_SOURCES} ${${name}_HEADERS})
   else()
-    add_executable(${name}_exe EXCLUDE_FROM_ALL
+    add_executable(${name}_exe ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
@@ -125,10 +129,19 @@ macro(add_hpx_executable name)
     endif()
 
     hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
-    target_link_libraries(${name}_exe
-      ${${name}_DEPENDENCIES}
-      ${${name}_COMPONENT_DEPENDENCIES}
-      ${hpx_libs})
+
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+      target_link_libraries(${name}_exe
+        ${${name}_DEPENDENCIES}
+        ${${name}_COMPONENT_DEPENDENCIES}
+        ${hpx_libs}
+        imf svml irng intlc)
+    else()
+      target_link_libraries(${name}_exe
+        ${${name}_DEPENDENCIES}
+        ${${name}_COMPONENT_DEPENDENCIES}
+        ${hpx_libs})
+    endif()
     set_property(TARGET ${name}_exe APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_PREFIX=\"${HPX_PREFIX}\""
@@ -136,6 +149,10 @@ macro(add_hpx_executable name)
                  "BOOST_ENABLE_ASSERT_HANDLER")
   else()
     target_link_libraries(${name}_exe ${${name}_DEPENDENCIES})
+  endif()
+
+  if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
+    set_target_properties(${name}_exe PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
   endif()
 
   if(NOT HPX_NO_INSTALL)

@@ -118,7 +118,7 @@ struct channel
     void post(BOOST_RV_REF(T) result)
     {
         BOOST_ASSERT(data_);
-        //if (data_->is_ready())
+        //if (data_->ready())
         //    data_->move_data();
         data_->set_data(result);
     }
@@ -126,7 +126,7 @@ struct channel
     void post(T const& result)
     {
         BOOST_ASSERT(data_);
-        //if (data_->is_ready())
+        //if (data_->ready())
         //    data_->move_data();
         data_->set_data(result);
     }
@@ -137,13 +137,13 @@ struct channel
     {
         BOOST_ASSERT(data_);
         return lcos::detail::make_future_from_data<T>(data_).then
-            (boost::forward<completed_callback_type>(f));
+            (boost::forward<F>(f));
     }
 
     bool ready() const
     {
         BOOST_ASSERT(data_);
-        return data_->is_ready();
+        return data_->ready();
     }
 };
 
@@ -158,7 +158,7 @@ struct channel<void>
     BOOST_COPYABLE_AND_MOVABLE(vector3d);
 
   public:
-    typedef typename future_data::completed_callback_type
+    typedef future_data::completed_callback_type
         completed_callback_type;
 
     channel() : data_(new future_data()) {}
@@ -237,7 +237,7 @@ struct channel<void>
     void post()
     {
         BOOST_ASSERT(data_);
-        //if (data_->is_ready())
+        //if (data_->ready())
         //    data_->move_data();
         data_->set_data(hpx::util::unused);
     }
@@ -254,7 +254,7 @@ struct channel<void>
     bool ready() const
     {
         BOOST_ASSERT(data_);
-        return data_->is_ready();
+        return data_->ready();
     }
 };
 

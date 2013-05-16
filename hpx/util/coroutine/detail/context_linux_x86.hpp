@@ -70,11 +70,10 @@ namespace hpx { namespace util { namespace coroutines
     }
 
     template<typename T>
-    void trampoline(T* fun);
+    BOOST_FORCEINLINE void trampoline(T* fun);
 
     template<typename T>
-    BOOST_FORCEINLINE void
-    trampoline(T* fun)
+    void trampoline(T* fun)
     {
       (*fun)();
       std::abort();

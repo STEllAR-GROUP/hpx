@@ -299,6 +299,11 @@ namespace hpx { namespace threads { namespace detail
                 {
                     break;
                 }
+
+                if (0 == num_thread) {
+                    // do background work in parcel layer
+                    hpx::parcelset::flush_buffers();
+                }
             }
 
             // Clean up all terminated threads for all thread queues once in a

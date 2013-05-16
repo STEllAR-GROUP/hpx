@@ -72,10 +72,10 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
         {                                                                     \
             /* Note that the caller is responsible for deleting the filter */ \
             /* instance returned from this function */                        \
-            static util::binary_filter* call()                                \
+            static util::binary_filter* call(parcelset::parcel const& p)      \
             {                                                                 \
-                using namespace hpx::plugins::compression;                    \
-                return new snappy_serialization_filter(true);                 \
+                return hpx::create_binary_filter(                             \
+                    "snappy_serialization_filter", true);                     \
             }                                                                 \
         };                                                                    \
     }}                                                                        \

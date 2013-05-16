@@ -106,11 +106,15 @@ macro(add_hpx_component name)
   hpx_print_list("DEBUG" "add_component.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
 
+  if(NOT HPX_EXTERNAL_CMAKE)
+    set(exclude_from_all EXCLUDE_FROM_ALL)
+  endif()
+
   if(${${name}_ESSENTIAL})
     add_library(${name}_component SHARED
       ${${name}_SOURCES} ${${name}_HEADERS})
   else()
-    add_library(${name}_component SHARED EXCLUDE_FROM_ALL
+    add_library(${name}_component SHARED ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
@@ -146,6 +150,7 @@ macro(add_hpx_component name)
   else()
     set(lib_name ${name})
   endif()
+
   # set properties of generated shared library
   set_target_properties(${name}_component PROPERTIES
     # create *nix style library versions + symbolic links
@@ -154,6 +159,10 @@ macro(add_hpx_component name)
     # allow creating static and shared libs without conflicts
     CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME ${lib_name})
+
+  if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
+    set_target_properties(${name}_component PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
+  endif()
 
   if(HPX_SET_OUTPUT_PATH AND NOT ${name}_OUTPUT_SUFFIX)
     if(MSVC)

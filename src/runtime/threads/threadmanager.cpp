@@ -107,10 +107,12 @@ namespace hpx { namespace threads
         set_state_logger_("threadmanager_impl::set_state"),
         scheduler_(scheduler),
         notifier_(notifier),
-        used_processing_units_(0)
+        used_processing_units_()
     {
+        topology const& topology_ = get_topology();
+        resize(used_processing_units_, hardware_concurrency());
         for (std::size_t i = 0; i < num_threads; ++i)
-            used_processing_units_ |= scheduler_.get_pu_mask(get_topology(), i);
+            used_processing_units_ |= scheduler_.get_pu_mask(topology_, i);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -428,6 +430,26 @@ namespace hpx { namespace threads
         }
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        interruption_point(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::interruption_point",
+                "NULL thread id encountered");
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (thrd)
+            thrd->interruption_point();      // notify thread
+    }
+
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -585,9 +607,36 @@ namespace hpx { namespace threads
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        tfunc(std::size_t num_thread)
+        tfunc(std::size_t num_thread, topology const& topology_)
     {
-        // wait for all threads to start up before before starting px work
+        // Set the affinity for the current thread.
+        threads::mask_cref_type mask = get_pu_mask(topology_, num_thread);
+
+        LTM_(info) << "tfunc(" << num_thread
+            << "): will run on one processing unit within this mask: "
+            << std::hex << "0x" << mask;
+
+        error_code ec(lightweight);
+        topology_.set_thread_affinity_mask(mask, ec);
+        if (ec)
+        {
+            LTM_(warning) << "run: setting thread affinity on OS thread "
+                << num_thread << " failed with: " << ec.get_message();
+        }
+
+        // Setting priority of worker threads to a lower priority, this needs to
+        // be done in order to give the parcel pool threads higher priority
+        if (any(mask & get_used_processing_units()))
+        {
+            topology_.reduce_thread_priority(ec);
+            if (ec)
+            {
+                LTM_(warning) << "run: reducing thread priority on OS thread "
+                    << num_thread << " failed with: " << ec.get_message();
+            }
+        }
+
+        // wait for all threads to start up before before starting HPX work
         startup_->wait();
 
         // manage the number of this thread in its TSS
@@ -844,7 +893,7 @@ namespace hpx { namespace threads
             if (!status_is_valid(status) || !f(i, ec) || ec)
                 return false;
         }
-        else if (p.instancename_ == "allocator#*") 
+        else if (p.instancename_ == "allocator#*")
         {
             for (std::size_t t = 0; t < HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
             {
@@ -1226,21 +1275,6 @@ namespace hpx { namespace threads
     {
         manage_active_thread_count count(thread_count_);
 
-        // set affinity on Linux systems or when using HWLOC
-        topology const& topology_ = get_topology();
-        std::size_t mask = get_pu_mask(topology_, num_thread);
-
-        LTM_(info) << "tfunc(" << num_thread
-            << "): will run on one processing unit within this mask: "
-            << std::hex << "0x" << mask;
-
-        error_code ec(lightweight);
-        topology_.set_thread_affinity_mask(mask, ec);
-        if (ec) {
-            LTM_(warning) << "run: setting thread affinity on OS thread "
-                << num_thread << " failed with: " << ec.get_message();
-        }
-
         // run the work queue
         hpx::util::coroutines::prepare_main_thread main_thread;
 
@@ -1250,7 +1284,7 @@ namespace hpx { namespace threads
             exec_times[num_thread]);
 
 #if HPX_DEBUG != 0
-        // the last OS thread is allowed to exit only if no more PX threads exist
+        // the OS thread is allowed to exit only if no more HPX threads exist
         BOOST_ASSERT(!scheduler_.get_thread_count(
             unknown, thread_priority_default, num_thread));
 #endif
@@ -1290,7 +1324,7 @@ namespace hpx { namespace threads
 
             std::size_t thread_num = num_threads;
             while (thread_num-- != 0) {
-                std::size_t mask = get_pu_mask(topology_, thread_num);
+                threads::mask_cref_type mask = get_pu_mask(topology_, thread_num);
 
                 LTM_(info) << "run: create OS thread " << thread_num
                     << ": will run on one processing unit within this mask: "
@@ -1298,12 +1332,11 @@ namespace hpx { namespace threads
 
                 // create a new thread
                 threads_.push_back(new boost::thread(boost::bind(
-                    &threadmanager_impl::tfunc, this, thread_num)));
+                    &threadmanager_impl::tfunc, this, thread_num, boost::ref(topology_))));
 
                 // set the new threads affinity (on Windows systems)
                 error_code ec(lightweight);
                 topology_.set_thread_affinity_mask(threads_.back(), mask, ec);
-
                 if (ec)
                 {
                     LTM_(warning) << "run: setting thread affinity on OS "
@@ -1425,7 +1458,7 @@ namespace hpx { namespace threads
     {
         double const exec_time = static_cast<double>(exec_times[num_thread]);
         double const tfunc_time = static_cast<double>(tfunc_times[num_thread]);
-        double const percent = (tfunc_time != 0.) ? 1. - (exec_time / tfunc_time) : 1.;
+        double const percent = (tfunc_time != 0.) ? 1. - (exec_time / tfunc_time) : 1.; //-V550
 
         if (reset) {
             exec_times[num_thread] = 0;

@@ -32,7 +32,8 @@ macro(add_bzip2_module)
 
     set_property(TARGET compress_bzip2_lib APPEND
       PROPERTY COMPILE_DEFINITIONS
-      "HPX_LIBRARY_EXPORTS")
+      "HPX_LIBRARY_EXPORTS"
+      "HPX_PLUGIN_NAME=compress_bzip2")
 
     add_hpx_pseudo_dependencies(plugins.compression.bzip2 compress_bzip2_lib)
 

@@ -34,10 +34,7 @@ void worker(hpx::naming::id_type const& gid)
     }
 }
 
-typedef hpx::actions::plain_action1<hpx::naming::id_type const&, worker>
-    worker_action;
-
-HPX_REGISTER_PLAIN_ACTION(worker_action);
+HPX_PLAIN_ACTION(worker);
 
 ///////////////////////////////////////////////////////////////////////////////
 void breaker(hpx::naming::id_type const& gid)

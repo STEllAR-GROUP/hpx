@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,22 +20,28 @@ char const* const service_name = "/agas/";
 enum namespace_action_code
 {
     invalid_request                         = 0,
+
+    locality_ns_service                     = BOOST_BINARY_U(1100000),
+    locality_ns_bulk_service                = BOOST_BINARY_U(1100001),
+    locality_ns_allocate                    = BOOST_BINARY_U(1100010),
+    locality_ns_free                        = BOOST_BINARY_U(1100011),
+    locality_ns_localities                  = BOOST_BINARY_U(1100100),
+    locality_ns_num_localities              = BOOST_BINARY_U(1100101),
+    locality_ns_num_threads                 = BOOST_BINARY_U(1100110),
+    locality_ns_statistics_counter          = BOOST_BINARY_U(1100111),
+    locality_ns_resolve_locality            = BOOST_BINARY_U(1101000),
+    locality_ns_resolved_localities         = BOOST_BINARY_U(1101001),
+
     primary_ns_service                      = BOOST_BINARY_U(1000000),
     primary_ns_bulk_service                 = BOOST_BINARY_U(1000001),
     primary_ns_route                        = BOOST_BINARY_U(1000010),
-    primary_ns_allocate                     = BOOST_BINARY_U(1000011),
-    primary_ns_bind_gid                     = BOOST_BINARY_U(1000100),
-    primary_ns_resolve_gid                  = BOOST_BINARY_U(1000101),
-    primary_ns_resolve_locality             = BOOST_BINARY_U(1000110),
-    primary_ns_free                         = BOOST_BINARY_U(1000111),
-    primary_ns_unbind_gid                   = BOOST_BINARY_U(1001000),
-    primary_ns_change_credit_non_blocking   = BOOST_BINARY_U(1001001),
-    primary_ns_change_credit_sync           = BOOST_BINARY_U(1001010),
-    primary_ns_localities                   = BOOST_BINARY_U(1001011),
-    primary_ns_num_localities               = BOOST_BINARY_U(1001100),
-    primary_ns_num_threads                  = BOOST_BINARY_U(1001101),
-    primary_ns_statistics_counter           = BOOST_BINARY_U(1001110),
-    primary_ns_resolved_localities          = BOOST_BINARY_U(1001111),
+    primary_ns_bind_gid                     = BOOST_BINARY_U(1000011),
+    primary_ns_resolve_gid                  = BOOST_BINARY_U(1000100),
+    primary_ns_unbind_gid                   = BOOST_BINARY_U(1000101),
+    primary_ns_change_credit_non_blocking   = BOOST_BINARY_U(1000110),
+    primary_ns_change_credit_sync           = BOOST_BINARY_U(1000111),
+    primary_ns_statistics_counter           = BOOST_BINARY_U(1001000),
+
     component_ns_service                    = BOOST_BINARY_U(0100000),
     component_ns_bulk_service               = BOOST_BINARY_U(0100001),
     component_ns_bind_prefix                = BOOST_BINARY_U(0100010),
@@ -46,6 +52,7 @@ enum namespace_action_code
     component_ns_get_component_type_name    = BOOST_BINARY_U(0100111),
     component_ns_num_localities             = BOOST_BINARY_U(0101000),
     component_ns_statistics_counter         = BOOST_BINARY_U(0101001),
+
     symbol_ns_service                       = BOOST_BINARY_U(0010000),
     symbol_ns_bulk_service                  = BOOST_BINARY_U(0010001),
     symbol_ns_bind                          = BOOST_BINARY_U(0010010),
@@ -107,7 +114,7 @@ namespace detail
           , counter_target_count
           , component_ns_get_component_type_name
           , component_ns_statistics_counter }
-      , {   "count/num_localities"
+      , {   "count/num_localities_type"
           , ""
           , counter_target_time
           , component_ns_num_localities
@@ -143,7 +150,7 @@ namespace detail
           , counter_target_time
           , component_ns_get_component_type_name
           , component_ns_statistics_counter }
-      , {   "time/num_localities"
+      , {   "time/num_localities_type"
           , "ns"
           , counter_target_time
           , component_ns_num_localities
@@ -152,14 +159,93 @@ namespace detail
     static std::size_t const num_component_namespace_services =
         sizeof(component_namespace_services)/sizeof(component_namespace_services[0]);
 
-    // counter description data for primary namespace components
-    static counter_service_data const primary_namespace_services[] =
+    // counter description data for localities namespace components
+    static counter_service_data const locality_namespace_services[] =
     {
         // counters exposing API invocation counts
         {   "count/allocate"
           , ""
           , counter_target_count
-          , primary_ns_allocate
+          , locality_ns_allocate
+          , locality_ns_statistics_counter }
+      , {   "count/free"
+          , ""
+          , counter_target_count
+          , locality_ns_free
+          , locality_ns_statistics_counter }
+      , {   "count/localities"
+          , ""
+          , counter_target_count
+          , locality_ns_localities
+          , locality_ns_statistics_counter }
+      , {   "count/num_localities"
+          , ""
+          , counter_target_count
+          , locality_ns_num_localities
+          , locality_ns_statistics_counter }
+      , {   "count/num_threads"
+          , ""
+          , counter_target_count
+          , locality_ns_num_threads
+          , locality_ns_statistics_counter }
+      , {   "count/resolve_locality"
+          , ""
+          , counter_target_count
+          , locality_ns_resolve_locality
+          , locality_ns_statistics_counter }
+      , {   "count/resolved_localities"
+          , ""
+          , counter_target_time
+          , locality_ns_resolved_localities
+          , locality_ns_statistics_counter }
+      // counters exposing API timings
+      , {   "time/allocate"
+          , "ns"
+          , counter_target_time
+          , locality_ns_allocate
+          , locality_ns_statistics_counter }
+      , {   "time/free"
+          , "ns"
+          , counter_target_time
+          , locality_ns_free
+          , locality_ns_statistics_counter }
+      , {   "time/localities"
+          , "ns"
+          , counter_target_time
+          , locality_ns_localities
+          , locality_ns_statistics_counter }
+      , {   "time/lnum_ocalities"
+          , "ns"
+          , counter_target_time
+          , locality_ns_num_localities
+          , locality_ns_statistics_counter }
+      , {   "time/num_threads"
+          , "ns"
+          , counter_target_time
+          , locality_ns_num_threads
+          , locality_ns_statistics_counter }
+      , {   "time/resolve_locality"
+          , "ns"
+          , counter_target_time
+          , locality_ns_resolve_locality
+          , locality_ns_statistics_counter }
+      , {   "time/resolved_localities"
+          , "ns"
+          , counter_target_time
+          , locality_ns_resolved_localities
+          , primary_ns_statistics_counter }
+    };
+    static std::size_t const num_locality_namespace_services =
+        sizeof(locality_namespace_services)/sizeof(locality_namespace_services[0]);
+
+    // counter description data for primary namespace components
+    static counter_service_data const primary_namespace_services[] =
+    {
+        // counters exposing API invocation counts
+        {   "count/route"
+          , ""
+          , counter_target_count
+          , primary_ns_route
           , primary_ns_statistics_counter }
       , {   "count/bind_gid"
           , ""
@@ -171,51 +257,21 @@ namespace detail
           , counter_target_count
           , primary_ns_resolve_gid
           , primary_ns_statistics_counter }
-      , {   "count/resolve_locality"
-          , ""
-          , counter_target_count
-          , primary_ns_resolve_locality
-          , primary_ns_statistics_counter }
-      , {   "count/free"
-          , ""
-          , counter_target_count
-          , primary_ns_free
-          , primary_ns_statistics_counter }
       , {   "count/unbind_gid"
           , ""
           , counter_target_count
           , primary_ns_unbind_gid
           , primary_ns_statistics_counter }
-      , {   "count/change_credit_non_blocking"
+      , {   "count/change_credit"
           , ""
           , counter_target_count
           , primary_ns_change_credit_non_blocking
           , primary_ns_statistics_counter }
-      , {   "count/change_credit_sync"
-          , ""
-          , counter_target_count
-          , primary_ns_change_credit_sync
-          , primary_ns_statistics_counter }
-      , {   "count/localities"
-          , ""
-          , counter_target_count
-          , primary_ns_localities
-          , primary_ns_statistics_counter }
-      , {   "count/resolved_localities"
-          , ""
-          , counter_target_count
-          , primary_ns_resolved_localities
-          , primary_ns_statistics_counter }
-      , {   "count/num_threads"
-          , ""
-          , counter_target_count
-          , primary_ns_num_threads
-          , primary_ns_statistics_counter }
       // counters exposing API timings
-      , {   "time/allocate"
+      , {   "time/route"
           , "ns"
           , counter_target_time
-          , primary_ns_allocate
+          , primary_ns_route
           , primary_ns_statistics_counter }
       , {   "time/bind_gid"
           , "ns"
@@ -227,50 +283,19 @@ namespace detail
           , counter_target_time
           , primary_ns_resolve_gid
           , primary_ns_statistics_counter }
-      , {   "time/resolve_locality"
-          , "ns"
-          , counter_target_time
-          , primary_ns_resolve_locality
-          , primary_ns_statistics_counter }
-      , {   "time/free"
-          , "ns"
-          , counter_target_time
-          , primary_ns_free
-          , primary_ns_statistics_counter }
       , {   "time/unbind_gid"
           , "ns"
           , counter_target_time
           , primary_ns_unbind_gid
           , primary_ns_statistics_counter }
-      , {   "time/change_credit_non_blocking"
+      , {   "time/change_credit"
           , "ns"
           , counter_target_time
           , primary_ns_change_credit_non_blocking
           , primary_ns_statistics_counter }
-      , {   "time/change_credit_sync"
-          , "ns"
-          , counter_target_time
-          , primary_ns_change_credit_sync
-          , primary_ns_statistics_counter }
-      , {   "time/localities"
-          , "ns"
-          , counter_target_time
-          , primary_ns_localities
-          , primary_ns_statistics_counter }
-      , {   "time/resolved_localities"
-          , "ns"
-          , counter_target_time
-          , primary_ns_resolved_localities
-          , primary_ns_statistics_counter }
-      , {   "time/num_threads"
-          , "ns"
-          , counter_target_time
-          , primary_ns_num_threads
-          , primary_ns_statistics_counter }
     };
     static std::size_t const num_primary_namespace_services =
         sizeof(primary_namespace_services)/sizeof(primary_namespace_services[0]);
-
 
     // counter description data for symbol namespace components
     static counter_service_data const symbol_namespace_services[] =
@@ -334,6 +359,16 @@ namespace detail
       , error_code& ec = throws
         );
 }
+
+namespace server
+{
+    // forward declarations
+    struct HPX_EXPORT locality_namespace;
+    struct HPX_EXPORT primary_namespace;
+    struct HPX_EXPORT component_namespace;
+    struct HPX_EXPORT symbol_namespace;
+}
+
 }}
 
 #endif // HPX_60B7914E_21A5_4977_AA9C_8E66C44EE0FB

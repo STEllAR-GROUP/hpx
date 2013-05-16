@@ -36,7 +36,12 @@ set(HPX_GIT_COMMIT @HPX_GIT_COMMIT@
 
 if(NOT MSVC)
   set(HPX_RPATH @external_rpath@ CACHE PATH "Base RPATH for linking against HPX")
-  mark_as_advanced(FORCE HPX_RPATH)
+  set(HPX_PIE ON CACHE BOOL "Compile executables as shared objects")
+  mark_as_advanced(FORCE HPX_RPATH HPX_PIE)
+else()
+  set(HPX_LINK_FLAG_TARGET_PROPERTIES "@hpx_link_flag_target_properties@"
+    CACHE STRING "Additional link time properties")
+  mark_as_advanced(FORCE HPX_LINK_FLAG_TARGET_PROPERTIES)
 endif()
 
 set(HPX_LIBRARY_DIR @external_link_directories@ CACHE STRING "HPX library directories")
@@ -51,12 +56,15 @@ set(HPX_BUILD_TYPE @CMAKE_BUILD_TYPE@ CACHE STRING
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} @external_cmake_path@)
 
 set(HPX_DEBUG_POSTFIX "d" CACHE STRING "Debug postfix for HPX")
+if("${HPX_BUILD_TYPE}" STREQUAL "Debug")
+    set(HPX_POSTFIX ${HPX_DEBUG_POSTFIX})
+endif()
 
-set(HPX_PIE ON CACHE BOOL "Compile executables as shared objects")
+include(HPX_SetOutputPaths)
 
 mark_as_advanced(FORCE HPX_C_COMPILER HPX_CXX_COMPILER HPX_Fortran_COMPILER) 
 mark_as_advanced(FORCE HPX_C_COMPILE_FLAGS HPX_CXX_COMPILE_FLAGS HPX_Fortran_COMPILE_FLAGS) 
-mark_as_advanced(FORCE HPX_LIBRARY_DIR HPX_INCLUDE_DIR HPX_PREFIX HPX_GIT_COMMIT HPX_DEBUG_POSTFIX HPX_PIE)
+mark_as_advanced(FORCE HPX_LIBRARIES HPX_LIBRARY_DIR HPX_INCLUDE_DIR HPX_PREFIX HPX_GIT_COMMIT HPX_DEBUG_POSTFIX HPX_PIE)
 
 include(HPX_Utils)
 

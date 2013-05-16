@@ -34,7 +34,8 @@ namespace hpx
         lcos::future<result_type> f = when_n(
             f0);
         if (!f.valid()) {
-            { if (&ec == &hpx::throws) { HPX_THROW_EXCEPTION( uninitialized_value, "lcos::wait_n", "lcos::when_n didn't return a valid future"); } else { ec = make_error_code(static_cast<hpx::error>( uninitialized_value), "lcos::when_n didn't return a valid future", "lcos::wait_n", "D:/Devel\\hpx\\hpx\\lcos\\wait_n.hpp", 386, (ec.category() == hpx::get_lightweight_hpx_category()) ? hpx::lightweight : hpx::plain); } };
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+                "lcos::when_n didn't return a valid future");
             return result_type();
         }
         return f.get(ec);
@@ -66,7 +67,8 @@ namespace hpx
         lcos::future<result_type> f = when_n(
             f0 , f1);
         if (!f.valid()) {
-            { if (&ec == &hpx::throws) { HPX_THROW_EXCEPTION( uninitialized_value, "lcos::wait_n", "lcos::when_n didn't return a valid future"); } else { ec = make_error_code(static_cast<hpx::error>( uninitialized_value), "lcos::when_n didn't return a valid future", "lcos::wait_n", "D:/Devel\\hpx\\hpx\\lcos\\wait_n.hpp", 386, (ec.category() == hpx::get_lightweight_hpx_category()) ? hpx::lightweight : hpx::plain); } };
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+                "lcos::when_n didn't return a valid future");
             return result_type();
         }
         return f.get(ec);
@@ -98,7 +100,8 @@ namespace hpx
         lcos::future<result_type> f = when_n(
             f0 , f1 , f2);
         if (!f.valid()) {
-            { if (&ec == &hpx::throws) { HPX_THROW_EXCEPTION( uninitialized_value, "lcos::wait_n", "lcos::when_n didn't return a valid future"); } else { ec = make_error_code(static_cast<hpx::error>( uninitialized_value), "lcos::when_n didn't return a valid future", "lcos::wait_n", "D:/Devel\\hpx\\hpx\\lcos\\wait_n.hpp", 386, (ec.category() == hpx::get_lightweight_hpx_category()) ? hpx::lightweight : hpx::plain); } };
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+                "lcos::when_n didn't return a valid future");
             return result_type();
         }
         return f.get(ec);
@@ -130,7 +133,8 @@ namespace hpx
         lcos::future<result_type> f = when_n(
             f0 , f1 , f2 , f3);
         if (!f.valid()) {
-            { if (&ec == &hpx::throws) { HPX_THROW_EXCEPTION( uninitialized_value, "lcos::wait_n", "lcos::when_n didn't return a valid future"); } else { ec = make_error_code(static_cast<hpx::error>( uninitialized_value), "lcos::when_n didn't return a valid future", "lcos::wait_n", "D:/Devel\\hpx\\hpx\\lcos\\wait_n.hpp", 386, (ec.category() == hpx::get_lightweight_hpx_category()) ? hpx::lightweight : hpx::plain); } };
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+                "lcos::when_n didn't return a valid future");
             return result_type();
         }
         return f.get(ec);
@@ -162,7 +166,8 @@ namespace hpx
         lcos::future<result_type> f = when_n(
             f0 , f1 , f2 , f3 , f4);
         if (!f.valid()) {
-            { if (&ec == &hpx::throws) { HPX_THROW_EXCEPTION( uninitialized_value, "lcos::wait_n", "lcos::when_n didn't return a valid future"); } else { ec = make_error_code(static_cast<hpx::error>( uninitialized_value), "lcos::when_n didn't return a valid future", "lcos::wait_n", "D:/Devel\\hpx\\hpx\\lcos\\wait_n.hpp", 386, (ec.category() == hpx::get_lightweight_hpx_category()) ? hpx::lightweight : hpx::plain); } };
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+                "lcos::when_n didn't return a valid future");
             return result_type();
         }
         return f.get(ec);

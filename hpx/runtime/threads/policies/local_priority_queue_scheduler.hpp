@@ -102,7 +102,11 @@ namespace hpx { namespace threads { namespace policies
             affinity_data_(init.num_queues_, init.pu_offset_, init.pu_step_,
                 init.affinity_domain_, init.affinity_desc_),
             numa_sensitive_(init.numa_sensitive_),
-            topology_(get_topology())
+            topology_(get_topology()),
+            steals_in_numa_domain_(init.num_queues_),
+            numa_domain_masks_(init.num_queues_),
+            steals_outside_numa_domain_(init.num_queues_),
+            outside_numa_domain_masks_(init.num_queues_)
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
@@ -126,7 +130,8 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
-        std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
+        threads::mask_cref_type get_pu_mask(topology const& topology,
+            std::size_t num_thread) const
         {
             return affinity_data_.get_pu_mask(topology, num_thread, numa_sensitive_);
         }
@@ -139,7 +144,7 @@ namespace hpx { namespace threads { namespace policies
         std::size_t get_num_stolen_threads(std::size_t num_thread, bool reset)
         {
             std::size_t num_stolen_threads = 0;
-            if (num_thread == std::size_t(-1)) 
+            if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                     num_stolen_threads +=
@@ -199,25 +204,16 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
-            std::size_t queue_size = queues_.size();
-
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             // try to figure out the NUMA node where the data lives
             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
-                boost::uint64_t mask = 0;
-#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
-                mask = topology_.get_thread_affinity_mask_from_lva(data.lva);
-#endif
-                if (mask) {
-                    std::size_t m = 0x01LL;
-                    for (std::size_t i = 0; i < queue_size; m <<= 1, ++i)
-                    {
-                        if (!(m & mask))
-                            continue;
-                        num_thread = i;
-                        break;
-                    }
+                mask_cref_type mask =
+                    topology_.get_thread_affinity_mask_from_lva(data.lva);
+                if (any(mask)) {
+                    num_thread = find_first(mask);
                 }
             }
+#endif
 
             if (std::size_t(-1) == num_thread)
                 num_thread = ++curr_queue_ % queues_.size();
@@ -274,22 +270,33 @@ namespace hpx { namespace threads { namespace policies
 
             // steal thread from other queue, first try high priority queues,
             // then normal ones
-            for (std::size_t i = 1; i < high_priority_queue_size; ++i) {
-                std::size_t idx = (i + num_thread) % high_priority_queue_size;
-                if (high_priority_queues_[idx]->
-                        get_next_thread(thrd, queue_size + idx))
+
+            mask_cref_type this_numa_domain = numa_domain_masks_[num_thread];
+            mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
+            for (std::size_t i = 0; i < high_priority_queue_size; ++i)
+            {
+                if (i == num_thread)
+                    continue;         // don't steal from ourselves
+                if (!test(this_numa_domain, i) && !test(numa_domain, i))
+                    continue;
+
+                if (high_priority_queues_[i]->get_next_thread(thrd, queue_size + i))
                 {
-                    high_priority_queues_[idx]->increment_num_stolen_threads();
+                    high_priority_queues_[i]->increment_num_stolen_threads();
                     return true;
                 }
             }
 
             // steal thread from other queue
-            for (std::size_t i = 1; i < queue_size; ++i) {
-                std::size_t idx = (i + num_thread) % queue_size;
-                if (queues_[idx]->get_next_thread(thrd, num_thread))
+            for (std::size_t i = 0; i < queue_size; ++i) {
+                if (i == num_thread)
+                    continue;         // don't steal from ourselves
+                if (!test(this_numa_domain, i) && !test(numa_domain, i))
+                    continue;
+
+                if (queues_[i]->get_next_thread(thrd, num_thread))
                 {
-                    queues_[idx]->increment_num_stolen_threads();
+                    queues_[i]->increment_num_stolen_threads();
                     return true;
                 }
             }
@@ -608,17 +615,11 @@ namespace hpx { namespace threads { namespace policies
 
             // steal work items: first try to steal from other cores in
             // the same NUMA node
-            std::size_t num_pu = get_pu_num(num_thread);
-            mask_type core_mask =
-                topology_.get_thread_affinity_mask(num_pu, numa_sensitive_);
-            mask_type node_mask =
-                topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_);
-
-            if (core_mask && node_mask) {
-                boost::uint64_t m = 0x01LL;
-                for (std::size_t i = 0; i < queues_size; m <<= 1, ++i)
+            if (test(steals_in_numa_domain_, num_thread)) {
+                mask_cref_type numa_domain = numa_domain_masks_[num_thread];
+                for (std::size_t i = 0; i < queues_size; ++i)
                 {
-                    if (i == num_thread || !(m & node_mask))
+                    if (i == num_thread || !test(numa_domain, i))
                         continue;         // don't steal from ourselves
 
                     result = queues_[num_thread]->wait_or_add_new(i,
@@ -631,15 +632,21 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            // if nothing found ask everybody else
-            for (std::size_t i = 1; i < queues_size; ++i) {
-                std::size_t idx = (i + num_thread) % queues_size;
-                result = queues_[num_thread]->wait_or_add_new(idx, running,
-                    idle_loop_count, added, queues_[idx]) && result;
-                if (0 != added)
+            // if nothing found, ask everybody else
+            if (test(steals_outside_numa_domain_, num_thread)) {
+                mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
+                for (std::size_t i = 0; i < queues_size; ++i)
                 {
-                    queues_[num_thread]->increment_num_stolen_threads(added);
-                    return result;
+                    if (i == num_thread || !test(numa_domain, i))
+                        continue;         // don't steal from ourselves
+
+                    result = queues_[num_thread]->wait_or_add_new(i, running,
+                        idle_loop_count, added, queues_[i]) && result;
+                    if (0 != added)
+                    {
+                        queues_[num_thread]->increment_num_stolen_threads(added);
+                        return result;
+                    }
                 }
             }
 
@@ -676,13 +683,43 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
         {
+            // forward this call to all queues etc.
             if (num_thread < high_priority_queues_.size())
                 high_priority_queues_[num_thread]->on_start_thread(num_thread);
             if (num_thread == queues_.size()-1)
                 low_priority_queue_.on_start_thread(num_thread);
 
             queues_[num_thread]->on_start_thread(num_thread);
+
+            // precalculate certain constants for the given thread number
+            std::size_t num_pu = get_pu_num(num_thread);
+            mask_cref_type machine_mask = topology_.get_machine_affinity_mask();
+            mask_cref_type core_mask =
+                topology_.get_thread_affinity_mask(num_pu, numa_sensitive_);
+            mask_cref_type node_mask =
+                topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_);
+
+            if (any(core_mask) && any(node_mask)) {
+                set(steals_in_numa_domain_, num_thread);
+                numa_domain_masks_[num_thread] = node_mask;
+            }
+
+            // we allow the thread on the boundary of the NUMA domain to steal
+            mask_type first_mask = mask_type();
+            resize(first_mask, mask_size(core_mask));
+
+            std::size_t first = find_first(node_mask);
+            if (first != std::size_t(-1))
+                set(first_mask, first);
+            else
+                first_mask = core_mask;
+
+            if (any(first_mask & core_mask)) {
+                set(steals_outside_numa_domain_, num_thread);
+                outside_numa_domain_masks_[num_thread] = not_(node_mask) & machine_mask;
+            }
         }
+
         void on_stop_thread(std::size_t num_thread)
         {
             if (num_thread < high_priority_queues_.size())
@@ -692,6 +729,7 @@ namespace hpx { namespace threads { namespace policies
 
             queues_[num_thread]->on_stop_thread(num_thread);
         }
+
         void on_error(std::size_t num_thread, boost::exception_ptr const& e)
         {
             if (num_thread < high_priority_queues_.size())
@@ -710,6 +748,10 @@ namespace hpx { namespace threads { namespace policies
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;
         topology const& topology_;
+        mask_type steals_in_numa_domain_;
+        std::vector<mask_type> numa_domain_masks_;
+        mask_type steals_outside_numa_domain_;
+        std::vector<mask_type> outside_numa_domain_masks_;
     };
 }}}
 

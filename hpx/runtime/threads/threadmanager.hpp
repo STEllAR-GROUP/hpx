@@ -342,6 +342,17 @@ namespace hpx { namespace threads
         virtual void interrupt(thread_id_type id, bool flag,
             error_code& ec = throws) = 0;
 
+        /// Interrupt the current thread at this point if it was canceled. This
+        /// will throw a thread_interrupted exception, which will cancel the thread.
+        ///
+        /// \param id         [in] The thread id of the thread which should be
+        ///                   interrupted.
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        virtual void interruption_point(thread_id_type id,
+            error_code& ec = throws) = 0;
+
         /// The run_thread_exit_callbacks function is part of the thread related
         /// API. It runs all exit functions for one of the threads.
         ///
@@ -393,7 +404,7 @@ namespace hpx { namespace threads
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
-        virtual mask_type get_pu_mask(topology const&, std::size_t) const = 0;
+        virtual mask_cref_type get_pu_mask(topology const&, std::size_t) const = 0;
 
         virtual boost::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1), bool reset = false) = 0;
@@ -424,7 +435,7 @@ namespace hpx { namespace threads
 
         // Returns the mask identifying all processing units used by this
         // thread manager.
-        virtual mask_type get_used_processing_units() const = 0;
+        virtual mask_cref_type get_used_processing_units() const = 0;
 
         ///////////////////////////////////////////////////////////////////////
         static std::size_t get_worker_thread_num(bool* numa_sensitive = 0);

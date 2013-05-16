@@ -32,7 +32,7 @@ namespace hpx { namespace util
         std::string library
         )
     {
-#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__) && !defined(__MIC)
         try {
             hpx::util::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
 

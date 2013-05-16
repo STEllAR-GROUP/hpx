@@ -71,24 +71,25 @@ namespace hpx { namespace util
         names_.reserve(names.size());
         if (ids_.empty())
         {
-            // do INI expansion on all counter names
-            for (std::size_t i = 0; i < names.size(); ++i)
-                util::expand(names[i]);
-
-            error_code ec(lightweight);
-
             using HPX_STD_PLACEHOLDERS::_1;
             using HPX_STD_PLACEHOLDERS::_2;
 
             HPX_STD_FUNCTION<performance_counters::discover_counter_func> func(
-                HPX_STD_BIND(&query_counters::find_counter, this, _1, boost::ref(ec)));
+                HPX_STD_BIND(&query_counters::find_counter, this, _1, _2));
 
             ids_.reserve(names.size());
             uoms_.reserve(names.size());
-            BOOST_FOREACH(std::string const& name, names)
+            BOOST_FOREACH(std::string& name, names)
             {
-                performance_counters::discover_counter_type(name, func,
-                    performance_counters::discover_counters_full);
+                // do INI expansion on counter name
+                util::expand(name);
+
+                // find matching counter type
+                {
+                    hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    performance_counters::discover_counter_type(name, func,
+                        performance_counters::discover_counters_full);
+                }
             }
         }
 
@@ -119,7 +120,7 @@ namespace hpx { namespace util
         double val = value.get_value<double>(ec);
 
 #ifdef HPX_HAVE_APEX
-        apex_sample_value(name.c_str(), val);
+        apex::sample_value(name.c_str(), val);
 #endif
 
         out << performance_counters::remove_counter_prefix(name) << ",";
@@ -130,7 +131,7 @@ namespace hpx { namespace util
                 << ",[s]," << val;
             if (!uom.empty())
                 out << ",[" << uom << "]";
-            out << "\n"; 
+            out << "\n";
         }
         else {
             out << "invalid\n";

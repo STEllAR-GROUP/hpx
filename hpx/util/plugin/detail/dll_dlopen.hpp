@@ -186,7 +186,6 @@ namespace hpx { namespace util { namespace plugin {
             boost::mutex::scoped_lock lock(mutex_instance());
 
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
-            typedef typename boost::remove_pointer<SymbolType>::type PointedType;
 
             // Open the library. Yes, we do it on every access to
             // a symbol, the LoadLibrary function increases the refcnt of the dll

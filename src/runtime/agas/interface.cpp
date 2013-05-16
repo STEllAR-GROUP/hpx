@@ -330,8 +330,8 @@ boost::uint32_t get_locality_id(error_code& ec)
     if (get_runtime_ptr() == 0)
         return naming::invalid_locality_id;
 
-    naming::gid_type l = naming::get_agas_client().local_locality(ec);
-    return naming::get_locality_id_from_gid(l);
+    naming::gid_type l = naming::get_agas_client().get_local_locality(ec);
+    return l ? naming::get_locality_id_from_gid(l) : naming::invalid_locality_id;
 }
 
 }}

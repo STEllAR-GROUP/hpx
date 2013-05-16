@@ -9,6 +9,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/static_reinit.hpp>
@@ -169,6 +171,8 @@ namespace hpx
 
         virtual naming::locality const& here() const = 0;
 
+        virtual applier::applier& get_applier() = 0;
+
         virtual boost::uint64_t get_runtime_support_lva() const = 0;
 
         virtual boost::uint64_t get_memory_lva() const = 0;
@@ -214,8 +218,16 @@ namespace hpx
         void start_active_counters(error_code& ec = throws);
         void stop_active_counters(error_code& ec = throws);
         void reset_active_counters(error_code& ec = throws);
-        void evaluate_active_counters(bool reset = false, 
+        void evaluate_active_counters(bool reset = false,
             char const* description = 0, error_code& ec = throws);
+
+        parcelset::policies::message_handler* create_message_handler(
+            char const* message_handler_type, char const* action,
+            parcelset::parcelport* pp, std::size_t num_messages,
+            std::size_t interval, error_code& ec = throws);
+        util::binary_filter* create_binary_filter(
+            char const* binary_filter_type, bool compress,
+            error_code& ec = throws);
 
     protected:
         void init_tss();
@@ -246,6 +258,9 @@ namespace hpx
         boost::scoped_ptr<threads::topology> topology_;
 
         state state_;
+
+        components::server::memory memory_;
+        components::server::runtime_support runtime_support_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

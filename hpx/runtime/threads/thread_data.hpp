@@ -205,6 +205,7 @@ namespace hpx { namespace threads
             thread_state_ex current_state_ex = get_state_ex();
             current_state_ex_.store(thread_state_ex(wait_signaled,
                 current_state_ex.get_tag() + 1), boost::memory_order_release);
+
             return coroutine_(current_state_ex);
         }
 
@@ -552,6 +553,8 @@ namespace hpx { namespace threads
             }
             requested_interrupt_ = flag;
         }
+
+        bool interruption_point(bool throw_on_interrupt = true);
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         std::size_t get_thread_data() const

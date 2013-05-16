@@ -23,16 +23,16 @@
 //  HPX_VERSION_FULL & 0x00FF00 is the minor version
 //  HPX_VERSION_FULL & 0xFF0000 is the major version
 //
-#define HPX_VERSION_FULL         0x100000
+#define HPX_VERSION_FULL         0x090506
 
-#define HPX_VERSION_MAJOR        1
-#define HPX_VERSION_MINOR        0
-#define HPX_VERSION_SUBMINOR     0
+#define HPX_VERSION_MAJOR        0
+#define HPX_VERSION_MINOR        9
+#define HPX_VERSION_SUBMINOR     6
 
-#define HPX_VERSION_DATE         20130118
+#define HPX_VERSION_DATE         20130407
 
 #if !defined(HPX_AGAS_VERSION)
-    #define HPX_AGAS_VERSION 0x21
+    #define HPX_AGAS_VERSION 0x30
 #endif
 
 #define HPX_VERSION_TAG          "-trunk"

@@ -107,6 +107,7 @@ namespace hpx { namespace util
           , naming::gid_type const& upper
             )
         {
+            mutex_type::scoped_lock al(allocation_mtx);
             current_lower = lower;
             current_i = lower;
             current_upper = upper;

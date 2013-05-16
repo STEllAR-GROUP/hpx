@@ -35,7 +35,9 @@
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
 /// \namespace hpx
@@ -102,10 +104,9 @@ namespace hpx
             connection_tcpip = 0,
             connection_shmem = 1,
             connection_portals4 = 2,
+            connection_ibverbs = 3,
             connection_last
         };
-
-        HPX_API_EXPORT std::string get_connection_type_name(connection_type);
 
         class HPX_API_EXPORT parcel;
         class HPX_API_EXPORT parcelport;
@@ -114,14 +115,25 @@ namespace hpx
         namespace server
         {
             class parcelport_queue;
-            struct parcelhandler_queue_base;
-
-            namespace policies
-            {
-                struct global_parcelhandler_queue;
-                typedef global_parcelhandler_queue parcelhandler_queue;
-            }
         }
+
+        struct parcelhandler_queue_base;
+
+        namespace policies
+        {
+            struct global_parcelhandler_queue;
+            typedef global_parcelhandler_queue parcelhandler_queue;
+
+            struct message_handler;
+        }
+
+        HPX_API_EXPORT std::string get_connection_type_name(connection_type);
+        HPX_API_EXPORT policies::message_handler* get_message_handler(
+            parcelhandler* ph, char const* name, char const* type, std::size_t num,
+            std::size_t interval, naming::locality const& l, connection_type t,
+            error_code& ec = throws);
+
+        HPX_API_EXPORT void flush_buffers();
     }
 
     /// \namespace threads
@@ -471,14 +483,17 @@ namespace hpx
             // An LCO representing a value which may not have been computed yet.
             component_promise = ((6 << 16) | component_base_lco_with_value),
 
+            // AGAS locality services.
+            component_agas_locality_namespace = 7,
+
             // AGAS primary address resolution services.
-            component_agas_primary_namespace = 7,
+            component_agas_primary_namespace = 8,
 
             // AGAS global type system.
-            component_agas_component_namespace = 8,
+            component_agas_component_namespace = 9,
 
             // AGAS symbolic naming services.
-            component_agas_symbol_namespace = 9,
+            component_agas_symbol_namespace = 10,
 
             component_last,
             component_first_dynamic = component_last,
@@ -488,8 +503,7 @@ namespace hpx
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <boost::uint64_t MSB, boost::uint64_t LSB,
-            typename Component = detail::this_type>
+        template <typename Component = detail::this_type>
         class fixed_component_base;
 
         template <typename Component>
@@ -573,6 +587,12 @@ namespace hpx
         template <typename Result>
         class future;
 
+        template <typename Result>
+        future<typename util::detail::remove_reference<Result>::type> 
+        make_ready_future(BOOST_FWD_REF(Result));
+
+        future<void> make_ready_future();
+
         template <typename ValueType>
         struct object_semaphore;
 
@@ -592,6 +612,8 @@ namespace hpx
     /// \namespace util
     namespace util
     {
+        struct binary_filter;
+
         class HPX_EXPORT section;
         class HPX_EXPORT runtime_configuration;
         class HPX_EXPORT io_service_pool;
@@ -614,7 +636,9 @@ namespace hpx
     {
         async = 0x01,
         deferred = 0x02,
-        all = 0x03        // async | deferred
+        task = 0x04,        // see N3632
+        sync = 0x08,
+        all = 0x0f          // async | deferred | task | sync
     };
     BOOST_SCOPED_ENUM_END
 
@@ -623,13 +647,6 @@ namespace hpx
     {
         return static_cast<int>(lhs) & static_cast<int>(rhs) ? true : false;
     }
-
-    /// \brief Return the list of locality ids of remote localities supporting
-    ///        the given component type. By default this function will return
-    ///        the list of all remote localities (all but the current locality).
-    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities();
-    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
-        components::component_type);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
@@ -649,6 +666,7 @@ namespace hpx
     // Pulling important types into the main namespace
     using naming::id_type;
     using lcos::future;
+    using lcos::make_ready_future;
     using lcos::promise;
 
     /// \endcond
@@ -684,6 +702,35 @@ namespace hpx
     ///
     /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
     HPX_API_EXPORT naming::id_type find_here(error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the global id representing the root locality
+    ///
+    /// The function \a find_root_locality() can be used to retrieve the global 
+    /// id usable to refer to the root locality locality.
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global id representing the root locality for this 
+    ///           application.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
+    ///           otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
+    HPX_API_EXPORT naming::id_type find_root_locality(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the list of global ids representing all localities
@@ -751,6 +798,70 @@ namespace hpx
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
         components::component_type type, error_code& ec = throws);
+
+    /// \brief Return the list of locality ids of remote localities supporting
+    ///        the given component type. By default this function will return
+    ///        the list of all remote localities (all but the current locality).
+    ///
+    /// The function \a find_remote_localities() can be used to retrieve the
+    /// global ids of all remote localities currently available to this
+    /// application (i.e. all localities except the current one).
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global ids representing the remote localities currently
+    ///           available to this application.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return an empty vector otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_locality()
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities();
+
+    /// \brief Return the list of locality ids of remote localities supporting
+    ///        the given component type. By default this function will return
+    ///        the list of all remote localities (all but the current locality).
+    ///
+    /// The function \a find_remote_localities() can be used to retrieve the
+    /// global ids of all remote localities currently available to this
+    /// application (i.e. all localities except the current one) which
+    /// support the creation of instances of the given component type.
+    ///
+    /// \param type  [in] The type of the components for which the function should
+    ///           return the available remote localities.
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global ids representing the remote localities currently
+    ///           available to this application.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return an empty vector otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_locality()
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
+        components::component_type);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing an arbitrary locality which
@@ -964,13 +1075,13 @@ namespace hpx
     ///           application is running on (as returned by
     ///           \a get_num_localities()).
     ///
-    /// \note     This function needs to be executed on a HPX-thread. It will
-    ///           fail otherwise (it will return -1).
-    ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
+    ///
+    /// \note     This function needs to be executed on a HPX-thread. It will
+    ///           fail otherwise (it will return -1).
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -991,6 +1102,15 @@ namespace hpx
     /// identifies the thread in the context of HPX. If the function is called
     /// while no HPX runtime system is active, it will return zero.
     HPX_API_EXPORT std::string const* get_thread_name();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of worker OS- threads used to execute HPX 
+    ///        threads
+    ///
+    /// This function returns the number of OS-threads used to execute HPX 
+    /// threads. If the function is called while no HPX runtime system is active, 
+    /// it will return zero.
+    HPX_API_EXPORT std::size_t get_num_worker_threads();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the system uptime measure on the thread executing this call.
@@ -1095,7 +1215,7 @@ namespace hpx
     ///           line option \--hpx:print-counter)
     HPX_API_EXPORT void stop_active_counters(error_code& ec = throws);
 
-    /// \brief Evaluate and utput all active performance counters, optionally 
+    /// \brief Evaluate and output all active performance counters, optionally
     ///        naming the point in code marked by this function.
     ///
     /// \param reset       [in] this is an optional flag allowing to reset
@@ -1120,6 +1240,36 @@ namespace hpx
     ///           line option \--hpx:print-counter)
     HPX_API_EXPORT void evaluate_active_counters(bool reset = false,
         char const* description = 0, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a message handler plugin
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    HPX_API_EXPORT parcelset::policies::message_handler* create_message_handler(
+        char const* message_handler_type, char const* action,
+        parcelset::parcelport* pp, std::size_t num_messages,
+        std::size_t interval, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a binary filter plugin
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    HPX_API_EXPORT util::binary_filter* create_binary_filter(
+        char const* binary_filter_type, bool compress, error_code& ec = throws);
 }
 
 #include <hpx/lcos/async_fwd.hpp>

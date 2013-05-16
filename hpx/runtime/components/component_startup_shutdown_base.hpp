@@ -53,17 +53,17 @@ namespace hpx { namespace components
 /// This macro is used to register the given component factory with
 /// Hpx.Plugin. This macro has to be used for each of the components.
 #define HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY(RegistryType, componentname)   \
-        HPX_PLUGIN_EXPORT(HPX_PLUGIN_PREFIX,                                \
-            hpx::components::component_startup_shutdown_base, RegistryType,   \
-            componentname, startup_shutdown)                                  \
-    /**/
+    HPX_PLUGIN_EXPORT(HPX_PLUGIN_COMPONENT_PREFIX,                            \
+        hpx::components::component_startup_shutdown_base, RegistryType,       \
+        componentname, startup_shutdown)                                      \
+/**/
 
 /// This macro is used to define the required Hpx.Plugin entry point for the
 /// startup/shutdown registry. This macro has to be used in not more than one
 /// compilation unit of a component module.
 #define HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                             \
-        HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PREFIX, startup_shutdown)         \
-    /**/
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, startup_shutdown)     \
+/**/
 
 #endif
 

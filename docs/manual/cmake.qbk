@@ -292,16 +292,39 @@ variables are used more seldom and are mainly useful for debugging purposes.
       for this option is `OFF`. This option can be enabled only if the
       __boost_wave__ tool is available (see CMake variable `BOOSTWAVE` below).]
     ]
-    [[`HPX_USE_SHMEM_PARCELPORT:BOOL`]
+    [[`HPX_USE_PARCELPORT_SHMEM:BOOL`]
      [Sets whether the experimental implementation of a parcelport communicating
       over shared memory will be enabled or not. This variable is set to `OFF`
       by default.]
     ]
-    [[`HPX_USE_ZLIB_COMPRESSION:BOOL`]
+    [[`HPX_USE_PARCELPORT_IBVERBS:BOOL`]
+     [Sets whether the experimental implementation of a parcelport communicating
+      over Infiniband will be enabled or not. This variable is set to `OFF`
+      by default. In order to use this option the IBVERBS and RDMACM libraries 
+      must be found and configured by cmake.]
+    ]
+    [[`HPX_USE_COMPRESSION_ZLIB:BOOL`]
      [Sets whether support for compressing parcels using the __zlib__ library will
       be enabled or not. This variable is set to `OFF` by default. If you enable
       this option CMake will try to find the __zlib__ library, which might require
       setting the CMake variable `ZLIB_ROOT`.]
+    ]
+    [[`HPX_USE_COMPRESSION_BZIP2:BOOL`]
+     [Sets whether support for compressing parcels using the __bzip2__ library will
+      be enabled or not. This variable is set to `OFF` by default. If you enable
+      this option CMake will try to find the __bzip2__ library, which might require
+      setting the CMake variable `BZIP_ROOT`.]
+    ]
+    [[`HPX_USE_COMPRESSION_SNAPPY:BOOL`]
+     [Sets whether support for compressing parcels using the __snappy__ library will
+      be enabled or not. This variable is set to `OFF` by default. If you enable
+      this option CMake will try to find the __snappy__ library, which might require
+      setting the CMake variable `SNAPPY_ROOT`.]
+    ]
+    [[`HPX_USE_MORE_THAN_64_THREADS:BOOL`]
+     [Sets whether HPX should be configured to run more than 64 threads (for
+      system having more than 64 processing units, like the XeonPhi device).
+      The variable is set to `OFF` by default.]
     ]
 ]
 
@@ -316,7 +339,7 @@ in a different location you can specify its base directory by appending `_ROOT`
 to the variable name as listed below. For instance, to configure a custom
 directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
 
-[variablelist Additional Tools and Libraries used by __hpx__
+[variablelist Additional Tools and Libraries used by HPX
     [[`BOOST_ROOT:PATH`]
      [Specifies where to look for the __boost__ installation to be used for
       compiling __hpx__. Set this if CMake is not able to locate a suitable
@@ -367,7 +390,6 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
      [Specifies where to look for the __mpi__ tool `mpiexec`.]
     ]
 ]
-
 
 [endsect]
 

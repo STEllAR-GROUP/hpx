@@ -10,6 +10,7 @@
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/find_prefix.hpp>
+#include <hpx/util/register_locks.hpp>
 
 #include <boost/config.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -65,6 +66,9 @@ namespace hpx { namespace util
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
+#if HPX_VERIFY_LOCKS
+            "lock_detection = ${HPX_LOCK_DETECTION:0}",
+#endif
 
             // add placeholders for keys to be added by command line handling
             "os_threads = 1",
@@ -110,6 +114,11 @@ namespace hpx { namespace util
             "[hpx.parcel.shmem]",
             "enable=${HPX_USE_SHMEM_PARCELPORT:0}",
             "data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
+
+            // ibverbs related settings
+            "[hpx.parcel.ibverbs]",
+            "enable=${HPX_USE_IBVERBS_PARCELPORT:0}",
+            "buffer_size=${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -278,6 +287,10 @@ namespace hpx { namespace util
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
+#if HPX_VERIFY_LOCKS
+        if (enable_lock_detection())
+            util::enable_lock_detection();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -319,6 +332,10 @@ namespace hpx { namespace util
 
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
+#endif
+#if HPX_VERIFY_LOCKS
+        if (enable_lock_detection())
+            util::enable_lock_detection();
 #endif
     }
 
@@ -476,38 +493,36 @@ namespace hpx { namespace util
         return 16;
     }
 
-    std::size_t runtime_configuration::get_agas_local_cache_size() const
+    std::size_t runtime_configuration::get_agas_local_cache_size(std::size_t dflt) const
     {
-        std::size_t cache_size = HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE;
+        std::size_t cache_size = dflt;
 
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 cache_size = boost::lexical_cast<std::size_t>(
-                    sec->get_entry("local_cache_size",
-                        HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE));
+                    sec->get_entry("local_cache_size", cache_size));
             }
         }
 
-        if (cache_size < 16)
+        if (cache_size != std::size_t(~0x0ul) && cache_size < 16ul)
             cache_size = 16;      // limit lower bound
         return cache_size;
     }
 
-    std::size_t runtime_configuration::get_agas_local_cache_size_per_thread() const
+    std::size_t runtime_configuration::get_agas_local_cache_size_per_thread(std::size_t dflt) const
     {
-        std::size_t cache_size = HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD;
+        std::size_t cache_size = dflt;
 
         if (has_section("hpx.agas")) {
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 cache_size = boost::lexical_cast<std::size_t>(
-                    sec->get_entry("local_cache_size_per_thread",
-                        HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD));
+                    sec->get_entry("local_cache_size_per_thread", cache_size));
             }
         }
 
-        if (cache_size < 16)
+        if (cache_size != std::size_t(~0x0ul) && cache_size < 16ul)
             cache_size = 16;      // limit lower bound
         return cache_size;
     }
@@ -573,6 +588,21 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
                     sec->get_entry("use_itt_notify", "0")) ? true : false;
+            }
+        }
+#endif
+        return false;
+    }
+
+    // Enable lock detection during suspension
+    bool runtime_configuration::enable_lock_detection() const
+    {
+#if HPX_VERIFY_LOCKS
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return boost::lexical_cast<int>(
+                    sec->get_entry("lock_detection", "0")) ? true : false;
             }
         }
 #endif

@@ -48,10 +48,6 @@ using boost::program_options::options_description;
 using boost::program_options::value;
 
 using hpx::naming::id_type;
-using hpx::actions::plain_result_action1;
-using hpx::actions::plain_result_action5;
-using hpx::actions::plain_action3;
-using hpx::actions::plain_action4;
 using hpx::async;
 using hpx::lcos::future;
 using hpx::lcos::wait;
@@ -90,22 +86,8 @@ void calc_force(uint64_t k,uint64_t t,uint64_t i);
 
 ///////////////////////////////////////////////////////////////////////////////
 //Action Declarations
-typedef plain_action3<
-     uint64_t,    // argument 
-     uint64_t,    // argument
-     uint64_t,    // argument
-     calc_force   // function
- > calc_force_action;
-HPX_REGISTER_PLAIN_ACTION(calc_force_action);
-
-typedef plain_action4< 
-     vector<future<void> > const &,
-     config_f const &,
-     uint64_t,
-     uint64_t,
-     move
- > move_action;
-HPX_REGISTER_PLAIN_ACTION(move_action);
+HPX_PLAIN_ACTION(calc_force);
+HPX_PLAIN_ACTION(move);
 
 ///////////////////////////////////////////////////////////////////////////////
 //Global Variables

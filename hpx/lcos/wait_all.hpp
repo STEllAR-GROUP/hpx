@@ -261,7 +261,7 @@ namespace hpx
         std::copy(begin, end, std::back_inserter(lazy_values));
 
         if (lazy_values.empty())
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
 
         lcos::local::futures_factory<return_type()> p(
             detail::when_all<value_type>(boost::move(lazy_values)));
@@ -278,7 +278,7 @@ namespace hpx
         typedef std::vector<lcos::future<T> > return_type;
 
         if (lazy_values.empty())
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
 
         lcos::local::futures_factory<return_type()> p(
             detail::when_all<T>(boost::move(lazy_values)));
@@ -288,13 +288,13 @@ namespace hpx
     }
 
     template <typename T>
-    lcos::future<std::vector<lcos::future<T> > >
+    lcos::future<std::vector<lcos::future<T> > > //-V659
     when_all(std::vector<lcos::future<T> > const& lazy_values)
     {
         typedef std::vector<lcos::future<T> > return_type;
 
         if (lazy_values.empty())
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
 
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(

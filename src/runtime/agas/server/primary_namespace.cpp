@@ -6,11 +6,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
@@ -45,14 +45,14 @@ response primary_namespace::service(
 { // {{{
     switch (req.get_action_code())
     {
-        case primary_ns_allocate:
+        case primary_ns_route:
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.allocate_.time_
+                  , counter_data_.route_.time_
                 );
-                counter_data_.increment_allocate_count();
-                return allocate(req, ec);
+                counter_data_.increment_route_count();
+                return route(req, ec);
             }
         case primary_ns_bind_gid:
             {
@@ -72,15 +72,6 @@ response primary_namespace::service(
                 counter_data_.increment_resolve_gid_count();
                 return resolve_gid(req, ec);
             }
-        case primary_ns_free:
-            {
-                update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.free_.time_
-                );
-                counter_data_.increment_free_count();
-                return free(req, ec);
-            }
         case primary_ns_unbind_gid:
             {
                 update_time_on_exit update(
@@ -94,58 +85,36 @@ response primary_namespace::service(
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.change_credit_non_blocking_.time_
+                  , counter_data_.change_credit_.time_
                 );
-                counter_data_.increment_change_credit_non_blocking_count();
+                counter_data_.increment_change_credit_count();
                 return change_credit_non_blocking(req, ec);
             }
         case primary_ns_change_credit_sync:
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.change_credit_sync_.time_
+                  , counter_data_.change_credit_.time_
                 );
-                counter_data_.increment_change_credit_sync_count();
+                counter_data_.increment_change_credit_count();
                 return change_credit_sync(req, ec);
-            }
-        case primary_ns_localities:
-            {
-                update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.localities_.time_
-                );
-                counter_data_.increment_localities_count();
-                return localities(req, ec);
-            }
-        case primary_ns_resolved_localities:
-            {
-                update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.resolved_localities_.time_
-                );
-                counter_data_.increment_resolved_localities_count();
-                return resolved_localities(req, ec);
-            }
-        case primary_ns_num_localities:
-            {
-                update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.num_localities_.time_
-                );
-                counter_data_.increment_num_localities_count();
-                return get_num_localities(req, ec);
-            }
-        case primary_ns_num_threads:
-            {
-                update_time_on_exit update(
-                    counter_data_
-                  , counter_data_.num_threads_.time_
-                );
-                counter_data_.increment_num_threads_count();
-                return get_num_threads(req, ec);
             }
         case primary_ns_statistics_counter:
             return statistics_counter(req, ec);
+
+        case locality_ns_allocate:
+        case locality_ns_free:
+        case locality_ns_localities:
+        case locality_ns_num_localities:
+        case locality_ns_num_threads:
+        case locality_ns_resolve_locality:
+        case locality_ns_resolved_localities:
+        {
+            LAGAS_(warning) <<
+                "primary_namespace::service, redirecting request to "
+                "locality_namespace";
+            return naming::get_agas_client().service(req, ec);
+        }
 
         case component_ns_bind_prefix:
         case component_ns_bind_name:
@@ -156,7 +125,7 @@ response primary_namespace::service(
         case component_ns_num_localities:
         {
             LAGAS_(warning) <<
-                "component_namespace::service, redirecting request to "
+                "primary_namespace::service, redirecting request to "
                 "component_namespace";
             return naming::get_agas_client().service(req, ec);
         }
@@ -167,19 +136,20 @@ response primary_namespace::service(
         case symbol_ns_iterate_names:
         {
             LAGAS_(warning) <<
-                "component_namespace::service, redirecting request to "
+                "primary_namespace::service, redirecting request to "
                 "symbol_namespace";
             return naming::get_agas_client().service(req, ec);
         }
 
         default:
+        case locality_ns_service:
         case component_ns_service:
         case primary_ns_service:
         case symbol_ns_service:
         case invalid_request:
         {
             HPX_THROWS_IF(ec, bad_action_code
-              , "component_namespace::service"
+              , "primary_namespace::service"
               , boost::str(boost::format(
                     "invalid action code encountered in request, "
                     "action_code(%x)")
@@ -203,7 +173,7 @@ void primary_namespace::register_counter_types(
       , agas::server::primary_namespace_service_name));
 
     for (std::size_t i = 0;
-          i < detail::num_primary_namespace_services;
+          i != detail::num_primary_namespace_services;
           ++i)
     {
         std::string name(detail::primary_namespace_services[i].name_);
@@ -218,7 +188,7 @@ void primary_namespace::register_counter_types(
           , performance_counters::counter_raw
           , help
           , creator
-          , &performance_counters::default_counter_discoverer
+          , &performance_counters::locality_counter_discoverer
           , HPX_PERFORMANCE_COUNTER_V1
           , detail::primary_namespace_services[i].uom_
           , ec
@@ -229,9 +199,16 @@ void primary_namespace::register_counter_types(
 
 void primary_namespace::register_server_instance(
     char const* servicename
+  , boost::uint32_t locality_id
   , error_code& ec
     )
 {
+    // set locality_id for this component
+    if (locality_id != naming::invalid_locality_id)
+    {
+        this->base_type::set_locality_id(locality_id);
+    }
+
     // now register this AGAS instance with AGAS :-P
     instance_name_ = agas::service_name;
     instance_name_ += agas::server::primary_namespace_service_name;
@@ -242,6 +219,14 @@ void primary_namespace::register_server_instance(
     agas::register_name(instance_name_, get_gid().get_gid(), ec);
 }
 
+void primary_namespace::unregister_server_instance(
+    error_code& ec
+    )
+{
+    agas::unregister_name(instance_name_, ec);
+    this->base_type::finalize();
+}
+
 void primary_namespace::finalize()
 {
     if (!instance_name_.empty())
@@ -249,6 +234,50 @@ void primary_namespace::finalize()
         error_code ec(lightweight);
         agas::unregister_name(instance_name_, ec);
     }
+}
+
+// Parcel routing forwards the message handler request to the routed action
+parcelset::policies::message_handler* primary_namespace::get_message_handler(
+    parcelset::parcelhandler* ph
+  , naming::locality const& loc
+  , parcelset::connection_type t
+  , parcelset::parcel const& p
+    )
+{
+    typedef hpx::actions::transfer_action<
+        server::primary_namespace::service_action
+    > action_type;
+
+    boost::shared_ptr<action_type> act =
+        boost::static_pointer_cast<action_type>(p.get_action());
+    agas::request const& req = hpx::actions::get<0>(*act);
+
+    // only routing is handled in a special way
+    if (req.get_action_code() != primary_ns_route)
+        return 0;
+
+    parcelset::parcel routed_p = req.get_parcel();
+    return routed_p.get_message_handler(ph, loc, t);
+}
+
+util::binary_filter* primary_namespace::get_serialization_filter(
+    parcelset::parcel const& p
+    )
+{
+    typedef hpx::actions::transfer_action<
+        server::primary_namespace::service_action
+    > action_type;
+
+    boost::shared_ptr<action_type> act =
+        boost::static_pointer_cast<action_type>(p.get_action());
+    agas::request const& req = hpx::actions::get<0>(*act);
+
+    // only routing is handled in a special way
+    if (req.get_action_code() != primary_ns_route)
+        return 0;
+
+    parcelset::parcel routed_p = req.get_parcel();
+    return routed_p.get_serialization_filter();
 }
 
 // TODO: do/undo semantics (e.g. transactions)
@@ -268,185 +297,6 @@ std::vector<response> primary_namespace::bulk_service(
 
     return r;
 }
-
-response primary_namespace::allocate(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ allocate implementation
-    using boost::fusion::at_c;
-
-    // parameters
-    naming::locality ep = req.get_locality();
-    boost::uint64_t const count = req.get_count();
-    boost::uint64_t const real_count = (count) ? (count - 1) : (0);
-    boost::uint32_t const num_threads = req.get_num_threads();
-
-    mutex_type::scoped_lock l(mutex_);
-
-    partition_table_type::iterator it = partitions_.find(ep)
-                                 , end = partitions_.end();
-
-    // If the endpoint is in the table, then this is a resize.
-    if (it != end)
-    {
-        // Just return the prefix
-        // REVIEW: Should this be an error?
-        if (0 == count)
-        {
-            LAGAS_(info) << (boost::format(
-                "primary_namespace::allocate, ep(%1%), count(%2%), "
-                "lower(%3%), upper(%4%), prefix(%5%), "
-                "response(repeated_request)")
-                % ep
-                % count
-                % at_c<1>(it->second)
-                % at_c<1>(it->second)
-                % at_c<0>(it->second));
-
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return response(primary_ns_allocate
-                          , at_c<1>(it->second)
-                          , at_c<1>(it->second)
-                          , at_c<0>(it->second)
-                          , repeated_request);
-        }
-
-        // Compute the new allocation.
-        naming::gid_type lower(at_c<1>(it->second) + 1),
-                         upper(lower + real_count);
-
-        // Check for overflow.
-        if (upper.get_msb() != lower.get_msb())
-        {
-            // Check for address space exhaustion (we currently use 80 bis of
-            // the gid for the actual id)
-            if (HPX_UNLIKELY((lower.get_msb() & ~0xFF) == 0xFF))
-            {
-                HPX_THROWS_IF(ec, internal_server_error
-                  , "primary_namespace::allocate"
-                  , "primary namespace has been exhausted");
-                return response();
-            }
-
-            // Otherwise, correct
-            lower = naming::gid_type(upper.get_msb(), 0);
-            upper = lower + real_count;
-        }
-
-        // Store the new upper bound.
-        at_c<1>(it->second) = upper;
-
-        // Set the initial credit count.
-        naming::detail::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-        naming::detail::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
-
-        LAGAS_(info) << (boost::format(
-            "primary_namespace::allocate, ep(%1%), count(%2%), "
-            "lower(%3%), upper(%4%), prefix(%5%), response(repeated_request)")
-            % ep % count % lower % upper % at_c<0>(it->second));
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(primary_ns_allocate
-                      , lower
-                      , upper
-                      , at_c<0>(it->second)
-                      , repeated_request);
-    }
-
-    // If the endpoint isn't in the table, then we're registering it.
-    else
-    {
-        // Check for address space exhaustion.
-        if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size()))
-        {
-            HPX_THROWS_IF(ec, internal_server_error
-              , "primary_namespace::allocate"
-              , "primary namespace has been exhausted");
-            return response();
-        }
-
-        // Compute the locality's prefix.
-        boost::uint32_t prefix = prefix_counter_++;
-        naming::gid_type id(naming::get_gid_from_locality_id(prefix));
-
-        // Check if this prefix has already been assigned.
-        while (gvas_.count(id))
-        {
-            prefix = prefix_counter_++;
-            id = naming::get_gid_from_locality_id(prefix);
-        }
-
-        // Start assigning ids with the second block of 64bit numbers only.
-        // The first block is reserved for components with LVA-encoded GIDs.
-        naming::gid_type lower_id(id.get_msb() + 1, 0);
-
-        // We need to create an entry in the partition table for this
-        // locality.
-        partition_table_type::iterator pit;
-
-        if (HPX_UNLIKELY(!util::insert_checked(partitions_.insert(
-                std::make_pair(ep,
-                    partition_type(prefix, lower_id, num_threads))), pit)))
-        {
-            // If this branch is taken, then the partition table was updated
-            // at some point after we first checked it, which would indicate
-            // memory corruption or a locking failure.
-            HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::allocate"
-              , boost::str(boost::format(
-                    "partition table insertion failed due to a locking "
-                    "error or memory corruption, endpoint(%1%), "
-                    "prefix(%2%), lower_id(%3%)")
-                    % ep % prefix % lower_id));
-            return response();
-        }
-
-        const gva g(ep, components::component_runtime_support, count);
-
-        // Now that we've inserted the locality into the partition table
-        // successfully, we need to put the locality's GID into the GVA
-        // table so that parcels can be sent to the memory of a locality.
-        if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
-                std::make_pair(id, g)))))
-        {
-            HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::allocate"
-              , boost::str(boost::format(
-                    "GVA table insertion failed due to a locking error "
-                    "or memory corruption, gid(%1%), gva(%2%)")
-                    % id % g));
-            return response();
-        }
-
-        // Generate the requested GID range
-        naming::gid_type lower = lower_id + 1;
-        naming::gid_type upper = lower + real_count;
-
-        at_c<1>((*pit).second) = upper;
-
-        // Set the initial credit count.
-        naming::detail::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-        naming::detail::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
-
-        LAGAS_(info) << (boost::format(
-            "primary_namespace::allocate, ep(%1%), count(%2%), "
-            "lower(%3%), upper(%4%), prefix(%5%)")
-            % ep % count % lower % upper % prefix);
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(primary_ns_allocate
-                      , lower
-                      , upper
-                      , prefix);
-    }
-} // }}}
 
 response primary_namespace::bind_gid(
     request const& req
@@ -619,113 +469,13 @@ response primary_namespace::resolve_gid(
                       , no_success);
     }
 
-    else
-    {
-        LAGAS_(info) << (boost::format(
-            "primary_namespace::resolve_gid, gid(%1%), base(%2%), gva(%3%)")
-            % id % at_c<0>(r) % at_c<1>(r));
-
-        return response(primary_ns_resolve_gid
-                      , at_c<0>(r)
-                      , at_c<1>(r));
-    }
-} // }}}
-
-response primary_namespace::resolve_locality(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ resolve_locality implementation
-    using boost::fusion::at_c;
-
-    // parameters
-    naming::locality ep = req.get_locality();
-
-    mutex_type::scoped_lock l(mutex_);
-
-    partition_table_type::iterator pit = partitions_.find(ep)
-                                 , pend = partitions_.end();
-
-    if (pit != pend)
-    {
-        boost::uint32_t const prefix = at_c<0>(pit->second);
-
-        LAGAS_(info) << (boost::format(
-            "primary_namespace::resolve_locality, ep(%1%), prefix(%2%)")
-            % ep % prefix);
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(primary_ns_resolve_locality, prefix);
-    }
-
     LAGAS_(info) << (boost::format(
-        "primary_namespace::resolve_locality, ep(%1%), response(no_success)")
-        % ep);
+        "primary_namespace::resolve_gid, gid(%1%), base(%2%), gva(%3%)")
+        % id % at_c<0>(r) % at_c<1>(r));
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(primary_ns_resolve_locality, 0, no_success);
-} // }}}
-
-response primary_namespace::free(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ free implementation
-    using boost::fusion::at_c;
-
-    // parameters
-    naming::locality ep = req.get_locality();
-
-    mutex_type::scoped_lock l(mutex_);
-
-    partition_table_type::iterator pit = partitions_.find(ep)
-                                 , pend = partitions_.end();
-
-    if (pit != pend)
-    {
-        gva_table_type::iterator git = gvas_.find
-            (naming::get_gid_from_locality_id(at_c<0>(pit->second)));
-        gva_table_type::iterator gend = gvas_.end();
-
-        if (HPX_UNLIKELY(git == gend))
-        {
-            HPX_THROWS_IF(ec, internal_server_error
-              , "primary_namespace::free"
-              , boost::str(boost::format(
-                    "partition table entry has no corresponding GVA table "
-                    "entry, endpoint(%1%)")
-                    % ep));
-            return response();
-        }
-
-        // Wipe the locality from the tables.
-        partitions_.erase(pit);
-        gvas_.erase(git);
-
-        LAGAS_(info) << (boost::format(
-            "primary_namespace::free, ep(%1%)")
-            % ep);
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return response(primary_ns_free);
-    }
-
-    LAGAS_(info) << (boost::format(
-        "primary_namespace::free, ep(%1%), "
-        "response(no_success)")
-        % ep);
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(primary_ns_free
-                       , no_success);
+    return response(primary_ns_resolve_gid
+                    , at_c<0>(r)
+                    , at_c<1>(r));
 } // }}}
 
 response primary_namespace::unbind_gid(
@@ -1255,67 +1005,6 @@ void primary_namespace::kill_sync(
         ec = make_success_code();
 } // }}}
 
-response primary_namespace::localities(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ localities implementation
-    using boost::fusion::at_c;
-
-    mutex_type::scoped_lock l(mutex_);
-
-    std::vector<boost::uint32_t> p;
-
-    partition_table_type::const_iterator it = partitions_.begin()
-                                       , end = partitions_.end();
-
-    for (; it != end; ++it)
-        p.push_back(at_c<0>(it->second));
-
-    LAGAS_(info) << (boost::format(
-        "primary_namespace::localities, localities(%1%)")
-        % p.size());
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(primary_ns_localities, p);
-} // }}}
-
-response primary_namespace::resolved_localities(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ localities implementation
-    using boost::fusion::at_c;
-
-    mutex_type::scoped_lock l(mutex_);
-
-    std::vector<naming::locality> localities;
-
-    partition_table_type::const_iterator it = partitions_.begin()
-                                       , end = partitions_.end();
-
-    for (; it != end; ++it) {
-        boost::fusion::vector2<naming::gid_type, gva> r =
-            resolve_gid_locked(
-                naming::get_gid_from_locality_id(at_c<0>(it->second)), ec);
-
-        if (ec) return response();
-
-        localities.push_back(at_c<1>(r).endpoint);
-    }
-
-    LAGAS_(info) << (boost::format(
-        "primary_namespace::resolved_localities, localities(%1%)")
-        % localities.size());
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(primary_ns_resolved_localities, localities);
-} // }}}
-
 boost::fusion::vector2<naming::gid_type, gva>
 primary_namespace::resolve_gid_locked(
     naming::gid_type const& gid
@@ -1400,53 +1089,6 @@ primary_namespace::resolve_gid_locked(
         (naming::invalid_gid, gva());
 } // }}}
 
-response primary_namespace::get_num_localities(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ get_num_localities implementation
-    mutex_type::scoped_lock l(mutex_);
-
-    boost::uint32_t num_localities =
-        static_cast<boost::uint32_t>(partitions_.size());
-
-    LAGAS_(info) << (boost::format(
-        "primary_namespace::get_num_localities, localities(%1%)")
-        % num_localities);
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(primary_ns_num_localities, num_localities);
-} // }}}
-
-response primary_namespace::get_num_threads(
-    request const& req
-  , error_code& ec
-    )
-{ // {{{ get_num_threads implementation
-    mutex_type::scoped_lock l(mutex_);
-
-    std::vector<boost::uint32_t> num_threads;
-
-    partition_table_type::iterator end = partitions_.end();
-    for (partition_table_type::iterator it = partitions_.begin();
-         it != end; ++it)
-    {
-        using boost::fusion::at_c;
-        num_threads.push_back(at_c<2>(it->second));
-    }
-
-    LAGAS_(info) << (boost::format(
-        "primary_namespace::get_num_threads, localities(%1%)")
-        % num_threads.size());
-
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(primary_ns_num_threads, num_threads);
-} // }}}
-
 response primary_namespace::statistics_counter(
     request const& req
   , error_code& ec
@@ -1471,7 +1113,7 @@ response primary_namespace::statistics_counter(
     namespace_action_code code = invalid_request;
     detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
-          i < detail::num_primary_namespace_services;
+          i != detail::num_primary_namespace_services;
           ++i)
     {
         if (p.countername_ == detail::primary_namespace_services[i].name_)
@@ -1496,8 +1138,8 @@ response primary_namespace::statistics_counter(
     if (target == detail::counter_target_count)
     {
         switch (code) {
-        case primary_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
+        case primary_ns_route:
+            get_data_func = boost::bind(&cd::get_route_count, &counter_data_, ::_1);
             break;
         case primary_ns_bind_gid:
             get_data_func = boost::bind(&cd::get_bind_gid_count, &counter_data_, ::_1);
@@ -1505,32 +1147,12 @@ response primary_namespace::statistics_counter(
         case primary_ns_resolve_gid:
             get_data_func = boost::bind(&cd::get_resolve_gid_count, &counter_data_, ::_1);
             break;
-        case primary_ns_resolve_locality:
-            get_data_func = boost::bind(&cd::get_resolve_locality_count, &counter_data_, ::_1);
-            break;
-        case primary_ns_free:
-            get_data_func = boost::bind(&cd::get_free_count, &counter_data_, ::_1);
-            break;
         case primary_ns_unbind_gid:
             get_data_func = boost::bind(&cd::get_unbind_gid_count, &counter_data_, ::_1);
             break;
         case primary_ns_change_credit_non_blocking:
-            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_count, &counter_data_, ::_1);
-            break;
         case primary_ns_change_credit_sync:
-            get_data_func = boost::bind(&cd::get_change_credit_sync_count, &counter_data_, ::_1);
-            break;
-        case primary_ns_localities:
-            get_data_func = boost::bind(&cd::get_localities_count, &counter_data_, ::_1);
-            break;
-        case primary_ns_resolved_localities:
-            get_data_func = boost::bind(&cd::get_resolved_localities_count, &counter_data_, ::_1);
-            break;
-        case primary_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_, ::_1);
-            break;
-        case primary_ns_num_threads:
-            get_data_func = boost::bind(&cd::get_num_threads_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_change_credit_count, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1540,9 +1162,10 @@ response primary_namespace::statistics_counter(
         }
     }
     else {
+        BOOST_ASSERT(detail::counter_target_time == target);
         switch (code) {
-        case primary_ns_allocate:
-            get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
+        case primary_ns_route:
+            get_data_func = boost::bind(&cd::get_route_time, &counter_data_, ::_1);
             break;
         case primary_ns_bind_gid:
             get_data_func = boost::bind(&cd::get_bind_gid_time, &counter_data_, ::_1);
@@ -1550,36 +1173,16 @@ response primary_namespace::statistics_counter(
         case primary_ns_resolve_gid:
             get_data_func = boost::bind(&cd::get_resolve_gid_time, &counter_data_, ::_1);
             break;
-        case primary_ns_resolve_locality:
-            get_data_func = boost::bind(&cd::get_resolve_locality_time, &counter_data_, ::_1);
-            break;
-        case primary_ns_free:
-            get_data_func = boost::bind(&cd::get_free_time, &counter_data_, ::_1);
-            break;
         case primary_ns_unbind_gid:
             get_data_func = boost::bind(&cd::get_unbind_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_change_credit_non_blocking:
-            get_data_func = boost::bind(&cd::get_change_credit_non_blocking_time, &counter_data_, ::_1);
-            break;
         case primary_ns_change_credit_sync:
-            get_data_func = boost::bind(&cd::get_change_credit_sync_time, &counter_data_, ::_1);
-            break;
-        case primary_ns_localities:
-            get_data_func = boost::bind(&cd::get_localities_time, &counter_data_, ::_1);
-            break;
-        case primary_ns_resolved_localities:
-            get_data_func = boost::bind(&cd::get_resolved_localities_time, &counter_data_, ::_1);
-            break;
-        case primary_ns_num_localities:
-            get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_, ::_1);
-            break;
-        case primary_ns_num_threads:
-            get_data_func = boost::bind(&cd::get_num_threads_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_change_credit_time, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
-              , "component_namespace::statistics"
+              , "primary_namespace::statistics"
               , "bad action code while querying statistics");
             return response();
         }
@@ -1603,10 +1206,10 @@ response primary_namespace::statistics_counter(
 }
 
 // access current counter values
-boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
+boost::int64_t primary_namespace::counter_data::get_route_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(allocate_.count_, reset);
+    return util::get_and_reset_value(route_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)
@@ -1621,65 +1224,23 @@ boost::int64_t primary_namespace::counter_data::get_resolve_gid_count(bool reset
     return util::get_and_reset_value(resolve_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolve_locality_count(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(resolve_locality_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_free_count(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(free_.count_, reset);
-}
-
 boost::int64_t primary_namespace::counter_data::get_unbind_gid_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_count(bool reset)
+boost::int64_t primary_namespace::counter_data::get_change_credit_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_non_blocking_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_change_credit_sync_count(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_sync_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_localities_count(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(localities_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_num_localities_count(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(num_localities_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_num_threads_count(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(num_threads_.count_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_resolved_localities_count(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(resolved_localities_.count_, reset);
+    return util::get_and_reset_value(change_credit_.count_, reset);
 }
 
 // access execution time counters
-boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
+boost::int64_t primary_namespace::counter_data::get_route_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(allocate_.time_, reset);
+    return util::get_and_reset_value(route_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_bind_gid_time(bool reset)
@@ -1694,65 +1255,23 @@ boost::int64_t primary_namespace::counter_data::get_resolve_gid_time(bool reset)
     return util::get_and_reset_value(resolve_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_resolve_locality_time(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(resolve_locality_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_free_time(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(free_.time_, reset);
-}
-
 boost::int64_t primary_namespace::counter_data::get_unbind_gid_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(unbind_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_non_blocking_time(bool reset)
+boost::int64_t primary_namespace::counter_data::get_change_credit_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_non_blocking_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_change_credit_sync_time(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_sync_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_localities_time(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(localities_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_num_localities_time(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(num_localities_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_num_threads_time(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(num_threads_.time_, reset);
-}
-
-boost::int64_t primary_namespace::counter_data::get_resolved_localities_time(bool reset)
-{
-    mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(resolved_localities_.time_, reset);
+    return util::get_and_reset_value(change_credit_.time_, reset);
 }
 
 // increment counter values
-void primary_namespace::counter_data::increment_allocate_count()
+void primary_namespace::counter_data::increment_route_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++allocate_.count_;
+    ++route_.count_;
 }
 
 void primary_namespace::counter_data::increment_bind_gid_count()
@@ -1767,58 +1286,16 @@ void primary_namespace::counter_data::increment_resolve_gid_count()
     ++resolve_gid_.count_;
 }
 
-void primary_namespace::counter_data::increment_resolve_locality_count()
-{
-    mutex_type::scoped_lock l(mtx_);
-    ++resolve_locality_.count_;
-}
-
-void primary_namespace::counter_data::increment_free_count()
-{
-    mutex_type::scoped_lock l(mtx_);
-    ++free_.count_;
-}
-
 void primary_namespace::counter_data::increment_unbind_gid_count()
 {
     mutex_type::scoped_lock l(mtx_);
     ++unbind_gid_.count_;
 }
 
-void primary_namespace::counter_data::increment_change_credit_non_blocking_count()
+void primary_namespace::counter_data::increment_change_credit_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++change_credit_non_blocking_.count_;
-}
-
-void primary_namespace::counter_data::increment_change_credit_sync_count()
-{
-    mutex_type::scoped_lock l(mtx_);
-    ++change_credit_sync_.count_;
-}
-
-void primary_namespace::counter_data::increment_localities_count()
-{
-    mutex_type::scoped_lock l(mtx_);
-    ++localities_.count_;
-}
-
-void primary_namespace::counter_data::increment_num_localities_count()
-{
-    mutex_type::scoped_lock l(mtx_);
-    ++num_localities_.count_;
-}
-
-void primary_namespace::counter_data::increment_num_threads_count()
-{
-    mutex_type::scoped_lock l(mtx_);
-    ++num_threads_.count_;
-}
-
-void primary_namespace::counter_data::increment_resolved_localities_count()
-{
-    mutex_type::scoped_lock l(mtx_);
-    ++resolved_localities_.count_;
+    ++change_credit_.count_;
 }
 
 }}}

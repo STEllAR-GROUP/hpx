@@ -88,7 +88,8 @@ struct abp_queue_scheduler : boost::noncopyable
 
     bool numa_sensitive() const { return numa_sensitive_; }
 
-    std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
+    threads::mask_cref_type get_pu_mask(topology const& topology, 
+        std::size_t num_thread) const
     {
         return topology.get_thread_affinity_mask(num_thread, numa_sensitive_);
     }
@@ -295,17 +296,16 @@ struct abp_queue_scheduler : boost::noncopyable
 
         // steal work items: first try to steal from other cores in the
         // same NUMA node
-        boost::uint64_t core_mask
+        threads::mask_cref_type core_mask
             = topology_.get_thread_affinity_mask(num_thread, numa_sensitive_);
-        boost::uint64_t node_mask
+        threads::mask_cref_type node_mask
             = topology_.get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
         std::size_t queue_size = queues_.size();
-        if (core_mask && node_mask) {
-            boost::uint64_t m = 0x01LL;
-            for (std::size_t i = 1; i < queue_size; m <<= 1, ++i)
+        if (any(core_mask) && any(node_mask)) {
+            for (std::size_t i = 1; i < queue_size; ++i)
             {
-                if (i == num_thread || !(m & node_mask))
+                if (i == num_thread || !test(node_mask, i))
                     continue;         // don't steal from ourselves
 
                 result = queues_[num_thread]->steal_new_or_terminate(

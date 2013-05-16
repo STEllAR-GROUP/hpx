@@ -188,9 +188,11 @@ namespace hpx { namespace components
             this->base_type::terminate_all(gid_);
         }
 
-        void insert_agas_cache_entry(naming::gid_type const& gid, naming::address const& g)
+        void update_agas_cache_entry(naming::gid_type const& gid,
+            naming::address const& g, boost::uint64_t count,
+            boost::uint64_t offset)
         {
-            this->base_type::insert_agas_cache_entry(gid_, gid, g);
+            this->base_type::update_agas_cache_entry(gid_, gid, g, count, offset);
         }
 
         /// \brief Retrieve configuration information

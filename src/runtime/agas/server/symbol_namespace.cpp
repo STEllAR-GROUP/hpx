@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
@@ -78,20 +79,29 @@ response symbol_namespace::service(
         case symbol_ns_statistics_counter:
             return statistics_counter(req, ec);
 
-        case primary_ns_allocate:
+        case locality_ns_allocate:
+        case locality_ns_free:
+        case locality_ns_localities:
+        case locality_ns_num_localities:
+        case locality_ns_num_threads:
+        case locality_ns_resolve_locality:
+        case locality_ns_resolved_localities:
+        {
+            LAGAS_(warning) <<
+                "symbol_namespace::service, redirecting request to "
+                "locality_namespace";
+            return naming::get_agas_client().service(req, ec);
+        }
+
+        case primary_ns_route:
         case primary_ns_bind_gid:
         case primary_ns_resolve_gid:
-        case primary_ns_free:
         case primary_ns_unbind_gid:
         case primary_ns_change_credit_non_blocking:
         case primary_ns_change_credit_sync:
-        case primary_ns_localities:
-        case primary_ns_num_localities:
-        case primary_ns_num_threads:
-        case primary_ns_resolved_localities:
         {
             LAGAS_(warning) <<
-                "component_namespace::service, redirecting request to "
+                "symbol_namespace::service, redirecting request to "
                 "primary_namespace";
             return naming::get_agas_client().service(req, ec);
         }
@@ -105,19 +115,20 @@ response symbol_namespace::service(
         case component_ns_num_localities:
         {
             LAGAS_(warning) <<
-                "component_namespace::service, redirecting request to "
+                "symbol_namespace::service, redirecting request to "
                 "component_namespace";
             return naming::get_agas_client().service(req, ec);
         }
 
         default:
+        case locality_ns_service:
         case component_ns_service:
         case primary_ns_service:
         case symbol_ns_service:
         case invalid_request:
         {
             HPX_THROWS_IF(ec, bad_action_code
-              , "component_namespace::service"
+              , "symbol_namespace::service"
               , boost::str(boost::format(
                     "invalid action code encountered in request, "
                     "action_code(%x)")
@@ -141,7 +152,7 @@ void symbol_namespace::register_counter_types(
       , agas::server::symbol_namespace_service_name));
 
     for (std::size_t i = 0;
-          i < detail::num_symbol_namespace_services;
+          i != detail::num_symbol_namespace_services;
           ++i)
     {
         std::string name(detail::symbol_namespace_services[i].name_);
@@ -156,7 +167,7 @@ void symbol_namespace::register_counter_types(
           , performance_counters::counter_raw
           , help
           , creator
-          , &performance_counters::default_counter_discoverer
+          , &performance_counters::locality0_counter_discoverer
           , HPX_PERFORMANCE_COUNTER_V1
           , detail::symbol_namespace_services[i].uom_
           , ec
@@ -178,6 +189,14 @@ void symbol_namespace::register_server_instance(
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
     agas::register_name(instance_name_, get_gid().get_gid(), ec);
+}
+
+void symbol_namespace::unregister_server_instance(
+    error_code& ec
+    )
+{
+    agas::unregister_name(instance_name_, ec);
+    this->base_type::finalize();
 }
 
 void symbol_namespace::finalize()
@@ -433,7 +452,7 @@ response symbol_namespace::statistics_counter(
     namespace_action_code code = invalid_request;
     detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
-          i < detail::num_symbol_namespace_services;
+          i != detail::num_symbol_namespace_services;
           ++i)
     {
         if (p.countername_ == detail::symbol_namespace_services[i].name_)
@@ -478,6 +497,7 @@ response symbol_namespace::statistics_counter(
         }
     }
     else {
+        BOOST_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case symbol_ns_bind:
             get_data_func = boost::bind(&cd::get_bind_time, &counter_data_, ::_1);

@@ -162,7 +162,7 @@ namespace hpx { namespace naming
                     // handle this problem.
                     naming::resolver_client& resolver =
                         naming::get_agas_client();
-                    resolver.incref(*this, HPX_INITIAL_GLOBALCREDIT * 2);
+                    resolver.incref_apply(*this, *this, HPX_INITIAL_GLOBALCREDIT * 2);
                 }
                 return newid;
             }
@@ -262,7 +262,7 @@ namespace hpx { namespace naming
 
     inline lcos::future<naming::id_type> get_colocation_id_async(naming::id_type id)
     {
-        return lcos::make_future(naming::get_colocation_id(id, throws));
+        return lcos::make_ready_future(naming::get_colocation_id(id, throws));
     }
 }}
 

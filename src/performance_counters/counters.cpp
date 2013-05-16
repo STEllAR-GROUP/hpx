@@ -425,6 +425,11 @@ namespace hpx { namespace performance_counters
         if (p.parentinstancename_.empty()) {
             p.parentinstancename_ = "locality";
             p.parentinstanceindex_ = static_cast<boost::int64_t>(get_locality_id());
+            if (p.instancename_.empty())
+            {
+                p.instancename_ = "total";
+                p.instanceindex_ = -1;
+            }
         }
 
         // fill with complete counter type info
@@ -618,14 +623,28 @@ namespace hpx { namespace performance_counters
         // \brief Create a new aggregating performance counter instance based
         //        on given base counter name and given base time interval
         //        (milliseconds).
-        naming::gid_type create_aggregating_counter(
+        naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
             std::vector<boost::int64_t> const& parameters, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().
-                create_aggregating_counter(info, base_counter_name,
+                create_statistics_counter(info, base_counter_name,
                     parameters, gid, ec);
+            return gid;
+        }
+
+        // \brief Create a new aggregating performance counter instance based
+        //        on given base counter name and given base time interval
+        //        (milliseconds).
+        naming::gid_type create_arithmetics_counter(
+            counter_info const& info, std::string const& base_counter_name1,
+            std::string const& base_counter_name2, error_code& ec)
+        {
+            naming::gid_type gid;
+            get_runtime().get_counter_registry().
+                create_arithmetics_counter(info, base_counter_name1,
+                    base_counter_name2, gid, ec);
             return gid;
         }
 
@@ -655,7 +674,8 @@ namespace hpx { namespace performance_counters
             if (ec) {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "no create function for performance counter found: " +
-                    info.fullname_ + " (" + ec.get_message() + ")");
+                    remove_counter_prefix(info.fullname_) + 
+                        " (" + ec.get_message() + ")");
                 return naming::invalid_gid;
             }
 
@@ -678,7 +698,8 @@ namespace hpx { namespace performance_counters
             if (ec) {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "couldn't create performance counter: " +
-                    info.fullname_ + " (" + ec.get_message() + ")");
+                    remove_counter_prefix(info.fullname_) + 
+                        " (" + ec.get_message() + ")");
                 return naming::invalid_gid;
             }
 
@@ -888,7 +909,7 @@ namespace hpx { namespace performance_counters
                     throw;
                 ec = make_error_code(e.get_error(), e.what());
                 LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
-                    % complemented_info.fullname_ % e.what());
+                    % remove_counter_prefix(complemented_info.fullname_) % e.what());
                 return lcos::future<naming::id_type>();
             }
         }

@@ -32,7 +32,3 @@ HPX_REGISTER_ACTION(
 HPX_REGISTER_ACTION(
     primary_namespace::bulk_service_action,
     primary_namespace_bulk_service_action)
-
-HPX_REGISTER_ACTION(
-    primary_namespace::route_action,
-    primary_namespace_route_action)

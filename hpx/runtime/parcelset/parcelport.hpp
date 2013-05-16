@@ -15,6 +15,9 @@
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+
+#include <boost/enable_shared_from_this.hpp>
 
 #include <string>
 #include <map>
@@ -35,7 +38,9 @@ namespace hpx { namespace parcelset
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
     /// to receive parcels.
-    class HPX_EXPORT parcelport : boost::noncopyable
+    class HPX_EXPORT parcelport 
+      : public boost::enable_shared_from_this<parcelport>,
+        boost::noncopyable
     {
     private:
         // avoid warnings about using \a this in member initializer list
@@ -137,7 +142,8 @@ namespace hpx { namespace parcelset
             connection_cache_insertions = 0,
             connection_cache_evictions = 1,
             connection_cache_hits = 2,
-            connection_cache_misses = 3
+            connection_cache_misses = 3,
+            connection_cache_reclaims = 4
         };
 
         virtual boost::int64_t
@@ -260,7 +266,7 @@ namespace hpx { namespace parcelset
 
         std::size_t get_pending_parcels_count(bool /*reset*/)
         {
-            util::spinlock::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(mtx_);
             return pending_parcels_.size();
         }
 
@@ -288,7 +294,7 @@ namespace hpx { namespace parcelset
 
     protected:
         /// mutex for all of the member data
-        mutable util::spinlock mtx_;
+        mutable lcos::local::spinlock mtx_;
 
         /// The handler for all incoming requests.
         server::parcelport_queue parcels_;

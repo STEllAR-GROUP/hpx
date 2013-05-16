@@ -291,9 +291,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
           BOOST_ASSERT(this->count() > 0);
 
           typedef typename coroutine_type::self self_type;
-          typedef typename coroutine_type::arg_slot_traits traits;
-          typedef typename coroutine_type::result_slot_type result_slot_type;
-
           {
               self_type self(this);
               reset_self_on_exit on_exit(&self);

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -41,14 +41,12 @@ namespace server
 // Base name used to register the component
 char const* const component_namespace_service_name = "component_namespace/";
 
-struct HPX_EXPORT component_namespace :
-    components::fixed_component_base<
-        HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB, // constant GID
-        component_namespace
-    >
+struct HPX_EXPORT component_namespace
+  : components::fixed_component_base<component_namespace>
 {
     // {{{ nested types
-    typedef lcos::local::mutex mutex_type;
+    typedef lcos::local::spinlock mutex_type;
+    typedef components::fixed_component_base<component_namespace> base_type;
 
     typedef hpx::util::function<
         void(std::string const&, components::component_type)
@@ -77,61 +75,61 @@ struct HPX_EXPORT component_namespace :
     // data structure holding all counters for the omponent_namespace component
     struct counter_data :  boost::noncopyable
     {
-      typedef lcos::local::spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
-      struct api_counter_data
-      {
-        api_counter_data()
-          : count_(0)
-          , time_(0)
+        struct api_counter_data
+        {
+            api_counter_data()
+                : count_(0)
+                , time_(0)
+            {}
+
+            boost::int64_t count_;
+            boost::int64_t time_;
+        };
+
+        counter_data()
         {}
 
-        boost::int64_t count_;
-        boost::int64_t time_;
-      };
-
-      counter_data()
-      {}
-
     public:
-      // access current counter values
-      boost::int64_t get_bind_prefix_count(bool);
-      boost::int64_t get_bind_name_count(bool);
-      boost::int64_t get_resolve_id_count(bool);
-      boost::int64_t get_unbind_name_count(bool);
-      boost::int64_t get_iterate_types_count(bool);
-      boost::int64_t get_component_type_name_count(bool);
-      boost::int64_t get_num_localities_count(bool);
+        // access current counter values
+        boost::int64_t get_bind_prefix_count(bool);
+        boost::int64_t get_bind_name_count(bool);
+        boost::int64_t get_resolve_id_count(bool);
+        boost::int64_t get_unbind_name_count(bool);
+        boost::int64_t get_iterate_types_count(bool);
+        boost::int64_t get_component_type_name_count(bool);
+        boost::int64_t get_num_localities_count(bool);
 
-      boost::int64_t get_bind_prefix_time(bool);
-      boost::int64_t get_bind_name_time(bool);
-      boost::int64_t get_resolve_id_time(bool);
-      boost::int64_t get_unbind_name_time(bool);
-      boost::int64_t get_iterate_types_time(bool);
-      boost::int64_t get_component_type_name_time(bool);
-      boost::int64_t get_num_localities_time(bool);
+        boost::int64_t get_bind_prefix_time(bool);
+        boost::int64_t get_bind_name_time(bool);
+        boost::int64_t get_resolve_id_time(bool);
+        boost::int64_t get_unbind_name_time(bool);
+        boost::int64_t get_iterate_types_time(bool);
+        boost::int64_t get_component_type_name_time(bool);
+        boost::int64_t get_num_localities_time(bool);
 
-      // increment counter values
-      void increment_bind_prefix_count();
-      void increment_bind_name_count();
-      void increment_resolve_id_count();
-      void increment_unbind_name_ount();
-      void increment_iterate_types_count();
-      void increment_get_component_type_name_count();
-      void increment_num_localities_count();
+        // increment counter values
+        void increment_bind_prefix_count();
+        void increment_bind_name_count();
+        void increment_resolve_id_count();
+        void increment_unbind_name_ount();
+        void increment_iterate_types_count();
+        void increment_get_component_type_name_count();
+        void increment_num_localities_count();
 
     private:
-      friend struct update_time_on_exit;
-      friend struct component_namespace;
+        friend struct update_time_on_exit;
+        friend struct component_namespace;
 
-      mutable mutex_type mtx_;
-      api_counter_data bind_prefix_;          // component_ns_bind_prefix
-      api_counter_data bind_name_;            // component_ns_bind_name
-      api_counter_data resolve_id_;           // component_ns_resolve_id
-      api_counter_data unbind_name_;          // component_ns_unbind_name
-      api_counter_data iterate_types_;        // component_ns_iterate_types
-      api_counter_data get_component_type_name_; // component_ns_get_component_type_name
-      api_counter_data num_localities_;  // component_ns_num_localities
+        mutable mutex_type mtx_;
+        api_counter_data bind_prefix_;          // component_ns_bind_prefix
+        api_counter_data bind_name_;            // component_ns_bind_name
+        api_counter_data resolve_id_;           // component_ns_resolve_id
+        api_counter_data unbind_name_;          // component_ns_unbind_name
+        api_counter_data iterate_types_;        // component_ns_iterate_types
+        api_counter_data get_component_type_name_; // component_ns_get_component_type_name
+        api_counter_data num_localities_;  // component_ns_num_localities
     };
     counter_data counter_data_;
 
@@ -156,9 +154,7 @@ struct HPX_EXPORT component_namespace :
 
   public:
     component_namespace()
-      : mutex_()
-      , component_ids_()
-      , factories_()
+      : base_type(HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB)
       , type_counter(components::component_first_dynamic)
     {}
 
@@ -198,6 +194,10 @@ struct HPX_EXPORT component_namespace :
     void register_server_instance(
         char const* servicename
       , error_code& ec = throws
+        );
+
+    void unregister_server_instance(
+        error_code& ec = throws
         );
 
     response bind_prefix(
@@ -260,9 +260,9 @@ struct HPX_EXPORT component_namespace :
     HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_service, service_action);
     HPX_DEFINE_COMPONENT_ACTION(component_namespace, remote_bulk_service, bulk_service_action);
 
-    /// This is the default hook implementation for decorate_action which 
+    /// This is the default hook implementation for decorate_action which
     /// does no hooking at all.
-    static HPX_STD_FUNCTION<threads::thread_function_type> 
+    static HPX_STD_FUNCTION<threads::thread_function_type>
     wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
         naming::address::address_type)
     {

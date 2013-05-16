@@ -111,7 +111,7 @@ namespace hpx { namespace util
             // do not rely on ADL to find the proper call_once
             boost::call_once(constructed_,
                 boost::bind(&reinitializable_static::value_constructor<U>,
-                    boost::addressof(val)));
+                    const_cast<U const *>(boost::addressof(val))));
         }
 
         operator reference()

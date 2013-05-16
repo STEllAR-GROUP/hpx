@@ -540,19 +540,7 @@ inline void multiply_and_add(
     }
 }
 
-typedef hpx::actions::plain_action4<
-    // Arguments.
-    orthotope<double> const& // C_sub
-  , orthotope<double> const& // A_sub
-  , orthotope<double> const& // B_sub
-  , matrix_mutex const&
-    // Bound function.
-  , &multiply_and_add<double>
-> multiply_and_add_action;
-
-HPX_REGISTER_PLAIN_ACTION(multiply_and_add_action);
-
-//typedef hpx::lcos::dataflow<multiply_and_add_action> multiply_and_add_dataflow;
+HPX_PLAIN_ACTION(multiply_and_add<double>, multiply_and_add_action);
 
 template <
     typename T

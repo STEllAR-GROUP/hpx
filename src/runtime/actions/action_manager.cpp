@@ -48,73 +48,7 @@ namespace hpx { namespace actions
         // write this parcel to the log
         LPT_(debug) << "action_manager: fetch_parcel: " << p;
 
-        // decode the action-type in the parcel
-        continuation_type cont = p.get_continuation();
-        actions::action_type act = p.get_action();
-        int comptype = act->get_component_type();
-        naming::locality dest = p.get_destination_locality();
-
-        // fetch the set of destinations
-        std::vector<naming::address> const& addrs = p.get_destination_addrs();
-
-        // if the parcel carries a continuation it should be directed to a
-        // single destination
-        BOOST_ASSERT(!cont || addrs.size() == 1);
-
-        // schedule a thread for each of the destinations
-        threads::threadmanager_base& tm = appl_.get_thread_manager();
-        std::vector<naming::address>::const_iterator end = addrs.end();
-        for (std::vector<naming::address>::const_iterator it = addrs.begin();
-             it != end; ++it)
-        {
-            naming::address const& addr = *it;
-
-            // make sure this parcel destination matches the proper locality
-            BOOST_ASSERT(dest == addr.locality_);
-
-            // decode the local virtual address of the parcel
-            naming::address::address_type lva = addr.address_;
-
-            // by convention, a zero address references the local runtime
-            // support component
-            if (0 == lva)
-                lva = appl_.get_runtime_support_raw_gid().get_lsb();
-
-            // make sure the component_type of the action matches the
-            // component type in the destination address
-            if (HPX_UNLIKELY(!components::types_are_compatible(
-                addr.type_, comptype)))
-            {
-                hpx::util::osstream strm;
-                strm << " types are not compatible: destination_type("
-                      << addr.type_ << ") action_type(" << comptype
-                      << ") parcel ("  << p << ")";
-                HPX_THROW_EXCEPTION(bad_component_type,
-                    "action_manager::fetch_parcel",
-                    hpx::util::osstream_get_string(strm));
-            }
-
-            // dispatch action, register work item either with or without
-            // continuation support
-            if (!cont) {
-                // No continuation is to be executed, register the plain 
-                // action and the local-virtual address with the TM only.
-                threads::thread_init_data data;
-                tm.register_work(
-                    act->get_thread_init_data(lva, data),
-                    threads::pending);
-            }
-            else {
-                // This parcel carries a continuation, register a wrapper 
-                // which first executes the original thread function as 
-                // required by the action and triggers the continuations 
-                // afterwards.
-                threads::thread_init_data data;
-                tm.register_work(
-                    act->get_thread_init_data(cont, lva, data),
-                    threads::pending);
-            }
-        }
+        appl_.schedule_action(p);
     }
 
     // Invoked by the Thread Manager when it is running out of work-items

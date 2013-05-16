@@ -45,7 +45,7 @@ namespace sheneos { namespace server
         inline std::size_t get_index(dimension::type d, double value);
 
         /// Tri-linear interpolation routine.
-        inline double interpolate(double* values,
+        inline double tl_interpolate(double* values,
             std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
             double delta_ye, double delta_logtemp, double delta_logrho);
 
@@ -133,50 +133,11 @@ namespace sheneos { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action4<
-            partition3d,                        // Component server type.
-            std::string const&,                 // Arguments of this action.
-            dimension const&,
-            dimension const&,
-            dimension const&,
-            &partition3d::init                  // Method bound to this action.
-        > init_action;
-
-        typedef hpx::actions::result_action4<
-            partition3d,                        // Component server type.
-            std::vector<double>,                // Return type.
-            double,                             // Arguments of this action.
-            double,
-            double,
-            boost::uint32_t,
-            &partition3d::interpolate           // Method bound to this action.
-        > interpolate_action;
-
-        typedef hpx::actions::result_action4<
-            partition3d,                        // Component server type.
-            double,                             // Return type.
-            double,                             // Arguments of this action.
-            double,
-            double,
-            boost::uint32_t,
-            &partition3d::interpolate_one       // Method bound to this action.
-        > interpolate_one_action;
-
-        typedef hpx::actions::result_action2<
-            partition3d,                        // Component server type.
-            std::vector<std::vector<double> >,  // Return type.
-            std::vector<sheneos_coord> const&,  // Arguments of this action.
-            boost::uint32_t,
-            &partition3d::interpolate_bulk      // Method bound to this action.
-        > interpolate_bulk_action;
-
-        typedef hpx::actions::result_action2<
-            partition3d,                        // Component server type.
-            std::vector<double>,                // Return type.
-            std::vector<sheneos_coord> const&,  // Arguments of this action.
-            boost::uint32_t,
-            &partition3d::interpolate_one_bulk  // Method bound to this action.
-        > interpolate_one_bulk_action;
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, init);
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate);
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one);
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_bulk);
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one_bulk);
 
     protected:
         double interpolate_one(sheneos_coord const& c,

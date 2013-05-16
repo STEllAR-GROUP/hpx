@@ -117,13 +117,13 @@ namespace detail
 
         virtual result_type get_data(error_code& ec = throws) = 0;
         virtual result_type move_data(error_code& ec = throws) = 0;
-        virtual bool is_ready() const = 0;
+        virtual bool ready() const = 0;
         virtual bool has_value() const = 0;
         virtual bool has_exception() const = 0;
         virtual BOOST_SCOPED_ENUM(future_status) get_state() const = 0;
 
         // cancellation is disabled by default
-        virtual bool is_cancelable() const
+        virtual bool cancelable() const
         {
             return false;
         }
@@ -166,7 +166,7 @@ namespace detail
         void wait()
         {
             typename mutex_type::scoped_lock l(mtx_);
-            if (!is_ready()) {
+            if (!ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 reset_cb r(*this, util::bind(
                     &future_data_base::wake_me_up, this_, threads::get_self_id()));
@@ -180,7 +180,7 @@ namespace detail
         wait_for(boost::posix_time::time_duration const& p)
         {
             typename mutex_type::scoped_lock l(mtx_);
-            if (!is_ready()) {
+            if (!ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 reset_cb r(*this, util::bind(
                     &future_data_base::wake_me_up, this_, threads::get_self_id()));
@@ -196,7 +196,7 @@ namespace detail
         wait_until(boost::posix_time::ptime const& at)
         {
             typename mutex_type::scoped_lock l(mtx_);
-            if (!is_ready()) {
+            if (!ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 reset_cb r(*this, util::bind(
                     &future_data_base::wake_me_up, this_, threads::get_self_id()));
@@ -229,7 +229,8 @@ namespace detail
         typedef typename base_type::completed_callback_type
             completed_callback_type;
 
-        friend class lcos::future<Result>;
+        template <typename T>
+        friend class lcos::future;
 
         template <typename T>
         friend struct local::channel;
@@ -394,7 +395,7 @@ namespace detail
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool is_ready() const
+        bool ready() const
         {
             return !data_.is_empty();
         }
@@ -408,17 +409,17 @@ namespace detail
     public:
         bool has_value() const
         {
-            return is_ready() && data_.peek(&has_data_helper);
+            return ready() && data_.peek(&has_data_helper);
         }
 
         bool has_exception() const
         {
-            return is_ready() && !data_.peek(&has_data_helper);
+            return ready() && !data_.peek(&has_data_helper);
         }
 
         BOOST_SCOPED_ENUM(future_status) get_state() const
         {
-            return is_ready() ? future_status::ready : future_status::deferred;
+            return ready() ? future_status::ready : future_status::deferred;
         }
 
         /// Reset the promise to allow to restart an asynchronous
@@ -441,13 +442,13 @@ namespace detail
         completed_callback_type
         set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
         {
-            // this future coincidentally instance keeps us alive
+            // this future instance coincidentally keeps us alive
             lcos::future<Result> f =
                 lcos::detail::make_future_from_data<Result>(this);
 
             completed_callback_type retval = boost::move(on_completed_);
 
-            if (!data_sink.empty() && this->is_ready()) {
+            if (!data_sink.empty() && this->ready()) {
                 // invoke the callback (continuation) function right away
                 data_sink(f);
             }
@@ -455,7 +456,7 @@ namespace detail
                 on_completed_ = boost::move(data_sink);
             }
 
-            return retval;
+            return boost::move(retval);
         }
 
         void reset_on_completed()
@@ -606,7 +607,7 @@ namespace detail
         virtual void do_run() = 0;
 
         // cancellation support
-        bool is_cancelable() const
+        bool cancelable() const
         {
             return true;
         }
@@ -622,7 +623,7 @@ namespace detail
                     return;
                 }
 
-                if (this->is_ready())
+                if (this->ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {

@@ -187,6 +187,16 @@ namespace hpx { namespace threads
         ///                 the function will throw on error instead.
         void interrupt(thread_id_type id, bool flag, error_code& ec = throws);
 
+        /// Interrupt the current thread at this point if it was canceled. This
+        /// will throw a thread_interrupted exception, which will cancel the thread.
+        ///
+        /// \param id         [in] The thread id of the thread which should be
+        ///                   interrupted.
+        /// \param ec         [in,out] this represents the error status on exit,
+        ///                   if this is pre-initialized to \a hpx#throws
+        ///                   the function will throw on error instead.
+        void interruption_point(thread_id_type id, error_code& ec = throws);
+
         /// The run_thread_exit_callbacks function is part of the thread related
         /// API. It runs all exit functions for one of the threads.
         ///
@@ -429,7 +439,7 @@ namespace hpx { namespace threads
 
     protected:
         // this is the thread function executing the work items in the queue
-        void tfunc(std::size_t num_thread);
+        void tfunc(std::size_t num_thread, topology const& topology_);
         void tfunc_impl(std::size_t num_thread);
 
     public:
@@ -479,14 +489,14 @@ namespace hpx { namespace threads
 
         /// Return the mask for processing units the given thread is allowed
         /// to run on.
-        mask_type get_pu_mask(topology const& topology, std::size_t num_thread) const
+        mask_cref_type get_pu_mask(topology const& topology, std::size_t num_thread) const
         {
             return scheduler_.get_pu_mask(topology, num_thread);
         }
 
         // Returns the mask identifying all processing units used by this
         // thread manager.
-        mask_type get_used_processing_units() const
+        mask_cref_type get_used_processing_units() const
         {
             return used_processing_units_;
         }

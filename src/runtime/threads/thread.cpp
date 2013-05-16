@@ -256,14 +256,14 @@ namespace hpx
                 this->move_data(ec);
             }
 
-            bool is_valid() const
+            bool valid() const
             {
                 return id_ != threads::invalid_thread_id && 
                        id_ != thread::uninitialized;
             }
 
             // cancellation support
-            bool is_cancelable() const
+            bool cancelable() const
             {
                 return true;
             }
@@ -271,7 +271,7 @@ namespace hpx
             void cancel()
             {
                 mutex_type::scoped_lock l(this->mtx_);
-                if (!this->is_ready()) {
+                if (!this->ready()) {
                     threads::interrupt_thread(id_);
                     this->set_error(thread_interrupted,
                         "thread_task_base::cancel",
@@ -285,7 +285,7 @@ namespace hpx
             {
                 // might have been finished or canceled
                 mutex_type::scoped_lock l(this->mtx_);
-                if (!this->is_ready())
+                if (!this->ready())
                     this->set_data(result_type());
                 id_ = threads::invalid_thread_id;
             }
@@ -306,7 +306,7 @@ namespace hpx
 
         detail::thread_task_base* p = new detail::thread_task_base(id_);
         boost::intrusive_ptr<lcos::detail::future_data_base<void> > base(p);
-        if (!p->is_valid()) {
+        if (!p->valid()) {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::get_future",
                 "Could not create future as thread has been terminated.");
             return lcos::future<void>();
@@ -336,19 +336,7 @@ namespace hpx
 
         void interruption_point()
         {
-            if (interruption_enabled() && interruption_requested())
-            {
-                // Verify that there are no more registered locks for this
-                // OS-thread. This will throw if there are still any locks
-                // held.
-                util::force_error_on_lock();
-
-                // now interrupt this thread
-                HPX_THROW_EXCEPTION(thread_interrupted,
-                    "hpx::thread::interruption_point",
-                    "hpx::this_thread::interruption_point: "
-                    "thread aborts itself due to requested thread interruption");
-            }
+            threads::interruption_point(threads::get_self_id());
         }
 
         bool interruption_enabled()

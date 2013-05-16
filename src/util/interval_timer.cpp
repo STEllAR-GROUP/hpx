@@ -38,28 +38,58 @@ namespace hpx { namespace util
         is_terminated_(false)
     {}
 
-    bool interval_timer::start()
+    bool interval_timer::start(bool evaluate_)
     {
         mutex_type::scoped_lock l(mtx_);
-        if (!is_started_) {
-            is_started_ = true;
+        if (is_terminated_)
+            return false;
 
+        if (!is_started_) {
             if (first_start_) {
                 first_start_ = false;
-                l.unlock();
+
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                 if (pre_shutdown_)
                     register_pre_shutdown_function(boost::bind(&interval_timer::terminate, this));
                 else
                     register_shutdown_function(boost::bind(&interval_timer::terminate, this));
             }
-            else {
+
+            if (evaluate_) {
                 l.unlock();
+                evaluate(threads::wait_signaled);
+            }
+            else {
+                schedule_thread();
             }
 
-            evaluate(threads::wait_signaled);
             return true;
         }
         return false;
+    }
+
+    bool interval_timer::restart(bool evaluate_)
+    {
+        if (!is_started_)
+            return start(evaluate_);
+
+        mutex_type::scoped_lock l(mtx_);
+
+        if (is_terminated_)
+            return false;
+
+        // interrupt timer thread, if needed
+        stop_locked();
+
+        // reschedule evaluation thread
+        if (evaluate_) {
+            l.unlock();
+            evaluate(threads::wait_signaled);
+        }
+        else {
+            schedule_thread();
+        }
+        return true;
     }
 
     bool interval_timer::stop()
@@ -81,6 +111,7 @@ namespace hpx { namespace util
             }
             return true;
         }
+
         BOOST_ASSERT(id_ == 0);
         return false;
     }
@@ -90,9 +121,12 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(mtx_);
         if (!is_terminated_) {
             is_terminated_ = true;
-            if (on_term_)
-                on_term_();
             stop_locked();
+
+            if (on_term_) {
+                l.unlock();
+                on_term_();
+            }
         }
     }
 
@@ -109,21 +143,36 @@ namespace hpx { namespace util
     threads::thread_state_enum interval_timer::evaluate(
         threads::thread_state_ex_enum statex)
     {
-        if (statex == threads::wait_abort || 0 == microsecs_)
-            return threads::terminated;        // object has been finalized, exit
+        try {
+            mutex_type::scoped_lock l(mtx_);
 
-        mutex_type::scoped_lock l(mtx_);
-        id_ = 0;
+            if (is_terminated_ || statex == threads::wait_abort || 0 == microsecs_)
+                return threads::terminated;        // object has been finalized, exit
 
-        bool result = false;
+            if (id_ != 0 && id_ != threads::get_self_id())
+                return threads::terminated;        // obsolete timer thread
 
-        {
-            util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-            result = f_();            // invoke the supplied function
+            id_ = 0;
+            is_started_ = false;
+
+            bool result = false;
+
+            {
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                result = f_();            // invoke the supplied function
+            }
+
+            // some other thread might already have started the timer
+            if (0 == id_ && result) {
+                BOOST_ASSERT(!is_started_);
+                schedule_thread();        // wait and repeat
+            }
         }
-
-        if (result)
-            schedule_thread();        // wait and repeat
+        catch (hpx::exception const& e){
+            // the lock above might throw yield_aborted
+            if (e.get_error() != yield_aborted)
+                throw;
+        }
         return threads::terminated;   // do not re-schedule this thread
     }
 
@@ -143,6 +192,8 @@ namespace hpx { namespace util
             boost::posix_time::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
             threads::thread_priority_critical);
+
+        is_started_ = true;
     }
 }}
 

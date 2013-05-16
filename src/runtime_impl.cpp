@@ -98,7 +98,7 @@ namespace hpx {
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             util::runtime_configuration const& rtcfg,
-            runtime_mode locality_mode, 
+            runtime_mode locality_mode,
             std::size_t num_threads, init_scheduler_type const& init)
       : runtime(rtcfg),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
@@ -129,8 +129,7 @@ namespace hpx {
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, *thread_manager_,
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
-        action_manager_(applier_),
-        runtime_support_(parcel_handler_.get_locality(), agas_client_, applier_)
+        action_manager_(applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
@@ -341,6 +340,9 @@ namespace hpx {
     {
         LRT_(warning) << "runtime_impl: about to stop services";
 
+        // flush all parcel buffers, stop buffering parcels at this point
+        parcel_handler_.flush_buffers(true);
+
         // execute all on_exit functions whenever the first thread calls this
         this->runtime::stopping();
 
@@ -474,7 +476,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
-        char const* context, std::size_t num, char const* postfix, 
+        char const* context, std::size_t num, char const* postfix,
         bool service_thread)
     {
         // initialize our TSS
@@ -487,7 +489,7 @@ namespace hpx {
         BOOST_ASSERT(NULL == runtime::thread_name_.get());    // shouldn't be initialized yet
 
         std::string* fullname = new std::string(context);
-        if (postfix && *postfix) 
+        if (postfix && *postfix)
             *fullname += postfix;
         *fullname += "#" + boost::lexical_cast<std::string>(num);
         runtime::thread_name_.reset(fullname);
@@ -508,7 +510,7 @@ namespace hpx {
 
         // if this is a service thread, set its service affinity
         if (service_thread) {
-            threads::mask_type used_processing_units =
+            threads::mask_cref_type used_processing_units =
                 thread_manager_->get_used_processing_units();
 
             this->topology_->set_thread_affinity_mask(

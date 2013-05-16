@@ -8,8 +8,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config/forceinline.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
@@ -19,10 +19,43 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/function_types/result_type.hpp>
 #include <boost/detail/iterator.hpp>
-#include <boost/move/move.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/is_void.hpp>
+#include <boost/mpl/if.hpp>
 
 namespace hpx { namespace lcos
 {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct future_traits
+    {
+    };
+
+    template <typename T>
+    struct future_traits<lcos::future<T> >
+    {
+        typedef T value_type;
+    };
+
+    template <typename T>
+    struct future_traits<lcos::future<T> const>
+    {
+        typedef T value_type;
+    };
+
+    template <typename Iter>
+    struct future_iterator_traits
+    {
+        typedef future_traits<
+            typename boost::detail::iterator_traits<Iter>::value_type
+        > traits_type;
+    };
+
+    template <typename T>
+    struct future_iterator_traits<future<T> >
+    {
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     class future
@@ -94,6 +127,13 @@ namespace hpx { namespace lcos
             future_data_.swap(p);
         }
 
+        // accept wrapped future
+        future(BOOST_RV_REF(future<future>) other)
+        {
+            future f = boost::move(other.unwrap());
+            (*this).swap(f);
+        }
+
         explicit future(BOOST_RV_REF(Result) init)
         {
             typedef lcos::detail::future_data<Result> impl_type;
@@ -138,13 +178,13 @@ namespace hpx { namespace lcos
 
         Result move(error_code& ec = throws)
         {
-            return future_data_->move_data(ec);
+            return boost::move(future_data_->move_data(ec));
         }
 
         // state introspection
-        bool is_ready() const
+        bool ready() const
         {
-            return future_data_ && future_data_->is_ready();
+            return future_data_ && future_data_->ready();
         }
 
         bool has_value() const
@@ -166,9 +206,9 @@ namespace hpx { namespace lcos
         }
 
         // cancellation support
-        bool is_cancelable() const
+        bool cancelable() const
         {
-            return future_data_->is_cancelable();
+            return future_data_->cancelable();
         }
 
         void cancel()
@@ -184,11 +224,11 @@ namespace hpx { namespace lcos
         // continuation support
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
-        then(threads::executor sched, BOOST_FWD_REF(F) f);
+        then(BOOST_FWD_REF(F) f);
 
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
-        then(BOOST_FWD_REF(F) f);
+        then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         // reset any pending continuation function
         void then()
@@ -227,15 +267,32 @@ namespace hpx { namespace lcos
             return wait_for(util::to_time_duration(rel_time));
         }
 
+        future<typename future_traits<
+            typename boost::mpl::if_<
+                traits::is_future<Result>, Result, future<void>
+            >::type
+        >::value_type> unwrap(error_code& ec = throws);
+
+    private:
+        template <typename InnerResult, typename UnwrapResult>
+        void on_inner_ready(future<InnerResult>& inner,
+            boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p);
+
+        template <typename UnwrapResult>
+        void on_outer_ready(
+            boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p);
+
     private:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
 
     // extension: create a pre-initialized future object
     template <typename Result>
-    future<Result> make_future(Result const& init)
+    future<typename util::detail::remove_reference<Result>::type>
+    make_ready_future(BOOST_FWD_REF(Result) init)
     {
-        return future<Result>(init);
+        return future<typename util::detail::remove_reference<Result>::type>(
+            boost::forward<Result>(init));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -264,7 +321,7 @@ namespace hpx { namespace lcos
             detail::get_future_data(lcos::future<Result_> const&);
 
         // make_future uses the dummy argument constructor below
-        friend future<void> make_future();
+        friend future<void> make_ready_future();
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
@@ -312,6 +369,13 @@ namespace hpx { namespace lcos
             future_data_.swap(other.future_data_);
         }
 
+        // accept wrapped future
+        future(BOOST_RV_REF(future<future>) other)
+        {
+            future f = boost::move(other.unwrap());
+            (*this).swap(f);
+        }
+
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
             if (this != &other)
@@ -346,9 +410,9 @@ namespace hpx { namespace lcos
         }
 
         // state introspection
-        bool is_ready() const
+        bool ready() const
         {
-            return future_data_->is_ready();
+            return future_data_->ready();
         }
 
         bool has_value() const
@@ -370,9 +434,9 @@ namespace hpx { namespace lcos
         }
 
         // cancellation support
-        bool is_cancelable() const
+        bool cancelable() const
         {
-            return future_data_->is_cancelable();
+            return future_data_->cancelable();
         }
 
         void cancel()
@@ -388,11 +452,11 @@ namespace hpx { namespace lcos
         // continuation support
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
-        then(threads::executor sched, BOOST_FWD_REF(F) f);
+        then(BOOST_FWD_REF(F) f);
 
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
-        then(BOOST_FWD_REF(F) f);
+        then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         // reset any pending continuation function
         void then()
@@ -437,7 +501,7 @@ namespace hpx { namespace lcos
     };
 
     // extension: create a pre-initialized future object
-    inline future<void> make_future()
+    inline future<void> make_ready_future()
     {
         return future<void>(1);   // dummy argument
     }
@@ -453,7 +517,7 @@ namespace hpx { namespace lcos
         }
 
         template <typename Result>
-        inline lcos::future<Result> make_future_from_data(
+        inline lcos::future<Result> make_future_from_data( //-V659
             BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >) p)
         {
             return lcos::future<Result>(boost::move(p));
@@ -480,31 +544,6 @@ namespace hpx { namespace lcos
             return f.future_data_.get();
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct future_traits
-    {
-    };
-
-    template <typename T>
-    struct future_traits<lcos::future<T> >
-    {
-        typedef T value_type;
-    };
-
-    template <typename Iter>
-    struct future_iterator_traits
-    {
-        typedef future_traits<
-            typename boost::detail::iterator_traits<Iter>::value_type
-        > traits_type;
-    };
-
-    template <typename T>
-    struct future_iterator_traits<future<T> >
-    {
-    };
 }}
 
 #endif

@@ -208,6 +208,14 @@ namespace hpx { namespace util
                 detail::report_thread_warning(env.get_batch_name(),
                     threads, batch_threads);
             }
+
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS)
+            if (threads > 64) {
+                throw std::logic_error("Requested more than 64 threads to "
+                    "use for this application, use the option "
+                    "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
+            }
+#endif
             num_threads_ = threads;
         }
 

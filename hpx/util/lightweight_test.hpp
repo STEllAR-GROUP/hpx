@@ -250,6 +250,13 @@ inline int report_errors(std::ostream& stream = std::cerr)
          expr1, expr2, msg)                                                 \
     /***/
 
+#define HPX_TEST_NEQ_MSG(expr1, expr2, msg)                                 \
+    ::hpx::util::detail::global_fixture.check_not_equal                     \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::counter_test,                                         \
+         expr1, expr2, msg)                                                 \
+    /***/
+
 #define HPX_SANITY(expr)                                                    \
     ::hpx::util::detail::global_fixture.check                               \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \

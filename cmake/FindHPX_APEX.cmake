@@ -23,7 +23,7 @@ endif()
 hpx_find_package(APEX
   LIBRARIES Apex
   LIBRARY_PATHS lib 
-  HEADERS apex.h
+  HEADERS apex.hpp
   HEADER_PATHS include)
 
 if(APEX_FOUND)
@@ -32,4 +32,10 @@ if(APEX_FOUND)
   hpx_include_sys_directories(${APEX_INCLUDE_DIR})
   hpx_link_sys_directories(${APEX_LIBRARY_DIR})
   add_definitions(-DHPX_HAVE_APEX)
+
+  # APEX can support the amplifier interface, so enable that, too
+  if(NOT AMPLIFIER_ROOT)
+    set(AMPLIFIER_ROOT ${APEX_ROOT})
+    set(HPX_USE_ITTNOTIFY ON)
+  endif()
 endif()

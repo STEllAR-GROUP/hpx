@@ -107,7 +107,8 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
-        std::size_t get_pu_mask(topology const& topology, std::size_t num_thread) const
+        threads::mask_cref_type get_pu_mask(topology const& topology,
+            std::size_t num_thread) const
         {
             return topology.get_thread_affinity_mask(num_thread, numa_sensitive_);
         }
@@ -160,26 +161,16 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
-            std::size_t queue_size = queues_.size();
-
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             // try to figure out the NUMA node where the data lives
             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
-                boost::uint64_t mask = 0;
-#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
-                mask = topology_.get_thread_affinity_mask_from_lva(data.lva);
-#endif
-                if (mask) {
-                    std::size_t m = 0x01LL;
-                    for (std::size_t i = 0; i < queue_size; m <<= 1, ++i)
-                    {
-                        if (!(m & mask))
-                            continue;
-                        num_thread = i;
-                        break;
-                    }
+                threads::mask_cref_type mask =
+                    topology_.get_thread_affinity_mask_from_lva(data.lva);
+                if (any(mask)) {
+                    num_thread = find_first(mask);
                 }
             }
-
+#endif
             if (std::size_t(-1) == num_thread)
                 num_thread = ++curr_queue_ % queue_size;
 
@@ -557,16 +548,15 @@ namespace hpx { namespace threads { namespace policies
 
             // steal work items: first try to steal from other cores in the
             // same NUMA node
-            boost::uint64_t core_mask
+            threads::mask_cref_type core_mask
                 = topology_.get_thread_affinity_mask(num_thread, numa_sensitive_);
-            boost::uint64_t node_mask
+            threads::mask_cref_type node_mask
                 = topology_.get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
-            if (core_mask && node_mask) {
-                boost::uint64_t m = 0x01LL;
-                for (std::size_t i = 1; i < queues_size; m <<= 1, ++i)
+            if (any(core_mask) && any(node_mask)) {
+                for (std::size_t i = 1; i < queues_size; ++i)
                 {
-                    if (i == num_thread || !(m & node_mask))
+                    if (i == num_thread || !test(node_mask, i))
                         continue;         // don't steal from ourselves
 
                     result = queues_[num_thread]->steal_new_or_terminate(

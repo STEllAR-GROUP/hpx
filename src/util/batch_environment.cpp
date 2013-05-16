@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,8 +17,141 @@
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
 
+#define BOOST_SPIRIT_USE_PHOENIX_V3
+
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix.hpp>
+#include <boost/phoenix/core.hpp>
+#include <boost/phoenix/operator.hpp>
+#include <boost/phoenix/statement.hpp>
+#include <boost/phoenix/stl.hpp>
+#include <boost/phoenix/fusion.hpp>
+#include <boost/phoenix/scope.hpp>
+#include <boost/phoenix/bind.hpp>
+#include <boost/fusion/include/pair.hpp>
+
+namespace {
+    struct construct_nodes
+    {
+        typedef void result_type;
+
+        typedef std::vector<std::string> vector_type;
+
+        typedef
+            boost::optional<
+                std::vector<
+                    vector_type
+                >
+            >
+            optional_type;
+
+        typedef
+            std::vector<
+                boost::fusion::vector<
+                    std::string
+                  , optional_type
+                >
+            >
+            param_type;
+
+        result_type operator()(std::vector<std::string> & nodes, param_type const & p) const
+        {
+            typedef param_type::value_type value_type;
+
+            std::vector<std::string> tmp_nodes;
+
+            BOOST_FOREACH(value_type const & value, p)
+            {
+                std::string const & prefix = boost::fusion::at_c<0>(value);
+                optional_type const & ranges = boost::fusion::at_c<1>(value);
+                bool push_now = tmp_nodes.empty();
+                if(ranges)
+                {
+                    BOOST_FOREACH(vector_type const & range, *ranges)
+                    {
+                        if(range.size() == 1)
+                        {
+                            std::string s(prefix);
+                            s += range[0];
+                            if(push_now)
+                            {
+                                tmp_nodes.push_back(s);
+                            }
+                            else
+                            {
+                                BOOST_FOREACH(std::string & node, tmp_nodes)
+                                {
+                                    node += s;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            std::size_t begin = boost::lexical_cast<std::size_t>(range[0]);
+                            std::size_t end = boost::lexical_cast<std::size_t>(range[1]);
+                            if(begin > end) std::swap(begin, end);
+
+                            std::vector<std::string> vs;
+
+                            for(std::size_t i = begin; i <= end; ++i)
+                            {
+                                std::string s(prefix);
+                                if(i < 10 && range[0].length() > 1)
+                                    s += "0";
+                                if(i < 100 && range[0].length() > 2)
+                                    s += "0";
+                                s += boost::lexical_cast<std::string>(i);
+                                if(push_now)
+                                {
+                                    tmp_nodes.push_back(s);
+                                }
+                                else
+                                {
+                                    vs.push_back(s);
+                                }
+                            }
+                            if(!push_now)
+                            {
+                                std::vector<std::string> tmp;
+                                std::swap(tmp, tmp_nodes);
+                                BOOST_FOREACH(std::string s, tmp)
+                                {
+                                    BOOST_FOREACH(std::string const & s2, vs)
+                                    {
+                                        s += s2;
+                                        tmp_nodes.push_back(s);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if(push_now)
+                    {
+                        tmp_nodes.push_back(prefix);
+                    }
+                    else
+                    {
+                        BOOST_FOREACH(std::string & node, tmp_nodes)
+                        {
+                            node += prefix;
+                        }
+                    }
+                }
+            }
+            nodes.insert(nodes.end(), tmp_nodes.begin(), tmp_nodes.end());
+        }
+    };
+
+    void add_tasks_per_node(std::size_t idx, std::size_t n, std::vector<std::size_t> & nodes)
+    {
+        for(std::size_t i = 0; i < n; ++i)
+        {
+            nodes.push_back(idx);
+        }
+    }
+}
 
 namespace hpx { namespace util
 {
@@ -52,7 +186,7 @@ namespace hpx { namespace util
                     if (!line.empty()) {
                         if (debug_)
                             std::cerr << "read: '" << line << "'" << std::endl;
-
+            
                         boost::asio::ip::tcp::endpoint ep =
                             util::resolve_hostname(line, 0, io_service);
 
@@ -137,7 +271,7 @@ namespace hpx { namespace util
             if (!s.empty()) {
                 if (debug_)
                     std::cerr << "extracted: '" << s << "'" << std::endl;
-
+        
                 boost::asio::ip::tcp::endpoint ep =
                     util::resolve_hostname(s, 0, io_service);
 
@@ -195,6 +329,8 @@ namespace hpx { namespace util
         std::string const& agas_host)
     {
         char* slurm_nodelist_env = std::getenv("SLURM_NODELIST");
+
+        /** FIXME: use that info
         char* tasks_per_node_env = std::getenv("SLURM_TASKS_PER_NODE");
 
         std::vector<std::size_t> tasks_per_node;
@@ -217,19 +353,9 @@ namespace hpx { namespace util
                 begin
               , end
               , (
-                  (   qi::int_ >> "(x" >> qi::int_ >> ')')[
-                           phoenix::for_(
-                               phoenix::ref(i) = 0
-                             , phoenix::ref(i) != qi::_2
-                             , ++phoenix::ref(i)
-                           )
-                           [
-                               phoenix::push_back(
-                                   phoenix::ref(tasks_per_node)
-                                 , qi::_1
-                               )
-                           ]
-                  ]
+                    (qi::int_ >> "(x" >> qi::int_ >> ')')[
+                        phoenix::bind(::add_tasks_per_node, qi::_1, qi::_2, phoenix::ref(tasks_per_node))
+                    ]
                 | qi::int_[
                         phoenix::push_back(
                             phoenix::ref(tasks_per_node)
@@ -239,6 +365,7 @@ namespace hpx { namespace util
                 ) % ','
             );
         }
+        **/
 
         if (slurm_nodelist_env)
         {
@@ -247,28 +374,57 @@ namespace hpx { namespace util
                           << std::endl;
             }
 
-            typedef boost::tokenizer<boost::char_separator<char> > tokenizer_type;
+            std::string nodelist_str(slurm_nodelist_env);
+            std::string::iterator begin = nodelist_str.begin();
+            std::string::iterator end = nodelist_str.end();
 
             std::vector<std::string> nodes;
-            boost::char_separator<char> sep (" \t:");
-            tokenizer_type tok(std::string(slurm_nodelist_env), sep);
-            tokenizer_type::iterator end = tok.end();
-            std::size_t i = 0;
-            for (tokenizer_type::iterator it = tok.begin (); it != end; ++it)
-            {
-                if (!tasks_per_node.empty())
-                {
-                    for(std::size_t j = 0; j != tasks_per_node[j]; ++j)
-                    {
-                        nodes.push_back (*it);
-                    }
-                }
-                else
-                {
-                    nodes.push_back (*it);
-                }
-                ++i;
-            }
+
+            namespace qi = boost::spirit::qi;
+            namespace phoenix = boost::phoenix;
+
+            qi::rule<std::string::iterator, std::string()>
+                prefix;
+            prefix %= +(qi::print - (qi::char_("[") | qi::char_(",")));
+
+            qi::rule<std::string::iterator, std::string()>
+                range_str;
+            range_str %= +(qi::print - (qi::char_("]") | qi::char_( ",") | qi::char_("-")));
+
+            qi::rule<std::string::iterator, std::vector<std::string>()>
+                range;
+            range %= range_str >> *('-' >> range_str);
+
+            qi::rule<std::string::iterator,
+                    boost::fusion::vector<
+                        std::string,
+                        boost::optional<std::vector<std::vector<std::string> > >
+                    >()>
+                ranges;
+            ranges %= prefix >> -(qi::lit("[") >> (range % ',') >> qi::lit("]"));
+
+            qi::rule<std::string::iterator>
+                hostlist = (+ranges)[
+                                phoenix::bind(::construct_nodes(),
+                                    phoenix::ref(nodes), qi::_1)
+                           ];
+
+            qi::rule<std::string::iterator>
+                nodelist = hostlist % ',';
+
+
+            qi::parse(
+                begin
+              , end
+              , nodelist
+            );
+
+            /*
+            std::cout << nodelist_str << "\n";
+            std::cout << "---\n";
+            for(std::string const & s: nodes) std::cout << s << "\n";
+            std::cout << "---\n";
+            */
 
             return init_from_nodelist(nodes, agas_host);
         }
@@ -281,19 +437,38 @@ namespace hpx { namespace util
     std::size_t batch_environment::retrieve_number_of_threads() const
     {
         std::size_t result = 1;
-        char* slurm_cpus_on_node = std::getenv("SLURM_CPUS_ON_NODE");
-        if (slurm_cpus_on_node) {
+        char* slurm_cpus_per_task = std::getenv("SLURM_CPUS_PER_TASK");
+        if(slurm_cpus_per_task)
+        {
             try {
-                std::string value(slurm_cpus_on_node);
+                std::string value(slurm_cpus_per_task);
                 result = boost::lexical_cast<std::size_t>(value);
                 if (debug_) {
-                    std::cerr << "retrieve_number_of_threads (SLURM_CPUS_ON_NODE): "
+                    std::cerr << "retrieve_number_of_threads (SLURM_CPUS_PER_TASK): "
                               << result << std::endl;
                 }
                 return result;
             }
             catch (boost::bad_lexical_cast const&) {
                 ; // just ignore the error
+            }
+        }
+        else
+        {
+            char* slurm_cpus_on_node = std::getenv("SLURM_CPUS_ON_NODE");
+            if (slurm_cpus_on_node) {
+                try {
+                    std::string value(slurm_cpus_on_node);
+                    result = boost::lexical_cast<std::size_t>(value);
+                    if (debug_) {
+                        std::cerr << "retrieve_number_of_threads (SLURM_CPUS_ON_NODE): "
+                                  << result << std::endl;
+                    }
+                    return result;
+                }
+                catch (boost::bad_lexical_cast const&) {
+                    ; // just ignore the error
+                }
             }
         }
 

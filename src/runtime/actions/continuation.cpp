@@ -26,7 +26,7 @@ namespace hpx
         apply(set, id, e);
     }
 
-    void set_lco_error(naming::id_type const& id,
+    void set_lco_error(naming::id_type const& id, //-V659
         BOOST_RV_REF(boost::exception_ptr) e)
     {
         lcos::base_lco::set_exception_action set;
@@ -65,7 +65,7 @@ namespace hpx { namespace actions
         set_lco_error(gid_, e);
     }
 
-    void continuation::trigger_error(BOOST_RV_REF(boost::exception_ptr) e) const
+    void continuation::trigger_error(BOOST_RV_REF(boost::exception_ptr) e) const //-V659
     {
         if (!gid_) {
             HPX_THROW_EXCEPTION(invalid_status,

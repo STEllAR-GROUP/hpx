@@ -135,7 +135,7 @@ namespace hpx { namespace detail
         boost::int64_t pid_ = ::getpid();
         std::string back_trace(backtrace());
 
-        std::string hostname_ = "";
+        std::string hostname_;
         hpx::runtime* rt = get_runtime_ptr();
         if (rt && rt->get_state() >= runtime::state_initialized && 
                   rt->get_state() < runtime::state_stopped)
@@ -150,7 +150,7 @@ namespace hpx { namespace detail
         boost::uint32_t node = 0;
         std::size_t shepherd = std::size_t(-1);
         std::size_t thread_id = 0;
-        std::string thread_name("");
+        std::string thread_name;
 
         threads::thread_self* self = threads::get_self_ptr();
         if (NULL != self)
@@ -398,13 +398,16 @@ namespace hpx
 
     std::string diagnostic_information(boost::exception_ptr const& e)
     {
-        if (!e) return "";
+        if (!e) return std::string();
 
         try {
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
             return hpx::diagnostic_information(be);
+        }
+        catch (...) {
+            return std::string();
         }
     }
 
@@ -419,8 +422,43 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// Return the error message.
+    std::string get_error_what(boost::exception const& e)
+    {
+        // Try a cast to std::exception - this should handle boost.system
+        // error codes in addition to the standard library exceptions.
+        std::exception const* se = dynamic_cast<std::exception const*>(&e);
+        return se ? se->what() : std::string();
+    }
+
+    std::string get_error_what(boost::exception_ptr const& e)
+    {
+        if (!e) return std::string();
+
+        try {
+            boost::rethrow_exception(e);
+        }
+        catch (boost::exception const& be) {
+            return hpx::get_error_what(be);
+        }
+        catch (...) {
+            return std::string();
+        }
+    }
+
+    std::string get_error_what(hpx::exception const& e)
+    {
+        return get_error_what(dynamic_cast<boost::exception const&>(e));
+    }
+
+    std::string get_error_what(hpx::error_code const& e)
+    {
+        return get_error_what(detail::access_exception(e));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     /// Return the locality where the exception was thrown.
-    boost::uint32_t get_locality_id(boost::exception const& e)
+    boost::uint32_t get_error_locality_id(boost::exception const& e)
     {
         boost::uint32_t const* locality =
             boost::get_error_info<hpx::detail::throw_locality>(e);
@@ -429,7 +467,7 @@ namespace hpx
         return naming::invalid_locality_id;
     }
 
-    boost::uint32_t get_locality_id(boost::exception_ptr const& e)
+    boost::uint32_t get_error_locality_id(boost::exception_ptr const& e)
     {
         if (!e)
             return naming::invalid_locality_id;
@@ -438,18 +476,21 @@ namespace hpx
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
-            return get_locality_id(be);
+            return get_error_locality_id(be);
+        }
+        catch (...) {
+            return naming::invalid_locality_id;
         }
     }
 
-    boost::uint32_t get_locality_id(hpx::exception const& e)
+    boost::uint32_t get_error_locality_id(hpx::exception const& e)
     {
-        return get_locality_id(dynamic_cast<boost::exception const&>(e));
+        return get_error_locality_id(dynamic_cast<boost::exception const&>(e));
     }
 
-    boost::uint32_t get_locality_id(hpx::error_code const& e)
+    boost::uint32_t get_error_locality_id(hpx::error_code const& e)
     {
-        return get_locality_id(detail::access_exception(e));
+        return get_error_locality_id(detail::access_exception(e));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -481,40 +522,43 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     /// Return the host-name of the locality where the exception was thrown.
-    std::string get_host_name(boost::exception const& e)
+    std::string get_error_host_name(boost::exception const& e)
     {
         std::string const* hostname_ =
             boost::get_error_info<hpx::detail::throw_hostname>(e);
         if (hostname_ && !hostname_->empty())
             return *hostname_;
-        return "";
+        return std::string();
     }
 
-    std::string get_host_name(boost::exception_ptr const& e)
+    std::string get_error_host_name(boost::exception_ptr const& e)
     {
-        if (!e) return "";
+        if (!e) return std::string();
 
         try {
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
-            return get_host_name(be);
+            return get_error_host_name(be);
+        }
+        catch (...) {
+            return std::string();
         }
     }
 
-    std::string get_host_name(hpx::exception const& e)
+    std::string get_error_host_name(hpx::exception const& e)
     {
-        return get_host_name(dynamic_cast<boost::exception const&>(e));
+        return get_error_host_name(dynamic_cast<boost::exception const&>(e));
     }
 
-    std::string get_host_name(hpx::error_code const& e)
+    std::string get_error_host_name(hpx::error_code const& e)
     {
-        return get_host_name(detail::access_exception(e));
+        return get_error_host_name(detail::access_exception(e));
     }
 
     /// Return the (operating system) process id of the locality where the
     /// exception was thrown.
-    boost::int64_t get_process_id(boost::exception const& e)
+    boost::int64_t get_error_process_id(boost::exception const& e)
     {
         boost::int64_t const* pid_ =
             boost::get_error_info<hpx::detail::throw_pid>(e);
@@ -523,7 +567,7 @@ namespace hpx
         return -1;
     }
 
-    boost::int64_t get_process_id(boost::exception_ptr const& e)
+    boost::int64_t get_error_process_id(boost::exception_ptr const& e)
     {
         if (!e) return -1;
 
@@ -531,22 +575,25 @@ namespace hpx
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
-            return get_process_id(be);
+            return get_error_process_id(be);
+        }
+        catch (...) {
+            return -1;
         }
     }
 
-    boost::int64_t get_process_id(hpx::exception const& e)
+    boost::int64_t get_error_process_id(hpx::exception const& e)
     {
-        return get_process_id(dynamic_cast<boost::exception const&>(e));
+        return get_error_process_id(dynamic_cast<boost::exception const&>(e));
     }
 
-    boost::int64_t get_process_id(hpx::error_code const& e)
+    boost::int64_t get_error_process_id(hpx::error_code const& e)
     {
-        return get_process_id(detail::access_exception(e));
+        return get_error_process_id(detail::access_exception(e));
     }
 
     /// Return the function name from which the exception was thrown.
-    std::string get_function_name(boost::exception const& e)
+    std::string get_error_function_name(boost::exception const& e)
     {
         char const* const* func =
             boost::get_error_info<boost::throw_function>(e);
@@ -558,34 +605,110 @@ namespace hpx
         if (s)
             return *s;
 
-        return "";
+        return std::string();
     }
 
-    std::string get_function_name(boost::exception_ptr const& e)
+    std::string get_error_function_name(boost::exception_ptr const& e)
     {
-        if (!e) return "";
+        if (!e) return std::string();
 
         try {
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
-            return get_function_name(be);
+            return get_error_function_name(be);
+        }
+        catch (...) {
+            return std::string();
         }
     }
 
-    std::string get_function_name(hpx::exception const& e)
+    std::string get_error_function_name(hpx::exception const& e)
     {
-        return get_function_name(dynamic_cast<boost::exception const&>(e));
+        return get_error_function_name(dynamic_cast<boost::exception const&>(e));
     }
 
-    std::string get_function_name(hpx::error_code const& e)
+    std::string get_error_function_name(hpx::error_code const& e)
     {
-        return get_function_name(detail::access_exception(e));
+        return get_error_function_name(detail::access_exception(e));
+    }
+
+    /// Return the stack backtrace at the point the exception was thrown.
+    std::string get_error_backtrace(boost::exception const& e)
+    {
+        std::string const* back_trace =
+            boost::get_error_info<hpx::detail::throw_stacktrace>(e);
+        if (back_trace && !back_trace->empty())
+            return *back_trace;
+
+        return std::string();
+    }
+
+    std::string get_error_backtrace(boost::exception_ptr const& e)
+    {
+        if (!e) return std::string();
+
+        try {
+            boost::rethrow_exception(e);
+        }
+        catch (boost::exception const& be) {
+            return get_error_backtrace(be);
+        }
+        catch (...) {
+            return std::string();
+        }
+    }
+
+    std::string get_error_backtrace(hpx::exception const& e)
+    {
+        return get_error_backtrace(dynamic_cast<boost::exception const&>(e));
+    }
+
+    std::string get_error_backtrace(hpx::error_code const& e)
+    {
+        return get_error_backtrace(detail::access_exception(e));
+    }
+
+    /// Return the environment of the OS-process at the point the exception 
+    /// was thrown.
+    std::string get_error_env(boost::exception const& e)
+    {
+        std::string const* env =
+            boost::get_error_info<hpx::detail::throw_env>(e);
+        if (env && !env->empty())
+            return *env;
+
+        return std::string();
+    }
+
+    std::string get_error_env(boost::exception_ptr const& e)
+    {
+        if (!e) return std::string();
+
+        try {
+            boost::rethrow_exception(e);
+        }
+        catch (boost::exception const& be) {
+            return get_error_env(be);
+        }
+        catch (...) {
+            return std::string();
+        }
+    }
+
+    std::string get_error_env(hpx::exception const& e)
+    {
+        return get_error_env(dynamic_cast<boost::exception const&>(e));
+    }
+
+    std::string get_error_env(hpx::error_code const& e)
+    {
+        return get_error_env(detail::access_exception(e));
     }
 
     /// Return the (source code) file name of the function from which the
     /// exception was thrown.
-    std::string get_file_name(boost::exception const& e)
+    std::string get_error_file_name(boost::exception const& e)
     {
         char const* const* file =
             boost::get_error_info<boost::throw_file>(e);
@@ -597,34 +720,37 @@ namespace hpx
         if (s)
             return *s;
 
-        return "";
+        return std::string();
     }
 
-    std::string get_file_name(boost::exception_ptr const& e)
+    std::string get_error_file_name(boost::exception_ptr const& e)
     {
-        if (!e) return "";
+        if (!e) return std::string();
 
         try {
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
-            return get_file_name(be);
+            return get_error_file_name(be);
+        }
+        catch (...) {
+            return std::string();
         }
     }
 
-    std::string get_file_name(hpx::exception const& e)
+    std::string get_error_file_name(hpx::exception const& e)
     {
-        return get_file_name(dynamic_cast<boost::exception const&>(e));
+        return get_error_file_name(dynamic_cast<boost::exception const&>(e));
     }
 
-    std::string get_file_name(hpx::error_code const& e)
+    std::string get_error_file_name(hpx::error_code const& e)
     {
-        return get_file_name(detail::access_exception(e));
+        return get_error_file_name(detail::access_exception(e));
     }
 
     /// Return the line number in the (source code) file of the function from
     /// which the exception was thrown.
-    int get_line_number(boost::exception const& e)
+    int get_error_line_number(boost::exception const& e)
     {
         int const* line =
             boost::get_error_info<boost::throw_line>(e);
@@ -633,7 +759,7 @@ namespace hpx
         return -1;
     }
 
-    int get_line_number(boost::exception_ptr const& e)
+    int get_error_line_number(boost::exception_ptr const& e)
     {
         if (!e) return -1;
 
@@ -641,23 +767,26 @@ namespace hpx
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
-            return get_line_number(be);
+            return get_error_line_number(be);
+        }
+        catch (...) {
+            return -1;
         }
     }
 
-    int get_line_number(hpx::exception const& e)
+    int get_error_line_number(hpx::exception const& e)
     {
-        return get_line_number(dynamic_cast<boost::exception const&>(e));
+        return get_error_line_number(dynamic_cast<boost::exception const&>(e));
     }
 
-    int get_line_number(hpx::error_code const& e)
+    int get_error_line_number(hpx::error_code const& e)
     {
-        return get_line_number(detail::access_exception(e));
+        return get_error_line_number(detail::access_exception(e));
     }
 
     /// Return the sequence number of the OS-thread used to execute HPX-threads
     /// from which the exception was thrown.
-    std::size_t get_os_thread(boost::exception const& e)
+    std::size_t get_error_os_thread(boost::exception const& e)
     {
         std::size_t const* shepherd =
             boost::get_error_info<hpx::detail::throw_shepherd>(e);
@@ -666,7 +795,7 @@ namespace hpx
         return std::size_t(-1);
     }
 
-    std::size_t get_os_thread(boost::exception_ptr const& e)
+    std::size_t get_error_os_thread(boost::exception_ptr const& e)
     {
         if (!e) return std::size_t(-1);
 
@@ -674,23 +803,26 @@ namespace hpx
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
-            return get_os_thread(be);
+            return get_error_os_thread(be);
+        }
+        catch (...) {
+            return std::size_t(-1);
         }
     }
 
-    std::size_t get_os_thread(hpx::exception const& e)
+    std::size_t get_error_os_thread(hpx::exception const& e)
     {
-        return get_os_thread(dynamic_cast<boost::exception const&>(e));
+        return get_error_os_thread(dynamic_cast<boost::exception const&>(e));
     }
 
-    std::size_t get_os_thread(hpx::error_code const& e)
+    std::size_t get_error_os_thread(hpx::error_code const& e)
     {
-        return get_os_thread(detail::access_exception(e));
+        return get_error_os_thread(detail::access_exception(e));
     }
 
     /// Return the unique thread id of the HPX-thread from which the exception
     /// was thrown.
-    std::size_t get_thread_id(boost::exception const& e)
+    std::size_t get_error_thread_id(boost::exception const& e)
     {
         std::size_t const* thread_id =
             boost::get_error_info<hpx::detail::throw_thread_id>(e);
@@ -699,7 +831,7 @@ namespace hpx
         return 0;
     }
 
-    std::size_t get_thread_id(boost::exception_ptr const& e)
+    std::size_t get_error_thread_id(boost::exception_ptr const& e)
     {
         if (!e) return std::size_t(-1);
 
@@ -707,51 +839,57 @@ namespace hpx
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
-            return get_thread_id(be);
+            return get_error_thread_id(be);
+        }
+        catch (...) {
+            return std::size_t(-1);
         }
     }
 
-    std::size_t get_thread_id(hpx::exception const& e)
+    std::size_t get_error_thread_id(hpx::exception const& e)
     {
-        return get_thread_id(dynamic_cast<boost::exception const&>(e));
+        return get_error_thread_id(dynamic_cast<boost::exception const&>(e));
     }
 
-    std::size_t get_thread_id(hpx::error_code const& e)
+    std::size_t get_error_thread_id(hpx::error_code const& e)
     {
-        return get_thread_id(detail::access_exception(e));
+        return get_error_thread_id(detail::access_exception(e));
     }
 
     /// Return any addition thread description of the HPX-thread from which the
     /// exception was thrown.
-    std::string get_thread_description(boost::exception const& e)
+    std::string get_error_thread_description(boost::exception const& e)
     {
         std::string const* thread_description =
             boost::get_error_info<hpx::detail::throw_thread_name>(e);
         if (thread_description && !thread_description->empty())
             return *thread_description;
-        return "";
+        return std::string();
     }
 
-    std::string get_thread_description(boost::exception_ptr const& e)
+    std::string get_error_thread_description(boost::exception_ptr const& e)
     {
-        if (!e) return "";
+        if (!e) return std::string();
 
         try {
             boost::rethrow_exception(e);
         }
         catch (boost::exception const& be) {
-            return get_thread_description(be);
+            return get_error_thread_description(be);
+        }
+        catch (...) {
+            return std::string();
         }
     }
 
-    std::string get_thread_description(hpx::exception const& e)
+    std::string get_error_thread_description(hpx::exception const& e)
     {
-        return get_thread_description(dynamic_cast<boost::exception const&>(e));
+        return get_error_thread_description(dynamic_cast<boost::exception const&>(e));
     }
 
-    std::string get_thread_description(hpx::error_code const& e)
+    std::string get_error_thread_description(hpx::error_code const& e)
     {
-        return get_thread_description(detail::access_exception(e));
+        return get_error_thread_description(detail::access_exception(e));
     }
 }
 

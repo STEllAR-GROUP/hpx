@@ -118,11 +118,12 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         return start_all();
     }
 
-    bool thread_counters::read_value(papi_counter *cnt)
+	bool thread_counters::read_value(papi_counter *cnt, bool reset)
     {
         if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
         timestamp_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         cnt->update_state(timestamp_, counts_[cnt->get_counter_index()]);
+	if (reset) counts_[cnt->get_counter_index()] = 0;
         return true;
     }
 
@@ -226,12 +227,15 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
 
         if (status_ == PAPI_COUNTER_ACTIVE)
-            counters_->read_value(this);
+            counters_->read_value(this, reset);
 
         hpx::performance_counters::counter_value value;
 
         if (timestamp_ != -1) copy_value(value);
         else value.status_ = hpx::performance_counters::status_invalid_data;
+
+	// clear local copy
+        if (reset) value_ = 0;
 
         value.count_ = ++invocation_count_;
 
@@ -259,13 +263,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         return stop_counter();
     }
 
-    bool papi_counter::stop_counter()
+    void papi_counter::reset()
     {
-        if (status_ == PAPI_COUNTER_ACTIVE)
-        {
-            if (!counters_->remove_event(this)) return false;
-        }
-        return true;
+        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
+
+        reset_counter();
     }
 
     void papi_counter::finalize()

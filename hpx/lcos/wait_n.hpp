@@ -180,14 +180,14 @@ namespace hpx
             HPX_THROW_EXCEPTION(hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "number of results to wait for is out of bounds");
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
         }
 
         if (lazy_values.empty()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "empty container passed to when_n");
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
         }
 
         lcos::local::futures_factory<return_type()> p(
@@ -209,14 +209,14 @@ namespace hpx
             HPX_THROW_EXCEPTION(hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "number of results to wait for is out of bounds");
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
         }
 
         if (lazy_values.empty()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "empty container passed to when_n");
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
         }
 
         lcos::local::futures_factory<return_type()> p(
@@ -227,7 +227,7 @@ namespace hpx
     }
 
     template <typename T>
-    lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T> > > >
+    lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<T> > > > //-V659
     when_n(std::size_t n, std::vector<lcos::future<T> > const& lazy_values)
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
@@ -237,14 +237,14 @@ namespace hpx
             HPX_THROW_EXCEPTION(hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "number of results to wait for is out of bounds");
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
         }
 
         if (lazy_values.empty()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "empty container passed to when_n");
-            return lcos::make_future(return_type());
+            return lcos::make_ready_future(return_type());
         }
 
         lcos::local::futures_factory<return_type()> p =

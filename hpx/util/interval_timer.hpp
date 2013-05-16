@@ -27,20 +27,37 @@ namespace hpx { namespace util
     public:
         interval_timer();
         interval_timer(HPX_STD_FUNCTION<bool()> const& f,
-            boost::int64_t microsecs, std::string const& description, 
+            boost::int64_t microsecs, std::string const& description,
             bool pre_shutdown = false);
         interval_timer(HPX_STD_FUNCTION<bool()> const& f,
             HPX_STD_FUNCTION<void()> const& on_term, boost::int64_t microsecs,
                 std::string const& description, bool pre_shutdown = false);
         ~interval_timer();
 
-        bool start();
+        bool start(bool evaluate_ = true);
         bool stop();
+
+        bool restart(bool evaluate_ = true);
 
         bool is_started() const { return is_started_; }
         bool is_terminated() const { return is_terminated_; }
 
-        boost::int64_t get_interval() const { return microsecs_; }
+        boost::int64_t get_interval() const
+        {
+            mutex_type::scoped_lock l(mtx_);
+            return microsecs_;
+        }
+
+        void slow_down(boost::int64_t max_interval)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            microsecs_ = (std::min)((110 * microsecs_) / 100, max_interval);
+        }
+        void speed_up(boost::int64_t min_interval)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            microsecs_ = (std::max)((90 * microsecs_) / 100, min_interval);
+        }
 
     protected:
         // schedule a high priority task after a given time interval
@@ -58,7 +75,7 @@ namespace hpx { namespace util
         mutable mutex_type mtx_;
         HPX_STD_FUNCTION<bool()> f_;  ///< function to call
         HPX_STD_FUNCTION<void()> on_term_;  ///< function to call on termination
-        boost::int64_t microsecs_;       ///< time interval
+        boost::int64_t microsecs_;    ///< time interval
         threads::thread_id_type id_;  ///< id of currently scheduled thread
         std::string description_;     ///< description of this interval timer
 

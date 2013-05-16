@@ -8,6 +8,7 @@ set(subdirs
     agas
     actions
     lcos
+    performance_counters
     threads
     util
    )
@@ -34,7 +35,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      FOLDER "Tests/Regressions/")
 
-  add_hpx_regression_test(${test} ${${test}_PARAMETERS})  
+  add_hpx_regression_test(${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.regressions.${test})
@@ -47,4 +48,3 @@ foreach(test ${tests})
   add_hpx_pseudo_dependencies(tests.regressions.${test}
                               ${test}_test_exe)
 endforeach()
-

@@ -72,16 +72,8 @@ int main(int argc, char* argv[])
 naming::id_type set_initialdata(int);
 void update(naming::id_type);
 
-typedef
-    actions::plain_result_action1<naming::id_type,int, set_initialdata>
-set_initialdata_action;
-
-typedef
-    actions::plain_action1<naming::id_type, update>
-update_action;
-
-HPX_REGISTER_PLAIN_ACTION(set_initialdata_action);
-HPX_REGISTER_PLAIN_ACTION(update_action);
+HPX_PLAIN_ACTION(set_initialdata);
+HPX_PLAIN_ACTION(update);
 
 int hpx_main(po::variables_map &vm)
 {

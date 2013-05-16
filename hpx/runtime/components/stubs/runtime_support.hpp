@@ -227,8 +227,9 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         static void
-        insert_agas_cache_entry(naming::id_type const& targetgid,
-            naming::gid_type const& gid, naming::address const& g);
+        update_agas_cache_entry(naming::id_type const& targetgid,
+            naming::gid_type const& gid, naming::address const& g,
+            boost::uint64_t count, boost::uint64_t offset);
 
         ///////////////////////////////////////////////////////////////////////
         static void

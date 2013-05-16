@@ -459,6 +459,8 @@ namespace hpx { namespace threads { namespace policies
 
             // do not execute the work, but register a task description for
             // later thread creation
+            ++new_tasks_count_;
+
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             new_tasks_.enqueue(new task_description(
                 boost::move(data), initial_state,
@@ -468,8 +470,6 @@ namespace hpx { namespace threads { namespace policies
             new_tasks_.enqueue(new task_description(
                 boost::move(data), initial_state));
 #endif
-            ++new_tasks_count_;
-
             if (&ec != &throws)
                 ec = make_success_code();
 
@@ -493,8 +493,9 @@ namespace hpx { namespace threads { namespace policies
                 }
 #endif
 
+                bool finished = count == ++work_items_count_;
                 enqueue(work_items_, trd, num_thread);
-                if (count == ++work_items_count_)
+                if (finished)
                     break;
             }
         }
@@ -516,10 +517,15 @@ namespace hpx { namespace threads { namespace policies
                 }
 #endif
 
+                bool finish = count == ++new_tasks_count_;
                 if (new_tasks_.enqueue(task))
                 {
-                    if (count == ++new_tasks_count_)
+                    if (finish)
                         break;
+                }
+                else
+                {
+                    --new_tasks_count_;
                 }
             }
         }
@@ -530,7 +536,8 @@ namespace hpx { namespace threads { namespace policies
         {
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             thread_description* tdesc;
-            if (dequeue(work_items_, tdesc, num_thread))
+            if (0 != work_items_count_.load(boost::memory_order_relaxed) &&
+                dequeue(work_items_, tdesc, num_thread))
             {
                 --work_items_count_;
 
@@ -546,7 +553,8 @@ namespace hpx { namespace threads { namespace policies
                 return true;
             }
 #else
-            if (dequeue(work_items_, thrd, num_thread))
+            if (0 != work_items_count_.load(boost::memory_order_relaxed) &&
+                dequeue(work_items_, thrd, num_thread))
             {
                 --work_items_count_;
                 return true;
@@ -558,6 +566,7 @@ namespace hpx { namespace threads { namespace policies
         /// Schedule the passed thread
         void schedule_thread(threads::thread_data* thrd, std::size_t num_thread)
         {
+            ++work_items_count_;
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             enqueue(work_items_,
                 new thread_description(thrd, util::high_resolution_clock::now()),
@@ -565,7 +574,6 @@ namespace hpx { namespace threads { namespace policies
 #else
             enqueue(work_items_, thrd, num_thread);
 #endif
-            ++work_items_count_;
             do_some_work();         // wake up sleeping threads
         }
 

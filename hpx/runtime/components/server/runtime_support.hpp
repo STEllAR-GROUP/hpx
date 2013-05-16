@@ -32,6 +32,8 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <hpx/plugins/plugin_factory_base.hpp>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace components { namespace server
@@ -41,6 +43,7 @@ namespace hpx { namespace components { namespace server
     {
     private:
         typedef lcos::local::spinlock component_map_mutex_type;
+        typedef lcos::local::spinlock plugin_map_mutex_type;
         typedef boost::mutex mutex_type;
 
         struct component_factory
@@ -60,6 +63,23 @@ namespace hpx { namespace components { namespace server
         typedef component_factory component_factory_type;
         typedef std::map<component_type, component_factory_type> component_map_type;
 
+        struct plugin_factory
+        {
+            plugin_factory() : isenabled(false) {}
+
+            plugin_factory(
+                  boost::shared_ptr<plugins::plugin_factory_base> const& f,
+                  hpx::util::plugin::dll const& d, bool enabled)
+              : first(f), second(d), isenabled(enabled)
+            {};
+
+            boost::shared_ptr<plugins::plugin_factory_base> first;
+            hpx::util::plugin::dll second;
+            bool isenabled;
+        };
+        typedef plugin_factory plugin_factory_type;
+        typedef std::map<std::string, plugin_factory_type> plugin_map_type;
+
     public:
         typedef runtime_support type_holder;
 
@@ -73,8 +93,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // constructor
-        runtime_support(naming::gid_type const& prefix,
-                naming::resolver_client& agas_client, applier::applier& applier);
+        runtime_support();
 
         ~runtime_support()
         {
@@ -135,9 +154,10 @@ namespace hpx { namespace components { namespace server
         /// \brief Retrieve configuration information
         util::section get_config();
 
-        /// \brief Insert the given name mapping into the AGAS cache of this
+        /// \brief Update the given name mapping into the AGAS cache of this
         ///        locality.
-        void insert_agas_cache_entry(naming::gid_type const&, naming::address const&);
+        void update_agas_cache_entry(naming::gid_type const&,
+            naming::address const&, boost::uint64_t, boost::uint64_t);
 
         /// \brief Load all components on this locality.
         bool load_components();
@@ -188,7 +208,7 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, get_config);
 #endif
 
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, insert_agas_cache_entry);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, update_agas_cache_entry);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, garbage_collect);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_performance_counter);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, get_instance_count);
@@ -247,14 +267,22 @@ namespace hpx { namespace components { namespace server
 
         void remove_here_from_connection_cache();
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
             return boost::move(f);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        parcelset::policies::message_handler* create_message_handler(
+            char const* message_handler_type, char const* action,
+            parcelset::parcelport* pp, std::size_t num_messages,
+            std::size_t interval, error_code& ec);
+        util::binary_filter* create_binary_filter(
+            char const* binary_filter_type, bool compress, error_code& ec);
 
     protected:
         // Load all components from the ini files found in the configuration
@@ -271,6 +299,12 @@ namespace hpx { namespace components { namespace server
         bool load_commandline_options(hpx::util::plugin::dll& d,
             boost::program_options::options_description& options);
 
+        // Load all plugins from the ini files found in the configuration
+        bool load_plugins(util::section& ini);
+        bool load_plugin(util::section& ini, std::string const& instance,
+            std::string const& component, boost::filesystem::path lib,
+            bool isenabled);
+
     private:
         mutex_type mtx_;
         boost::condition wait_condition_;
@@ -279,7 +313,10 @@ namespace hpx { namespace components { namespace server
         bool terminated_;
 
         component_map_mutex_type cm_mtx_;
+        plugin_map_mutex_type p_mtx_;
+
         component_map_type components_;
+        plugin_map_type plugins_;
 
         lcos::local::spinlock globals_mtx_;
         std::list<HPX_STD_FUNCTION<void()> > pre_startup_functions_;
@@ -381,8 +418,8 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::get_config_action,
     get_config_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::insert_agas_cache_entry_action,
-    insert_agas_cache_entry_action)
+    hpx::components::server::runtime_support::update_agas_cache_entry_action,
+    update_agas_cache_entry_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::garbage_collect_action,
     garbage_collect_action)

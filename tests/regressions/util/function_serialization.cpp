@@ -6,11 +6,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/function.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/async.hpp>
-#include <hpx/lcos/wait_all.hpp>
+#include <hpx/include/async.hpp>
+#include <hpx/include/lcos.hpp>
 #include <hpx/include/compression_zlib.hpp>
+#include <hpx/include/parcel_coalescing.hpp>
+#include <hpx/include/iostreams.hpp>
 
 #include <boost/serialization/access.hpp>
 
@@ -24,15 +26,13 @@ struct functor
     void operator()() const
     {
     }
-
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned int) {}
 };
 
 void pass_functor(hpx::util::function<void()> const& f) {}
 
 HPX_PLAIN_ACTION(pass_functor, pass_functor_action);
 HPX_ACTION_USES_ZLIB_COMPRESSION(pass_functor_action);
+HPX_ACTION_USES_MESSAGE_COALESCING(pass_functor_action);
 
 void worker(hpx::util::function<void()> const& f)
 {
@@ -52,6 +52,8 @@ void worker(hpx::util::function<void()> const& f)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
+    hpx::util::high_resolution_timer t;
+
     {
         functor g;
         hpx::util::function<void()> f(g);
@@ -65,6 +67,9 @@ int hpx_main(variables_map& vm)
 
         hpx::wait_all(futures);
     }
+
+    double elapsed = t.elapsed();
+    hpx::cout << "Elapsed time: " << elapsed << "\n" << hpx::flush;
 
     return hpx::finalize();
 }

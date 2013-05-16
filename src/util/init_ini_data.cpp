@@ -11,6 +11,7 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
+#include <hpx/plugins/plugin_registry_base.hpp>
 
 #include <string>
 #include <iostream>
@@ -106,7 +107,7 @@ namespace hpx { namespace util
 //         result = handle_ini_file_env(ini, "HPX_LOCATION", "/share/hpx/hpx.ini") || result;
 
         result = handle_ini_file_env(ini, "HOME", "/.hpx.ini") || result;
-        result =  handle_ini_file_env(ini, "PWD", "/.hpx.ini") || result;
+        result = handle_ini_file_env(ini, "PWD", "/.hpx.ini") || result;
 
         if (!hpx_ini_file.empty()) {
             bool result2 = handle_ini_file(ini, hpx_ini_file);
@@ -178,6 +179,76 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // iterate over all shared libraries in the given directory and construct
     // default ini settings assuming all of those are components
+    void load_component_factory(hpx::util::plugin::dll& d, util::section& ini,
+        std::string const& curr, std::string name)
+    {
+        hpx::util::plugin::plugin_factory<components::component_registry_base>
+            pf(d, "registry");
+
+        // retrieve the names of all known registries
+        std::vector<std::string> names;
+        pf.get_names(names);      // throws on error
+
+        std::vector<std::string> ini_data;
+        if (names.empty()) {
+            // This HPX module does not export any factories, but
+            // might export startup/shutdown functions. Create some
+            // default configuration data.
+            using namespace boost::assign;
+#if defined(HPX_DEBUG)
+            // unmangle the name in debug mode
+            if (name[name.size()-1] == 'd')
+                name.resize(name.size()-1);
+#endif
+            ini_data += std::string("[hpx.components.") + name + "]";
+            ini_data += "name = " + name;
+            ini_data += "path = " + curr;
+            ini_data += "no_factory = 1";
+            ini_data += "enabled = 1";
+        }
+        else {
+            // ask all registries
+            BOOST_FOREACH(std::string const& s, names)
+            {
+                // create the component registry object
+                boost::shared_ptr<components::component_registry_base>
+                    registry (pf.create(s));
+                registry->get_component_info(ini_data);
+            }
+        }
+
+        // incorporate all information from this module's
+        // registry into our internal ini object
+        ini.parse("component registry", ini_data, false);
+    }
+
+    void load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
+        std::string const& curr, std::string const& name)
+    {
+        hpx::util::plugin::plugin_factory<plugins::plugin_registry_base>
+            pf(d, "plugin");
+
+        // retrieve the names of all known registries
+        std::vector<std::string> names;
+        pf.get_names(names);      // throws on error
+
+        std::vector<std::string> ini_data;
+        if (!names.empty()) {
+            // ask all registries
+            BOOST_FOREACH(std::string const& s, names)
+            {
+                // create the plugin registry object
+                boost::shared_ptr<plugins::plugin_registry_base>
+                    registry(pf.create(s));
+                registry->get_plugin_info(ini_data);
+            }
+        }
+
+        // incorporate all information from this module's
+        // registry into our internal ini object
+        ini.parse("plugin registry", ini_data, false);
+    }
+
     void init_ini_data_default(std::string const& libs, util::section& ini)
     {
         namespace fs = boost::filesystem;
@@ -223,62 +294,35 @@ namespace hpx { namespace util
                     // get the handle of the library
                     hpx::util::plugin::dll d(curr.string(), name);
 
-                    // get the factory
-                    hpx::util::plugin::plugin_factory<components::component_registry_base>
-                        pf(d, "registry");
-
-                    // retrieve the names of all known registries
-                    std::vector<std::string> names;
-                    pf.get_names(names);      // throws on error
-
-                    std::vector<std::string> ini_data;
-                    if (names.empty()) {
-                        // This HPX module does not export any factories, but
-                        // might export startup/shutdown functions. Create some
-                        // default configuration data.
-                        using namespace boost::assign;
-                        ini_data += std::string("[hpx.components.") + name + "]";
-                        ini_data += "name = " + name;
-                        ini_data += "path = " + curr.parent_path().string();
-                        ini_data += "no_factory = 1";
-                        ini_data += "enabled = 1";
-                    }
-                    else {
-                        // ask all registries
-                        BOOST_FOREACH(std::string const& s, names)
-                        {
-                            // create the component registry object
-                            boost::shared_ptr<components::component_registry_base>
-                                registry (pf.create(s));
-                            registry->get_component_info(ini_data);
-                        }
-                    }
-
-                    // incorporate all information from this module's
-                    // registry into our internal ini object
-                    ini.parse("component registry", ini_data, false);
-
-                    continue;   // handle next module
+                    // get the component factory
+                    std::string curr_fullname(curr.parent_path().string());
+                    load_component_factory(d, ini, curr_fullname, name);
                 }
                 catch (std::logic_error const& e) {
                     LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
-                    continue;   // handle next module
                 }
                 catch (std::exception const& e) {
                     LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
-                    continue;   // handle next module
                 }
 
-// FIXME: make sure this isn't needed anymore for sure
-            // if something went wrong while reading the registry, just use
-            // some default settings
-//                 util::section sec;
-//                 sec.add_entry("name", name);
-//                 sec.add_entry("path", libs);
-//                 sec.add_entry("isdefault", "true");
-//                 components_sec->add_section(name, sec);
+                try {
+                    // get the handle of the library
+                    hpx::util::plugin::dll d(curr.string(), name);
+
+                    // get the component factory
+                    std::string curr_fullname(curr.parent_path().string());
+                    load_plugin_factory(d, ini, curr_fullname, name);
+                }
+                catch (std::logic_error const& e) {
+                    LRT_(info) << "skipping " << curr.string()
+                               << ": " << e.what();
+                }
+                catch (std::exception const& e) {
+                    LRT_(info) << "skipping " << curr.string()
+                               << ": " << e.what();
+                }
             }
         }
         catch (fs::filesystem_error const& /*e*/) {

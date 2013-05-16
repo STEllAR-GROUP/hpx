@@ -38,6 +38,7 @@
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/and.hpp>
+#include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
 #if defined(BOOST_NO_DECLTYPE)
 #  include <boost/typeof/typeof.hpp>
@@ -45,6 +46,9 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
 
+#include <hpx/config/bind.hpp>
+#include <hpx/config/tuple.hpp>
+#include <hpx/config/function.hpp>
 #include <hpx/traits/needs_guid_initialization.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -57,9 +61,6 @@
 #include <hpx/util/void_cast.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
-#include <hpx/config/bind.hpp>
-#include <hpx/config/tuple.hpp>
-#include <hpx/config/function.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -190,10 +191,13 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the filter to be used while serializing an 
         /// instance of this action type.
-        virtual util::binary_filter* get_serialization_filter() const = 0;
+        virtual util::binary_filter* get_serialization_filter(
+            parcelset::parcel const& p) const = 0;
 
         /// Return a pointer to the message handler to be used for this action.
-        virtual parcelset::policies::message_handler* get_message_handler() const = 0;
+        virtual parcelset::policies::message_handler* get_message_handler(
+            parcelset::parcelhandler* ph, naming::locality const& loc,
+            parcelset::connection_type t, parcelset::parcel const& p) const = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -522,15 +526,19 @@ namespace hpx { namespace actions
 
         /// Return a pointer to the filter to be used while serializing an 
         /// instance of this action type.
-        util::binary_filter* get_serialization_filter() const
+        util::binary_filter* get_serialization_filter(
+            parcelset::parcel const& p) const
         {
-            return traits::action_serialization_filter<derived_type>::call();
+            return traits::action_serialization_filter<derived_type>::call(p);
         }
 
         /// Return a pointer to the message handler to be used for this action.
-        parcelset::policies::message_handler* get_message_handler() const
+        parcelset::policies::message_handler* get_message_handler(
+            parcelset::parcelhandler* ph, naming::locality const& loc,
+            parcelset::connection_type t, parcelset::parcel const& p) const
         {
-            return traits::action_message_handler<derived_type>::call();
+            return traits::action_message_handler<derived_type>::
+                call(ph, loc, t, p);
         }
 
     public:
@@ -652,18 +660,34 @@ namespace hpx { namespace actions
         //    construct_continuation_thread_object_function()
         #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
+        typedef typename traits::promise_local_result<Result>::type local_result_type;
+
         // bring in the definition for all overloads for operator()
         template <typename IdType>
         BOOST_FORCEINLINE typename boost::enable_if<
             boost::mpl::and_<
                 boost::mpl::bool_<
                     boost::fusion::result_of::size<arguments_type>::value == 0>,
-                boost::is_same<IdType, naming::id_type> >,
-            typename traits::promise_local_result<Result>::type
+                boost::is_same<IdType, naming::id_type>,
+                boost::is_same<local_result_type, void> >
         >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
-            return hpx::async(*this, id).get(ec);
+            hpx::async(*this, id).get(ec);
+        }
+
+        template <typename IdType>
+        BOOST_FORCEINLINE typename boost::enable_if<
+            boost::mpl::and_<
+                boost::mpl::bool_<
+                    boost::fusion::result_of::size<arguments_type>::value == 0>,
+                boost::is_same<IdType, naming::id_type>,
+                boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+            local_result_type
+        >::type
+        operator()(IdType const& id, error_code& ec = throws) const
+        {
+            return boost::move(hpx::async(*this, id).move(ec));
         }
 
         #include <hpx/runtime/actions/define_function_operators.hpp>
@@ -870,6 +894,14 @@ namespace hpx { namespace actions
 #include <hpx/config/warnings_suffix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
+        hpx::actions::detail::register_base_helper<action>                    \
+            BOOST_PP_CAT(                                                     \
+                BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
+                _##actionname);                                               \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
@@ -898,14 +930,6 @@ namespace hpx { namespace actions
     HPX_REGISTER_BASE_HELPER(hpx::actions::transfer_action<action>, actionname) \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
 /**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
-        hpx::actions::detail::register_base_helper<action>                    \
-            BOOST_PP_CAT(                                                     \
-                BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
-                _##actionname);                                               \
-    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1(action)              \
@@ -947,6 +971,12 @@ namespace hpx { namespace actions
         BOOST_PP_STRINGIZE(actionname))                                       \
     HPX_REGISTER_ACTION_DECLARATION_GUID(hpx::actions::transfer_action<action>) \
 /**/
+
+///////////////////////////////////////////////////////////////////////////////
+// Register the action templates with serialization.
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Action>), (hpx::actions::transfer_action<Action>)
+)
 
 #if 0 //WIP
 ///////////////////////////////////////////////////////////////////////////////

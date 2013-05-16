@@ -31,7 +31,32 @@
 #include <cstdlib>
 #include <stdexcept>
 
-namespace hpx { namespace util { namespace coroutines 
+///////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS) && BOOST_VERSION >= 105300
+
+#define HPX_COROUTINES_SEGMENTS 10
+
+extern "C"
+{
+    void *__splitstack_makecontext(std::size_t,
+        void *[HPX_COROUTINES_SEGMENTS], std::size_t *);
+    void __splitstack_releasecontext(void *[HPX_COROUTINES_SEGMENTS]);
+    void __splitstack_resetcontext(void *[HPX_COROUTINES_SEGMENTS]);
+    void __splitstack_block_signals_context(void *[HPX_COROUTINES_SEGMENTS],
+        int * new_value, int * old_value);
+    void __splitstack_getcontext(void * [HPX_COROUTINES_SEGMENTS]);
+    void __splitstack_setcontext(void * [HPX_COROUTINES_SEGMENTS]);
+}
+
+#if !defined (SIGSTKSZ)
+# define SIGSTKSZ (8 * 1024)
+# define UDEF_SIGSTKSZ
+#endif
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace util { namespace coroutines
 {
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
@@ -44,9 +69,9 @@ namespace hpx { namespace util { namespace coroutines
     {
         ///////////////////////////////////////////////////////////////////////
         // This is taken directly from one of the Boost.Context examples
-        class simple_stack_allocator
+#if !defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
+        struct stack_allocator
         {
-        public:
             static std::size_t maximum_stacksize()
             { return HPX_HUGE_STACK_SIZE; }
 
@@ -77,11 +102,49 @@ namespace hpx { namespace util { namespace coroutines
                 std::free(limit);
             }
         };
+#else
+        struct stack_allocator
+        {
+            typedef void *segments_context[HPX_COROUTINES_SEGMENTS];
 
-        // Generic implementation for the context_impl_base class based on 
+            static std::size_t maximum_stacksize()
+            {
+                BOOST_ASSERT_MSG( false, "segmented stack is unbound");
+                return 0;
+            }
+
+            static std::size_t default_stacksize()
+            { return minimum_stacksize(); }
+
+            static std::size_t minimum_stacksize()
+            { return SIGSTKSZ + sizeof(boost::context::fcontext_t) + 15; }
+
+            void* allocate(std::size_t size) const
+            {
+                BOOST_ASSERT(default_stacksize() <= size);
+
+                void* limit = __splitstack_makecontext(size, segments_ctx_, &size);
+                if (!limit) boost::throw_exception(std::bad_alloc());
+
+                int off = 0;
+                 __splitstack_block_signals_context(segments_ctx_, &off, 0);
+
+                return static_cast<char *>(limit) + size;
+            }
+
+            void deallocate(void* vp, std::size_t size) const
+            {
+                __splitstack_releasecontext(segments_ctx_);
+            }
+
+            segments_context segments_ctx_;
+        };
+#endif
+
+        // Generic implementation for the context_impl_base class based on
         // Boost.Context.
         template <typename T>
-        BOOST_FORCEINLINE void trampoline(intptr_t pv) 
+        BOOST_FORCEINLINE void trampoline(intptr_t pv)
         {
             T* fun = reinterpret_cast<T*>(pv);
             BOOST_ASSERT(fun);
@@ -105,13 +168,13 @@ namespace hpx { namespace util { namespace coroutines
             explicit fcontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
               : cb_(reinterpret_cast<intptr_t>(&cb))
             {
-                std::size_t stack_size_ = (stack_size == -1) ? 
+                std::size_t stack_size_ = (stack_size == -1) ?
                       alloc_.minimum_stacksize() : std::size_t(stack_size);
 
                 void* stack_pointer_ = alloc_.allocate(stack_size_);
                 void (*fn)(intptr_t) = &trampoline<Functor>;
 
-                boost::context::fcontext_t* ctx = 
+                boost::context::fcontext_t* ctx =
                     boost::context::make_fcontext(stack_pointer_, stack_size_, fn);
 
                 std::swap(*ctx, ctx_);
@@ -119,7 +182,7 @@ namespace hpx { namespace util { namespace coroutines
 
             ~fcontext_context_impl()
             {
-                if (ctx_.fc_stack.sp) 
+                if (ctx_.fc_stack.sp)
                 {
                     alloc_.deallocate(ctx_.fc_stack.sp, ctx_.fc_stack.size);
                     ctx_.fc_stack.size = 0;
@@ -142,9 +205,9 @@ namespace hpx { namespace util { namespace coroutines
             void reset_stack()
             {
             }
-            void rebind_stack() 
+            void rebind_stack()
             {
-                if (ctx_.fc_stack.sp) 
+                if (ctx_.fc_stack.sp)
                     increment_stack_recycle_count();
             }
 
@@ -161,19 +224,28 @@ namespace hpx { namespace util { namespace coroutines
             }
             static boost::uint64_t increment_stack_recycle_count()
             {
-              return ++get_stack_recycle_counter();
+                return ++get_stack_recycle_counter();
             }
 
         private:
-            friend void swap_context(fcontext_context_impl& from, 
+            friend void swap_context(fcontext_context_impl& from,
                 fcontext_context_impl const& to, detail::default_hint)
             {
+#if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
+                __splitstack_getcontext(from.alloc_.segments_ctx_);
+                __splitstack_setcontext(to.alloc_.segments_ctx);
+#endif
+                // switch to other coroutine context
                 boost::context::jump_fcontext(&from.ctx_, &to.ctx_, to.cb_, false);
+
+#if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
+                __splitstack_setcontext(from.alloc_.segments_ctx);
+#endif
             }
 
         private:
             boost::context::fcontext_t ctx_;
-            simple_stack_allocator alloc_;
+            stack_allocator alloc_;
             intptr_t cb_;
         };
 

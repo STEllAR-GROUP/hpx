@@ -15,6 +15,7 @@ async_continue                        "" "hpx\.manual\.applying_actions\.action_
 # hpx/hpx_fwd.hpp
 find_here                             "" "hpx\.find_here.*"
 find_all_localities                   "" "hpx\.find_all_localities.*"
+find_remote_localities                "" "hpx\.find_remote_localities.*"
 find_locality                         "" "hpx\.find_locality.*"
 get_num_localities                    "" "hpx\.get_num_localities.*"
 get_num_localities_async              "" "hpx\.get_num_localities_async.*"
@@ -32,6 +33,9 @@ get_colocation_id_async               "" "hpx\.get_colocation_id_async.*"
 set_lco_event                         "" "hpx\.set_lco_event.*"
 set_lco_value                         "" "hpx\.set_lco_value.*"
 set_lco_error                         "" "hpx\.set_lco_error.*"
+
+# hpx/runtime/components/new.hpp
+new_                                  "" "hpx\.components\.new_.*"
 
 # hpx/exception.hpp
 HPX_THROW_EXCEPTION                   "" "HPX_THROW_EXCEPTION"
@@ -97,16 +101,19 @@ make_error_code                       "" "header\.hpx\.exception_hpp"
 make_success_code                     "" "header\.hpx\.exception_hpp"
 
 diagnostic_information                "" "hpx\.diagnostic_information.*"
-get_locality_id                       "" "hpx\.get_locality_id.*"
-get_error                             "" "hpx\.get_error.*"
-get_host_name                         "" "hpx\.get_host_name.*"
-get_process_id                        "" "hpx\.get_process_id.*"
-get_function_name                     "" "hpx\.get_function_name.*"
-get_file_name                         "" "hpx\.get_file_name.*"
-get_line_number                       "" "hpx\.get_line_number.*"
-get_os_thread                         "" "hpx\.get_os_thread.*"
-get_thread_id                         "" "hpx\.get_thread_id.*"
-get_thread_description                "" "hpx\.get_thread_description.*"
+get_error_locality_id                 "" "hpx\.get_error_locality_id.*"
+get_error_error                       "" "hpx\.get_error_error.*"
+get_error_host_name                   "" "hpx\.get_error_host_name.*"
+get_error_process_id                  "" "hpx\.get_error_process_id.*"
+get_error_function_name               "" "hpx\.get_error_function_name.*"
+get_error_file_name                   "" "hpx\.get_error_file_name.*"
+get_error_line_number                 "" "hpx\.get_error_line_number.*"
+get_error_os_thread                   "" "hpx\.get_error_os_thread.*"
+get_error_thread_id                   "" "hpx\.get_error_thread_id.*"
+get_error_thread_description          "" "hpx\.get_error_thread_description.*"
+get_error_backtrace                   "" "hpx\.get_error_backtrace.*"
+get_error_what                        "" "hpx\.get_error_what.*"
+get_error_env                         "" "hpx\.get_error_env.*"
 
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"

@@ -18,7 +18,7 @@
 // test failures, which is expected.
 // The bit masks in the tests below are assuming a 12 core system (with
 // hyper threading), with 2 NUMA nodes (2 sockets), 6 cores each.
-#define VERIFY_AFFINITY_MASKS
+//#define VERIFY_AFFINITY_MASKS
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_HWLOC)
@@ -51,7 +51,7 @@ namespace test
     {
         std::string option_;
         data_good_thread t[2];
-        hpx::threads::mask_type masks[2];
+        boost::uint64_t masks[2];
     };
 
 //  Test cases implemented below:

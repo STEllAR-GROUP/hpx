@@ -20,16 +20,21 @@ system and application performance.
 
           where:[br] `<agas_service>` is one of the following:
             `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
-            `change_credit_non_blocking`, `change_credit_sync`, `free`,
-            `iterate_names`, `iterate_types`, `localities`, `resolve`,
-            `resolve_gid`, `resolve_id`, `resolve_locality`, `unbind`,
-            `unbind_gid`, `unbind_name`.
+            `change_credit`, `free`, `get_component_typename`,
+            `iterate_names`, `iterate_types`, `localities`,
+            `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
+            `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
+            `route`, `unbind`, `unbind_gid`, `unbind_name`.
         ]
         [`<agas_instance>/total`
 
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
-          Currently, this value will be `root` as we do not have distributed
-          AGAS services implemented yet.
+          Currently, this value will be `locality#*`, where `*` is the locality
+          id of the locality hosting the AGAS service. Except for `<agas_service>`
+          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, and `change_credit`
+          the only value for `*` is `0` (only the primary AGAS service components
+          live on all localities, whereas all other AGAS services are available
+          on `locality#0` only).
         ]
         [None]
         [Returns the total number of invocations of the specified AGAS service
@@ -39,16 +44,21 @@ system and application performance.
 
           where:[br] `<agas_service>` is one of the following:
             `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
-            `change_credit_non_blocking`, `change_credit_sync`, `free`,
-            `iterate_names`, `iterate_types`, `localities`, `resolve`,
-            `resolve_gid`, `resolve_id`, `resolve_locality`, `unbind`,
-            `unbind_gid`, `unbind_name`.
+            `change_credit`, `free`, `get_component_typename`,
+            `iterate_names`, `iterate_types`, `localities`,
+            `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
+            `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
+            `route`, `unbind`, `unbind_gid`, `unbind_name`.
         ]
         [`<agas_instance>/total`
 
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
-          Currently, this value will be `root` as we do not have distributed
-          AGAS services implemented yet.
+          Currently, this value will be `locality#*`, where `*` is the locality
+          id of the locality hosting the AGAS service. Except for `<agas_service>`
+          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, and `change_credit`
+          the only value for `*` is `0` (only the primary AGAS service components
+          live on all localities, whereas all other AGAS services are available
+          on `locality#0` only).
         ]
         [None]
         [Returns the overall execution time of the specified AGAS service
@@ -67,7 +77,8 @@ system and application performance.
         ]
         [None]
         [Returns the number of cache events (evictions, hits, inserts, and
-         misses) in the AGAS cache of the specified locality (see `<cache_statistics>`.]
+         misses) in the AGAS cache of the specified locality (see 
+         `<cache_statistics>`.]
     ]
 ]
 
@@ -91,7 +102,7 @@ system and application performance.
          (see `<operation>`, e.g. `sent` or `received`) for the specified
          `<connection_type>`.
 
-         The performance counters for the conenction type `shmem` are available
+         The performance counters for the connection type `shmem` are available
          only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
          defined while compiling the __hpx__ core library (which is not defined
          by default). Please see __cmake_options__ for more details.]
@@ -114,7 +125,7 @@ system and application performance.
          operation for the specified `<connection_type>` the given locality
          (see `<operation>`, e.g. `sent` or `received`).
 
-         The performance counters for the conenction type `shmem` are available
+         The performance counters for the connection type `shmem` are available
          only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
          defined while compiling the __hpx__ core library (which is not defined
          by default). Please see __cmake_options__ for more details.]
@@ -136,7 +147,7 @@ system and application performance.
          e.g. `sent` or `received`, possibly compressed) for the specified
          `<connection_type>` by the given locality.
 
-         The performance counters for the conenction type `shmem` are available
+         The performance counters for the connection type `shmem` are available
          only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
          defined while compiling the __hpx__ core library (which is not defined
          by default). Please see __cmake_options__ for more details.]
@@ -158,10 +169,29 @@ system and application performance.
          for the specified `<connection_type>`on the given locality (see
          `<operation>`, e.g. `sent` or `received`).
 
-         The performance counters for the conenction type `shmem` are available
+         The performance counters for the connection type `shmem` are available
          only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
          defined while compiling the __hpx__ core library (which is not defined
          by default). Please see __cmake_options__ for more details.]
+    ]
+    [   [`/parcels/count/routed`
+        ]
+        [`locality#*/total`
+
+          where:[br] `*` is the locality id of the locality the number of
+          routed parcels should be queried for. The locality id is a (zero
+          based) number identifying the locality.
+        ]
+        [None]
+        [Returns the overall number of routed (outbound) parcels transferred
+         by the given locality.
+
+         Routed parcels are those which cannot directly be delivered to its
+         destination as the local AGAS is not able to resolve the destination
+         address. In this case a parcel is sent to the AGAS service component
+         which is responsible for creating the destination GID (and is
+         responsible for resolving the destination address). This AGAS service
+         component will deiver the parcel to its final target.]
     ]
     [   [`/parcels/count/<connection_type>/<operation>`
 
@@ -180,8 +210,13 @@ system and application performance.
          `<connection_type>` by the given locality (see `<operation>`, e.g.
          `sent` or `received`).
 
-         The performance counters for the conenction type `shmem` are available
-         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         The performance counters for the connection type `shmem` are available
+         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.
+
+         The performance counters for the connection type `ibverbs` are available
+         only if the compile time constant `HPX_USE_PARCELPORT_IBVERBS` was
          defined while compiling the __hpx__ core library (which is not defined
          by default). Please see __cmake_options__ for more details.]
     ]
@@ -203,15 +238,21 @@ system and application performance.
          the specified `<connection_type>` by the given locality (see
          `<operation>`, e.g. `sent` or `received`).
 
-         The performance counters for the conenction type `shmem` are available
-         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         The performance counters for the connection type `shmem` are available
+         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.
+
+         The performance counters for the connection type `ibverbs` are available
+         only if the compile time constant `HPX_USE_PARCELPORT_IBVERBS` was
          defined while compiling the __hpx__ core library (which is not defined
          by default). Please see __cmake_options__ for more details.]
     ]
     [   [`/parcelport/count/<connection_type>/<cache_statistics>`
 
           where:[br] `<cache_statistics>` is one of the following:
-          `cache-insertions`, `cache-evictions`, `cache-hits`, `cache-misses`[br]
+          `cache-insertions`, `cache-evictions`, `cache-hits`, `cache-misses`,
+          `cache-misses`[br]
           `<connection_type>` is one of the following: `tcp`, `shmem`
         ]
         [`locality#*/total`
@@ -221,13 +262,18 @@ system and application performance.
           identifying the locality.
         ]
         [None]
-        [Returns the overall number cache events (evictions, hits, inserts, and
-         misses) for the connection cache of the given connection type on the
-         given locality (see `<cache_statistics>`, e.g. `cache-insertions`,
-         `cache-evictions`, `cache-hits`, or `cache-misses`).
+        [Returns the overall number cache events (evictions, hits, inserts,
+         misses, andreclaims) for the connection cache of the given connection 
+         type on the given locality (see `<cache_statistics>`, e.g. `cache-insertions`,
+         `cache-evictions`, `cache-hits`, `cache-misses`, or `cache-reclaims`).
 
-         The performance counters for the conenction type `shmem` are available
-         only if the compile time constant `HPX_USE_SHMEM_PARCELPORT` was
+         The performance counters for the connection type `shmem` are available
+         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default). Please see __cmake_options__ for more details.
+
+         The performance counters for the connection type `ibverbs` are available
+         only if the compile time constant `HPX_USE_PARCELPORT_IBVERBS` was
          defined while compiling the __hpx__ core library (which is not defined
          by default). Please see __cmake_options__ for more details.]
     ]
@@ -611,6 +657,43 @@ system and application performance.
         [Any parameter will be interpreted as the time interval (in
          milliseconds) at which the underlying counter should be queried. If
          no value is specified, the counter will assume `1000` \[ms\] as the default.]
+    ]
+]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[table Performance Counters for Elementary Arithmetic Operations
+    [[Counter Type] [Counter Instance Formatting] [Parameters] [Description]]
+    [   [`/arithmetics/add`]
+        [None]
+        [Returns the sum calculated based on the values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         two other full performance counter names which are queried whenever
+         this counter is accessed.]
+    ]
+    [   [`/arithmetics/subtract`]
+        [None]
+        [Returns the difference calculated based on the values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         two other full performance counter names which are queried whenever
+         this counter is accessed.]
+    ]
+    [   [`/arithmetics/multiply`]
+        [None]
+        [Returns the product calculated based on the values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         two other full performance counter names which are queried whenever
+         this counter is accessed.]
+    ]
+    [   [`/arithmetics/divide`]
+        [None]
+        [Returns the result of division of the values queried from the
+         underlying counters (the ones specified as the parameters).]
+        [The parameter will be interpreted as a comma separated list of
+         two other full performance counter names which are queried whenever
+         this counter is accessed.]
     ]
 ]
 

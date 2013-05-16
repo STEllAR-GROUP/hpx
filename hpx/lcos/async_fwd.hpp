@@ -36,7 +36,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid);
+        > const & /*act*/, naming::id_type const& gid);
 }
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
@@ -71,7 +71,7 @@ namespace hpx
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg));
+        > const & /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg));
 }
 
 #undef N

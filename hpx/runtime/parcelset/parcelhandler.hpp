@@ -66,6 +66,12 @@ namespace hpx { namespace parcelset
 
         void rethrow_exception();
 
+        //
+        typedef std::pair<naming::locality, std::string> handler_key_type;
+        typedef std::map<
+            handler_key_type, boost::shared_ptr<policies::message_handler> >
+        message_handler_map;
+
     public:
         typedef parcelport::read_handler_type read_handler_type;
         typedef parcelport::write_handler_type write_handler_type;
@@ -94,6 +100,9 @@ namespace hpx { namespace parcelset
 
         /// \brief Stop all parcelports associated with this parcelhandler
         void stop(bool blocking = true);
+
+        /// \ brief flush all parcel buffers
+        void flush_buffers(bool stop_buffering = false);
 
         /// \brief Allow access to AGAS resolver instance.
         ///
@@ -348,11 +357,22 @@ namespace hpx { namespace parcelset
 
         void enable_alternative_parcelports()
         {
-            use_alternative_parcelports_ = true;
+            use_alternative_parcelports_.store(true);
+        }
+
+        void disable_alternative_parcelports()
+        {
+            use_alternative_parcelports_.store(false);
         }
 
         /// Return the reference to an existing io_service
         util::io_service_pool* get_thread_pool(char const* name);
+
+        ///////////////////////////////////////////////////////////////////////
+        policies::message_handler* get_message_handler(char const* action,
+            char const* message_handler_type, std::size_t num_messages,
+             std::size_t interval, naming::locality const& loc,
+             connection_type t, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         // Performance counter data
@@ -362,6 +382,9 @@ namespace hpx { namespace parcelset
 
         // number of messages sent
         std::size_t get_message_send_count(connection_type, bool) const;
+
+        // number of parcels routed
+        boost::int64_t get_parcel_routed_count(bool);
 
         // number of parcels received
         std::size_t get_parcel_receive_count(connection_type, bool) const;
@@ -408,7 +431,7 @@ namespace hpx { namespace parcelset
 
         std::size_t get_outgoing_queue_length(bool reset) const;
 
-        connection_type find_appropriate_connection_type(naming::locality dest);
+        connection_type find_appropriate_connection_type(naming::locality const& dest);
 
         void register_counter_types(connection_type pp_type);
 
@@ -428,14 +451,20 @@ namespace hpx { namespace parcelset
         /// queue of incoming parcels
         boost::shared_ptr<parcelhandler_queue_base> parcels_;
 
-        /// Anyexception thrown earlier on one of the ASIO threads is stored here
+        /// Any exception thrown earlier on one of the ASIO threads is stored here
         mutex_type mtx_;
         boost::exception_ptr exception_;
 
         /// Allow to use alternative parcel-ports (this is enabled only after
         /// the runtime systems of all localities are guaranteed to have
         /// reached a certain state).
-        bool use_alternative_parcelports_;
+        boost::atomic<bool> use_alternative_parcelports_;
+
+        /// Store message handlers for actions
+        message_handler_map handlers_;
+
+        /// Count number of (outbound) parcels routed
+        boost::atomic<boost::int64_t> count_routed_;
     };
 }}
 

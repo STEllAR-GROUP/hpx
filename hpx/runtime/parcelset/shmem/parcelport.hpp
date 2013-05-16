@@ -79,6 +79,24 @@ namespace hpx { namespace parcelset { namespace shmem
         /// \endcode
         void put_parcel(parcel const & p, write_handler_type f);
 
+        /// Queues a list of parcels for transmission to another locality
+        ///
+        /// \note The function put_parcels() is asynchronous, the provided
+        /// functions or function objects get invoked on completion of the send
+        /// operation or on any error.
+        ///
+        /// \param parcels  [in] A reference to the list of parcels to send.
+        /// \param handlers [in] A list of function objects to be invoked on
+        ///                 successful completion or on errors. The signature of
+        ///                 these function objects is expected to be:
+        ///
+        /// \code
+        ///      void handler(boost::system::error_code const& err,
+        ///                   std::size_t bytes_written);
+        /// \endcode
+        void put_parcels(std::vector<parcel> const & parcels,
+            std::vector<write_handler_type> const& handlers);
+
         /// Cache specific functionality
         void remove_from_connection_cache(naming::locality const& loc)
         {
@@ -98,6 +116,19 @@ namespace hpx { namespace parcelset { namespace shmem
         boost::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type t, bool reset);
 
+        /// support enable_shared_from_this
+        boost::shared_ptr<parcelport> shared_from_this()
+        {
+            return boost::static_pointer_cast<parcelport>(
+                parcelset::parcelport::shared_from_this());
+        }
+
+        boost::shared_ptr<parcelport const> shared_from_this() const
+        {
+            return boost::static_pointer_cast<parcelport const>(
+                parcelset::parcelport::shared_from_this());
+        }
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
@@ -116,6 +147,15 @@ namespace hpx { namespace parcelset { namespace shmem
         /// \brief Retrieve a new connection
         parcelport_connection_ptr get_connection(naming::locality const& l, 
             error_code& ec = throws);
+
+        parcelport_connection_ptr create_connection(naming::locality const& l,
+            error_code& ec = throws);
+
+        void send_parcels_or_reclaim_connection(naming::locality const& locality_id,
+            parcelport_connection_ptr const& client_connection);
+        void retry_sending_parcels(naming::locality const& locality_id);
+        void get_connection_and_send_parcels(naming::locality const& locality_id, 
+            naming::gid_type const& parcel_id);
 
     private:
         /// The pool of io_service objects used to perform asynchronous operations.

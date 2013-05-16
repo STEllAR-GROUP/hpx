@@ -19,13 +19,26 @@ namespace hpx { namespace applier
     bool bind_gid(naming::gid_type const& gid_, naming::address const& addr,
         error_code& ec)
     {
-        return get_applier().get_agas_client().bind(gid_, addr, ec);
+        applier* appl = get_applier_ptr();
+        if (0 == appl) {
+            HPX_THROWS_IF(ec, invalid_status, "applier::bind_gid",
+                "applier is not valid");
+            return false;
+        }
+        return appl->get_agas_client().bind(gid_, addr, ec);
     }
 
     void unbind_gid(naming::gid_type const& gid_, error_code& ec)
     {
         if (gid_) {
-            get_applier().get_agas_client().unbind(gid_, ec);
+            applier* appl = get_applier_ptr();
+            if (0 == appl) {
+                HPX_THROWS_IF(ec, invalid_status, "applier::unbind_gid",
+                    "applier is not valid");
+            }
+            else {
+                appl->get_agas_client().unbind(gid_, ec);
+            }
         }
         else {
             HPX_THROWS_IF(ec, bad_parameter, "applier::unbind_gid",
@@ -36,13 +49,26 @@ namespace hpx { namespace applier
     bool bind_range(naming::gid_type const& gid, std::size_t count,
         naming::address const& addr, std::size_t offset, error_code& ec)
     {
-        return get_applier().get_agas_client().bind_range(gid, count, addr, offset, ec);
+        applier* appl = get_applier_ptr();
+        if (0 == appl) {
+            HPX_THROWS_IF(ec, invalid_status, "applier::bind_range",
+                "applier is not valid");
+            return false;
+        }
+        return appl->get_agas_client().bind_range(gid, count, addr, offset, ec);
     }
 
     void unbind_range(naming::gid_type const& gid, std::size_t count,
         error_code& ec)
     {
-        get_applier().get_agas_client().unbind_range(gid, count, ec);
+        applier* appl = get_applier_ptr();
+        if (0 == appl) {
+            HPX_THROWS_IF(ec, invalid_status, "applier::unbind_range",
+                "applier is not valid");
+        }
+        else {
+            appl->get_agas_client().unbind_range(gid, count, ec);
+        }
     }
 }}
 

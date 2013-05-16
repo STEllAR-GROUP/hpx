@@ -10,26 +10,26 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
 
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
-#include <boost/fusion/include/value_at.hpp>
-#include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/include/make_vector.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 #include <boost/fusion/include/at_c.hpp>
+#include <boost/fusion/include/value_at.hpp>
 
 // The number of types that the request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 13
+#define HPX_AGAS_REQUEST_SUBTYPES 14
 
 namespace hpx { namespace agas
 {
@@ -49,7 +49,7 @@ struct request
 
     request()
         : mc(invalid_request)
-        , data(boost::fusion::make_vector())
+        , data(util::make_tuple())
     {}
 
     request(
@@ -59,7 +59,7 @@ struct request
       , boost::int64_t count_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(lower_, upper_, count_))
+      , data(util::make_tuple(lower_, upper_, count_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -70,7 +70,7 @@ struct request
       , boost::uint64_t count_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(gid_, count_))
+      , data(util::make_tuple(gid_, count_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -82,7 +82,7 @@ struct request
       , gva const& gva_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(gid_, gva_))
+      , data(util::make_tuple(gid_, gva_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -92,7 +92,7 @@ struct request
       , naming::gid_type const& gid_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(gid_))
+      , data(util::make_tuple(gid_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -104,7 +104,7 @@ struct request
       , boost::uint32_t num_threads_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(locality_, count_, num_threads_))
+      , data(util::make_tuple(locality_, count_, num_threads_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -114,7 +114,7 @@ struct request
       , naming::locality const& locality_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(locality_))
+      , data(util::make_tuple(locality_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -124,22 +124,10 @@ struct request
       , components::component_type ctype_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(ctype_))
+      , data(util::make_tuple(ctype_))
     {
         // TODO: verification of namespace_action_code
     }
-
-/*
-    request(
-        namespace_action_code type_
-      , boost::int32_t ctype_
-        )
-      : mc(type_)
-      , data(boost::fusion::make_vector(ctype_))
-    {
-        // TODO: verification of namespace_action_code
-    }
-*/
 
     request(
         namespace_action_code type_
@@ -147,7 +135,7 @@ struct request
       , boost::uint32_t prefix_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(name_, prefix_))
+      , data(util::make_tuple(name_, prefix_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -158,7 +146,7 @@ struct request
       , naming::gid_type const& gid_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(name_, gid_))
+      , data(util::make_tuple(name_, gid_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -168,7 +156,7 @@ struct request
       , std::string const& name_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(name_))
+      , data(util::make_tuple(name_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -178,7 +166,7 @@ struct request
       , iterate_names_function_type const& f_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(f_))
+      , data(util::make_tuple(f_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -188,7 +176,17 @@ struct request
       , iterate_types_function_type const& f_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(f_))
+      , data(util::make_tuple(f_))
+    {
+        // TODO: verification of namespace_action_code
+    }
+
+    request(
+        namespace_action_code type_
+      , parcelset::parcel const& p
+        )
+      : mc(type_)
+      , data(util::make_tuple(p))
     {
         // TODO: verification of namespace_action_code
     }
@@ -197,7 +195,7 @@ struct request
         namespace_action_code type_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector())
+      , data(util::make_tuple())
     {
         // TODO: verification of namespace_action_code
     }
@@ -284,23 +282,32 @@ struct request
         return get_data<subtype_iterate_types_function, 0>(ec);
     }
 
+    parcelset::parcel get_parcel(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_parcel, 0>(ec);
+    }
+
     naming::locality get_locality(
         error_code& ec = throws
         ) const
     { // {{{
-        naming::locality l;
+        switch (data.which())
+        {
+            case subtype_locality_count:
+                return get_data<subtype_locality_count, 0>(ec);
 
-        // Don't let the first attempt throw.
-        error_code first_try(lightweight);
-        l = get_data<subtype_locality_count, 0>(first_try);
+            case subtype_locality:
+                return get_data<subtype_locality, 0>(ec);
 
-        // If the first try failed, check again.
-        if (first_try)
-            l = get_data<subtype_locality, 0>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return l;
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "request::get_locality",
+                    "invalid operation for request type");
+                return naming::locality();
+            }
+        }
     } // }}}
 
     naming::gid_type get_gid(
@@ -327,7 +334,7 @@ struct request
                     "invalid operation for request type");
                 return naming::invalid_gid;
             }
-        };
+        }
     } // }}}
 
     naming::gid_type get_lower_bound(
@@ -405,6 +412,7 @@ struct request
       , subtype_iterate_names_function  = 0xa
       , subtype_iterate_types_function  = 0xb
       , subtype_void                    = 0xc
+      , subtype_parcel                  = 0xd
       // update HPX_AGAS_REQUEST_SUBTYPES above if you add more entries
     };
 
@@ -414,31 +422,31 @@ struct request
     typedef boost::variant<
         // 0x0
         // primary_ns_change_credit
-        boost::fusion::vector3<
+        util::tuple<
             naming::gid_type // lower
           , naming::gid_type // upper
           , boost::int64_t   // credit
         >
         // 0x1
         // primary_ns_unbind_gid
-      , boost::fusion::vector2<
+      , util::tuple<
             naming::gid_type // gid
           , boost::uint64_t  // count
         >
         // 0x2
         // primary_ns_bind_gid
-      , boost::fusion::vector2<
+      , util::tuple<
             naming::gid_type // gid
           , gva              // resolved address
         >
         // 0x3
         // primary_ns_resolve_gid
-      , boost::fusion::vector1<
+      , util::tuple<
             naming::gid_type // gid
         >
         // 0x4
         // primary_ns_allocate
-      , boost::fusion::vector3<
+      , util::tuple<
             naming::locality // locality
           , boost::uint64_t  // count
           , boost::uint32_t  // num_threads
@@ -446,24 +454,24 @@ struct request
         // 0x5
         // primary_ns_free
         // primary_ns_resolve_locality
-      , boost::fusion::vector1<
+      , util::tuple<
             naming::locality // locality
         >
         // 0x6
         // component_ns_resolve_id
         // component_ns_get_component_type
-      , boost::fusion::vector1<
+      , util::tuple<
             components::component_type // ctype
         >
         // 0x7
         // component_ns_bind_prefix
-      , boost::fusion::vector2<
+      , util::tuple<
             std::string     // name
           , boost::uint32_t // prefix
         >
         // 0x8
         // symbol_ns_bind
-      , boost::fusion::vector2<
+      , util::tuple<
             std::string      // name
           , naming::gid_type // gid
         >
@@ -475,23 +483,28 @@ struct request
         // component_ns_statistics
         // primary_ns_statistics
         // symbol_ns_statistics
-      , boost::fusion::vector1<
+      , util::tuple<
             std::string // name
         >
         // 0xa
         // symbol_ns_iterate_names
-      , boost::fusion::vector1<
+      , util::tuple<
             iterate_names_function_type // f
         >
         // 0xb
         // component_ns_iterate_types
-      , boost::fusion::vector1<
+      , util::tuple<
             iterate_types_function_type // f
         >
         // 0xc
         // primary_ns_localities
         // primary_ns_resolved_localities
-      , boost::fusion::vector0<
+      , util::tuple<
+        >
+        // 0xd
+        // primary_ns_route
+      , util::tuple<
+            parcelset::parcel
         >
     > data_type;
 

@@ -54,26 +54,10 @@ namespace bfs { namespace server
         void reset();
 
         // action definitions
-        typedef hpx::actions::action3<
-            concurrent_bgl_graph, graph_init,
-            std::size_t, std::size_t,
-                std::vector<std::pair<std::size_t, std::size_t> > const&,
-            &concurrent_bgl_graph::init
-        > init_action;
-
-        typedef hpx::actions::result_action1<
-            concurrent_bgl_graph, double, graph_bfs, std::size_t,
-            &concurrent_bgl_graph::bfs
-        > bfs_action;
-
-        typedef hpx::actions::result_action0<
-            concurrent_bgl_graph, std::vector<std::size_t>, graph_get_parents,
-            &concurrent_bgl_graph::get_parents
-        > get_parents_action;
-
-        typedef hpx::actions::action0<
-            concurrent_bgl_graph, graph_reset, &concurrent_bgl_graph::reset
-        > reset_action;
+        HPX_DEFINE_COMPONENT_ACTION(concurrent_bgl_graph, init);
+        HPX_DEFINE_COMPONENT_ACTION(concurrent_bgl_graph, bfs);
+        HPX_DEFINE_COMPONENT_ACTION(concurrent_bgl_graph, get_parents);
+        HPX_DEFINE_COMPONENT_ACTION(concurrent_bgl_graph, reset);
 
     private:
         std::size_t idx_;

@@ -14,6 +14,17 @@ namespace hpx { namespace agas { namespace stubs
 void primary_namespace::service_non_blocking(
     naming::id_type const& gid
   , request const& req
+  , HPX_STD_FUNCTION<void(boost::system::error_code const&, std::size_t)> const& f
+  , threads::thread_priority priority
+    )
+{
+    typedef server_type::service_action action_type;
+    hpx::apply_p_cb<action_type>(gid, priority, f, req);
+}
+
+void primary_namespace::service_non_blocking(
+    naming::id_type const& gid
+  , request const& req
   , threads::thread_priority priority
     )
 {

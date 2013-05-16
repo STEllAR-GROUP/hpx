@@ -42,16 +42,9 @@ std::size_t thread_affinity_worker(std::size_t desired)
     {
         // extract the desired affinity mask
         hpx::threads::topology const& t = hpx::get_runtime().get_topology();
-        std::size_t desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
+        hpx::threads::mask_type desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
 
-        std::size_t idx = 0;
-        for (std::size_t i = 0; i < sizeof(std::size_t) * CHAR_BIT; ++i)
-        {
-            if (desired_mask & (static_cast<std::size_t>(1) << i))
-            {
-                idx = i;
-            }
-        }
+        std::size_t idx = hpx::threads::find_first(desired_mask);
 
 #if defined(HPX_HAVE_HWLOC)
         hwloc_topology_t topo;
@@ -76,32 +69,6 @@ std::size_t thread_affinity_worker(std::size_t desired)
 
         hwloc_bitmap_free(cpuset);
         hwloc_topology_destroy(topo);
-#elif defined(BOOST_WINDOWS)
-        DWORD_PTR current_mask = SetThreadAffinityMask(GetCurrentThread(), DWORD_PTR(-1));
-        SetThreadAffinityMask(GetCurrentThread(), current_mask);
-        HPX_TEST_EQ(desired_mask, current_mask);
-#elif defined(__linux__)
-        cpu_set_t cpu;
-        CPU_ZERO(&cpu);
-
-#  if defined(HPX_HAVE_PTHREAD_SETAFFINITY_NP)
-        if (0 == pthread_getaffinity_np(pthread_self(), sizeof(cpu), &cpu))
-#  else
-        if (0 == sched_getaffinity(syscall(SYS_gettid), sizeof(cpu), &cpu))
-#  endif
-        {
-            std::size_t num_cores = hpx::threads::hardware_concurrency();
-            for (std::size_t i = 0; i < num_cores; ++i)
-            {
-                // only the bit for the current core should be set
-                if (i == current) {
-                    HPX_TEST(CPU_ISSET(i, &cpu));
-                }
-                else {
-                    HPX_TEST(!CPU_ISSET(i, &cpu));
-                }
-            }
-        }
 #endif
         return desired;
     }
@@ -171,8 +138,6 @@ HPX_PLAIN_ACTION(thread_affinity_foreman, thread_affinity_foreman_action)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& /*vm*/)
 {
-    HPX_TEST_LTE(hpx::threads::hardware_concurrency(), sizeof(std::size_t) * CHAR_BIT);
-    HPX_TEST_LTE(hpx::threads::hardware_concurrency(), sizeof(unsigned long) * CHAR_BIT);
     {
         // Get a list of all available localities.
         std::vector<hpx::naming::id_type> localities =

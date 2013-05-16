@@ -145,7 +145,7 @@ int hpx_main(
 
         bool verbose = vm.count("verbose") != 0;
 
-        boost::uint32_t num_localities = hpx::find_all_localities().size();
+        boost::uint32_t num_localities = hpx::get_num_localities();
 
         hpx::id_type const here = hpx::find_here();
 
@@ -182,7 +182,7 @@ int main(
 
     cmdline.add_options()
         ( "test-runs"
-        , value<boost::uint64_t>()->default_value(10000)
+        , value<boost::uint64_t>()->default_value(1000)
         , "number of times to repeat the test (0 == infinite)")
 
         ( "verbose"

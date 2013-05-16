@@ -32,6 +32,9 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/parse_command_line.hpp>
 
+#include <hpx/plugins/message_handler_factory_base.hpp>
+#include <hpx/plugins/binary_filter_factory_base.hpp>
+
 #include <algorithm>
 #include <set>
 
@@ -85,8 +88,8 @@ HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::get_config_action,
     get_config_action)
 HPX_REGISTER_ACTION(
-    hpx::components::server::runtime_support::insert_agas_cache_entry_action,
-    insert_agas_cache_entry_action)
+    hpx::components::server::runtime_support::update_agas_cache_entry_action,
+    update_agas_cache_entry_action)
 HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::garbage_collect_action,
     garbage_collect_action)
@@ -109,12 +112,9 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime_support::runtime_support(
-            naming::gid_type const& prefix, naming::resolver_client& agas_client,
-            applier::applier& applier)
+    runtime_support::runtime_support()
       : stopped_(false), terminated_(false)
-    {
-    }
+    {}
 
     ///////////////////////////////////////////////////////////////////////////
     // return, whether more than one instance of the given component can be
@@ -157,19 +157,19 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of invalid/unknown type: "
                  << components::get_component_type_name(type);
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
-                "runtime_support::create_component",
+                "runtime_support::bulk_create_components",
                 hpx::util::osstream_get_string(strm));
             return ids;
         }
 
+        l.unlock();
+
     // create new component instance
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
-        {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
-            ids.reserve(count);
-            for (std::size_t i = 0; i < count; ++i)
-                ids.push_back(factory->create());
-        }
+
+        ids.reserve(count);
+        for (std::size_t i = 0; i < count; ++i)
+            ids.push_back(factory->create());
 
     // log result if requested
         if (LHPX_ENABLED(info))
@@ -434,10 +434,11 @@ namespace hpx { namespace components { namespace server
 
     /// \brief Insert the given name mapping into the AGAS cache of this
     ///        locality.
-    void runtime_support::insert_agas_cache_entry(naming::gid_type const& gid,
-        naming::address const& addr)
+    void runtime_support::update_agas_cache_entry(naming::gid_type const& gid,
+        naming::address const& addr, boost::uint64_t count,
+        boost::uint64_t offset)
     {
-        naming::get_agas_client().insert_cache_entry(gid, addr);
+        naming::get_agas_client().update_cache_entry(gid, addr, count, offset);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -481,6 +482,8 @@ namespace hpx { namespace components { namespace server
             // now delete the entry
             components_.erase(curr);
         }
+
+        plugins_.clear();       // unload all plugins
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -602,11 +605,13 @@ namespace hpx { namespace components { namespace server
                 get_runtime().get_agas_client();
 
             error_code ec(lightweight);
-            agas_client.unbind(appl.get_runtime_support_raw_gid(), ec);
-            agas_client.unbind(appl.get_memory_raw_gid(), ec);
 
             // Drop the locality from the partition table.
             agas_client.unregister_locality(appl.here(), ec);
+
+            // unregister fixed components
+            agas_client.unbind(appl.get_runtime_support_raw_gid(), ec);
+            agas_client.unbind(appl.get_memory_raw_gid(), ec);
 
             if (remove_from_remote_caches)
                 remove_here_from_connection_cache();
@@ -647,10 +652,13 @@ namespace hpx { namespace components { namespace server
     bool runtime_support::load_components()
     {
         // load components now that AGAS is up
-        get_runtime().get_config().load_components();
-        return load_components(get_runtime().get_config(),
-            get_runtime().get_agas_client().local_locality(),
-            get_runtime().get_agas_client());
+        util::runtime_configuration& ini = get_runtime().get_config();
+        ini.load_components();
+
+        naming::resolver_client& client = get_runtime().get_agas_client();
+        bool result = load_components(ini, client.get_local_locality(), client);
+
+        return load_plugins(ini) && result;
     }
 
     void runtime_support::call_startup_functions(bool pre_startup)
@@ -714,6 +722,107 @@ namespace hpx { namespace components { namespace server
         {
             apply(act, id, rt->here());
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    parcelset::policies::message_handler*
+    runtime_support::create_message_handler(
+        char const* message_handler_type, char const* action,
+        parcelset::parcelport* pp, std::size_t num_messages,
+        std::size_t interval, error_code& ec)
+    {
+        // locate the factory for the requested plugin type
+        plugin_map_mutex_type::scoped_lock l(p_mtx_);
+
+        plugin_map_type::const_iterator it = plugins_.find(message_handler_type);
+        if (it == plugins_.end() || !(*it).second.first) {
+            // we don't know anything about this component
+            hpx::util::osstream strm;
+            strm << "attempt to create message handler plugin instance of "
+                    "invalid/unknown type: " << message_handler_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_message_handler",
+                hpx::util::osstream_get_string(strm));
+            return 0;
+        }
+
+        l.unlock();
+
+        // create new component instance
+        boost::shared_ptr<plugins::message_handler_factory_base> factory(
+            boost::static_pointer_cast<plugins::message_handler_factory_base>(
+                (*it).second.first));
+
+        parcelset::policies::message_handler* mh = factory->create(action,
+            pp, num_messages, interval);
+        if (0 == mh) {
+            hpx::util::osstream strm;
+            strm << "couldn't to create message handler plugin of type: " 
+                 << message_handler_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_message_handler",
+                hpx::util::osstream_get_string(strm));
+            return 0;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // log result if requested
+        if (LHPX_ENABLED(info))
+        {
+            LRT_(info) << "successfully created message handler plugin of type: "
+                       << message_handler_type;
+        }
+        return mh;
+    }
+
+    util::binary_filter* runtime_support::create_binary_filter(
+        char const* binary_filter_type, bool compress, error_code& ec)
+    {
+        // locate the factory for the requested plugin type
+        plugin_map_mutex_type::scoped_lock l(p_mtx_);
+
+        plugin_map_type::const_iterator it = plugins_.find(binary_filter_type);
+        if (it == plugins_.end() || !(*it).second.first) {
+            // we don't know anything about this component
+            hpx::util::osstream strm;
+            strm << "attempt to create binary filter plugin instance of "
+                    "invalid/unknown type: " << binary_filter_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_binary_filter",
+                hpx::util::osstream_get_string(strm));
+            return 0;
+        }
+
+        l.unlock();
+
+        // create new component instance
+        boost::shared_ptr<plugins::binary_filter_factory_base> factory(
+            boost::static_pointer_cast<plugins::binary_filter_factory_base>(
+                (*it).second.first));
+
+        util::binary_filter* bf = factory->create(compress);
+        if (0 == bf) {
+            hpx::util::osstream strm;
+            strm << "couldn't to create binary filter plugin of type: " 
+                 << binary_filter_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_binary_filter",
+                hpx::util::osstream_get_string(strm));
+            return 0;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // log result if requested
+        if (LHPX_ENABLED(info))
+        {
+            LRT_(info) << "successfully binary filter handler plugin of type: "
+                       << binary_filter_type;
+        }
+        return bf;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -831,7 +940,7 @@ namespace hpx { namespace components { namespace server
             }
             catch (hpx::exception const& e) {
                 LRT_(warning) << "caught exception while loading " << instance
-                              << ", " << get_hpx_category().message(e.get_error())
+                              << ", " << e.get_error_code().get_message()
                               << ": " << e.what();
                 if (e.get_error_code().value() == hpx::commandline_option_error)
                 {
@@ -849,8 +958,8 @@ namespace hpx { namespace components { namespace server
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
                 boost::program_options::variables_map vm;
 
-                util::parse_commandline(ini, options, unknown_cmd_line, vm, 
-                    std::size_t(-1), util::rethrow_on_error, 
+                util::parse_commandline(ini, options, unknown_cmd_line, vm,
+                    std::size_t(-1), util::rethrow_on_error,
                     get_runtime_mode_from_name(runtime_mode));
             }
 
@@ -997,7 +1106,8 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
-            if (0 == component_ini || "0" == component_ini->get_entry("no_factory", "0")) {
+            if (0 == component_ini || "0" == component_ini->get_entry("no_factory", "0"))
+            {
                 // get the factory
                 hpx::util::plugin::plugin_factory<component_factory_base> pf (d,
                     "factory");
@@ -1038,17 +1148,164 @@ namespace hpx { namespace components { namespace server
                 }
 
                 LRT_(info) << "dynamic loading succeeded: " << lib.string()
-                           << ": " << instance << ": "
-                           << components::get_component_type_name(t);
+                            << ": " << instance << ": "
+                            << components::get_component_type_name(t);
             }
 
             // make sure startup/shutdown registration is called once for each
-            // module
+            // module, same for plugins
             if (startup_handled.find(d.get_name()) == startup_handled.end()) {
                 startup_handled.insert(d.get_name());
                 load_commandline_options(d, options);
                 load_startup_shutdown_functions(d);
             }
+        }
+        catch (hpx::exception const&) {
+            throw;
+        }
+        catch (std::logic_error const& e) {
+            LRT_(warning) << "dynamic loading failed: " << lib.string()
+                          << ": " << instance << ": " << e.what();
+            return false;
+        }
+        catch (std::exception const& e) {
+            LRT_(warning) << "dynamic loading failed: " << lib.string()
+                          << ": " << instance << ": " << e.what();
+            return false;
+        }
+        return true;    // component got loaded
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Load all components from the ini files found in the configuration
+    bool runtime_support::load_plugins(util::section& ini)
+    {
+        // load all components as described in the configuration information
+        if (!ini.has_section("hpx.plugins")) {
+            LRT_(info) << "No plugins found/loaded.";
+            return true;     // no plugins to load
+        }
+
+        // each shared library containing components may have an ini section
+        //
+        // # mandatory section describing the component module
+        // [hpx.plugins.instance_name]
+        //  name = ...           # the name of this component module
+        //  path = ...           # the path where to find this component module
+        //  enabled = false      # optional (default is assumed to be true)
+        //
+        // # optional section defining additional properties for this module
+        // [hpx.plugins.instance_name.settings]
+        //  key = value
+        //
+        util::section* sec = ini.get_section("hpx.plugins");
+        if (NULL == sec)
+        {
+            LRT_(error) << "NULL section found";
+            return false;     // something bad happened
+        }
+
+        util::section::section_map const& s = (*sec).get_sections();
+        typedef util::section::section_map::const_iterator iterator;
+        iterator end = s.end();
+        for (iterator i = s.begin (); i != end; ++i)
+        {
+            namespace fs = boost::filesystem;
+
+            // the section name is the instance name of the component
+            util::section const& sect = i->second;
+            std::string instance (sect.get_name());
+            std::string component;
+
+            if (i->second.has_entry("name"))
+                component = sect.get_entry("name");
+            else
+                component = instance;
+
+            bool isenabled = true;
+            if (sect.has_entry("enabled")) {
+                std::string tmp = sect.get_entry("enabled");
+                boost::algorithm::to_lower (tmp);
+                if (tmp == "no" || tmp == "false" || tmp == "0") {
+                    LRT_(info) << "plugin factory disabled: " << instance;
+                    isenabled = false;     // this component has been disabled
+                }
+            }
+
+            fs::path lib;
+            try {
+                if (sect.has_entry("path"))
+                    lib = hpx::util::create_path(sect.get_entry("path"));
+                else
+                    lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
+
+                // first, try using the path as the full path to the library
+                if (!load_plugin(ini, instance, component, lib, isenabled))
+                {
+                    // build path to component to load
+                    std::string libname(HPX_MAKE_DLL_STRING(component));
+                    lib /= hpx::util::create_path(libname);
+                    if (!load_plugin(ini, instance, component, lib, isenabled))
+                    {
+                        continue;   // next please :-P
+                    }
+                }
+            }
+            catch (hpx::exception const& e) {
+                LRT_(warning) << "caught exception while loading " << instance
+                              << ", " << e.get_error_code().get_message()
+                              << ": " << e.what();
+            }
+        } // for
+        return true;
+    }
+
+    bool runtime_support::load_plugin(util::section& ini,
+        std::string const& instance, std::string const& plugin,
+        boost::filesystem::path lib, bool isenabled)
+    {
+        namespace fs = boost::filesystem;
+        if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
+            return false;
+
+        try {
+            // get the handle of the library
+            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(plugin));
+
+            // initialize the factory instance using the preferences from the
+            // ini files
+            util::section const* glob_ini = NULL;
+            if (ini.has_section("settings"))
+                glob_ini = ini.get_section("settings");
+
+            util::section const* plugin_ini = NULL;
+            std::string plugin_section("hpx.plugins." + instance);
+            if (ini.has_section(plugin_section))
+                plugin_ini = ini.get_section(plugin_section);
+
+            if (0 != plugin_ini && "0" != plugin_ini->get_entry("no_factory", "0"))
+                return false;
+
+            // get the factory
+            hpx::util::plugin::plugin_factory<plugins::plugin_factory_base>
+                pf (d, "factory");
+
+            // create the component factory object, if not disabled
+            boost::shared_ptr<plugins::plugin_factory_base> factory (
+                pf.create(instance, glob_ini, plugin_ini, isenabled));
+
+            // store component factory and module for later use
+            plugin_factory_type data(factory, d, isenabled);
+            std::pair<plugin_map_type::iterator, bool> p =
+                plugins_.insert(plugin_map_type::value_type(instance, data));
+
+            if (!p.second) {
+                LRT_(fatal) << "duplicate plugin type: " << instance;
+                return false;   // duplicate component id?
+            }
+
+            LRT_(info) << "dynamic loading succeeded: " << lib.string()
+                        << ": " << instance;
         }
         catch (hpx::exception const&) {
             throw;

@@ -42,9 +42,9 @@ set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuratio
 ################################################################################
 project(hpx CXX C)
 
-set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 0)
-set(HPX_PATCH_LEVEL   0)
+set(HPX_MAJOR_VERSION 0)
+set(HPX_MINOR_VERSION 9)
+set(HPX_PATCH_LEVEL   6)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
@@ -176,6 +176,15 @@ else()
 endif()
 
 ###############################################################################
+# Configure upper limit for number of threads, this is important for XeonPhi
+###############################################################################
+hpx_option(HPX_USE_MORE_THAN_64_THREADS BOOL
+    "HPX applications will use more than 64 threads (default: OFF)." OFF ADVANCED)
+if(HPX_USE_MORE_THAN_64_THREADS)
+  hpx_add_definitions(-DHPX_HAVE_MORE_THAN_64_THREADS)
+endif()
+
+###############################################################################
 # Configure compression and other plugins
 ###############################################################################
 add_hpx_pseudo_target(plugins)
@@ -190,6 +199,9 @@ endif()
 if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
   hpx_add_definitions(-DHPX_HAVE_COMPRESSION_ZLIB)
 endif()
+
+# Parcel coalescing is used by the main HPX library, enable it always
+hpx_add_definitions(-DHPX_HAVE_PARCEL_COALESCING)
 
 ###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -212,7 +224,6 @@ hpx_add_definitions(-DHPX_LOG_NO_TSS)
 hpx_add_definitions(-DHPX_LOG_NO_TS)
 hpx_add_definitions(-DHPX_PLUGIN_SYMBOLS_PREFIX=hpx)
 hpx_add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
-hpx_add_definitions(-DBOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 
 # disable usage of std::atomics in lockfree
 if(${BOOST_MINOR_VERSION} LESS 53)
@@ -253,6 +264,14 @@ if(CMAKE_Fortran_COMPILER)
     hpx_info("gfortran_config" "Compiler reports compatibility with gfortran version ${GFORTRAN_VERSION_STR}")
   endif()
 endif()
+
+# If we are compiling with an intel compiler, we need to override the default
+# boost compiler config in order to have proper C++11 detection for more
+# recent intel compiler versions (>12.0)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    hpx_add_definitions(-DBOOST_COMPILER_CONFIG="${CMAKE_SOURCE_DIR}/hpx/config/boost/compiler/intel.hpp")
+endif()
+
 
 hpx_include(CompilerFlags)
 
@@ -301,6 +320,19 @@ if(${BOOST_MINOR_VERSION} GREATER 51)
     hpx_add_definitions(-DHPX_HAVE_PARCELPORT_SHMEM)
   endif()
 endif()
+
+################################################################################
+# Decide whether to use rdma based ibverbs parcelport
+################################################################################
+find_package(HPX_Ibverbs)
+find_package(HPX_Rdmacm)
+if(IBVERBS_FOUND AND RDMACM_FOUND)
+  hpx_option(HPX_USE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
+  if(HPX_USE_PARCELPORT_IBVERBS)
+    hpx_add_definitions(-DHPX_HAVE_PARCELPORT_IBVERBS)
+  endif()
+endif()
+
 
 ################################################################################
 # Logging configuration
@@ -390,12 +422,10 @@ if(HPX_THREAD_DEBUG_INFO)
   hpx_add_definitions(-DHPX_THREAD_MAINTAIN_PARENT_REFERENCE=1)
   hpx_add_definitions(-DHPX_THREAD_MAINTAIN_PHASE_INFORMATION=1)
   hpx_add_definitions(-DHPX_THREAD_MAINTAIN_DESCRIPTION=1)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_TARGET_ADDRESS=1)
 else()
   hpx_add_definitions(-DHPX_THREAD_MAINTAIN_PARENT_REFERENCE=0)
   hpx_add_definitions(-DHPX_THREAD_MAINTAIN_PHASE_INFORMATION=0)
   hpx_add_definitions(-DHPX_THREAD_MAINTAIN_DESCRIPTION=0)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_TARGET_ADDRESS=0)
 endif()
 
 hpx_option(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL "Enable thread stack back trace being captured on suspension (default: OFF)" OFF ADVANCED)
@@ -406,6 +436,20 @@ if(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   hpx_add_definitions(-DHPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH=${HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
 else()
   hpx_add_definitions(-DHPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION=0)
+endif()
+
+hpx_option(HPX_THREAD_MAINTAIN_TARGET_ADDRESS BOOL "Enable storing target address in thread for NUMA awareness (default: OFF)" OFF ADVANCED)
+if(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
+  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_TARGET_ADDRESS=1)
+else()
+  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_TARGET_ADDRESS=0)
+endif()
+
+hpx_option(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME BOOL "Enable collecting queue wait times for threads (default: ON)" ON ADVANCED)
+if(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME)
+  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_QUEUE_WAITTIME=1)
+else()
+  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_QUEUE_WAITTIME=0)
 endif()
 
 ################################################################################
@@ -687,6 +731,7 @@ if(MSVC)
     hpx_option(HPX_HAVE_CXX11_DECLTYPE BOOL "Compiler supports C++11 decltype keyword (default: ON)." ON ADVANCED)
     if(HPX_HAVE_CXX11_DECLTYPE)
       hpx_add_definitions(-DHPX_HAVE_CXX11_DECLTYPE)
+      hpx_add_definitions(-DBOOST_RESULT_OF_USE_DECLTYPE)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_UNIQUE_PTR BOOL "Compiler supports C++11 std::unique_ptr (default: ON)." ON ADVANCED)
@@ -760,6 +805,44 @@ if(MSVC)
   hpx_add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
   hpx_add_definitions(-DHPX_COROUTINE_USE_FIBERS)
   hpx_add_definitions(-DPSAPI_VERSION=1)
+
+  hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
+             "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
+
+  if(HPX_GOOGLE_PERFTOOLS)
+    find_package(HPX_GooglePerftools)
+    if(GOOGLE_PERFTOOLS_FOUND)
+      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
+      hpx_include_sys_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+      hpx_link_sys_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
+      hpx_add_definitions(-DHPX_GOOGLE_PERFTOOLS)
+    endif()
+  endif()
+
+  if(NOT HPX_MALLOC)
+    set(HPX_MALLOC "TCMalloc")
+  endif()
+  find_package(HPX_TCMalloc)
+
+  if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC" AND NOT TCMALLOC_FOUND)
+    hpx_warn("malloc" "tcmalloc allocator not found.")
+  endif()
+
+  set(hpx_MALLOC_LIBRARY "")
+
+  if(NOT "${HPX_MALLOC}" MATCHES "system|System|SYSTEM")
+    if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
+      hpx_info("malloc" "Using tcmalloc allocator.")
+      set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
+      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
+      set(HPX_LINK_FLAG_TARGET_PROPERTIES "/INCLUDE:__tcmalloc")
+      hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
+      hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
+      hpx_add_definitions(-DHPX_TCMALLOC)
+    endif()
+  else()
+    hpx_info("malloc" "Using system allocator.")
+  endif()
 
 ################################################################################
 # GCC-compatible compiler configuration
@@ -837,7 +920,8 @@ else()
 
     hpx_check_for_cxx11_auto(HPX_HAVE_CXX11_AUTO DEFINITIONS HPX_HAVE_CXX11_AUTO)
 
-    hpx_check_for_cxx11_decltype(HPX_HAVE_CXX11_DECLTYPE DEFINITIONS HPX_HAVE_CXX11_DECLTYPE)
+    hpx_check_for_cxx11_decltype(HPX_HAVE_CXX11_DECLTYPE
+      DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
 
     hpx_check_for_cxx11_std_unique_ptr(HPX_HAVE_CXX11_STD_UNIQUE_PTR
       DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
@@ -873,6 +957,8 @@ else()
     hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX C Fortran)
     hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX)
   endif()
+
+
 
   # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
   hpx_use_flag_if_available(-Werror=vla LANGUAGES CXX C)
@@ -943,6 +1029,40 @@ else()
   ##############################################################################
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     hpx_use_flag_if_available(-Wno-cast-align)
+  endif()
+
+  ##############################################################################
+  # ICPC-only configuration
+  ##############################################################################
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    # Disable the following warnings:
+    # #1170: invalid redeclaration of nested class
+    # #858: type qualifier on return type is meaningless
+    # #1098: the qualifier on this friend declaration is ignored
+    # #488: template parameter not used in declaring the parameter type
+    hpx_use_flag_if_available(-wd1170)
+    hpx_use_flag_if_available(-wd858)
+    hpx_use_flag_if_available(-wd1098)
+    hpx_use_flag_if_available(-wd488)
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
+       "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
+       "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+      ## FIXME: figure out which flags can be used with HPX
+      #hpx_use_flag_if_available(-opt-calloc)
+      #hpx_use_flag_if_available(-inline-calloc)
+      #hpx_use_flag_if_available(-ip)
+      #hpx_use_flag_if_available(-ipo)
+      #hpx_use_flag_if_available(-opt-class-analysis)
+      #hpx_use_flag_if_available(-opt-multi-version-aggressive)
+      #hpx_use_flag_if_available(-xHost)
+      hpx_use_flag_if_available(-fno-alias)
+      hpx_use_flag_if_available(-fbuiltin)
+      hpx_use_flag_if_available(-finline)
+      #hpx_use_flag_if_available(-fma)
+      #hpx_use_flag_if_available(-fno-implicit-inline-templates)
+      #hpx_use_flag_if_available(-fno-implicit-templates)
+      #hpx_use_flag_if_available(-ftls-model=initial-exec)
+    endif()
   endif()
 
   ##############################################################################
@@ -1150,6 +1270,7 @@ if(HPX_BUILD_TESTS)
   add_custom_command(TARGET tests POST_BUILD
     COMMAND ${CMAKE_SOURCE_DIR}/python/scripts/hpx_run_tests.py
     ARGS --prefix=${CMAKE_BINARY_DIR}/bin/
+         --args=\${HPX_TEST_ARGUMENTS}
          --log-stdout
          --no-exit-code
          ${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
@@ -1429,7 +1550,14 @@ foreach(library ${BOOST_LIBRARIES})
     "${boost_library_info}    CACHE FILEPATH \"Boost ${library} shared library.\")\n")
 endforeach()
 
-get_directory_property(external_definitions DEFINITIONS)
+get_directory_property(definitions DEFINITIONS)
+
+set(external_definitions "")
+
+foreach(definition ${definitions})
+    string(REGEX REPLACE "\"" "\\\\\\\\\\\\\\\\\"" definition ${definition})
+    set(external_definitions "${external_definitions} ${definition}")
+endforeach()
 
 set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 
@@ -1443,6 +1571,11 @@ if(HPX_NO_INSTALL)
   set(external_cmake_path ${hpx_SOURCE_DIR}/cmake)
 else()
   set(external_cmake_path ${HPX_PREFIX}/share/hpx-${HPX_VERSION}/cmake)
+endif()
+
+set(hpx_link_flag_target_properties "")
+if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
+  set(hpx_link_flag_target_properties "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
 endif()
 
 configure_file(${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in

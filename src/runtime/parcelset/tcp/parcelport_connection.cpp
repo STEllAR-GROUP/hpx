@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,6 +25,9 @@ namespace hpx { namespace parcelset { namespace tcp
       : socket_(io_service), out_priority_(0), out_size_(0), out_data_size_(0),
         there_(locality_id), parcels_sent_(parcels_sent),
         archive_flags_(boost::archive::no_header)
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+      , state_(state_initialized)
+#endif
     {
 #ifdef BOOST_BIG_ENDIAN
         std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
@@ -43,6 +46,10 @@ namespace hpx { namespace parcelset { namespace tcp
     ///////////////////////////////////////////////////////////////////////////
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+        state_ = state_set_parcel;
+#endif
+
 #if defined(HPX_DEBUG)
         // make sure that all parcels go to the same locality
         BOOST_FOREACH(parcel const& p, pv)

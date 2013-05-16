@@ -12,12 +12,11 @@
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/protect.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
-#include <hpx/traits/supports_result_of.hpp>
+#include <hpx/traits/is_callable.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
@@ -26,6 +25,7 @@
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
+#include <boost/type_traits/is_void.hpp>
 
 namespace hpx { namespace detail
 {
@@ -43,6 +43,21 @@ namespace hpx { namespace detail
         typedef lcos::future<typename ResultOf::type> type;
     };
 #endif
+
+    template <typename F>
+    BOOST_FORCEINLINE typename detail::create_future<F()>::type
+    call_sync(BOOST_FWD_REF(F) f, boost::mpl::false_)
+    {
+        return make_ready_future(f());
+    }
+
+    template <typename F>
+    BOOST_FORCEINLINE typename detail::create_future<F()>::type
+    call_sync(BOOST_FWD_REF(F) f, boost::mpl::true_)
+    {
+        f();
+        return make_ready_future();
+    }
 }}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -60,31 +75,31 @@ namespace hpx
     // Launch the given function or function object asynchronously and return a
     // future allowing to synchronize with the returned result.
     template <typename F>
-    typename detail::create_future<F()>::type
-    async (threads::executor sched, BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
-    {
-        typedef typename boost::result_of<F()>::type result_type;
-        lcos::local::futures_factory<result_type()> p(
-            sched, boost::forward<F>(f));
-        if (policy & launch::async)
-            p.apply();
-        return p.get_future();
-    }
-
-    template <typename F>
-    typename detail::create_future<F()>::type
+    typename boost::lazy_enable_if<
+        traits::is_callable<F>
+      , detail::create_future<F()>
+    >::type
     async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
+        if (policy == launch::sync)
+        {
+            typedef typename boost::is_void<result_type>::type predicate;
+            return detail::call_sync(boost::forward<F>(f), predicate());
+        }
+
         lcos::local::futures_factory<result_type()> p(
             boost::forward<F>(f));
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply();
         return p.get_future();
     }
 
     template <typename F>
-    typename detail::create_future<F()>::type
+    typename boost::lazy_enable_if<
+        traits::is_callable<F>
+      , detail::create_future<F()>
+    >::type
     async (BOOST_FWD_REF(F) f)
     {
         return async(launch::all, boost::forward<F>(f));
@@ -104,33 +119,8 @@ namespace hpx
 #define HPX_UTIL_BOUND_FUNCTION_ASYNC(Z, N, D)                                \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
     typename boost::lazy_enable_if<                                           \
-        traits::supports_result_of<F>                                         \
-      , detail::create_future<                                                \
-            typename boost::remove_reference<F>::type(                        \
-                BOOST_PP_ENUM_PARAMS(N, A)                                    \
-            )                                                                 \
-        >                                                                     \
-    >::type                                                                   \
-    async (threads::executor sched, BOOST_SCOPED_ENUM(launch) policy,         \
-        BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                       \
-    {                                                                         \
-        typedef typename boost::result_of<                                    \
-            F(BOOST_PP_ENUM_PARAMS(N, A))                                     \
-        >::type result_type;                                                  \
-        lcos::local::futures_factory<result_type()> p(sched,                  \
-            util::bind(boost::forward<F>(f),                                  \
-                HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
-        if (policy & launch::async) p.apply();                                \
-        return p.get_future();                                                \
-    }                                                                         \
-    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::lazy_enable_if<                                           \
-        traits::supports_result_of<F>                                         \
-      , detail::create_future<                                                \
-            typename boost::remove_reference<F>::type(                        \
-                BOOST_PP_ENUM_PARAMS(N, A)                                    \
-            )                                                                 \
-        >                                                                     \
+        traits::is_callable<F>                                                \
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>                  \
     >::type                                                                   \
     async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,              \
         HPX_ENUM_FWD_ARGS(N, A, a))                                           \
@@ -138,20 +128,22 @@ namespace hpx
         typedef typename boost::result_of<                                    \
             F(BOOST_PP_ENUM_PARAMS(N, A))                                     \
         >::type result_type;                                                  \
+        if (policy == launch::sync) {                                         \
+            typedef typename boost::is_void<result_type>::type predicate;     \
+            return detail::call_sync(util::bind(boost::forward<F>(f),         \
+                HPX_ENUM_FORWARD_ARGS(N, A, a)), predicate());                \
+        }                                                                     \
         lcos::local::futures_factory<result_type()> p(                        \
             util::bind(boost::forward<F>(f),                                  \
                 HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
-        if (policy & launch::async) p.apply();                                \
+        if (detail::has_async_policy(policy))                                 \
+            p.apply();                                                        \
         return p.get_future();                                                \
     }                                                                         \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
     typename boost::lazy_enable_if<                                           \
-        traits::supports_result_of<F>                                         \
-      , detail::create_future<                                                \
-            typename boost::remove_reference<F>::type(                        \
-                BOOST_PP_ENUM_PARAMS(N, A)                                    \
-            )                                                                 \
-        >                                                                     \
+        traits::is_callable<F>                                                \
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>                  \
     >::type                                                                   \
     async (BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                    \
     {                                                                         \
@@ -203,27 +195,6 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
     lcos::future<R>
-    async(threads::executor sched, BOOST_SCOPED_ENUM(launch) policy,
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_function, N)<
-                R
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, T)
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            >
-        ))) bound)
-    {
-        lcos::local::futures_factory<R()> p(sched, boost::move(bound));
-        if (policy & launch::async)
-            p.apply();
-        return p.get_future();
-    }
-
-    template <
-        typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    lcos::future<R>
     async(BOOST_SCOPED_ENUM(launch) policy,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_function, N)<
@@ -233,8 +204,13 @@ namespace hpx
             >
         ))) bound)
     {
+        if (policy == launch::sync) {
+            typedef typename boost::is_void<R>::type predicate;
+            return detail::call_sync(boost::move(bound), predicate());
+        }
+
         lcos::local::futures_factory<R()> p(boost::move(bound));
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply();
         return p.get_future();
     }
@@ -266,30 +242,6 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     lcos::future<R>                                                           \
-    async(threads::executor sched, BOOST_SCOPED_ENUM(launch) policy,          \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_function, NN)<              \
-                R                                                             \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, T)               \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        lcos::local::futures_factory<R()> p(sched,                            \
-            util::bind(                                                       \
-                util::protect(boost::move(bound))                             \
-              , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
-        if (policy & launch::async) p.apply();                                \
-        return p.get_future();                                                \
-    }                                                                         \
-    template <                                                                \
-        typename R                                                            \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename T)              \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    lcos::future<R>                                                           \
     async(BOOST_SCOPED_ENUM(launch) policy,                                   \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_function, NN)<              \
@@ -300,11 +252,18 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
+        if (policy == launch::sync) {                                         \
+            typedef typename boost::is_void<R>::type predicate;               \
+            return detail::call_sync(util::bind(                              \
+                util::protect(boost::move(bound))                             \
+              , HPX_ENUM_FORWARD_ARGS(N, A, a)), predicate());                \
+        }                                                                     \
         lcos::local::futures_factory<R()> p(                                  \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
               , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
-        if (policy & launch::async) p.apply();                                \
+        if (detail::has_async_policy(policy))                                 \
+            p.apply();                                                        \
         return p.get_future();                                                \
     }                                                                         \
     template <                                                                \
@@ -348,31 +307,6 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
     lcos::future<R>
-    async(threads::executor sched, BOOST_SCOPED_ENUM(launch) policy,
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_member_function, N)<
-                R
-              , C
-              BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-                    BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), T)
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            >
-        ))) bound)
-    {
-        lcos::local::futures_factory<R()> p(sched, boost::move(bound));
-        if (policy & launch::async)
-            p.apply();
-        return p.get_future();
-    }
-
-    template <
-        typename R
-      , typename C
-      BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-            BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), typename T)
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    lcos::future<R>
     async(BOOST_SCOPED_ENUM(launch) policy,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_member_function, N)<
@@ -384,8 +318,13 @@ namespace hpx
             >
         ))) bound)
     {
+        if (policy == launch::sync) {
+            typedef typename boost::is_void<R>::type predicate;
+            return detail::call_sync(boost::move(bound), predicate());
+        }
+
         lcos::local::futures_factory<R()> p(boost::move(bound));
-        if (policy & launch::async)
+        if (detail::has_async_policy(policy))
             p.apply();
         return p.get_future();
     }
@@ -423,34 +362,6 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     lcos::future<R>                                                           \
-    async(threads::executor sched, BOOST_SCOPED_ENUM(launch) policy,          \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_member_function, NN)<       \
-                R                                                             \
-              , C                                                             \
-              BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                             \
-                    BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), T)                 \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        lcos::local::futures_factory<R()> p(sched,                            \
-            util::bind(                                                       \
-                util::protect(boost::move(bound))                             \
-              , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
-        if (policy & launch::async) p.apply();                                \
-        return p.get_future();                                                \
-    }                                                                         \
-    template <                                                                \
-        typename R                                                            \
-      , typename C                                                            \
-      BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                     \
-          BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), typename T)                  \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    lcos::future<R>                                                           \
     async(BOOST_SCOPED_ENUM(launch) policy,                                   \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_member_function, NN)<       \
@@ -463,11 +374,18 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
+        if (policy == launch::sync) {                                         \
+            typedef typename boost::is_void<R>::type predicate;               \
+            return detail::call_sync(util::bind(                              \
+                util::protect(boost::move(bound))                             \
+              , HPX_ENUM_FORWARD_ARGS(N, A, a)), predicate());                \
+        }                                                                     \
         lcos::local::futures_factory<R()> p(                                  \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
               , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
-        if (policy & launch::async) p.apply();                                \
+        if (detail::has_async_policy(policy))                                 \
+            p.apply();                                                        \
         return p.get_future();                                                \
     }                                                                         \
     template <                                                                \
@@ -511,28 +429,7 @@ namespace hpx
         typename F
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
-    typename detail::create_future<F()>::type
-    async(threads::executor sched, BOOST_SCOPED_ENUM(launch) policy,
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
-                F
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            >
-        ))) bound)
-    {
-        typedef typename detail::create_future<F()>::type result_type;
-        lcos::local::futures_factory<typename result_type::result_type()>
-            p(sched, boost::move(bound));
-        if (policy & launch::async)
-            p.apply();
-        return p.get_future();
-    }
-
-    template <
-        typename F
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    typename detail::create_future<F()>::type
+    typename detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
     async(BOOST_SCOPED_ENUM(launch) policy,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
@@ -541,10 +438,17 @@ namespace hpx
             >
         ))) bound)
     {
-        typedef typename detail::create_future<F()>::type result_type;
-        lcos::local::futures_factory<typename result_type::result_type()>
-            p(boost::move(bound));
-        if (policy & launch::async)
+        typedef typename boost::result_of<
+            F(BOOST_PP_ENUM_PARAMS(N, Arg))
+        >::type result_type;
+
+        if (policy == launch::sync) {
+            typedef typename boost::is_void<result_type>::type predicate;
+            return detail::call_sync(boost::move(bound), predicate());
+        }
+
+        lcos::local::futures_factory<result_type()> p(boost::move(bound));
+        if (detail::has_async_policy(policy))
             p.apply();
         return p.get_future();
     }
@@ -553,7 +457,7 @@ namespace hpx
         typename F
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
-    typename detail::create_future<F()>::type
+    typename detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
     async(
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
@@ -565,35 +469,8 @@ namespace hpx
         return async(launch::all, boost::move(bound));
     }
 
-    // define async() overloads for n-nary bound member functions
+    // define async() overloads for n-nary bound function objects
 #define HPX_UTIL_BOUND_MEMBER_FUNCTOR_ASYNC(Z, N, D)                          \
-    template <                                                                \
-        typename F                                                            \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    typename detail::create_future<                                           \
-        F(BOOST_PP_ENUM_PARAMS(N, A))                                         \
-    >::type                                                                   \
-    async(threads::executor sched, BOOST_SCOPED_ENUM(launch) policy,          \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_functor, NN)<               \
-                F                                                             \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        typedef typename detail::create_future<                               \
-                F(BOOST_PP_ENUM_PARAMS(N, A))                                 \
-            >::type result_type;                                              \
-        lcos::local::futures_factory<typename result_type::result_type()> p(  \
-            util::bind(sched,                                                 \
-                util::protect(boost::move(bound))                             \
-              , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
-        if (policy & launch::async) p.apply();                                \
-        return p.get_future();                                                \
-    }                                                                         \
     template <                                                                \
         typename F                                                            \
       BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
@@ -611,14 +488,21 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
-        typedef typename detail::create_future<                               \
-                F(BOOST_PP_ENUM_PARAMS(N, A))                                 \
-            >::type result_type;                                              \
-        lcos::local::futures_factory<typename result_type::result_type()> p(  \
+        typedef typename boost::result_of<                                    \
+            F(BOOST_PP_ENUM_PARAMS(N, A))                                     \
+        >::type result_type;                                                  \
+        if (policy == launch::sync) {                                         \
+            typedef typename boost::is_void<result_type>::type predicate;     \
+            return detail::call_sync(util::bind(                              \
+                util::protect(boost::move(bound))                             \
+              , HPX_ENUM_FORWARD_ARGS(N, A, a)), predicate());                \
+        }                                                                     \
+        lcos::local::futures_factory<result_type()> p(                        \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
               , HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
-        if (policy & launch::async) p.apply();                                \
+        if (detail::has_async_policy(policy))                                 \
+            p.apply();                                                        \
         return p.get_future();                                                \
     }                                                                         \
     template <                                                                \

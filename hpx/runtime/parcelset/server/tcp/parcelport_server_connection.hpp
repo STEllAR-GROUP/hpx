@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011 Katelyn Kufahl
 //  Copyright (c) 2011 Bryce Lelbach
 //
@@ -62,9 +62,11 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         ~parcelport_connection()
         {
             // gracefully and portably shutdown the socket
-            boost::system::error_code ec;
-            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-            socket_.close(ec);    // close the socket to give it back to the OS
+            if (socket_.is_open()) {
+                boost::system::error_code ec;
+                socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                socket_.close(ec);    // close the socket to give it back to the OS
+            }
         }
 
         /// Get the socket associated with the parcelport_connection.
@@ -174,18 +176,15 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 performance_counters::parcels::data_point receive_data = 
                     receive_data_;
 
+                // add parcel data to incoming parcel queue
+                boost::uint64_t inbound_data_size = in_data_size_;
+                decode_message(parcelport_, data, inbound_data_size, receive_data);
+
                 ack_ = true;
                 boost::asio::async_write(socket_,
                     boost::asio::buffer(&ack_, sizeof(ack_)),
                     boost::bind(f, shared_from_this(), 
                         boost::asio::placeholders::error, handler));
-
-                // add parcel data to incoming parcel queue
-                boost::uint64_t inbound_data_size = in_data_size_;
-                decode_message(parcelport_, data, inbound_data_size, receive_data);
-
-                // Inform caller that data has been received ok.
-                boost::get<0>(handler)(e);
             }
         }
 
@@ -193,6 +192,9 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         void handle_write_ack(boost::system::error_code const& e,
             boost::tuple<Handler> handler)
         {
+            // Inform caller that data has been received ok.
+            boost::get<0>(handler)(e);
+
             // Issue a read operation to read the next parcel.
             async_read(boost::get<0>(handler));
         }

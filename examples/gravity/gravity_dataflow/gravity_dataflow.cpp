@@ -49,17 +49,6 @@ using boost::program_options::options_description;
 using boost::program_options::value;
 
 using hpx::naming::id_type;
-using hpx::actions::plain_result_action1;
-using hpx::actions::plain_result_action2;
-using hpx::actions::plain_result_action3;
-using hpx::actions::plain_result_action4;
-using hpx::actions::plain_result_action5;
-using hpx::actions::plain_result_action6;
-using hpx::actions::plain_action1;
-using hpx::actions::plain_action2;
-using hpx::actions::plain_action3;
-using hpx::actions::plain_action4;
-using hpx::actions::plain_action6;
 using hpx::async;
 using hpx::lcos::future;
 using hpx::lcos::wait;
@@ -92,45 +81,11 @@ void calc_force(Vector_container pts,uint64_t k,uint64_t t,uint64_t i);
 Vector_container identity(Vector_container pts);
 ///////////////////////////////////////////////////////////////////////////////
 //Action Declarations
-typedef plain_result_action3<       //!!//
-     Vector_container, //return type
-     Vector_container, //argument
-     uint64_t,               //!!
-     uint64_t,               //!!
-     &calc                    //!!
- > calc_action;              //!!
-HPX_REGISTER_PLAIN_ACTION(calc_action); //!!//
-
-typedef plain_action4<
-     Vector_container, //argument
-     uint64_t,         // argument
-     uint64_t,         // argument
-     uint64_t,         // argument
-     &calc_force       // function
- > calc_force_action;
-HPX_REGISTER_PLAIN_ACTION(calc_force_action);
-
-typedef plain_result_action4<
-     Vector_container, //return type
-     Vector_container, //argument
-     config_f const &,
-     uint64_t,
-     uint64_t,
-     &calc_move
- > move_action;
-HPX_REGISTER_PLAIN_ACTION(move_action);
-
+HPX_PLAIN_ACTION(calc);
+HPX_PLAIN_ACTION(calc_force);
+HPX_PLAIN_ACTION(move);
 HPX_PLAIN_ACTION(identity, id_action);
-
-//typedef plain_result_action6<
-typedef plain_action4<
-     Vector_container, //argument
-     config_f const &,
-     uint64_t,
-     uint64_t,
-     &printval
- > print_action;
-HPX_REGISTER_PLAIN_ACTION(print_action);
+HPX_PLAIN_ACTION(print);
 
 ///////////////////////////////////////////////////////////////////////////////
 //Global Variables

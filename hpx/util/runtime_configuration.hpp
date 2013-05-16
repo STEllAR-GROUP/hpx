@@ -64,8 +64,10 @@ namespace hpx { namespace util
         std::size_t get_shmem_data_buffer_cache_size() const;
 
         // Get AGAS client-side local cache size
-        std::size_t get_agas_local_cache_size() const;
-        std::size_t get_agas_local_cache_size_per_thread() const;
+        std::size_t get_agas_local_cache_size(
+            std::size_t dflt = HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE) const;
+        std::size_t get_agas_local_cache_size_per_thread(
+            std::size_t dflt = HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) const;
 
         bool get_agas_caching_mode() const;
 
@@ -85,6 +87,9 @@ namespace hpx { namespace util
 
         // Can be set to true if we want to use the ITT notify tools API.
         bool get_itt_notify_mode() const;
+
+        // Enable lock detection during suspension
+        bool enable_lock_detection() const;
 
         // Returns the number of OS threads this locality is running.
         std::size_t get_os_thread_count() const;

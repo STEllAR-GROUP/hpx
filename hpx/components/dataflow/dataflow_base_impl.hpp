@@ -56,7 +56,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             naming::id_type id;
             ar & id;
-            gid_promise = lcos::make_future(id);
+            gid_promise = lcos::make_ready_future(id);
         }
 
         template <typename Archive>

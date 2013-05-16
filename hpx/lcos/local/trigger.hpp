@@ -92,7 +92,7 @@ namespace hpx { namespace lcos { namespace local
         {
             typename mutex_type::scoped_lock l(mtx_);
 
-            if (promise_.is_ready())
+            if (promise_.ready())
             {
                 // segment already filled, logic error
                 HPX_THROWS_IF(ec, bad_parameter, "trigger::set",

@@ -40,6 +40,7 @@ set(doxygen_dependencies
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_non_const_action.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/new.hpp
     ${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp)
 
 foreach(doxygen_input ${doxygen_dependencies})
@@ -111,8 +112,8 @@ hpx_quickbook_to_html(hpx
                 --stringparam toc.max.depth 4
                 --stringparam generate.section.toc.level 4
                 --stringparam boost.image.src ${image}
-                --stringparam boost.image.w 322 
-                --stringparam boost.image.h 101
+                --stringparam boost.image.w 458
+                --stringparam boost.image.h 112
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}

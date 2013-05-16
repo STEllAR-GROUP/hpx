@@ -25,7 +25,6 @@ using hpx::components::memory_block;
 using hpx::components::access_memory_block;
 
 using hpx::actions::manage_object_action;
-using hpx::actions::plain_action4;
 
 using hpx::applier::applier;
 using hpx::applier::get_applier;
@@ -92,11 +91,9 @@ struct quicksort_parallel
 
     static void call(id_type prefix, id_type d, std::size_t begin,
                      std::size_t end);
-
-    typedef plain_action4<
-        id_type, id_type, std::size_t, std::size_t, &quicksort_parallel::call
-    > action_type;
 };
+
+HPX_PLAIN_ACTION(quicksort_parallel<int>::call, quicksort_int_action);
 
 template <typename T>
 std::size_t quicksort_parallel<T>::sort_count(0);
@@ -117,7 +114,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
         // always spawn the larger part in a new thread
         if (2 * middle_idx < end - begin)
         {
-            future<void> n = async<action_type>(prefix, prefix, d,
+            future<void> n = async<quicksort_int_action>(prefix, prefix, d,
                 (std::max)(begin + 1, middle_idx), end);
 
             call(prefix, d, begin, middle_idx);
@@ -126,7 +123,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
 
         else
         {
-            future<void> n = async<action_type>(prefix, prefix, d,
+            future<void> n = async<quicksort_int_action>(prefix, prefix, d,
                 begin, middle_idx);
 
             call(prefix, d, (std::max)(begin + 1, middle_idx), end);
@@ -134,9 +131,6 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
         }
     }
 }
-
-typedef quicksort_parallel<int>::action_type quicksort_int_action;
-HPX_REGISTER_PLAIN_ACTION(quicksort_int_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
@@ -187,7 +181,7 @@ int hpx_main(variables_map& vm)
         std::cout << "parallel quicksort" << std::endl;
 
         t.restart();
-        future<void> n = async<quicksort_parallel<int>::action_type>(
+        future<void> n = async<quicksort_int_action>(
             prefix, prefix, mb.get_gid(), 0, elements);
         ::hpx::lcos::wait(n);
         elapsed = t.elapsed();
