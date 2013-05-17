@@ -6,10 +6,6 @@
 #if !defined(HPX_SERVER_TUPLES_WAREHOUSE_MAY_04_2013_0801PM)
 #define HPX_SERVER_TUPLES_WAREHOUSE_MAY_04_2013_0801PM
 
-#include <vector>
-#include <boost/unordered_map.hpp>
-#include <hpx/util/storage/tuple.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/components/server/locking_hook.hpp>
@@ -17,6 +13,12 @@
 #include <hpx/util/storage/tuple.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/local/mutex.hpp>
+
+#include <vector>
+#include <algorithm>
+
+#include <boost/unordered_map.hpp>
+#include <hpx/util/storage/tuple.hpp>
 
 // #define TS_DEBUG
 
@@ -138,7 +140,7 @@ namespace examples { namespace server
                     // update index set
                     if(matched_indices.empty()) // not found yet
                     {
-                        for_each(found_range.first,
+                        std::for_each(found_range.first,
                             found_range.second,
                             [&matched_indices](pair_type& p)
                         { matched_indices.insert(p.second); }
@@ -148,7 +150,7 @@ namespace examples { namespace server
                     {
                         matched_indices_type new_matched_indices;
 
-                        for_each(found_range.first,
+                        std::for_each(found_range.first,
                             found_range.second,
                             [&new_matched_indices, &matched_indices](pair_type& p)
                         { if(matched_indices.find(p.second) !=  
@@ -228,10 +230,11 @@ namespace examples { namespace server
 
                 for(unsigned int pos = 0; pos < tuple_fields_.size(); ++pos)
                 {
-                    tuple_field_container::index_field_map_iterator_type it;
-                    it = tuple_fields_[pos].index_field_map_.find(id);
+                    tuple_field_container& tf = tuple_fields_[pos];
+                    tuple_field_container::index_field_map_iterator_type it = 
+                        tf.index_field_map_.find(id);
 
-                    if( it == tuple_fields_[pos].index_field_map_.end() ) // not found
+                    if( it == tf.index_field_map_.end() ) // not found
                     {
                         break;
                     }
@@ -240,8 +243,8 @@ namespace examples { namespace server
                         result.push_back((it->second)->first); // append the any object
 
                         // erase the record
-                        tuple_fields_[pos].field_index_map_.erase(it->second);
-                        tuple_fields_[pos].index_field_map_.erase(it);
+                        tf.field_index_map_.erase(it->second);
+                        tf.index_field_map_.erase(it);
                     }
                 }
 
