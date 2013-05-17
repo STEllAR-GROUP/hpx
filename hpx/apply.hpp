@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -63,7 +63,7 @@ namespace hpx
 
 #define HPX_UTIL_BOUND_FUNCTION_APPLY(Z, N, D)                                \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::enable_if<                                                \
+    typename boost::lazy_enable_if<                                           \
         traits::is_callable<F>                                                \
       , bool                                                                  \
     >::type                                                                   \
@@ -75,8 +75,8 @@ namespace hpx
         return false;                                                         \
     }                                                                         \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::enable_if<                                                \
-        traits::supports_result_of<F>                                         \
+    typename boost::lazy_enable_if<                                           \
+        traits::is_callable<F>                                                \
       , bool                                                                  \
     >::type                                                                   \
     apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                     \

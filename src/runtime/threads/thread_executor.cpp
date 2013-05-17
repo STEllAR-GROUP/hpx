@@ -9,9 +9,11 @@
 #include <hpx/lcos/local/once.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
+#include <boost/atomic.hpp>
+
 namespace hpx { namespace threads
 {
-    executor& executor::default_executor()
+    scheduled_executor& scheduled_executor::default_executor()
     {
         typedef util::reinitializable_static<
             executors::default_executor, tag
@@ -19,6 +21,15 @@ namespace hpx { namespace threads
 
         static_type instance;
         return instance.get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    boost::atomic<scheduled_executor*> default_executor_instance;
+
+    scheduled_executor* default_executor()
+    {
+        scheduled_executor* retval = default_executor_instance.load();
+        return retval ? retval : &scheduled_executor::default_executor();
     }
 }}
 

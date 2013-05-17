@@ -52,7 +52,7 @@ namespace hpx { namespace  threads
         std::size_t initial_allocation(detail::manage_executor* proxy,
             error_code& ec = throws);
 
-        // Detach the executor identified with the given cookie
+        // Detach the executor identified by the given cookie
         void detach(std::size_t cookie, error_code& ec = throws);
 
         // Return the singleton resource manager instance

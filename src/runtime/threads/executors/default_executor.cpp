@@ -21,19 +21,6 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             threads::thread_stacksize_default, ec);
     }
 
-    // Like add(), except that if the attempt to add the function would
-    // cause the caller to block in add, try_add would instead do
-    // nothing and return false.
-    bool default_executor::try_add(HPX_STD_FUNCTION<void()> f,
-        char const* desc, threads::thread_state_enum initial_state,
-        bool run_now, error_code& ec)
-    {
-        register_thread_nullary(boost::move(f), desc, initial_state, run_now,
-            threads::thread_priority_normal, std::size_t(-1),
-            threads::thread_stacksize_default, ec);
-        return true;      // this function will never block
-    }
-
     // Schedule given function for execution in this executor no sooner
     // than time abs_time. This call never blocks, and may violate
     // bounds on the executor's queue size.
@@ -75,7 +62,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Return an estimate of the number of waiting tasks.
-    std::size_t default_executor::num_pending_tasks(error_code& ec) const
+    std::size_t default_executor::num_pending_closures(error_code& ec) const
     {
         return get_thread_count() - get_thread_count(terminated);
     }

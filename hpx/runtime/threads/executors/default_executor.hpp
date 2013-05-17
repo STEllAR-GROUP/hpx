@@ -15,20 +15,13 @@ namespace hpx { namespace threads { namespace executors
     namespace detail
     {
         class HPX_EXPORT default_executor 
-          : public threads::detail::executor_base
+          : public threads::detail::scheduled_executor_base
         {
         public:
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
             void add(HPX_STD_FUNCTION<void()> f, char const* description,
-                threads::thread_state_enum initial_state, bool run_now,
-                error_code& ec);
-
-            // Like add(), except that if the attempt to add the function would
-            // cause the caller to block in add, try_add would instead do
-            // nothing and return false.
-            bool try_add(HPX_STD_FUNCTION<void()> f, char const* description,
                 threads::thread_state_enum initial_state, bool run_now,
                 error_code& ec);
 
@@ -47,15 +40,15 @@ namespace hpx { namespace threads { namespace executors
                 error_code& ec);
 
             // Return an estimate of the number of waiting tasks.
-            std::size_t num_pending_tasks(error_code& ec) const;
+            std::size_t num_pending_closures(error_code& ec) const;
         };
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct default_executor : public executor
+    struct default_executor : public scheduled_executor
     {
         default_executor()
-          : executor(new detail::default_executor())
+          : scheduled_executor(new detail::default_executor())
         {}
     };
 }}}

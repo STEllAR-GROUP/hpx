@@ -214,6 +214,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 #endif
+            std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
                 num_thread = ++curr_queue_ % queues_.size();
@@ -233,7 +234,7 @@ namespace hpx { namespace threads { namespace policies
                     run_now, queues_.size() + high_priority_queues_.size(), ec);
             }
 
-            BOOST_ASSERT(num_thread < queues_.size());
+            BOOST_ASSERT(num_thread < queue_size);
             return queues_[num_thread]->create_thread(data, initial_state,
                 run_now, num_thread, ec);
         }

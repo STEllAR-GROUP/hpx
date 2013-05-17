@@ -74,7 +74,7 @@ namespace hpx { namespace threads
         std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits)
     {
         std::size_t available = 0;
-        for (std::size_t i = 0; i < punits_.size(); ++i)
+        for (std::size_t i = 0; i != punits_.size(); ++i)
         {
             if (use_count == punits_[i].use_count_)
             {
@@ -108,7 +108,7 @@ namespace hpx { namespace threads
 
         // processing units found, inform scheduler
         std::size_t punits = 0;
-        for (std::size_t i = 0; i < available_punits.size(); ++i)
+        for (std::size_t i = 0; i != available_punits.size(); ++i)
         {
             if (available_punits[i] == punit_status::reserved)
             {
@@ -123,7 +123,7 @@ namespace hpx { namespace threads
 
         if (ec) {
             // on error, remove the already assigned virtual cores
-            for (std::size_t j = 0; j < punits; ++j)
+            for (std::size_t j = 0; j != punits; ++j)
                 proxy->remove_processing_unit(j, ec);
             return std::vector<coreids_type>();
         }

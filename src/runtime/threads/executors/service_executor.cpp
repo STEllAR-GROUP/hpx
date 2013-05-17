@@ -118,7 +118,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Return an estimate of the number of waiting tasks.
-    std::size_t service_executor::num_pending_tasks(error_code& ec) const
+    std::size_t service_executor::num_pending_closures(error_code& ec) const
     {
         return task_count_;
     }

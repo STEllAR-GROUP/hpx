@@ -86,30 +86,8 @@ namespace hpx { namespace threads
                 threads::thread_state_enum initial_state, bool run_now,
                 error_code& ec) = 0;
 
-            // Like add(), except that if the attempt to add the function would
-            // cause the caller to block in add, try_add would instead do
-            // nothing and return false.
-            virtual bool try_add(HPX_STD_FUNCTION<void()> f, char const* desc,
-                threads::thread_state_enum initial_state, bool run_now,
-                error_code& ec) = 0;
-
-            // Schedule given function for execution in this executor no sooner
-            // than time abs_time. This call never blocks, and may violate
-            // bounds on the executor's queue size.
-            virtual void add_at(boost::posix_time::ptime const& abs_time,
-                HPX_STD_FUNCTION<void()> f, char const* desc,
-                error_code& ec) = 0;
-
-            // Schedule given function for execution in this executor no sooner
-            // than time rel_time from now. This call never blocks, and may
-            // violate bounds on the executor's queue size.
-            virtual void add_after(
-                boost::posix_time::time_duration const& rel_time,
-                HPX_STD_FUNCTION<void()> f, char const* desc,
-                error_code& ec) = 0;
-
             // Return an estimate of the number of waiting closures.
-            virtual std::size_t num_pending_tasks(error_code& ec) const = 0;
+            virtual std::size_t num_pending_closures(error_code& ec) const = 0;
 
         private:
             // reference counting
@@ -129,28 +107,50 @@ namespace hpx { namespace threads
             if (0 == --p->count_)
                 delete p;
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        class scheduled_executor_base : public executor_base
+        {
+        public:
+            // Schedule given function for execution in this executor no sooner
+            // than time abs_time. This call never blocks, and may violate
+            // bounds on the executor's queue size.
+            virtual void add_at(boost::posix_time::ptime const& abs_time,
+                HPX_STD_FUNCTION<void()> f, char const* desc,
+                error_code& ec) = 0;
+
+            // Schedule given function for execution in this executor no sooner
+            // than time rel_time from now. This call never blocks, and may
+            // violate bounds on the executor's queue size.
+            virtual void add_after(
+                boost::posix_time::time_duration const& rel_time,
+                HPX_STD_FUNCTION<void()> f, char const* desc,
+                error_code& ec) = 0;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // This is equivalent to the proposed executor interface (see N3562)
+    //
+    //    class executor
+    //    {
+    //    public:
+    //        virtual ~executor_base() {}
+    //        virtual void add(function<void()> closure) = 0;
+    //        virtual size_t num_pending_closures() const = 0;
+    //    };
+    //
     class HPX_EXPORT executor
     {
-        struct tag {};
-
     protected:
         // generic executors can't be created directly
         executor(detail::executor_base* data)
           : executor_data_(data)
-        {
-        }
+        {}
 
     public:
-        executor()
-        {
-        }
-
-        ~executor()
-        {
-        }
+        // default constructor creates invalid (non-usable) executor
+        executor() {}
 
         /// Schedule the specified function for execution in this executor.
         /// Depending on the subclass implementation, this may block in some
@@ -162,57 +162,10 @@ namespace hpx { namespace threads
             executor_data_->add(f, desc, initial_state, run_now, ec);
         }
 
-        /// Like add(), except that if the attempt to add the function would
-        /// cause the caller to block in add, try_add would instead do
-        /// nothing and return false.
-        bool try_add(HPX_STD_FUNCTION<void()> f, char const* desc = 0,
-            threads::thread_state_enum initial_state = threads::pending,
-            bool run_now = true, error_code& ec = throws)
-        {
-            return executor_data_->try_add(f, desc, initial_state, run_now, ec);
-        }
-
-        /// Schedule given function for execution in this executor no sooner
-        /// than time abs_time. This call never blocks, and may violate
-        /// bounds on the executor's queue size.
-        void add_at(boost::posix_time::ptime const& abs_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
-            error_code& ec = throws)
-        {
-            executor_data_->add_at(abs_time, f, desc, ec);
-        }
-
-        template <typename Clock, typename Duration>
-        void add_at(boost::chrono::time_point<Clock, Duration> const& abs_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
-            error_code& ec = throws)
-        {
-            add_at(util::to_ptime(abs_time), f, desc, ec);
-        }
-
-        /// Schedule given function for execution in this executor no sooner
-        /// than time rel_time from now. This call never blocks, and may
-        /// violate bounds on the executor's queue size.
-        void add_after(
-            boost::posix_time::time_duration const& rel_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
-            error_code& ec = throws)
-        {
-            executor_data_->add_after(rel_time, f, desc, ec);
-        }
-
-        template <typename Rep, typename Period>
-        void add_after(boost::chrono::duration<Rep, Period> const& rel_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
-            error_code& ec = throws)
-        {
-            add_at(util::to_time_duration(rel_time), f, desc, ec);
-        }
-
         /// Return an estimate of the number of waiting closures.
-        std::size_t num_pending_tasks(error_code& ec = throws) const
+        std::size_t num_pending_closures(error_code& ec = throws) const
         {
-            return executor_data_->num_pending_tasks(ec);
+            return executor_data_->num_pending_closures(ec);
         }
 
         operator util::safe_bool<executor>::result_type() const
@@ -220,12 +173,103 @@ namespace hpx { namespace threads
             return util::safe_bool<executor>()(executor_data_.get() ? true : false);
         }
 
-        /// Return a reference to the default executor for this process.
-        static executor& default_executor();
-
-    private:
+    protected:
         boost::intrusive_ptr<detail::executor_base> executor_data_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // This is equivalent to the proposed scheduled_executor interface (see
+    // N3562)
+    //
+    //      class scheduled_executor : public executor
+    //      {
+    //      public:
+    //          virtual void add_at(chrono::system_clock::time_point abs_time,
+    //              function<void()> closure) = 0;
+    //          virtual void add_after(chrono::system_clock::duration rel_time,
+    //              function<void()> closure) = 0;
+    //      };
+    //
+    class HPX_EXPORT scheduled_executor : public executor
+    {
+    private:
+        struct tag {};
+
+    protected:
+        // generic executors can't be created directly
+        scheduled_executor(detail::scheduled_executor_base* data)
+          : executor(data)
+        {}
+
+    public:
+        // default constructor creates invalid (non-usable) executor
+        scheduled_executor() {}
+
+        /// Effects: The specified function object shall be scheduled for 
+        /// execution by the executor at some point in the future no sooner 
+        /// than the time represented by abs_time.
+        /// Synchronization: completion of closure on a particular thread 
+        /// happens before destruction of that thread’s thread-duration
+        /// variables.
+        /// Error conditions: If invoking closure throws an exception, the 
+        /// executor shall call terminate.
+        void add_at(boost::posix_time::ptime const& abs_time,
+            HPX_STD_FUNCTION<void()> closure, char const* desc = 0,
+            error_code& ec = throws)
+        {
+            boost::static_pointer_cast<detail::scheduled_executor_base>(
+                executor_data_)->add_at(abs_time, closure, desc, ec);
+        }
+
+        template <typename Clock, typename Duration>
+        void add_at(boost::chrono::time_point<Clock, Duration> const& abs_time,
+            HPX_STD_FUNCTION<void()> closure, char const* desc = 0,
+            error_code& ec = throws)
+        {
+            add_at(util::to_ptime(abs_time), closure, desc, ec);
+        }
+
+        /// Effects: The specified function object shall be scheduled for 
+        /// execution by the executor at some point in the future no sooner 
+        /// than time rel_time from now.
+        /// Synchronization: completion of closure on a particular thread 
+        /// happens before destruction of that thread’s thread-duration
+        /// variables.
+        /// Error conditions: If invoking closure throws an exception, the 
+        /// executor shall call terminate.
+        void add_after(
+            boost::posix_time::time_duration const& rel_time,
+            HPX_STD_FUNCTION<void()> closure, char const* desc = 0,
+            error_code& ec = throws)
+        {
+            boost::static_pointer_cast<detail::scheduled_executor_base>(
+                executor_data_)->add_after(rel_time, closure, desc, ec);
+        }
+
+        template <typename Rep, typename Period>
+        void add_after(boost::chrono::duration<Rep, Period> const& rel_time,
+            HPX_STD_FUNCTION<void()> closure, char const* desc = 0,
+            error_code& ec = throws)
+        {
+            add_at(util::to_time_duration(rel_time), closure, desc, ec);
+        }
+
+        /// Return a reference to the default executor for this process.
+        static scheduled_executor& default_executor();
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Returns: a non-null pointer to the default executor defined by the 
+    /// active process. If set_default_executor hasn’t been called then the 
+    /// return value is a pointer to an executor of unspecified type.
+    HPX_EXPORT scheduled_executor* default_executor();
+
+    /// Effect: the default executor of the active process is set to the given 
+    /// executor instance. 
+    /// Requires: executor shall not be null.
+    /// Synchronization: Changing and using the default executor is sequentially 
+    /// consistent.
+    HPX_EXPORT void set_default_executor(scheduled_executor* executor);
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
