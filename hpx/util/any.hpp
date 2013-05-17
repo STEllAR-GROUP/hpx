@@ -701,6 +701,7 @@ namespace hpx { namespace util
         void* object;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename IArchive_, typename OArchive_, typename Char_>
     std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
@@ -982,7 +983,7 @@ namespace hpx { namespace util
     };
     ///////////////////////////////////////////////////////////////////////////
 
-    template <typename IArchive, typename OArchive, typename Char>
+    template <typename IArchive, typename OArchive, typename Char=char>
     void swap(basic_any<IArchive, OArchive, Char>& lhs,
         basic_any<IArchive, OArchive, Char>& rhs) BOOST_NOEXCEPT
     {
@@ -1045,7 +1046,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    typedef basic_any<portable_binary_iarchive, portable_binary_oarchive> any;
+    typedef basic_any<portable_binary_iarchive, portable_binary_oarchive, char> any;
     typedef basic_any<portable_binary_iarchive, portable_binary_oarchive, wchar_t> wany;
 
     typedef basic_any<void, void, char> any_nonser;
