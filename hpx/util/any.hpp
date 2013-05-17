@@ -351,11 +351,11 @@ namespace hpx { namespace util
         {
             template <typename Archive>
             void serialize(Archive & ar, unsigned) {}
-            bool operator==(empty const&) const 
+            bool operator==(empty const&) const
             {
                 return false; // undefined
             }
-            bool operator!=(empty const&) const 
+            bool operator!=(empty const&) const
             {
                 return false; // undefined
             }
@@ -426,7 +426,7 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        explicit basic_any(T const& x)
+        basic_any(T const& x)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -457,10 +457,10 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        explicit basic_any(T&& x, 
+        basic_any(T&& x,
             typename boost::disable_if<
                 boost::is_same<
-                    basic_any, 
+                    basic_any,
                     typename boost::remove_const<
                         typename util::detail::remove_reference<T>::type
                     >::type
@@ -744,7 +744,7 @@ namespace hpx { namespace util
         }
 
         template <typename T>
-        explicit basic_any(T const& x)
+        basic_any(T const& x)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -775,10 +775,10 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        explicit basic_any(T&& x, 
+        basic_any(T&& x,
             typename boost::disable_if<
                 boost::is_same<
-                    basic_any, 
+                    basic_any,
                     typename boost::remove_const<
                         typename util::detail::remove_reference<T>::type
                     >::type
@@ -983,7 +983,7 @@ namespace hpx { namespace util
     };
     ///////////////////////////////////////////////////////////////////////////
 
-    template <typename IArchive, typename OArchive, typename Char=char>
+    template <typename IArchive, typename OArchive, typename Char>
     void swap(basic_any<IArchive, OArchive, Char>& lhs,
         basic_any<IArchive, OArchive, Char>& rhs) BOOST_NOEXCEPT
     {
