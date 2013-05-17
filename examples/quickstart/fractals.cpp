@@ -9,15 +9,15 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/include/iostream.hpp>
+#include <hpx/include/iostreams.hpp>
 
 #include <vector>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#include <EasyBMP/EasyBMP.h>
-#include <EasyBMP/EasyBMP.cpp>
+#include "EasyBMP/EasyBMP.h"
+#include "EasyBMP/EasyBMP.cpp"
 
 const int sizeY = 256;
 const int sizeX = sizeY;
@@ -75,8 +75,8 @@ int hpx_main()
             {
                 hpx::id_type const locality_id = hpx::find_here();
 
-                float x0 = (float)i * 3.5 / (float)sizeX - 2.5;
-                float y0 = (float)j * 2.0 / (float)sizeY - 1.0;
+                float x0 = (float)i * 3.5f / (float)sizeX - 2.5f;
+                float y0 = (float)j * 2.0f / (float)sizeY - 1.0f;
 
                 fractals_action temp;
                 iteration.push_back(async(temp, locality_id, x0, y0, max_iteration));
@@ -98,11 +98,11 @@ int hpx_main()
                 //total += it;
                 for (int k = 0; k < 2; k++)
                 {
-                RGBApixel pix;
-                pix.Blue = (it*255)/max_iteration;
-                pix.Red = (it*255)/max_iteration;
-                pix.Green = (it*255)/max_iteration;
-                SetImage.SetPixel(i * 2 + k,j,pix);
+                    RGBApixel pix;
+                    pix.Blue = (it*255)/max_iteration;
+                    pix.Red = (it*255)/max_iteration;
+                    pix.Green = (it*255)/max_iteration;
+                    SetImage.SetPixel(i * 2 + k,j,pix);
                 }
             }
         }
