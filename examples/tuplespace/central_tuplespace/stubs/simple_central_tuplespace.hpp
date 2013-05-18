@@ -29,7 +29,7 @@ namespace examples { namespace stubs
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         //[simple_central_tuplespace_stubs_write_async
-        static hpx::lcos::future<int> write_async(hpx::naming::id_type const& gid, tuple_type tuple)
+        static hpx::lcos::future<int> write_async(hpx::naming::id_type const& gid, tuple_type const& tuple)
         {
             typedef server::simple_central_tuplespace::write_action action_type;
             return hpx::async<action_type>(gid, tuple);
@@ -39,7 +39,7 @@ namespace examples { namespace stubs
         /// put \p tuple into tuplespace.
         ///
         /// \note This function is fully synchronous.
-        static int write_sync(hpx::naming::id_type const& gid, tuple_type tuple)
+        static int write_sync(hpx::naming::id_type const& gid, tuple_type const& tuple)
         {
             typedef server::simple_central_tuplespace::write_action action_type;
             return hpx::async<action_type>(gid, tuple).get();
@@ -52,7 +52,7 @@ namespace examples { namespace stubs
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         static hpx::lcos::future<tuple_type>
-        read_async(hpx::naming::id_type const& gid, const tuple_type tp, long timeout)
+        read_async(hpx::naming::id_type const& gid, const tuple_type& tp, long const& timeout)
         {
             typedef server::simple_central_tuplespace::read_action action_type;
             return hpx::async<action_type>(gid, tp, timeout);
@@ -63,7 +63,7 @@ namespace examples { namespace stubs
         /// \note This function is fully synchronous.
         //[simple_central_tuplespace_stubs_read_sync
         static tuple_type
-        read_sync(hpx::naming::id_type const& gid, const tuple_type tp, long timeout)
+        read_sync(hpx::naming::id_type const& gid, const tuple_type& tp, long const& timeout)
         {
             typedef server::simple_central_tuplespace::read_action action_type;
             return hpx::async<action_type>(gid, tp, timeout).get();
@@ -80,7 +80,7 @@ namespace examples { namespace stubs
         ///          until the value is ready.
         //[simple_central_tuplespace_stubs_take_async
         static hpx::lcos::future<tuple_type>
-        take_async(hpx::naming::id_type const& gid, const tuple_type tp, long timeout)
+        take_async(hpx::naming::id_type const& gid, const tuple_type& tp, long const& timeout)
         {
             typedef server::simple_central_tuplespace::take_action action_type;
             return hpx::async<action_type>(gid, tp, timeout);
@@ -91,7 +91,7 @@ namespace examples { namespace stubs
         ///
         /// \note This function is fully synchronous.
         static tuple_type take_sync(hpx::naming::id_type const& gid
-                , const tuple_type tp, long timeout)
+                , const tuple_type& tp, const long& timeout)
         {
             // The following get yields control while the action is executed.
             return take_async(gid, tp, timeout).get();

@@ -52,7 +52,7 @@ namespace examples
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         //[simple_central_tuplespace_client_write_async
-        hpx::lcos::future<int> write_async(const tuple_type tuple)
+        hpx::lcos::future<int> write_async(const tuple_type& tuple)
         {
             BOOST_ASSERT(this->get_gid());
             return this->base_type::write_async(this->get_gid(), tuple);
@@ -62,7 +62,7 @@ namespace examples
         /// put \p tuple into tuplespace.
         ///
         /// \note This function is fully synchronous.
-        int write_sync(const tuple_type tuple)
+        int write_sync(const tuple_type& tuple)
         {
             BOOST_ASSERT(this->get_gid());
             return this->base_type::write_sync(this->get_gid(), tuple);
@@ -74,7 +74,7 @@ namespace examples
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
-        hpx::lcos::future<tuple_type> read_async(const tuple_type tp, long timeout)
+        hpx::lcos::future<tuple_type> read_async(const tuple_type& tp, long const& timeout)
         {
             BOOST_ASSERT(this->get_gid());
             return this->base_type::read_async(this->get_gid(), tp, timeout);
@@ -84,7 +84,7 @@ namespace examples
         ///
         /// \note This function is fully synchronous.
         //[simple_central_tuplespace_client_read_sync
-        tuple_type read_sync(const tuple_type tp, long timeout)
+        tuple_type read_sync(const tuple_type& tp, long const& timeout)
         {
             BOOST_ASSERT(this->get_gid());
             return this->base_type::read_sync(this->get_gid(), tp, timeout);
@@ -100,7 +100,7 @@ namespace examples
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[simple_central_tuplespace_client_take_async
-        hpx::lcos::future<tuple_type> take_async(const tuple_type tp, long timeout)
+        hpx::lcos::future<tuple_type> take_async(const tuple_type& tp, long const& timeout)
         {
             BOOST_ASSERT(this->get_gid());
             return this->base_type::take_async(this->get_gid(), tp, timeout);
@@ -110,7 +110,7 @@ namespace examples
         /// take matching tuple from tuplespace within \p timeout.
         ///
         /// \note This function is fully synchronous.
-        tuple_type take_sync(const tuple_type tp, long timeout)
+        tuple_type take_sync(const tuple_type& tp, long const& timeout)
         {
             BOOST_ASSERT(this->get_gid());
             return this->base_type::take_sync(this->get_gid(), tp, timeout);

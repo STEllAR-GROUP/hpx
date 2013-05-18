@@ -87,7 +87,7 @@ namespace examples { namespace server
 
             // put tuple into tuplespace
             // out function
-            int write(const tuple_type tp)
+            int write(const tuple_type& tp)
             {
                 if(tp.empty())
                 {
@@ -101,7 +101,7 @@ namespace examples { namespace server
 
             // read from tuplespace
             // rd function
-            tuple_type read(const tuple_type tp, long timeout) const
+            tuple_type read(const tuple_type& tp, const long& timeout) const
             {
                 tuple_type result;
                 hpx::util::high_resolution_timer t;
@@ -128,7 +128,7 @@ namespace examples { namespace server
 
             // take from tuplespace
             // in function
-            tuple_type take(const tuple_type tp, long timeout)
+            tuple_type take(const tuple_type& tp, const long& timeout)
             {
                 tuple_type result;
                 hpx::util::high_resolution_timer t;
