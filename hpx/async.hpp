@@ -163,6 +163,8 @@ namespace hpx
     async (threads::executor sched, BOOST_FWD_REF(F) f,                       \
         HPX_ENUM_FWD_ARGS(N, A, a))                                           \
     {                                                                         \
+        typedef typename boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type\
+            result_type;                                                      \
         lcos::local::futures_factory<result_type()> p(sched,                  \
             util::bind(boost::forward<F>(f),                                  \
                 HPX_ENUM_FORWARD_ARGS(N, A, a)));                             \
@@ -591,6 +593,10 @@ namespace hpx
             >
         ))) bound)
     {
+        typedef typename 
+            boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type 
+        result_type;
+
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
         return p.get_future();
@@ -665,6 +671,8 @@ namespace hpx
       , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
     )                                                                         \
     {                                                                         \
+        typedef typename boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type\
+            result_type;                                                      \
         lcos::local::futures_factory<result_type()> p(sched,                  \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
