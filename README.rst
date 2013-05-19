@@ -75,7 +75,7 @@ Version 1.0 (See accompanying file LICENSE_1_0.txt or an online copy available
 `here <http://www.boost.org/LICENSE_1_0.txt>`_).
 
 Before starting to build HPX, please read about the
-`prerequisites <http://stellar.cct.lsu.edu/files/hpx_0.9.0/docs/hpx/tutorial/getting_started.html>`_.
+`prerequisites <http://stellar.cct.lsu.edu/files/hpx_0.9.5/docs/hpx/tutorial/getting_started.html>`_.
 
 Linux
 -----
@@ -194,12 +194,15 @@ Windows
    created in step 1.
 
 4) Add CMake variable definitions (if any) by clicking the "Add Entry" button.
-   Most probably you will need to at least add the directories where Boost is
-   located as BOOST_ROOT and where HWLOC is located as HWLOC_ROOT.
+   Most probably you will need to at least add the directories where `Boost <http://www.boost.org>`_
+   is located as BOOST_ROOT and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is 
+   located as HWLOC_ROOT.
 
 5) Press the "Configure" button. A window will pop up asking you which compilers
    to use. Select the x64 Visual Studio 10 compiler (Visual Studio 2012 is
-   supported as well).
+   supported as well). Note that while it is possible to build HPX for x86 
+   we don't recommend doing so as 32 bit runs are severly limited by a 32 bit 
+   Windows system limitation affecting the number of HPX threads you can create.
 
 6) If the "Generate" button is not clickable, press "Configure" again. Repeat
    this step until the "Generate" button becomes clickable.
