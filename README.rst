@@ -100,7 +100,7 @@ Linux
          /path/to/hpx/source/tree
 
 4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
-   add the -jN flag to your make invocation, where N is the number of nodes
+   add the -jN flag to your make invocation, where N is the number of cores
    on your machine plus one::
 
     $ gmake -j5
@@ -191,15 +191,15 @@ Windows
 3) Open up the CMake GUI. In the input box labelled "Where is the source code:",
    enter the full path to the source folder. In the input box labelled
    "Where to build the binaries:", enter the full path to the build folder you
-   created in step 1.
+   created in step 2.
 
 4) Add CMake variable definitions (if any) by clicking the "Add Entry" button.
    Most probably you will need to at least add the directories where `Boost <http://www.boost.org>`_
    is located as BOOST_ROOT and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is 
    located as HWLOC_ROOT.
 
-5) Press the "Configure" button. A window will pop up asking you which compilers
-   to use. Select the x64 Visual Studio 10 compiler (Visual Studio 2012 is
+5) Press the "Configure" button. A window will pop up asking you which compiler
+   to use. Select the x64 Visual Studio 10 compiler (x64 Visual Studio 2012 is
    supported as well). Note that while it is possible to build HPX for x86 
    we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit 
    Windows system limitation affecting the number of HPX threads you can create.
