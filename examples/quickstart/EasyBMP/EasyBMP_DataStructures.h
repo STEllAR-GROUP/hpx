@@ -63,7 +63,8 @@ inline ebmpDWORD FlipDWORD( ebmpDWORD in )
 // in memory
 
 struct RGBApixel {
-    RGBApixel() : Blue(), Green(), Red(), Alpha() {}
+    RGBApixel(ebmpBYTE b = ebmpBYTE(), ebmpBYTE g = ebmpBYTE(), ebmpBYTE r = ebmpBYTE(), ebmpBYTE a = ebmpBYTE()) 
+      : Blue(b), Green(g), Red(r), Alpha(a) {}
 
     ebmpBYTE Blue;
     ebmpBYTE Green;

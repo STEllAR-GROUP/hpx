@@ -17,6 +17,7 @@ set(example_programs
     fibonacci_one
     fibonacci_futures
     fractals
+    fractals_executor
     fractals_struct
     #fractals_oclm
     interest_calculator
@@ -44,6 +45,7 @@ set(event_synchronization_FLAGS DEPENDENCIES iostreams_component)
 
 set(error_handling_FLAGS DEPENDENCIES iostreams_component)
 set(fractals_FLAGS DEPENDENCIES iostreams_component)
+set(fractals_executor_FLAGS DEPENDENCIES iostreams_component)
 if(HPX_USE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
   set(hello_world_FLAGS DEPENDENCIES iostreams_component compress_snappy_lib)
 else()

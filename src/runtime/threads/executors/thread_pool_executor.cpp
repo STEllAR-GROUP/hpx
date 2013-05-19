@@ -71,6 +71,10 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         current_concurrency_(0), tasks_scheduled_(0), tasks_completed_(0),
         min_punits_(min_punits), max_punits_(max_punits), cookie_(0)
     {
+        states_.resize(max_punits);
+        for (std::size_t i = 0; i != max_punits; ++i)
+            states_[i] = starting;
+
         // Inform the resource manager about this new executor. This causes the
         // resource manager to interact with this executor using the
         // manage_executor interface.
@@ -84,9 +88,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // destroyed. This will cause it to invoke remove_processing_unit below
         // for each of the currently allocated virtual cores.
         resource_manager& rm = resource_manager::get();
-        rm.detach(cookie_);
+        rm.stop_executor(cookie_);
 
+        // wait for executor to finish executing
         shutdown_sem_.wait();
+
+        // detach this executor from resource manager
+        rm.detach(cookie_);
     }
 
     threads::thread_state_enum thread_pool_executor::thread_function_nullary(
@@ -109,14 +117,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
-    void thread_pool_executor::add(HPX_STD_FUNCTION<void()> f,
+    void thread_pool_executor::add(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f,
         char const* desc, threads::thread_state_enum initial_state,
         bool run_now, error_code& ec)
     {
         // create a new thread
-        boost::intrusive_ptr<thread_pool_executor> this_(this);
         thread_init_data data(util::bind(
-            &thread_pool_executor::thread_function_nullary, this_,
+            &thread_pool_executor::thread_function_nullary, this,
             boost::move(f)), desc);
 
         threads::detail::create_thread(scheduler_, data, initial_state, run_now, ec);
@@ -129,42 +136,17 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             ec = make_success_code();
     }
 
-    // Like add(), except that if the attempt to add the function would
-    // cause the caller to block in add, try_add would instead do
-    // nothing and return false.
-    bool thread_pool_executor::try_add(HPX_STD_FUNCTION<void()> f,
-        char const* desc, threads::thread_state_enum initial_state,
-        bool run_now, error_code& ec)
-    {
-        // create a new thread
-        boost::intrusive_ptr<thread_pool_executor> this_(this);
-        thread_init_data data(util::bind(
-            &thread_pool_executor::thread_function_nullary, this_,
-            boost::move(f)), desc);
-
-        threads::detail::create_thread(scheduler_, data, initial_state, run_now, ec);
-        if (ec) return false;
-
-        // update statistics
-        ++tasks_scheduled_;
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return true;      // this function will never block
-    }
-
     // Schedule given function for execution in this executor no sooner
     // than time abs_time. This call never blocks, and may violate
     // bounds on the executor's queue size.
     void thread_pool_executor::add_at(
         boost::posix_time::ptime const& abs_time,
-        HPX_STD_FUNCTION<void()> f, char const* desc, error_code& ec)
+        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc, 
+        error_code& ec)
     {
         // create a new suspended thread
-        boost::intrusive_ptr<thread_pool_executor> this_(this);
         thread_init_data data(util::bind(
-            &thread_pool_executor::thread_function_nullary, this_,
+            &thread_pool_executor::thread_function_nullary, this,
             boost::move(f)), desc);
 
         thread_id_type id = threads::detail::create_thread(
@@ -188,12 +170,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     void thread_pool_executor::add_after(
         boost::posix_time::time_duration const& rel_time,
-        HPX_STD_FUNCTION<void()> f, char const* desc, error_code& ec)
+        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc, 
+        error_code& ec)
     {
         // create a new suspended thread
-        boost::intrusive_ptr<thread_pool_executor> this_(this);
         thread_init_data data(util::bind(
-            &thread_pool_executor::thread_function_nullary, this_,
+            &thread_pool_executor::thread_function_nullary, this,
             boost::move(f)), desc);
 
         thread_id_type id = threads::detail::create_thread(
@@ -223,7 +205,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // execute all work
     void thread_pool_executor::run(std::size_t virt_core)
     {
-        states_[virt_core] = running;
+        state expected = starting;
+        states_[virt_core].compare_exchange_strong(expected, running);
+
         ++current_concurrency_;
 
         BOOST_SCOPE_EXIT(&current_concurrency_) {

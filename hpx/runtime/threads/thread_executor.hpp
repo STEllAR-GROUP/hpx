@@ -82,7 +82,7 @@ namespace hpx { namespace threads
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            virtual void add(HPX_STD_FUNCTION<void()> f, char const* desc,
+            virtual void add(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc,
                 threads::thread_state_enum initial_state, bool run_now,
                 error_code& ec) = 0;
 
@@ -116,7 +116,7 @@ namespace hpx { namespace threads
             // than time abs_time. This call never blocks, and may violate
             // bounds on the executor's queue size.
             virtual void add_at(boost::posix_time::ptime const& abs_time,
-                HPX_STD_FUNCTION<void()> f, char const* desc,
+                BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc,
                 error_code& ec) = 0;
 
             // Schedule given function for execution in this executor no sooner
@@ -124,7 +124,7 @@ namespace hpx { namespace threads
             // violate bounds on the executor's queue size.
             virtual void add_after(
                 boost::posix_time::time_duration const& rel_time,
-                HPX_STD_FUNCTION<void()> f, char const* desc,
+                BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc,
                 error_code& ec) = 0;
         };
     }
@@ -159,7 +159,7 @@ namespace hpx { namespace threads
             threads::thread_state_enum initial_state = threads::pending,
             bool run_now = true, error_code& ec = throws)
         {
-            executor_data_->add(f, desc, initial_state, run_now, ec);
+            executor_data_->add(boost::move(f), desc, initial_state, run_now, ec);
         }
 
         /// Return an estimate of the number of waiting closures.
@@ -214,19 +214,21 @@ namespace hpx { namespace threads
         /// Error conditions: If invoking closure throws an exception, the 
         /// executor shall call terminate.
         void add_at(boost::posix_time::ptime const& abs_time,
-            HPX_STD_FUNCTION<void()> closure, char const* desc = 0,
+            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_at(abs_time, closure, desc, ec);
+                executor_data_)->add_at(abs_time, boost::move(f), desc, ec);
         }
 
         template <typename Clock, typename Duration>
         void add_at(boost::chrono::time_point<Clock, Duration> const& abs_time,
-            HPX_STD_FUNCTION<void()> closure, char const* desc = 0,
+            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
             error_code& ec = throws)
         {
-            add_at(util::to_ptime(abs_time), closure, desc, ec);
+            boost::static_pointer_cast<detail::scheduled_executor_base>(
+                executor_data_)->add_at(util::to_ptime(abs_time), 
+                boost::move(f), desc, ec);
         }
 
         /// Effects: The specified function object shall be scheduled for 
@@ -239,19 +241,21 @@ namespace hpx { namespace threads
         /// executor shall call terminate.
         void add_after(
             boost::posix_time::time_duration const& rel_time,
-            HPX_STD_FUNCTION<void()> closure, char const* desc = 0,
+            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_after(rel_time, closure, desc, ec);
+                executor_data_)->add_after(rel_time, boost::move(f), desc, ec);
         }
 
         template <typename Rep, typename Period>
         void add_after(boost::chrono::duration<Rep, Period> const& rel_time,
-            HPX_STD_FUNCTION<void()> closure, char const* desc = 0,
+            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
             error_code& ec = throws)
         {
-            add_at(util::to_time_duration(rel_time), closure, desc, ec);
+            boost::static_pointer_cast<detail::scheduled_executor_base>(
+                executor_data_)->add_after(util::to_time_duration(rel_time), 
+                boost::move(f), desc, ec);
         }
 
         /// Return a reference to the default executor for this process.

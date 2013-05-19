@@ -117,6 +117,9 @@ namespace hpx { namespace threads
 
                 core_ids.push_back(std::make_pair(i, punits));
                 ++punits;
+
+                // update use count for reserved processing units
+                ++punits_[i].use_count_;
             }
         }
         BOOST_ASSERT(punits <= max_punits);
@@ -124,13 +127,35 @@ namespace hpx { namespace threads
         if (ec) {
             // on error, remove the already assigned virtual cores
             for (std::size_t j = 0; j != punits; ++j)
+            {
                 proxy->remove_processing_unit(j, ec);
+                --punits_[j].use_count_;
+            }
             return std::vector<coreids_type>();
         }
 
         if (&ec != &throws)
             ec = make_success_code();
         return core_ids;
+    }
+
+    // Stop the executor identified with the given cookie
+    void resource_manager::stop_executor(std::size_t cookie, error_code& ec)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        proxies_map_type::iterator it = proxies_.find(cookie);
+        if (it == proxies_.end()) {
+            HPX_THROWS_IF(ec, bad_parameter, "resource_manager::detach",
+                "the given cookie is not known to the resource manager");
+            return;
+        }
+
+        // inform executor to give up virtual core
+        proxy_data& p = (*it).second;
+        BOOST_FOREACH(coreids_type coreids, p.core_ids_)
+        {
+            p.proxy_->remove_processing_unit(coreids.second, ec);
+        }
     }
 
     // Detach the executor identified with the given cookie
@@ -145,9 +170,10 @@ namespace hpx { namespace threads
         }
 
         // inform executor to give up virtual core
-        proxy_data& p = (*it).second;
-        BOOST_FOREACH(coreids_type coreids, p.core_ids_)
-            p.proxy_->remove_processing_unit(coreids.second, ec);
+        BOOST_FOREACH(coreids_type coreids, (*it).second.core_ids_)
+        {
+            --punits_[coreids.first].use_count_;
+        }
 
         proxies_.erase(cookie);
     }

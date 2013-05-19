@@ -68,11 +68,11 @@ namespace hpx { namespace lcos { namespace local
               : f_(boost::move(f))
             {}
 
-            task_object(threads::executor sched, F const& f)
+            task_object(threads::executor& sched, F const& f)
               : base_type(sched), f_(f)
             {}
 
-            task_object(threads::executor sched, BOOST_RV_REF(F) f)
+            task_object(threads::executor& sched, BOOST_RV_REF(F) f)
               : base_type(sched), f_(boost::move(f))
             {}
 
@@ -105,11 +105,11 @@ namespace hpx { namespace lcos { namespace local
               : f_(boost::move(f))
             {}
 
-            task_object(threads::executor sched, F const& f)
+            task_object(threads::executor& sched, F const& f)
               : base_type(sched), f_(f)
             {}
 
-            task_object(threads::executor sched, BOOST_RV_REF(F) f)
+            task_object(threads::executor& sched, BOOST_RV_REF(F) f)
               : base_type(sched), f_(boost::move(f))
             {}
 
@@ -431,12 +431,12 @@ namespace hpx { namespace lcos { namespace local
         packaged_task() {}
 
         template <typename F>
-        explicit packaged_task(threads::executor sched, BOOST_FWD_REF(F) f)
+        explicit packaged_task(threads::executor& sched, BOOST_FWD_REF(F) f)
           : task_(new detail::task_object<Result, F>(sched, boost::forward<F>(f))),
             future_obtained_(false)
         {}
 
-        explicit packaged_task(threads::executor sched, Result (*f)())
+        explicit packaged_task(threads::executor& sched, Result (*f)())
           : task_(new detail::task_object<Result , Result (*)()>(sched, f)),
             future_obtained_(false)
         {}
@@ -577,12 +577,12 @@ namespace hpx { namespace lcos { namespace local
         futures_factory() {}
 
         template <typename F>
-        explicit futures_factory(threads::executor sched, BOOST_FWD_REF(F) f)
+        explicit futures_factory(threads::executor& sched, BOOST_FWD_REF(F) f)
           : task_(new detail::task_object<Result, F>(sched, boost::forward<F>(f))),
             future_obtained_(false)
         {}
 
-        explicit futures_factory(threads::executor sched, Result (*f)())
+        explicit futures_factory(threads::executor& sched, Result (*f)())
           : task_(new detail::task_object<Result , Result (*)()>(sched, f)),
             future_obtained_(false)
         {}

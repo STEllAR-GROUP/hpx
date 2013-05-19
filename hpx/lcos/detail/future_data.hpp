@@ -494,11 +494,11 @@ namespace detail
 
     public:
         task_base()
-          : started_(false), id_(threads::invalid_thread_id)
+          : started_(false), id_(threads::invalid_thread_id), sched_(0)
         {}
 
-        task_base(threads::executor sched)
-          : started_(false), id_(threads::invalid_thread_id), sched_(sched)
+        task_base(threads::executor& sched)
+          : started_(false), id_(threads::invalid_thread_id), sched_(&sched)
         {}
 
         // retrieving the value
@@ -546,7 +546,7 @@ namespace detail
             future_base_type this_(this);
 
             if (sched_) {
-                sched_.add(HPX_STD_BIND(&task_base::run_impl, this_),
+                sched_->add(HPX_STD_BIND(&task_base::run_impl, this_),
                     "task_base::apply", threads::pending, false);
             }
             else {
@@ -653,7 +653,7 @@ namespace detail
     protected:
         bool started_;
         threads::thread_id_type id_;
-        threads::executor sched_;
+        threads::executor* sched_;
     };
 }}}
 

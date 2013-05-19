@@ -19,8 +19,8 @@
 #include "EasyBMP/EasyBMP.h"
 #include "EasyBMP/EasyBMP.cpp"
 
-const int sizeY = 256;
-const int sizeX = sizeY;
+int const sizeY = 256;
+int const sizeX = sizeY;
 
 int fractals(float x0, float y0, int max_iteration);
 
@@ -53,34 +53,33 @@ int hpx_main()
     hpx::util::high_resolution_timer t;
 
     {
-        using hpx::lcos::future;
-        using hpx::async;
         using namespace std;
+
+        using hpx::future;
+        using hpx::async;
         using hpx::wait_all;
 
-        int max_iteration = 255;
+        int const max_iteration = 255;
 
-        vector<fractals_action> fAct;   //[sizeX * sizeY];
         vector<future<int>> iteration;
-
         iteration.reserve(sizeX*sizeY);
+
         hpx::cout << "Initial setup completed in " 
                   << t.elapsed() 
                   << "s. Initializing and running futures...\n";
         t.restart();
 
+        hpx::id_type const here = hpx::find_here();
+        fractals_action fractal_pixel;
+
         for (int i = 0; i < sizeX; i++)
         {
             for (int j = 0; j < sizeY; j++)
             {
-                hpx::id_type const locality_id = hpx::find_here();
-
                 float x0 = (float)i * 3.5f / (float)sizeX - 2.5f;
                 float y0 = (float)j * 2.0f / (float)sizeY - 1.0f;
 
-                fractals_action temp;
-                iteration.push_back(async(temp, locality_id, x0, y0, max_iteration));
-                fAct.push_back(temp);
+                iteration.push_back(async(fractal_pixel, here, x0, y0, max_iteration));
             }
         }
         wait_all(iteration);
@@ -90,19 +89,15 @@ int hpx_main()
                   << "s. Transferring from futures to general memory...\n";
         t.restart();
 
-        for (int i = 0; i < sizeX; i++)
+        for (int i = 0; i < sizeX; ++i)
         {
-            for (int j = 0; j < sizeY; j++)
+            for (int j = 0; j < sizeY; ++j)
             {
                 int it = iteration[i*sizeX + j].get();
-                //total += it;
-                for (int k = 0; k < 2; k++)
+                for (int k = 0; k < 2; ++k)
                 {
-                    RGBApixel pix;
-                    pix.Blue = (it*255)/max_iteration;
-                    pix.Red = (it*255)/max_iteration;
-                    pix.Green = (it*255)/max_iteration;
-                    SetImage.SetPixel(i * 2 + k,j,pix);
+                    int p = (it * 255) / max_iteration;
+                    SetImage.SetPixel(i * 2 + k, j, RGBApixel(p, p, p));
                 }
             }
         }

@@ -38,7 +38,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // simply launch the given function or function object asynchronously
     template <typename F>
-    bool apply(threads::executor sched, BOOST_FWD_REF(F) f)
+    bool apply(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
         sched.add(boost::forward<F>(f), "hpx::apply");
         return false;   // executed locally
@@ -67,7 +67,7 @@ namespace hpx
         traits::is_callable<F>                                                \
       , bool                                                                  \
     >::type                                                                   \
-    apply(threads::executor sched, BOOST_FWD_REF(F) f,                        \
+    apply(threads::executor& sched, BOOST_FWD_REF(F) f,                       \
         HPX_ENUM_FWD_ARGS(N, A, a))                                           \
     {                                                                         \
         sched.add(util::bind(boost::forward<F>(f),                            \
@@ -128,7 +128,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
     bool apply(
-        threads::executor sched,
+        threads::executor& sched,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_function, N)<
                 R
@@ -167,7 +167,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
-    bool apply(threads::executor sched,                                       \
+    bool apply(threads::executor& sched,                                      \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_function, NN)<              \
                 R                                                             \
@@ -220,7 +220,7 @@ namespace hpx
             BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), typename T)
       BOOST_PP_COMMA_IF(N)  BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
-    bool apply(threads::executor sched,
+    bool apply(threads::executor& sched,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_member_function, N)<
                 R
@@ -267,7 +267,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
-    bool apply(threads::executor sched,                                       \
+    bool apply(threads::executor& sched,                                      \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_member_function, NN)<       \
                 R                                                             \
@@ -323,7 +323,7 @@ namespace hpx
         typename F
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
-    bool apply(threads::executor sched,
+    bool apply(threads::executor& sched,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
                 F
@@ -358,7 +358,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
-    bool apply(threads::executor sched,                                       \
+    bool apply(threads::executor& sched,                                      \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_functor, NN)<               \
                 F                                                             \

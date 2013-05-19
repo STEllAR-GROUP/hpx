@@ -100,7 +100,7 @@ namespace hpx
         traits::is_callable<F>
       , detail::create_future<F()>
     >::type
-    async (threads::executor sched, BOOST_FWD_REF(F) f)
+    async (threads::executor& sched, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
 
@@ -160,7 +160,7 @@ namespace hpx
         traits::is_callable<F>                                                \
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>                  \
     >::type                                                                   \
-    async (threads::executor sched, BOOST_FWD_REF(F) f,                       \
+    async (threads::executor& sched, BOOST_FWD_REF(F) f,                      \
         HPX_ENUM_FWD_ARGS(N, A, a))                                           \
     {                                                                         \
         typedef typename boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type\
@@ -252,7 +252,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
     lcos::future<R>
-    async(threads::executor sched,
+    async(threads::executor& sched,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_function, N)<
                 R
@@ -324,7 +324,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     lcos::future<R>                                                           \
-    async(threads::executor sched,                                            \
+    async(threads::executor& sched,                                           \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_function, NN)<              \
                 R                                                             \
@@ -412,7 +412,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
     lcos::future<R>
-    async(threads::executor sched,
+    async(threads::executor& sched,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_member_function, N)<
                 R
@@ -496,7 +496,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
     >                                                                         \
     lcos::future<R>                                                           \
-    async(threads::executor sched,                                            \
+    async(threads::executor& sched,                                           \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_member_function, NN)<       \
                 R                                                             \
@@ -585,7 +585,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
     >
     typename detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
-    async(threads::executor sched,
+    async(threads::executor& sched,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
                 F
@@ -662,7 +662,7 @@ namespace hpx
     typename detail::create_future<                                           \
         F(BOOST_PP_ENUM_PARAMS(N, A))                                         \
     >::type                                                                   \
-    async(threads::executor sched,                                            \
+    async(threads::executor& sched,                                           \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_functor, NN)<               \
                 F                                                             \
@@ -743,7 +743,7 @@ namespace hpx
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
         >::result_type
     >
-    async(threads::executor sched,
+    async(threads::executor& sched,
         BOOST_RV_REF(HPX_UTIL_STRIP((
             BOOST_PP_CAT(hpx::util::detail::bound_action, N)<
                 Action
@@ -808,7 +808,7 @@ namespace hpx
           BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)                 \
         >::result_type                                                        \
     >                                                                         \
-    async(threads::executor sched,                                            \
+    async(threads::executor& sched,                                           \
         BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
             BOOST_PP_CAT(hpx::util::detail::bound_action, NN)<                \
                 Action                                                        \

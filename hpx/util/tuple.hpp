@@ -22,8 +22,10 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/int.hpp>
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500
 #include <boost/mpl/fold.hpp>
 #include <boost/mpl/and.hpp>
+#endif
 
 #include <boost/serialization/is_bitwise_serializable.hpp>
 
@@ -101,7 +103,7 @@ namespace hpx { namespace util
         };
 #endif
 
-// gcc 4.4.x is not able to cope this this, thus we disable the optimization
+// gcc 4.4.x is not able to cope with this, thus we disable the optimization
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500
         ///////////////////////////////////////////////////////////////////////
         struct compute_sequence_is_bitwise_serializable
