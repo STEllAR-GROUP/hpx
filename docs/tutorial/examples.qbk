@@ -243,7 +243,7 @@ will yield:
 
 Notice how the ordering of the two print statements will change with
 subsequent runs. To run this program on multiple localities please see the
-__pbs__ documentation.
+section __using_pbs__.
 
 [heading Walkthrough]
 

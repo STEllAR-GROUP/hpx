@@ -96,9 +96,9 @@ a build system.
         [Used for OS-thread pinning and NUMA awareness.]]
 ]
 
-[note You need to build the following Boost libraries for __hpx__: 
+[note You need to build the following Boost libraries for __hpx__:
       Boost.DateTime, Boost.Filesystem, Boost.ProgramOptions, Boost.Regex,
-      Boost.Serialization, Boost.System, Boost.Thread, Boost.Chrono (starting 
+      Boost.Serialization, Boost.System, Boost.Thread, Boost.Chrono (starting
       Boost 1.47.0), and Boost.Atomic (starting Boost 1.53.0).]
 
 Depending on the options you chose while building and installing __hpx__,
@@ -209,13 +209,16 @@ detail in the sections __unix_installation__ and __windows_installation__.
   of your __hpx__ source tree.
 
 ``
-    $ cmake [CMake variable definitions] /path/to/source/tree
+    $ cmake -DBOOST_ROOT=/root/of/boost/installation \
+        -DHWLOC_ROOT=/root/of/hwloc/installation
+        [other CMake variable definitions] \
+        /path/to/source/tree
 ``
 
 [:for instance:]
 
 ``
-    $ cmake -DBOOST_ROOT=~/packages/boost -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.8.0
+    $ cmake -DBOOST_ROOT=~/packages/boost -DHWLOC=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.6
 ``
 
 * Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag to
@@ -380,17 +383,22 @@ of Clang, libc++, and Boost).
   "Where to build the binaries:", enter the full path to the build folder you
   created before.
 * Add CMake variable definitions (if any) by clicking the "Add Entry" button.
-  The only required variable you need to define is `BOOST_ROOT`. This (PATH)
-  variable needs to be set to point to the root folder of your Boost
-  installation. It is recommended to set the variable `CMAKE_INSTALL_PREFIX` as
+  There are two required variables you need to define: `BOOST_ROOT` and
+  `HWLOC_ROOT`. These (PATH) variable needs to be set to point to the root
+  folder of your __boost__ and __hwloc__ installations.
+  It is recommended to set the variable `CMAKE_INSTALL_PREFIX` as
   well. This allows to control where the built HPX libraries will be installed.
   If this (PATH) variable is set, it has to refer to the directory where the
   built __hpx__ files should be installed to.
 * Press the "Configure" button. A window will pop up asking you which compilers
-  to use. Select the Visual Studio 10 (64Bit) compilers (they are usually
-  the default if available).
-* Make sure that the under the `CMAKE` tree that the `CMAKE_BUILD_TYPE` build
-  type is set to Debug or Release, according to what you plain to do.
+  to use. Select the Visual Studio 10 (64Bit) compiler (it usually is
+  the default if available). The Visual Studio 2012 (64Bit) compiler is
+  supported as well. Note that while it is possible to build HPX for x86
+  we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit
+  Windows system limitation affecting the number of HPX threads you can create.
+* Make sure that that the `CMAKE_BUILD_TYPE` build type (under the `CMAKE` tree)
+  is set to `Debug` or `Release`, according to what you plain to do (alternatively,
+  this variable can be set to `RelWithDebInfo` or `MinSizeRel`).
 * Press "Configure" again. Repeat this step until the "Generate" button becomes
   clickable (and until no variable definitions are marked red anymore).
 * Press "Generate".
@@ -440,10 +448,10 @@ in the section __hello_world_example__.
          have to be placed before the option [hpx_cmdline --hpx:nodes], which
          in this case should be the last option on the command line.
 
-         Alternatively, use the option [hpx_cmdline --hpx:endnodes] to explicitly 
+         Alternatively, use the option [hpx_cmdline --hpx:endnodes] to explicitly
          mark the end of the list of node names:
          ```
-         __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` ``[hpx_cmdline --hpx:endnodes] ``$APP_OPTIONS 
+         __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` ``[hpx_cmdline --hpx:endnodes] ``$APP_OPTIONS
          ```
          ]
 
@@ -499,7 +507,7 @@ Now, we invoke this script using the __pbsdsh__ tool:
     APP_PATH=~/packages/hpx/bin/hello_world
     APP_OPTIONS=
 
-    __pbsdsh__ -u runme.sh $APP_PATH $APP_OPTIONS ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` 
+    __pbsdsh__ -u runme.sh $APP_PATH $APP_OPTIONS ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE`
 ```
 
 All that remains now is submitting the job to the queuing system. Assuming that
@@ -561,6 +569,69 @@ Congratulations! You have just run your first distributed __hpx__ application!
 [c++]
 
 [endsect] [/ How to Use __hpx__ Applications with PBS]
+
+[section:unix_slurm How to Use __hpx__ Applications with SLURM]
+
+Just like PBS (described in section __using_pbs__), __slurm__ is a job management
+system which is widely used on large supercomputing systems. Any __hpx__
+application can easily be run using SLURM. This section describes how this can
+be done.
+
+The easiest way to run an __hpx__ application using SLURM is to utilize the
+command line tool __srun__ which interacts with the SLURM batch scheduling
+system.
+
+```
+    srun -p <node-type> -N <number-of-nodes> hpx-application <application-arguments>
+```
+
+Here, `<node-type>` is one of the node partitions existing on the target machine
+(consult the machines documentation to get a list of existing partitions) and
+`<number-of-nodes>` is the number of compute nodes you want to use. By default,
+the HPX application is started with one locality per node and uses all available
+cores on a node. You can change the number of localities started per node (for
+example to account for NUMA effects) by specifying the `-n` option of srun. The
+number of cores per locality can be set by `-c`. The `<application-arguments>`
+are any application specific arguments which need to passed on to the
+application.
+
+[note There is no need to use any of the __hpx__ command line options related to
+      the number of localities, number of threads, or related to networking
+      ports. All of this information is automatically extracted from the SLURM
+      environment by the __hpx__ startup code.]
+
+[heading Interactive Shells]
+
+To get an interactive development shell on one of the nodes you can issue the
+following command:
+
+```
+     srun -p <node-type> -N <number-of-nodes> --pty /bin/bash -l
+```
+
+After the shell has been opened, you can run your HPX application. By default,
+it uses all available cores. Note that if you requested one node, you don't
+need to do `srun` again. However, if you requested more than one nodes, and want
+to run your distributed application, you can use `srun` again to start up the
+distributed HPX application. It will use the resources that have been requested
+for the interactive shell.
+
+[heading Scheduling Batch Jobs]
+
+The above mentioned method of running __hpx__ applications is fine for
+development purposes. The disadvantage that comes with `srun` is that it only
+returns once the application is finished. This might not be appropriate for
+longer running applications (for example benchmarks or larger scale simulations).
+In order to cope with that limitation you can use the __sbatch__ command.
+
+The `sbatch` command expects a script that it can run once the requested
+resources are available. In order to request resources you need to add
+`#SBATCH` comments in your script or provide the necessary parameters to
+`sbatch` directly. The parameters are the same as with `srun`. The commands you
+need to execute are the same you would need to start your application as if you
+were in an interactive shell.
+
+[endsect]
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
