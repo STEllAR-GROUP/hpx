@@ -94,7 +94,10 @@ Linux
 3) Invoke CMake from your build directory, pointing the CMake driver to the root
    of your HPX source tree::
 
-    $ cmake -DBOOST_ROOT=/your_boost_directory [other CMake variable definitions] /path/to/hpx/source/tree
+    $ cmake -DBOOST_ROOT=/your_boost_directory \
+         -DHWLOC_ROOT=/your_hwloc_directory \
+         [other CMake variable definitions] \
+         /path/to/hpx/source/tree
 
 4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of nodes
@@ -191,8 +194,8 @@ Windows
    created in step 1.
 
 4) Add CMake variable definitions (if any) by clicking the "Add Entry" button.
-   Most probably you will need to at least add the directory where Boost is
-   located as BOOST_ROOT.
+   Most probably you will need to at least add the directories where Boost is
+   located as BOOST_ROOT and where HWLOC is located as HWLOC_ROOT.
 
 5) Press the "Configure" button. A window will pop up asking you which compilers
    to use. Select the x64 Visual Studio 10 compiler (Visual Studio 2012 is
