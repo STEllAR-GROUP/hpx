@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/threads/executors/default_executor.hpp>
-#include <hpx/runtime/threads/executors/thread_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/runtime/threads/executors/service_executor.hpp>
 
 #endif

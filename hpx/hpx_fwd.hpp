@@ -28,6 +28,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 
 #include <hpx/config.hpp>
@@ -158,6 +159,7 @@ namespace hpx
             template <typename Mutex = boost::mutex>
             class HPX_EXPORT local_queue_scheduler;
 
+            template <typename Mutex = boost::mutex>
             class HPX_EXPORT local_priority_queue_scheduler;
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
@@ -170,7 +172,7 @@ namespace hpx
             class HPX_EXPORT callback_notifier;
 
             // define the default scheduler to use
-            typedef local_priority_queue_scheduler queue_scheduler;
+            typedef local_priority_queue_scheduler<> queue_scheduler;
         }
 
         struct HPX_EXPORT threadmanager_base;

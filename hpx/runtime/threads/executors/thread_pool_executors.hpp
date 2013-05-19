@@ -9,7 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 
@@ -22,9 +21,11 @@ namespace hpx { namespace threads { namespace executors
     namespace detail
     {
         //////////////////////////////////////////////////////////////////////
+        template <typename Scheduler>
         class manage_thread_pool_executor;
 
         //////////////////////////////////////////////////////////////////////
+        template <typename Scheduler>
         class HPX_EXPORT thread_pool_executor
           : public threads::detail::executor_base
         {
@@ -58,7 +59,7 @@ namespace hpx { namespace threads { namespace executors
             std::size_t num_pending_closures(error_code& ec) const;
 
         protected:
-            friend class manage_thread_pool_executor;
+            friend class manage_thread_pool_executor<Scheduler>;
 
             // The function below are used by the resource manager to
             // interact with the scheduler.
@@ -85,7 +86,7 @@ namespace hpx { namespace threads { namespace executors
                 HPX_STD_FUNCTION<void()> const& func);
 
             // the scheduler used by this executor
-            policies::local_queue_scheduler<lcos::local::spinlock> scheduler_;
+            Scheduler scheduler_;
             lcos::local::counting_semaphore shutdown_sem_;
             boost::ptr_vector<boost::atomic<hpx::state> > states_;
 
@@ -107,11 +108,16 @@ namespace hpx { namespace threads { namespace executors
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct thread_pool_executor : public executor
+    struct local_queue_executor : public executor
     {
-        thread_pool_executor(std::size_t max_punits = 1, std::size_t min_punits = 1)
-          : executor(new detail::thread_pool_executor(max_punits, min_punits))
-        {}
+        local_queue_executor(std::size_t max_punits = 1, 
+            std::size_t min_punits = 1);
+    };
+
+    struct local_priority_queue_executor : public executor
+    {
+        local_priority_queue_executor(std::size_t max_punits = 1, 
+            std::size_t min_punits = 1);
     };
 }}}
 

@@ -66,7 +66,7 @@ int hpx_main()
         t.restart();
 
         {
-            hpx::threads::executors::thread_pool_executor exec;
+            hpx::threads::executors::local_queue_executor exec;
 
             for (int i = 0; i < sizeX; ++i)
             {

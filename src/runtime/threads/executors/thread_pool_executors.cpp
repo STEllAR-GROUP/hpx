@@ -5,10 +5,12 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
+#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
-#include <hpx/runtime/threads/executors/thread_pool_executor.hpp>
+#include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/util/register_locks.hpp>
 
 #include <boost/scope_exit.hpp>
@@ -23,14 +25,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Scheduler>
     class manage_thread_pool_executor
       : public threads::detail::manage_executor
     {
     public:
-        manage_thread_pool_executor(thread_pool_executor& sched)
+        manage_thread_pool_executor(thread_pool_executor<Scheduler>& sched)
           : sched_(sched)
-        {
-        }
+        {}
 
     protected:
         // Return the requested policy element.
@@ -60,11 +62,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         }
 
     private:
-        thread_pool_executor& sched_;
+        thread_pool_executor<Scheduler>& sched_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_pool_executor::thread_pool_executor(std::size_t max_punits,
+    template <typename Scheduler>
+    thread_pool_executor<Scheduler>::thread_pool_executor(std::size_t max_punits,
             std::size_t min_punits)
       : scheduler_(max_punits), shutdown_sem_(0),
         states_(max_punits), puinits_(max_punits),
@@ -79,10 +82,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // resource manager to interact with this executor using the
         // manage_executor interface.
         resource_manager& rm = resource_manager::get();
-        cookie_ = rm.initial_allocation(new manage_thread_pool_executor(*this));
+        cookie_ = rm.initial_allocation(new manage_thread_pool_executor<Scheduler>(*this));
     }
 
-    thread_pool_executor::~thread_pool_executor()
+    template <typename Scheduler>
+    thread_pool_executor<Scheduler>::~thread_pool_executor()
     {
         // Inform the resource manager that this executor is about to be 
         // destroyed. This will cause it to invoke remove_processing_unit below
@@ -111,7 +115,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 #endif
     }
 
-    threads::thread_state_enum thread_pool_executor::thread_function_nullary(
+    template <typename Scheduler>
+    threads::thread_state_enum 
+    thread_pool_executor<Scheduler>::thread_function_nullary(
         HPX_STD_FUNCTION<void()> const& func)
     {
         // execute the actual thread function
@@ -131,7 +137,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
-    void thread_pool_executor::add(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f,
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::add(
+        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f,
         char const* desc, threads::thread_state_enum initial_state,
         bool run_now, error_code& ec)
     {
@@ -156,7 +164,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule given function for execution in this executor no sooner
     // than time abs_time. This call never blocks, and may violate
     // bounds on the executor's queue size.
-    void thread_pool_executor::add_at(
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::add_at(
         boost::posix_time::ptime const& abs_time,
         BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc, 
         error_code& ec)
@@ -188,7 +197,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule given function for execution in this executor no sooner
     // than time rel_time from now. This call never blocks, and may
     // violate bounds on the executor's queue size.
-    void thread_pool_executor::add_after(
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::add_after(
         boost::posix_time::time_duration const& rel_time,
         BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc, 
         error_code& ec)
@@ -218,7 +228,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Return an estimate of the number of waiting tasks.
-    std::size_t thread_pool_executor::num_pending_closures(error_code& ec) const
+    template <typename Scheduler>
+    std::size_t thread_pool_executor<Scheduler>::num_pending_closures(
+        error_code& ec) const
     {
         if (&ec != &throws)
             ec = make_success_code();
@@ -226,7 +238,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // execute all work
-    void thread_pool_executor::run(std::size_t virt_core)
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::run(std::size_t virt_core)
     {
         // Set the state to 'running' only if it's still in 'starting' state, 
         // otherwise our destructor is currently being executed, which means
@@ -248,8 +261,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Return statistics collected by this scheduler
-    void thread_pool_executor::get_statistics(executor_statistics& stats,
-        error_code& ec) const
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::get_statistics(
+        executor_statistics& stats, error_code& ec) const
     {
         if (&ec != &throws)
             ec = make_success_code();
@@ -260,7 +274,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Return the requested policy element
-    std::size_t thread_pool_executor::get_policy_element(
+    template <typename Scheduler>
+    std::size_t thread_pool_executor<Scheduler>::get_policy_element(
         threads::detail::executor_parameter p, error_code& ec) const
     {
         switch(p) {
@@ -284,8 +299,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Provide the given processing unit to the scheduler.
-    void thread_pool_executor::add_processing_unit(std::size_t virt_core,
-        std::size_t thread_num, error_code& ec)
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::add_processing_unit(
+        std::size_t virt_core, std::size_t thread_num, error_code& ec)
     {
         register_thread_nullary(
             util::bind(&thread_pool_executor::run, this, virt_core),
@@ -295,10 +311,30 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     }
 
     // Remove the given processing unit from the scheduler.
-    void thread_pool_executor::remove_processing_unit(std::size_t virt_core,
-        error_code& ec)
+    template <typename Scheduler>
+    void thread_pool_executor<Scheduler>::remove_processing_unit(
+        std::size_t virt_core, error_code& ec)
     {
         // inform the scheduler to stop the virtual core
         states_[virt_core] = stopping;
     }
 }}}}
+
+namespace hpx { namespace threads { namespace executors
+{
+    ///////////////////////////////////////////////////////////////////////////
+    local_queue_executor::local_queue_executor(
+            std::size_t max_punits, std::size_t min_punits)
+      : executor(new detail::thread_pool_executor<
+            policies::local_queue_scheduler<lcos::local::spinlock> >(
+                max_punits, min_punits))
+    {}
+
+    ///////////////////////////////////////////////////////////////////////////
+    local_priority_queue_executor::local_priority_queue_executor(
+            std::size_t max_punits, std::size_t min_punits)
+      : executor(new detail::thread_pool_executor<
+            policies::local_priority_queue_scheduler<lcos::local::spinlock> >(
+                max_punits, min_punits))
+    {}
+}}}

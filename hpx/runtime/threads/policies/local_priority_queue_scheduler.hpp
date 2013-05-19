@@ -37,6 +37,7 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
+    template <typename Mutex>
     class local_priority_queue_scheduler : boost::noncopyable
     {
     private:
@@ -67,7 +68,7 @@ namespace hpx { namespace threads { namespace policies
             {}
 
             init_parameter(std::size_t num_queues,
-                    std::size_t num_high_priority_queues,
+                    std::size_t num_high_priority_queues = std::size_t(-1),
                     std::size_t max_queue_thread_count = max_thread_count,
                     bool numa_sensitive = false,
                     std::size_t pu_offset = 0,
@@ -75,7 +76,9 @@ namespace hpx { namespace threads { namespace policies
                     std::string const& affinity = "pu",
                     std::string const& affinity_desc = "")
               : num_queues_(num_queues),
-                num_high_priority_queues_(num_high_priority_queues),
+                num_high_priority_queues_(
+                    num_high_priority_queues == std::size_t(-1) ? 
+                    num_high_priority_queues : num_queues),
                 max_queue_thread_count_(max_queue_thread_count),
                 pu_offset_(pu_offset), pu_step_(pu_step),
                 numa_sensitive_(numa_sensitive),
@@ -110,13 +113,13 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
-                queues_[i] = new thread_queue<>(init.max_queue_thread_count_);
+                queues_[i] = new thread_queue<Mutex>(init.max_queue_thread_count_);
 
             BOOST_ASSERT(init.num_high_priority_queues_ != 0);
             BOOST_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
             for (std::size_t i = 0; i < init.num_high_priority_queues_; ++i) {
                 high_priority_queues_[i] =
-                    new thread_queue<>(init.max_queue_thread_count_);
+                    new thread_queue<Mutex>(init.max_queue_thread_count_);
             }
         }
 
@@ -742,9 +745,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        std::vector<thread_queue<>*> queues_;   ///< this manages all the PX threads
-        std::vector<thread_queue<>*> high_priority_queues_;
-        thread_queue<> low_priority_queue_;
+        std::vector<thread_queue<Mutex>*> queues_;   ///< this manages all the PX threads
+        std::vector<thread_queue<Mutex>*> high_priority_queues_;
+        thread_queue<Mutex> low_priority_queue_;
         boost::atomic<std::size_t> curr_queue_;
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;
