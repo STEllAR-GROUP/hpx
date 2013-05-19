@@ -18,7 +18,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void get_processing_units(std::size_t num_threads,
         std::vector<std::size_t>& punits)
     {
-        for (std::size_t i = 0; i < num_threads; ++i)
+        for (std::size_t i = 0; i != num_threads; ++i)
             punits.push_back(i);
     }
 
@@ -94,7 +94,21 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         shutdown_sem_.wait();
 
         // detach this executor from resource manager
-        rm.detach(cookie_);
+        rm.detach(cookie_);     // this releases proxy (manage_thread_pool_executor)
+
+#if defined(HPX_DEBUG)
+        // all resources should have been stopped at this point
+        for (std::size_t i = 0; i != states_.size(); ++i)
+        {
+            BOOST_ASSERT(states_[i] == stopping);
+        }
+
+        // all scheduled tasks should have completed executing
+        BOOST_ASSERT(tasks_completed_ == tasks_scheduled_);
+
+        // all driver threads should have stopped executing
+        BOOST_ASSERT(current_concurrency_ == 0);
+#endif
     }
 
     threads::thread_state_enum thread_pool_executor::thread_function_nullary(
@@ -126,11 +140,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             &thread_pool_executor::thread_function_nullary, this,
             boost::move(f)), desc);
 
-        threads::detail::create_thread(scheduler_, data, initial_state, run_now, ec);
-        if (ec) return;
-
         // update statistics
         ++tasks_scheduled_;
+
+        threads::detail::create_thread(scheduler_, data, initial_state, run_now, ec);
+        if (ec) {
+            --tasks_scheduled_;
+            return;
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -154,12 +171,15 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (ec) return;
         BOOST_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
-        // now schedule new thread for execution
-        threads::detail::set_thread_state_timed(scheduler_, abs_time, id, ec);
-        if (ec) return;
-
         // update statistics
         ++tasks_scheduled_;
+
+        // now schedule new thread for execution
+        threads::detail::set_thread_state_timed(scheduler_, abs_time, id, ec);
+        if (ec) {
+            --tasks_scheduled_;
+            return;
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -183,12 +203,15 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         if (ec) return;
         BOOST_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
-        // now schedule new thread for execution
-        threads::detail::set_thread_state_timed(scheduler_, rel_time, id, ec);
-        if (ec) return;
-
         // update statistics
         ++tasks_scheduled_;
+
+        // now schedule new thread for execution
+        threads::detail::set_thread_state_timed(scheduler_, rel_time, id, ec);
+        if (ec) {
+            --tasks_scheduled_;
+            return;
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -205,21 +228,23 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // execute all work
     void thread_pool_executor::run(std::size_t virt_core)
     {
+        // Set the state to 'running' only if it's still in 'starting' state, 
+        // otherwise our destructor is currently being executed, which means
+        // we need to still execute all threads.
         state expected = starting;
         states_[virt_core].compare_exchange_strong(expected, running);
 
         ++current_concurrency_;
 
-        BOOST_SCOPE_EXIT(&current_concurrency_) {
+        BOOST_SCOPE_EXIT(&current_concurrency_, &shutdown_sem_) {
             --current_concurrency_;
+            shutdown_sem_.signal();
         } BOOST_SCOPE_EXIT_END
 
         boost::int64_t executed_threads = 0;
         boost::uint64_t overall_times = 0, thread_times = 0;
         threads::detail::scheduling_loop(virt_core, scheduler_, 
             states_[virt_core], executed_threads, overall_times, thread_times);
-
-        shutdown_sem_.signal();
     }
 
     // Return statistics collected by this scheduler

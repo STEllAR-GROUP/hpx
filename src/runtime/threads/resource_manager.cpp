@@ -47,6 +47,9 @@ namespace hpx { namespace threads
         std::size_t max_punits = proxy->get_policy_element(detail::max_concurrency, ec1);
         if (ec1) max_punits = threads::hardware_concurrency();
 
+        // lock the resource manager from this point on
+        mutex_type::scoped_lock l(mtx_);
+
         // allocate initial resources for the given executor
         std::vector<std::pair<std::size_t, std::size_t> > cores =
             allocate_virt_cores(proxy, min_punits, max_punits, ec);
@@ -54,12 +57,8 @@ namespace hpx { namespace threads
 
         // attach the given proxy to this resource manager
         std::size_t cookie = ++next_cookie_;
-
-        {
-            mutex_type::scoped_lock l(mtx_);
-            proxies_.insert(proxies_map_type::value_type(
-                cookie, proxy_data(proxy, boost::move(cores))));
-        }
+        proxies_.insert(proxies_map_type::value_type(
+            cookie, proxy_data(proxy, boost::move(cores))));
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -69,6 +68,8 @@ namespace hpx { namespace threads
     // Find 'desired' amount of processing units which have the given use count
     // (use count is the number of schedulers associated with a given processing
     // unit).
+    //
+    // the resource manager is locked while executing this function
     std::size_t resource_manager::reserve_processing_units(
         std::size_t use_count, std::size_t desired,
         std::vector<BOOST_SCOPED_ENUM(punit_status)>& available_punits)
@@ -86,6 +87,7 @@ namespace hpx { namespace threads
         return available;
     }
 
+    // the resource manager is locked while executing this function
     std::vector<std::pair<std::size_t, std::size_t> >
     resource_manager::allocate_virt_cores(
         detail::manage_executor* proxy, std::size_t min_punits,
@@ -150,7 +152,7 @@ namespace hpx { namespace threads
             return;
         }
 
-        // inform executor to give up virtual core
+        // inform executor to give up virtual cores
         proxy_data& p = (*it).second;
         BOOST_FOREACH(coreids_type coreids, p.core_ids_)
         {
@@ -169,9 +171,10 @@ namespace hpx { namespace threads
             return;
         }
 
-        // inform executor to give up virtual core
+        // adjust resource usage count
         BOOST_FOREACH(coreids_type coreids, (*it).second.core_ids_)
         {
+            BOOST_ASSERT(punits_[coreids.first].use_count_ != 0);
             --punits_[coreids.first].use_count_;
         }
 
