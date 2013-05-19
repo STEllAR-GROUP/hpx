@@ -201,7 +201,7 @@ Windows
 5) Press the "Configure" button. A window will pop up asking you which compilers
    to use. Select the x64 Visual Studio 10 compiler (Visual Studio 2012 is
    supported as well). Note that while it is possible to build HPX for x86 
-   we don't recommend doing so as 32 bit runs are severly limited by a 32 bit 
+   we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit 
    Windows system limitation affecting the number of HPX threads you can create.
 
 6) If the "Generate" button is not clickable, press "Configure" again. Repeat
