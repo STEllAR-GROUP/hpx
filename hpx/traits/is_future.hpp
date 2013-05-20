@@ -11,7 +11,7 @@
 
 namespace hpx { namespace lcos
 {
-    template <typename Result, typename RemoteResult> class future;
+    template <typename Result> class future;
 }}
 
 namespace hpx { namespace traits

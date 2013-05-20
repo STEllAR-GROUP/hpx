@@ -94,7 +94,8 @@ struct registration_header
     registration_header(
         naming::locality const& locality_
       , boost::uint64_t parcelport_allocation_
-      , boost::uint64_t response_allocation_      , boost::uint64_t component_runtime_support_ptr_
+      , boost::uint64_t response_allocation_
+      , boost::uint64_t component_runtime_support_ptr_
       , boost::uint64_t component_memory_ptr_
       , boost::uint64_t primary_ns_ptr_
       , boost::uint32_t num_threads_

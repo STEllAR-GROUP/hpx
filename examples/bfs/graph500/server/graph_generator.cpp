@@ -65,9 +65,9 @@ static int generate_4way_bernoulli(mrg_state* st, int level, int nlevels) {
 #endif
   int adjusted_bc_numerator = INITIATOR_BC_NUMERATOR + spk_noise_factor;
   val %= INITIATOR_DENOMINATOR;
-  if (val < adjusted_bc_numerator) return 1;
+  if (val < uint32_t(adjusted_bc_numerator)) return 1;
   val -= adjusted_bc_numerator;
-  if (val < adjusted_bc_numerator) return 2;
+  if (val < uint32_t(adjusted_bc_numerator)) return 2;
   val -= adjusted_bc_numerator;
 #if SPK_NOISE_LEVEL == 0
   if (val < INITIATOR_A_NUMERATOR) return 0;

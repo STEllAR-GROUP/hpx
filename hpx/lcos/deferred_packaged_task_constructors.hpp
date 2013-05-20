@@ -61,7 +61,7 @@ private:
         naming::id_type const& gid,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        if (!((*th->impl_)->is_ready()))
+        if (!((*th->impl_)->ready()))
             th->apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 

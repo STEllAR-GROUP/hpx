@@ -31,6 +31,14 @@ The major new fetures in this release are:
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 765] - Align hpx::any with N3508: Any Library Proposal (Revision 2)
+* [issue 764] - Align hpx::future with newest N3558: A Standardized Representation
+                of Asynchronous Operations
+* [issue 762] - added a human readable output for the ping pong example
+* [issue 761] - Ambiguous typename when constructing derived component
+* [issue 760] - Simple components can not be derived
+* [issue 759] - make install doesn't give a complete install
+* [issue 758] - Stack overflow when using locking_hook<>
 * [issue 757] - copy paste error; unsupported function overloading
 * [issue 755] - Papi counters don't work with reset and evaluate API's
 * [issue 753] - cmake bugfix and improved component action docs
@@ -42,6 +50,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 745] - apply_callback needs to invoke callback when applied locally
 * [issue 744] - CMake fixes
 * [issue 743] - Problem Building github version of HPX
+* [issue 742] - Remove HPX_STD_BIND
 * [issue 741] - assertion 'px != 0' failed: HPX(assertion_failure) for low
                 numbers of OS threads
 * [issue 739] - Performance counters do not count to the end of the program

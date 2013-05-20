@@ -235,15 +235,27 @@ namespace hpx { namespace naming
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int /*version*/)
         {
-            ar & id_msb_;
-            ar & id_lsb_;
+            ar & boost::serialization::make_array(this, 1);
         }
 
         // actual gid
         boost::uint64_t id_msb_;
         boost::uint64_t id_lsb_;
     };
+}}
 
+namespace boost { namespace serialization
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // we know that we can serialize a gid as a byte sequence
+    template <>
+    struct is_bitwise_serializable<hpx::naming::gid_type>
+       : boost::mpl::true_
+    {};
+}}
+
+namespace hpx { namespace naming
+{
     ///////////////////////////////////////////////////////////////////////////
     inline std::ostream& operator<< (std::ostream& os, gid_type const& id)
     {

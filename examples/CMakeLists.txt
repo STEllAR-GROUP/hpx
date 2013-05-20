@@ -42,7 +42,6 @@ set(subdirs
     startup_shutdown
     thread_aware_timer
     throttle
-    tuplespace
    )
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -60,6 +59,12 @@ else()
   set(subdirs ${subdirs}
       hpxla
       geometry
+      )
+endif()
+
+if(HPX_HAVE_CXX11_LAMBDAS)
+  set(subdirs ${subdirs}
+      tuplespace
       )
 endif()
 

@@ -351,11 +351,11 @@ namespace hpx { namespace util
         {
             template <typename Archive>
             void serialize(Archive & ar, unsigned) {}
-            bool operator==(empty const&) const 
+            bool operator==(empty const&) const
             {
                 return false; // undefined
             }
-            bool operator!=(empty const&) const 
+            bool operator!=(empty const&) const
             {
                 return false; // undefined
             }
@@ -457,7 +457,14 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        explicit basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
+        explicit basic_any(T&& x,
+            typename boost::disable_if<
+                boost::is_same<
+                    basic_any,
+                    typename boost::remove_const<
+                        typename util::detail::remove_reference<T>::type
+                    >::type
+                > >::type* = 0)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -637,20 +644,14 @@ namespace hpx { namespace util
         // because hpx::uti::any is used only in contexts where these operators
         // do exist
         template <typename IArchive_, typename OArchive_, typename Char_>
-        friend inline std::basic_istream<Char_>&
+        friend std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
-            basic_any<IArchive_, OArchive_, Char_>& obj)
-        {
-            return obj.table->stream_in(i, &obj.object);
-        }
+            basic_any<IArchive_, OArchive_, Char_>& obj);
 
         template <typename IArchive_, typename OArchive_, typename Char_>
-        friend inline std::basic_ostream<Char_>&
+        friend std::basic_ostream<Char_>&
         operator<< (std::basic_ostream<Char_>& o,
-            basic_any<IArchive_, OArchive_, Char_> const& obj)
-        {
-            return obj.table->stream_out(o, &obj.object);
-        }
+            basic_any<IArchive_, OArchive_, Char_> const& obj);
 
     private:
 
@@ -700,6 +701,22 @@ namespace hpx { namespace util
         void* object;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename IArchive_, typename OArchive_, typename Char_>
+    std::basic_istream<Char_>&
+        operator>> (std::basic_istream<Char_>& i,
+        basic_any<IArchive_, OArchive_, Char_>& obj)
+    {
+        return obj.table->stream_in(i, &obj.object);
+    }
+
+    template <typename IArchive_, typename OArchive_, typename Char_>
+    std::basic_ostream<Char_>&
+        operator<< (std::basic_ostream<Char_>& o,
+        basic_any<IArchive_, OArchive_, Char_> const& obj)
+    {
+        return obj.table->stream_out(o, &obj.object);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Char> // default is char
@@ -758,7 +775,14 @@ namespace hpx { namespace util
 
         // Perfect forwarding of T
         template <typename T>
-        explicit basic_any(T&& x, typename boost::disable_if<boost::is_same<basic_any&, T> >::type* = 0)
+        explicit basic_any(T&& x,
+            typename boost::disable_if<
+                boost::is_same<
+                    basic_any,
+                    typename boost::remove_const<
+                        typename util::detail::remove_reference<T>::type
+                    >::type
+                > >::type* = 0)
           : table(detail::any::get_table<
                       typename boost::remove_const<
                           typename util::detail::remove_reference<T>::type
@@ -932,25 +956,19 @@ namespace hpx { namespace util
             }
         }
 
-    // these functions have been added in the assumption that the embedded
-    // type has a corresponding operator defined, which is completely safe
-    // because hpx::util::any is used only in contexts where these operators
-    // do exist
-        template <typename Char_>
-        friend inline std::basic_istream<Char_>&
+        // these functions have been added in the assumption that the embedded
+        // type has a corresponding operator defined, which is completely safe
+        // because hpx::util::any is used only in contexts where these operators
+        // do exist
+        template <typename IArchive_, typename OArchive_, typename Char_>
+        friend std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
-            basic_any<void, void, Char_>& obj)
-        {
-            return obj.table->stream_in(i, &obj.object);
-        }
+            basic_any<IArchive_, OArchive_, Char_>& obj);
 
-        template <typename Char_>
-        friend inline std::basic_ostream<Char_>&
+        template <typename IArchive_, typename OArchive_, typename Char_>
+        friend std::basic_ostream<Char_>&
         operator<< (std::basic_ostream<Char_>& o,
-            basic_any<void, void, Char_> const& obj)
-        {
-            return obj.table->stream_out(o, &obj.object);
-        }
+            basic_any<IArchive_, OArchive_, Char_> const& obj);
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
@@ -965,7 +983,7 @@ namespace hpx { namespace util
     };
     ///////////////////////////////////////////////////////////////////////////
 
-    template <typename T, typename IArchive, typename OArchive, typename Char>
+    template <typename IArchive, typename OArchive, typename Char>
     void swap(basic_any<IArchive, OArchive, Char>& lhs,
         basic_any<IArchive, OArchive, Char>& rhs) BOOST_NOEXCEPT
     {
@@ -978,8 +996,8 @@ namespace hpx { namespace util
     {
         if (operand && operand->type() == BOOST_SP_TYPEID(T)) {
             return hpx::util::detail::any::get_table<T>::is_small::value ?
-                reinterpret_cast<T*>(&operand->object) :
-                reinterpret_cast<T*>(operand->object);
+                reinterpret_cast<T*>(reinterpret_cast<void*>(&operand->object)) :
+                reinterpret_cast<T*>(reinterpret_cast<void*>(operand->object));
         }
         return 0;
     }
@@ -1008,7 +1026,7 @@ namespace hpx { namespace util
         nonref* result = any_cast<nonref>(&operand);
         if(!result)
             boost::throw_exception(bad_any_cast(operand.type(), BOOST_SP_TYPEID(T)));
-        return *result;
+        return static_cast<T>(*result);
     }
 
     template <typename T, typename IArchive, typename OArchive, typename Char>
@@ -1025,13 +1043,35 @@ namespace hpx { namespace util
         return any_cast<nonref const&>(const_cast<basic_any<IArchive, OArchive, Char> &>(operand));
     }
 
+
     ///////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    typedef basic_any<portable_binary_iarchive, portable_binary_oarchive> any;
+    typedef basic_any<portable_binary_iarchive, portable_binary_oarchive, char> any;
     typedef basic_any<portable_binary_iarchive, portable_binary_oarchive, wchar_t> wany;
 
     typedef basic_any<void, void, char> any_nonser;
     typedef basic_any<void, void, wchar_t> wany_nonser;
+
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    struct hash_any
+    {
+        size_t operator()(const any &elem ) const
+        {
+            std::vector<char> data;
+
+            {
+                portable_binary_oarchive ar (
+                        data, 0, boost::archive::no_header);
+                ar << elem;
+            }  // let archive go out of scope
+
+            // now 'data' has the serialized binary byte stream
+
+            return std::hash<std::string>()(std::string(data.begin(), data.end()));
+        }
+    };
 
 }}    // namespace hpx::util
 

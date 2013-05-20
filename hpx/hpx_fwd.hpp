@@ -35,7 +35,9 @@
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
 /// \namespace hpx
@@ -585,6 +587,12 @@ namespace hpx
         template <typename Result>
         class future;
 
+        template <typename Result>
+        future<typename util::detail::remove_reference<Result>::type> 
+        make_ready_future(BOOST_FWD_REF(Result));
+
+        future<void> make_ready_future();
+
         template <typename ValueType>
         struct object_semaphore;
 
@@ -628,7 +636,9 @@ namespace hpx
     {
         async = 0x01,
         deferred = 0x02,
-        all = 0x03        // async | deferred
+        task = 0x04,        // see N3632
+        sync = 0x08,
+        all = 0x0f          // async | deferred | task | sync
     };
     BOOST_SCOPED_ENUM_END
 
@@ -656,6 +666,7 @@ namespace hpx
     // Pulling important types into the main namespace
     using naming::id_type;
     using lcos::future;
+    using lcos::make_ready_future;
     using lcos::promise;
 
     /// \endcond

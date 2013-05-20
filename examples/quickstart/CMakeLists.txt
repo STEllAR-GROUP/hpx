@@ -10,9 +10,10 @@ set(example_programs
     component_inheritance
     component_inheritance_simple
     error_handling
-    event_synchronization 
+    event_synchronization
     factorial
     fibonacci
+    fibonacci_await
     fibonacci_one
     fibonacci_futures
     fractals
@@ -33,6 +34,7 @@ if(HPX_HAVE_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
       hello_world
       1d_wave_equation
+      fibonacci_dataflow
      )
 endif()
 

@@ -40,7 +40,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         {
             boost::format err("%s (%s)");
             HPX_THROW_EXCEPTION(hpx::no_success, fname,
-                                boost::str(err % info % PAPI_descr_error(rc)));
+                                boost::str(err % info % PAPI_strerror(rc)));
         }
     }
     inline void papi_call(int rc, std::string const& info, char const *fname,

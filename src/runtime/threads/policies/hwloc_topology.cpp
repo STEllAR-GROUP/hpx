@@ -351,10 +351,10 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        hwloc_membind_policy_t policy = HWLOC_MEMBIND_DEFAULT;
-        hwloc_nodeset_t nodeset = hwloc_bitmap_alloc();
-
-        {
+//        hwloc_membind_policy_t policy = HWLOC_MEMBIND_DEFAULT;
+//        hwloc_nodeset_t nodeset = hwloc_bitmap_alloc();
+//
+//        {
 //             scoped_lock lk(topo_mtx);
 //             int ret = hwloc_get_area_membind_nodeset(topo,
 //                 reinterpret_cast<void const*>(lva), 1, nodeset, &policy, 0);
@@ -378,9 +378,9 @@ namespace hpx { namespace threads
 //                 hwloc_bitmap_free(cpuset);
 //                 return mask;
 //             }
-        }
-
-        hwloc_bitmap_free(nodeset);
+//        }
+//
+//        hwloc_bitmap_free(nodeset);
         return empty_mask;
     } // }}}
 

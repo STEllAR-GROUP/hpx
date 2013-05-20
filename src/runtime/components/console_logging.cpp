@@ -8,6 +8,7 @@
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>

@@ -12,6 +12,7 @@
 #include <hpx/util/ini.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/spinlock.hpp>
+#include <hpx/util/tuple.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>

@@ -85,10 +85,10 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Result>
-        void run_impl(lcos::future<Result> const& f);
+        void run_impl(lcos::future<Result>& f);
 
         template <typename Result>
-        void run (lcos::future<Result> const& f, error_code& ec)
+        void run (lcos::future<Result>& f, error_code& ec)
         {
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
@@ -108,7 +108,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename Result>
-        void run (lcos::future<Result> const& f)
+        void run (lcos::future<Result>& f)
         {
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
@@ -126,16 +126,16 @@ namespace hpx { namespace lcos { namespace detail
 
         template <typename Result>
         threads::thread_state_enum
-        async_impl(lcos::future<Result> const& f);
+        async_impl(lcos::future<Result>& f);
 
         template <typename Result>
-        void async (lcos::future<Result> const& f, error_code& ec)
+        void async (lcos::future<Result>& f, error_code& ec)
         {
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
-                        "continuation_base::run",
+                        "continuation_base::async",
                         "this task has already been started");
                     return;
                 }
@@ -151,6 +151,26 @@ namespace hpx { namespace lcos { namespace detail
                 ec = make_success_code();
         }
 
+        template <typename Result>
+        void async (lcos::future<Result>& f)
+        {
+            {
+                typename mutex_type::scoped_lock l(this->mtx_);
+                if (started_) {
+                    HPX_THROW_EXCEPTION(task_already_started,
+                        "continuation_base::async",
+                        "this task has already been started");
+                    return;
+                }
+                started_ = true;
+            }
+
+            future_base_type this_(this);
+            applier::register_thread_plain(
+                HPX_STD_BIND(&continuation_base::async_impl<Result>, this_, f),
+                "continuation_base::async");
+        }
+
         void deleting_owner()
         {
             typename mutex_type::scoped_lock l(this->mtx_);
@@ -164,7 +184,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // cancellation support
-        bool is_cancelable() const
+        bool cancelable() const
         {
             return true;
         }
@@ -180,7 +200,7 @@ namespace hpx { namespace lcos { namespace detail
                     return;
                 }
 
-                if (this->is_ready())
+                if (this->ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {
@@ -220,13 +240,13 @@ namespace hpx { namespace lcos { namespace detail
             ContResult
         >::result_type result_type;
 
-        virtual void do_run(lcos::future<Result> const& f) = 0;
+        virtual void do_run(lcos::future<Result>& f) = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ContResult>
     template <typename Result>
-    void continuation_base<ContResult>::run_impl(lcos::future<Result> const& f)
+    void continuation_base<ContResult>::run_impl(lcos::future<Result>& f)
     {
         typedef continuation<ContResult, Result> derived_type;
         static_cast<derived_type*>(this)->do_run(f);
@@ -235,7 +255,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename ContResult>
     template <typename Result>
     threads::thread_state_enum continuation_base<ContResult>::async_impl(
-        lcos::future<Result> const& f)
+        lcos::future<Result>& f)
     {
         typedef continuation<ContResult, Result> derived_type;
         reset_id r(*this);
@@ -267,7 +287,7 @@ namespace hpx { namespace lcos { namespace local
               : f_(boost::forward<Func>(f))
             {}
 
-            void do_run(lcos::future<Result> const& f)
+            void do_run(lcos::future<Result>& f)
             {
                 try {
                     this->set_data(f_(f));
@@ -297,7 +317,7 @@ namespace hpx { namespace lcos { namespace local
               : f_(boost::forward<Func>(f))
             {}
 
-            void do_run(lcos::future<Result> const& f)
+            void do_run(lcos::future<Result>& f)
             {
                 try {
                     f_(f);
@@ -308,6 +328,29 @@ namespace hpx { namespace lcos { namespace local
                 }
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Source, typename Destination>
+        void transfer_result(Source& src, Destination& dest, boost::mpl::false_)
+        {
+            dest.set_data(src.get());
+        }
+
+        template <typename Source, typename Destination>
+        void transfer_result(Source& src, Destination& dest, boost::mpl::true_)
+        {
+            src.get();
+            dest.set_data(util::unused);
+        }
+
+        template <typename Source, typename Destination>
+        void transfer_result(Source& src, Destination& dest)
+        {
+            typedef typename boost::is_void<
+                typename future_traits<Source>::value_type
+            >::type predicate;
+            transfer_result(src, dest, predicate());
+        }
     }
 
 //     ///////////////////////////////////////////////////////////////////////////
@@ -448,11 +491,12 @@ namespace hpx { namespace lcos
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // attach a local continuation to this future instance
     template <typename Result>
     template <typename F>
     inline future<typename boost::result_of<F(future<Result>)>::type>
-    future<Result>::then(BOOST_FWD_REF(F) f)
+    future<Result>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future)>::type result_type;
 
@@ -460,12 +504,50 @@ namespace hpx { namespace lcos
         typedef lcos::detail::continuation_base<result_type> cont_impl_type;
         boost::intrusive_ptr<cont_impl_type> p(
             detail::make_continuation_base<result_type, Result>(
-                util::bind(util::protect(boost::forward<F>(f)), util::placeholders::_1)));
+                boost::forward<F>(f)));
 
         // bind an on_completed handler to this future which will invoke the
         // continuation
-        void (cont_impl_type::*cb)(lcos::future<Result> const&) =
-            &cont_impl_type::template run<Result>;
+        void (cont_impl_type::*cb)(lcos::future<Result>&);
+        if (policy & launch::sync)
+            cb = &cont_impl_type::template run<Result>;
+        else 
+            cb = &cont_impl_type::template async<Result>;
+
+        future_data_->set_on_completed(util::bind(cb, p, *this));
+
+        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
+    }
+
+    template <typename Result>
+    template <typename F>
+    inline future<typename boost::result_of<F(future<Result>)>::type>
+    future<Result>::then(BOOST_FWD_REF(F) f)
+    {
+        return then(launch::all, boost::forward<F>(f));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F>
+    inline future<typename boost::result_of<F(future<void>)>::type>
+    future<void>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
+    {
+        typedef typename boost::result_of<F(future)>::type result_type;
+
+        // create continuation
+        typedef lcos::detail::continuation_base<result_type> cont_impl_type;
+        boost::intrusive_ptr<cont_impl_type> p(
+            detail::make_continuation_base<result_type, void>(
+                boost::forward<F>(f)));
+
+        // bind an on_completed handler to this future which will invoke the
+        // continuation
+        void (cont_impl_type::*cb)(lcos::future<void>&);
+        if (policy & launch::sync)
+            cb = &cont_impl_type::template run<void>;
+        else 
+            cb = &cont_impl_type::template async<void>;
+
         future_data_->set_on_completed(util::bind(cb, p, *this));
 
         return lcos::detail::make_future_from_data<result_type>(boost::move(p));
@@ -475,21 +557,75 @@ namespace hpx { namespace lcos
     inline future<typename boost::result_of<F(future<void>)>::type>
     future<void>::then(BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future)>::type result_type;
+        return then(launch::all, boost::forward<F>(f));
+    }
 
-        // create continuation
-        typedef lcos::detail::continuation_base<result_type> cont_impl_type;
-        boost::intrusive_ptr<cont_impl_type> p(
-            detail::make_continuation_base<result_type, void>(
-                util::bind(util::protect(boost::forward<F>(f)), util::placeholders::_1)));
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    future<typename future_traits<
+        typename boost::mpl::if_<
+            traits::is_future<Result>, Result, future<void>
+        >::type
+    >::value_type>
+    future<Result>::unwrap(error_code& ec)
+    {
+        BOOST_STATIC_ASSERT_MSG(
+            traits::is_future<Result>::value, "invalid use of unwrap");
 
-        // bind an on_completed handler to this future which will invoke the
-        // continuation
-        void (cont_impl_type::*cb)(lcos::future<void> const&) =
-            &cont_impl_type::template run<void>;
-        future_data_->set_on_completed(util::bind(cb, p, *this));
+        typedef typename future_traits<Result>::value_type result_type;
+        typedef lcos::detail::future_data<result_type> future_data_type;
+
+        if (!valid()) {
+            HPX_THROWS_IF(ec, future_uninitialized,
+                "future<Result>::unwrap",
+                "this future has not been initialized");
+            return future<result_type>();
+        }
+
+        // create a continuation
+        boost::intrusive_ptr<future_data_type> p(new future_data_type());
+
+        // Bind an on_completed handler to this future which will wait for
+        // the inner future and will transfer its result to the new future.
+        void (future::*outer_ready)(boost::intrusive_ptr<future_data_type>) =
+                &future::on_outer_ready<result_type>;
+        future_data_->set_on_completed(util::bind(outer_ready, *this, p));
 
         return lcos::detail::make_future_from_data<result_type>(boost::move(p));
+    }
+
+    template <typename Result>
+    template <typename InnerResult, typename UnwrapResult>
+    void future<Result>::on_inner_ready(future<InnerResult>& inner,
+        boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
+    {
+        try {
+            local::detail::transfer_result(inner, *p);
+        }
+        catch (...) {
+            p->set_exception(boost::current_exception());
+        }
+    }
+
+    template <typename Result>
+    template <typename UnwrapResult>
+    void future<Result>::on_outer_ready(
+        boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
+    {
+        typedef typename future_traits<Result>::value_type inner_result_type;
+
+        void (future::*inner_ready)(future<inner_result_type>&,
+            boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> >) =
+                &future::on_inner_ready<inner_result_type, UnwrapResult>;
+
+        try {
+            // if we get here, this future is ready
+            using util::placeholders::_1;
+            get().then(util::bind(inner_ready, *this, _1, boost::move(p)));
+        }
+        catch(...) {
+            p->set_exception(boost::current_exception());
+        }
     }
 }}
 
