@@ -264,8 +264,8 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_USE_ITTNOTIFY)
-#  define HPX_USE_ITTNOTIFY 0
+#if !defined(HPX_HAVE_ITTNOTIFY)
+#  define HPX_HAVE_ITTNOTIFY 0
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -446,8 +446,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(BOOST_WINDOWS)
 #  define snprintf _snprintf
-#  if !defined(HPX_EMULATE_SWAP_CONTEXT)
-#    define HPX_EMULATE_SWAP_CONTEXT 0
+#  if !defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
+#    define HPX_HAVE_SWAP_CONTEXT_EMULATION 0
 #  endif
 #endif
 
@@ -485,15 +485,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Enable lock verification code which allows to check whether there are locks
 // held while HPX-threads are suspended and/or interrupted.
-#if !defined(HPX_VERIFY_LOCKS)
+#if !defined(HPX_HAVE_VERIFY_LOCKS)
 #  if defined(HPX_DEBUG)
-#    define HPX_VERIFY_LOCKS 1
+#    define HPX_HAVE_VERIFY_LOCKS 1
 #  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_SMALL_STACK_SIZE)
-#  if defined(BOOST_WINDOWS) && !defined(HPX_COROUTINE_USE_GENERIC_CONTEXT)
+#  if defined(BOOST_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 #    define HPX_SMALL_STACK_SIZE    0x4000        // 16kByte
 #  else
 #    if defined(HPX_DEBUG)

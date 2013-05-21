@@ -33,7 +33,7 @@
 
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
-#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
 #endif
 
@@ -209,7 +209,7 @@ namespace hpx {
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
         HPX_STD_FUNCTION<hpx_main_function_type> const& func, bool blocking)
     {
-#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
         // needs to be called to avoid problems at system startup
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
         _isatty(0);

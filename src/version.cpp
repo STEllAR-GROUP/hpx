@@ -10,6 +10,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/stringstream.hpp>
 
+#include <boost/config.hpp>
 #include <boost/version.hpp>
 #include <boost/format.hpp>
 #include <boost/preprocessor/stringize.hpp>
@@ -89,8 +90,6 @@ namespace hpx
     //  HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH=5
     //  HPX_THREAD_MAINTAIN_TARGET_ADDRESS=1
     //  HPX_THREAD_MAINTAIN_QUEUE_WAITTIME=0
-    //  HPX_HAVE_STACKTRACES
-    //  HPX_HAVE_NATIVE_TLS
     //  HPX_UTIL_BIND
     //  HPX_UTIL_FUNCTION
     //  HPX_UTIL_TUPLE
@@ -99,8 +98,6 @@ namespace hpx
     //  HPX_HAVE_CXX11_AUTO
     //  HPX_HAVE_CXX11_DECLTYPE
     //  HPX_HAVE_CXX11_STD_UNIQUE_PTR
-    //  HPX_COROUTINE_USE_FIBERS
-    //  HPX_EMULATE_SWAP_CONTEXT
     //  HPX_ACTION_ARGUMENT_LIMIT=4
     //  HPX_FUNCTION_ARGUMENT_LIMIT=7
 
@@ -148,33 +145,80 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_PARCELPORT_IBVERBS=OFF\n";
 #endif
-#if defined(HPX_VERIFY_LOCKS) && HPX_VERIFY_LOCKS
-        strm << "  HPX_VERIFY_LOCKS=ON\n";
+#if defined(HPX_HAVE_VERIFY_LOCKS) && HPX_HAVE_VERIFY_LOCKS
+        strm << "  HPX_HAVE_VERIFY_LOCKS=ON\n";
 #else
-        strm << "  HPX_VERIFY_LOCKS=OFF\n";
+        strm << "  HPX_HAVE_VERIFY_LOCKS=OFF\n";
 #endif
 #if defined(HPX_HAVE_HWLOC)
         strm << "  HPX_HAVE_HWLOC=ON\n";
 #else
         strm << "  HPX_HAVE_HWLOC=OFF\n";
 #endif
-#if defined(HPX_USE_ITTNOTIFY) && HPX_USE_ITTNOTIFY
-        strm << "  HPX_USE_ITTNOTIFY=ON\n";
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY
+        strm << "  HPX_HAVE_ITTNOTIFY=ON\n";
 #else
-        strm << "  HPX_USE_ITTNOTIFY=OFF\n";
+        strm << "  HPX_HAVE_ITTNOTIFY=OFF\n";
 #endif
 #if defined(BOOST_MSVC)
-#if defined(HPX_COROUTINE_USE_FIBERS)
-        strm << "  HPX_COROUTINE_USE_FIBERS=ON\n";
+#if defined(HPX_HAVE_FIBER_BASED_COROUTINES)
+        strm << "  HPX_HAVE_FIBER_BASED_COROUTINES=ON\n";
 #else
-        strm << "  HPX_COROUTINE_USE_FIBERS=OFF\n";
+        strm << "  HPX_HAVE_FIBER_BASED_COROUTINES=OFF\n";
 #endif
-#if defined(HPX_EMULATE_SWAP_CONTEXT)
-        strm << "  HPX_EMULATE_SWAP_CONTEXT=ON\n";
+#if defined(HPX_HAVE_SWAP_CONTEXT_EMULATION)
+        strm << "  HPX_HAVE_SWAP_CONTEXT_EMULATION=ON\n";
 #else
-        strm << "  HPX_EMULATE_SWAP_CONTEXT=OFF\n";
+        strm << "  HPX_HAVE_SWAP_CONTEXT_EMULATION=OFF\n";
 #endif
 #endif
+        strm << "\n";
+#if defined(HPX_LIMIT)
+        strm << "  HPX_LIMIT=" << HPX_LIMIT << "\n";
+#endif
+#if defined(HPX_ACTION_ARGUMENT_LIMIT)
+        strm << "  HPX_ACTION_ARGUMENT_LIMIT="
+             << HPX_ACTION_ARGUMENT_LIMIT << "\n";
+#endif
+#if defined(HPX_COMPONENT_CREATE_ARGUMENT_LIMIT)
+        strm << "  HPX_COMPONENT_CREATE_ARGUMENT_LIMIT="
+             << HPX_COMPONENT_CREATE_ARGUMENT_LIMIT << "\n";
+#endif
+#if defined(HPX_FUNCTION_ARGUMENT_LIMIT)
+        strm << "  HPX_FUNCTION_ARGUMENT_LIMIT="
+             << HPX_FUNCTION_ARGUMENT_LIMIT << "\n";
+#endif
+#if defined(HPX_LOCK_LIMIT)
+        strm << "  HPX_LOCK_LIMIT=" << HPX_LOCK_LIMIT << "\n";
+#endif
+#if defined(HPX_TUPLE_LIMIT)
+        strm << "  HPX_TUPLE_LIMIT=" << HPX_TUPLE_LIMIT << "\n";
+#endif
+#if defined(HPX_WAIT_ARGUMENT_LIMIT)
+        strm << "  HPX_WAIT_ARGUMENT_LIMIT="
+             << HPX_WAIT_ARGUMENT_LIMIT << "\n";
+#endif
+#if defined(HPX_MAX_PARCEL_CONNECTIONS)
+        strm << "  HPX_MAX_PARCEL_CONNECTIONS="
+             << HPX_MAX_PARCEL_CONNECTIONS << "\n";
+#endif
+#if defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY)
+        strm << "  HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY="
+             << HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY << "\n";
+#endif
+#if defined(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE)
+        strm << "  HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE="
+             << HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE << "\n";
+#endif
+#if defined(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD)
+        strm << "  HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD="
+             << HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD << "\n";
+#endif
+#if defined(HPX_HAVE_PARCELPORT_SHMEM) && defined(HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE)
+        strm << "  HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE="
+             << HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE << "\n";
+#endif
+
         strm << "  HPX_PREFIX=" << HPX_PREFIX << "\n";
 
         return util::osstream_get_string(strm);
