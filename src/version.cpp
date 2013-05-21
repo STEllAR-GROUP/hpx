@@ -107,7 +107,7 @@ namespace hpx
     std::string configuration_string()
     {
         hpx::util::osstream strm;
-        strm << "{config}:\n";
+
 #if defined(HPX_HAVE_NATIVE_TLS)
         strm << "  HPX_HAVE_NATIVE_TLS=ON\n";
 #else
@@ -203,8 +203,8 @@ namespace hpx
     {
         // HWLOC_API_VERSION: 0x00010700
         return boost::str(boost::format("V%d.%d.%d") %
-            (HWLOC_API_VERSION / 10000) % (HWLOC_API_VERSION / 100 % 1000) %
-            (HWLOC_API_VERSION % 100));
+            (HWLOC_API_VERSION / 0x10000) % (HWLOC_API_VERSION / 0x100 % 0x100) %
+            (HWLOC_API_VERSION % 0x100));
     }
 #endif
 
@@ -238,7 +238,7 @@ namespace hpx
             "  Date: %s\n"
             "  Platform: %s\n"
             "  Compiler: %s\n"
-            "  Standard Library: %s\n");
+            "  Standard Library: %s");
 
         return boost::str(logo %
             build_string() %
