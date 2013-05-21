@@ -18,6 +18,7 @@ described in the table below:
     [[`--hpx:help`, `--help` or `-h`]       [print out program usage (default: this message), possible
                                              values: 'full' (additionally prints options from components)]]
     [[`--hpx:version`, `--version` or `-v`] [print out __hpx__ version and copyright information]]
+    [[`--hpx:info`]                         [print out __hpx__ configuration information]]
     [[`--hpx:options-file arg`]             [specify a file containing command line options
                                              (alternatively: @filepath)]]
 
