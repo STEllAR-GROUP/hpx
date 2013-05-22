@@ -84,8 +84,6 @@ int hpx_main()
             // finish executing
         }
 
-        wait_all(iteration);
-
         hpx::cout << sizeX*sizeY << " calculations run in " 
                   << t.elapsed() 
                   << "s. Transferring from futures to general memory...\n"
