@@ -1708,10 +1708,13 @@ void addressing_service::update_cache_entry(
             gva_cache_type::entry_type e;
 
             if (!gva_cache_.get_entry(key, idbase, e))
+            {
                 // This is impossible under sane conditions.
                 HPX_THROWS_IF(ec, invalid_data
                   , "addressing_service::update_cache_entry"
                   , "data corruption or lock error occurred in cache");
+                return;
+            }
 
             LAS_(warning) <<
                 ( boost::format(
