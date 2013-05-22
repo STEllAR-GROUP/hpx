@@ -75,14 +75,9 @@ namespace hpx { namespace util
         template <typename T>
         struct get_table;
 
-        struct fxn_ptr_table_virtbase
-        {
-            virtual ~fxn_ptr_table_virtbase() {}
-        };
-
         // serializable function pointer table
         template <typename IArchive, typename OArchive, typename Char>
-        struct fxn_ptr_table : fxn_ptr_table_virtbase
+        struct fxn_ptr_table
         {
             virtual fxn_ptr_table * get_ptr() = 0;
 
@@ -104,7 +99,7 @@ namespace hpx { namespace util
 
         // function pointer table
         template <typename Char>
-        struct fxn_ptr_table<void, void, Char> : fxn_ptr_table_virtbase
+        struct fxn_ptr_table<void, void, Char>
         {
             virtual fxn_ptr_table * get_ptr() = 0;
             boost::detail::sp_typeinfo const& (*get_type)();
@@ -405,11 +400,6 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
 // disable tracking for function pointer table
 namespace boost { namespace serialization
 {
-    template <>
-    struct tracking_level<hpx::util::detail::any::fxn_ptr_table_virtbase>
-      : boost::mpl::int_<boost::serialization::track_never>
-    {};
-
     template <typename IArchive, typename OArchive, typename Char>
     struct tracking_level<
             hpx::util::detail::any::fxn_ptr_table<IArchive, OArchive, Char> >
