@@ -75,11 +75,17 @@ namespace hpx { namespace util
         template <typename T>
         struct get_table;
 
+        struct fxn_ptr_table_virtbase
+        {
+            virtual ~fxn_ptr_table_virtbase() {}
+        };
+
         // serializable function pointer table
         template <typename IArchive, typename OArchive, typename Char>
-        struct fxn_ptr_table
+        struct fxn_ptr_table : fxn_ptr_table_virtbase
         {
             virtual fxn_ptr_table * get_ptr() = 0;
+
             boost::detail::sp_typeinfo const& (*get_type)();
             void (*static_delete)(void**);
             void (*destruct)(void**);
@@ -98,7 +104,7 @@ namespace hpx { namespace util
 
         // function pointer table
         template <typename Char>
-        struct fxn_ptr_table<void, void, Char>
+        struct fxn_ptr_table<void, void, Char> : fxn_ptr_table_virtbase
         {
             virtual fxn_ptr_table * get_ptr() = 0;
             boost::detail::sp_typeinfo const& (*get_type)();
@@ -394,6 +400,28 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (template <typename IArchive, typename OArchive, typename Vtable, typename Char>)
   , (hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char>)
 )
+
+///////////////////////////////////////////////////////////////////////////////
+// disable tracking for function pointer table
+namespace boost { namespace serialization
+{
+    template <>
+    struct tracking_level<hpx::util::detail::any::fxn_ptr_table_virtbase>
+      : boost::mpl::int_<boost::serialization::track_never>
+    {};
+
+    template <typename IArchive, typename OArchive, typename Char>
+    struct tracking_level<
+            hpx::util::detail::any::fxn_ptr_table<IArchive, OArchive, Char> >
+      : boost::mpl::int_<boost::serialization::track_never>
+    {};
+
+    template <typename IArchive, typename OArchive, typename Vtable, typename Char>
+    struct tracking_level<
+            hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char> >
+      : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 
 namespace hpx { namespace util
 {
