@@ -17,6 +17,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 //Units are in m, kg, s, and therefore N.
 ///////////////////////////////////////////////////////////////////////////////
+
+#include<hpx/hpx.hpp>
+#include<hpx/hpx_fwd.hpp>
+#include<hpx/hpx_init.hpp>
+#include<hpx/runtime/actions/plain_action.hpp>
+#include<hpx/runtime/components/plain_component_factory.hpp>
+#include<hpx/util/high_resolution_timer.hpp>
+#include<hpx/lcos/async.hpp>
+
 #include<iostream>
 #include<fstream>
 #include<sstream>
@@ -30,14 +39,6 @@
 
 #include<boost/cstdint.hpp>
 #include<boost/format.hpp>
-
-#include<hpx/hpx.hpp>
-#include<hpx/hpx_fwd.hpp>
-#include<hpx/hpx_init.hpp>
-#include<hpx/runtime/actions/plain_action.hpp>
-#include<hpx/runtime/components/plain_component_factory.hpp>
-#include<hpx/util/high_resolution_timer.hpp>
-#include<hpx/lcos/async.hpp>
 
 #include "gravity.hpp"
 
@@ -72,7 +73,7 @@ namespace boost
 //Forward Declarations
 vector<future<void> > calc(uint64_t k,uint64_t t);
 vector<components> dist(uint64_t t,uint64_t i,uint64_t l);
-void move(vector<future<void> > const& cfp,config_f const& param,uint64_t k,
+void move1(vector<future<void> > const& cfp,config_f const& param,uint64_t k,
           uint64_t t);
 void printval(future<void> const & mp,config_f& param,uint64_t k,uint64_t t,
                ofstream &coorfile, ofstream &trbst);///!!!!//
@@ -87,7 +88,7 @@ void calc_force(uint64_t k,uint64_t t,uint64_t i);
 ///////////////////////////////////////////////////////////////////////////////
 //Action Declarations
 HPX_PLAIN_ACTION(calc_force);
-HPX_PLAIN_ACTION(move);
+HPX_PLAIN_ACTION(move1, move_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 //Global Variables
@@ -103,11 +104,11 @@ int hpx_main(variables_map& vm)
      ofstream trbst; //optional output file
      string j; // Buffer
      uint64_t k=0; //Number of points in simulation
-     float ct=0; //Computation time
+     double ct=0; //Computation time
      vector<future<void> > cfp; // calc_force promises
      future<void> mp; //move promise
 
-     debug=vm.count("debug");
+     debug=vm.count("debug") ? true : false;
      cout <<"Config File Location: "<< vm["config-file"].as<std::string>() 
           << "\n";
      param.num_cores=get_os_thread_count();
@@ -205,7 +206,7 @@ vector<components> dist(uint64_t t,uint64_t i,uint64_t l) {
 
 void move(vector<future<void> >const& cfp,config_f const & param,uint64_t k,uint64_t t) {
  uint64_t tn=t+1;
- double timestep=param.timestep; //the timestep
+ double timestep= double(param.timestep); //the timestep
  
  for (uint64_t i=0;i<k;++i) {
      wait(cfp[i]);
