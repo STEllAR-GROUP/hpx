@@ -6,9 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_SIGNING_REQUEST_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_SIGNING_REQUEST_HPP
 
-#include <hpx/hpx_fwd.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <hpx/hpx_fwd.hpp>
 
+#include "capability.hpp"
 #include "identity.hpp"
 #include "public_key.hpp"
 
@@ -17,6 +18,8 @@ namespace hpx { namespace components { namespace security { namespace server
     class certificate_signing_request
     {
     public:
+        static std::size_t const capability_size = 8;
+
         certificate_signing_request()
         {
         }
@@ -38,6 +41,11 @@ namespace hpx { namespace components { namespace security { namespace server
             return subject_public_key_;
         }
 
+        capability const & get_capability() const
+        {
+            return capability_;
+        }
+
     private:
         friend class boost::serialization::access;
 
@@ -46,10 +54,13 @@ namespace hpx { namespace components { namespace security { namespace server
         {
             ar & subject_;
             ar & subject_public_key_;
+            ar & capability_;
         }
 
         identity subject_;
         public_key subject_public_key_;
+
+        capability capability_;
     };
 }}}}
 
