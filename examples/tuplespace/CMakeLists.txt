@@ -19,7 +19,7 @@ foreach(example ${examples})
   # add example executable
   add_hpx_executable(${example}_client
     SOURCES ${sources}
-    DEPENDENCIES ${example}_component
+    DEPENDENCIES ${example}_component iostreams_component
     FOLDER "Examples/TupleSpace/${example}")
 
   # add a custom target for this example

@@ -20,7 +20,7 @@ int level_bbox(int level,parameter &par)
 {
   int rc;
   int ghostwidth = par->ghostwidth;
-  double ethreshold = par->ethreshold;
+//  double ethreshold = par->ethreshold;
 
   int gi;
   double minx,maxx;

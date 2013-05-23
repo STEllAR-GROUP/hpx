@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -142,6 +143,14 @@ namespace {
             nodes.insert(nodes.end(), tmp_nodes.begin(), tmp_nodes.end());
         }
     };
+
+    void add_tasks_per_node(std::size_t idx, std::size_t n, std::vector<std::size_t> & nodes)
+    {
+        for(std::size_t i = 0; i < n; ++i)
+        {
+            nodes.push_back(idx);
+        }
+    }
 }
 
 namespace hpx { namespace util
@@ -320,6 +329,8 @@ namespace hpx { namespace util
         std::string const& agas_host)
     {
         char* slurm_nodelist_env = std::getenv("SLURM_NODELIST");
+
+        /** FIXME: use that info
         char* tasks_per_node_env = std::getenv("SLURM_TASKS_PER_NODE");
 
         std::vector<std::size_t> tasks_per_node;
@@ -342,19 +353,9 @@ namespace hpx { namespace util
                 begin
               , end
               , (
-                  (   qi::int_ >> "(x" >> qi::int_ >> ')')[
-                           phoenix::for_(
-                               phoenix::ref(i) = 0
-                             , phoenix::ref(i) != qi::_2
-                             , ++phoenix::ref(i)
-                           )
-                           [
-                               phoenix::push_back(
-                                   phoenix::ref(tasks_per_node)
-                                 , qi::_1
-                               )
-                           ]
-                  ]
+                    (qi::int_ >> "(x" >> qi::int_ >> ')')[
+                        phoenix::bind(::add_tasks_per_node, qi::_1, qi::_2, phoenix::ref(tasks_per_node))
+                    ]
                 | qi::int_[
                         phoenix::push_back(
                             phoenix::ref(tasks_per_node)
@@ -364,6 +365,7 @@ namespace hpx { namespace util
                 ) % ','
             );
         }
+        **/
 
         if (slurm_nodelist_env)
         {

@@ -72,7 +72,7 @@ typedef void* __itt_heap_function;
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
 
-#if HPX_USE_ITTNOTIFY != 0
+#if HPX_HAVE_ITTNOTIFY != 0
 extern bool use_ittnotify_api;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -456,6 +456,6 @@ namespace hpx { namespace util { namespace itt
     };
 }}}
 
-#endif // HPX_USE_ITTNOTIFY
+#endif // HPX_HAVE_ITTNOTIFY
 
 #endif

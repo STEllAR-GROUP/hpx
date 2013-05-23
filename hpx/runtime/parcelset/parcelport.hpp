@@ -17,6 +17,8 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <boost/enable_shared_from_this.hpp>
+
 #include <string>
 #include <map>
 #include <vector>
@@ -36,7 +38,9 @@ namespace hpx { namespace parcelset
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
     /// to receive parcels.
-    class HPX_EXPORT parcelport : boost::noncopyable
+    class HPX_EXPORT parcelport 
+      : public boost::enable_shared_from_this<parcelport>,
+        boost::noncopyable
     {
     private:
         // avoid warnings about using \a this in member initializer list

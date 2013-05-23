@@ -9,8 +9,10 @@
 #include <vector>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/access.hpp>
+#include <boost/type_traits/remove_const.hpp>
 
 #include <hpx/util/any.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace storage
@@ -24,7 +26,7 @@ namespace hpx { namespace util { namespace storage
 
             typedef std::vector<hpx::util::any> tuple_holder;
             typedef hpx::util::any elem_type;
-            typedef std::string key_type;
+            typedef hpx::util::hash_any hash_elem_functor;
 
             typedef tuple_holder::iterator iterator;
             typedef tuple_holder::const_iterator const_iterator;
@@ -43,14 +45,59 @@ namespace hpx { namespace util { namespace storage
 
             bool empty() const
             {
-                return tuple_.empty();
+                if(tuple_.empty())
+                {
+                    return true;
+                }
+                else
+                {
+                    for(const_iterator it = tuple_.begin();
+                            it != tuple_.end(); ++it)
+                    {
+                        if(!it->empty())
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
+
+            size_t size() const
+            {
+                return tuple_.size();
+            }
+
+            tuple& push_back(const elem_type& elem)
+            {
+                tuple_.push_back(elem);
+                return *this;
             }
 
             template <typename T>
-            tuple& push_back(const T& field)
+            tuple& push_back(const T& field, 
+                    typename boost::disable_if<boost::is_same<
+                        elem_type, 
+                        typename boost::remove_const<
+                            typename util::detail::remove_reference<T>::type
+                        >::type
+                    > >::type* = 0)
             {
                 tuple_.push_back(elem_type(field)); // insert an any object
                 return *this;
+            }
+
+            tuple& push_back_empty()
+            {
+                tuple_.push_back(elem_type()); // insert an empty any object
+                return *this;
+            }
+
+            template <typename T>
+            T get(unsigned int index)
+            {
+                return hpx::util::any_cast<T>(tuple_.at(index));
             }
 
             iterator begin()

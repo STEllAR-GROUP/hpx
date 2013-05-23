@@ -18,6 +18,7 @@ described in the table below:
     [[`--hpx:help`, `--help` or `-h`]       [print out program usage (default: this message), possible
                                              values: 'full' (additionally prints options from components)]]
     [[`--hpx:version`, `--version` or `-v`] [print out __hpx__ version and copyright information]]
+    [[`--hpx:info`]                         [print out __hpx__ configuration information]]
     [[`--hpx:options-file arg`]             [specify a file containing command line options
                                              (alternatively: @filepath)]]
 
@@ -196,7 +197,7 @@ information needs to be stored in one of the `ini` configuration files:
 For runs involving more than one locality it is sometimes desireable to supply
 specific command line options to single localities only. Especially when the
 __hpx__ application is launched using a scheduler (like PBS, for more details
-see section __pbs__), specifying dedicated command line options for single
+see section __using_pbs__), specifying dedicated command line options for single
 localities could prove to be tricky. For this reason all of the command line
 options which have the general format `--hpx:<some_key>` can be used in a more
 general form: `--hpx:<N>:<some_key>`, where <N> is the number of the locality

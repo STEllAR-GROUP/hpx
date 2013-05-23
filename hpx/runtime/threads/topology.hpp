@@ -53,6 +53,11 @@ namespace hpx { namespace threads
         return (mask != 0) ? true : false;
     }
 
+    inline mask_type not_(mask_cref_type mask)
+    {
+        return ~mask;
+    }
+
     inline bool test(mask_cref_type mask, std::size_t idx)
     {
         BOOST_ASSERT(idx < sizeof(bits)/sizeof(bits[0]));
@@ -96,6 +101,11 @@ namespace hpx { namespace threads
     inline bool any(mask_cref_type mask)
     {
         return mask.any();
+    }
+
+    inline mask_type not_(mask_cref_type mask)
+    {
+        return ~mask;
     }
 
     inline bool test(mask_cref_type mask, std::size_t idx)

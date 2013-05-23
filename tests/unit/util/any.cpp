@@ -9,7 +9,11 @@
 #include <hpx/util/any.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/unordered_map.hpp>
+#include <hpx/util/storage/tuple.hpp>
+
 #include <boost/serialization/access.hpp>
+#include <boost/any.hpp>
 
 #include "small_big_object.hpp"
 
@@ -27,6 +31,24 @@ using hpx::finalize;
 int hpx_main(variables_map& vm)
 {
     {
+        {
+
+            typedef uint64_t index_type;
+            typedef hpx::util::any elem_type;
+            typedef hpx::util::hash_any hash_elem_functor;
+
+            typedef boost::unordered_multimap<elem_type, index_type, hash_elem_functor> field_index_map_type;
+            typedef field_index_map_type::iterator field_index_map_iterator_type;
+
+            field_index_map_type field_index_map_;
+            field_index_map_iterator_type it;
+            elem_type elem(std::string("first string"));
+            index_type id = 1;
+
+            std::pair<elem_type, index_type> pp=std::make_pair(elem,id);
+            it = field_index_map_.insert(pp);
+        }
+
         // test equality
         {
             any any1(7), any2(7), any3(10), any4(std::string("seven"));

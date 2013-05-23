@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/itt_notify.hpp>
 
-#if HPX_USE_ITTNOTIFY != 0
+#if HPX_HAVE_ITTNOTIFY != 0
 
 #include <ittnotify.h>
 #include <legacy/ittnotify.h>
@@ -360,5 +360,5 @@ void itt_heap_internal_access_end()
     HPX_INTERNAL_INTERNAL_ACCESS_END();
 }
 
-#endif // HPX_USE_ITTNOTIFY
+#endif // HPX_HAVE_ITTNOTIFY
 

@@ -449,7 +449,7 @@ public:
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool get_console_locality(
-        naming::gid_type& locality_id
+        naming::gid_type& locality
       , error_code& ec = throws
         );
 

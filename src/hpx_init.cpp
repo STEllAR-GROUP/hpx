@@ -504,8 +504,6 @@ namespace hpx
         {
             add_startup_functions(rt, vm, mode, startup, shutdown);
 
-            util::apex_wrapper apex("hpx-application");
-
             // Run this runtime instance using the given function f.
             if (0 != f)
                 return rt.run(boost::bind(f, vm));
@@ -938,16 +936,14 @@ namespace hpx
         shutdown_function_type const& shutdown, hpx::runtime_mode mode,
         bool blocking)
     {
-#ifdef HPX_HAVE_APEX
-        apex_init(argc, argv);
-#endif
-
         int result = 0;
         set_error_handlers();
 
         try {
             // handle all common command line switches
             util::command_line_handling cfg(mode, f, ini_config);
+
+            util::apex_wrapper_init(argc, argv);
 
             result = cfg.call(desc_cmdline, argc, argv);
             if (result != 0) {
@@ -1113,6 +1109,7 @@ namespace hpx
                   get_runtime().get_runtime_support_lva());
 
         p->shutdown_all(shutdown_timeout);
+        util::apex_finalize();
 
         return 0;
     }
@@ -1163,19 +1160,44 @@ namespace hpx
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
 
-        p->terminate_all();
+        if (0 == p) {
+            components::stubs::runtime_support::terminate_all(
+                naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+            return;
+        }
 
+        p->terminate_all();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int stop()
+    int stop(error_code& ec)
     {
         HPX_STD_UNIQUE_PTR<runtime> rt(get_runtime_ptr());    // take ownership!
+        if (0 == rt.get()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
 
         int result = rt->wait();
         rt->stop();
 
         return result;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    int wait(error_code& ec)
+    {
+        runtime* rt(get_runtime_ptr());
+        if (0 == rt) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::wait",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
+
+        return rt->wait();
     }
 }
 

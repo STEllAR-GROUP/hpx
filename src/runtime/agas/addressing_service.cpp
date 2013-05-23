@@ -818,11 +818,6 @@ bool addressing_service::bind_range(
   , error_code& ec
     )
 { // {{{ bind_range implementation
-    typedef lcos::packaged_action<server::primary_namespace::service_action>
-        future_type;
-
-//     future_type* f = 0;
-
     try {
         naming::locality const& ep = baseaddr.locality_;
 
@@ -1713,10 +1708,13 @@ void addressing_service::update_cache_entry(
             gva_cache_type::entry_type e;
 
             if (!gva_cache_.get_entry(key, idbase, e))
+            {
                 // This is impossible under sane conditions.
                 HPX_THROWS_IF(ec, invalid_data
                   , "addressing_service::update_cache_entry"
                   , "data corruption or lock error occurred in cache");
+                return;
+            }
 
             LAS_(warning) <<
                 ( boost::format(

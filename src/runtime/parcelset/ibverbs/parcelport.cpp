@@ -82,7 +82,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 acceptor_->bind(ep);
 
                 acceptor_->async_accept(conn->context(),
-                    boost::bind(&parcelport::handle_accept, this,
+                    boost::bind(&parcelport::handle_accept, 
+                        this->shared_from_this(),
                         boost::asio::placeholders::error, conn));
             }
             catch (boost::system::system_error const& e) {
@@ -154,7 +155,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 io_service_pool_.get_io_service(), *this));
 
             acceptor_->async_accept(conn->context(),
-                boost::bind(&parcelport::handle_accept, this,
+                boost::bind(&parcelport::handle_accept, 
+                    this->shared_from_this(),
                     boost::asio::placeholders::error, conn));
 
             {
@@ -166,7 +168,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             // now accept the incoming connection by starting to read from the
             // context
             c->async_read(boost::bind(&parcelport::handle_read_completion,
-                this, boost::asio::placeholders::error, c));
+                this->shared_from_this(), boost::asio::placeholders::error, c));
         }
         else {
             // remove this connection from the list of known connections
@@ -359,8 +361,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         // Create a new HPX thread which sends parcels that are still pending.
         hpx::applier::register_thread_nullary(
-            HPX_STD_BIND(&parcelport::retry_sending_parcels, this,
-                locality_id), "retry_sending_parcels",
+            HPX_STD_BIND(&parcelport::retry_sending_parcels, 
+                this->shared_from_this(), locality_id), "retry_sending_parcels",
                 threads::pending, true, threads::thread_priority_critical);
     }
 
@@ -377,7 +379,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
         // ... start an asynchronous write operation now.
         client_connection->async_write(
             hpx::parcelset::detail::call_for_each(handlers),
-            boost::bind(&parcelport::send_pending_parcels_trampoline, this,
+            boost::bind(&parcelport::send_pending_parcels_trampoline, 
+                this->shared_from_this(),
                 boost::asio::placeholders::error, ::_2, ::_3));
     }
 

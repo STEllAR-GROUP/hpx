@@ -41,7 +41,7 @@ namespace hpx { namespace lcos { namespace local
             // result
             void deleting_owner()
             {
-                if (!this->is_ready()) {
+                if (!this->ready()) {
                     this->set_error(broken_promise,
                         "future_object<Result>::deleting_owner",
                         "deleting owner before future has become ready");
@@ -130,7 +130,7 @@ namespace hpx { namespace lcos { namespace local
             typename mutex_type::scoped_lock l(mtx_);
             if (task_)
             {
-                if (task_->is_ready() && !future_obtained_)
+                if (task_->ready() && !future_obtained_)
                 {
                     task_->set_error(broken_promise,
                         "promise<Result>::~promise()",
@@ -158,7 +158,7 @@ namespace hpx { namespace lcos { namespace local
 
                 if (task_)
                 {
-                    if (task_->is_ready() && !future_obtained_)
+                    if (task_->ready() && !future_obtained_)
                     {
                         task_->set_error(broken_promise,
                             "promise<Result>::operator=()",
@@ -237,10 +237,10 @@ namespace hpx { namespace lcos { namespace local
             return task_.get() ? true : false;
         }
 
-        bool is_ready() const
+        bool ready() const
         {
             typename mutex_type::scoped_lock l(mtx_);
-            return task_->is_ready();
+            return task_->ready();
         }
 
     protected:
@@ -272,7 +272,7 @@ namespace hpx { namespace lcos { namespace local
 
             if (task_)
             {
-                if (task_->is_ready() && !future_obtained_)
+                if (task_->ready() && !future_obtained_)
                 {
                     task_->set_error(broken_promise,
                         "promise<Result>::operator=()",
@@ -301,7 +301,7 @@ namespace hpx { namespace lcos { namespace local
 
                 if (task_)
                 {
-                    if (task_->is_ready() && !future_obtained_)
+                    if (task_->ready() && !future_obtained_)
                     {
                         task_->set_error(broken_promise,
                             "promise<void>::operator=()",
@@ -380,10 +380,10 @@ namespace hpx { namespace lcos { namespace local
             return task_.get() ? true : false;
         }
 
-        bool is_ready() const
+        bool ready() const
         {
             mutex_type::scoped_lock l(mtx_);
-            return task_->is_ready();
+            return task_->ready();
         }
 
     private:
@@ -427,7 +427,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (task_)
             {
-                if (task_->is_ready() && !future_obtained_)
+                if (task_->ready() && !future_obtained_)
                 {
                     task_->set_error(broken_promise,
                         "packaged_task<Result()>::operator=()",
@@ -450,7 +450,7 @@ namespace hpx { namespace lcos { namespace local
             if (this != &rhs) {
                 if (task_)
                 {
-                    if (task_->is_ready() && !future_obtained_)
+                    if (task_->ready() && !future_obtained_)
                     {
                         task_->set_error(broken_promise,
                             "packaged_task<Result()>::operator=()",

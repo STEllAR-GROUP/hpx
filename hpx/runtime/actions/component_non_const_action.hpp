@@ -551,12 +551,6 @@ namespace hpx { namespace actions
         HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, func)::type name\
     /**/
 
-///////////////////////////////////////////////////////////////////////////////
-// Register the action templates with serialization.
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Action>), (hpx::actions::transfer_action<Action>)
-)
-
 /// \endcond
 
 #include <hpx/config/warnings_suffix.hpp>

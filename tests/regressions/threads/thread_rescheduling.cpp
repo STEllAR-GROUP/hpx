@@ -62,7 +62,7 @@ namespace detail
             {
                 // loop over all lazy_values, executing the next as soon as its
                 // value gets available
-                if (!handled[i] && lazy_values[i].is_ready())
+                if (!handled[i] && lazy_values[i].ready())
                 {
                     handled[i] = true;
                     ++handled_count;

@@ -30,11 +30,15 @@ macro(add_hpx_executable name)
   endif()
 
   # add the executable build target
+  if(NOT HPX_EXTERNAL_CMAKE)
+    set(exclude_from_all EXCLUDE_FROM_ALL)
+  endif()
+
   if(${${name}_ESSENTIAL})
     add_executable(${name}_exe
       ${${name}_SOURCES} ${${name}_HEADERS})
   else()
-    add_executable(${name}_exe EXCLUDE_FROM_ALL
+    add_executable(${name}_exe ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 

@@ -149,7 +149,19 @@ namespace hpx
     /// called on every locality. This function should be used only if the 
     /// runtime system was started using `hpx::start`.
     ///
-    HPX_EXPORT int stop();
+    HPX_EXPORT int stop(error_code& ec = throws);
+
+    /// \brief Wait for the runtime system to finish executing
+    ///
+    /// \returns            The function returns the value, which has been
+    ///                     returned from the user supplied main HPX function
+    ///                     (usually `hpx_main`).
+    ///
+    /// This function will block and wait for this locality to finish executing
+    /// before returning to the caller. This function should be used only if the 
+    /// runtime system was started using `hpx::start`.
+    ///
+    HPX_EXPORT int wait(error_code& ec = throws);
 }
 
 #endif

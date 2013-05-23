@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -41,14 +41,11 @@ namespace hpx { namespace parcelset { namespace shmem
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
 #if defined(HPX_DEBUG)
-        // make sure that all parcels require the same serialization filter and
-        // that all of them go to the same locality
-        util::binary_filter* filter = pv[0].get_serialization_filter();
+        // make sure that all parcels go to the same locality
         BOOST_FOREACH(parcel const& p, pv)
         {
             naming::locality const locality_id = p.get_destination_locality();
             BOOST_ASSERT(locality_id == destination());
-            BOOST_ASSERT(filter == p.get_serialization_filter());
         }
 #endif
 

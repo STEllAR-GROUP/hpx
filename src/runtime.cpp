@@ -22,7 +22,7 @@
 #include <iostream>
 #include <vector>
 
-#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
 #endif
 
@@ -490,6 +490,30 @@ namespace hpx
             naming::id_type::unmanaged);
     }
 
+    naming::id_type find_root_locality(error_code& ec)
+    {
+        runtime* rt = hpx::get_runtime_ptr();
+        if (NULL == rt)
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
+                "the runtime system is not available at this time");
+            return naming::invalid_id;
+        }
+
+        naming::gid_type console_locality;
+        if (!rt->get_agas_client().get_console_locality(console_locality))
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
+                "the root locality is not available at this time");
+            return naming::invalid_id;
+        }
+
+        if (&ec != &throws) 
+            ec = make_success_code();
+
+        return naming::id_type(console_locality, naming::id_type::unmanaged);
+    }
+
     std::vector<naming::id_type>
     find_all_localities(components::component_type type, error_code& ec)
     {
@@ -578,7 +602,7 @@ namespace hpx
     lcos::future<boost::uint32_t> get_num_localities_async()
     {
         if (NULL == hpx::get_runtime_ptr())
-            return lcos::make_future<boost::uint32_t>(0);
+            return lcos::make_ready_future<boost::uint32_t>(0);
 
         return get_runtime().get_agas_client().get_num_localities_async();
     }
@@ -587,7 +611,7 @@ namespace hpx
         components::component_type type)
     {
         if (NULL == hpx::get_runtime_ptr())
-            return lcos::make_future<boost::uint32_t>(0);
+            return lcos::make_ready_future<boost::uint32_t>(0);
 
         return get_runtime().get_agas_client().get_num_localities_async(type);
     }

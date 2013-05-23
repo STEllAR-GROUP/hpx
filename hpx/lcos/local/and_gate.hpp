@@ -192,7 +192,7 @@ namespace hpx { namespace lcos { namespace local
                 return;
             }
 
-           // make sure this set operation has not arrived ahead of time
+            // make sure this set operation has not arrived ahead of time
             if (!test_condition(generation))
             {
                 conditional_trigger c;

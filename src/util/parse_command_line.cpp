@@ -328,6 +328,7 @@ namespace hpx { namespace util
                     "print out program usage (default: this message), possible "
                     "values: 'full' (additionally prints options from components)")
                 ("hpx:version", "print out HPX version and copyright information")
+                ("hpx:info", "print out HPX configuration information")
                 ("hpx:options-file", value<std::vector<std::string> >()->composing(),
                     "specify a file containing command line options "
                     "(alternatively: @filepath)")

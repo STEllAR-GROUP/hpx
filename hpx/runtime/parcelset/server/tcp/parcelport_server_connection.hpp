@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011 Katelyn Kufahl
 //  Copyright (c) 2011 Bryce Lelbach
 //
@@ -62,9 +62,11 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         ~parcelport_connection()
         {
             // gracefully and portably shutdown the socket
-            boost::system::error_code ec;
-            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-            socket_.close(ec);    // close the socket to give it back to the OS
+            if (socket_.is_open()) {
+                boost::system::error_code ec;
+                socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+                socket_.close(ec);    // close the socket to give it back to the OS
+            }
         }
 
         /// Get the socket associated with the parcelport_connection.
@@ -109,12 +111,6 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         }
 
     protected:
-        template <typename Handler>
-        void async_restart_read(boost::tuple<Handler> handler)
-        {
-            async_read(boost::get<0>(handler));
-        }
-
         /// Handle a completed read of the message priority and size from the
         /// message header.
         /// The handler is passed using a tuple since boost::bind seems to have
@@ -128,10 +124,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                void (parcelport_connection::*f)(boost::tuple<Handler>) = 
-                        &parcelport_connection::async_restart_read<Handler>;
-                socket_.get_io_service().post(
-                    boost::bind(f, shared_from_this(), handler));
+                async_read(boost::get<0>(handler));
             }
             else {
                 // Determine the length of the serialized data.
@@ -166,10 +159,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                void (parcelport_connection::*f)(boost::tuple<Handler>) = 
-                        &parcelport_connection::async_restart_read<Handler>;
-                socket_.get_io_service().post(
-                    boost::bind(f, shared_from_this(), handler));
+                async_read(boost::get<0>(handler));
             }
             else {
                 // complete data point and pass it along
@@ -206,10 +196,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
             boost::get<0>(handler)(e);
 
             // Issue a read operation to read the next parcel.
-            void (parcelport_connection::*f)(boost::tuple<Handler>) = 
-                    &parcelport_connection::async_restart_read<Handler>;
-            socket_.get_io_service().post(
-                boost::bind(f, shared_from_this(), handler));
+            async_read(boost::get<0>(handler));
         }
 
     private:

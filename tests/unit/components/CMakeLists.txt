@@ -5,6 +5,7 @@
 
 set(tests
     remote_object
+    get_gid
    )
 
 set(remote_object_FLAGS

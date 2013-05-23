@@ -34,6 +34,12 @@ namespace hpx { namespace util
             return 1;
         }
 
+        int print_info(std::ostream& out)
+        {
+            out << hpx::configuration_string() << std::endl;
+            return 1;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         inline void encode (std::string &str, char s, char const *r)
         {
@@ -621,8 +627,14 @@ namespace hpx { namespace util
         rtcfg_.reconfigure(ini_config_);
 
         // print version/copyright information
-        if (vm_.count("hpx:version"))
-            return detail::print_version(std::cout);
+        if (vm_.count("hpx:version") || vm_.count("hpx:info"))
+        {
+            if (vm_.count("hpx:version"))
+                detail::print_version(std::cout);
+            if (vm_.count("hpx:info"))
+                detail::print_info(std::cout);
+            return 1;
+        }
 
 #if defined(HPX_HAVE_HWLOC)
         if (vm_.count("hpx:print-bind")) {

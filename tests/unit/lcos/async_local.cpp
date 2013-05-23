@@ -45,6 +45,36 @@ struct decrement
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+void do_nothing(boost::int32_t i)
+{
+}
+
+struct do_nothing_obj
+{
+    // implement result_of protocol
+    template <typename F>
+    struct result;
+
+    template <typename F, typename T>
+    struct result<F(T)>
+    {
+        typedef void type;
+    };
+
+    // actual functionality
+    void operator()(boost::int32_t i) const
+    {
+    }
+};
+
+struct do_nothing_member
+{
+    void call(boost::int32_t i) const
+    {
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
     {
@@ -54,6 +84,12 @@ int hpx_main()
         hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, &increment, 42);
         HPX_TEST_EQ(f2.get(), 43);
+
+        hpx::future<void> f3 = hpx::async(&do_nothing, 42);
+        f3.get();
+
+        hpx::future<void> f4 = hpx::async(hpx::launch::sync, &do_nothing, 42);
+        f4.get();
     }
 
     {
@@ -74,6 +110,14 @@ int hpx_main()
         hpx::future<boost::int32_t> f4 =
             hpx::async(hpx::launch::all, hpx::util::bind(&increment, _1), 42);
         HPX_TEST_EQ(f4.get(), 43);
+
+        hpx::future<void> f5 = hpx::async(hpx::launch::all,
+            hpx::util::bind(&do_nothing, _1), 42);
+        f5.get();
+
+        hpx::future<void> f6 = hpx::async(hpx::launch::sync,
+            hpx::util::bind(&do_nothing, _1), 42);
+        f6.get();
     }
 
     {
@@ -85,6 +129,15 @@ int hpx_main()
         hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, increment, 42);
         HPX_TEST_EQ(f2.get(), 43);
+#endif
+
+        hpx::future<void> f3 = hpx::async(do_nothing, 42);
+        f3.get();
+
+        // VS2010 bails out with the following code
+#if !defined(BOOST_MSVC) || BOOST_MSVC >= 1700
+        hpx::future<void> f4 = hpx::async(hpx::launch::sync, do_nothing, 42);
+        f4.get();
 #endif
     }
 
@@ -106,6 +159,14 @@ int hpx_main()
         hpx::future<boost::int32_t> f4 =
             hpx::async(hpx::launch::all, hpx::util::bind(increment, _1), 42);
         HPX_TEST_EQ(f4.get(), 43);
+
+        hpx::future<void> f5 = hpx::async(hpx::launch::all,
+            hpx::util::bind(do_nothing, _1), 42);
+        f5.get();
+
+        hpx::future<void> f6 = hpx::async(hpx::launch::sync,
+            hpx::util::bind(do_nothing, _1), 42);
+        f6.get();
     }
 
 // We are currently not able to detect whether a type is callable. We need the
@@ -142,6 +203,15 @@ int hpx_main()
         hpx::future<boost::int32_t> f4 =
             hpx::async(hpx::launch::all, hpx::util::bind(mult, _1), 42);
         HPX_TEST_EQ(f4.get(), 84);
+
+        do_nothing_obj do_nothing_f;
+        hpx::future<void> f5 = hpx::async(hpx::launch::all,
+            hpx::util::bind(do_nothing_f, _1), 42);
+        f5.get();
+
+        hpx::future<void> f6 = hpx::async(hpx::launch::sync,
+            hpx::util::bind(do_nothing_f, _1), 42);
+        f6.get();
     }
 
     {
@@ -153,6 +223,15 @@ int hpx_main()
         hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, &decrement::call, dec, 42);
         HPX_TEST_EQ(f2.get(), 41);
+
+        do_nothing_member dnm;
+        hpx::future<void> f3 = hpx::async(hpx::launch::all,
+            &do_nothing_member::call, dnm, 42);
+        f3.get();
+
+        hpx::future<void> f4 = hpx::async(hpx::launch::sync,
+            &do_nothing_member::call, dnm, 42);
+        f4.get();
     }
 
     {
@@ -175,6 +254,15 @@ int hpx_main()
         hpx::future<boost::int32_t> f4 = hpx::async(
             hpx::launch::all, hpx::util::bind(&decrement::call, dec, _1), 42);
         HPX_TEST_EQ(f4.get(), 41);
+
+        do_nothing_member dnm;
+        hpx::future<void> f5 = hpx::async(hpx::launch::all,
+            hpx::util::bind(&do_nothing_member::call, dnm, _1), 42);
+        f5.get();
+
+        hpx::future<void> f6 = hpx::async(hpx::launch::sync,
+            hpx::util::bind(&do_nothing_member::call, dnm, _1), 42);
+        f6.get();
     }
 
     return hpx::finalize();

@@ -35,7 +35,9 @@
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
 /// \namespace hpx
@@ -585,6 +587,12 @@ namespace hpx
         template <typename Result>
         class future;
 
+        template <typename Result>
+        future<typename util::detail::remove_reference<Result>::type> 
+        make_ready_future(BOOST_FWD_REF(Result));
+
+        future<void> make_ready_future();
+
         template <typename ValueType>
         struct object_semaphore;
 
@@ -628,7 +636,9 @@ namespace hpx
     {
         async = 0x01,
         deferred = 0x02,
-        all = 0x03        // async | deferred
+        task = 0x04,        // see N3632
+        sync = 0x08,
+        all = 0x0f          // async | deferred | task | sync
     };
     BOOST_SCOPED_ENUM_END
 
@@ -656,6 +666,7 @@ namespace hpx
     // Pulling important types into the main namespace
     using naming::id_type;
     using lcos::future;
+    using lcos::make_ready_future;
     using lcos::promise;
 
     /// \endcond
@@ -691,6 +702,35 @@ namespace hpx
     ///
     /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
     HPX_API_EXPORT naming::id_type find_here(error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the global id representing the root locality
+    ///
+    /// The function \a find_root_locality() can be used to retrieve the global 
+    /// id usable to refer to the root locality locality.
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global id representing the root locality for this 
+    ///           application.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
+    ///           otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
+    HPX_API_EXPORT naming::id_type find_root_locality(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the list of global ids representing all localities

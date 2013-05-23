@@ -1019,7 +1019,7 @@ namespace hpx { namespace threads
                 store_state(prev_state_);
         }
 
-        bool is_valid() const { return need_restore_state_; }
+        bool valid() const { return need_restore_state_; }
 
         // allow to change the state the thread will be switched to after
         // execution
@@ -1632,7 +1632,7 @@ namespace hpx { namespace threads
               HPX_STD_BIND(&coroutine_type::impl_type::get_stack_recycle_count, _1),
               HPX_STD_FUNCTION<boost::uint64_t(bool)>(), "", 0
             },
-#if !defined(BOOST_WINDOWS) && !defined(HPX_COROUTINE_USE_GENERIC_CONTEXT)
+#if !defined(BOOST_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
             // /threads{locality#%d/total}/count/stack-unbinds
             { "count/stack-unbinds",
               HPX_STD_BIND(&coroutine_type::impl_type::get_stack_unbind_count, _1),
@@ -1770,7 +1770,7 @@ namespace hpx { namespace threads
               counts_creator, &performance_counters::locality_counter_discoverer,
               ""
             },
-#if !defined(BOOST_WINDOWS) && !defined(HPX_COROUTINE_USE_GENERIC_CONTEXT)
+#if !defined(BOOST_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
             { "/threads/count/stack-unbinds", performance_counters::counter_raw,
               "returns the total number of HPX-thread unbind (madvise) operations "
               "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
@@ -1849,17 +1849,14 @@ namespace hpx { namespace threads
                         // tries to set state to active (only if state is still
                         // the same as 'state')
                         switch_status thrd_stat (thrd, state);
-                        if (thrd_stat.is_valid() && thrd_stat.get_previous() == pending) {
+                        if (thrd_stat.valid() && thrd_stat.get_previous() == pending) {
                             // thread returns new required state
                             // store the returned state in the thread
                             {
-#if defined(HPX_USE_ITTNOTIFY)
+#if HPX_HAVE_ITTNOTIFY != 0
                                 util::itt::caller_context cctx(ctx);
                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
-#endif
-#if defined(HPX_HAVE_APEX)
-                                util::apex_wrapper apex("hpx-user-level-thread");
 #endif
 
                                 // Record time elapsed in thread changing state

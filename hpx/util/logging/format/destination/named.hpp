@@ -111,8 +111,6 @@ namespace detail {
         // recomputes the write steps - note taht this takes place after each operation
         // for instance, the user might have first set the string and later added the formatters
         void compute_write_steps() {
-            typedef typename string_type::size_type size_type;
-
             typename data::write info(m_data);
             info->write_steps.clear();
 
