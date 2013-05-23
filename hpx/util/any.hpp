@@ -79,6 +79,7 @@ namespace hpx { namespace util
         template <typename IArchive, typename OArchive, typename Char>
         struct fxn_ptr_table
         {
+            virtual ~fxn_ptr_table() {}
             virtual fxn_ptr_table * get_ptr() = 0;
 
             boost::detail::sp_typeinfo const& (*get_type)();
@@ -101,7 +102,9 @@ namespace hpx { namespace util
         template <typename Char>
         struct fxn_ptr_table<void, void, Char>
         {
+            virtual ~fxn_ptr_table() {}
             virtual fxn_ptr_table * get_ptr() = 0;
+
             boost::detail::sp_typeinfo const& (*get_type)();
             void (*static_delete)(void**);
             void (*destruct)(void**);
