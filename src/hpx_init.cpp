@@ -1176,7 +1176,7 @@ namespace hpx
         if (0 == rt.get()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
                 "the runtime system is not active (did you already "
-                "call finalize?)");
+                "call hpx::finalize?)");
             return -1;
         }
 
@@ -1187,13 +1187,13 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int wait(error_code& ec)
+    int wait_for_stop(error_code& ec)
     {
         runtime* rt(get_runtime_ptr());
         if (0 == rt) {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::wait",
+            HPX_THROWS_IF(ec, invalid_status, "hpx::wait_for_stop",
                 "the runtime system is not active (did you already "
-                "call finalize?)");
+                "call hpx::finalize?)");
             return -1;
         }
 
