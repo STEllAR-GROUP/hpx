@@ -1,3 +1,8 @@
+//  Copyright (c) 2013 Jeroen Habraken
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_IDENTITY_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_IDENTITY_HPP
 
@@ -33,6 +38,17 @@ namespace hpx { namespace components { namespace security { namespace server
         boost::uint64_t get_lsb() const
         {
             return lsb_;
+        }
+
+        bool operator<(identity const & rhs) const
+        {
+            if (msb_ < rhs.msb_)
+                return true;
+
+            if (msb_ > rhs.msb_)
+                return false;
+
+            return lsb_ < rhs.lsb_;
         }
 
     private:

@@ -6,43 +6,45 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/components/security/certificate_authority_base.hpp>
+#include <hpx/components/security/server/certificate_store.hpp>
 #include <hpx/components/security/server/root_certificate_authority.hpp>
 #include <hpx/components/security/server/subordinate_certificate_authority.hpp>
-
-#include <iostream>
+#include <hpx/util/lightweight_test.hpp>
 
 int hpx_main(boost::program_options::variables_map &)
 {
     {
         using namespace hpx::components::security;
 
-        certificate_authority_base root_ca(
+        server::certificate_store store;
+
+        certificate_authority_base root(
             hpx::components::new_<
                 server::root_certificate_authority
             >(hpx::find_here()));
 
-        server::signed_type<server::certificate> const & root_ca_certificate =
-            root_ca.get_certificate();
+        store.insert(root.get_certificate());
 
-        server::public_key const & root_ca_public_key =
-            root_ca_certificate.get_type().get_subject_public_key();
+        server::signed_type<server::certificate> const & root_certificate =
+            root.get_certificate();
 
-        std::cout << std::boolalpha
-                  << root_ca_public_key.verify(root_ca_certificate)
-                  << std::endl;
+        server::public_key const & root_public_key =
+            root_certificate.get_type().get_subject_public_key();
+
+        HPX_TEST(root_public_key.verify(root_certificate));
 
 
-        certificate_authority_base subordinate_ca(
+        certificate_authority_base subordinate(
             hpx::components::new_<
                 server::subordinate_certificate_authority
-            >(hpx::find_here(), root_ca.get_gid()));
+            >(hpx::find_here(), root.get_gid()));
 
-        server::signed_type<server::certificate> const & subordinate_ca_certificate =
-            subordinate_ca.get_certificate();
+        store.insert(subordinate.get_certificate());
 
-        std::cout << std::boolalpha
-                  << root_ca_public_key.verify(subordinate_ca_certificate)
-                  << std::endl;
+        server::signed_type<server::certificate> const & subordinate_certificate =
+            subordinate.get_certificate();
+
+        HPX_TEST(root_public_key.verify(subordinate_certificate));
     }
 
     return hpx::finalize();

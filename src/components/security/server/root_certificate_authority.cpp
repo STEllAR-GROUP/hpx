@@ -12,8 +12,11 @@ namespace hpx { namespace components { namespace security { namespace server
     root_certificate_authority::root_certificate_authority()
       : certificate_authority_base()
     {
+        capability capability;
+        capability.set(traits::capability<>::capability_certificate_authority);
+
         certificate_ = secret_key_.sign(
-            certificate(get_gid(), get_gid(), public_key_));
+            certificate(get_gid(), get_gid(), public_key_, capability));
     }
 
     signed_type<certificate>

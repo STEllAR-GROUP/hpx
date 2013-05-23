@@ -3,6 +3,7 @@
 
 #include <boost/serialization/serialization.hpp>
 
+#include "capability.hpp"
 #include "certificate_signing_request.hpp"
 #include "identity.hpp"
 #include "public_key.hpp"
@@ -18,10 +19,12 @@ namespace hpx { namespace components { namespace security { namespace server
 
         certificate(identity const & issuer,
                     identity const & subject,
-                    public_key const & subject_public_key)
+                    public_key const & subject_public_key,
+                    capability const & capability)
           : issuer_(issuer)
           , subject_(subject)
           , subject_public_key_(subject_public_key)
+          , capability_(capability)
         {
         }
 
@@ -30,6 +33,7 @@ namespace hpx { namespace components { namespace security { namespace server
           : issuer_(issuer)
           , subject_(csr.get_subject())
           , subject_public_key_(csr.get_subject_public_key())
+          , capability_(csr.get_capability())
         {
         }
 
@@ -48,6 +52,11 @@ namespace hpx { namespace components { namespace security { namespace server
             return subject_public_key_;
         }
 
+        capability const & get_capability() const
+        {
+            return capability_;
+        }
+
     private:
         friend class boost::serialization::access;
 
@@ -58,12 +67,16 @@ namespace hpx { namespace components { namespace security { namespace server
 
             ar & subject_;
             ar & subject_public_key_;
+
+            ar & capability_;
         }
 
         identity issuer_;
 
         identity subject_;
         public_key subject_public_key_;
+
+        capability capability_;
     };
 }}}}
 
