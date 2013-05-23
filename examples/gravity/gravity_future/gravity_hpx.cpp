@@ -204,7 +204,7 @@ vector<components> dist(uint64_t t,uint64_t i,uint64_t l) {
  return comp;
 }
 
-void move(vector<future<void> >const& cfp,config_f const & param,uint64_t k,uint64_t t) {
+void move1(vector<future<void> >const& cfp,config_f const & param,uint64_t k,uint64_t t) {
  uint64_t tn=t+1;
  double timestep= double(param.timestep); //the timestep
  
