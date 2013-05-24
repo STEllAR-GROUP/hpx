@@ -590,7 +590,9 @@ Here, `<node-type>` is one of the node partitions existing on the target machine
 `<number-of-nodes>` is the number of compute nodes you want to use. By default,
 the HPX application is started with one locality per node and uses all available
 cores on a node. You can change the number of localities started per node (for
-example to account for NUMA effects) by specifying the `-n` option of srun. The
+example to account for NUMA effects) by specifying the `-n` option of srun. We
+suggest to always specify `-n <number-of-instances>`, even if `<number-of-instances>`
+is equal to one (`1`). The
 number of cores per locality can be set by `-c`. The `<application-arguments>`
 are any application specific arguments which need to passed on to the
 application.
