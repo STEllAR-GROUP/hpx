@@ -172,7 +172,7 @@ namespace hpx
         strm << "  HPX_HAVE_SWAP_CONTEXT_EMULATION=OFF\n";
 #endif
 #endif
-        strm << "\n";
+
 #if defined(HPX_LIMIT)
         strm << "  HPX_LIMIT=" << HPX_LIMIT << "\n";
 #endif
