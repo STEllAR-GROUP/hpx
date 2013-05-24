@@ -590,9 +590,7 @@ Here, `<node-type>` is one of the node partitions existing on the target machine
 `<number-of-nodes>` is the number of compute nodes you want to use. By default,
 the HPX application is started with one locality per node and uses all available
 cores on a node. You can change the number of localities started per node (for
-example to account for NUMA effects) by specifying the `-n` option of srun. We
-suggest to always specify `-n <number-of-instances>`, even if `<number-of-instances>`
-is equal to one (`1`). The
+example to account for NUMA effects) by specifying the `-n` option of srun. The
 number of cores per locality can be set by `-c`. The `<application-arguments>`
 are any application specific arguments which need to passed on to the
 application.
@@ -601,6 +599,15 @@ application.
       the number of localities, number of threads, or related to networking
       ports. All of this information is automatically extracted from the SLURM
       environment by the __hpx__ startup code.]
+
+[important The __srun__ documentation explicitly states: "If `-c` is specified 
+      without `-n`, as many tasks will be allocated per node as possible while 
+      satisfying the `-c` restriction. For instance on a cluster with 8 CPUs per 
+      node, a job request for 4 nodes and 3 CPUs per task may be allocated 3 or 
+      6 CPUs per node (1 or 2 tasks per node) depending upon resource consumption 
+      by other jobs."
+      For this reason, we suggest to always specify `-n <number-of-instances>`, 
+      even if `<number-of-instances>` is equal to one (`1`).]
 
 [heading Interactive Shells]
 
