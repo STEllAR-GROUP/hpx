@@ -121,7 +121,7 @@ namespace hpx { namespace detail
                     << hpx::detail::throw_file(file)
                     << hpx::detail::throw_line(static_cast<int>(line))
                     << hpx::detail::throw_env(env)
-                    << hpx::detail::throw_env(config));
+                    << hpx::detail::throw_config(config));
         }
         catch (...) {
             return boost::current_exception();
