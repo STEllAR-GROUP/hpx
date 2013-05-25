@@ -15,8 +15,19 @@ namespace hpx { namespace components { namespace security { namespace server
         capability capability;
         capability.set(traits::capability<>::capability_certificate_authority);
 
-        certificate_ = secret_key_.sign(
-            certificate(get_gid(), get_gid(), public_key_, capability));
+        certificate_ = key_pair_.sign(certificate(
+            get_gid(), get_gid(), key_pair_.get_public_key(), capability));
+    }
+
+    root_certificate_authority::root_certificate_authority(
+        key_pair const & key_pair)
+      : certificate_authority_base(key_pair)
+    {
+        capability capability;
+        capability.set(traits::capability<>::capability_certificate_authority);
+
+        certificate_ = key_pair_.sign(certificate(
+            get_gid(), get_gid(), key_pair_.get_public_key(), capability));
     }
 
     signed_type<certificate>
@@ -31,7 +42,7 @@ namespace hpx { namespace components { namespace security { namespace server
         {
             // TODO, capability checks
 
-            signed_certificate = secret_key_.sign(certificate(get_gid(), csr));
+            signed_certificate = key_pair_.sign(certificate(get_gid(), csr));
         }
 
         return signed_certificate;

@@ -3,32 +3,40 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COMPONENTS_SECURITY_SERVER_PUBLIC_KEY_HPP
-#define HPX_COMPONENTS_SECURITY_SERVER_PUBLIC_KEY_HPP
+#ifndef HPX_COMPONENTS_SECURITY_SERVER_KEY_PAIR_HPP
+#define HPX_COMPONENTS_SECURITY_SERVER_KEY_PAIR_HPP
 
-#include <boost/array.hpp>
 #include <boost/serialization/serialization.hpp>
-#include <sodium.h>
 
+#include "public_key.hpp"
+#include "secret_key.hpp"
 #include "signed_type.hpp"
 
 namespace hpx { namespace components { namespace security { namespace server
 {
-    class public_key
+    class key_pair
     {
     public:
+        key_pair()
+          : secret_key_(public_key_)
+        {
+        }
+
+        public_key const & get_public_key()
+        {
+            return public_key_;
+        }
+
+        template <typename T>
+        signed_type<T> sign(T const & type) const
+        {
+            return secret_key_.sign(type);
+        }
+
         template <typename T>
         bool verify(signed_type<T> const & signed_type) const
         {
-            unsigned char type[sizeof signed_type];
-            unsigned long long type_length;
-
-            return crypto_sign_open(
-                type,
-                &type_length,
-                reinterpret_cast<unsigned char const *>(&signed_type),
-                sizeof signed_type,
-                bytes_.data()) == 0;
+            return public_key_.verify(signed_type);
         }
 
     private:
@@ -37,14 +45,12 @@ namespace hpx { namespace components { namespace security { namespace server
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int)
         {
-            ar & bytes_;
+            ar & public_key_;
+            ar & secret_key_;
         }
 
-        friend class secret_key;
-
-        boost::array<
-            unsigned char, crypto_sign_PUBLICKEYBYTES
-        > bytes_;
+        public_key public_key_;
+        secret_key secret_key_;
     };
 }}}}
 

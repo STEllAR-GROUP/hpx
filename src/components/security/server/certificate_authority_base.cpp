@@ -10,7 +10,12 @@
 namespace hpx { namespace components { namespace security { namespace server
 {
     certificate_authority_base::certificate_authority_base()
-      : secret_key_(public_key_)
+    {
+    }
+
+    certificate_authority_base::certificate_authority_base(
+        key_pair const & key_pair)
+      : key_pair_(key_pair)
     {
     }
 

@@ -12,8 +12,7 @@
 
 #include "certificate.hpp"
 #include "certificate_signing_request.hpp"
-#include "public_key.hpp"
-#include "secret_key.hpp"
+#include "key_pair.hpp"
 #include "signed_type.hpp"
 
 namespace hpx { namespace components { namespace security { namespace server
@@ -23,6 +22,7 @@ namespace hpx { namespace components { namespace security { namespace server
     {
     public:
         certificate_authority_base();
+        certificate_authority_base(key_pair const &);
         virtual ~certificate_authority_base();
 
         virtual signed_type<certificate> sign_certificate_signing_request(
@@ -46,8 +46,7 @@ namespace hpx { namespace components { namespace security { namespace server
           , get_certificate);
 
     protected:
-        public_key public_key_;
-        secret_key secret_key_;
+        key_pair key_pair_;
 
         signed_type<certificate> certificate_;
     };
