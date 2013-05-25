@@ -47,7 +47,7 @@
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
-#if HPX_EMULATE_SWAP_CONTEXT != 0
+#if HPX_HAVE_SWAP_CONTEXT_EMULATION != 0
 extern "C" void switch_to_fiber(void* lpFiber) throw();
 #endif
 
@@ -138,7 +138,7 @@ namespace hpx { namespace util { namespace coroutines
           from.m_ctx = ConvertThreadToFiber(0);
           BOOST_ASSERT(from.m_ctx != 0);
 
-#if HPX_EMULATE_SWAP_CONTEXT != 0
+#if HPX_HAVE_SWAP_CONTEXT_EMULATION != 0
           switch_to_fiber(to.m_ctx);
 #else
           SwitchToFiber(to.m_ctx);
@@ -151,7 +151,7 @@ namespace hpx { namespace util { namespace coroutines
           bool call_from_main = from.m_ctx == 0;
           if(call_from_main)
             from.m_ctx = GetCurrentFiber();
-#if HPX_EMULATE_SWAP_CONTEXT != 0
+#if HPX_HAVE_SWAP_CONTEXT_EMULATION != 0
           switch_to_fiber(to.m_ctx);
 #else
           SwitchToFiber(to.m_ctx);

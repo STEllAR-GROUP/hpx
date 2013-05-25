@@ -9,6 +9,21 @@
 #ifndef HPX_LCOS_LOCAL_DATAFLOW_HPP
 #define HPX_LCOS_LOCAL_DATAFLOW_HPP
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/forceinline.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/move.hpp>
+
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/inc.hpp>
+#include <boost/preprocessor/repeat.hpp>
+#include <boost/preprocessor/iterate.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_binary_params.hpp>
+
+#include <boost/type_traits/remove_const.hpp>
+
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/local/preprocessed/dataflow.hpp>
 #else
@@ -29,8 +44,9 @@
 
 #define HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER(z, n, d)                           \
     typedef                                                                     \
-        typename hpx::util::detail::remove_reference<BOOST_PP_CAT(F, n)>::type  \
-        BOOST_PP_CAT(BOOST_PP_CAT(f, n), _type);                                \
+        typename boost::remove_const<typename                                   \
+            hpx::util::detail::remove_reference<BOOST_PP_CAT(F, n)>::type       \
+        >::type BOOST_PP_CAT(BOOST_PP_CAT(f, n), _type);                        \
                                                                                 \
     typedef                                                                     \
         typename future_traits<                                                 \

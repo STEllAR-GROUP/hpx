@@ -107,6 +107,8 @@ namespace hpx
     // Returns the HPX build date and time
     HPX_EXPORT std::string build_date_time();
 
+    // Return the HPX configuration information
+    HPX_EXPORT std::string configuration_string();
 
     // Helper data structures allowing to automatically detect version problems
     // between applications and the core libraries.

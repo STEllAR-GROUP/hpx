@@ -79,7 +79,9 @@ namespace hpx { namespace util
         template <typename IArchive, typename OArchive, typename Char>
         struct fxn_ptr_table
         {
+            virtual ~fxn_ptr_table() {}
             virtual fxn_ptr_table * get_ptr() = 0;
+
             boost::detail::sp_typeinfo const& (*get_type)();
             void (*static_delete)(void**);
             void (*destruct)(void**);
@@ -100,7 +102,9 @@ namespace hpx { namespace util
         template <typename Char>
         struct fxn_ptr_table<void, void, Char>
         {
+            virtual ~fxn_ptr_table() {}
             virtual fxn_ptr_table * get_ptr() = 0;
+
             boost::detail::sp_typeinfo const& (*get_type)();
             void (*static_delete)(void**);
             void (*destruct)(void**);
@@ -394,6 +398,23 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (template <typename IArchive, typename OArchive, typename Vtable, typename Char>)
   , (hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char>)
 )
+
+///////////////////////////////////////////////////////////////////////////////
+// disable tracking for function pointer table
+namespace boost { namespace serialization
+{
+    template <typename IArchive, typename OArchive, typename Char>
+    struct tracking_level<
+            hpx::util::detail::any::fxn_ptr_table<IArchive, OArchive, Char> >
+      : boost::mpl::int_<boost::serialization::track_never>
+    {};
+
+    template <typename IArchive, typename OArchive, typename Vtable, typename Char>
+    struct tracking_level<
+            hpx::util::detail::any::fxn_ptr<IArchive, OArchive, Vtable, Char> >
+      : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
 
 namespace hpx { namespace util
 {

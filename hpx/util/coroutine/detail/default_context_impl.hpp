@@ -97,7 +97,7 @@
      make copyable.
 */
 
-#if HPX_COROUTINE_USE_GENERIC_CONTEXT != 0
+#if HPX_HAVE_GENERIC_CONTEXT_COROUTINES != 0
 
 #if BOOST_VERSION >= 105100
 
@@ -139,7 +139,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
 #error No default_context_impl available for this system
 
-#endif // HPX_COROUTINE_USE_GENERIC_CONTEXT
+#endif // HPX_HAVE_GENERIC_CONTEXT_COROUTINES
 
 namespace hpx { namespace util { namespace coroutines
 {

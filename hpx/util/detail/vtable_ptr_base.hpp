@@ -15,18 +15,6 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/mpl/int.hpp>
 
-namespace hpx { namespace util { namespace detail {
-
-    struct vtable_ptr_virtbase
-    {
-        virtual ~vtable_ptr_virtbase() {}
-    };
-
-}}}
-
-BOOST_CLASS_TRACKING(hpx::util::detail::vtable_ptr_virtbase,
-    boost::serialization::track_never)
-
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/vtable_ptr_base.hpp>
 #else
@@ -72,7 +60,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
 

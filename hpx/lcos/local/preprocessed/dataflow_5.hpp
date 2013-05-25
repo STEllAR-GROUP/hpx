@@ -23,7 +23,7 @@ namespace hpx { namespace lcos { namespace local {
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
             func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_;
+            typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F0>::type >::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_;
             
             typedef
                 typename boost::result_of<
@@ -127,7 +127,7 @@ namespace hpx { namespace lcos { namespace local {
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
             func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename hpx::util::detail::remove_reference<F1>::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_;
+            typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F0>::type >::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F1>::type >::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_;
             
             typedef
                 typename boost::result_of<
@@ -231,7 +231,7 @@ namespace hpx { namespace lcos { namespace local {
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
             func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename hpx::util::detail::remove_reference<F1>::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_; typedef typename hpx::util::detail::remove_reference<F2>::type f2_type; typedef typename future_traits< f2_type >::value_type f2_result_type; f2_type f2_; f2_result_type f2_result_;
+            typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F0>::type >::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F1>::type >::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F2>::type >::type f2_type; typedef typename future_traits< f2_type >::value_type f2_result_type; f2_type f2_; f2_result_type f2_result_;
             
             typedef
                 typename boost::result_of<
@@ -335,7 +335,7 @@ namespace hpx { namespace lcos { namespace local {
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
             func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename hpx::util::detail::remove_reference<F1>::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_; typedef typename hpx::util::detail::remove_reference<F2>::type f2_type; typedef typename future_traits< f2_type >::value_type f2_result_type; f2_type f2_; f2_result_type f2_result_; typedef typename hpx::util::detail::remove_reference<F3>::type f3_type; typedef typename future_traits< f3_type >::value_type f3_result_type; f3_type f3_; f3_result_type f3_result_;
+            typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F0>::type >::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F1>::type >::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F2>::type >::type f2_type; typedef typename future_traits< f2_type >::value_type f2_result_type; f2_type f2_; f2_result_type f2_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F3>::type >::type f3_type; typedef typename future_traits< f3_type >::value_type f3_result_type; f3_type f3_; f3_result_type f3_result_;
             
             typedef
                 typename boost::result_of<
@@ -439,7 +439,7 @@ namespace hpx { namespace lcos { namespace local {
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
             func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename hpx::util::detail::remove_reference<F1>::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_; typedef typename hpx::util::detail::remove_reference<F2>::type f2_type; typedef typename future_traits< f2_type >::value_type f2_result_type; f2_type f2_; f2_result_type f2_result_; typedef typename hpx::util::detail::remove_reference<F3>::type f3_type; typedef typename future_traits< f3_type >::value_type f3_result_type; f3_type f3_; f3_result_type f3_result_; typedef typename hpx::util::detail::remove_reference<F4>::type f4_type; typedef typename future_traits< f4_type >::value_type f4_result_type; f4_type f4_; f4_result_type f4_result_;
+            typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F0>::type >::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F1>::type >::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F2>::type >::type f2_type; typedef typename future_traits< f2_type >::value_type f2_result_type; f2_type f2_; f2_result_type f2_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F3>::type >::type f3_type; typedef typename future_traits< f3_type >::value_type f3_result_type; f3_type f3_; f3_result_type f3_result_; typedef typename boost::remove_const<typename hpx::util::detail::remove_reference<F4>::type >::type f4_type; typedef typename future_traits< f4_type >::value_type f4_result_type; f4_type f4_; f4_result_type f4_result_;
             
             typedef
                 typename boost::result_of<

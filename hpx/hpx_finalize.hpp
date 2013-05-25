@@ -161,7 +161,7 @@ namespace hpx
     /// before returning to the caller. This function should be used only if the 
     /// runtime system was started using `hpx::start`.
     ///
-    HPX_EXPORT int wait(error_code& ec = throws);
+    HPX_EXPORT int wait_for_stop(error_code& ec = throws);
 }
 
 #endif

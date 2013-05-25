@@ -110,7 +110,7 @@ if(HPX_INTERNAL_CHRONO)
 endif()
 
 if(MSVC)
-  if(HPX_EMULATE_SWAP_CONTEXT)
+  if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     set(switch_to_fiber_source "${hpx_SOURCE_DIR}/src/util/coroutine/switch_to_fiber.asm")
     add_hpx_library_sources(hpx_external_objects
       GLOB GLOBS "${switch_to_fiber_source}")
@@ -120,7 +120,7 @@ if(MSVC)
       DEPENDS ${switch_to_fiber_source})
     set(hpx_external_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
       CACHE INTERNAL "External object files for HPX." FORCE)
-    hpx_add_definitions(-DHPX_EMULATE_SWAP_CONTEXT)
+    hpx_add_definitions(-DHPX_HAVE_SWAP_CONTEXT_EMULATION)
   endif()
 endif()
 
@@ -345,7 +345,7 @@ if(NOT MSVC)
                                    INSTALL_RPATH_USE_LINK_PATH TRUE
                                    INSTALL_RPATH ${HPX_RPATH})
 else()
-  if(HPX_EMULATE_SWAP_CONTEXT)
+  if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     set(hpx_link_flag_properties "${hpx_link_flag_properties} /EXPORT:switch_to_fiber")
   endif()
   set_target_properties(hpx PROPERTIES LINK_FLAGS "${hpx_link_flag_properties}")

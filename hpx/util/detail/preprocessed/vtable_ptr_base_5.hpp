@@ -20,7 +20,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
         virtual vtable_ptr_base * get_ptr() = 0;
@@ -79,7 +78,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
         virtual vtable_ptr_base * get_ptr() = 0;
@@ -138,7 +136,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
         virtual vtable_ptr_base * get_ptr() = 0;
@@ -197,7 +194,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
         virtual vtable_ptr_base * get_ptr() = 0;
@@ -256,7 +252,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
         virtual vtable_ptr_base * get_ptr() = 0;
@@ -315,7 +310,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
         virtual vtable_ptr_base * get_ptr() = 0;
@@ -374,7 +368,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
         virtual vtable_ptr_base * get_ptr() = 0;
@@ -433,7 +426,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
         virtual vtable_ptr_base * get_ptr() = 0;
@@ -492,7 +484,6 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
-        : vtable_ptr_virtbase
     {
         virtual ~vtable_ptr_base() {}
         virtual vtable_ptr_base * get_ptr() = 0;
