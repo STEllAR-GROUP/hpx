@@ -95,6 +95,20 @@ namespace hpx { namespace actions
             );
             return util::type_id<Action>::typeid_.type_id();
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        // If an action returns a future, we need to do special things
+        template <typename Result>
+        struct remote_action_result
+        {
+            typedef Result type;
+        };
+
+        template <typename Result>
+        struct remote_action_result<lcos::future<Result> >
+        {
+            typedef Result type;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -621,7 +635,7 @@ namespace hpx { namespace actions
     {
         typedef Component component_type;
         typedef Derived derived_type;
-        typedef Result result_type;
+        typedef Result remote_result_type;
         typedef Arguments arguments_type;
 
         typedef void action_tag;
@@ -671,9 +685,36 @@ namespace hpx { namespace actions
                 boost::is_same<IdType, naming::id_type>,
                 boost::is_same<local_result_type, void> >
         >::type
+        operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id, error_code& ec = throws) const
+        {
+            hpx::async<action>(policy, id).get(ec);
+        }
+
+        template <typename IdType>
+        BOOST_FORCEINLINE typename boost::enable_if<
+            boost::mpl::and_<
+                boost::mpl::bool_<
+                    boost::fusion::result_of::size<arguments_type>::value == 0>,
+                boost::is_same<IdType, naming::id_type>,
+                boost::is_same<local_result_type, void> >
+        >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
-            hpx::async(*this, id).get(ec);
+            hpx::async<action>(launch::sync, id).get(ec);
+        }
+
+        template <typename IdType>
+        BOOST_FORCEINLINE typename boost::enable_if<
+            boost::mpl::and_<
+                boost::mpl::bool_<
+                    boost::fusion::result_of::size<arguments_type>::value == 0>,
+                boost::is_same<IdType, naming::id_type>,
+                boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+            local_result_type
+        >::type
+        operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id, error_code& ec = throws) const
+        {
+            return hpx::async<action>(policy, id).move(ec);
         }
 
         template <typename IdType>
@@ -687,7 +728,7 @@ namespace hpx { namespace actions
         >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
-            return boost::move(hpx::async(*this, id).move(ec));
+            return hpx::async<action>(launch::sync, id).move(ec);
         }
 
         #include <hpx/runtime/actions/define_function_operators.hpp>
@@ -877,6 +918,7 @@ namespace hpx { namespace actions
     {
         typedef typename Action::derived_type type;
         typedef typename type::result_type result_type;
+        typedef typename type::remote_result_type remote_result_type;
     };
 
     template <typename Action>
@@ -884,6 +926,7 @@ namespace hpx { namespace actions
     {
         typedef typename Action::type type;
         typedef typename type::result_type result_type;
+        typedef typename type::remote_result_type remote_result_type;
     };
 
     /// \endcond

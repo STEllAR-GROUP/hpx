@@ -38,26 +38,26 @@ namespace hpx
     template <typename Action>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
 
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid);
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid);
         return p.get_future();
     }
 
     template <typename Action>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid)
@@ -125,7 +125,7 @@ namespace hpx
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -133,21 +133,21 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
 
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         return p.get_future();
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))

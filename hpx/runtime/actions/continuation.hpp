@@ -23,6 +23,7 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/archive/detail/check.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -271,8 +272,7 @@ namespace hpx { namespace actions
 
         static void register_base()
         {
-            util::void_cast_register_nonvirt<
-                typed_continuation, continuation>();
+            util::void_cast_register_nonvirt<typed_continuation, continuation>();
         }
 
     private:
@@ -371,6 +371,91 @@ namespace hpx { namespace actions
         }
 
         util::function<void(naming::id_type)> f_;
+    };
+
+    // special handling of actions returning a future
+    template <typename Result>
+    struct typed_continuation<lcos::future<Result> >
+      : continuation
+      , boost::enable_shared_from_this<typed_continuation<lcos::future<Result> > >
+    {
+        typed_continuation()
+        {}
+
+        explicit typed_continuation(naming::id_type const& gid)
+          : continuation(gid)
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+                BOOST_FWD_REF(F) f)
+          : continuation(gid), f_(boost::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(BOOST_FWD_REF(F) f)
+          : f_(boost::forward<F>(f))
+        {}
+
+        virtual ~typed_continuation()
+        {
+            detail::guid_initialization<typed_continuation>();
+        }
+
+        void deferred_trigger(lcos::future<Result> result) const
+        {
+            if (f_.empty()) {
+                if (!this->get_gid()) {
+                    HPX_THROW_EXCEPTION(invalid_status,
+                        "typed_continuation<lcos::future<Result> >::trigger_value",
+                        "attempt to trigger invalid LCO (the id is invalid)");
+                    return;
+                }
+                hpx::set_lco_value(this->get_gid(), result.move());
+            }
+            else {
+                f_(this->get_gid(), result.move());
+            }
+        }
+
+        void trigger_value(BOOST_RV_REF(lcos::future<Result>) result) const
+        {
+            LLCO_(info)
+                << "typed_continuation<lcos::future<hpx::lcos::future<Result> > >::trigger("
+                << this->get_gid() << ")";
+
+            // attach continuation to this future which will send the result back
+            // once its ready
+            using util::placeholders::_1;
+            deferred_result_ = result.then(
+                util::bind(&typed_continuation::deferred_trigger, shared_from_this(), _1));
+        }
+
+        static void register_base()
+        {
+            util::void_cast_register_nonvirt<typed_continuation, continuation>();
+        }
+
+    private:
+        /// serialization support
+        friend class boost::serialization::access;
+        typedef continuation base_type;
+
+        template <class Archive>
+        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            // serialize function
+            bool have_function = !f_.empty();
+            ar & have_function;
+            if (have_function)
+                ar & f_;
+
+            // serialize base class
+            ar & util::base_object_nonvirt<base_type>(*this);
+        }
+
+        util::function<void(naming::id_type, Result)> f_;
+        mutable lcos::future<void> deferred_result_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

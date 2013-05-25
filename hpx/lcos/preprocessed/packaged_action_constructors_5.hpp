@@ -9,7 +9,8 @@
 
 
     template <typename Arg0 , typename Arg1>
-    void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
         using HPX_STD_PLACEHOLDERS::_1;
         using HPX_STD_PLACEHOLDERS::_2;
@@ -19,7 +20,7 @@
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1>
-    void apply_p(naming::id_type const& gid,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
         using HPX_STD_PLACEHOLDERS::_1;
@@ -40,7 +41,7 @@
                     << ", "
                     << gid
                     << ") args(" << (2 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1>
     packaged_action(naming::gid_type const& gid,
@@ -53,11 +54,12 @@
                     << ", "
                     << gid
                     << ") args(" << (2 + 1) << ")";
-        apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+        apply_p(launch::all, naming::id_type(gid, naming::id_type::unmanaged),
             priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
-    void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
         using HPX_STD_PLACEHOLDERS::_1;
         using HPX_STD_PLACEHOLDERS::_2;
@@ -67,7 +69,7 @@
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
-    void apply_p(naming::id_type const& gid,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
         using HPX_STD_PLACEHOLDERS::_1;
@@ -88,7 +90,7 @@
                     << ", "
                     << gid
                     << ") args(" << (3 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
     packaged_action(naming::gid_type const& gid,
@@ -101,11 +103,12 @@
                     << ", "
                     << gid
                     << ") args(" << (3 + 1) << ")";
-        apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+        apply_p(launch::all, naming::id_type(gid, naming::id_type::unmanaged),
             priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
         using HPX_STD_PLACEHOLDERS::_1;
         using HPX_STD_PLACEHOLDERS::_2;
@@ -115,7 +118,7 @@
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    void apply_p(naming::id_type const& gid,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
         using HPX_STD_PLACEHOLDERS::_1;
@@ -136,7 +139,7 @@
                     << ", "
                     << gid
                     << ") args(" << (4 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     packaged_action(naming::gid_type const& gid,
@@ -149,11 +152,12 @@
                     << ", "
                     << gid
                     << ") args(" << (4 + 1) << ")";
-        apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+        apply_p(launch::all, naming::id_type(gid, naming::id_type::unmanaged),
             priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
         using HPX_STD_PLACEHOLDERS::_1;
         using HPX_STD_PLACEHOLDERS::_2;
@@ -163,7 +167,7 @@
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    void apply_p(naming::id_type const& gid,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
         using HPX_STD_PLACEHOLDERS::_1;
@@ -184,7 +188,7 @@
                     << ", "
                     << gid
                     << ") args(" << (5 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     packaged_action(naming::gid_type const& gid,
@@ -197,6 +201,6 @@
                     << ", "
                     << gid
                     << ") args(" << (5 + 1) << ")";
-        apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+        apply_p(launch::all, naming::id_type(gid, naming::id_type::unmanaged),
             priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }

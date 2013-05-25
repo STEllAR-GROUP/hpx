@@ -18,20 +18,21 @@ namespace hpx
             typename Action::arguments_type>::value == 1>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type remote_result_type;
+        typedef typename action_type::result_type result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy)) {
+        if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                new hpx::actions::typed_continuation<remote_result_type>(
+                policy
+              , new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ));
         }
@@ -43,7 +44,7 @@ namespace hpx
             typename Action::arguments_type>::value == 1>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
@@ -94,20 +95,21 @@ namespace hpx
             typename Action::arguments_type>::value == 2>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type remote_result_type;
+        typedef typename action_type::result_type result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy)) {
+        if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                new hpx::actions::typed_continuation<remote_result_type>(
+                policy
+              , new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -119,7 +121,7 @@ namespace hpx
             typename Action::arguments_type>::value == 2>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1,
@@ -170,20 +172,21 @@ namespace hpx
             typename Action::arguments_type>::value == 3>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type remote_result_type;
+        typedef typename action_type::result_type result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy)) {
+        if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                new hpx::actions::typed_continuation<remote_result_type>(
+                policy
+              , new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -195,7 +198,7 @@ namespace hpx
             typename Action::arguments_type>::value == 3>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2,
@@ -246,20 +249,21 @@ namespace hpx
             typename Action::arguments_type>::value == 4>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type remote_result_type;
+        typedef typename action_type::result_type result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy)) {
+        if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                new hpx::actions::typed_continuation<remote_result_type>(
+                policy
+              , new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -271,7 +275,7 @@ namespace hpx
             typename Action::arguments_type>::value == 4>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3,
@@ -322,20 +326,21 @@ namespace hpx
             typename Action::arguments_type>::value == 5>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type remote_result_type;
+        typedef typename action_type::result_type result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy)) {
+        if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                new hpx::actions::typed_continuation<remote_result_type>(
+                policy
+              , new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
@@ -347,7 +352,7 @@ namespace hpx
             typename Action::arguments_type>::value == 5>
       , lcos::future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
     async_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4,

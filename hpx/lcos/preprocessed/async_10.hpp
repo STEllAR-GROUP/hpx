@@ -14,7 +14,7 @@ namespace hpx
     template <typename Action, typename Arg0>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -22,19 +22,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
@@ -72,7 +72,7 @@ namespace hpx
     template <typename Action, typename Arg0 , typename Arg1>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -80,19 +80,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
@@ -130,7 +130,7 @@ namespace hpx
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -138,19 +138,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -188,7 +188,7 @@ namespace hpx
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -196,19 +196,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
@@ -246,7 +246,7 @@ namespace hpx
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -254,19 +254,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -304,7 +304,7 @@ namespace hpx
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -312,19 +312,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
@@ -362,7 +362,7 @@ namespace hpx
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -370,19 +370,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
@@ -420,7 +420,7 @@ namespace hpx
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -428,19 +428,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
@@ -478,7 +478,7 @@ namespace hpx
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -486,19 +486,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
@@ -536,7 +536,7 @@ namespace hpx
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -544,19 +544,19 @@ namespace hpx
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename action_type::result_type
+            typename action_type::remote_result_type
         >::type result_type;
         typedef lcos::packaged_action<action_type, result_type>
             packaged_action_type;
         packaged_action_type p;
-        if (detail::has_async_policy(policy))
-            p.apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
+        if (policy == launch::sync || detail::has_async_policy(policy))
+            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     lcos::future<
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
     >
     async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)

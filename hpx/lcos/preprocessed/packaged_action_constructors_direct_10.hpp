@@ -9,7 +9,7 @@
 
 
     template <typename Arg0 , typename Arg1>
-    void apply(naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -44,10 +44,10 @@
                     << ", "
                     << gid
                     << ") args(" << (2 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
-    void apply(naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -82,10 +82,10 @@
                     << ", "
                     << gid
                     << ") args(" << (3 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    void apply(naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -120,10 +120,10 @@
                     << ", "
                     << gid
                     << ") args(" << (4 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    void apply(naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -158,10 +158,10 @@
                     << ", "
                     << gid
                     << ") args(" << (5 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    void apply(naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -196,10 +196,10 @@
                     << ", "
                     << gid
                     << ") args(" << (6 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
+        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    void apply(naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -234,10 +234,10 @@
                     << ", "
                     << gid
                     << ") args(" << (7 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
+        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    void apply(naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -272,10 +272,10 @@
                     << ", "
                     << gid
                     << ") args(" << (8 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
+        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    void apply(naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -310,10 +310,10 @@
                     << ", "
                     << gid
                     << ") args(" << (9 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
+        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    void apply(naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -348,5 +348,5 @@
                     << ", "
                     << gid
                     << ") args(" << (10 + 1) << ")";
-        apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
+        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
     }

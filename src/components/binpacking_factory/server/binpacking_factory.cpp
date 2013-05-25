@@ -124,7 +124,7 @@ namespace hpx { namespace components { namespace server
             // create one component at a time
             v.push_back(future_values_type::value_type(localities[i].get_gid()));
             lcos::packaged_action<action_type, std::vector<naming::gid_type> > p;
-            p.apply(localities[i], type, numcreate);
+            p.apply(launch::async, localities[i], type, numcreate);
             v.back().gids_ = p.get_future();
 
             created_count += numcreate;
@@ -249,7 +249,7 @@ namespace hpx { namespace components { namespace server
             // create all components  for each locality at a time
             v.push_back(future_values_type::value_type(localities[i].get_gid()));
             lcos::packaged_action<action_type, std::vector<naming::gid_type> > p;
-            p.apply(localities[i], type, numcreate);
+            p.apply(launch::async, localities[i], type, numcreate);
             v.back().gids_ = p.get_future();
 
             created_count += numcreate;
