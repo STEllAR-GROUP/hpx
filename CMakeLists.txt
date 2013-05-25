@@ -505,7 +505,7 @@ endif()
 ################################################################################
 # libsodium: P(ortable|ackageable) NaCl
 ################################################################################
-find_package(HPX_SODIUM)
+find_package(HPX_Sodium)
 if(SODIUM_FOUND)
   hpx_include_sys_directories(${SODIUM_INCLUDE_DIR})
   hpx_link_sys_directories(${SODIUM_LIBRARY_DIR})
