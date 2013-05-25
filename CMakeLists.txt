@@ -779,6 +779,11 @@ if(MSVC)
     # which is benign
     hpx_append_flag(-wd4307)
 
+    if(MSVC11)
+      # MSVC2012 is overeager to report 'qualifier applied to function type has no meaning; ignored'
+      hpx_append_flag(-wd4180)
+    endif()
+
     # According to the ifort Windows manual, W3 isn't supported
     hpx_append_flag(-W1 LANGUAGES Fortran)
   endif()
