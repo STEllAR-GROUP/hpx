@@ -40,6 +40,11 @@ namespace hpx { namespace components { namespace security { namespace server
             return lsb_;
         }
 
+        bool operator!=(identity const & rhs) const
+        {
+            return msb_ != rhs.msb_ || lsb_ != rhs.lsb_;
+        }
+
         bool operator<(identity const & rhs) const
         {
             if (msb_ < rhs.msb_)

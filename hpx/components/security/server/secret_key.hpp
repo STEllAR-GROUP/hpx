@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_SECURITY_SERVER_SECRET_KEY_HPP
 
 #include <boost/array.hpp>
+#include <boost/serialization/serialization.hpp>
 #include <sodium.h>
 
 #include "public_key.hpp"
@@ -39,6 +40,14 @@ namespace hpx { namespace components { namespace security { namespace server
         }
 
     private:
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, const unsigned int)
+        {
+            ar & bytes_;
+        }
+
         boost::array<
             unsigned char, crypto_sign_SECRETKEYBYTES
         > bytes_;

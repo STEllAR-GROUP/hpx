@@ -9,7 +9,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/components/security/server/certificate_authority_base.hpp>
+
+#include "certificate_authority_base.hpp"
+#include "key_pair.hpp"
 
 namespace hpx { namespace components { namespace security { namespace server
 {
@@ -22,11 +24,10 @@ namespace hpx { namespace components { namespace security { namespace server
         typedef certificate_authority_base base_type_holder;
 
         root_certificate_authority();
+        root_certificate_authority(key_pair const &);
 
         signed_type<certificate> sign_certificate_signing_request(
             signed_type<certificate_signing_request> const &) const;
-
-    private:
     };
 }}}}
 
