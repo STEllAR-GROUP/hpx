@@ -58,7 +58,10 @@ namespace hpx
         typename Derived, typename Arg0, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 1>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -73,7 +76,10 @@ namespace hpx
         typename Derived, typename Arg0, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 1>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -135,7 +141,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 2>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -150,7 +159,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 2>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -212,7 +224,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 3>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -227,7 +242,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 3>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -289,7 +307,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 4>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -304,7 +325,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 4>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -366,7 +390,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 5>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -381,7 +408,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 5>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -443,7 +473,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 6>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -458,7 +491,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 6>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -520,7 +556,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 7>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -535,7 +574,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 7>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -597,7 +639,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 8>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -612,7 +657,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 8>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -674,7 +722,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 9>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -689,7 +740,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 9>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -751,7 +805,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 10>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -766,7 +823,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 10>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -828,7 +888,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 11>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -843,7 +906,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 11>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -905,7 +971,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 12>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -920,7 +989,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 12>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -982,7 +1054,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 13>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -997,7 +1072,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 13>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -1059,7 +1137,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 14>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -1074,7 +1155,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 14>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<
@@ -1136,7 +1220,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 15>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -1151,7 +1238,10 @@ namespace hpx
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14, typename F>
     typename boost::enable_if<
         boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 15>
-      , lcos::future<typename traits::promise_local_result<Result>::type>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
     >::type
     async_continue(
         hpx::actions::action<

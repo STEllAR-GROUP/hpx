@@ -111,25 +111,53 @@ namespace hpx { namespace lcos
         ///               apply the action.
         void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, _1, _2));
+
+            naming::address addr;
+            if (policy == launch::sync && agas::is_local_address(gid, addr)) {
+                // local, direct execution
+                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                    components::get_component_type<
+                        typename action_type::component_type>()));
+
+                (*this->impl_)->set_data(
+                    boost::move(action_type::execute_function(addr.address_,
+                        util::forward_as_tuple())));
+            }
+            else {
+                using HPX_STD_PLACEHOLDERS::_1;
+                using HPX_STD_PLACEHOLDERS::_2;
+
+                hpx::apply_c_cb<action_type>(this->get_gid(), gid,
+                    HPX_STD_BIND(&packaged_action::parcel_write_handler,
+                        this, _1, _2));
+            }
         }
 
         void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
             threads::thread_priority priority)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, _1, _2));
+
+            naming::address addr;
+            if (policy == launch::sync && agas::is_local_address(gid, addr)) {
+                // local, direct execution
+                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                    components::get_component_type<
+                        typename action_type::component_type>()));
+
+                (*this->impl_)->set_data(
+                    boost::move(action_type::execute_function(addr.address_,
+                        util::forward_as_tuple())));
+            }
+            else {
+                using HPX_STD_PLACEHOLDERS::_1;
+                using HPX_STD_PLACEHOLDERS::_2;
+
+                hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
+                    HPX_STD_BIND(&packaged_action::parcel_write_handler,
+                        this, _1, _2));
+            }
         }
 
         /// Construct a new \a packaged_action instance. The \a thread
@@ -181,26 +209,54 @@ namespace hpx { namespace lcos
         void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
             BOOST_FWD_REF(Arg0) arg0)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
-                boost::forward<Arg0>(arg0));
+
+            naming::address addr;
+            if (policy == launch::sync && agas::is_local_address(gid, addr)) {
+                // local, direct execution
+                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                    components::get_component_type<
+                        typename action_type::component_type>()));
+
+                (*this->impl_)->set_data(
+                    boost::move(action_type::execute_function(addr.address_,
+                        util::forward_as_tuple(boost::forward<Arg0>(arg0)))));
+            }
+            else {
+                using HPX_STD_PLACEHOLDERS::_1;
+                using HPX_STD_PLACEHOLDERS::_2;
+
+                hpx::apply_c_cb<action_type>(this->get_gid(), gid,
+                    HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
+                    boost::forward<Arg0>(arg0));
+            }
         }
 
         template <typename Arg0>
         void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority, 
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
-                boost::forward<Arg0>(arg0));
+
+            naming::address addr;
+            if (policy == launch::sync && agas::is_local_address(gid, addr)) {
+                // local, direct execution
+                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                    components::get_component_type<
+                        typename action_type::component_type>()));
+
+                (*this->impl_)->set_data(
+                    boost::move(action_type::execute_function(addr.address_,
+                        util::forward_as_tuple(boost::forward<Arg0>(arg0)))));
+            }
+            else {
+                using HPX_STD_PLACEHOLDERS::_1;
+                using HPX_STD_PLACEHOLDERS::_2;
+
+                hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority, 
+                    HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
+                    boost::forward<Arg0>(arg0));
+            }
         }
 
         /// Construct a new \a packaged_action instance. The \a thread

@@ -26,8 +26,10 @@
 boost::uint64_t threshold = 2;
 boost::uint64_t distribute_at = 2;
 
+///////////////////////////////////////////////////////////////////////////////
 boost::atomic<std::size_t> next_locality(0);
 std::vector<hpx::id_type> localities;
+hpx::id_type here;
 
 struct when_all_wrapper
 {
@@ -62,13 +64,13 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
         return hpx::make_ready_future(fibonacci_serial(n));
 
     fibonacci_future_action fib;
-    hpx::id_type loc = hpx::find_here();
+    hpx::id_type loc = here;
 
     if (n == distribute_at)
         loc = localities[++next_locality % localities.size()];
 
-    hpx::future<boost::uint64_t> f = hpx::async(hpx::launch::async, fib, loc, n-1);
-    hpx::future<boost::uint64_t> r = hpx::async(hpx::launch::sync, fib, loc, n-2);
+    hpx::future<boost::uint64_t> f = hpx::async(fib, loc, n-1);
+    hpx::future<boost::uint64_t> r = fib(loc, n-2);
 
     return hpx::when_all(f, r).then(when_all_wrapper());
 }
@@ -96,12 +98,16 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     distribute_at = vm["distribute-at"].as<unsigned int>();
-    if (distribute_at < 2 || distribute_at > n) {
+    if (distribute_at < threshold || distribute_at > n) {
         std::cerr << "fibonacci_futures: wrong command line argument value for "
             "option 'distribute-at', should be in between 2 and n-value"
             ", value specified: " << threshold << std::endl;
         return hpx::finalize(); // Handles HPX shutdown
     }
+
+    here = hpx::find_here();
+    localities = hpx::find_all_localities();
+    next_locality = 0;
 
     bool executed_one = false;
     boost::uint64_t r = 0;

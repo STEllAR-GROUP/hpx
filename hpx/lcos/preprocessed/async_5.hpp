@@ -45,7 +45,10 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -56,7 +59,10 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -103,7 +109,10 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -114,7 +123,10 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -161,7 +173,10 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -172,7 +187,10 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -219,7 +237,10 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -230,7 +251,10 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -277,7 +301,10 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
@@ -288,7 +315,10 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    lcos::future<typename traits::promise_local_result<Result>::type>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Derived>::remote_result_type
+        >::type>
     async (
         hpx::actions::action<
             Component, Result, Arguments, Derived

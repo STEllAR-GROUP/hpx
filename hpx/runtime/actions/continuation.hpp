@@ -93,6 +93,7 @@ namespace hpx { namespace actions
     // Parcel continuations are polymorphic objects encapsulating the
     // id_type of the destination where the result has to be sent.
     class HPX_EXPORT continuation
+      : public boost::enable_shared_from_this<continuation>
     {
     public:
         continuation()
@@ -253,8 +254,8 @@ namespace hpx { namespace actions
 
         void trigger_value(BOOST_RV_REF(Result) result) const
         {
-            LLCO_(info) 
-                << "typed_continuation<Result>::trigger_value(" 
+            LLCO_(info)
+                << "typed_continuation<Result>::trigger_value("
                 << this->get_gid() << ")";
             if (f_.empty()) {
                 if (!this->get_gid()) {
@@ -375,9 +376,7 @@ namespace hpx { namespace actions
 
     // special handling of actions returning a future
     template <typename Result>
-    struct typed_continuation<lcos::future<Result> >
-      : continuation
-      , boost::enable_shared_from_this<typed_continuation<lcos::future<Result> > >
+    struct typed_continuation<lcos::future<Result> > : continuation
     {
         typed_continuation()
         {}
@@ -426,9 +425,10 @@ namespace hpx { namespace actions
 
             // attach continuation to this future which will send the result back
             // once its ready
-            using util::placeholders::_1;
             deferred_result_ = result.then(
-                util::bind(&typed_continuation::deferred_trigger, shared_from_this(), _1));
+                util::bind(&typed_continuation::deferred_trigger,
+                    boost::static_pointer_cast<typed_continuation const>(shared_from_this()),
+                    util::placeholders::_1));
         }
 
         static void register_base()
