@@ -47,7 +47,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -55,17 +54,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_1::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_1::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -117,6 +170,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -133,7 +188,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0>
@@ -198,7 +252,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0) , boost::forward<FF1>(f1)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -206,17 +259,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_2::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_2::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -268,6 +375,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -284,7 +393,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0 , typename F1>
@@ -349,7 +457,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0) , boost::forward<FF1>(f1) , boost::forward<FF2>(f2)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -357,17 +464,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_3::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_3::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -419,6 +580,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -435,7 +598,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2>
@@ -500,7 +662,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0) , boost::forward<FF1>(f1) , boost::forward<FF2>(f2) , boost::forward<FF3>(f3)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -508,17 +669,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_4::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_4::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -570,6 +785,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -586,7 +803,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
@@ -651,7 +867,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0) , boost::forward<FF1>(f1) , boost::forward<FF2>(f2) , boost::forward<FF3>(f3) , boost::forward<FF4>(f4)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -659,17 +874,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_5::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_5::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -721,6 +990,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -737,7 +1008,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
@@ -802,7 +1072,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0) , boost::forward<FF1>(f1) , boost::forward<FF2>(f2) , boost::forward<FF3>(f3) , boost::forward<FF4>(f4) , boost::forward<FF5>(f5)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -810,17 +1079,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_6::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_6::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -872,6 +1195,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -888,7 +1213,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
@@ -953,7 +1277,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0) , boost::forward<FF1>(f1) , boost::forward<FF2>(f2) , boost::forward<FF3>(f3) , boost::forward<FF4>(f4) , boost::forward<FF5>(f5) , boost::forward<FF6>(f6)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -961,17 +1284,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_7::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_7::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -1023,6 +1400,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -1039,7 +1418,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
@@ -1104,7 +1482,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0) , boost::forward<FF1>(f1) , boost::forward<FF2>(f2) , boost::forward<FF3>(f3) , boost::forward<FF4>(f4) , boost::forward<FF5>(f5) , boost::forward<FF6>(f6) , boost::forward<FF7>(f7)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -1112,17 +1489,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_8::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_8::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -1174,6 +1605,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -1190,7 +1623,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
@@ -1255,7 +1687,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0) , boost::forward<FF1>(f1) , boost::forward<FF2>(f2) , boost::forward<FF3>(f3) , boost::forward<FF4>(f4) , boost::forward<FF5>(f5) , boost::forward<FF6>(f6) , boost::forward<FF7>(f7) , boost::forward<FF8>(f8)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -1263,17 +1694,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_9::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_9::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -1325,6 +1810,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -1341,7 +1828,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
@@ -1406,7 +1892,6 @@ namespace hpx { namespace lcos { namespace local {
               , futures_(
                     boost::forward<FF0>(f0) , boost::forward<FF1>(f1) , boost::forward<FF2>(f2) , boost::forward<FF3>(f3) , boost::forward<FF4>(f4) , boost::forward<FF5>(f5) , boost::forward<FF6>(f6) , boost::forward<FF7>(f7) , boost::forward<FF8>(f8) , boost::forward<FF9>(f9)
                 )
-              , state_(0)
             {}
             template <typename Iter>
             BOOST_FORCEINLINE
@@ -1414,17 +1899,71 @@ namespace hpx { namespace lcos { namespace local {
                 BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
             )
             {
-                boost::fusion::invoke(func_, futures_);
                 if(!result_.valid())
                 {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::make_ready_future();
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
+                    boost::fusion::invoke(func_, futures_);
                     result_promise_.set_value();
                 }
             }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+                    void (dataflow_frame_10::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &dataflow_frame_10::await;
+                    boost::fusion::deref(iter).then(
+                        boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+>>>>>>> d1a016e
+                }
+            }
+<<<<<<< HEAD
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -1476,6 +2015,8 @@ namespace hpx { namespace lcos { namespace local {
                     );
                     return;
                 }
+== == == =
+>>>>>>> d1a016e
                 await(
                     boost::fusion::next(iter)
                   , typename boost::is_same<next_type, end_type>::type()
@@ -1492,7 +2033,6 @@ namespace hpx { namespace lcos { namespace local {
             }
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
