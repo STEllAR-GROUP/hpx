@@ -45,27 +45,26 @@
 #define N BOOST_PP_ITERATION()
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        using HPX_STD_PLACEHOLDERS::_1;
-        using HPX_STD_PLACEHOLDERS::_2;
-
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_PLACEHOLDERS::_1),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply_p(naming::id_type const& gid,
+    void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        using HPX_STD_PLACEHOLDERS::_1;
-        using HPX_STD_PLACEHOLDERS::_2;
-
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_PLACEHOLDERS::_1),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -80,7 +79,7 @@
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        apply(launch::all, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -94,7 +93,7 @@
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+        apply_p(launch::all, naming::id_type(gid, naming::id_type::unmanaged),
             priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 

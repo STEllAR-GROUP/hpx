@@ -61,23 +61,23 @@ namespace hpx { namespace lcos
     template <typename Action, typename Result>
     class packaged_action<Action, Result, boost::mpl::false_>
       : public promise<Result,
-            typename hpx::actions::extract_action<Action>::result_type>
+            typename hpx::actions::extract_action<Action>::remote_result_type>
     {
     private:
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef promise<Result, typename action_type::result_type> base_type;
+        typedef promise<Result, typename action_type::remote_result_type> base_type;
         typedef typename base_type::completed_callback_type
             completed_callback_type;
 
         struct profiler_tag {};
 
-        void parcel_write_handler(boost::system::error_code const& ec, std::size_t)
+        void parcel_write_handler(boost::system::error_code const& ec)
         {
             // any error in the parcel layer will be stored in the future object
             if (ec) {
                 boost::exception_ptr exception =
                     hpx::detail::get_exception(hpx::exception(ec),
-                        "packaged_action::parcel_write_handler", 
+                        "packaged_action::parcel_write_handler",
                         __FILE__, __LINE__);
                 this->base_type::set_exception(exception);
             }
@@ -109,26 +109,23 @@ namespace hpx { namespace lcos
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        void apply(naming::id_type const& gid)
+        void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
             hpx::apply_c_cb<action_type>(this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, _1, _2));
+                    this, HPX_STD_PLACEHOLDERS::_1));
         }
 
-        void apply_p(naming::id_type const& gid, threads::thread_priority priority)
+        void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+            threads::thread_priority priority)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
             hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, _1, _2));
+                    this, HPX_STD_PLACEHOLDERS::_1));
         }
 
         /// Construct a new \a packaged_action instance. The \a thread
@@ -154,7 +151,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(0)";
-            apply(gid);
+            apply(launch::all, gid);
         }
 
         packaged_action(naming::id_type const& gid,
@@ -166,7 +163,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(0)";
-            apply_p(gid, priority);
+            apply_p(launch::all, gid, priority);
         }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -177,27 +174,26 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
+        void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+            BOOST_FWD_REF(Arg0) arg0)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+
             hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                    HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
-        void apply_p(naming::id_type const& gid,
+        void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-            using HPX_STD_PLACEHOLDERS::_2;
-
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority, 
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this, _1, _2),
+
+            hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                    HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>(arg0));
         }
 
@@ -228,7 +224,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, boost::forward<Arg0>(arg0));
+            apply(launch::all, gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
@@ -242,7 +238,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply_p(gid, priority, boost::forward<Arg0>(arg0));
+            apply_p(launch::all, gid, priority, boost::forward<Arg0>(arg0));
         }
 
         // pull in remaining constructors
@@ -255,23 +251,23 @@ namespace hpx { namespace lcos
     template <typename Action, typename Result>
     class packaged_action<Action, Result, boost::mpl::true_>
       : public promise<Result,
-          typename hpx::actions::extract_action<Action>::result_type>
+          typename hpx::actions::extract_action<Action>::remote_result_type>
     {
     private:
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef promise<Result, typename action_type::result_type> base_type;
+        typedef promise<Result, typename action_type::remote_result_type> base_type;
         typedef typename base_type::completed_callback_type
             completed_callback_type;
 
         struct profiler_tag {};
 
-        void parcel_write_handler(boost::system::error_code const& ec, std::size_t)
+        void parcel_write_handler(boost::system::error_code const& ec)
         {
             // any error in the parcel layer will be stored in the future object
             if (ec) {
                 boost::exception_ptr exception =
                     hpx::detail::get_exception(hpx::exception(ec),
-                        "packaged_action::parcel_write_handler", 
+                        "packaged_action::parcel_write_handler",
                         __FILE__, __LINE__);
                 this->base_type::set_exception(exception);
             }
@@ -295,7 +291,7 @@ namespace hpx { namespace lcos
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         template <typename IdType>
-        void apply(IdType const& gid)
+        void apply(BOOST_SCOPED_ENUM(launch) policy, IdType const& gid)
         {
             BOOST_STATIC_ASSERT((boost::is_same<IdType, naming::id_type>::value));
 
@@ -315,13 +311,10 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                using HPX_STD_PLACEHOLDERS::_1;
-                using HPX_STD_PLACEHOLDERS::_2;
-
                 hpx::applier::detail::apply_c_cb<action_type>(addr,
                     this->get_gid(), gid,
-                    HPX_STD_BIND(&packaged_action::parcel_write_handler, 
-                        this, _1, _2));
+                    HPX_STD_BIND(&packaged_action::parcel_write_handler,
+                        this, HPX_STD_PLACEHOLDERS::_1));
             }
         }
 
@@ -348,7 +341,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(0)";
-            apply(gid);
+            apply(launch::all, gid);
         }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -359,7 +352,8 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
+        void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+            BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
@@ -377,13 +371,10 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                using HPX_STD_PLACEHOLDERS::_1;
-                using HPX_STD_PLACEHOLDERS::_2;
-
                 hpx::applier::detail::apply_c_cb<action_type>(
                     addr, this->get_gid(), gid,
-                    HPX_STD_BIND(&packaged_action::parcel_write_handler, 
-                        this, _1, _2),
+                    HPX_STD_BIND(&packaged_action::parcel_write_handler,
+                        this, HPX_STD_PLACEHOLDERS::_1),
                     boost::forward<Arg0>(arg0));
             }
         }
@@ -415,7 +406,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, boost::forward<Arg0>(arg0));
+            apply(launch::all, gid, boost::forward<Arg0>(arg0));
         }
 
         // pull in remaining constructors

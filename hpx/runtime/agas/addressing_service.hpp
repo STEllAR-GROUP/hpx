@@ -309,7 +309,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     naming::gid_type const& get_local_locality(error_code& ec = throws) const
     {
-        if (locality_ == naming::invalid_gid) {
+        if (!locality_) {
             HPX_THROWS_IF(ec, invalid_status,
                 "addressing_service::get_local_locality",
                 "local locality has not been initialized (yet)");
@@ -344,7 +344,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     bool resolve_locally_known_addresses(
         naming::gid_type const& id
       , naming::address& addr
-      , error_code& ec
       );
 
     /// \brief Register performance counter types exposing properties from the
@@ -982,7 +981,7 @@ public:
         );
 
     bool is_local_lva_encoded_address(
-        naming::gid_type const& id
+        boost::uint64_t msb
         );
 
     // same, but bulk operation

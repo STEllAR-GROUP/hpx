@@ -36,7 +36,7 @@ struct HPX_EXPORT component_namespace
         typedef server_type::service_action action_type;
 
         lcos::packaged_action<action_type, Result> p;
-        p.apply_p(gid, priority, req);
+        p.apply_p(launch::async, gid, priority, req);
         return p.get_future();
     }
 
@@ -69,7 +69,7 @@ struct HPX_EXPORT component_namespace
         typedef server_type::bulk_service_action action_type;
 
         lcos::packaged_action<action_type> p;
-        p.apply_p(gid, priority, reqs);
+        p.apply_p(launch::async, gid, priority, reqs);
         return p.get_future();
     }
 

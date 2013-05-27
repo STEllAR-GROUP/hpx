@@ -29,8 +29,8 @@ naming::gid_type bootstrap_primary_namespace_gid()
 
 naming::id_type bootstrap_primary_namespace_id()
 {
-    return naming::id_type( bootstrap_primary_namespace_gid()
-                          , naming::id_type::unmanaged);
+    return naming::id_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB
+      , naming::id_type::unmanaged);
 }
 
 namespace server
