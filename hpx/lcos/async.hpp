@@ -84,7 +84,7 @@ namespace hpx
         }
 
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy))
+        if (policy == launch::sync || detail::has_async_policy(policy))
             p.apply(policy, gid);
 
         return p.get_future();
@@ -218,7 +218,7 @@ namespace hpx
         }
 
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy))
+        if (policy == launch::sync || detail::has_async_policy(policy))
             p.apply(policy, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
 
         return p.get_future();

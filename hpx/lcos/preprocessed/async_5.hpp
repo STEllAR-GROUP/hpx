@@ -60,7 +60,7 @@ namespace hpx
                 call(is_future_pred(), gid, addr, boost::forward<Arg0>( arg0 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy))
+        if (policy == launch::sync || detail::has_async_policy(policy))
             p.apply(policy, gid, boost::forward<Arg0>( arg0 ));
         return p.get_future();
     }
@@ -156,7 +156,7 @@ namespace hpx
                 call(is_future_pred(), gid, addr, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy))
+        if (policy == launch::sync || detail::has_async_policy(policy))
             p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         return p.get_future();
     }
@@ -252,7 +252,7 @@ namespace hpx
                 call(is_future_pred(), gid, addr, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy))
+        if (policy == launch::sync || detail::has_async_policy(policy))
             p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         return p.get_future();
     }
@@ -348,7 +348,7 @@ namespace hpx
                 call(is_future_pred(), gid, addr, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy))
+        if (policy == launch::sync || detail::has_async_policy(policy))
             p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         return p.get_future();
     }
@@ -444,7 +444,7 @@ namespace hpx
                 call(is_future_pred(), gid, addr, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
         lcos::packaged_action<action_type, result_type> p;
-        if (detail::has_async_policy(policy))
+        if (policy == launch::sync || detail::has_async_policy(policy))
             p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         return p.get_future();
     }

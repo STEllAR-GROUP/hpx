@@ -71,7 +71,7 @@ namespace hpx { namespace lcos
 
         struct profiler_tag {};
 
-        void parcel_write_handler(boost::system::error_code const& ec, std::size_t)
+        void parcel_write_handler(boost::system::error_code const& ec)
         {
             // any error in the parcel layer will be stored in the future object
             if (ec) {
@@ -115,7 +115,7 @@ namespace hpx { namespace lcos
 
             hpx::apply_c_cb<action_type>(this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, HPX_STD_PLACEHOLDERS::_1, HPX_STD_PLACEHOLDERS::_2));
+                    this, HPX_STD_PLACEHOLDERS::_1));
         }
 
         void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -125,7 +125,7 @@ namespace hpx { namespace lcos
 
             hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, HPX_STD_PLACEHOLDERS::_1, HPX_STD_PLACEHOLDERS::_2));
+                    this, HPX_STD_PLACEHOLDERS::_1));
         }
 
         /// Construct a new \a packaged_action instance. The \a thread
@@ -181,7 +181,7 @@ namespace hpx { namespace lcos
 
             hpx::apply_c_cb<action_type>(this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
-                    HPX_STD_PLACEHOLDERS::_1, HPX_STD_PLACEHOLDERS::_2),
+                    HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>(arg0));
         }
 
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos
 
             hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
-                    HPX_STD_PLACEHOLDERS::_1, HPX_STD_PLACEHOLDERS::_2),
+                    HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>(arg0));
         }
 
@@ -261,7 +261,7 @@ namespace hpx { namespace lcos
 
         struct profiler_tag {};
 
-        void parcel_write_handler(boost::system::error_code const& ec, std::size_t)
+        void parcel_write_handler(boost::system::error_code const& ec)
         {
             // any error in the parcel layer will be stored in the future object
             if (ec) {
@@ -311,13 +311,10 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                using HPX_STD_PLACEHOLDERS::_1;
-                using HPX_STD_PLACEHOLDERS::_2;
-
                 hpx::applier::detail::apply_c_cb<action_type>(addr,
                     this->get_gid(), gid,
                     HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                        this, _1, _2));
+                        this, HPX_STD_PLACEHOLDERS::_1));
             }
         }
 
@@ -374,13 +371,10 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                using HPX_STD_PLACEHOLDERS::_1;
-                using HPX_STD_PLACEHOLDERS::_2;
-
                 hpx::applier::detail::apply_c_cb<action_type>(
                     addr, this->get_gid(), gid,
                     HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                        this, _1, _2),
+                        this, HPX_STD_PLACEHOLDERS::_1),
                     boost::forward<Arg0>(arg0));
             }
         }
