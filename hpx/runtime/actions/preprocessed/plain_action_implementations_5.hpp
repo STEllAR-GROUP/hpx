@@ -107,7 +107,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_result_action" << 1
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
         }
     };
@@ -271,7 +271,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_action" << 1
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
             return util::unused;
         }
@@ -486,7 +486,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_result_action" << 2
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
         }
     };
@@ -650,7 +650,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_action" << 2
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
             return util::unused;
         }
@@ -865,7 +865,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_result_action" << 3
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
         }
     };
@@ -1029,7 +1029,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_action" << 3
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
             return util::unused;
         }
@@ -1244,7 +1244,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_result_action" << 4
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
         }
     };
@@ -1408,7 +1408,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_action" << 4
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
             return util::unused;
         }
@@ -1623,7 +1623,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_result_action" << 5
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
         }
     };
@@ -1787,7 +1787,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_action" << 5
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
             F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
             return util::unused;
         }

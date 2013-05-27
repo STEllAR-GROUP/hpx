@@ -43,7 +43,7 @@
                     << ", "
                     << gid
                     << ") args(" << (2 + 1) << ")";
-        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -80,7 +80,7 @@
                     << ", "
                     << gid
                     << ") args(" << (3 + 1) << ")";
-        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -117,7 +117,7 @@
                     << ", "
                     << gid
                     << ") args(" << (4 + 1) << ")";
-        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -154,5 +154,5 @@
                     << ", "
                     << gid
                     << ") args(" << (5 + 1) << ")";
-        apply(apply::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }

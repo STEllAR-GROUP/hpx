@@ -705,17 +705,17 @@ namespace hpx { namespace actions
             hpx::async<action>(launch::sync, id).get(ec);
         }
 
-        template <typename Result>
+        template <typename LocalResult>
         struct sync_invoke_0
         {
-            BOOST_FORCEINLINE static Result call(
+            BOOST_FORCEINLINE static LocalResult call(
                 boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
                 naming::id_type const& id, error_code& ec)
             {
                 return hpx::async<action>(policy, id).move(ec);
             }
 
-            BOOST_FORCEINLINE static Result call(
+            BOOST_FORCEINLINE static LocalResult call(
                 boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
                 naming::id_type const& id, error_code& ec)
             {

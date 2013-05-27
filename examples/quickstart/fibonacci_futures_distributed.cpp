@@ -95,18 +95,14 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (std::size_t i = 0; i != max_runs; ++i)
-        {
-            // Create a Future for the whole calculation, execute it locally,
-            // and wait for it.
-            r = fibonacci_serial(n);
-        }
+        // Synchronous execution, use as reference only.
+        r = fibonacci_serial(n);
 
 //        double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
         boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial(%1%) == %2%,"
             "elapsed time:,%3%,[s]\n";
-        std::cout << (boost::format(fmt) % n % r % (d / max_runs));
+        std::cout << (boost::format(fmt) % n % r % d);
 
         executed_one = true;
     }
@@ -118,8 +114,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         for (std::size_t i = 0; i != max_runs; ++i)
         {
-            // Create a Future for the whole calculation, execute it locally, and
-            // wait for it.
+            // Create a Future for the whole calculation and wait for it.
             r = fibonacci_future(n).get();
         }
 

@@ -75,11 +75,11 @@
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
+    template <typename LocalResult>
     struct BOOST_PP_CAT(sync_invoke_, N)
     {
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        BOOST_FORCEINLINE static Result call(
+        BOOST_FORCEINLINE static LocalResult call(
             boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
             naming::id_type const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
             error_code& ec)
@@ -89,7 +89,7 @@
         }
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        BOOST_FORCEINLINE static Result call(
+        BOOST_FORCEINLINE static LocalResult call(
             boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
             naming::id_type const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
             error_code& ec)

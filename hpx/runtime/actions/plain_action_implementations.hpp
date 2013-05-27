@@ -166,7 +166,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_result_action" << N
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
 
             return F(BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
         }
@@ -349,7 +349,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "plain_base_action" << N
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
+                << detail::get_action_name<Derived>() << ")";
 
             F(BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
             return util::unused;

@@ -38,7 +38,7 @@ namespace hpx
         BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
 
@@ -150,7 +150,7 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg), BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
 

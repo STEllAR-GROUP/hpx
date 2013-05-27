@@ -202,7 +202,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << N
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component const>::call(lva)) << ")";
 
@@ -402,7 +402,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << N
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component const>::call(lva)) << ")";
 

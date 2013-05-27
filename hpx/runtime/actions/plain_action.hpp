@@ -132,7 +132,7 @@ namespace hpx { namespace actions
         {
             LTM_(debug)
                 << "plain_base_result_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ")";
             return F();
         }
@@ -284,7 +284,7 @@ namespace hpx { namespace actions
         {
             LTM_(debug)
                 << "plain_base_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ")";
             F();
             return util::unused;

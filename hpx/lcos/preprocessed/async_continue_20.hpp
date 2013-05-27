@@ -25,7 +25,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -108,7 +108,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -191,7 +191,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -274,7 +274,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -357,7 +357,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -440,7 +440,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -523,7 +523,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -606,7 +606,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -689,7 +689,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -772,7 +772,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -855,7 +855,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -938,7 +938,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -1021,7 +1021,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -1104,7 +1104,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -1187,7 +1187,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -1270,7 +1270,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -1353,7 +1353,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -1436,7 +1436,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -1519,7 +1519,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;
@@ -1602,7 +1602,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
+        typedef typename action_type::remote_result_type remote_result_type;
         typedef typename traits::promise_local_result<
             remote_result_type>::type result_type;
         lcos::packaged_action<action_type, result_type> p;

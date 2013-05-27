@@ -84,7 +84,7 @@
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply(apply::all, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        apply(launch::all, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
 #undef N
