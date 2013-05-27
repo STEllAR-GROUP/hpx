@@ -55,8 +55,8 @@
     operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
         HPX_ENUM_FWD_ARGS(N, Arg, arg), error_code& ec = throws) const
     {
-        hpx::async<action>(policy, id
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).get(ec);
+        hpx::async<action>(policy, id,
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).get(ec);
     }
 
     template <typename IdType, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -70,11 +70,35 @@
     operator()(IdType const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         error_code& ec = throws) const
     {
-        hpx::async<action>(launch::sync, id
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).get(ec);
+        hpx::async<action>(launch::sync, id,
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).get(ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    struct BOOST_PP_CAT(sync_invoke_, N)
+    {
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_FORCEINLINE static Result call(
+            boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
+            naming::id_type const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+            error_code& ec)
+        {
+            return hpx::async<action>(policy, id,
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).move(ec);
+        }
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_FORCEINLINE static Result call(
+            boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
+            naming::id_type const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+            error_code& ec)
+        {
+            return hpx::async<action>(policy, id,
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        }
+    };
+
     template <typename IdType, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
@@ -87,8 +111,8 @@
     operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
         HPX_ENUM_FWD_ARGS(N, Arg, arg), error_code& ec = throws) const
     {
-        return hpx::async<action>(policy, id
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).move(ec);
+        return BOOST_PP_CAT(sync_invoke_, N)<local_result_type>::call(
+            is_future_pred(), policy, id, HPX_ENUM_FORWARD_ARGS(N, Arg, arg), ec);
     }
 
     template <typename IdType, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -103,8 +127,8 @@
     operator()(IdType const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         error_code& ec = throws) const
     {
-        return hpx::async<action>(launch::sync, id
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).move(ec);
+        return BOOST_PP_CAT(sync_invoke_, N)<local_result_type>::call(
+            is_future_pred(), launch::sync, id, HPX_ENUM_FORWARD_ARGS(N, Arg, arg), ec);
     }
 
 #undef N

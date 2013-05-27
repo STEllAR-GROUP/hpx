@@ -3,9 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This is a purely local version demonstrating different versions of making
-// the calculation of a fibonacci asynchronous.
-
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
@@ -98,10 +95,10 @@ int hpx_main(boost::program_options::variables_map& vm)
     }
 
     distribute_at = vm["distribute-at"].as<unsigned int>();
-    if (distribute_at < threshold || distribute_at > n) {
+    if (distribute_at < 2 || distribute_at > n) {
         std::cerr << "fibonacci_futures: wrong command line argument value for "
             "option 'distribute-at', should be in between 2 and n-value"
-            ", value specified: " << threshold << std::endl;
+            ", value specified: " << distribute_at << std::endl;
         return hpx::finalize(); // Handles HPX shutdown
     }
 
@@ -147,7 +144,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 //        double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
         boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
-        char const* fmt = "fibonacci_future_unwrapped_when_all(%1%) == %2%,elapsed time:,%3%,[s]\n";
+        char const* fmt = "fibonacci_future(%1%) == %2%,elapsed time:,%3%,[s]\n";
         std::cout << (boost::format(fmt) % n % r % (d / max_runs));
 
         executed_one = true;

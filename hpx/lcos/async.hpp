@@ -32,6 +32,31 @@ namespace hpx
                 (static_cast<int>(launch::async)|static_cast<int>(launch::task))) ?
                     true : false;
         }
+
+        template <typename Action, typename Result>
+        struct sync_local_invoke_0
+        {
+            BOOST_FORCEINLINE static lcos::future<Result> call(
+                boost::mpl::false_, naming::id_type const& gid,
+                naming::address const& addr)
+            {
+                lcos::packaged_action<Action, Result> p;
+                p.apply(launch::sync, gid);
+                return p.get_future();
+            }
+
+            BOOST_FORCEINLINE static lcos::future<Result> call(
+                boost::mpl::true_, naming::id_type const& gid,
+                naming::address const& addr)
+            {
+                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                    components::get_component_type<
+                        typename Action::component_type>()));
+
+                return Action::execute_function(addr.address_,
+                    util::forward_as_tuple());
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -47,9 +72,21 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
 
+        naming::address addr;
+        if (policy == launch::sync && agas::is_local_address(gid, addr))
+        {
+            typedef typename traits::is_future<
+                typename action_type::result_type
+            >::type is_future_pred;
+
+            return detail::sync_local_invoke_0<action_type, result_type>::
+                call(is_future_pred(), gid, addr);
+        }
+
         lcos::packaged_action<action_type, result_type> p;
-        if (policy == launch::sync || detail::has_async_policy(policy))
+        if (detail::has_async_policy(policy))
             p.apply(policy, gid);
+
         return p.get_future();
     }
 
@@ -125,13 +162,42 @@ namespace hpx
 
 namespace hpx
 {
+    namespace detail
+    {
+        template <typename Action, typename Result>
+        struct BOOST_PP_CAT(sync_local_invoke_, N)
+        {
+            template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+            BOOST_FORCEINLINE static lcos::future<Result> call(
+                boost::mpl::false_, naming::id_type const& gid,
+                naming::address const&, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+            {
+                lcos::packaged_action<Action, Result> p;
+                p.apply(launch::sync, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+                return p.get_future();
+            }
+
+            template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+            BOOST_FORCEINLINE static lcos::future<Result> call(
+                boost::mpl::true_, naming::id_type const&,
+                naming::address const& addr, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+            {
+                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                    components::get_component_type<
+                        typename Action::component_type>()));
+
+                return Action::execute_function(addr.address_,
+                    util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+            }
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type
-    >
+        >::type>
     async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
@@ -139,12 +205,22 @@ namespace hpx
         typedef typename traits::promise_local_result<
             typename action_type::remote_result_type
         >::type result_type;
-        typedef lcos::packaged_action<action_type, result_type>
-            packaged_action_type;
 
-        packaged_action_type p;
-        if (policy == launch::sync || detail::has_async_policy(policy))
+        naming::address addr;
+        if (policy == launch::sync && agas::is_local_address(gid, addr))
+        {
+            typedef typename traits::is_future<
+                typename action_type::result_type
+            >::type is_future_pred;
+
+            return detail::BOOST_PP_CAT(sync_local_invoke_, N)<action_type, result_type>::
+                call(is_future_pred(), gid, addr, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        }
+
+        lcos::packaged_action<action_type, result_type> p;
+        if (detail::has_async_policy(policy))
             p.apply(policy, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+
         return p.get_future();
     }
 
@@ -152,8 +228,7 @@ namespace hpx
     lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type
-    >
+        >::type>
     async (naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return async<Action>(launch::all, gid,

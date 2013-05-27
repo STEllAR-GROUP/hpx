@@ -18,6 +18,7 @@
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/type_size.hpp>
+#include <hpx/traits/is_future.hpp>
 
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -675,6 +676,7 @@ namespace hpx { namespace actions
         #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
         typedef typename traits::promise_local_result<Result>::type local_result_type;
+        typedef typename traits::is_future<local_result_type>::type is_future_pred;
 
         // bring in the definition for all overloads for operator()
         template <typename IdType>
@@ -703,6 +705,24 @@ namespace hpx { namespace actions
             hpx::async<action>(launch::sync, id).get(ec);
         }
 
+        template <typename Result>
+        struct sync_invoke_0
+        {
+            BOOST_FORCEINLINE static Result call(
+                boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
+                naming::id_type const& id, error_code& ec)
+            {
+                return hpx::async<action>(policy, id).move(ec);
+            }
+
+            BOOST_FORCEINLINE static Result call(
+                boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
+                naming::id_type const& id, error_code& ec)
+            {
+                return hpx::async<action>(policy, id);
+            }
+        };
+
         template <typename IdType>
         BOOST_FORCEINLINE typename boost::enable_if<
             boost::mpl::and_<
@@ -712,9 +732,11 @@ namespace hpx { namespace actions
                 boost::mpl::not_<boost::is_same<local_result_type, void> > >,
             local_result_type
         >::type
-        operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id, error_code& ec = throws) const
+        operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
+            error_code& ec = throws) const
         {
-            return hpx::async<action>(policy, id).move(ec);
+            return sync_invoke_0<local_result_type>::call(is_future_pred(),
+                policy, id, ec);
         }
 
         template <typename IdType>
@@ -728,7 +750,8 @@ namespace hpx { namespace actions
         >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
-            return hpx::async<action>(launch::sync, id).move(ec);
+            return sync_invoke_0<local_result_type>::call(is_future_pred(),
+                launch::sync, id, ec);
         }
 
         #include <hpx/runtime/actions/define_function_operators.hpp>
