@@ -43,6 +43,18 @@ namespace hpx { namespace lcos
         typedef T value_type;
     };
 
+    template <typename T>
+    struct future_traits<lcos::future<T> &>
+    {
+        typedef T value_type;
+    };
+
+    template <typename T>
+    struct future_traits<lcos::future<T> const &>
+    {
+        typedef T value_type;
+    };
+
     template <typename Iter>
     struct future_iterator_traits
     {
