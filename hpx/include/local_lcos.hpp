@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/lcos/local/event.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
