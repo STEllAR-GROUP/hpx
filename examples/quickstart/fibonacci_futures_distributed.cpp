@@ -81,30 +81,11 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t max_runs = vm["n-runs"].as<boost::uint64_t>();
 
     if (max_runs == 0) {
-        std::cerr << "fibonacci_futures: wrong command line argument value for "
+        std::cerr << "fibonacci_futures_distributed: wrong command "
+            "line argument value for "
             "option 'n-runs', should not be zero" << std::endl;
         return hpx::finalize(); // Handles HPX shutdown
     }
-
-    threshold = vm["threshold"].as<unsigned int>();
-    if (threshold < 2 || threshold > n) {
-        std::cerr << "fibonacci_futures: wrong command line argument value for "
-            "option 'threshold', should be in between 2 and n-value"
-            ", value specified: " << threshold << std::endl;
-        return hpx::finalize(); // Handles HPX shutdown
-    }
-
-    distribute_at = vm["distribute-at"].as<unsigned int>();
-    if (distribute_at < 2 || distribute_at > n) {
-        std::cerr << "fibonacci_futures: wrong command line argument value for "
-            "option 'distribute-at', should be in between 2 and n-value"
-            ", value specified: " << distribute_at << std::endl;
-        return hpx::finalize(); // Handles HPX shutdown
-    }
-
-    here = hpx::find_here();
-    localities = hpx::find_all_localities();
-    next_locality = 0;
 
     bool executed_one = false;
     boost::uint64_t r = 0;
@@ -161,7 +142,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
+boost::program_options::options_description get_commandline_options()
 {
     // Configure application-specific options
     boost::program_options::options_description
@@ -180,7 +161,53 @@ int main(int argc, char* argv[])
         ( "test", value<std::string>()->default_value("all"),
           "select tests to execute (0-7, default: all)")
     ;
+    return desc_commandline;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void init_globals()
+{
+    // Retrieve command line using the Boost.ProgramOptions library.
+    boost::program_options::variables_map vm;
+    if (!hpx::util::retrieve_commandline_arguments(get_commandline_options(), vm))
+    {
+        HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+            "fibonacci_futures_distributed",
+            "failed to handle command line options");
+        return;
+    }
+
+    boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+
+    threshold = vm["threshold"].as<unsigned int>();
+    if (threshold < 2 || threshold > n) {
+        HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+            "fibonacci_futures_distributed",
+            "wrong command line argument value for option 'threshold', "
+            "should be in between 2 and n-value, value specified: " + 
+                boost::lexical_cast<std::string>(threshold));
+        return;
+    }
+
+    distribute_at = vm["distribute-at"].as<unsigned int>();
+    if (distribute_at < 2 || distribute_at > n) {
+        HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+            "fibonacci_futures_distributed",
+            "wrong command line argument value for option 'distribute-at', "
+            "should be in between 2 and n-value, value specified: " + 
+                boost::lexical_cast<std::string>(distribute_at));
+        return;
+    }
+
+    here = hpx::find_here();
+    localities = hpx::find_all_localities();
+    next_locality = 0;
+}
+
+int main(int argc, char* argv[])
+{
+    hpx::register_startup_function(&init_globals);
 
     // Initialize and run HPX
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(get_commandline_options(), argc, argv);
 }
