@@ -7,7 +7,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/components/security/certificate_authority_base.hpp>
 #include <hpx/components/security/server/certificate_store.hpp>
+#include <hpx/components/security/server/hash.hpp>
 #include <hpx/components/security/server/key_pair.hpp>
+#include <hpx/components/security/server/parcel.hpp>
 #include <hpx/components/security/server/root_certificate_authority.hpp>
 #include <hpx/components/security/server/subordinate_certificate_authority.hpp>
 #include <hpx/util/lightweight_test.hpp>
@@ -50,6 +52,16 @@ int hpx_main(boost::program_options::variables_map &)
         store.insert(subordinate_certificate);
 
         HPX_TEST(root_public_key.verify(subordinate_certificate));
+
+
+        server::hash hash;
+        hash.update(
+            reinterpret_cast<unsigned char const *>("Hello, world!"), 13);
+
+        server::parcel parcel(0, hash);
+
+        server::signed_type<server::parcel> signed_parcel =
+            subordinate_key_pair.sign(parcel);
     }
 
     return hpx::finalize();

@@ -29,12 +29,18 @@ namespace hpx { namespace components { namespace security { namespace server
             signed_type<T> signed_type;
             unsigned long long signed_type_length;
 
-            crypto_sign(
-                reinterpret_cast<unsigned char *>(&signed_type),
-                &signed_type_length,
-                reinterpret_cast<unsigned char const *>(&type),
-                sizeof type,
-                bytes_.data());
+            if (crypto_sign(
+                    reinterpret_cast<unsigned char *>(&signed_type),
+                    &signed_type_length,
+                    reinterpret_cast<unsigned char const *>(&type),
+                    sizeof type,
+                    bytes_.data()) != 0)
+            {
+                // TODO
+            }
+
+            if (sizeof type + crypto_sign_BYTES != signed_type_length)
+                ; // TODO
 
             return signed_type;
         }
