@@ -715,7 +715,7 @@ namespace hpx { namespace naming
         return get_runtime().get_agas_client();
     }
 
-    locality const& get_locality_address()
+    locality const& get_locality()
     {
         runtime* rt = get_runtime_ptr();
         BOOST_ASSERT(rt &&

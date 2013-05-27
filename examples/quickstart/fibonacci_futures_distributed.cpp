@@ -196,13 +196,12 @@ void init_globals()
 
     here = hpx::find_here();
     localities = hpx::find_all_localities();
-    next_locality = 0;
+    next_locality.store(0);
 }
 
 int main(int argc, char* argv[])
 {
-    hpx::register_startup_function(&init_globals);
-
     // Initialize and run HPX
+    hpx::register_startup_function(&init_globals);
     return hpx::init(get_commandline_options(), argc, argv);
 }

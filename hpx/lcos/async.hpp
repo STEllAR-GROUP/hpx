@@ -85,7 +85,12 @@ namespace hpx
 
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
-            p.apply(policy, gid);
+        {
+            if (addr)
+                p.apply(policy, addr, gid);
+            else
+                p.apply(policy, gid);
+        }
 
         return p.get_future();
     }
@@ -219,7 +224,12 @@ namespace hpx
 
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
-            p.apply(policy, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        {
+            if (addr)
+                p.apply(policy, addr, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            else
+                p.apply(policy, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        }
 
         return p.get_future();
     }

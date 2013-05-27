@@ -61,7 +61,12 @@ namespace hpx
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
-            p.apply(policy, gid, boost::forward<Arg0>( arg0 ));
+        {
+            if (addr)
+                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ));
+            else
+                p.apply(policy, gid, boost::forward<Arg0>( arg0 ));
+        }
         return p.get_future();
     }
     template <typename Action, typename Arg0>
@@ -157,7 +162,12 @@ namespace hpx
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
-            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+        {
+            if (addr)
+                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+            else
+                p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+        }
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1>
@@ -253,7 +263,12 @@ namespace hpx
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
-            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+        {
+            if (addr)
+                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+            else
+                p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+        }
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
@@ -349,7 +364,12 @@ namespace hpx
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
-            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+        {
+            if (addr)
+                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+            else
+                p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+        }
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -445,7 +465,12 @@ namespace hpx
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
-            p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+        {
+            if (addr)
+                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+            else
+                p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+        }
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>

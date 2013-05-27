@@ -12,6 +12,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
+#include <hpx/config/bind.hpp>
+#include <hpx/config/tuple.hpp>
+#include <hpx/config/function.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>
@@ -19,6 +22,19 @@
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/traits/is_future.hpp>
+#include <hpx/traits/needs_guid_initialization.hpp>
+#include <hpx/runtime/get_lva.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/serialize_sequence.hpp>
+#include <hpx/util/serialize_exception.hpp>
+#include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/base_object.hpp>
+#include <hpx/util/void_cast.hpp>
+#include <hpx/util/register_locks.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/lcos/async_fwd.hpp>
 
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -46,22 +62,6 @@
 #endif
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
-
-#include <hpx/config/bind.hpp>
-#include <hpx/config/tuple.hpp>
-#include <hpx/config/function.hpp>
-#include <hpx/traits/needs_guid_initialization.hpp>
-#include <hpx/runtime/get_lva.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/util/serialize_sequence.hpp>
-#include <hpx/util/serialize_exception.hpp>
-#include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/base_object.hpp>
-#include <hpx/util/void_cast.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
