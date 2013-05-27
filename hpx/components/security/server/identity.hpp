@@ -16,7 +16,6 @@ namespace hpx { namespace components { namespace security { namespace server
     {
     public:
         identity()
-          : msb_(0), lsb_(0)
         {
         }
 
