@@ -21,7 +21,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -44,7 +45,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -67,7 +69,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -90,7 +93,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -113,7 +117,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -136,7 +141,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -159,7 +165,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -182,7 +189,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -205,7 +213,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -228,7 +237,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -251,7 +261,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -274,7 +285,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -297,7 +309,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -320,7 +333,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -343,7 +357,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -366,7 +381,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -389,7 +405,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -412,7 +429,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -435,7 +453,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -458,7 +477,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -481,7 +501,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -504,7 +525,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T
@@ -527,7 +549,8 @@
           , object<T>
         > p;
         p.apply(
-            target_id
+            launch::async
+          , target_id
           , target_id
           , remote_object::ctor_fun<
                 T

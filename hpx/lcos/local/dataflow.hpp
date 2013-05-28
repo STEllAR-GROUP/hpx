@@ -9,20 +9,7 @@
 #ifndef HPX_LCOS_LOCAL_DATAFLOW_HPP
 #define HPX_LCOS_LOCAL_DATAFLOW_HPP
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/config/forceinline.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
-#include <hpx/util/move.hpp>
-
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/inc.hpp>
-#include <boost/preprocessor/repeat.hpp>
-#include <boost/preprocessor/iterate.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-
-#include <boost/type_traits/remove_const.hpp>
+#include <hpx/traits/is_future_range.hpp>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/local/preprocessed/dataflow.hpp>
@@ -33,64 +20,29 @@
 #endif
 
 #define HPX_LCOS_LOCAL_DATAFLOW_FRAME_RESULT_OF(z, n, d)                        \
-    BOOST_PP_CAT(BOOST_PP_CAT(f, n), _result_type)                              \
+    BOOST_PP_CAT(BOOST_PP_CAT(f, n), _type)                                     \
 /**/
 
 #define HPX_LCOS_LOCAL_DATAFLOW_FRAME_CTOR_LIST(z, n, d)                        \
-    BOOST_PP_CAT(BOOST_PP_CAT(f, n), _)(                                        \
-        boost::forward<BOOST_PP_CAT(FF, n)>(BOOST_PP_CAT(f, n))                 \
-    )                                                                           \
+    boost::forward<BOOST_PP_CAT(FF, n)>(BOOST_PP_CAT(f, n))                     \
 /**/
 
 #define HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER(z, n, d)                           \
-    typedef                                                                     \
-        typename boost::remove_const<typename                                   \
-            hpx::util::detail::remove_reference<BOOST_PP_CAT(F, n)>::type       \
-        >::type BOOST_PP_CAT(BOOST_PP_CAT(f, n), _type);                        \
-                                                                                \
-    typedef                                                                     \
-        typename future_traits<                                                 \
-            BOOST_PP_CAT(BOOST_PP_CAT(f, n), _type)                             \
-        >::value_type                                                           \
-        BOOST_PP_CAT(BOOST_PP_CAT(f, n), _result_type);                         \
-                                                                                \
     BOOST_PP_CAT(BOOST_PP_CAT(f, n), _type)                                     \
-        BOOST_PP_CAT(BOOST_PP_CAT(f, n), _);                                    \
-    BOOST_PP_CAT(BOOST_PP_CAT(f, n), _result_type)                              \
-        BOOST_PP_CAT(BOOST_PP_CAT(f, n), _result_);                             \
 /**/
-                    
-#define HPX_LCOS_LOCAL_DATAFLOW_FRAME_STATE_SWITCH(z, n, d)                     \
-    case BOOST_PP_INC(n) : goto BOOST_PP_CAT(L, n);                             \
-/**/
-
-#define HPX_LCOS_LOCAL_DATAFLOW_FRAME_LABEL(z, n, d)                            \
-BOOST_PP_CAT(L, n):                                                             \
-    BOOST_PP_CAT(BOOST_PP_CAT(f, n), _result_)                                  \
-        = BOOST_PP_CAT(BOOST_PP_CAT(f, n), _).get();                            \
-                                                                                \
-    if(!BOOST_PP_CAT(BOOST_PP_CAT(f, BOOST_PP_INC(n)), _).ready())              \
-    {                                                                           \
-        state_ = BOOST_PP_INC(BOOST_PP_INC(n));                                 \
-        if(!result_.valid())                                                    \
-        {                                                                       \
-            result_ = result_promise_.get_future();                             \
-        }                                                                       \
-        BOOST_PP_CAT(BOOST_PP_CAT(f, BOOST_PP_INC(n)), _).                      \
-            then(                                                               \
-                boost::bind(                                                    \
-                    &BOOST_PP_CAT(dataflow_frame_, N)::await                    \
-                  , this->shared_from_this()                                    \
-                )                                                               \
-            );                                                                  \
-        return;                                                                 \
-    }                                                                           \
+#define HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER_TYPES(z, n, d)                     \
+    typedef                                                                     \
+        typename boost::remove_const<                                           \
+            typename hpx::util::detail::remove_reference<                       \
+                BOOST_PP_CAT(F, n)                                              \
+            >::type                                                             \
+        >::type                                                                 \
+        BOOST_PP_CAT(BOOST_PP_CAT(f, n), _type);                                \
 /**/
 
 #define HPX_LCOS_LOCAL_DATAFLOW_FRAME_INVOKE(z, n, d)                           \
     BOOST_PP_CAT(BOOST_PP_CAT(f, n), _result_)                                  \
 /**/
-
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT, <hpx/lcos/local/dataflow.hpp>))          \
@@ -101,8 +53,6 @@ BOOST_PP_CAT(L, n):                                                             
 #undef HPX_LCOS_LOCAL_DATAFLOW_FRAME_CTOR_LIST
 #undef HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER
 #undef HPX_LCOS_LOCAL_DATAFLOW_FRAME_RESULT_OF
-#undef HPX_LCOS_LOCAL_DATAFLOW_FRAME_STATE_SWITCH
-#undef HPX_LCOS_LOCAL_DATAFLOW_FRAME_LABEL
 #undef HPX_LCOS_LOCAL_DATAFLOW_FRAME_INVOKE
 
 #if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
@@ -132,7 +82,13 @@ namespace hpx { namespace lcos { namespace local {
                 func_type;
 
             func_type func_;
-            BOOST_PP_REPEAT(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER, _)
+            BOOST_PP_REPEAT(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER_TYPES, _)
+            typedef                                                          
+                BOOST_PP_CAT(hpx::util::tuple, N)<                           
+                    BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER, _)
+                >                                                            
+                futures_type;                                                
+            futures_type futures_;
             
             typedef
                 typename boost::result_of<
@@ -145,85 +101,181 @@ namespace hpx { namespace lcos { namespace local {
                     )
                 >::type
                 result_type;
+
             typedef hpx::future<result_type> future_result_type;
             typedef hpx::lcos::local::promise<result_type> promise_result_type;
 
             template <typename FFunc, BOOST_PP_ENUM_PARAMS(N, typename FF)>
             BOOST_PP_CAT(dataflow_frame_, N)(
-                BOOST_FWD_REF(FFunc) func, HPX_ENUM_FWD_ARGS(N, FF, f)
+                BOOST_SCOPED_ENUM(launch) policy
+              , BOOST_FWD_REF(FFunc) func
+              , HPX_ENUM_FWD_ARGS(N, FF, f)
             )
               : func_(boost::forward<FFunc>(func))
-              , BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_CTOR_LIST, _)
-              , state_(0)
+              , futures_(
+                    BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_CTOR_LIST, _)
+                )
+              , policy_(policy)
             {}
 
-            BOOST_FORCEINLINE void await()
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::true_
+            )
             {
-                switch (state_)
+                if(!result_.valid())
                 {
-                    BOOST_PP_REPEAT(
-                        N
-                      , HPX_LCOS_LOCAL_DATAFLOW_FRAME_STATE_SWITCH
-                      , _
-                    )
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(policy_, hpx::util::bind(f, func_, futures_));
                 }
-
-                if(!f0_.ready())
+                else
                 {
-                    state_ = 1;
+                    boost::fusion::invoke(func_, futures_);
+                    result_promise_.set_value();
+                }
+            }
+
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_, boost::mpl::false_
+            )
+            {
+                if(!result_.valid())
+                {
+                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
+                    result_
+                        = hpx::async(policy_, hpx::util::bind(f, func_, futures_));
+                }
+                else
+                {
+                    result_promise_.set_value(
+                        boost::fusion::invoke(func_, futures_)
+                    );
+                }
+            }
+
+            template <typename Iter>
+            void await_range(Iter next, Iter end)
+            {
+                if(next == end) return;
+
+                if(!next->ready())
+                {
                     if(!result_.valid())
                     {
                         result_ = result_promise_.get_future();
                     }
-                    f0_.then(
-                        boost::bind(
-                            &BOOST_PP_CAT(dataflow_frame_, N)::await
+
+                    void (BOOST_PP_CAT(dataflow_frame_, N)::*f)
+                        (Iter, Iter)
+                        = &BOOST_PP_CAT(dataflow_frame_, N)::await_range;
+
+                    next->then(
+                        policy_
+                      , boost::bind(
+                            f
                           , this->shared_from_this()
+                          , next
+                          , end
                         )
                     );
                     return;
                 }
 
-                BOOST_PP_REPEAT(
-                    BOOST_PP_DEC(N)
-                  , HPX_LCOS_LOCAL_DATAFLOW_FRAME_LABEL
-                  , _
-                )
-
-BOOST_PP_CAT(L, BOOST_PP_DEC(N)):
-                BOOST_PP_CAT(BOOST_PP_CAT(f, BOOST_PP_DEC(N)), _result_)
-                    = BOOST_PP_CAT(BOOST_PP_CAT(f, BOOST_PP_DEC(N)), _).get();
-
-                if(state_ == 0)
-                {
-                    result_
-                        = hpx::make_ready_future(
-                            func_(
-                                BOOST_PP_ENUM(
-                                    N
-                                  , HPX_LCOS_LOCAL_DATAFLOW_FRAME_INVOKE
-                                  , _
-                                )
-                            )
-                        );
-                }
-                else
-                {
-                    result_promise_.set_value(
-                        func_(
-                            BOOST_PP_ENUM(
-                                N
-                              , HPX_LCOS_LOCAL_DATAFLOW_FRAME_INVOKE
-                              , _
-                            )
-                        )
-                    );
-                }
+                await_range(++next, end);
             }
 
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            typename boost::enable_if<
+                typename traits::is_future_range<
+                    typename boost::fusion::result_of::deref<Iter>::type
+                >::type
+            >::type
+            await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+
+                await_range(
+                    boost::begin(boost::fusion::deref(iter))
+                  , boost::end(boost::fusion::deref(iter))
+                );
+
+                await(
+                    boost::fusion::next(iter)
+                  , typename boost::is_same<next_type, end_type>::type()
+                  , IsVoid()
+                );
+            }
+
+            
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            typename boost::disable_if<
+                typename traits::is_future_range<
+                    typename boost::fusion::result_of::deref<Iter>::type
+                >::type
+            >::type
+            await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+
+                if(!boost::fusion::deref(iter).ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+
+                    void (BOOST_PP_CAT(dataflow_frame_, N)::*f)
+                        (Iter const &, boost::mpl::false_, IsVoid)
+                        = &BOOST_PP_CAT(dataflow_frame_, N)::await;
+
+                    boost::fusion::deref(iter).then(
+                        policy_
+                      , boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , iter
+                          , boost::mpl::false_()
+                          , IsVoid()
+                        )
+                    );
+                    return;
+                }
+
+                await(
+                    boost::fusion::next(iter)
+                  , typename boost::is_same<next_type, end_type>::type()
+                  , IsVoid()
+                );
+            }
+
+            BOOST_FORCEINLINE void await()
+            {
+                await(
+                    boost::fusion::begin(futures_)
+                  , boost::mpl::false_()
+                  , typename boost::is_same<void, result_type>::type()
+                );
+            }
+            
+            BOOST_SCOPED_ENUM(launch) policy_;
             future_result_type result_;
             promise_result_type result_promise_;
-            int state_;
         };
     }
 
@@ -233,7 +285,7 @@ BOOST_PP_CAT(L, BOOST_PP_DEC(N)):
         Func
       , BOOST_PP_ENUM_PARAMS(N, F)
     >::future_result_type
-    dataflow(BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
+    dataflow(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
     {
         typedef
             BOOST_PP_CAT(detail::dataflow_frame_, N)<
@@ -244,13 +296,25 @@ BOOST_PP_CAT(L, BOOST_PP_DEC(N)):
 
         boost::shared_ptr<frame_type> frame =
             boost::make_shared<frame_type>(
-                boost::forward<Func>(func)
+                policy
+              , boost::forward<Func>(func)
               , HPX_ENUM_FORWARD_ARGS(N, F, f)
             );
 
         frame->await();
 
         return frame->result_;
+    }
+
+    template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
+    BOOST_FORCEINLINE
+    typename BOOST_PP_CAT(detail::dataflow_frame_, N)<
+        Func
+      , BOOST_PP_ENUM_PARAMS(N, F)
+    >::future_result_type
+    dataflow(BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
+    {
+        return dataflow(launch::all, func, HPX_ENUM_FORWARD_ARGS(N, F, f));
     }
 
 }}}

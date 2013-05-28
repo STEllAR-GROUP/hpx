@@ -110,7 +110,7 @@ namespace hpx { namespace components { namespace stubs
                 naming::id_type(gid, naming::id_type::unmanaged));
 
             lcos::packaged_action<action_type, void> p;
-            p.apply(id, type, gid, count);
+            p.apply(launch::async, id, type, gid, count);
             p.get_future().get();
         }
     }

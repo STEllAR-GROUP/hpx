@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace server
             // create components for each locality in one go
             v.push_back(future_values_type::value_type(fact.get_gid()));
             lcos::packaged_action<action_type, std::vector<naming::gid_type> > p;
-            p.apply(fact, type, numcreate);
+            p.apply(launch::async, fact, type, numcreate);
             v.back().gids_ = p.get_future();
 
             created_count += numcreate;
@@ -156,7 +156,7 @@ namespace hpx { namespace components { namespace server
             // components for each partition
             v.push_back(future_values_type::value_type(localities[i].get_gid()));
             lcos::packaged_action<action_type, std::vector<naming::gid_type> > p;
-            p.apply(localities[i], type, count);
+            p.apply(launch::async, localities[i], type, count);
             v.back().gids_ = p.get_future();
         }
 

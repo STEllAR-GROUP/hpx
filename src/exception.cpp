@@ -121,7 +121,7 @@ namespace hpx { namespace detail
                     << hpx::detail::throw_file(file)
                     << hpx::detail::throw_line(static_cast<int>(line))
                     << hpx::detail::throw_env(env)
-                    << hpx::detail::throw_env(config));
+                    << hpx::detail::throw_config(config));
         }
         catch (...) {
             return boost::current_exception();
@@ -329,12 +329,6 @@ namespace hpx
         if (env && !env->empty())
             strm << "{env}: " << *env;
 
-        // Try a cast to std::exception - this should handle boost.system
-        // error codes in addition to the standard library exceptions.
-        std::exception const* se = dynamic_cast<std::exception const*>(&e);
-        if (se)
-            strm << "{what}: " << se->what() << "\n";
-
         boost::uint32_t const* locality =
             boost::get_error_info<hpx::detail::throw_locality>(e);
         if (locality)
@@ -396,6 +390,12 @@ namespace hpx
 
         // add full build information
         strm << full_build_string();
+
+        // Try a cast to std::exception - this should handle boost.system
+        // error codes in addition to the standard library exceptions.
+        std::exception const* se = dynamic_cast<std::exception const*>(&e);
+        if (se)
+            strm << "{what}: " << se->what() << "\n";
 
         return util::osstream_get_string(strm);
     }

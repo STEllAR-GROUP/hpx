@@ -25,9 +25,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple1<
             typename detail::remove_qualifiers<T0>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -96,9 +98,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 1
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
         }
     };
     
@@ -157,20 +174,6 @@ namespace hpx { namespace actions
             direct_result_action1, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 1
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -205,9 +208,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple1<
             typename detail::remove_qualifiers<T0>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -277,9 +281,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 1
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
+            return util::unused;
         }
     };
     
@@ -333,21 +353,6 @@ namespace hpx { namespace actions
             direct_action1, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 1
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -398,9 +403,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple2<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -469,9 +476,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 2
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
         }
     };
     
@@ -530,20 +552,6 @@ namespace hpx { namespace actions
             direct_result_action2, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 2
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -578,9 +586,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple2<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -650,9 +659,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 2
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
+            return util::unused;
         }
     };
     
@@ -706,21 +731,6 @@ namespace hpx { namespace actions
             direct_action2, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 2
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -771,9 +781,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple3<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -842,9 +854,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 3
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
         }
     };
     
@@ -903,20 +930,6 @@ namespace hpx { namespace actions
             direct_result_action3, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 3
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -951,9 +964,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple3<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1023,9 +1037,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 3
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
+            return util::unused;
         }
     };
     
@@ -1079,21 +1109,6 @@ namespace hpx { namespace actions
             direct_action3, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 3
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -1144,9 +1159,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple4<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1215,9 +1232,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 4
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
         }
     };
     
@@ -1276,20 +1308,6 @@ namespace hpx { namespace actions
             direct_result_action4, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 4
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -1324,9 +1342,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple4<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1396,9 +1415,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 4
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
+            return util::unused;
         }
     };
     
@@ -1452,21 +1487,6 @@ namespace hpx { namespace actions
             direct_action4, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 4
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -1517,9 +1537,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple5<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1588,9 +1610,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 5
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
         }
     };
     
@@ -1649,20 +1686,6 @@ namespace hpx { namespace actions
             direct_result_action5, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 5
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -1697,9 +1720,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple5<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1769,9 +1793,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 5
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
+            return util::unused;
         }
     };
     
@@ -1825,21 +1865,6 @@ namespace hpx { namespace actions
             direct_action5, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 5
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -1890,9 +1915,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple6<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -1961,9 +1988,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 6
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5));
         }
     };
     
@@ -2022,20 +2064,6 @@ namespace hpx { namespace actions
             direct_result_action6, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 6
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -2070,9 +2098,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple6<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -2142,9 +2171,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 6
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5));
+            return util::unused;
         }
     };
     
@@ -2198,21 +2243,6 @@ namespace hpx { namespace actions
             direct_action6, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 6
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -2263,9 +2293,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple7<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -2334,9 +2366,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 7
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6));
         }
     };
     
@@ -2395,20 +2442,6 @@ namespace hpx { namespace actions
             direct_result_action7, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 7
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -2443,9 +2476,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple7<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -2515,9 +2549,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 7
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6));
+            return util::unused;
         }
     };
     
@@ -2571,21 +2621,6 @@ namespace hpx { namespace actions
             direct_action7, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 7
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -2636,9 +2671,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple8<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -2707,9 +2744,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 8
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7));
         }
     };
     
@@ -2768,20 +2820,6 @@ namespace hpx { namespace actions
             direct_result_action8, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 8
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -2816,9 +2854,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple8<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -2888,9 +2927,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 8
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7));
+            return util::unused;
         }
     };
     
@@ -2944,21 +2999,6 @@ namespace hpx { namespace actions
             direct_action8, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 8
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -3009,9 +3049,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple9<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -3080,9 +3122,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 9
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8));
         }
     };
     
@@ -3141,20 +3198,6 @@ namespace hpx { namespace actions
             direct_result_action9, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 9
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -3189,9 +3232,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple9<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -3261,9 +3305,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 9
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8));
+            return util::unused;
         }
     };
     
@@ -3317,21 +3377,6 @@ namespace hpx { namespace actions
             direct_action9, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 9
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -3382,9 +3427,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple10<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -3453,9 +3500,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 10
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9));
         }
     };
     
@@ -3514,20 +3576,6 @@ namespace hpx { namespace actions
             direct_result_action10, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 10
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -3562,9 +3610,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple10<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -3634,9 +3683,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 10
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9));
+            return util::unused;
         }
     };
     
@@ -3690,21 +3755,6 @@ namespace hpx { namespace actions
             direct_action10, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 10
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -3755,9 +3805,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple11<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -3826,9 +3878,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 11
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10));
         }
     };
     
@@ -3887,20 +3954,6 @@ namespace hpx { namespace actions
             direct_result_action11, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 11
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -3935,9 +3988,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple11<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -4007,9 +4061,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 11
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10));
+            return util::unused;
         }
     };
     
@@ -4063,21 +4133,6 @@ namespace hpx { namespace actions
             direct_action11, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 11
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -4128,9 +4183,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple12<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type , typename detail::remove_qualifiers<T11>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -4199,9 +4256,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 12
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11));
         }
     };
     
@@ -4260,20 +4332,6 @@ namespace hpx { namespace actions
             direct_result_action12, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 12
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -4308,9 +4366,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple12<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type , typename detail::remove_qualifiers<T11>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -4380,9 +4439,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 12
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11));
+            return util::unused;
         }
     };
     
@@ -4436,21 +4511,6 @@ namespace hpx { namespace actions
             direct_action12, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 12
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -4501,9 +4561,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple13<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type , typename detail::remove_qualifiers<T11>::type , typename detail::remove_qualifiers<T12>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -4572,9 +4634,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 13
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12));
         }
     };
     
@@ -4633,20 +4710,6 @@ namespace hpx { namespace actions
             direct_result_action13, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 13
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -4681,9 +4744,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple13<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type , typename detail::remove_qualifiers<T11>::type , typename detail::remove_qualifiers<T12>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -4753,9 +4817,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 13
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12));
+            return util::unused;
         }
     };
     
@@ -4809,21 +4889,6 @@ namespace hpx { namespace actions
             direct_action13, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 13
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -4874,9 +4939,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple14<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type , typename detail::remove_qualifiers<T11>::type , typename detail::remove_qualifiers<T12>::type , typename detail::remove_qualifiers<T13>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -4945,9 +5012,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 14
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type13>::call( args. a13));
         }
     };
     
@@ -5006,20 +5088,6 @@ namespace hpx { namespace actions
             direct_result_action14, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 14
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type13>::call( args. a13));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -5054,9 +5122,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple14<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type , typename detail::remove_qualifiers<T11>::type , typename detail::remove_qualifiers<T12>::type , typename detail::remove_qualifiers<T13>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -5126,9 +5195,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 14
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type13>::call( args. a13));
+            return util::unused;
         }
     };
     
@@ -5182,21 +5267,6 @@ namespace hpx { namespace actions
             direct_action14, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 14
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type13>::call( args. a13));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()
@@ -5247,9 +5317,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple15<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type , typename detail::remove_qualifiers<T11>::type , typename detail::remove_qualifiers<T12>::type , typename detail::remove_qualifiers<T13>::type , typename detail::remove_qualifiers<T14>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -5318,9 +5390,24 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << 15
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            return (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type13>::call( args. a13) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type14>::call( args. a14));
         }
     };
     
@@ -5379,20 +5466,6 @@ namespace hpx { namespace actions
             direct_result_action15, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << 15
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            return (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type13>::call( args. a13) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type14>::call( args. a14));
-        }
         
         
         static base_action::action_type get_action_type()
@@ -5427,9 +5500,10 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple15<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type , typename detail::remove_qualifiers<T10>::type , typename detail::remove_qualifiers<T11>::type , typename detail::remove_qualifiers<T12>::type , typename detail::remove_qualifiers<T13>::type , typename detail::remove_qualifiers<T14>::type> arguments_type;
-        typedef action<Component const, result_type, arguments_type, Derived>
+        typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
     protected:
         
@@ -5499,9 +5573,25 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component const>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component const>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+        
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << 15
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component const>::call(lva)) << ")";
+            (get_lva<Component const>::call(lva)->*F)(
+                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type13>::call( args. a13) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type14>::call( args. a14));
+            return util::unused;
         }
     };
     
@@ -5555,21 +5645,6 @@ namespace hpx { namespace actions
             direct_action15, Derived
         >::type derived_type;
         typedef boost::mpl::true_ direct_execution;
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << 15
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component const>::call(lva)) << ")";
-            (get_lva<Component const>::call(lva)->*F)(
-                util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type10>::call( args. a10) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type11>::call( args. a11) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type12>::call( args. a12) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type13>::call( args. a13) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type14>::call( args. a14));
-            return util::unused;
-        }
         
         
         static base_action::action_type get_action_type()

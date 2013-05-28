@@ -68,9 +68,12 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
+
         typedef BOOST_PP_CAT(hpx::util::tuple, N)<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
-        typedef action<Component, result_type, arguments_type, Derived>
+        typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
 
     protected:
@@ -146,9 +149,26 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+
+        // direct execution
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_result_action" << N
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
+
+            return (get_lva<Component>::call(lva)->*F)(
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
         }
     };
 
@@ -211,22 +231,6 @@ namespace hpx { namespace actions
 
         typedef boost::mpl::true_ direct_execution;
 
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_result_action" << N
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
-
-            return (get_lva<Component>::call(lva)->*F)(
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
-        }
-
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
         static base_action::action_type get_action_type()
@@ -263,9 +267,11 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
+        typedef util::unused_type remote_result_type;
+
         typedef BOOST_PP_CAT(hpx::util::tuple, N)<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
-        typedef action<Component, result_type, arguments_type, Derived>
+        typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
 
     protected:
@@ -341,9 +347,27 @@ namespace hpx { namespace actions
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
             return boost::move(Derived::decorate_action(
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component>::call(lva),
+                    boost::forward<Arguments>(args)), lva));
+        }
+
+        // direct execution
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            LTM_(debug)
+                << "base_action" << N
+                << "::execute_function name("
+                << detail::get_action_name<Derived>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
+
+            (get_lva<Component>::call(lva)->*F)(
+                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
+            return util::unused;
         }
     };
 
@@ -403,23 +427,6 @@ namespace hpx { namespace actions
         >::type derived_type;
 
         typedef boost::mpl::true_ direct_execution;
-
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            LTM_(debug)
-                << "direct_action" << N
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
-
-            (get_lva<Component>::call(lva)->*F)(
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
-            return util::unused;
-        }
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.

@@ -43,10 +43,14 @@ void print_tuple(const tuple_type& tuple)
 
 void simple_central_tuplespace_test(const std::string& tuplespace_symbol_name, const tuple_type tuple)
 {
-   hpx::naming::id_type ts_gid;                                     
-   hpx::agas::resolve_name(tuplespace_symbol_name, ts_gid);  
+   examples::simple_central_tuplespace central_tuplespace;
 
-   examples::simple_central_tuplespace central_tuplespace(ts_gid);
+   if(!central_tuplespace.connect(tuplespace_symbol_name))
+   {
+       hpx::cerr << "locality " << hpx::get_locality_id() << ": " 
+           << "FAIL to connect " << tuplespace_symbol_name << hpx::endl;
+       return;
+   }
 
    int ret = central_tuplespace.write_sync(tuple);
    hpx::cout << "locality " << hpx::get_locality_id() << ": " << "write_sync ";
@@ -96,15 +100,16 @@ int hpx_main()
         // Find the localities connected to this application.
         std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-        // Create an central_tuplespace component either on this locality (if the
-        // example is executed on one locality only) or on any of the remote
-        // localities (otherwise).
-        examples::simple_central_tuplespace central_tuplespace(
-            hpx::components::new_<central_tuplespace_type>(localities.back()));
-
-        // register central_tuplespace component in agas
         const std::string tuplespace_symbol_name = "/tuplespace";
-        hpx::agas::register_name(tuplespace_symbol_name, central_tuplespace.get_gid());
+        examples::simple_central_tuplespace central_tuplespace;
+
+        if(!central_tuplespace.create(tuplespace_symbol_name, localities.back()))
+        {
+            hpx::cerr << "locality " << hpx::get_locality_id() << ": " 
+                << "FAIL to create " << tuplespace_symbol_name << hpx::endl;
+
+            return hpx::finalize();
+        }
 
 
         tuple_type tuple1;

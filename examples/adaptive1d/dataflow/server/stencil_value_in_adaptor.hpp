@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             BOOST_ASSERT(gid_);       // must be valid at this point
 
             this->reset();            // reset the underlying future
-            this->apply(gid_);        // asynchronously start the future action
+            this->apply(launch::all, gid_);        // asynchronously start the future action
         }
 
         // connect this in-port to a data source
