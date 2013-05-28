@@ -47,11 +47,12 @@ int int_f2(int l, int r) {++int_f2_count; return l + r; }
 
 void function_pointers()
 {
-    void_f_count = 0;
-    int_f_count = 0;
-    void_f1_count = 0;
-    int_f1_count = 0;
-    int_f2_count = 0;
+    void_f_count.store(0);
+    int_f_count.store(0);
+    void_f1_count.store(0);
+    int_f1_count.store(0);
+    int_f2_count.store(0);
+
     future<void> f1 = dataflow(unwrap(&void_f1), async(bind(&int_f)));
     future<int>
         f2 = dataflow(
@@ -103,8 +104,9 @@ int future_int_f2(future<int> f1, future<int> f2)
 
 void future_function_pointers()
 {
-    future_void_f1_count = 0;
-    future_void_f2_count = 0;
+    future_void_f1_count.store(0);
+    future_void_f2_count.store(0);
+
     future<void> f1
         = dataflow(
             &future_void_f1, async(bind(&future_void_f1, make_ready_future()))
@@ -113,7 +115,7 @@ void future_function_pointers()
     hpx::wait(f1);
 
     HPX_TEST_EQ(future_void_f1_count, 2u);
-    future_void_f1_count = 0;
+    future_void_f1_count.store(0);
 
     future<void> f2 = dataflow(
         &future_void_f2
@@ -124,8 +126,8 @@ void future_function_pointers()
     hpx::wait(f2);
     HPX_TEST_EQ(future_void_f1_count, 2u);
     HPX_TEST_EQ(future_void_f2_count, 1u);
-    future_void_f1_count = 0;
-    future_void_f2_count = 0;
+    future_void_f1_count.store(0);
+    future_void_f2_count.store(0);
 
     future<int> f3 = dataflow(
         &future_int_f1
@@ -134,7 +136,7 @@ void future_function_pointers()
 
     HPX_TEST_EQ(f3.get(), 1);
     HPX_TEST_EQ(future_int_f1_count, 1u);
-    future_int_f1_count = 0;
+    future_int_f1_count.store(0);
 
     future<int> f4 = dataflow(
         &future_int_f2
@@ -145,8 +147,8 @@ void future_function_pointers()
     HPX_TEST_EQ(f4.get(), 2);
     HPX_TEST_EQ(future_int_f1_count, 2u);
     HPX_TEST_EQ(future_int_f2_count, 1u);
-    future_int_f1_count = 0;
-    future_int_f2_count = 0;
+    future_int_f1_count.store(0);
+    future_int_f2_count.store(0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
