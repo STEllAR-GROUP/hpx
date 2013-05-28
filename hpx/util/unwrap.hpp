@@ -9,6 +9,33 @@
 namespace hpx { namespace util {
     namespace detail
     {
+        template <typename Future, typename IsFutureRange = typename traits::is_future_range<Future>::type>
+        struct unwrap_param_type;
+
+        template <typename Future>
+        struct unwrap_param_type<Future, boost::mpl::true_>
+        {
+            typedef
+                std::vector<
+                    typename hpx::lcos::future_traits<
+                        typename boost::remove_const<
+                            typename detail::remove_reference<
+                                Future
+                            >::type
+                        >::type::value_type
+                    >::value_type
+                >
+                type;
+        };
+
+        template <typename Future>
+        struct unwrap_param_type<Future, boost::mpl::false_>
+        {
+            typedef
+                typename hpx::lcos::future_traits<Future>::value_type
+                type;
+        };
+
         template <typename F>
         struct unwrap_impl
         {
@@ -18,11 +45,41 @@ namespace hpx { namespace util {
             struct result;
 
 #define     HPX_UTIL_UNWRAP_IMPL_RESULT_OF(Z, N, D)                             \
-            typename hpx::lcos::future_traits<BOOST_PP_CAT(A, N)>::value_type   \
+            typename unwrap_param_type<BOOST_PP_CAT(A, N)>::type                \
             /**/
+
 #define     HPX_UTIL_UNWRAP_IMPL_INVOKE(Z, N, D)                                \
-            BOOST_PP_CAT(a, N).get()                                            \
+            this->get(BOOST_PP_CAT(a, N))                                       \
             /**/
+
+            template <typename Future>
+            typename boost::disable_if<
+                typename traits::is_future_range<Future>::type
+              , typename unwrap_param_type<Future>::type
+            >::type
+            get(Future & f)
+            {
+                return f.get();
+            }
+
+            template <typename Range>
+            typename boost::enable_if<
+                typename traits::is_future_range<Range>::type
+              , typename unwrap_param_type<Range>::type
+            >::type
+            get(Range & r)
+            {
+                typename unwrap_param_type<Range>::type res;
+                
+                res.reserve(r.size());
+
+                BOOST_FOREACH(typename Range::value_type const & f, r)
+                {
+                    res.push_back(f.get());
+                }
+
+                return res;
+            }
 
 #define     HPX_UTIL_UNWRAP_IMPL_OPERATOR(Z, N, D)                              \
             template <typename This, BOOST_PP_ENUM_PARAMS(N, typename A)>       \
@@ -59,7 +116,12 @@ namespace hpx { namespace util {
                 return f_(BOOST_PP_ENUM(N, HPX_UTIL_UNWRAP_IMPL_INVOKE, _));    \
             }                                                                   \
             /**/
-            BOOST_PP_REPEAT_FROM_TO(1, 15, HPX_UTIL_UNWRAP_IMPL_OPERATOR, _)
+            BOOST_PP_REPEAT_FROM_TO(
+                1
+              , HPX_FUNCTION_ARGUMENT_LIMIT
+              , HPX_UTIL_UNWRAP_IMPL_OPERATOR
+              , _
+            )
 #undef      HPX_UTIL_UNWRAP_IMPL_OPERATOR
         };
     }

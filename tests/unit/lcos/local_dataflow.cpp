@@ -45,6 +45,18 @@ int int_f1(int i) {++int_f1_count; return i+42; }
 boost::atomic<boost::uint32_t> int_f2_count;
 int int_f2(int l, int r) {++int_f2_count; return l + r; }
 
+boost::atomic<boost::uint32_t> int_f_vector_count;
+
+int int_f_vector(std::vector<int> const & vf)
+{
+    int sum = 0;
+    BOOST_FOREACH(int f, vf)
+    {
+        sum += f;
+    }
+    return sum;
+}
+
 void function_pointers()
 {
     void_f_count.store(0);
@@ -73,14 +85,24 @@ void function_pointers()
               , make_ready_future(37)
             )
         );
+    
+    int_f_vector_count.store(0);
+    std::vector<future<int> > vf;
+    for(std::size_t i = 0; i < 10; ++i)
+    {
+        vf.push_back(dataflow(unwrap(&int_f1), make_ready_future(42)));
+    }
+    future<int> f4 = dataflow(unwrap(&int_f_vector), vf);
+
 
     hpx::wait(f1);
     HPX_TEST_EQ(f2.get(), 126);
     HPX_TEST_EQ(f3.get(), 163);
+    HPX_TEST_EQ(f4.get(), 10 * 84);
     HPX_TEST_EQ(void_f_count, 0u);
     HPX_TEST_EQ(int_f_count, 1u);
     HPX_TEST_EQ(void_f1_count, 1u);
-    HPX_TEST_EQ(int_f1_count, 4u);
+    HPX_TEST_EQ(int_f1_count, 14u);
     HPX_TEST_EQ(int_f2_count, 1u);
 }
 
