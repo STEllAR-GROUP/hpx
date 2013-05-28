@@ -30,6 +30,44 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<
+            typename Action::arguments_type>::value == 0>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type>
+    >::type
+    async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(F) f);
+
+    template <typename Action, typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<
+            typename Action::arguments_type>::value == 0>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type>
+    >::type
+    async_continue(naming::id_type const& gid, BOOST_FWD_REF(F) f);
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 0>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
+    >::type
+    async_continue(BOOST_SCOPED_ENUM(launch) policy,
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > /*act*/, naming::id_type const& gid, BOOST_FWD_REF(F) f);
+
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename F>
     typename boost::enable_if<
@@ -70,6 +108,47 @@ namespace hpx
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg),
+        typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<
+            typename Action::arguments_type>::value == N>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type>
+    >::type
+    async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        HPX_ENUM_FWD_ARGS(N, Arg, arg), BOOST_FWD_REF(F) f);
+
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<
+            typename Action::arguments_type>::value == N>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::remote_result_type
+            >::type>
+    >::type
+    async_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+        BOOST_FWD_REF(F) f);
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
+    typename boost::enable_if<
+        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == N>
+      , lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Derived>::remote_result_type
+            >::type>
+    >::type
+    async_continue(BOOST_SCOPED_ENUM(launch) policy,
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+        BOOST_FWD_REF(F) f);
+
     template <typename Component, typename Result, typename Arguments,
         typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
     typename boost::enable_if<

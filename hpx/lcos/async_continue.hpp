@@ -15,6 +15,7 @@
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async_fwd.hpp>
+#include <hpx/lcos/async_continue_fwd.hpp>
 
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -45,8 +46,7 @@ namespace hpx
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                launch::async
-              , new hpx::actions::typed_continuation<result_type>(
+                new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid);
         }
@@ -157,8 +157,7 @@ namespace hpx
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                policy
-              , new hpx::actions::typed_continuation<result_type>(
+                new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }

@@ -31,8 +31,7 @@ namespace hpx
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                policy
-              , new hpx::actions::typed_continuation<result_type>(
+                new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ));
         }
@@ -114,8 +113,7 @@ namespace hpx
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                policy
-              , new hpx::actions::typed_continuation<result_type>(
+                new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -197,8 +195,7 @@ namespace hpx
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                policy
-              , new hpx::actions::typed_continuation<result_type>(
+                new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -280,8 +277,7 @@ namespace hpx
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                policy
-              , new hpx::actions::typed_continuation<result_type>(
+                new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -363,8 +359,7 @@ namespace hpx
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
-                policy
-              , new hpx::actions::typed_continuation<result_type>(
+                new hpx::actions::typed_continuation<result_type>(
                     p.get_gid(), boost::forward<F>(f))
               , gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
