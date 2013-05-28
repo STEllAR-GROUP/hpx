@@ -94,6 +94,7 @@ namespace hpx
         unknown_error = 47,                         ///< An unknown error occurred
         bad_plugin_type = 48,                       ///< The specified plugin type is not known or otherwise invalid
         filesystem_error = 49,                      ///< The specified file does not exist or other filesystem related error
+        security_error = 50,                        ///< An error occurred in the security component
 
         /// \cond NOINTERNAL
         last_error,
@@ -151,9 +152,10 @@ namespace hpx
         /* 44 */ "thread_interrupted",
         /* 45 */ "thread_not_interruptable",
         /* 46 */ "duplicate_component_id",
-        /* 47 */ "unknown_error",
+        /* 47 */ "unknown_error"
         /* 48 */ "bad_plugin_type",
         /* 49 */ "filesystem_error",
+        /* 50 */ "security_error",
         /*    */ ""
     };
     /// \endcond
