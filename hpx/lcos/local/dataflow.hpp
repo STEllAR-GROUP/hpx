@@ -105,12 +105,15 @@ namespace hpx { namespace lcos { namespace local {
 
             template <typename FFunc, BOOST_PP_ENUM_PARAMS(N, typename FF)>
             BOOST_PP_CAT(dataflow_frame_, N)(
-                BOOST_FWD_REF(FFunc) func, HPX_ENUM_FWD_ARGS(N, FF, f)
+                BOOST_SCOPED_ENUM(launch) policy
+              , BOOST_FWD_REF(FFunc) func
+              , HPX_ENUM_FWD_ARGS(N, FF, f)
             )
               : func_(boost::forward<FFunc>(func))
               , futures_(
                     BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_CTOR_LIST, _)
                 )
+              , policy_(policy)
             {}
 
             template <typename Iter>
@@ -123,7 +126,7 @@ namespace hpx { namespace lcos { namespace local {
                 {
                     result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                        = hpx::async(policy_, hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
@@ -142,7 +145,7 @@ namespace hpx { namespace lcos { namespace local {
                 {
                     result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
                     result_
-                        = hpx::async(hpx::util::bind(f, func_, futures_));
+                        = hpx::async(policy_, hpx::util::bind(f, func_, futures_));
                 }
                 else
                 {
@@ -175,7 +178,8 @@ namespace hpx { namespace lcos { namespace local {
                         = &BOOST_PP_CAT(dataflow_frame_, N)::await;
 
                     boost::fusion::deref(iter).then(
-                        boost::bind(
+                        policy_
+                      , boost::bind(
                             f
                           , this->shared_from_this()
                           , iter
@@ -201,7 +205,8 @@ namespace hpx { namespace lcos { namespace local {
                   , typename boost::is_same<void, result_type>::type()
                 );
             }
-
+            
+            BOOST_SCOPED_ENUM(launch) policy_;
             future_result_type result_;
             promise_result_type result_promise_;
         };
@@ -213,7 +218,7 @@ namespace hpx { namespace lcos { namespace local {
         Func
       , BOOST_PP_ENUM_PARAMS(N, F)
     >::future_result_type
-    dataflow(BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
+    dataflow(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
     {
         typedef
             BOOST_PP_CAT(detail::dataflow_frame_, N)<
@@ -224,13 +229,25 @@ namespace hpx { namespace lcos { namespace local {
 
         boost::shared_ptr<frame_type> frame =
             boost::make_shared<frame_type>(
-                boost::forward<Func>(func)
+                policy
+              , boost::forward<Func>(func)
               , HPX_ENUM_FORWARD_ARGS(N, F, f)
             );
 
         frame->await();
 
         return frame->result_;
+    }
+
+    template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
+    BOOST_FORCEINLINE
+    typename BOOST_PP_CAT(detail::dataflow_frame_, N)<
+        Func
+      , BOOST_PP_ENUM_PARAMS(N, F)
+    >::future_result_type
+    dataflow(BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
+    {
+        return dataflow(launch::all, func, HPX_ENUM_FORWARD_ARGS(N, F, f));
     }
 
 }}}
