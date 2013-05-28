@@ -8,6 +8,7 @@
 
 #include <boost/array.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <hpx/exception.hpp>
 #include <sodium.h>
 
 #include "public_key.hpp"
@@ -36,11 +37,21 @@ namespace hpx { namespace components { namespace security { namespace server
                     sizeof type,
                     bytes_.data()) != 0)
             {
-                // TODO
+                HPX_THROW_EXCEPTION(
+                    hpx::security_error
+                  , "secret_key::sign"
+                  , "Failed to sign type"
+                )
             }
 
             if (sizeof type + crypto_sign_BYTES != signed_type_length)
-                ; // TODO
+            {
+                HPX_THROW_EXCEPTION(
+                    hpx::security_error
+                  , "secret_key::sign"
+                  , "Signature of incorrect length"
+                )
+            }
 
             return signed_type;
         }

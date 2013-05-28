@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_SECURITY_SERVER_HASH_HPP
 
 #include <boost/array.hpp>
+#include <hpx/exception.hpp>
 #include <sodium.h>
 
 namespace hpx { namespace components { namespace security { namespace server
@@ -28,7 +29,11 @@ namespace hpx { namespace components { namespace security { namespace server
                 if (crypto_generichash_init(
                         &state, NULL, 0, final_type::static_size) != 0)
                 {
-                    // TODO
+                    HPX_THROW_EXCEPTION(
+                        hpx::security_error
+                      , "hash::init"
+                      , "Failed to initialise hash state"
+                    )
                 }
             }
 
@@ -41,7 +46,11 @@ namespace hpx { namespace components { namespace security { namespace server
                 if (crypto_generichash_update(
                         &state, input, input_length) != 0)
                 {
-                    // TODO
+                    HPX_THROW_EXCEPTION(
+                        hpx::security_error
+                      , "hash::update"
+                      , "Failed to update hash state"
+                    )
                 }
             }
 
@@ -55,7 +64,11 @@ namespace hpx { namespace components { namespace security { namespace server
                       , final.c_array()
                       , final_type::static_size) != 0)
                 {
-                    // TODO
+                    HPX_THROW_EXCEPTION(
+                        hpx::security_error
+                      , "hash::final"
+                      , "Failed to finalise hash state"
+                    )
                 }
 
                 return final;
