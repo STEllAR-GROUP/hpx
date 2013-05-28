@@ -9,6 +9,8 @@
 #ifndef HPX_LCOS_LOCAL_DATAFLOW_HPP
 #define HPX_LCOS_LOCAL_DATAFLOW_HPP
 
+#include <hpx/traits/is_future_range.hpp>
+
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/local/preprocessed/dataflow.hpp>
 #else
@@ -154,10 +156,75 @@ namespace hpx { namespace lcos { namespace local {
                     );
                 }
             }
+
+            template <typename Iter>
+            void await_range(Iter next, Iter end)
+            {
+                if(next == end) return;
+
+                if(!next->ready())
+                {
+                    if(!result_.valid())
+                    {
+                        result_ = result_promise_.get_future();
+                    }
+
+                    void (BOOST_PP_CAT(dataflow_frame_, N)::*f)
+                        (Iter, Iter)
+                        = &BOOST_PP_CAT(dataflow_frame_, N)::await_range;
+
+                    next->then(
+                        policy_
+                      , boost::bind(
+                            f
+                          , this->shared_from_this()
+                          , next
+                          , end
+                        )
+                    );
+                    return;
+                }
+
+                await_range(++next, end);
+            }
+
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            typename boost::enable_if<
+                typename traits::is_future_range<
+                    typename boost::fusion::result_of::deref<Iter>::type
+                >::type
+            >::type
+            await(Iter const & iter, boost::mpl::false_, IsVoid)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename boost::fusion::result_of::end<futures_type>::type
+                    end_type;
+
+                await_range(
+                    boost::begin(boost::fusion::deref(iter))
+                  , boost::end(boost::fusion::deref(iter))
+                );
+
+                await(
+                    boost::fusion::next(iter)
+                  , typename boost::is_same<next_type, end_type>::type()
+                  , IsVoid()
+                );
+            }
+
             
             template <typename Iter, typename IsVoid>
             BOOST_FORCEINLINE
-            void await(Iter const & iter, boost::mpl::false_, IsVoid)
+            typename boost::disable_if<
+                typename traits::is_future_range<
+                    typename boost::fusion::result_of::deref<Iter>::type
+                >::type
+            >::type
+            await(Iter const & iter, boost::mpl::false_, IsVoid)
             {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type

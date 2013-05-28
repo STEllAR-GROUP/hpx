@@ -102,6 +102,18 @@ int future_int_f2(future<int> f1, future<int> f2)
     return f1.get() + f2.get();
 }
 
+boost::atomic<boost::uint32_t> future_int_f_vector_count;
+
+int future_int_f_vector(std::vector<future<int> > const & vf)
+{
+    int sum = 0;
+    BOOST_FOREACH(future<int> f, vf)
+    {
+        sum += f.get();
+    }
+    return sum;
+}
+
 void future_function_pointers()
 {
     future_void_f1_count.store(0);
@@ -149,6 +161,16 @@ void future_function_pointers()
     HPX_TEST_EQ(future_int_f2_count, 1u);
     future_int_f1_count.store(0);
     future_int_f2_count.store(0);
+    
+    future_int_f_vector_count.store(0);
+    std::vector<future<int> > vf;
+    for(std::size_t i = 0; i < 10; ++i)
+    {
+        vf.push_back(dataflow(&future_int_f1, make_ready_future()));
+    }
+    future<int> f5 = dataflow(&future_int_f_vector, vf);
+
+    HPX_TEST_EQ(f5.get(), 10);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
