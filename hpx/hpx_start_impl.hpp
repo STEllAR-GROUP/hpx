@@ -22,7 +22,7 @@ namespace hpx
     /// with the runtime system's execution.
     inline void
     start(int (*f)(boost::program_options::variables_map& vm),
-        boost::program_options::options_description& desc_cmdline,
+        boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[], HPX_STD_FUNCTION<void()> const& startup,
         HPX_STD_FUNCTION<void()> const& shutdown, hpx::runtime_mode mode)
     {
@@ -38,7 +38,7 @@ namespace hpx
     /// settings). It will return immediatly after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline void
-    start(boost::program_options::options_description& desc_cmdline,
+    start(boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[], HPX_STD_FUNCTION<void()> const& startup,
         HPX_STD_FUNCTION<void()> const& shutdown, hpx::runtime_mode mode)
     {
@@ -54,7 +54,7 @@ namespace hpx
     /// settings). It will return immediatly after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline void
-    start(boost::program_options::options_description& desc_cmdline,
+    start(boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& cfg,
         HPX_STD_FUNCTION<void()> const& startup,
         HPX_STD_FUNCTION<void()> const& shutdown, hpx::runtime_mode mode)
@@ -71,7 +71,7 @@ namespace hpx
     /// settings). It will return immediatly after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline void
-    start(boost::program_options::options_description& desc_cmdline, int argc,
+    start(boost::program_options::options_description const& desc_cmdline, int argc,
         char* argv[], hpx::runtime_mode mode)
     {
         HPX_STD_FUNCTION<void()> const empty;
