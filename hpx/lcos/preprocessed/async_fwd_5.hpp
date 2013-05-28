@@ -11,6 +11,12 @@
 namespace hpx
 {
     
+    template <typename Action>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid);
     template <typename Component, typename Result,
         typename Arguments, typename Derived>
     lcos::future<
@@ -21,6 +27,12 @@ namespace hpx
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > const & , naming::id_type const& gid);
+    template <typename Action>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (naming::id_type const& gid);
     template <typename Component, typename Result,
         typename Arguments, typename Derived>
     lcos::future<
@@ -35,6 +47,19 @@ namespace hpx
 namespace hpx
 {
     
+    template <typename Action, typename Arg0>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0);
+    template <typename Action, typename Arg0>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0);
     template <typename Component, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0>
@@ -61,6 +86,19 @@ namespace hpx
 namespace hpx
 {
     
+    template <typename Action, typename Arg0 , typename Arg1>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1);
+    template <typename Action, typename Arg0 , typename Arg1>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1);
     template <typename Component, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0 , typename Arg1>
@@ -87,6 +125,19 @@ namespace hpx
 namespace hpx
 {
     
+    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2);
+    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2);
     template <typename Component, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0 , typename Arg1 , typename Arg2>
@@ -113,6 +164,19 @@ namespace hpx
 namespace hpx
 {
     
+    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3);
+    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3);
     template <typename Component, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -139,6 +203,19 @@ namespace hpx
 namespace hpx
 {
     
+    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4);
+    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::remote_result_type
+        >::type>
+    async (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4);
     template <typename Component, typename Result,
         typename Arguments, typename Derived, 
         typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
