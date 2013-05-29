@@ -174,8 +174,7 @@ namespace hpx { namespace lcos { namespace local {
                         = &BOOST_PP_CAT(dataflow_frame_, N)::await_range;
 
                     next->then(
-                        policy_
-                      , boost::bind(
+                        boost::bind(
                             f
                           , this->shared_from_this()
                           , next
@@ -245,8 +244,7 @@ namespace hpx { namespace lcos { namespace local {
                         = &BOOST_PP_CAT(dataflow_frame_, N)::await;
 
                     boost::fusion::deref(iter).then(
-                        policy_
-                      , boost::bind(
+                        hpx::util::bind(
                             f
                           , this->shared_from_this()
                           , iter
@@ -264,7 +262,7 @@ namespace hpx { namespace lcos { namespace local {
                 );
             }
 
-            BOOST_FORCEINLINE void await()
+            BOOST_FORCEINLINE void operator()
             {
                 await(
                     boost::fusion::begin(futures_)
