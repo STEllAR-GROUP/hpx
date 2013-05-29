@@ -85,7 +85,7 @@ void function_pointers()
               , make_ready_future(37)
             )
         );
-    
+
     int_f_vector_count.store(0);
     std::vector<future<int> > vf;
     for(std::size_t i = 0; i < 10; ++i)
@@ -145,7 +145,7 @@ void future_function_pointers()
         = dataflow(
             &future_void_f1, async(bind(&future_void_f1, make_ready_future()))
         );
-    
+
     hpx::wait(f1);
 
     HPX_TEST_EQ(future_void_f1_count, 2u);
@@ -183,7 +183,7 @@ void future_function_pointers()
     HPX_TEST_EQ(future_int_f2_count, 1u);
     future_int_f1_count.store(0);
     future_int_f2_count.store(0);
-    
+
     future_int_f_vector_count.store(0);
     std::vector<future<int> > vf;
     for(std::size_t i = 0; i < 10; ++i)

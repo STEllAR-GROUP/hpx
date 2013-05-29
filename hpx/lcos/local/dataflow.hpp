@@ -9,7 +9,36 @@
 #ifndef HPX_LCOS_LOCAL_DATAFLOW_HPP
 #define HPX_LCOS_LOCAL_DATAFLOW_HPP
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/util/tuple.hpp>
+#include <hpx/util/bind.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
+
+#include <boost/fusion/include/deref.hpp>
+#include <boost/fusion/include/begin.hpp>
+#include <boost/fusion/include/end.hpp>
+#include <boost/fusion/include/next.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/or.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_same.hpp>
+
+#include <boost/preprocessor/repeat.hpp>
+#include <boost/preprocessor/enum.hpp>
+#include <boost/preprocessor/enum_params.hpp>
+#include <boost/preprocessor/iterate.hpp>
+#include <boost/preprocessor/cat.hpp>
+
+namespace hpx { namespace lcos { namespace local { namespace detail
+{
+    template <typename T>
+    struct is_future_or_future_range
+      : boost::mpl::or_<traits::is_future<T>, traits::is_future_range<T> >
+    {};
+}}}}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/local/preprocessed/dataflow.hpp>
@@ -83,13 +112,17 @@ namespace hpx { namespace lcos { namespace local {
 
             func_type func_;
             BOOST_PP_REPEAT(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER_TYPES, _)
-            typedef                                                          
-                BOOST_PP_CAT(hpx::util::tuple, N)<                           
+            typedef
+                BOOST_PP_CAT(hpx::util::tuple, N)<
                     BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER, _)
-                >                                                            
-                futures_type;                                                
+                >
+                futures_type;
             futures_type futures_;
-            
+
+            typedef
+                typename boost::fusion::result_of::end<futures_type>::type
+                end_type;
+
             typedef
                 typename boost::result_of<
                     func_type(
@@ -102,7 +135,7 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 result_type;
 
-            typedef hpx::future<result_type> future_result_type;
+            typedef hpx::future<result_type> type;
             typedef hpx::lcos::local::promise<result_type> promise_result_type;
 
             template <typename FFunc, BOOST_PP_ENUM_PARAMS(N, typename FF)>
@@ -189,19 +222,11 @@ namespace hpx { namespace lcos { namespace local {
 
             template <typename Iter, typename IsVoid>
             BOOST_FORCEINLINE
-            typename boost::enable_if<
-                typename traits::is_future_range<
-                    typename boost::fusion::result_of::deref<Iter>::type
-                >::type
-            >::type
-            await(Iter const & iter, boost::mpl::false_, IsVoid)
+            void await_next(Iter const& iter, IsVoid, boost::mpl::true_)
             {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                typedef
-                    typename boost::fusion::result_of::end<futures_type>::type
-                    end_type;
 
                 await_range(
                     boost::begin(boost::fusion::deref(iter))
@@ -210,29 +235,23 @@ namespace hpx { namespace lcos { namespace local {
 
                 await(
                     boost::fusion::next(iter)
-                  , typename boost::is_same<next_type, end_type>::type()
+                  , boost::mpl::bool_<boost::is_same<next_type, end_type>::value>()
                   , IsVoid()
                 );
             }
 
-            
             template <typename Iter, typename IsVoid>
             BOOST_FORCEINLINE
-            typename boost::disable_if<
-                typename traits::is_future_range<
-                    typename boost::fusion::result_of::deref<Iter>::type
-                >::type
-            >::type
-            await(Iter const & iter, boost::mpl::false_, IsVoid)
+            void await_next(Iter const& iter, IsVoid, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                typedef
-                    typename boost::fusion::result_of::end<futures_type>::type
-                    end_type;
 
-                if(!boost::fusion::deref(iter).ready())
+                boost::fusion::result_of::deref<Iter>::type& f_ =
+                    boost::fusion::deref(iter);
+
+                if(!f_.ready())
                 {
                     if(!result_.valid())
                     {
@@ -240,16 +259,16 @@ namespace hpx { namespace lcos { namespace local {
                     }
 
                     void (BOOST_PP_CAT(dataflow_frame_, N)::*f)
-                        (Iter const &, boost::mpl::false_, IsVoid)
-                        = &BOOST_PP_CAT(dataflow_frame_, N)::await;
+                        (Iter const &, IsVoid, boost::mpl::false_)
+                        = &BOOST_PP_CAT(dataflow_frame_, N)::await_next;
 
-                    boost::fusion::deref(iter).then(
+                    f_.then(
                         hpx::util::bind(
                             f
                           , this->shared_from_this()
                           , iter
-                          , boost::mpl::false_()
                           , IsVoid()
+                          , boost::mpl::false_()
                         )
                     );
                     return;
@@ -257,32 +276,53 @@ namespace hpx { namespace lcos { namespace local {
 
                 await(
                     boost::fusion::next(iter)
-                  , typename boost::is_same<next_type, end_type>::type()
+                  , boost::mpl::bool_<boost::is_same<next_type, end_type>::value>()
                   , IsVoid()
                 );
             }
 
-            BOOST_FORCEINLINE void operator()
+            template <typename Iter, typename IsVoid>
+            BOOST_FORCEINLINE
+            void await(Iter const& iter, boost::mpl::false_, IsVoid)
             {
+                typedef typename traits::is_future_range<
+                    typename boost::fusion::result_of::deref<Iter>::type
+                >::type is_range;
+                await_next(iter, IsVoid(), is_range());
+            }
+
+            BOOST_FORCEINLINE void await()
+            {
+                typedef
+                    typename boost::fusion::result_of::begin<futures_type>::type
+                    begin_type;
+
                 await(
                     boost::fusion::begin(futures_)
-                  , boost::mpl::false_()
-                  , typename boost::is_same<void, result_type>::type()
+                  , boost::mpl::bool_<boost::is_same<begin_type, end_type>::value>()
+                  , boost::mpl::bool_<boost::is_same<void, result_type>::value>()
                 );
             }
-            
+
             BOOST_SCOPED_ENUM(launch) policy_;
-            future_result_type result_;
+            type result_;
             promise_result_type result_promise_;
         };
     }
 
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
     BOOST_FORCEINLINE
-    typename BOOST_PP_CAT(detail::dataflow_frame_, N)<
-        Func
-      , BOOST_PP_ENUM_PARAMS(N, F)
-    >::future_result_type
+    typename boost::lazy_disable_if<
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , BOOST_PP_CAT(detail::dataflow_frame_, N)<
+            Func
+          , BOOST_PP_ENUM_PARAMS(N, F)
+        >
+    >::type
     dataflow(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
     {
         typedef
@@ -309,10 +349,26 @@ namespace hpx { namespace lcos { namespace local {
     typename BOOST_PP_CAT(detail::dataflow_frame_, N)<
         Func
       , BOOST_PP_ENUM_PARAMS(N, F)
-    >::future_result_type
+    >::type
     dataflow(BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
     {
-        return dataflow(launch::all, func, HPX_ENUM_FORWARD_ARGS(N, F, f));
+        typedef
+            BOOST_PP_CAT(detail::dataflow_frame_, N)<
+                Func
+              , BOOST_PP_ENUM_PARAMS(N, F)
+            >
+            frame_type;
+
+        boost::shared_ptr<frame_type> frame =
+            boost::make_shared<frame_type>(
+                launch::all
+              , boost::forward<Func>(func)
+              , HPX_ENUM_FORWARD_ARGS(N, F, f)
+            );
+
+        frame->await();
+
+        return frame->result_;
     }
 
 }}}

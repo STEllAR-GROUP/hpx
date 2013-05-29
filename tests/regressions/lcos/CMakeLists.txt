@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2013 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,8 +9,15 @@ set(tests
     future_hang_on_get
    )
 
-set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
+# MSVC 2010 is not able to cope with this test
+if(NOT MSVC10)
+  set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
+  set(tests ${tests}
+      dataflow_future_swap
+     )
+endif()
 
+set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
 if(HPX_HAVE_CXX11_LAMBDAS)
