@@ -147,7 +147,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -393,7 +393,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -639,7 +639,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -885,7 +885,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -1131,7 +1131,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -1377,7 +1377,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -1623,7 +1623,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -1869,7 +1869,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -2115,7 +2115,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -2361,7 +2361,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -2607,7 +2607,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -2853,7 +2853,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -3099,7 +3099,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -3345,7 +3345,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -3591,7 +3591,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -3837,7 +3837,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -4083,7 +4083,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -4329,7 +4329,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -4575,7 +4575,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
@@ -4821,7 +4821,7 @@ namespace hpx { namespace lcos { namespace local {
                 typedef
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
-                boost::fusion::result_of::deref<Iter>::type& f_ =
+                typename boost::fusion::result_of::deref<Iter>::type& f_ =
                     boost::fusion::deref(iter);
                 if(!f_.ready())
                 {
