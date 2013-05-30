@@ -15,6 +15,11 @@ if(NOT MSVC10)
   set(tests ${tests}
       dataflow_future_swap
      )
+  if(HPX_HAVE_CXX11_LAMBDAS)
+    set(tests ${tests}
+        dataflow_using
+       )
+  endif()
 endif()
 
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)

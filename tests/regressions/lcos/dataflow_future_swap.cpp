@@ -3,6 +3,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// This test case demonstrates the issue described in #775: runtime error with 
+// local dataflow (copying futures?).
+
 #include <iostream>
 
 #include <hpx/hpx.hpp>
