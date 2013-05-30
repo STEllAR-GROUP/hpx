@@ -17,6 +17,7 @@ if(NOT MSVC10)
      )
   if(HPX_HAVE_CXX11_LAMBDAS)
     set(tests ${tests}
+        dataflow_const_functor
         dataflow_using
        )
   endif()
