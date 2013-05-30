@@ -27,7 +27,7 @@ namespace hpx { namespace util
             num_localities_(1)
         {}
 
-        int call(boost::program_options::options_description& desc_cmdline,
+        int call(boost::program_options::options_description  const& desc_cmdline,
             int argc, char* argv[]);
 
         boost::program_options::variables_map vm_;

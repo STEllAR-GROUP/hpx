@@ -45,6 +45,54 @@ namespace examples
         simple_central_tuplespace(hpx::naming::id_type const& gid)
           : base_type(gid)
         {}
+
+        bool create(std::string const& symbol_name, hpx::id_type const& locality)
+        {
+            if(!symbol_name_.empty())
+            {
+                hpx::cerr<<"simple_central_tuplespace::create() : ERROR! current instance not empty!\n";
+                return false;
+            }
+            if(symbol_name_ == symbol_name) // itself
+            {
+                hpx::cerr<<"simple_central_tuplespace::create() : ERROR! current instance already attached to "<< symbol_name <<"\n";
+                return false;
+            }
+
+            // request gid;
+            *this = hpx::components::new_<examples::server::simple_central_tuplespace>(locality);
+            bool rc = hpx::agas::register_name(symbol_name, this->get_gid());
+
+            if(rc)
+            {
+                symbol_name_ = symbol_name;
+            }
+
+            return rc;
+        }
+
+        bool connect(std::string const& symbol_name)
+        {
+            if(symbol_name_ == symbol_name)
+            {
+                hpx::cerr<<"simple_central_tuplespace::connect() : ERROR! current instance already attached to "<< symbol_name <<"\n";
+                return false;
+            }
+
+            hpx::naming::id_type ts_gid;                                     
+            bool rc = hpx::agas::resolve_name(symbol_name, ts_gid);  
+
+            if(rc)
+            {
+                *this = ts_gid;
+                symbol_name_ = symbol_name;
+            }
+
+            return rc;
+        }
+
+
+
         ///////////////////////////////////////////////////////////////////////
         /// put \p tuple into tuplespace.
         ///
@@ -115,6 +163,9 @@ namespace examples
             BOOST_ASSERT(this->get_gid());
             return this->base_type::take_sync(this->get_gid(), tp, timeout);
         }
+
+    private:
+        std::string symbol_name_;
     };
 } // examples
 

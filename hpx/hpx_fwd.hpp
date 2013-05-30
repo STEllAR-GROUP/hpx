@@ -92,6 +92,7 @@ namespace hpx
         class HPX_API_EXPORT locality;
 
         HPX_API_EXPORT resolver_client& get_agas_client();
+        HPX_API_EXPORT locality const& get_locality();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -868,7 +869,7 @@ namespace hpx
     ///        supports the given component type.
     ///
     /// The function \a find_locality() can be used to retrieve the
-    /// global id of an arbitrary localities currently available to this
+    /// global id of an arbitrary locality currently available to this
     /// application which supports the creation of instances of the given
     /// component type.
     ///

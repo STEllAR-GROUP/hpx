@@ -32,10 +32,10 @@ namespace hpx
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type remote_result_type;
+        typedef typename action_type::result_type result_type;
 
         return apply<Action>(
-            new hpx::actions::typed_continuation<remote_result_type>(
+            new hpx::actions::typed_continuation<result_type>(
                 boost::forward<F>(f))
           , gid);
     }
@@ -100,10 +100,10 @@ namespace hpx
         BOOST_FWD_REF(F) f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type remote_result_type;
+        typedef typename action_type::result_type result_type;
 
         return apply<Action>(
-            new hpx::actions::typed_continuation<remote_result_type>(
+            new hpx::actions::typed_continuation<result_type>(
                 boost::forward<F>(f))
           , gid
           , HPX_ENUM_FORWARD_ARGS(N, Arg, arg));

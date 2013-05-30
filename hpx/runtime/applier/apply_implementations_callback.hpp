@@ -174,6 +174,27 @@ namespace hpx
     template <typename Action, typename Callback,
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
+    apply_p_cb(actions::continuation* c, naming::address& addr,
+        naming::id_type const& gid, threads::thread_priority priority,
+        BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        // Determine whether the gid is local or remote
+        if (addr.locality_ == naming::get_locality()) {
+            // apply locally
+            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            cb(boost::system::error_code(), 0);     // invoke callback
+            return result;
+        }
+
+        // apply remotely
+        return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
+            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+    }
+
+    template <typename Action, typename Callback,
+        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    inline bool
     apply_p_cb(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -287,6 +308,40 @@ namespace hpx
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
+            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+    }
+
+    template <typename Action, typename Callback,
+        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    inline bool
+    apply_c_p_cb(naming::id_type const& contgid, naming::address& addr,
+        naming::id_type const& gid, threads::thread_priority priority,
+        BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        typedef
+            typename hpx::actions::extract_action<Action>::result_type
+            result_type;
+
+        return apply_p_cb<Action>(
+            new actions::typed_continuation<result_type>(contgid),
+            addr, gid, priority, boost::forward<Callback>(cb),
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+    }
+
+    template <typename Action, typename Callback,
+        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    inline bool
+    apply_c_cb(naming::id_type const& contgid, naming::address& addr,
+        naming::id_type const& gid, BOOST_FWD_REF(Callback) cb,
+        HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        typedef
+            typename hpx::actions::extract_action<Action>::result_type
+            result_type;
+
+        return apply_p_cb<Action>(
+            new actions::typed_continuation<result_type>(contgid),
+            addr, gid, actions::action_priority<Action>(),
             boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 }

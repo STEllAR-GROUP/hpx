@@ -79,6 +79,7 @@ namespace hpx { namespace components
                     HPX_STD_BIND(&locking_hook::yield_function, this, _1));
 
                 undecorate_wrapper yield_undecorator;
+                (void)yield_undecorator;       // silence gcc warnings
                 result = f(state);
             }
 

@@ -600,6 +600,15 @@ application.
       ports. All of this information is automatically extracted from the SLURM
       environment by the __hpx__ startup code.]
 
+[important The __srun__ documentation explicitly states: "If `-c` is specified 
+      without `-n`, as many tasks will be allocated per node as possible while 
+      satisfying the `-c` restriction. For instance on a cluster with 8 CPUs per 
+      node, a job request for 4 nodes and 3 CPUs per task may be allocated 3 or 
+      6 CPUs per node (1 or 2 tasks per node) depending upon resource consumption 
+      by other jobs."
+      For this reason, we suggest to always specify `-n <number-of-instances>`, 
+      even if `<number-of-instances>` is equal to one (`1`).]
+
 [heading Interactive Shells]
 
 To get an interactive development shell on one of the nodes you can issue the

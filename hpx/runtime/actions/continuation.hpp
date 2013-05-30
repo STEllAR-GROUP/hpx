@@ -23,6 +23,7 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/archive/detail/check.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -92,6 +93,7 @@ namespace hpx { namespace actions
     // Parcel continuations are polymorphic objects encapsulating the
     // id_type of the destination where the result has to be sent.
     class HPX_EXPORT continuation
+      : public boost::enable_shared_from_this<continuation>
     {
     public:
         continuation()
@@ -252,8 +254,8 @@ namespace hpx { namespace actions
 
         void trigger_value(BOOST_RV_REF(Result) result) const
         {
-            LLCO_(info) 
-                << "typed_continuation<Result>::trigger_value(" 
+            LLCO_(info)
+                << "typed_continuation<Result>::trigger_value("
                 << this->get_gid() << ")";
             if (f_.empty()) {
                 if (!this->get_gid()) {
@@ -271,8 +273,7 @@ namespace hpx { namespace actions
 
         static void register_base()
         {
-            util::void_cast_register_nonvirt<
-                typed_continuation, continuation>();
+            util::void_cast_register_nonvirt<typed_continuation, continuation>();
         }
 
     private:

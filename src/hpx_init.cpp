@@ -930,7 +930,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     int run_or_start(hpx_main_type f,
-        boost::program_options::options_description& desc_cmdline,
+        boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& ini_config,
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode,
@@ -1037,7 +1037,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     int init(hpx_main_type f,
-        boost::program_options::options_description& desc_cmdline,
+        boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& ini_config,
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode)
@@ -1047,7 +1047,7 @@ namespace hpx
     }
 
     int start(hpx_main_type f,
-        boost::program_options::options_description& desc_cmdline,
+        boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& ini_config,
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode)
@@ -1089,7 +1089,7 @@ namespace hpx
         if (&ec != &throws)
             ec = make_success_code();
 
-        if (std::abs(localwait - 1.0) < 1e-16)
+        if (std::abs(localwait + 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
         else
         {
@@ -1101,7 +1101,7 @@ namespace hpx
             } while (current - start_time < localwait * 1e-6);
         }
 
-        if (std::abs(shutdown_timeout - 1.0) < 1e-16)
+        if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p =
@@ -1127,7 +1127,7 @@ namespace hpx
         if (&ec != &throws)
             ec = make_success_code();
 
-        if (std::abs(localwait - 1.0) < 1e-16)
+        if (std::abs(localwait + 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
         else
         {
@@ -1139,7 +1139,7 @@ namespace hpx
             } while (current - start_time < localwait * 1e-6);
         }
 
-        if (std::abs(shutdown_timeout - 1.0) < 1e-16)
+        if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p =
@@ -1176,7 +1176,7 @@ namespace hpx
         if (0 == rt.get()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
                 "the runtime system is not active (did you already "
-                "call finalize?)");
+                "call hpx::finalize?)");
             return -1;
         }
 
@@ -1184,20 +1184,6 @@ namespace hpx
         rt->stop();
 
         return result;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    int wait(error_code& ec)
-    {
-        runtime* rt(get_runtime_ptr());
-        if (0 == rt) {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::wait",
-                "the runtime system is not active (did you already "
-                "call finalize?)");
-            return -1;
-        }
-
-        return rt->wait();
     }
 }
 
