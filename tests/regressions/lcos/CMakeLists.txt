@@ -12,6 +12,7 @@ set(tests
 # MSVC 2010 is not able to cope with this test
 if(NOT MSVC10)
   set(dataflow_future_swap_FLAGS DEPENDENCIES iostreams_component)
+  set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
   set(tests ${tests}
       dataflow_future_swap
      )

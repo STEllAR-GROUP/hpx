@@ -47,12 +47,6 @@ set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(promise_PARAMETERS THREADS_PER_LOCALITY 4)
 
-if(HPX_HAVE_CXX11_LAMBDAS)
-  set(tests ${tests} local_dataflow_swap)
-  set(local_dataflow_swap_FLAGS DEPENDENCIES iostreams_component)
-  set(local_dataflow_swap_PARAMETERS THREADS_PER_LOCALITY 4)
-endif()
-
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
