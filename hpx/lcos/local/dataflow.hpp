@@ -151,6 +151,11 @@ namespace hpx { namespace lcos { namespace local {
               , policy_(policy)
             {}
 
+            result_type execute() const
+            {
+                return boost::fusion::invoke(func_, futures_);
+            }
+
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
@@ -159,15 +164,18 @@ namespace hpx { namespace lcos { namespace local {
             {
                 if(!result_.valid())
                 {
-                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
-                    result_
-                        = hpx::async(policy_, hpx::util::bind(f, func_, futures_));
+                    result_ = hpx::async(
+                        policy_
+                      , hpx::util::bind(
+                            &BOOST_PP_CAT(dataflow_frame_, N)::execute
+                          , this->shared_from_this()
+                        )
+                    );
+                    return;
                 }
-                else
-                {
-                    boost::fusion::invoke(func_, futures_);
-                    result_promise_.set_value();
-                }
+
+                boost::fusion::invoke(func_, futures_);
+                result_promise_.set_value();
             }
 
             template <typename Iter>
@@ -178,16 +186,19 @@ namespace hpx { namespace lcos { namespace local {
             {
                 if(!result_.valid())
                 {
-                    result_type (*f)(Func, futures_type &) = &boost::fusion::invoke;
-                    result_
-                        = hpx::async(policy_, hpx::util::bind(f, func_, futures_));
-                }
-                else
-                {
-                    result_promise_.set_value(
-                        boost::fusion::invoke(func_, futures_)
+                    result_ = hpx::async(
+                        policy_
+                      , hpx::util::bind(
+                            &BOOST_PP_CAT(dataflow_frame_, N)::execute
+                          , this->shared_from_this()
+                        )
                     );
+                    return;
                 }
+
+                result_promise_.set_value(
+                    boost::fusion::invoke(func_, futures_)
+                );
             }
 
             template <typename Iter>
