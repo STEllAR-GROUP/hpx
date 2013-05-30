@@ -232,9 +232,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_1<
-        Func
-      , F0
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_1<
+            Func
+          , F0
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0)
     {
@@ -478,9 +481,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_2<
-        Func
-      , F0 , F1
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_2<
+            Func
+          , F0 , F1
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1)
     {
@@ -724,9 +730,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_3<
-        Func
-      , F0 , F1 , F2
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_3<
+            Func
+          , F0 , F1 , F2
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2)
     {
@@ -970,9 +979,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_4<
-        Func
-      , F0 , F1 , F2 , F3
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_4<
+            Func
+          , F0 , F1 , F2 , F3
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3)
     {
@@ -1216,9 +1228,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_5<
-        Func
-      , F0 , F1 , F2 , F3 , F4
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_5<
+            Func
+          , F0 , F1 , F2 , F3 , F4
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4)
     {
@@ -1462,9 +1477,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_6<
-        Func
-      , F0 , F1 , F2 , F3 , F4 , F5
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_6<
+            Func
+          , F0 , F1 , F2 , F3 , F4 , F5
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5)
     {
@@ -1708,9 +1726,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_7<
-        Func
-      , F0 , F1 , F2 , F3 , F4 , F5 , F6
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_7<
+            Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6)
     {
@@ -1954,9 +1975,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_8<
-        Func
-      , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_8<
+            Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7)
     {
@@ -2200,9 +2224,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_9<
-        Func
-      , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_9<
+            Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8)
     {
@@ -2446,9 +2473,12 @@ namespace hpx { namespace lcos { namespace local {
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_10<
-        Func
-      , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , detail::dataflow_frame_10<
+            Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9)
     {

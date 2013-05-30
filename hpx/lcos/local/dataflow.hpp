@@ -357,9 +357,12 @@ namespace hpx { namespace lcos { namespace local {
 
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
     BOOST_FORCEINLINE
-    typename BOOST_PP_CAT(detail::dataflow_frame_, N)<
-        Func
-      , BOOST_PP_ENUM_PARAMS(N, F)
+    typename boost::lazy_disable_if<
+        boost::is_same<hpx::launch, typename boost::remove_const<typename hpx::util::detail::remove_reference<Func>::type>::type >
+      , BOOST_PP_CAT(detail::dataflow_frame_, N)<
+            Func
+          , BOOST_PP_ENUM_PARAMS(N, F)
+        >
     >::type
     dataflow(BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
     {
