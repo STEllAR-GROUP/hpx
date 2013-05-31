@@ -103,6 +103,12 @@ HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action)
 
+#if defined(HPX_HAVE_SECURITY)
+HPX_REGISTER_ACTION(
+    hpx::components::server::runtime_support::init_locality_ca_action,
+    init_locality_ca_action)
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::runtime_support,
@@ -1359,5 +1365,12 @@ namespace hpx { namespace components { namespace server
         }
         return true;    // component got loaded
     }
+
+#if defined(HPX_HAVE_SECURITY)
+    void runtime_support::init_locality_ca(naming::gid_type const& root_ca)
+    {
+        get_runtime().init_locality_ca(root_ca);
+    }
+#endif
 }}}
 

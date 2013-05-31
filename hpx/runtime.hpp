@@ -254,6 +254,11 @@ namespace hpx
         ///
         virtual bool unregister_thread() = 0;
 
+#if defined(HPX_HAVE_SECURITY)
+        // initialize the sub-CA for this locality
+        virtual void init_locality_ca(naming::gid_type const& root_ca) = 0;
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(

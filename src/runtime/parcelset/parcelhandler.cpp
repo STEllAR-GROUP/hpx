@@ -874,5 +874,25 @@ namespace hpx { namespace parcelset
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
     }
+
+#if defined(HPX_HAVE_SECURITY)
+    // set the certificate for this locality
+    void parcelhandler::set_locality_certificate(
+        components::security::server::signed_type<
+            components::security::server::certificate> const& cert)
+    {
+        BOOST_ASSERT(0 == cert_store_);     // should be called only once
+        cert_store_ = new components::security::server::certificate_store(cert);
+    }
+
+    // set the certificate for another locality
+    void parcelhandler::add_locality_certificate(
+        components::security::server::signed_type<
+            components::security::server::certificate> const& cert)
+    {
+        BOOST_ASSERT(0 != cert_store_);     // should have been created
+        cert_store_->insert(cert);
+    }
+#endif
 }}
 
