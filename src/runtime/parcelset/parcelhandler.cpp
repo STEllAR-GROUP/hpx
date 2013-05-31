@@ -130,6 +130,9 @@ namespace hpx { namespace parcelset
         parcels_(policy),
         use_alternative_parcelports_(false),
         count_routed_(0)
+#if defined(HPX_HAVE_SECURITY)
+      , cert_store_(0)
+#endif
     {
         BOOST_ASSERT(parcels_);
 
