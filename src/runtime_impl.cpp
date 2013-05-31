@@ -171,18 +171,16 @@ namespace hpx {
 #if defined(HPX_HAVE_SECURITY)
     // initialize the sub-CA for this locality
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_locality_ca()
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_locality_ca(
+        components::security::server::signed_type<
+            components::security::server::certificate> const& root_cert)
     {
         // create locality sub-CA and issue CSR
         sub_ca_.init();
 
-        if (agas_client_.is_bootstrap()) {      // this is the booststrap locality
-            parcel_handler_.add_locality_certificate(sub_ca_.get_certificate());
-        }
-        else {
-            // initialize certificate store inside parcel handler
-            parcel_handler_.set_locality_certificate(sub_ca_.get_certificate());
-        }
+        // initialize certificate store inside parcel handler
+        parcel_handler_.set_root_certificate(root_cert);
+        parcel_handler_.add_locality_certificate(sub_ca_.get_certificate());
     }
 #endif
 
@@ -204,7 +202,11 @@ namespace hpx {
         if (agas_client_.is_bootstrap()) {      // this is the booststrap locality
             // initialize root-CA
             root_ca_.init();
-            parcel_handler_.set_locality_certificate(root_ca_.get_certificate());
+
+            // extract root-CA certificate
+            components::security::server::signed_type<
+                components::security::server::certificate> root_cert =
+                    root_ca_.get_certificate();
 
             // initialize all sub-CAs
             std::vector<naming::id_type> locality_ids = find_all_localities();
@@ -214,7 +216,7 @@ namespace hpx {
             components::server::runtime_support::init_locality_ca_action act;
             BOOST_FOREACH(naming::id_type const& id, locality_ids)
             {
-                lazy_results.push_back(async(act, id));
+                lazy_results.push_back(async(act, id, root_cert));
             }
             wait_all(lazy_results);
         }
