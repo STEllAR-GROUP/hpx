@@ -31,8 +31,10 @@ namespace hpx { namespace util { namespace security
         BOOST_ASSERT(0 != sub_ca_);
 
         // Bind the ca_get_gid symbol dynamically and invoke it.
-        typedef naming::gid_type (*function_type)(
-            components::security::server::certificate_authority_base*);
+        typedef void (*function_type)(
+            components::security::server::certificate_authority_base*
+          , naming::gid_type*);
+
         typedef boost::function<void(function_type)> deleter_type;
 
         hpx::util::plugin::dll module(
@@ -40,7 +42,10 @@ namespace hpx { namespace util { namespace security
         std::pair<function_type, deleter_type> p =
             module.get<function_type, deleter_type>("ca_get_gid");
 
-        return (*p.first)(sub_ca_);
+        naming::gid_type gid;
+
+        (*p.first)(sub_ca_, &gid);
+        return gid;
     }
 
     void sub_ca::init()
@@ -66,10 +71,11 @@ namespace hpx { namespace util { namespace security
         BOOST_ASSERT(0 != sub_ca_);
 
         // Bind the ca_get_certificate symbol dynamically and invoke it.
-        typedef components::security::server::signed_type<
-            components::security::server::certificate
-        > (*function_type)(
-            components::security::server::certificate_authority_base*);
+        typedef void (*function_type)(
+            components::security::server::certificate_authority_base*
+          , components::security::server::signed_type<
+                components::security::server::certificate
+            >*);
 
         typedef boost::function<void(function_type)> deleter_type;
 
@@ -78,7 +84,12 @@ namespace hpx { namespace util { namespace security
         std::pair<function_type, deleter_type> p =
             module.get<function_type, deleter_type>("ca_get_certificate");
 
-        return (*p.first)(sub_ca_);
+        components::security::server::signed_type<
+            components::security::server::certificate
+        > certificate;
+
+        (*p.first)(sub_ca_, &certificate);
+        return certificate;
     }
 }}}
 
