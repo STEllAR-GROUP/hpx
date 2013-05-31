@@ -25,10 +25,21 @@ namespace hpx { namespace util { namespace security
         (*p.first)(sub_ca_);
     }
 
-    naming::gid_type const& sub_ca::get_gid() const
+    naming::gid_type sub_ca::get_gid() const
     {
         BOOST_ASSERT(0 != sub_ca_);
-        return sub_ca_->get_base_gid();
+
+        // Bind the ca_get_gid symbol dynamically and invoke it.
+        typedef naming::gid_type (*function_type)(
+            components::security::server::certificate_authority_base*);
+        typedef boost::function<void(function_type)> deleter_type;
+
+        hpx::util::plugin::dll module(
+            HPX_MAKE_DLL_STRING(std::string("security")));
+        std::pair<function_type, deleter_type> p =
+            module.get<function_type, deleter_type>("ca_get_gid");
+
+        return (*p.first)(sub_ca_);
     }
 
     void sub_ca::init(naming::gid_type const& root_ca)
@@ -52,7 +63,21 @@ namespace hpx { namespace util { namespace security
         components::security::server::certificate> sub_ca::get_certificate()
     {
         BOOST_ASSERT(0 != sub_ca_);
-        return sub_ca_->get_certificate();
+
+        // Bind the ca_get_certificate symbol dynamically and invoke it.
+        typedef components::security::server::signed_type<
+            components::security::server::certificate
+        > (*function_type)(
+            components::security::server::certificate_authority_base*);
+
+        typedef boost::function<void(function_type)> deleter_type;
+
+        hpx::util::plugin::dll module(
+            HPX_MAKE_DLL_STRING(std::string("security")));
+        std::pair<function_type, deleter_type> p =
+            module.get<function_type, deleter_type>("ca_get_certificate");
+
+        return (*p.first)(sub_ca_);
     }
 }}}
 

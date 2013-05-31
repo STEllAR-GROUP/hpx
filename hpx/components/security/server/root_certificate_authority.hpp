@@ -28,6 +28,13 @@ namespace hpx { namespace components { namespace security { namespace server
 
         signed_type<certificate> sign_certificate_signing_request(
             signed_type<certificate_signing_request> const &) const;
+
+        naming::gid_type get_base_gid() const
+        {
+            typedef simple_component_base<root_certificate_authority>
+                component_base_type;
+            return this->component_base_type::get_base_gid();
+        }
     };
 }}}}
 

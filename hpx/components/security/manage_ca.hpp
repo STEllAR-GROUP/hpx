@@ -32,6 +32,19 @@ extern "C"
     HPX_COMPONENT_EXPORT
         void delete_sub_ca(
             hpx::components::security::server::subordinate_certificate_authority*);
+
+    // common helpers
+    HPX_COMPONENT_EXPORT
+        void ca_get_certificate(
+            hpx::components::security::server::certificate_authority_base*
+          , hpx::components::security::server::signed_type<
+                hpx::components::security::server::certificate
+            >*);
+
+    HPX_COMPONENT_EXPORT
+        void ca_get_gid(
+            hpx::components::security::server::certificate_authority_base*
+          , hpx::naming::gid_type*);
 }
 
 #endif
