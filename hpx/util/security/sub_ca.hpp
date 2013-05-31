@@ -29,7 +29,7 @@ namespace hpx { namespace util { namespace security
 
         ~sub_ca();
 
-        void init(naming::gid_type const& root_ca);
+        void init();
 
         naming::gid_type get_gid() const;
 

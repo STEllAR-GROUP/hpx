@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/plugin.hpp>
+#include <hpx/util/security/root_ca.hpp>
 #include <hpx/util/security/sub_ca.hpp>
 
 #include <boost/function.hpp>
@@ -42,7 +43,7 @@ namespace hpx { namespace util { namespace security
         return (*p.first)(sub_ca_);
     }
 
-    void sub_ca::init(naming::gid_type const& root_ca)
+    void sub_ca::init()
     {
         // Bind the create_sub_ca symbol dynamically and invoke it.
         typedef ca_type* (*function_type)(
@@ -56,7 +57,7 @@ namespace hpx { namespace util { namespace security
             module.get<function_type, deleter_type>("create_sub_ca");
 
         sub_ca_ = (*p.first)(key_pair_,
-            naming::id_type(root_ca, naming::id_type::unmanaged));
+            naming::id_type(root_ca::get_gid(), naming::id_type::unmanaged));
     }
 
     components::security::server::signed_type<

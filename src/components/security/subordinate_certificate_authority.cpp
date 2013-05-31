@@ -11,7 +11,7 @@ typedef hpx::components::security::server::subordinate_certificate_authority
     subordinate_certificate_authority_type;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_4(
-    hpx::components::simple_component<subordinate_certificate_authority_type>
+    hpx::components::fixed_component<subordinate_certificate_authority_type>
   , subordinate_certificate_authority
   , "hpx::components::security::server::subordinate_certificate_authority"
   , ::hpx::components::factory_check);

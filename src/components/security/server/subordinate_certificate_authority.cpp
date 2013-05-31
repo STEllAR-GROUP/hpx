@@ -10,14 +10,27 @@
 
 namespace hpx { namespace components { namespace security { namespace server
 {
+    boost::uint64_t get_subordinate_certificate_authority_msb()
+    {
+        return naming::replace_locality_id(
+            HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB
+          , get_locality_id());
+    }
+
     subordinate_certificate_authority::subordinate_certificate_authority()
       : certificate_authority_base()
+      , fixed_component_base<subordinate_certificate_authority>(
+            get_subordinate_certificate_authority_msb()
+          , HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB)
     {
     }
 
     subordinate_certificate_authority::subordinate_certificate_authority(
         naming::id_type const & issuer_id)
       : certificate_authority_base()
+      , fixed_component_base<subordinate_certificate_authority>(
+            get_subordinate_certificate_authority_msb()
+          , HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB)
     {
         security::certificate_authority_base issuer(issuer_id);
 
@@ -32,6 +45,9 @@ namespace hpx { namespace components { namespace security { namespace server
         key_pair const & key_pair
       , naming::id_type const & issuer_id)
       : certificate_authority_base(key_pair)
+      , fixed_component_base<subordinate_certificate_authority>(
+            get_subordinate_certificate_authority_msb()
+          , HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB)
     {
         security::certificate_authority_base issuer(issuer_id);
 

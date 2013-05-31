@@ -171,11 +171,10 @@ namespace hpx {
 #if defined(HPX_HAVE_SECURITY)
     // initialize the sub-CA for this locality
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
-        init_locality_ca(naming::gid_type const& root_ca)
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_locality_ca()
     {
         // create locality sub-CA and issue CSR
-        sub_ca_.init(root_ca);
+        sub_ca_.init();
 
         if (agas_client_.is_bootstrap()) {      // this is the booststrap locality
             parcel_handler_.add_locality_certificate(sub_ca_.get_certificate());
@@ -208,7 +207,6 @@ namespace hpx {
             parcel_handler_.set_locality_certificate(root_ca_.get_certificate());
 
             // initialize all sub-CAs
-            naming::gid_type root_ca_gid = root_ca_.get_gid();
             std::vector<naming::id_type> locality_ids = find_all_localities();
             std::vector<lcos::future<void> > lazy_results;
             lazy_results.reserve(locality_ids.size());
@@ -216,7 +214,7 @@ namespace hpx {
             components::server::runtime_support::init_locality_ca_action act;
             BOOST_FOREACH(naming::id_type const& id, locality_ids)
             {
-                lazy_results.push_back(async(act, id, root_ca_gid));
+                lazy_results.push_back(async(act, id));
             }
             wait_all(lazy_results);
         }

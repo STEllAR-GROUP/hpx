@@ -338,7 +338,7 @@ namespace hpx {
 
 #if defined(HPX_HAVE_SECURITY)
         // initialize the sub-CA for this locality
-        void init_locality_ca(naming::gid_type const& root_ca);
+        void init_locality_ca();
 #endif
 
     private:

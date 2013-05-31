@@ -16,7 +16,7 @@ namespace hpx { namespace components { namespace security { namespace server
 {
     class HPX_COMPONENT_EXPORT subordinate_certificate_authority
       : public certificate_authority_base
-      , public simple_component_base<subordinate_certificate_authority>
+      , public fixed_component_base<subordinate_certificate_authority>
     {
     public:
         typedef subordinate_certificate_authority type_holder;
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace security { namespace server
 
         naming::gid_type get_base_gid() const
         {
-            typedef simple_component_base<subordinate_certificate_authority>
+            typedef fixed_component_base<subordinate_certificate_authority>
                 component_base_type;
             return this->component_base_type::get_base_gid();
         }
