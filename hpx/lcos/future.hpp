@@ -73,6 +73,9 @@ namespace hpx { namespace lcos
     template <typename Result>
     class future
     {
+    public:
+        typedef lcos::detail::future_data_base<Result> future_data_type;
+
     private:
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
@@ -93,11 +96,11 @@ namespace hpx { namespace lcos
         template <typename Result_>
         friend detail::future_data_base<Result_> const*
             detail::get_future_data(lcos::future<Result_> const&);
+        
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-        typedef lcos::detail::future_data_base<Result> future_data_type;
 
         explicit future(future_data_type* p)
           : future_data_(p)
@@ -312,6 +315,8 @@ namespace hpx { namespace lcos
     template <>
     class future<void>
     {
+    public:
+        typedef lcos::detail::future_data_base<void> future_data_type;
     private:
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
@@ -338,8 +343,6 @@ namespace hpx { namespace lcos
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
-
-        typedef lcos::detail::future_data_base<void> future_data_type;
 
         explicit future(future_data_type* p)
           : future_data_(p)

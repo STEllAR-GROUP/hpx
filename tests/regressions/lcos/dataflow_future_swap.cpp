@@ -26,19 +26,19 @@ struct mul
 {
     double operator()( double x1 , double x2 ) const
     {
-        hpx::this_thread::sleep_for( boost::posix_time::milliseconds(100) );
+        hpx::this_thread::sleep_for( boost::posix_time::milliseconds(10000) );
         hpx::cout << boost::format( "func: %f , %f\n" ) % x1 %x2 << hpx::flush;
         return x1*x2;
     }
 };
 
-double dummy(double x, double) { return x; }
+double dummy(double x, double) { std::cout << "dummy: " << x << "\n"; return x; }
 
 void future_swap( future_type &f1 , future_type &f2 )
 {
     future_type tmp = f1;
     f1 = hpx::lcos::local::dataflow( unwrap( &dummy ) , f2 , f1 );
-    f2 = hpx::lcos::local::dataflow( unwrap( &dummy ) , tmp , f1 );
+    f2 = hpx::lcos::local::dataflow( unwrap( &dummy ) , tmp, f1 );
 }
 
 int main()
