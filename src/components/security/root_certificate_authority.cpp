@@ -10,7 +10,12 @@
 typedef hpx::components::security::server::root_certificate_authority
     root_certificate_authority_type;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    hpx::components::simple_component<root_certificate_authority_type>
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY_4(
+    hpx::components::fixed_component<root_certificate_authority_type>
   , root_certificate_authority
-  , "hpx::components::security::server::root_certificate_authority");
+  , "hpx::components::security::server::root_certificate_authority"
+  , ::hpx::components::factory_check);
+
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    root_certificate_authority_type
+  , hpx::components::component_root_certificate_authority)

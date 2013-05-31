@@ -498,6 +498,12 @@ namespace hpx
             // AGAS symbolic naming services.
             component_agas_symbol_namespace = 10,
 
+#if defined(HPX_HAVE_SECURITY)
+            // Root-CA, Sub-CA
+            component_root_certificate_authority = 11,
+            component_subordinate_certificate_authority = 12,
+#endif
+
             component_last,
             component_first_dynamic = component_last,
 

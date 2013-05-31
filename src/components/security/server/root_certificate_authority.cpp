@@ -11,6 +11,8 @@ namespace hpx { namespace components { namespace security { namespace server
 {
     root_certificate_authority::root_certificate_authority()
       : certificate_authority_base()
+      , fixed_component_base<root_certificate_authority>(
+            HPX_ROOT_CERTIFICATE_AUTHORITY_MSB, HPX_ROOT_CERTIFICATE_AUTHORITY_LSB)
     {
         capability capability;
         capability.set(traits::capability<>::capability_certificate_authority);
@@ -22,6 +24,8 @@ namespace hpx { namespace components { namespace security { namespace server
     root_certificate_authority::root_certificate_authority(
         key_pair const & key_pair)
       : certificate_authority_base(key_pair)
+      , fixed_component_base<root_certificate_authority>(
+            HPX_ROOT_CERTIFICATE_AUTHORITY_MSB, HPX_ROOT_CERTIFICATE_AUTHORITY_LSB)
     {
         capability capability;
         capability.set(traits::capability<>::capability_certificate_authority);
