@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace security { namespace server
 
         signed_type<certificate_signing_request> signed_csr =
             key_pair_.sign(certificate_signing_request(
-                get_gid(), key_pair_.get_public_key()));
+                get_gid().get_gid(), key_pair_.get_public_key()));
 
         certificate_ = issuer.sign_certificate_signing_request(signed_csr);
     }
@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace security { namespace server
 
         signed_type<certificate_signing_request> signed_csr =
             key_pair_.sign(certificate_signing_request(
-                get_gid(), key_pair_.get_public_key()));
+                get_gid().get_gid(), key_pair_.get_public_key()));
 
         certificate_ = issuer.sign_certificate_signing_request(signed_csr);
     }
@@ -54,7 +54,8 @@ namespace hpx { namespace components { namespace security { namespace server
         {
             // TODO, capability checks
 
-            signed_certificate = key_pair_.sign(certificate(get_gid(), csr));
+            signed_certificate = key_pair_.sign(certificate(
+                get_gid().get_gid(), csr));
         }
 
         return signed_certificate;
