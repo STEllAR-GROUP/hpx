@@ -36,5 +36,22 @@ extern "C"
     {
         delete ca;
     }
+
+    // common helpers
+    void ca_get_certificate(
+        hpx::components::security::server::certificate_authority_base* ca
+      , hpx::components::security::server::signed_type<
+            hpx::components::security::server::certificate
+        >* cert)
+    {
+        *cert = ca->get_certificate();
+    }
+
+    void ca_get_gid(
+        hpx::components::security::server::certificate_authority_base* ca
+      , hpx::naming::gid_type* gid)
+    {
+        *gid = ca->get_base_gid();
+    }
 }
 

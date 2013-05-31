@@ -34,12 +34,7 @@ namespace hpx { namespace components { namespace security { namespace server
             return sign_certificate_signing_request(signed_csr);
         }
 
-        virtual signed_type<certificate> get_certificate() const;
-
-        signed_type<certificate> get_certificate_nonvirt() const
-        {
-            return get_certificate();
-        }
+        signed_type<certificate> get_certificate() const;
 
         HPX_DEFINE_COMPONENT_CONST_ACTION(
             certificate_authority_base
@@ -48,8 +43,9 @@ namespace hpx { namespace components { namespace security { namespace server
 
         HPX_DEFINE_COMPONENT_CONST_ACTION(
             certificate_authority_base
-          , get_certificate_nonvirt
-          , get_certificate_action);
+          , get_certificate);
+
+        virtual naming::gid_type get_base_gid() const = 0;
 
     protected:
         key_pair key_pair_;
