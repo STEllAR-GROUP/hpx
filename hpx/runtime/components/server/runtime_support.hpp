@@ -196,7 +196,7 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate_all);
 
 #if defined(HPX_HAVE_SECURITY)
-        void init_locality_ca(naming::gid_type const& root_ca);
+        void init_locality_ca();
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, init_locality_ca);
 #endif
 

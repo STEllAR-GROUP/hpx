@@ -90,6 +90,14 @@ char const* const primary_namespace_service_name = "primary_namespace/";
 ///     00000001000000010000000000000003
 ///         Address of the symbol_namespace component on the bootstrap AGAS
 ///         locality.
+///     00000001000000010000000000000004
+///         Address of the locality_namespace component on the bootstrap AGAS
+///         locality.
+///     00000001000000010000000000000005
+///         Address of the root-CA component
+///     xxxxxxxx000000010000000000000006
+///         Address of the locality based sub-CA, xxxxxxxx is replaced with the 
+///         correct locality id
 ///
 struct HPX_EXPORT primary_namespace
   : components::fixed_component_base<primary_namespace>

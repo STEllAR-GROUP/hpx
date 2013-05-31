@@ -24,21 +24,11 @@ namespace hpx { namespace util { namespace security
         delete key_pair_;
     }
 
-    naming::gid_type root_ca::get_gid() const
+    naming::gid_type root_ca::get_gid()
     {
-        BOOST_ASSERT(0 != root_ca_);
-
-        // Bind the ca_get_gid symbol dynamically and invoke it.
-        typedef naming::gid_type (*function_type)(
-            components::security::server::certificate_authority_base*);
-        typedef boost::function<void(function_type)> deleter_type;
-
-        hpx::util::plugin::dll module(
-            HPX_MAKE_DLL_STRING(std::string("security")));
-        std::pair<function_type, deleter_type> p =
-            module.get<function_type, deleter_type>("ca_get_gid");
-
-        return (*p.first)(root_ca_);
+        return naming::gid_type(
+            HPX_ROOT_CERTIFICATE_AUTHORITY_MSB
+          , HPX_ROOT_CERTIFICATE_AUTHORITY_LSB);
     }
 
     void root_ca::init()

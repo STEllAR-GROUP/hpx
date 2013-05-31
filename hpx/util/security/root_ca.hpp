@@ -31,7 +31,7 @@ namespace hpx { namespace util { namespace security
 
         void init();
 
-        naming::gid_type get_gid() const;
+        static naming::gid_type get_gid();
 
         bool is_valid() const
         {

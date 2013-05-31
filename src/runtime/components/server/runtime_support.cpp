@@ -1367,9 +1367,9 @@ namespace hpx { namespace components { namespace server
     }
 
 #if defined(HPX_HAVE_SECURITY)
-    void runtime_support::init_locality_ca(naming::gid_type const& root_ca)
+    void runtime_support::init_locality_ca()
     {
-        get_runtime().init_locality_ca(root_ca);
+        get_runtime().init_locality_ca();
     }
 #endif
 }}}
