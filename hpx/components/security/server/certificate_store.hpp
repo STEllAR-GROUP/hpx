@@ -11,7 +11,6 @@
 #include <hpx/exception.hpp>
 
 #include "certificate.hpp"
-#include "identity.hpp"
 #include "public_key.hpp"
 #include "signed_type.hpp"
 
@@ -19,7 +18,9 @@ namespace hpx { namespace components { namespace security { namespace server
 {
     class certificate_store
     {
-        typedef std::map<identity, signed_type<certificate> > store_type;
+        typedef std::map<
+            naming::gid_type, signed_type<certificate>
+        > store_type;
 
     public:
         certificate_store(signed_type<certificate> const & signed_certificate)
@@ -84,7 +85,7 @@ namespace hpx { namespace components { namespace security { namespace server
         }
 
         boost::optional<signed_type<certificate> >
-        at(identity const & subject) const
+        at(naming::gid_type const & subject) const
         {
             store_type::const_iterator iterator = store_.find(subject);
 

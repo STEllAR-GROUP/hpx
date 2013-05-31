@@ -5,8 +5,6 @@
 
 #include <hpx/components/security/server/certificate_authority_base.hpp>
 
-#include <iostream>
-
 namespace hpx { namespace components { namespace security { namespace server
 {
     certificate_authority_base::certificate_authority_base()

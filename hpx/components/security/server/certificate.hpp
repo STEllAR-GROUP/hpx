@@ -2,10 +2,9 @@
 #define HPX_SECURITY_CERTIFICATE_HPP
 
 #include <boost/serialization/serialization.hpp>
+#include <hpx/runtime/naming/name.hpp>
 
-#include "capability.hpp"
 #include "certificate_signing_request.hpp"
-#include "identity.hpp"
 #include "public_key.hpp"
 
 namespace hpx { namespace components { namespace security { namespace server
@@ -17,8 +16,8 @@ namespace hpx { namespace components { namespace security { namespace server
         {
         }
 
-        certificate(identity const & issuer,
-                    identity const & subject,
+        certificate(naming::gid_type const & issuer,
+                    naming::gid_type const & subject,
                     public_key const & subject_public_key,
                     capability const & capability)
           : issuer_(issuer)
@@ -28,7 +27,7 @@ namespace hpx { namespace components { namespace security { namespace server
         {
         }
 
-        certificate(identity const & issuer,
+        certificate(naming::gid_type const & issuer,
                     certificate_signing_request const & csr)
           : issuer_(issuer)
           , subject_(csr.get_subject())
@@ -37,12 +36,12 @@ namespace hpx { namespace components { namespace security { namespace server
         {
         }
 
-        identity const & get_issuer() const
+        naming::gid_type const & get_issuer() const
         {
             return issuer_;
         }
 
-        identity const & get_subject() const
+        naming::gid_type const & get_subject() const
         {
             return subject_;
         }
@@ -71,9 +70,9 @@ namespace hpx { namespace components { namespace security { namespace server
             ar & capability_;
         }
 
-        identity issuer_;
+        naming::gid_type issuer_;
 
-        identity subject_;
+        naming::gid_type subject_;
         public_key subject_public_key_;
 
         capability capability_;
