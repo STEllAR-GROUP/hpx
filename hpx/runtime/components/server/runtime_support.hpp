@@ -195,6 +195,11 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate_all);
 
+#if defined(HPX_HAVE_SECURITY)
+        void init_locality_ca(naming::gid_type const& root_ca);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, init_locality_ca);
+#endif
+
         // even if this is not a short/minimal action, we still execute it
         // directly to avoid a deadlock condition inside the thread manager
         // waiting for this thread to finish, which waits for the thread
@@ -432,6 +437,12 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action)
+
+#if defined(HPX_HAVE_SECURITY)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::runtime_support::init_locality_ca_action,
+    init_locality_ca_action)
+#endif
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
 #  include <hpx/runtime/components/server/gcc44/runtime_support_implementations.hpp>

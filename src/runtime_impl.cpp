@@ -168,6 +168,25 @@ namespace hpx {
         LRT_(debug) << "~runtime_impl(finished)";
     }
 
+#if defined(HPX_HAVE_SECURITY)
+    // initialize the sub-CA for this locality
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        init_locality_ca(naming::gid_type const& root_ca)
+    {
+        // create locality sub-CA and issue CSR
+        sub_ca_.init(root_ca);
+
+        if (agas_client_.is_bootstrap()) {      // this is the booststrap locality
+            parcel_handler_.add_locality_certificate(sub_ca_.get_certificate());
+        }
+        else {
+            // initialize certificate store inside parcel handler
+            parcel_handler_.set_locality_certificate(sub_ca_.get_certificate());
+        }
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     bool pre_main(hpx::runtime_mode);
 
@@ -180,6 +199,28 @@ namespace hpx {
 
         // Change our thread description, as we're about to call pre_main
         threads::set_thread_description(threads::get_self_id(), "pre_main");
+
+#if defined(HPX_HAVE_SECURITY)
+        // initialize security related objects
+        if (agas_client_.is_bootstrap()) {      // this is the booststrap locality
+            // initialize root-CA
+            root_ca_.init();
+            parcel_handler_.set_locality_certificate(root_ca_.get_certificate());
+
+            // initialize all sub-CAs
+            naming::gid_type root_ca_gid = root_ca_.get_gid();
+            std::vector<naming::id_type> locality_ids = find_all_localities();
+            std::vector<lcos::future<void> > lazy_results;
+            lazy_results.reserve(locality_ids.size());
+
+            components::server::runtime_support::init_locality_ca_action act;
+            BOOST_FOREACH(naming::id_type const& id, locality_ids)
+            {
+                lazy_results.push_back(async(act, id, root_ca_gid));
+            }
+            wait_all(lazy_results);
+        }
+#endif
 
         // Finish the bootstrap
         if (!hpx::pre_main(mode_)) {

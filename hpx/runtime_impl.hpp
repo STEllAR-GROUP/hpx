@@ -25,6 +25,11 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/thread_mapper.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/util/security/root_ca.hpp>
+#include <hpx/util/security/sub_ca.hpp>
+#endif
+
 #include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/shared_ptr.hpp>
@@ -331,6 +336,11 @@ namespace hpx {
         /// return zero.
         hpx::util::io_service_pool* get_thread_pool(char const* name);
 
+#if defined(HPX_HAVE_SECURITY)
+        // initialize the sub-CA for this locality
+        void init_locality_ca(naming::gid_type const& root_ca);
+#endif
+
     private:
         void init_tss(char const* context, std::size_t num, char const* postfix,
             bool service_thread);
@@ -354,6 +364,10 @@ namespace hpx {
         applier::applier applier_;
         actions::action_manager action_manager_;
         boost::signals2::scoped_connection default_error_sink_;
+#if defined(HPX_HAVE_SECURITY)
+        util::security::root_ca root_ca_;
+        util::security::sub_ca sub_ca_;
+#endif
     };
 }
 
