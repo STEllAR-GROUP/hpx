@@ -209,7 +209,9 @@ namespace hpx
 
 #if defined(HPX_HAVE_SECURITY)
         // initialize the sub-CA for this locality
-        virtual void init_locality_ca() = 0;
+        virtual void init_locality_ca(
+            components::security::server::signed_type<
+                components::security::server::certificate> const& root_cert) = 0;
 #endif
 
         ///////////////////////////////////////////////////////////////////////

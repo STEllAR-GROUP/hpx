@@ -378,8 +378,8 @@ namespace hpx { namespace parcelset
         util::io_service_pool* get_thread_pool(char const* name);
 
 #if defined(HPX_HAVE_SECURITY)
-        // set the certificate for this locality
-        void set_locality_certificate(
+        // set the certificate for the root certificate locality
+        void set_root_certificate(
             components::security::server::signed_type<
                 components::security::server::certificate> const& cert);
 

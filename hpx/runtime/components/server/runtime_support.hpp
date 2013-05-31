@@ -34,6 +34,10 @@
 
 #include <hpx/plugins/plugin_factory_base.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/server/certificate.hpp>
+#endif
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace components { namespace server
@@ -196,7 +200,8 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate_all);
 
 #if defined(HPX_HAVE_SECURITY)
-        void init_locality_ca();
+        void init_locality_ca(components::security::server::signed_type<
+            components::security::server::certificate> const& root_cert);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, init_locality_ca);
 #endif
 

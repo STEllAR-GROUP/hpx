@@ -878,8 +878,8 @@ namespace hpx { namespace parcelset
     }
 
 #if defined(HPX_HAVE_SECURITY)
-    // set the certificate for this locality
-    void parcelhandler::set_locality_certificate(
+    // set the certificate for the root certificate locality
+    void parcelhandler::set_root_certificate(
         components::security::server::signed_type<
             components::security::server::certificate> const& cert)
     {

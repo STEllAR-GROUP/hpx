@@ -12,7 +12,7 @@ HPX_REGISTER_COMPONENT_MODULE();
 typedef hpx::components::security::server::certificate_authority_base
     certificate_authority_base_type;
 
-typedef hpx::components::simple_component<
+typedef hpx::components::fixed_component<
     certificate_authority_base_type
 > certificate_authority_base_component_type;
 
