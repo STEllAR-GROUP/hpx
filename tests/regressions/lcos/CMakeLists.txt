@@ -16,6 +16,7 @@ if(NOT MSVC10)
   set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
   set(tests ${tests}
       dataflow_future_swap
+      dataflow_future_swap2
      )
   if(HPX_HAVE_CXX11_LAMBDAS)
     set(tests ${tests}

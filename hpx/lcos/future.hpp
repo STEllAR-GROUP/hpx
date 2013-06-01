@@ -317,6 +317,7 @@ namespace hpx { namespace lcos
     {
     public:
         typedef lcos::detail::future_data_base<void> future_data_type;
+
     private:
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
