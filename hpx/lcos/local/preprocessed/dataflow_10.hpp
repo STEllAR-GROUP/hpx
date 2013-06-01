@@ -135,35 +135,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -223,12 +209,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -237,23 +223,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -490,35 +461,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -578,12 +535,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -592,23 +549,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -845,35 +787,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -933,12 +861,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -947,23 +875,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -1200,35 +1113,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -1288,12 +1187,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -1302,23 +1201,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -1555,35 +1439,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -1643,12 +1513,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -1657,23 +1527,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -1910,35 +1765,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -1998,12 +1839,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -2012,23 +1853,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -2265,35 +2091,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -2353,12 +2165,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -2367,23 +2179,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -2620,35 +2417,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -2708,12 +2491,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -2722,23 +2505,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -2975,35 +2743,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -3063,12 +2817,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -3077,23 +2831,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -3330,35 +3069,21 @@ namespace hpx { namespace lcos { namespace local {
                                 completed_callback_type()
                             )
                         );
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(++next, end);
@@ -3418,12 +3143,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -3432,23 +3157,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(

@@ -10,6 +10,7 @@
 #define HPX_LCOS_LOCAL_DATAFLOW_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/apply.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/bind.hpp>
@@ -82,29 +83,44 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     {
         typename util::detail::remove_reference<F1>::type f1_;
         typename util::detail::remove_reference<F2>::type f2_;
+        BOOST_SCOPED_ENUM(launch) policy_;
 
         template <typename FF1, typename FF2>
-        compose_cb_impl(BOOST_FWD_REF(FF1) f1, BOOST_FWD_REF(FF2) f2)
+        compose_cb_impl(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(FF1) f1, BOOST_FWD_REF(FF2) f2)
           : f1_(boost::forward<FF1>(f1))
           , f2_(boost::forward<FF2>(f2))
+          , policy_(policy)
         {}
+
+        typedef void result_type;
 
         template <typename Future>
         void operator()(Future & f)
         {
-            f1_(f);
-            f2_(f);
+            if(f1_)
+            {
+                f1_(f);
+            }
+            if(hpx::detail::has_async_policy(policy_))
+            {
+                hpx::apply(hpx::util::bind(hpx::util::protect(f2_), f));
+            }
+            else
+            {
+                f2_(f);
+            }
         }
     };
 
     template <typename F1, typename F2>
     compose_cb_impl<F1, F2>
-    compose_cb(BOOST_FWD_REF(F1) f1, BOOST_FWD_REF(F2) f2)
+    compose_cb(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F1) f1, BOOST_FWD_REF(F2) f2)
     {
         return
             boost::move(
                 compose_cb_impl<F1, F2>(
-                    boost::forward<F1>(f1)
+                    policy
+                  , boost::forward<F1>(f1)
                   , boost::forward<F2>(f2)
                 )
             );
@@ -316,35 +332,21 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
 
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , this->shared_from_this()
-                                      , next
-                                      , end
-                                    )
+                    hpx::lcos::detail::get_future_data(*next)
+                    ->set_on_completed(
+                        boost::move(
+                            compose_cb(
+                                policy_
+                              , boost::move(cb)
+                              , boost::bind(
+                                    f
+                                  , this->shared_from_this()
+                                  , next
+                                  , end
                                 )
                             )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
-                            boost::bind(
-                                f
-                              , this->shared_from_this()
-                              , next
-                              , end
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
 
@@ -414,12 +416,12 @@ namespace hpx { namespace lcos { namespace local {
                             )
                         );
                     
-                    if(cb)
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
+                    hpx::lcos::detail::get_future_data(f_)
+                    ->set_on_completed(
+                        boost::move(
                             compose_cb(
-                                boost::move(cb)
+                                policy_
+                              , boost::move(cb)
                               , hpx::util::bind(
                                     f
                                   , this->shared_from_this()
@@ -428,23 +430,8 @@ namespace hpx { namespace lcos { namespace local {
                                   , boost::mpl::false_()
                                 )
                             )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        hpx::lcos::detail::get_future_data(f_)->set_on_completed(
-                            boost::move(
-                              hpx::util::bind(
-                                    f
-                                  , this->shared_from_this()
-                                  , iter
-                                  , IsVoid()
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
 
                     return;
                 }
