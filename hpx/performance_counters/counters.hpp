@@ -609,8 +609,8 @@ namespace hpx { namespace performance_counters
         // \brief Create a new arithmetics performance counter instance based on
         //        the given base counter names
         naming::gid_type create_arithmetics_counter(
-            counter_info const& info, std::string const& base_counter_name1,
-            std::string const& base_counter_name2, error_code& ec = throws);
+            counter_info const& info, std::vector<std::string> const& base_counter_names,
+            error_code& ec = throws);
 
         // \brief Create a new performance counter instance based on given
         //        counter info
