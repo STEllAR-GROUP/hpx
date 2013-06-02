@@ -14,7 +14,7 @@ set(subdirs
     util
    )
 
-if(SODIUM_FOUND)
+if(NOT HPX_HAVE_SECURITY AND SODIUM_FOUND)
     set(subdirs ${subdirs} security)
 endif()
 
