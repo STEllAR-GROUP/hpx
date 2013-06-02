@@ -24,6 +24,15 @@ boost::uint64_t threshold = 2;
 boost::uint64_t distribute_at = 2;
 
 ///////////////////////////////////////////////////////////////////////////////
+boost::atomic<std::size_t> serial_execution_count(0);
+
+std::size_t get_serial_execution_count()
+{
+    return serial_execution_count.load();
+}
+HPX_PLAIN_ACTION(get_serial_execution_count);
+
+///////////////////////////////////////////////////////////////////////////////
 boost::atomic<std::size_t> next_locality(0);
 std::vector<hpx::id_type> localities;
 hpx::id_type here;
@@ -42,11 +51,17 @@ struct when_all_wrapper
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_NO_INLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
+HPX_NO_INLINE boost::uint64_t fibonacci_serial_sub(boost::uint64_t n)
 {
     if (n < 2)
         return n;
-    return fibonacci_serial(n-1) + fibonacci_serial(n-2);
+    return fibonacci_serial_sub(n-1) + fibonacci_serial_sub(n-2);
+}
+
+HPX_NO_INLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
+{
+    ++serial_execution_count;
+    return fibonacci_serial_sub(n);
 }
 
 hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n);
@@ -115,13 +130,22 @@ int hpx_main(boost::program_options::variables_map& vm)
         for (std::size_t i = 0; i != max_runs; ++i)
         {
             // Create a Future for the whole calculation and wait for it.
+            next_locality.store(0);
             r = fibonacci_future(n).get();
         }
 
 //        double d = double(hpx::util::high_resolution_clock::now() - start) / 1.e9;
         boost::uint64_t d = hpx::util::high_resolution_clock::now() - start;
-        char const* fmt = "fibonacci_future(%1%) == %2%,elapsed time:,%3%,[s]\n";
-        std::cout << (boost::format(fmt) % n % r % (d / max_runs));
+        char const* fmt = "fibonacci_future(%1%) == %2%,elapsed time:,%3%,[s],%4%\n";
+        std::cout << (boost::format(fmt) % n % r % (d / max_runs) % next_locality.load());
+
+        get_serial_execution_count_action serial_count;
+        BOOST_FOREACH(hpx::id_type const& loc, localities) //hpx::find_all_localities())
+        {
+            std::size_t count = serial_count(loc);
+            std::cout << (boost::format("  serial-count,%1%,%2%\n") %
+                loc % (count / max_runs));
+        }
 
         executed_one = true;
     }
@@ -160,6 +184,16 @@ boost::program_options::options_description get_commandline_options()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+std::size_t get_num_repeats(std::size_t size)
+{
+    switch (size) {
+    case 2: return 2;
+    case 4: return 5;
+    case 8: return 5;
+    }
+    return 1;
+}
+
 void init_globals()
 {
     // Retrieve command line using the Boost.ProgramOptions library.
@@ -195,8 +229,23 @@ void init_globals()
     }
 
     here = hpx::find_here();
-    localities = hpx::find_all_localities();
     next_locality.store(0);
+    serial_execution_count.store(0);
+
+    // try to more evenly distribute the work over the participating localities
+    std::vector<hpx::id_type> locs = hpx::find_all_localities();
+    std::size_t num_repeats = get_num_repeats(locs.size());
+
+    localities.push_back(here);      // add ourselves
+    for (std::size_t j = 0; j != num_repeats; ++j)
+    {
+        for (std::size_t i = 0; i != locs.size(); ++i)
+        {
+            if (here == locs[i])
+                continue;
+            localities.push_back(locs[i]);
+        }
+    }
 }
 
 int main(int argc, char* argv[])
