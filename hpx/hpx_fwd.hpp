@@ -496,8 +496,8 @@ namespace hpx
             // AGAS symbolic naming services.
             component_agas_symbol_namespace = 10,
 
-#if defined(HPX_HAVE_SECURITY)
-            // Root-CA, Sub-CA
+#if defined(HPX_HAVE_SODIUM)
+            // root CA, subordinate CA
             component_root_certificate_authority = 11,
             component_subordinate_certificate_authority = 12,
 #endif
@@ -595,7 +595,7 @@ namespace hpx
         class future;
 
         template <typename Result>
-        future<typename util::detail::remove_reference<Result>::type> 
+        future<typename util::detail::remove_reference<Result>::type>
         make_ready_future(BOOST_FWD_REF(Result));
 
         future<void> make_ready_future();
@@ -713,7 +713,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing the root locality
     ///
-    /// The function \a find_root_locality() can be used to retrieve the global 
+    /// The function \a find_root_locality() can be used to retrieve the global
     /// id usable to refer to the root locality locality.
     ///
     /// \param ec [in,out] this represents the error status on exit, if this
@@ -724,7 +724,7 @@ namespace hpx
     ///           create new instances of components and to invoke plain actions
     ///           (global functions).
     ///
-    /// \returns  The global id representing the root locality for this 
+    /// \returns  The global id representing the root locality for this
     ///           application.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
@@ -1111,11 +1111,11 @@ namespace hpx
     HPX_API_EXPORT std::string const* get_thread_name();
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the number of worker OS- threads used to execute HPX 
+    /// \brief Return the number of worker OS- threads used to execute HPX
     ///        threads
     ///
-    /// This function returns the number of OS-threads used to execute HPX 
-    /// threads. If the function is called while no HPX runtime system is active, 
+    /// This function returns the number of OS-threads used to execute HPX
+    /// threads. If the function is called while no HPX runtime system is active,
     /// it will return zero.
     HPX_API_EXPORT std::size_t get_num_worker_threads();
 

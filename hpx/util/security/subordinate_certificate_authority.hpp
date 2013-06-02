@@ -6,7 +6,7 @@
 #if !defined(HPX_UTIL_SECURITY_SUB_CERTIFICATE_AUTHORITY_MAY_30_2013_0415PM)
 #define HPX_UTIL_SECURITY_SUB_CERTIFICATE_AUTHORITY_MAY_30_2013_0415PM
 
-#if defined(HPX_HAVE_SECURITY)
+#if defined(HPX_HAVE_SODIUM)
 
 #include <boost/assert.hpp>
 #include <hpx/components/security/server/key_pair.hpp>
