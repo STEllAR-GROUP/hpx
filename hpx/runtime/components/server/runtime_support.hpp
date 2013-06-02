@@ -200,9 +200,13 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate_all);
 
 #if defined(HPX_HAVE_SECURITY)
-        void init_locality_ca(components::security::server::signed_type<
-            components::security::server::certificate> const& root_cert);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, init_locality_ca);
+        void initialize_locality_certificate_authority(
+            components::security::server::signed_type<
+                components::security::server::certificate
+            > const & root_certificate);
+        HPX_DEFINE_COMPONENT_ACTION(
+            runtime_support,
+            initialize_locality_certificate_authority);
 #endif
 
         // even if this is not a short/minimal action, we still execute it
@@ -445,8 +449,8 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 #if defined(HPX_HAVE_SECURITY)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::init_locality_ca_action,
-    init_locality_ca_action)
+    hpx::components::server::runtime_support::initialize_locality_certificate_authority_action,
+    initialize_locality_certificate_authority_action)
 #endif
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)

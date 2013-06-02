@@ -105,8 +105,8 @@ HPX_REGISTER_ACTION(
 
 #if defined(HPX_HAVE_SECURITY)
 HPX_REGISTER_ACTION(
-    hpx::components::server::runtime_support::init_locality_ca_action,
-    init_locality_ca_action)
+    hpx::components::server::runtime_support::initialize_locality_certificate_authority_action,
+    initialize_locality_certificate_authority_action)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -763,7 +763,7 @@ namespace hpx { namespace components { namespace server
             pp, num_messages, interval);
         if (0 == mh) {
             hpx::util::osstream strm;
-            strm << "couldn't to create message handler plugin of type: " 
+            strm << "couldn't to create message handler plugin of type: "
                  << message_handler_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_message_handler",
@@ -811,7 +811,7 @@ namespace hpx { namespace components { namespace server
         util::binary_filter* bf = factory->create(compress);
         if (0 == bf) {
             hpx::util::osstream strm;
-            strm << "couldn't to create binary filter plugin of type: " 
+            strm << "couldn't to create binary filter plugin of type: "
                  << binary_filter_type;
             HPX_THROWS_IF(ec, hpx::bad_plugin_type,
                 "runtime_support::create_binary_filter",
@@ -1330,11 +1330,13 @@ namespace hpx { namespace components { namespace server
     }
 
 #if defined(HPX_HAVE_SECURITY)
-    void runtime_support::init_locality_ca(
+    void runtime_support::initialize_locality_certificate_authority(
         components::security::server::signed_type<
-            components::security::server::certificate> const& root_cert)
+            components::security::server::certificate
+        > const & root_certificate)
     {
-        get_runtime().init_locality_ca(root_cert);
+        get_runtime().initialize_locality_certificate_authority(
+            root_certificate);
     }
 #endif
 }}}

@@ -208,10 +208,11 @@ namespace hpx
         virtual hpx::util::io_service_pool* get_thread_pool(char const* name) = 0;
 
 #if defined(HPX_HAVE_SECURITY)
-        // initialize the sub-CA for this locality
-        virtual void init_locality_ca(
+        // Initialize the subordinate CA for this locality
+        virtual void initialize_locality_certificate_authority(
             components::security::server::signed_type<
-                components::security::server::certificate> const& root_cert) = 0;
+                components::security::server::certificate
+            > const & root_certificate) = 0;
 #endif
 
         ///////////////////////////////////////////////////////////////////////
