@@ -533,8 +533,7 @@ namespace hpx { namespace performance_counters
     ///        on given base counter name and given base time interval
     ///        (milliseconds).
     counter_status registry::create_arithmetics_counter(
-        counter_info const& info, std::string const& base_counter_name1,
-        std::string const& base_counter_name2,
+        counter_info const& info, std::vector<std::string> const& base_counter_names,
         naming::gid_type& gid, error_code& ec)
     {
         // create canonical type name
@@ -576,28 +575,28 @@ namespace hpx { namespace performance_counters
                     hpx::performance_counters::server::arithmetics_counter<
                         std::plus<double> > > counter_t;
                 gid = components::server::create_with_args<counter_t>(
-                    complemented_info, base_counter_name1, base_counter_name2);
+                    complemented_info, base_counter_names);
             }
             else if (p.countername_ == "subtract") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::minus<double> > > counter_t;
                 gid = components::server::create_with_args<counter_t>(
-                    complemented_info, base_counter_name1, base_counter_name2);
+                    complemented_info, base_counter_names);
             }
             else if (p.countername_ == "multiply") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::multiplies<double> > > counter_t;
                 gid = components::server::create_with_args<counter_t>(
-                    complemented_info, base_counter_name1, base_counter_name2);
+                    complemented_info, base_counter_names);
             }
             else if (p.countername_ == "divide") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::arithmetics_counter<
                         std::divides<double> > > counter_t;
                 gid = components::server::create_with_args<counter_t>(
-                    complemented_info, base_counter_name1, base_counter_name2);
+                    complemented_info, base_counter_names);
             }
             else {
                 HPX_THROWS_IF(ec, bad_parameter,

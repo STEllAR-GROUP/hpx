@@ -171,6 +171,11 @@ void addressing_service::adjust_local_cache_size()
                 local_cache_size_per_thread * std::size_t(get_num_overall_threads()));
         if (cache_size > gva_cache_.capacity())
             gva_cache_.reserve(cache_size);
+
+        LAGAS_(info) << (boost::format(
+            "addressing_service::adjust_local_cache_size, local_cache_size(%1%), "
+            "local_cache_size_per_thread(%2%), cache_size(%1%)")
+            % local_cache_size % local_cache_size_per_thread % cache_size);
     }
 } // }}}
 
