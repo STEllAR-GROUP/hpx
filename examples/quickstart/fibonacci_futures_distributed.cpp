@@ -65,6 +65,13 @@ HPX_NO_INLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
     return fibonacci_serial_sub(n);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+hpx::id_type get_next_locality()
+{
+    return localities[++next_locality % localities.size()];
+}
+
+///////////////////////////////////////////////////////////////////////////////
 hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n);
 HPX_PLAIN_ACTION(fibonacci_future);
 
@@ -77,15 +84,19 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
         return hpx::make_ready_future(fibonacci_serial(n));
 
     fibonacci_future_action fib;
-    hpx::id_type loc = here;
+    hpx::id_type loc1 = here;
+    hpx::id_type loc2 = here;
 
     if (n == distribute_at) {
-        boost::uint64_t nextloc = ++next_locality;
-        loc = localities[nextloc % localities.size()];
+        loc2 = get_next_locality();
+    }
+    else if (n-1 == distribute_at) {
+        loc1 = get_next_locality();
+        loc2 = get_next_locality();
     }
 
-    hpx::future<boost::uint64_t> f = hpx::async(fib, loc, n-1);
-    hpx::future<boost::uint64_t> r = fib(loc, n-2);
+    hpx::future<boost::uint64_t> f = hpx::async(fib, loc1, n-1);
+    hpx::future<boost::uint64_t> r = fib(loc2, n-2);
 
     return hpx::when_all(f, r).then(when_all_wrapper());
 }
