@@ -105,8 +105,8 @@ HPX_REGISTER_ACTION(
 
 #if defined(HPX_HAVE_SECURITY)
 HPX_REGISTER_ACTION(
-    hpx::components::server::runtime_support::init_locality_ca_action,
-    init_locality_ca_action)
+    hpx::components::server::runtime_support::initialize_locality_certificate_authority_action,
+    initialize_locality_certificate_authority_action)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1367,11 +1367,13 @@ namespace hpx { namespace components { namespace server
     }
 
 #if defined(HPX_HAVE_SECURITY)
-    void runtime_support::init_locality_ca(
+    void runtime_support::initialize_locality_certificate_authority(
         components::security::server::signed_type<
-            components::security::server::certificate> const& root_cert)
+            components::security::server::certificate
+        > const & root_certificate)
     {
-        get_runtime().init_locality_ca(root_cert);
+        get_runtime().initialize_locality_certificate_authority(
+            root_certificate);
     }
 #endif
 }}}

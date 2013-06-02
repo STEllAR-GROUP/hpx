@@ -26,8 +26,8 @@
 #include <hpx/util/thread_mapper.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
-#include <hpx/util/security/root_ca.hpp>
-#include <hpx/util/security/sub_ca.hpp>
+#include <hpx/util/security/root_certificate_authority.hpp>
+#include <hpx/util/security/subordinate_certificate_authority.hpp>
 #endif
 
 #include <boost/foreach.hpp>
@@ -344,10 +344,11 @@ namespace hpx {
         bool unregister_thread();
 
 #if defined(HPX_HAVE_SECURITY)
-        // initialize the sub-CA for this locality
-        void init_locality_ca(
+        // Initialize the subordinate CA for this locality
+        void initialize_locality_certificate_authority(
             components::security::server::signed_type<
-                components::security::server::certificate> const& root_cert);
+                components::security::server::certificate
+            > const & root_certificate);
 #endif
 
     private:
@@ -374,8 +375,8 @@ namespace hpx {
         actions::action_manager action_manager_;
         boost::signals2::scoped_connection default_error_sink_;
 #if defined(HPX_HAVE_SECURITY)
-        util::security::root_ca root_ca_;
-        util::security::sub_ca sub_ca_;
+        util::security::root_certificate_authority root_certificate_authority_;
+        util::security::subordinate_certificate_authority subordinate_certificate_authority_;
 #endif
     };
 }
