@@ -11,44 +11,39 @@
 
 namespace hpx { namespace util { namespace security
 {
-    root_ca::~root_ca()
-    {
-        // Bind the delete_root_ca symbol dynamically and invoke it.
-        typedef void (*function_type)(ca_type*);
-        typedef boost::function<void(function_type)> deleter_type;
-
-        hpx::util::plugin::dll module(
-            HPX_MAKE_DLL_STRING(std::string("security")));
-        std::pair<function_type, deleter_type> p =
-            module.get<function_type, deleter_type>("delete_root_ca");
-
-        (*p.first)(root_ca_);
-
-        delete key_pair_;
-    }
-
-    naming::gid_type root_ca::get_gid()
-    {
-        return naming::gid_type(
-            HPX_ROOT_CERTIFICATE_AUTHORITY_MSB
-          , HPX_ROOT_CERTIFICATE_AUTHORITY_LSB);
-    }
-
     void root_ca::init()
     {
         key_pair_ = new components::security::server::key_pair;
 
-        // Bind the create_root_ca symbol dynamically and invoke it.
+        // Bind the new_root_certificate_authority symbol dynamically and invoke it.
         typedef ca_type* (*function_type)(
             components::security::server::key_pair);
         typedef boost::function<void(function_type)> deleter_type;
 
-        hpx::util::plugin::dll module(
+        hpx::util::plugin::dll dll(
             HPX_MAKE_DLL_STRING(std::string("security")));
-        std::pair<function_type, deleter_type> p =
-            module.get<function_type, deleter_type>("create_root_ca");
+        std::pair<function_type, deleter_type> function =
+            dll.get<function_type, deleter_type>(
+                "new_root_certificate_authority");
 
-        root_ca_ = (*p.first)(*key_pair_);
+        root_ca_ = (*function.first)(*key_pair_);
+    }
+
+    root_ca::~root_ca()
+    {
+        // Bind the delete_root_certificate_authority symbol dynamically and invoke it.
+        typedef void (*function_type)(ca_type*);
+        typedef boost::function<void(function_type)> deleter_type;
+
+        hpx::util::plugin::dll dll(
+            HPX_MAKE_DLL_STRING(std::string("security")));
+        std::pair<function_type, deleter_type> function =
+            dll.get<function_type, deleter_type>(
+                "delete_root_certificate_authority");
+
+        (*function.first)(root_ca_);
+
+        delete key_pair_;
     }
 
     components::security::server::signed_type<
@@ -56,7 +51,7 @@ namespace hpx { namespace util { namespace security
     {
         BOOST_ASSERT(0 != root_ca_);
 
-        // Bind the ca_get_certificate symbol dynamically and invoke it.
+        // Bind the certificate_authority_get_certificate symbol dynamically and invoke it.
         typedef void (*function_type)(
             components::security::server::certificate_authority_base*
           , components::security::server::signed_type<
@@ -65,17 +60,26 @@ namespace hpx { namespace util { namespace security
 
         typedef boost::function<void(function_type)> deleter_type;
 
-        hpx::util::plugin::dll module(
+        hpx::util::plugin::dll dll(
             HPX_MAKE_DLL_STRING(std::string("security")));
-        std::pair<function_type, deleter_type> p =
-            module.get<function_type, deleter_type>("ca_get_certificate");
+        std::pair<function_type, deleter_type> function =
+            dll.get<function_type, deleter_type>(
+                "certificate_authority_get_certificate");
 
         components::security::server::signed_type<
             components::security::server::certificate
         > certificate;
 
-        (*p.first)(root_ca_, &certificate);
+        (*function.first)(root_ca_, &certificate);
+
         return certificate;
+    }
+
+    naming::gid_type root_ca::get_gid()
+    {
+        return naming::gid_type(
+            HPX_ROOT_CERTIFICATE_AUTHORITY_MSB
+          , HPX_ROOT_CERTIFICATE_AUTHORITY_LSB);
     }
 }}}
 
