@@ -22,6 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t threshold = 2;
 boost::uint64_t distribute_at = 2;
+int num_repeats = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::atomic<std::size_t> serial_execution_count(0);
@@ -78,8 +79,10 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
     fibonacci_future_action fib;
     hpx::id_type loc = here;
 
-    if (n == distribute_at)
-        loc = localities[++next_locality % localities.size()];
+    if (n == distribute_at) {
+        boost::uint64_t nextloc = ++next_locality;
+        loc = localities[nextloc % localities.size()];
+    }
 
     hpx::future<boost::uint64_t> f = hpx::async(fib, loc, n-1);
     hpx::future<boost::uint64_t> r = fib(loc, n-2);
@@ -140,7 +143,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::cout << (boost::format(fmt) % n % r % (d / max_runs) % next_locality.load());
 
         get_serial_execution_count_action serial_count;
-        BOOST_FOREACH(hpx::id_type const& loc, localities) //hpx::find_all_localities())
+        BOOST_FOREACH(hpx::id_type const& loc, hpx::find_all_localities())
         {
             std::size_t count = serial_count(loc);
             std::cout << (boost::format("  serial-count,%1%,%2%\n") %
@@ -179,21 +182,13 @@ boost::program_options::options_description get_commandline_options()
           "threshold for distribution to other nodes")
         ( "test", value<std::string>()->default_value("all"),
           "select tests to execute (0-7, default: all)")
+        ( "loc-repeat", value<int>()->default_value(1),
+          "how often should a locality > 0 be used")
     ;
     return desc_commandline;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-std::size_t get_num_repeats(std::size_t size)
-{
-    switch (size) {
-    case 2: return 2;
-    case 4: return 5;
-    case 8: return 5;
-    }
-    return 1;
-}
-
 void init_globals()
 {
     // Retrieve command line using the Boost.ProgramOptions library.
@@ -234,7 +229,7 @@ void init_globals()
 
     // try to more evenly distribute the work over the participating localities
     std::vector<hpx::id_type> locs = hpx::find_all_localities();
-    std::size_t num_repeats = get_num_repeats(locs.size());
+    std::size_t num_repeats = vm["loc-repeat"].as<int>();
 
     localities.push_back(here);      // add ourselves
     for (std::size_t j = 0; j != num_repeats; ++j)
