@@ -58,6 +58,16 @@ namespace hpx { namespace actions
                     hpx::report_error(boost::current_exception());
                 }
             }
+            catch (...) {
+                LTM_(error)
+                    << "Unhandled exception while executing component action("
+                    << detail::get_action_name<Derived>()
+                    << ") lva(" << reinterpret_cast<void const*>
+                        (get_lva<Component>::call(lva)) << ")";
+
+                // report this error to the console in any case
+                hpx::report_error(boost::current_exception());
+            }
 
             // Verify that there are no more registered locks for this
             // OS-thread. This will throw if there are still any locks
@@ -96,6 +106,20 @@ namespace hpx { namespace actions
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
                         boost::forward<Arguments>(args)), lva));
+        }
+
+        template <typename Arguments>
+        BOOST_FORCEINLINE static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments))
+        {
+            LTM_(debug)
+                << "base_result_action0::execute_function: name("
+                << detail::get_action_name<derived_type>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
+
+            return (get_lva<Component>::call(lva)->*F)();
         }
     };
 
@@ -152,20 +176,6 @@ namespace hpx { namespace actions
         >::type derived_type;
 
         typedef boost::mpl::true_ direct_execution;
-
-        template <typename Arguments>
-        BOOST_FORCEINLINE static Result
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments))
-        {
-            LTM_(debug)
-                << "direct_result_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
-
-            return (get_lva<Component>::call(lva)->*F)();
-        }
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
@@ -237,6 +247,16 @@ namespace hpx { namespace actions
                     hpx::report_error(boost::current_exception());
                 }
             }
+            catch (...) {
+                LTM_(error)
+                    << "Unhandled exception while executing component action("
+                    << detail::get_action_name<Derived>()
+                    << ") lva(" << reinterpret_cast<void const*>
+                        (get_lva<Component>::call(lva)) << ")";
+
+                // report this error to the console in any case
+                hpx::report_error(boost::current_exception());
+            }
 
             // Verify that there are no more registered locks for this
             // OS-thread. This will throw if there are still any locks
@@ -275,6 +295,20 @@ namespace hpx { namespace actions
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
                         boost::forward<Arguments>(args)), lva));
+        }
+
+        template <typename Arguments>
+        BOOST_FORCEINLINE static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments))
+        {
+            LTM_(debug)
+                << "base_action0::execute_function: name("
+                << detail::get_action_name<derived_type>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
+            (get_lva<Component>::call(lva)->*F)();
+            return util::unused;
         }
     };
 
@@ -326,20 +360,6 @@ namespace hpx { namespace actions
         >::type derived_type;
 
         typedef boost::mpl::true_ direct_execution;
-
-        template <typename Arguments>
-        BOOST_FORCEINLINE static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments))
-        {
-            LTM_(debug)
-                << "direct_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
-            (get_lva<Component>::call(lva)->*F)();
-            return util::unused;
-        }
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.

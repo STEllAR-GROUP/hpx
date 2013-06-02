@@ -65,6 +65,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -244,6 +253,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -441,6 +459,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -620,6 +647,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -817,6 +853,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -996,6 +1041,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -1193,6 +1247,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -1372,6 +1435,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -1569,6 +1641,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -1748,6 +1829,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -1945,6 +2035,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -2124,6 +2223,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -2321,6 +2429,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -2500,6 +2617,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -2697,6 +2823,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -2876,6 +3011,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -3073,6 +3217,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -3252,6 +3405,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -3449,6 +3611,15 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -3628,6 +3799,15 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
