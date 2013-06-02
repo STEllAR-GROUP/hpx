@@ -26,7 +26,7 @@ namespace hpx { namespace components
             "component_agas_primary_namespace",
             "component_agas_component_namespace",
             "component_agas_symbol_namespace",
-#if defined(HPX_HAVE_SECURITY)
+#if defined(HPX_HAVE_SODIUM)
             "component_root_certificate_authority",
             "component_subordinate_certificate_authority",
 #endif

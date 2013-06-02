@@ -498,8 +498,8 @@ namespace hpx
             // AGAS symbolic naming services.
             component_agas_symbol_namespace = 10,
 
-#if defined(HPX_HAVE_SECURITY)
-            // Root-CA, Sub-CA
+#if defined(HPX_HAVE_SODIUM)
+            // root CA, subordinate CA
             component_root_certificate_authority = 11,
             component_subordinate_certificate_authority = 12,
 #endif

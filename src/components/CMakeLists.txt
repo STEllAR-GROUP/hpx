@@ -18,7 +18,7 @@ if(PAPI_FOUND)
   set(subdirs ${subdirs} papi_counters)
 endif()
 
-if(SODIUM_FOUND)
+if(NOT HPX_HAVE_SECURITY AND SODIUM_FOUND)
   set(subdirs ${subdirs} security)
 endif()
 

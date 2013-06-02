@@ -22,7 +22,7 @@ namespace hpx { namespace components { namespace security { namespace server
         {
         }
 
-        public_key const & get_public_key()
+        public_key const & get_public_key() const
         {
             return public_key_;
         }

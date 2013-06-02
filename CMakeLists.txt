@@ -3,6 +3,7 @@
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
+# Copyright (c)      2013 Jeroen Habraken
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -505,18 +506,24 @@ endif()
 ################################################################################
 # Security, libsodium: P(ortable|ackageable) NaCl
 ################################################################################
+find_package(HPX_Sodium)
+if(SODIUM_FOUND)
+  hpx_add_definitions(-DHPX_HAVE_SODIUM)
+
+  hpx_include_sys_directories(${SODIUM_INCLUDE_DIR})
+  hpx_link_sys_directories(${SODIUM_LIBRARY_DIR})
+  if(MSVC)
+    hpx_add_definitions(-DSODIUM_STATIC)
+  endif()
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${SODIUM_LIBRARY})
+endif()
+
 hpx_option(HPX_HAVE_SECURITY BOOL "Enable enable security options (default: OFF)" OFF ADVANCED)
 if(HPX_HAVE_SECURITY)
-  find_package(HPX_Sodium)
   if(SODIUM_FOUND)
     hpx_add_definitions(-DHPX_HAVE_SECURITY)
-
-    hpx_include_sys_directories(${SODIUM_INCLUDE_DIR})
-    hpx_link_sys_directories(${SODIUM_LIBRARY_DIR})
-    if(MSVC)
-      hpx_add_definitions(-DSODIUM_STATIC)
-    endif()
-    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${SODIUM_LIBRARY})
+  else()
+    hpx_error("libsodium" "Failed to locate libsodium.")
   endif()
 endif()
 

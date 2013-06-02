@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if defined(HPX_HAVE_SECURITY)
+#if defined(HPX_HAVE_SODIUM)
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/security/root_certificate_authority.hpp>
@@ -34,7 +34,7 @@ namespace hpx { namespace util { namespace security
 
         // Bind the new_root_certificate_authority symbol dynamically and invoke it.
         typedef certificate_authority_type* (*function_type)(
-            components::security::server::key_pair);
+            components::security::server::key_pair const &);
         typedef boost::function<void(function_type)> deleter_type;
 
         hpx::util::plugin::dll dll(
