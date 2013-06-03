@@ -14,6 +14,12 @@ namespace hpx { namespace components { namespace security { namespace server
 {
     class signature
     {
+    public:
+        signature()
+        {
+            std::fill(bytes_.begin(), bytes_.end(), 0);
+        }
+
     private:
         friend class boost::serialization::access;
 

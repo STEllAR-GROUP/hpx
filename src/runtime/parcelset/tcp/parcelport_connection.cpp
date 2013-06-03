@@ -10,6 +10,11 @@
 #include <hpx/util/stringstream.hpp>
 #include <hpx/traits/type_size.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/server/certificate.hpp>
+#include <hpx/components/security/server/signed_type.hpp>
+#endif
+
 #include <stdexcept>
 
 #include <boost/iostreams/stream.hpp>
@@ -22,9 +27,12 @@ namespace hpx { namespace parcelset { namespace tcp
     parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& locality_id,
             performance_counters::parcels::gatherer& parcels_sent)
-      : socket_(io_service), out_priority_(0), out_size_(0), out_data_size_(0),
-        there_(locality_id), parcels_sent_(parcels_sent),
-        archive_flags_(boost::archive::no_header)
+      : socket_(io_service), out_priority_(0), out_size_(0), out_data_size_(0)
+#if defined(HPX_HAVE_SECURITY)
+      , first_message_(true)
+#endif
+      , there_(locality_id), parcels_sent_(parcels_sent)
+      , archive_flags_(boost::archive::no_header)
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
       , state_(state_initialized)
 #endif
@@ -93,6 +101,25 @@ namespace hpx { namespace parcelset { namespace tcp
                 util::portable_binary_oarchive archive(
                     out_buffer_, filter, archive_flags);
 
+#if defined(HPX_HAVE_SECURITY)
+                if (first_message_)
+                {
+                    error_code ec(lightweight);
+                    components::security::server::signed_certificate const& certificate =
+                        hpx::get_locality_certificate(ec);
+                    if (!ec) {
+                        archive << first_message_ << certificate;
+                        first_message_ = false;
+                    }
+                    else {
+                        bool has_certificate = false;
+                        archive << has_certificate;
+                    }
+                }
+                else {
+                    archive << first_message_;
+                }
+#endif
                 std::size_t count = pv.size();
                 archive << count;
 

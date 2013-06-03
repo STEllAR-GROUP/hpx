@@ -1277,6 +1277,39 @@ namespace hpx
     ///           hpx::exception.
     HPX_API_EXPORT util::binary_filter* create_binary_filter(
         char const* binary_filter_type, bool compress, error_code& ec = throws);
+
+#if defined(HPX_HAVE_SECURITY)
+    namespace components { namespace security { namespace server
+    {
+        class certificate;
+        template <typename T> class signed_type;
+        typedef signed_type<certificate> signed_certificate;
+    }}}
+
+    /// \brief Return the certificate for this locality
+    ///
+    /// \returns This function returns the signed certificate for this locality.
+    HPX_API_EXPORT components::security::server::signed_certificate const&
+        get_locality_certificate(error_code& ec = throws);
+
+    /// \brief Return the certificate for the given locality
+    ///
+    /// \param id The id representing the locality for which to retrieve 
+    ///           the signed certificate.
+    ///
+    /// \returns This function returns the signed certificate for the locality
+    ///          identified by the parameter \a id.
+    HPX_API_EXPORT components::security::server::signed_certificate const&
+        get_locality_certificate(naming::id_type const& id, error_code& ec = throws);
+
+    /// \brief Add the given certificate to the certificate store of this locality.
+    ///
+    /// \param cert The certificate to add to the certificate store of this
+    ///             locality
+    HPX_API_EXPORT void add_locality_certificate(
+        components::security::server::signed_certificate const& cert,
+        error_code& ec = throws);
+#endif
 }
 
 #include <hpx/lcos/async_fwd.hpp>

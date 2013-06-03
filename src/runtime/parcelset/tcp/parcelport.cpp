@@ -18,6 +18,11 @@
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/server/certificate.hpp>
+#include <hpx/components/security/server/signed_type.hpp>
+#endif
+
 #include <boost/version.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/read.hpp>
@@ -255,16 +260,6 @@ namespace hpx { namespace parcelset { namespace tcp
             }
         }
 
-//        if (0 == threads::get_self_ptr())
-//        {
-//            // parcels must be sent from an HPX thread, reschedule this call
-//            hpx::applier::register_thread_nullary(
-//                HPX_STD_BIND(&parcelport::retry_sending_parcels, this,
-//                    locality_id), "retry_sending_parcels",
-//                    threads::pending, true, threads::thread_priority_critical);
-//            return;
-//        }
-
         get_connection_and_send_parcels(locality_id, parcel_id);
     }
 
@@ -283,16 +278,6 @@ namespace hpx { namespace parcelset { namespace tcp
             e.first.push_back(p);
             e.second.push_back(f);
         }
-
-//        if (0 == threads::get_self_ptr())
-//        {
-//            // parcels must be sent from an HPX thread, reschedule this call
-//            hpx::applier::register_thread_nullary(
-//                HPX_STD_BIND(&parcelport::retry_sending_parcels, this,
-//                    locality_id), "retry_sending_parcels",
-//                    threads::pending, true, threads::thread_priority_critical);
-//            return;
-//        }
 
         get_connection_and_send_parcels(locality_id, parcel_id);
     }
@@ -592,10 +577,11 @@ namespace hpx { namespace parcelset { namespace tcp
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void decode_message(parcelport& pp,
+    bool decode_message(parcelport& pp,
         boost::shared_ptr<std::vector<char> > parcel_data,
         boost::uint64_t inbound_data_size,
-        performance_counters::parcels::data_point receive_data)
+        performance_counters::parcels::data_point receive_data,
+        bool first_message)
     {
         // protect from un-handled exceptions bubbling up
         try {
@@ -611,6 +597,17 @@ namespace hpx { namespace parcelset { namespace tcp
 
                     std::size_t parcel_count = 0;
 
+#if defined(HPX_HAVE_SECURITY)
+                    bool has_certificate = false;
+                    archive >> has_certificate;
+
+                    if (first_message && has_certificate) {
+                        components::security::server::signed_certificate certificate;
+                        archive >> certificate;
+                        add_locality_certificate(certificate);
+                        first_message = false;
+                    }
+#endif
                     archive >> parcel_count;
                     for(std::size_t i = 0; i < parcel_count; ++i)
                     {
@@ -669,6 +666,8 @@ namespace hpx { namespace parcelset { namespace tcp
                 << "decode_message: caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
+
+        return first_message;
     }
 
     ///////////////////////////////////////////////////////////////////////////

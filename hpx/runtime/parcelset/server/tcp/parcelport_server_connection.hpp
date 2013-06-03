@@ -38,10 +38,11 @@ namespace hpx { namespace parcelset { namespace tcp
     // forward declaration only
     class parcelport;
 
-    void decode_message(parcelport&,
+    bool decode_message(parcelport&,
         boost::shared_ptr<std::vector<char> > buffer,
         boost::uint64_t inbound_data_size,
-        performance_counters::parcels::data_point receive_data);
+        performance_counters::parcels::data_point receive_data,
+        bool first_message = false);
 }}}
 
 namespace hpx { namespace parcelset { namespace server { namespace tcp
@@ -55,8 +56,12 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         /// Construct a listening parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
                 parcelset::tcp::parcelport& parcelport)
-          : socket_(io_service), in_priority_(0), in_size_(0), in_data_size_(0),
-            in_buffer_(), parcelport_(parcelport)
+          : socket_(io_service), in_priority_(0), in_size_(0), in_data_size_(0)
+          , in_buffer_()
+#if defined(HPX_HAVE_SECURITY)
+          , first_message_(true)
+#endif
+          , parcelport_(parcelport)
         {}
 
         ~parcelport_connection()
@@ -178,8 +183,13 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
 
                 // add parcel data to incoming parcel queue
                 boost::uint64_t inbound_data_size = in_data_size_;
-                decode_message(parcelport_, data, inbound_data_size, receive_data);
 
+#if defined(HPX_HAVE_SECURITY)
+                first_message_ = decode_message(parcelport_, data,
+                    inbound_data_size, receive_data, first_message_);
+#else
+                decode_message(parcelport_, data, inbound_data_size, receive_data);
+#endif
                 ack_ = true;
                 boost::asio::async_write(socket_,
                     boost::asio::buffer(&ack_, sizeof(ack_)),
@@ -209,6 +219,10 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         boost::integer::ulittle64_t in_data_size_;
         boost::shared_ptr<std::vector<char> > in_buffer_;
         bool ack_;
+
+#if defined(HPX_HAVE_SECURITY)
+        bool first_message_;
+#endif
 
         /// The handler used to process the incoming request.
         parcelset::tcp::parcelport& parcelport_;

@@ -194,6 +194,10 @@ namespace hpx { namespace parcelset { namespace tcp
         std::vector<char> out_buffer_;
         bool ack_;
 
+#if defined(HPX_HAVE_SECURITY)
+        bool first_message_;
+#endif
+
         /// the other (receiving) end of this connection
         naming::locality there_;
 
