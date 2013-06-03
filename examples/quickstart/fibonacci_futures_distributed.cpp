@@ -7,6 +7,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/util/unwrap.hpp>
 
 #include <iostream>
 
@@ -59,16 +60,16 @@ HPX_NO_INLINE boost::uint64_t fibonacci_serial_sub(boost::uint64_t n)
     return fibonacci_serial_sub(n-1) + fibonacci_serial_sub(n-2);
 }
 
-HPX_NO_INLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
+boost::uint64_t fibonacci_serial(boost::uint64_t n)
 {
     ++serial_execution_count;
     return fibonacci_serial_sub(n);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::id_type get_next_locality()
+hpx::id_type const& get_next_locality(boost::uint64_t next)
 {
-    return localities[++next_locality % localities.size()];
+    return localities[next % localities.size()];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,11 +89,12 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
     hpx::id_type loc2 = here;
 
     if (n == distribute_at) {
-        loc2 = get_next_locality();
+        loc2 = get_next_locality(++next_locality);
     }
     else if (n-1 == distribute_at) {
-        loc1 = get_next_locality();
-        loc2 = get_next_locality();
+        boost::uint64_t next = next_locality += 2;
+        loc1 = get_next_locality(next-1);
+        loc2 = get_next_locality(next);
     }
 
     hpx::future<boost::uint64_t> f = hpx::async(fib, loc1, n-1);
