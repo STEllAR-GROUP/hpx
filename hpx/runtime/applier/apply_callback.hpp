@@ -126,7 +126,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb)
     {
         // Determine whether the gid is local or remote
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority);
             cb(boost::system::error_code(), 0);     // invoke callback
             return result;

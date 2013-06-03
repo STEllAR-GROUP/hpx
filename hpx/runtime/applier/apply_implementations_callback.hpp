@@ -179,7 +179,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         // Determine whether the gid is local or remote
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             // apply locally
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));

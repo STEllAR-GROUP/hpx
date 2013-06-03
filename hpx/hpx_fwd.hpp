@@ -92,7 +92,6 @@ namespace hpx
         class HPX_API_EXPORT locality;
 
         HPX_API_EXPORT resolver_client& get_agas_client();
-        HPX_API_EXPORT locality const& get_locality();
     }
 
     ///////////////////////////////////////////////////////////////////////////

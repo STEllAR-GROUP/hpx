@@ -38,7 +38,7 @@
         naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
@@ -99,7 +99,7 @@
         naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
@@ -160,7 +160,7 @@
         naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
@@ -221,7 +221,7 @@
         naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
@@ -282,7 +282,7 @@
         naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<

@@ -80,7 +80,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
