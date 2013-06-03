@@ -116,7 +116,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 1
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -326,7 +326,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 1
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -551,7 +551,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 2
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -761,7 +761,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 2
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -986,7 +986,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 3
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -1196,7 +1196,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 3
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -1421,7 +1421,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 4
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -1631,7 +1631,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 4
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -1856,7 +1856,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 5
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -2066,7 +2066,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 5
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -2291,7 +2291,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 6
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -2501,7 +2501,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 6
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -2726,7 +2726,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 7
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -2936,7 +2936,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 7
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -3161,7 +3161,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 8
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -3371,7 +3371,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 8
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -3596,7 +3596,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 9
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -3806,7 +3806,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 9
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -4031,7 +4031,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 10
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -4241,7 +4241,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 10
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -4466,7 +4466,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 11
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -4676,7 +4676,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 11
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -4901,7 +4901,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 12
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -5111,7 +5111,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 12
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -5336,7 +5336,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 13
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -5546,7 +5546,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 13
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -5771,7 +5771,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 14
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -5981,7 +5981,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 14
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
@@ -6206,7 +6206,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_result_action" << 15
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
@@ -6416,7 +6416,7 @@ namespace hpx { namespace actions
             LTM_(debug)
                 << "base_action" << 15
                 << "::execute_function name("
-                << detail::get_action_name<derived_type>()
+                << detail::get_action_name<Derived>()
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
