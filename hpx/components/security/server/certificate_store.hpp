@@ -88,20 +88,20 @@ namespace hpx { namespace components { namespace security { namespace server
             store_.insert(std::make_pair(subject, signed_certificate));
         }
 
-        signed_type<certificate> const &
-        at(naming::gid_type const & subject) const
+        signed_type<certificate> const&
+        at(naming::gid_type const & subject, error_code&ec = throws) const
         {
             store_type::const_iterator iterator = store_.find(subject);
 
             if (iterator == store_.end())
             {
-                HPX_THROW_EXCEPTION(
-                    hpx::security_error
-                  , "certificate_store::at"
-                  , "The certificate is not found"
-                )
+                HPX_THROWS_IF(
+                    ec, hpx::security_error
+                  , "certificate_store::certificate_store"
+                  , "Requesting a certificate for an unknown subject"
+                );
+                return signed_type<certificate>::invalid_signed_type;
             }
-
             return iterator->second;
         }
 

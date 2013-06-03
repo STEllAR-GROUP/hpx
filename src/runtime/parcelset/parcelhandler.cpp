@@ -896,6 +896,20 @@ namespace hpx { namespace parcelset
         BOOST_ASSERT(0 != cert_store_);     // should have been created
         cert_store_->insert(cert);
     }
+
+    components::security::server::signed_certificate const&
+        parcelhandler::get_locality_certificate(naming::gid_type const& gid,
+        error_code& ec) const
+    {
+        if (0 == cert_store_)     // should have been created
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "parcelhandler::get_locality_certificate",
+                "the parcel handler is not operational at this point");
+            return components::security::server::signed_certificate::invalid_signed_type;
+        }
+        return cert_store_->at(!gid ? locality_ : gid, ec);
+    }
 #endif
 }}
 

@@ -388,6 +388,9 @@ namespace hpx { namespace parcelset
         void add_locality_certificate(
             components::security::server::signed_type<
                 components::security::server::certificate> const& cert);
+
+        components::security::server::signed_certificate const&
+            get_locality_certificate(naming::gid_type const&, error_code& ec) const;
 #endif
 
         ///////////////////////////////////////////////////////////////////////

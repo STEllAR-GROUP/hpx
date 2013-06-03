@@ -247,14 +247,14 @@ namespace hpx
         parcelset::parcelport* pp, std::size_t num_messages,
         std::size_t interval, error_code& ec)
     {
-        return runtime_support_.create_message_handler(message_handler_type, 
+        return runtime_support_.create_message_handler(message_handler_type,
             action, pp, num_messages, interval, ec);
     }
 
     util::binary_filter* runtime::create_binary_filter(
         char const* binary_filter_type, bool compress, error_code& ec)
     {
-        return runtime_support_.create_binary_filter(binary_filter_type, 
+        return runtime_support_.create_binary_filter(binary_filter_type,
             compress, ec);
     }
 
@@ -508,7 +508,7 @@ namespace hpx
             return naming::invalid_id;
         }
 
-        if (&ec != &throws) 
+        if (&ec != &throws)
             ec = make_success_code();
 
         return naming::id_type(console_locality, naming::id_type::unmanaged);
@@ -760,6 +760,79 @@ namespace hpx { namespace threads
         return get_runtime().get_config().get_stack_size(stacksize);
     }
 }}
+
+#if defined(HPX_HAVE_SECURITY)
+namespace hpx
+{
+    /// \brief Return the certificate for this locality
+    ///
+    /// \returns This function returns the signed certificate for this locality.
+    components::security::server::signed_certificate const&
+        get_locality_certificate(error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (0 == rt ||
+            rt->get_state() < runtime::state_initialized ||
+            rt->get_state() >= runtime::state_stopped)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::get_locality_certificate",
+                "the runtime system is not operational at this point");
+            return components::security::server::signed_certificate::invalid_signed_type;
+        }
+
+        return rt->get_parcel_handler().
+            get_locality_certificate(naming::invalid_gid, ec);
+    }
+
+    /// \brief Return the certificate for the given locality
+    ///
+    /// \param id The id representing the locality for which to retrieve
+    ///           the signed certificate.
+    ///
+    /// \returns This function returns the signed certificate for the locality
+    ///          identified by the parameter \a id.
+    components::security::server::signed_certificate const&
+        get_locality_certificate(naming::id_type const& id, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (0 == rt ||
+            rt->get_state() < runtime::state_initialized ||
+            rt->get_state() >= runtime::state_stopped)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::get_locality_certificate",
+                "the runtime system is not operational at this point");
+            return components::security::server::signed_certificate::invalid_signed_type;
+        }
+
+        return rt->get_parcel_handler().
+            get_locality_certificate(id.get_gid(), ec);
+    }
+
+    /// \brief Add the given certificate to the certificate store of this locality.
+    ///
+    /// \param cert The certificate to add to the certificate store of this
+    ///             locality
+    void add_locality_certificate(
+        components::security::server::signed_certificate const& cert,
+        error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (0 == rt ||
+            rt->get_state() < runtime::state_initialized ||
+            rt->get_state() >= runtime::state_stopped)
+        {
+            HPX_THROWS_IF(ec, invalid_status, 
+                "hpx::get_locality_certificate",
+                "the runtime system is not operational at this point");
+            return;
+        }
+
+        rt->get_parcel_handler().add_locality_certificate(cert);
+    }
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

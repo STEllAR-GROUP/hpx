@@ -26,6 +26,8 @@ namespace hpx { namespace components { namespace security { namespace server
             return type_;
         }
 
+        static signed_type invalid_signed_type;
+
     private:
         friend class boost::serialization::access;
 
@@ -39,6 +41,11 @@ namespace hpx { namespace components { namespace security { namespace server
         signature signature_;
         T type_;
     };
+
+    template <typename T>
+    signed_type<T> signed_type<T>::invalid_signed_type =
+        signed_type<T>();
+
 }}}}
 
 #endif
