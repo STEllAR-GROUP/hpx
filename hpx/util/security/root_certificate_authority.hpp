@@ -33,7 +33,7 @@ namespace hpx { namespace util { namespace security
 
         components::security::server::signed_type<
             components::security::server::certificate
-        > get_certificate();
+        > get_certificate() const;
 
         static naming::gid_type get_gid();
 

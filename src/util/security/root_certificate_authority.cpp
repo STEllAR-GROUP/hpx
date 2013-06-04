@@ -30,6 +30,7 @@ namespace hpx { namespace util { namespace security
 
     void root_certificate_authority::initialize()
     {
+        BOOST_ASSERT(0 == key_pair_);
         key_pair_ = new components::security::server::key_pair;
 
         // Bind the new_root_certificate_authority symbol dynamically and invoke it.
@@ -43,12 +44,13 @@ namespace hpx { namespace util { namespace security
             dll.get<function_type, deleter_type>(
                 "new_root_certificate_authority");
 
+        BOOST_ASSERT(0 == root_certificate_authority_);
         root_certificate_authority_ = (*function.first)(*key_pair_);
     }
 
     components::security::server::signed_type<
         components::security::server::certificate
-    > root_certificate_authority::get_certificate()
+    > root_certificate_authority::get_certificate() const
     {
         BOOST_ASSERT(0 != root_certificate_authority_);
 

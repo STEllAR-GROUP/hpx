@@ -167,12 +167,79 @@ namespace hpx
         instance_number_(++instance_number_counter_),
         topology_(threads::create_topology()),
         state_(state_invalid)
+#if defined(HPX_HAVE_SECURITY)
+      , cert_store_(0)
+#endif
     {
         // initialize our TSS
         runtime::init_tss();
 
         counters_.reset(new performance_counters::registry());
+
+#if defined(HPX_HAVE_SECURITY)
+        // this is the AGAS booststrap node (node zero)
+        if (ini_.get_agas_service_mode() == agas::service_mode_bootstrap)
+        {
+            // Initialize root-CA
+            root_certificate_authority_.initialize();
+        }
+
+        // always initialize the subordinate CA
+        subordinate_certificate_authority_.initialize();
+#endif
     }
+
+#if defined(HPX_HAVE_SECURITY)
+    components::security::server::signed_certificate const&
+    runtime::get_root_certificate(error_code& ec) const
+    {
+        if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "runtime::get_root_certificate",
+                "the root's certificate is available on node zero only");
+            return components::security::server::signed_certificate::invalid_signed_type;
+        }
+        return root_certificate_authority_.get_certificate();
+    }
+
+
+    components::security::server::signed_certificate const&
+    runtime::get_certificate(error_code& ec) const
+    {
+        return subordinate_certificate_authority_.get_certificate();
+    }
+
+    // set the certificate for the root certificate locality
+    void runtime::set_root_certificate(
+        components::security::server::signed_certificate const& cert)
+    {
+        BOOST_ASSERT(0 == cert_store_);     // should be called only once
+        cert_store_ = new components::security::server::certificate_store(cert);
+    }
+
+    // set the certificate for another locality
+    void runtime::add_locality_certificate(
+        components::security::server::signed_certificate const& cert)
+    {
+        BOOST_ASSERT(0 != cert_store_);     // should have been created
+        cert_store_->insert(cert);
+    }
+
+    components::security::server::signed_certificate const&
+        runtime::get_locality_certificate(naming::gid_type const& gid,
+        error_code& ec) const
+    {
+        if (0 == cert_store_)     // should have been created
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "runtime::get_locality_certificate",
+                "the parcel handler is not operational at this point");
+            return components::security::server::signed_certificate::invalid_signed_type;
+        }
+        return cert_store_->at(!gid ? get_parcel_handler().get_locality() : gid, ec);
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     boost::atomic<int> runtime::instance_number_counter_(-1);
@@ -775,14 +842,13 @@ namespace hpx
             rt->get_state() < runtime::state_initialized ||
             rt->get_state() >= runtime::state_stopped)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
+            HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
                 "the runtime system is not operational at this point");
             return components::security::server::signed_certificate::invalid_signed_type;
         }
 
-        return rt->get_parcel_handler().
-            get_locality_certificate(naming::invalid_gid, ec);
+        return rt->get_locality_certificate(naming::invalid_gid, ec);
     }
 
     /// \brief Return the certificate for the given locality
@@ -800,14 +866,13 @@ namespace hpx
             rt->get_state() < runtime::state_initialized ||
             rt->get_state() >= runtime::state_stopped)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
+            HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
                 "the runtime system is not operational at this point");
             return components::security::server::signed_certificate::invalid_signed_type;
         }
 
-        return rt->get_parcel_handler().
-            get_locality_certificate(id.get_gid(), ec);
+        return rt->get_locality_certificate(id.get_gid(), ec);
     }
 
     /// \brief Add the given certificate to the certificate store of this locality.
@@ -823,13 +888,13 @@ namespace hpx
             rt->get_state() < runtime::state_initialized ||
             rt->get_state() >= runtime::state_stopped)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
+            HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
                 "the runtime system is not operational at this point");
             return;
         }
 
-        rt->get_parcel_handler().add_locality_certificate(cert);
+        rt->add_locality_certificate(cert);
     }
 }
 #endif

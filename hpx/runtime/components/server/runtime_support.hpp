@@ -34,10 +34,6 @@
 
 #include <hpx/plugins/plugin_factory_base.hpp>
 
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/server/certificate.hpp>
-#endif
-
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace components { namespace server
@@ -198,16 +194,6 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, terminate_all);
-
-#if defined(HPX_HAVE_SECURITY)
-        void initialize_locality_certificate_authority(
-            components::security::server::signed_type<
-                components::security::server::certificate
-            > const & root_certificate);
-        HPX_DEFINE_COMPONENT_ACTION(
-            runtime_support,
-            initialize_locality_certificate_authority);
-#endif
 
         // even if this is not a short/minimal action, we still execute it
         // directly to avoid a deadlock condition inside the thread manager
@@ -448,12 +434,6 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action)
-
-#if defined(HPX_HAVE_SECURITY)
-HPX_REGISTER_ACTION_DECLARATION(
-    hpx::components::server::runtime_support::initialize_locality_certificate_authority_action,
-    initialize_locality_certificate_authority_action)
-#endif
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
 #  include <hpx/runtime/components/server/gcc44/runtime_support_implementations.hpp>

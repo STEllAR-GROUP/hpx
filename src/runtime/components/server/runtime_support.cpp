@@ -103,12 +103,6 @@ HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action)
 
-#if defined(HPX_HAVE_SECURITY)
-HPX_REGISTER_ACTION(
-    hpx::components::server::runtime_support::initialize_locality_certificate_authority_action,
-    initialize_locality_certificate_authority_action)
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::runtime_support,
@@ -1365,16 +1359,5 @@ namespace hpx { namespace components { namespace server
         }
         return true;    // component got loaded
     }
-
-#if defined(HPX_HAVE_SECURITY)
-    void runtime_support::initialize_locality_certificate_authority(
-        components::security::server::signed_type<
-            components::security::server::certificate
-        > const & root_certificate)
-    {
-        get_runtime().initialize_locality_certificate_authority(
-            root_certificate);
-    }
-#endif
 }}}
 

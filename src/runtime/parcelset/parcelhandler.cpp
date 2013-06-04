@@ -130,9 +130,6 @@ namespace hpx { namespace parcelset
         parcels_(policy),
         use_alternative_parcelports_(false),
         count_routed_(0)
-#if defined(HPX_HAVE_SECURITY)
-      , cert_store_(0)
-#endif
     {
         BOOST_ASSERT(parcels_);
 
@@ -877,39 +874,5 @@ namespace hpx { namespace parcelset
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
     }
-
-#if defined(HPX_HAVE_SECURITY)
-    // set the certificate for the root certificate locality
-    void parcelhandler::set_root_certificate(
-        components::security::server::signed_type<
-            components::security::server::certificate> const& cert)
-    {
-        BOOST_ASSERT(0 == cert_store_);     // should be called only once
-        cert_store_ = new components::security::server::certificate_store(cert);
-    }
-
-    // set the certificate for another locality
-    void parcelhandler::add_locality_certificate(
-        components::security::server::signed_type<
-            components::security::server::certificate> const& cert)
-    {
-        BOOST_ASSERT(0 != cert_store_);     // should have been created
-        cert_store_->insert(cert);
-    }
-
-    components::security::server::signed_certificate const&
-        parcelhandler::get_locality_certificate(naming::gid_type const& gid,
-        error_code& ec) const
-    {
-        if (0 == cert_store_)     // should have been created
-        {
-            HPX_THROWS_IF(ec, invalid_status,
-                "parcelhandler::get_locality_certificate",
-                "the parcel handler is not operational at this point");
-            return components::security::server::signed_certificate::invalid_signed_type;
-        }
-        return cert_store_->at(!gid ? locality_ : gid, ec);
-    }
-#endif
 }}
 

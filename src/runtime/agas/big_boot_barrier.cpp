@@ -24,6 +24,11 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/server/certificate.hpp>
+#include <hpx/components/security/server/signed_type.hpp>
+#endif
+
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
 #include <boost/assert.hpp>
@@ -85,12 +90,12 @@ void early_parcel_sink(
 //     }
 } // }}}
 
+// This structure is used when a locality registers with node zero
 struct registration_header
 {
     registration_header() {}
 
     // TODO: pass head address as a GVA
-    // TODO: response_heap_address_ holds a redundant copy of the locality
     registration_header(
         naming::locality const& locality_
       , boost::uint64_t parcelport_allocation_
@@ -132,6 +137,9 @@ struct registration_header
     }
 };
 
+// This structure is used in the response from node zero to the locality which
+// is trying to register.
+
 // TODO: We don't need to send the full gid for the lower and upper bound of
 // each range, we can just send the lower gid and offsets into it.
 struct notification_header
@@ -169,6 +177,9 @@ struct notification_header
     naming::address primary_ns_address;
     naming::address component_ns_address;
     naming::address symbol_ns_address;
+#if defined(HPX_HAVE_SECURITY)
+    components::security::server::signed_certificate root_certificate;
+#endif
 
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int)
@@ -182,6 +193,9 @@ struct notification_header
         ar & primary_ns_address;
         ar & component_ns_address;
         ar & symbol_ns_address;
+#if defined(HPX_HAVE_SECURITY)
+        ar & root_certificate;
+#endif
     }
 };
 
@@ -252,7 +266,8 @@ void register_console(registration_header const& header)
     // it's dtor calls big_boot_barrier::notify().
     big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
-    naming::resolver_client& agas_client = get_runtime().get_agas_client();
+    runtime& rt = get_runtime();
+    naming::resolver_client& agas_client = rt.get_agas_client();
 
     if (HPX_UNLIKELY(!agas_client.is_bootstrap()))
     {
@@ -316,11 +331,16 @@ void register_console(registration_header const& header)
         server::symbol_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server_));
 
+    notification_header hdr (
+        prefix, heap_lower, heap_upper, parcel_lower, parcel_upper,
+        locality_addr, primary_addr, component_addr, symbol_addr);
+
+#if defined(HPX_HAVE_SECURITY)
+    hdr.root_certificate = rt.get_root_certificate();
+#endif
+
     actions::base_action* p =
-        new actions::transfer_action<notify_console_action>(
-            notification_header(
-                prefix, heap_lower, heap_upper, parcel_lower, parcel_upper,
-                locality_addr, primary_addr, component_addr, symbol_addr));
+        new actions::transfer_action<notify_console_action>(hdr);
 
     HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>(
         boost::bind(
@@ -370,8 +390,7 @@ void notify_console(notification_header const& header)
     agas_client.symbol_ns_addr_ = header.symbol_ns_address;
 
     // register runtime support component
-    naming::gid_type const runtime_support_gid(header.prefix.get_msb()
-      , 0);
+    naming::gid_type const runtime_support_gid(header.prefix.get_msb(), 0);
     naming::address runtime_support_address(rt.here()
       , components::get_component_type<components::server::runtime_support>()
       , rt.get_runtime_support_lva());
@@ -385,6 +404,12 @@ void notify_console(notification_header const& header)
       , server::primary_namespace::get_component_type(),
         agas_client.get_hosted_primary_ns_ptr());
     agas_client.bind(primary_gid, primary_addr);
+
+#if defined(HPX_HAVE_SECURITY)
+    // Initialize certificate store
+    rt.set_root_certificate(header.root_certificate);
+    rt.add_locality_certificate(rt.get_certificate());
+#endif
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
@@ -507,11 +532,16 @@ void register_worker(registration_header const& header)
         server::symbol_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server_));
 
+    notification_header hdr (
+        prefix, heap_lower, heap_upper, parcel_lower, parcel_upper,
+        locality_addr, primary_addr, component_addr, symbol_addr);
+
+#if defined(HPX_HAVE_SECURITY)
+    hdr.root_certificate = rt.get_root_certificate();
+#endif
+
     actions::base_action* p =
-        new actions::transfer_action<notify_console_action>(
-            notification_header(
-                prefix, heap_lower, heap_upper, parcel_lower, parcel_upper,
-                locality_addr, primary_addr, component_addr, symbol_addr));
+        new actions::transfer_action<notify_console_action>(hdr);
 
     // FIXME: This could screw with startup.
 
@@ -579,6 +609,12 @@ void notify_worker(notification_header const& header)
       , server::primary_namespace::get_component_type(),
         agas_client.get_hosted_primary_ns_ptr());
     agas_client.bind(primary_gid, primary_addr);
+
+#if defined(HPX_HAVE_SECURITY)
+    // Initialize certificate store
+    rt.set_root_certificate(header.root_certificate);
+    rt.add_locality_certificate(rt.get_certificate());
+#endif
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
