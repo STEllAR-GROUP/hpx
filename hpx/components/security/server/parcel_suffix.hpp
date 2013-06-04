@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COMPONENTS_SECURITY_SERVER_PARCEL_HPP
-#define HPX_COMPONENTS_SECURITY_SERVER_PARCEL_HPP
+#ifndef HPX_COMPONENTS_SECURITY_SERVER_PARCEL_SUFFIX_HPP
+#define HPX_COMPONENTS_SECURITY_SERVER_PARCEL_SUFFIX_HPP
 
 #include <boost/cstdint.hpp>
 #include <hpx/hpx_fwd.hpp>
@@ -13,20 +13,20 @@
 
 namespace hpx { namespace components { namespace security { namespace server
 {
-    class parcel
+    class parcel_suffix
     {
     public:
-        parcel()
+        parcel_suffix()
         {
         }
 
-        parcel(boost::uint64_t nonce, hash & hash)
-          : nonce_(nonce), hash_(hash.final())
+        parcel_suffix(naming::gid_type parcel_id, hash & hash)
+          : parcel_id_(parcel_id), hash_(hash.final())
         {
         }
 
     private:
-        boost::uint64_t nonce_;
+        naming::gid_type parcel_id_;
         traits::hash<>::final_type hash_;
     };
 }}}}

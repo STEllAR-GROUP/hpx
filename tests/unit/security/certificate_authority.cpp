@@ -40,7 +40,7 @@ int hpx_main(boost::program_options::variables_map &)
             subordinate_certificate =
                 subordinate_certificate_authority.get_certificate();
 
-        HPX_TEST(store.insert(subordinate_certificate));
+        store.insert(subordinate_certificate);
 
         HPX_TEST(root_public_key.verify(subordinate_certificate));
 
