@@ -38,7 +38,7 @@ namespace hpx { namespace components { namespace security { namespace server
 
             public_key const & issuer_public_key =
                 certificate.get_subject_public_key();
-            if (issuer_public_key.verify(signed_certificate) == false)
+            if (!issuer_public_key.verify(signed_certificate))
             {
                 HPX_THROW_EXCEPTION(
                     hpx::security_error

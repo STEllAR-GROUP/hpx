@@ -48,11 +48,16 @@ namespace hpx { namespace util { namespace security
         root_certificate_authority_ = (*function.first)(*key_pair_);
     }
 
-    components::security::server::signed_type<
-        components::security::server::certificate
-    > root_certificate_authority::get_certificate() const
+    components::security::server::signed_certificate
+        root_certificate_authority::get_certificate(error_code& ec) const
     {
-        BOOST_ASSERT(0 != root_certificate_authority_);
+        if (0 == root_certificate_authority_)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "root_certificate_authority::get_certificate",
+                "root_certificate_authority is not initialized yet");
+            return components::security::server::signed_certificate::invalid_signed_type;
+        }
 
         // Bind the certificate_authority_get_certificate symbol dynamically and invoke it.
         typedef void (*function_type)(

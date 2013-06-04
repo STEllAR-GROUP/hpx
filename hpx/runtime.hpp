@@ -64,7 +64,7 @@ namespace hpx
         /// \brief Manage list of functions to call on exit
         void on_exit(HPX_STD_FUNCTION<void()> f)
         {
-            boost::mutex::scoped_lock l(on_exit_functions_mtx_);
+            boost::mutex::scoped_lock l(mtx_);
             on_exit_functions_.push_back(f);
         }
 
@@ -81,7 +81,7 @@ namespace hpx
 
             typedef HPX_STD_FUNCTION<void()> value_type;
 
-            boost::mutex::scoped_lock l(on_exit_functions_mtx_);
+            boost::mutex::scoped_lock l(mtx_);
             BOOST_FOREACH(value_type f, on_exit_functions_)
                 f();
         }
@@ -286,14 +286,10 @@ namespace hpx
             error_code& ec = throws);
 
 #if defined(HPX_HAVE_SECURITY)
-        components::security::server::signed_certificate const&
+        components::security::server::signed_certificate
             get_root_certificate(error_code& ec = throws) const;
-        components::security::server::signed_certificate const&
+        components::security::server::signed_certificate
             get_certificate(error_code& ec = throws) const;
-
-        // set the certificate for the root certificate locality
-        void set_root_certificate(
-            components::security::server::signed_certificate const& cert);
 
         // add a certificate for another locality
         void add_locality_certificate(
@@ -301,6 +297,10 @@ namespace hpx
 
         components::security::server::signed_certificate const&
             get_locality_certificate(naming::gid_type const&, error_code& ec) const;
+
+        void init_subordinate_certificate_authority();
+        void store_root_certificate(
+            components::security::server::signed_certificate const&);
 #endif
 
     protected:
@@ -310,13 +310,17 @@ namespace hpx
         friend bool hpx::pre_main(runtime_mode);
         void set_state(state s) { state_ = s; }
 
+#if defined(HPX_HAVE_SECURITY)
+        void init_security();
+#endif
+
     protected:
         util::reinit_helper reinit_;
 
         // list of functions to call on exit
         typedef std::vector<HPX_STD_FUNCTION<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
-        boost::mutex on_exit_functions_mtx_;
+        mutable boost::mutex mtx_;
 
         util::runtime_configuration ini_;
         boost::shared_ptr<performance_counters::registry> counters_;

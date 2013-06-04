@@ -175,8 +175,8 @@ namespace hpx
             util::security::root_certificate_authority root_certificate_authority_;
             util::security::subordinate_certificate_authority subordinate_certificate_authority_;
 
-            /// certificate store
-            components::security::server::certificate_store* cert_store_;
+            // certificate store
+            HPX_STD_UNIQUE_PTR<components::security::server::certificate_store> cert_store_;
         };
     }
 
@@ -194,19 +194,45 @@ namespace hpx
         runtime::init_tss();
 
         counters_.reset(new performance_counters::registry());
+    }
 
 #if defined(HPX_HAVE_SECURITY)
+    // this is called on node zero during runtime construction
+    void runtime::init_security()
+    {
         // this is the AGAS booststrap node (node zero)
         if (ini_.get_agas_service_mode() == agas::service_mode_bootstrap)
         {
-            // Initialize root-CA
+            // Initialize the root-CA
+            boost::mutex::scoped_lock l(mtx_);
             security_data_->root_certificate_authority_.initialize();
+            security_data_->cert_store_.reset(
+                new components::security::server::certificate_store(
+                    security_data_->root_certificate_authority_.get_certificate()));
         }
-
-        // always initialize the subordinate CA
-        security_data_->subordinate_certificate_authority_.initialize();
-#endif
     }
+
+    // this is called on all localities during locality registration
+    void runtime::store_root_certificate(
+        components::security::server::signed_certificate const& cert)
+    {
+        // Only worker nodes need to store the root certificate at this
+        // point, the root locality was already initialized (see above).
+        if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
+        {
+            boost::mutex::scoped_lock l(mtx_);
+            security_data_->cert_store_.reset(
+                new components::security::server::certificate_store(cert));
+        }
+    }
+
+    // this is called right before pre-main on all localities
+    void runtime::init_subordinate_certificate_authority()
+    {
+        security_data_->subordinate_certificate_authority_.initialize();
+        add_locality_certificate(get_certificate());
+    }
+#endif
 
     runtime::~runtime()
     {
@@ -216,7 +242,7 @@ namespace hpx
     }
 
 #if defined(HPX_HAVE_SECURITY)
-    components::security::server::signed_certificate const&
+    components::security::server::signed_certificate
     runtime::get_root_certificate(error_code& ec) const
     {
         if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
@@ -226,25 +252,17 @@ namespace hpx
                 "the root's certificate is available on node zero only");
             return components::security::server::signed_certificate::invalid_signed_type;
         }
+
         BOOST_ASSERT(security_data_.get() != 0);
-        return security_data_->root_certificate_authority_.get_certificate();
+        return security_data_->root_certificate_authority_.get_certificate(ec);
     }
 
 
-    components::security::server::signed_certificate const&
-    runtime::get_certificate(error_code& ec) const
+    components::security::server::signed_certificate
+        runtime::get_certificate(error_code& ec) const
     {
         BOOST_ASSERT(security_data_.get() != 0);
-        return security_data_->subordinate_certificate_authority_.get_certificate();
-    }
-
-    // set the certificate for the root certificate locality
-    void runtime::set_root_certificate(
-        components::security::server::signed_certificate const& cert)
-    {
-        BOOST_ASSERT(security_data_.get() != 0);
-        BOOST_ASSERT(0 == security_data_->cert_store_);     // should be called only once
-        security_data_->cert_store_ = new components::security::server::certificate_store(cert);
+        return security_data_->subordinate_certificate_authority_.get_certificate(ec);
     }
 
     // set the certificate for another locality
@@ -252,13 +270,15 @@ namespace hpx
         components::security::server::signed_certificate const& cert)
     {
         BOOST_ASSERT(security_data_.get() != 0);
+
+        boost::mutex::scoped_lock l(mtx_);
         BOOST_ASSERT(0 != security_data_->cert_store_);     // should have been created
         security_data_->cert_store_->insert(cert);
     }
 
     components::security::server::signed_certificate const&
         runtime::get_locality_certificate(naming::gid_type const& gid,
-        error_code& ec) const
+            error_code& ec) const
     {
         BOOST_ASSERT(security_data_.get() != 0);
         if (0 == security_data_->cert_store_)     // should have been created
@@ -268,6 +288,8 @@ namespace hpx
                 "the parcel handler is not operational at this point");
             return components::security::server::signed_certificate::invalid_signed_type;
         }
+
+        boost::mutex::scoped_lock l(mtx_);
         return security_data_->cert_store_->at(!gid ? get_parcel_handler().get_locality() : gid, ec);
     }
 #endif

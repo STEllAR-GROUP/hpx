@@ -287,11 +287,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         destroy_big_boot_barrier();
     }
 
-    void launch_bootstrap(
-        util::runtime_configuration const& ini_
-        );
-
-    void launch_hosted();
+    void initialize();
 
     void adjust_local_cache_size();
 
@@ -367,6 +363,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         BOOST_ASSERT(0 != hosted.get());
         return &hosted->primary_ns_server_;
     }
+
+protected:
+    void launch_bootstrap(
+        util::runtime_configuration const& ini_
+        );
+
+    void launch_hosted();
 
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.

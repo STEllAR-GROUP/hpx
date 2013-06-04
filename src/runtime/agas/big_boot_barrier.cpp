@@ -59,7 +59,7 @@ void early_parcel_sink(
 { // {{{
     // De-serialize the parcel data
 //     util::portable_binary_iarchive archive(*parcel_data, boost::archive::no_header);
-// 
+//
 //     std::size_t parcel_count = 0;
 //     archive >> parcel_count;
 //     for(std::size_t i = 0; i < parcel_count; ++i)
@@ -282,7 +282,7 @@ void register_console(registration_header const& header)
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_console"
             , boost::str(boost::format(
-                "attempt to register locality %s more than once") % 
+                "attempt to register locality %s more than once") %
                     header.locality));
         return;
     }
@@ -336,7 +336,28 @@ void register_console(registration_header const& header)
         locality_addr, primary_addr, component_addr, symbol_addr);
 
 #if defined(HPX_HAVE_SECURITY)
-    hdr.root_certificate = rt.get_root_certificate();
+    // wait for the root certificate to be available
+    bool got_root_certificate = false;
+    for (std::size_t i = 0; i != HPX_MAX_NETWORK_RETRIES; ++i)
+    {
+        error_code ec(lightweight);
+        hdr.root_certificate = rt.get_root_certificate(ec);
+        if (!ec)
+        {
+            got_root_certificate = true;
+            break;
+        }
+        boost::this_thread::sleep(boost::get_system_time() +
+            boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+    }
+
+    if (!got_root_certificate)
+    {
+        HPX_THROW_EXCEPTION(internal_server_error
+          , "agas::register_console"
+          , "could not obtain root certificate");
+        return;
+    }
 #endif
 
     actions::base_action* p =
@@ -397,7 +418,7 @@ void notify_console(notification_header const& header)
     agas_client.bind(runtime_support_gid, runtime_support_address);
 
     // register local primary namespace component
-    naming::gid_type const primary_gid = 
+    naming::gid_type const primary_gid =
         stubs::primary_namespace::get_service_instance(
             agas_client.get_local_locality());
     naming::address primary_addr(rt.here()
@@ -406,9 +427,7 @@ void notify_console(notification_header const& header)
     agas_client.bind(primary_gid, primary_addr);
 
 #if defined(HPX_HAVE_SECURITY)
-    // Initialize certificate store
-    rt.set_root_certificate(header.root_certificate);
-    rt.add_locality_certificate(rt.get_certificate());
+    rt.store_root_certificate(header.root_certificate);
 #endif
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
@@ -485,7 +504,7 @@ void register_worker(registration_header const& header)
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
             , boost::str(boost::format(
-                "attempt to register locality %s more than once") % 
+                "attempt to register locality %s more than once") %
                     header.locality));
         return;
     }
@@ -537,7 +556,28 @@ void register_worker(registration_header const& header)
         locality_addr, primary_addr, component_addr, symbol_addr);
 
 #if defined(HPX_HAVE_SECURITY)
-    hdr.root_certificate = rt.get_root_certificate();
+    // wait for the root certificate to be available
+    bool got_root_certificate = false;
+    for (std::size_t i = 0; i != HPX_MAX_NETWORK_RETRIES; ++i)
+    {
+        error_code ec(lightweight);
+        hdr.root_certificate = rt.get_root_certificate(ec);
+        if (!ec)
+        {
+            got_root_certificate = true;
+            break;
+        }
+        boost::this_thread::sleep(boost::get_system_time() +
+            boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+    }
+
+    if (!got_root_certificate)
+    {
+        HPX_THROW_EXCEPTION(internal_server_error
+          , "agas::register_console"
+          , "could not obtain root certificate");
+        return;
+    }
 #endif
 
     actions::base_action* p =
@@ -602,7 +642,7 @@ void notify_worker(notification_header const& header)
     agas_client.bind(runtime_support_gid, runtime_support_address);
 
     // register local primary namespace component
-    naming::gid_type const primary_gid = 
+    naming::gid_type const primary_gid =
         stubs::primary_namespace::get_service_instance(
             agas_client.get_local_locality());
     naming::address primary_addr(rt.here()
@@ -611,9 +651,7 @@ void notify_worker(notification_header const& header)
     agas_client.bind(primary_gid, primary_addr);
 
 #if defined(HPX_HAVE_SECURITY)
-    // Initialize certificate store
-    rt.set_root_certificate(header.root_certificate);
-    rt.add_locality_certificate(rt.get_certificate());
+    rt.store_root_certificate(header.root_certificate);
 #endif
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
