@@ -93,16 +93,27 @@ void function_pointers()
         vf.push_back(dataflow(unwrap(&int_f1), make_ready_future(42)));
     }
     future<int> f4 = dataflow(unwrap(&int_f_vector), vf);
-
+    
+    future<int>
+        f5 = dataflow(
+            unwrap(&int_f1)
+          , dataflow(
+                unwrap(&int_f1)
+              , make_ready_future(42))
+          , dataflow(
+                unwrap(&void_f)
+              , make_ready_future())
+        );
 
     hpx::wait(f1);
     HPX_TEST_EQ(f2.get(), 126);
     HPX_TEST_EQ(f3.get(), 163);
     HPX_TEST_EQ(f4.get(), 10 * 84);
-    HPX_TEST_EQ(void_f_count, 0u);
+    HPX_TEST_EQ(f5.get(), 126);
+    HPX_TEST_EQ(void_f_count, 1u);
     HPX_TEST_EQ(int_f_count, 1u);
     HPX_TEST_EQ(void_f1_count, 1u);
-    HPX_TEST_EQ(int_f1_count, 14u);
+    HPX_TEST_EQ(int_f1_count, 16u);
     HPX_TEST_EQ(int_f2_count, 1u);
 }
 
