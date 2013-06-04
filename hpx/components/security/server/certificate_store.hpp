@@ -51,9 +51,15 @@ namespace hpx { namespace components { namespace security { namespace server
                 std::make_pair(certificate.get_subject(), signed_certificate));
         }
 
-        bool insert(signed_type<certificate> const & signed_certificate)
+        void insert(signed_type<certificate> const & signed_certificate)
         {
             certificate const & certificate = signed_certificate.get_type();
+
+            naming::gid_type const & subject = certificate.get_subject();
+
+            // FIXME, expiration dates?
+            if (store_.find(subject) != store_.end())
+                return;
 
             store_type::const_iterator issuer =
                 store_.find(certificate.get_issuer());
@@ -74,25 +80,29 @@ namespace hpx { namespace components { namespace security { namespace server
             {
                 HPX_THROW_EXCEPTION(
                     hpx::security_error
-                  , "certificate_store::certificate_store"
+                  , "certificate_store::insert"
                   , "The certificate signature is invalid"
                 )
             }
 
-            return store_.insert(
-                std::make_pair(certificate.get_subject(), signed_certificate)
-            ).second;
+            store_.insert(std::make_pair(subject, signed_certificate));
         }
 
-        boost::optional<signed_type<certificate> >
+        signed_type<certificate> const &
         at(naming::gid_type const & subject) const
         {
             store_type::const_iterator iterator = store_.find(subject);
 
-            if (iterator != store_.end())
-                return iterator->second;
+            if (iterator == store_.end())
+            {
+                HPX_THROW_EXCEPTION(
+                    hpx::security_error
+                  , "certificate_store::at"
+                  , "The certificate is not found"
+                )
+            }
 
-            return boost::none;
+            return iterator->second;
         }
 
     private:
