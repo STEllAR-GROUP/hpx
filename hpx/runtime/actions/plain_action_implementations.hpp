@@ -119,6 +119,14 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
 
                 // Verify that there are no more registered locks for this
                 // OS-thread. This will throw if there are still any locks
@@ -301,6 +309,14 @@ namespace hpx { namespace actions
                         // report this error to the console in any case
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
                 }
 
                 // Verify that there are no more registered locks for this

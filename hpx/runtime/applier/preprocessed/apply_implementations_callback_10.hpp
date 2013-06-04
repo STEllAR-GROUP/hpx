@@ -128,7 +128,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ));
@@ -397,7 +397,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
@@ -666,7 +666,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
@@ -935,7 +935,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
@@ -1204,7 +1204,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
@@ -1473,7 +1473,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
@@ -1742,7 +1742,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
@@ -2011,7 +2011,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
@@ -2280,7 +2280,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
@@ -2549,7 +2549,7 @@ namespace hpx
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
     {
         
-        if (addr.locality_ == naming::get_locality()) {
+        if (addr.locality_ == hpx::get_locality()) {
             
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));

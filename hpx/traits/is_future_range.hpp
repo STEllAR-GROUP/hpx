@@ -37,6 +37,11 @@ namespace hpx { namespace traits
     struct is_future_range<std::vector<T> const &>
       : is_future<T>
     {};
+
+    template <typename T>
+    struct is_future_range<std::vector<T> const>
+      : is_future<T>
+    {};
 }}
 
 #endif

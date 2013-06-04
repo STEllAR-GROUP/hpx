@@ -637,14 +637,12 @@ namespace hpx { namespace performance_counters
         // \brief Create a new aggregating performance counter instance based
         //        on given base counter name and given base time interval
         //        (milliseconds).
-        naming::gid_type create_arithmetics_counter(
-            counter_info const& info, std::string const& base_counter_name1,
-            std::string const& base_counter_name2, error_code& ec)
+        naming::gid_type create_arithmetics_counter(counter_info const& info,
+            std::vector<std::string> const& base_counter_names, error_code& ec)
         {
             naming::gid_type gid;
             get_runtime().get_counter_registry().
-                create_arithmetics_counter(info, base_counter_name1,
-                    base_counter_name2, gid, ec);
+                create_arithmetics_counter(info, base_counter_names, gid, ec);
             return gid;
         }
 
@@ -709,7 +707,8 @@ namespace hpx { namespace performance_counters
         ///////////////////////////////////////////////////////////////////////
         inline bool is_thread_kind(std::string const& pattern)
         {
-            return pattern.find("-thread#*") == pattern.size() - 9;
+            std::string::size_type p = pattern.find("-thread#*");
+            return p != std::string::npos && p == pattern.size() - 9;
         }
 
         inline std::string get_thread_kind(std::string const& pattern)
@@ -834,11 +833,13 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void register_with_agas(lcos::future<naming::id_type> f,
+    naming::id_type register_with_agas(lcos::future<naming::id_type> f,
         std::string const& fullname)
     {
         // register the canonical name with AGAS
-        agas::register_name(fullname, f.get());
+        naming::id_type id = f.get();
+        agas::register_name(fullname, id);
+        return id;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -899,10 +900,8 @@ namespace hpx { namespace performance_counters
                 }
 
                 // attach the function which registers the id_type with AGAS
-                f.then(util::bind(&register_with_agas, util::placeholders::_1,
+                return f.then(util::bind(&register_with_agas, util::placeholders::_1,
                     complemented_info.fullname_));
-
-                return f;
             }
             catch (hpx::exception const& e) {
                 if (&ec == &throws)

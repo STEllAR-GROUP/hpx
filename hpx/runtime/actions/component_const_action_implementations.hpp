@@ -152,6 +152,16 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component const>::call(lva)) << ")";
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
 
                 // Verify that there are no more registered locks for this
                 // OS-thread. This will throw if there are still any locks
@@ -351,6 +361,16 @@ namespace hpx { namespace actions
                         // report this error to the console in any case
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component const>::call(lva)) << ")";
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
                 }
 
                 // Verify that there are no more registered locks for this

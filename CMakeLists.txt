@@ -1575,7 +1575,7 @@ set(boost_library_info "")
 
 foreach(library ${BOOST_LIBRARIES})
   string(TOUPPER ${library} library_uc)
-  string(REGEX REPLACE "([ ()])" "\\\\\\1" BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})
+  string(REGEX REPLACE "([ ()])" "\\\\\\1" "BOOST_${library_uc}_LIBRARY" "${BOOST_${library_uc}_LIBRARY}")
   set(boost_library_info
     "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
   set(boost_library_info

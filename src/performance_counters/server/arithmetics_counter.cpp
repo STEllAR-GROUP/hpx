@@ -14,18 +14,48 @@
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
+    namespace detail
+    {
+        template <typename Operation>
+        struct init_value;
+
+        template <>
+        struct init_value<std::plus<double> >
+        {
+            static double call() { return 0.0; }
+        };
+
+        template <>
+        struct init_value<std::minus<double> >
+        {
+            static double call() { return 0.0; }
+        };
+
+        template <>
+        struct init_value<std::multiplies<double> >
+        {
+            static double call() { return 1.0; }
+        };
+
+        template <>
+        struct init_value<std::divides<double> >
+        {
+            static double call() { return 1.0; }
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Operation>
     arithmetics_counter<Operation>::arithmetics_counter(
-            counter_info const& info, std::string const& base_counter_name1,
-            std::string const& base_counter_name2)
+            counter_info const& info,
+            std::vector<std::string> const& base_counter_names)
       : base_type_holder(info),
-        base_counter_name1_(ensure_counter_prefix(base_counter_name1)),
-        base_counter_name2_(ensure_counter_prefix(base_counter_name2))
+        base_counter_names_(base_counter_names)
     {
         if (info.type_ != counter_aggregating) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -38,18 +68,25 @@ namespace hpx { namespace performance_counters { namespace server
     hpx::performance_counters::counter_value
         arithmetics_counter<Operation>::get_counter_value(bool reset)
     {
-        counter_value base_value1, base_value2;
+        std::vector<counter_value> base_values;
+        base_values.reserve(base_counter_names_.size());
+        base_counter_ids_.resize(base_counter_names_.size());
 
+        // lock here to avoid checking out multiple reference counted GIDs
+        // from AGAS
         {
-            // lock here to avoid checking out multiple reference counted GIDs
-            // from AGAS
             mutex_type::scoped_lock l(mtx_);
 
-            // gather current base values
-            if (!evaluate_base_counter(base_counter_id1_, base_counter_name1_, base_value1) ||
-                !evaluate_base_counter(base_counter_id2_, base_counter_name2_, base_value2))
+            for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
             {
-                return base_value1;
+                // gather current base values
+                counter_value value;
+                if (!evaluate_base_counter(base_counter_ids_[i], base_counter_names_[i], value))
+                {
+                    return value;
+                }
+
+                base_values.push_back(value);
             }
         }
 
@@ -64,16 +101,21 @@ namespace hpx { namespace performance_counters { namespace server
 //         }
 
         // apply arithmetic operation
-        double value = Operation()(base_value1.get_value<double>(),
-            base_value2.get_value<double>());
+        double value = detail::init_value<Operation>::call();
+        BOOST_FOREACH(counter_value const& base_value, base_values)
+        {
+            value = Operation()(value, base_value.get_value<double>());
+        }
 
-        if (base_value1.scale_inverse_) {
-            base_value1.value_ = static_cast<boost::int64_t>(value * base_value1.scaling_);
+        if (base_values[0].scale_inverse_ && base_values[0].scaling_ != 1.0) {
+            base_values[0].value_ =
+                static_cast<boost::int64_t>(value * base_values[0].scaling_);
         }
         else {
-            base_value1.value_ = static_cast<boost::int64_t>(value / base_value1.scaling_);
+            base_values[0].value_ =
+                static_cast<boost::int64_t>(value / base_values[0].scaling_);
         }
-        return base_value1;
+        return base_values[0];
     }
 
     template <typename Operation>
@@ -169,6 +211,29 @@ HPX_DEFINE_GET_COMPONENT_TYPE(dividing_counter_type::wrapped_type)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace detail
 {
+    void expand_counter_name_wildcards(std::vector<std::string>& names, error_code& ec)
+    {
+        std::vector<counter_info> counters;
+        BOOST_FOREACH(std::string const& name, names)
+        {
+            discover_counter_type(ensure_counter_prefix(name), counters,
+                discover_counters_full, ec);
+            if (ec) return;
+        }
+
+        std::vector<std::string> result;
+        result.reserve(counters.size());
+        BOOST_FOREACH(counter_info const& info, counters)
+        {
+            result.push_back(info.fullname_);
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        std::swap(names, result);
+    }
+
     /// Creation function for aggregating performance counters to be registered
     /// with the counter types.
     naming::gid_type arithmetics_counter_creator(counter_info const& info,
@@ -187,45 +252,42 @@ namespace hpx { namespace performance_counters { namespace detail
                     std::vector<std::string> names;
                     boost::split(names, paths.parameters_, boost::is_any_of(","));
 
-                    counter_path_elements paths1, paths2;
-                    if (names.size() != 2)
+                    // expand all wildcards in given counter names
+                    expand_counter_name_wildcards(names, ec);
+                    if (ec) return naming::invalid_gid;
+
+                    BOOST_FOREACH(std::string const& name, names)
+                    {
+                        counter_path_elements paths;
+                        if (status_valid_data != get_counter_path_elements(
+                                name, paths, ec) || ec)
+                        {
+                            HPX_THROWS_IF(ec, bad_parameter,
+                                "arithmetics_counter_creator",
+                                "the given (expanded) counter name is not a validly formed "
+                                "performance counter name: " + name);
+                            return naming::invalid_gid;
+                        }
+                    }
+
+                    if (names.size() < 2)
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "arithmetics_counter_creator",
                             "the parameter specification for an arithmetic counter "
-                            "has to be a comma separated list of two performance "
-                            "counter names: " + paths.parameters_);
+                            "has to expand to more than one counter name: " +
+                            paths.parameters_);
                         return naming::invalid_gid;
                     }
 
-                    if (status_valid_data != get_counter_path_elements(
-                            names[0], paths1, ec) || ec)
-                    {
-                        HPX_THROWS_IF(ec, bad_parameter,
-                            "arithmetics_counter_creator",
-                            "the first parameter is not a validly formed "
-                            "performance counter name: " + names[0]);
-                        return naming::invalid_gid;
-                    }
-
-                    if (status_valid_data != get_counter_path_elements(
-                            names[1], paths2, ec) || ec)
-                    {
-                        HPX_THROWS_IF(ec, bad_parameter,
-                            "arithmetics_counter_creator",
-                            "the second parameter is not a validly formed "
-                            "performance counter name: " + names[1]);
-                        return naming::invalid_gid;
-                    }
-
-                    return create_arithmetics_counter(info, names[0], names[1], ec);
+                    return create_arithmetics_counter(info, names, ec);
                 }
                 else {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "arithmetics_counter_creator",
                         "the parameter specification for an arithmetic counter "
                         "has to be a comma separated list of two performance "
-                        "counter names, none is given: " + 
+                        "counter names, none is given: " +
                             remove_counter_prefix(info.fullname_));
                 }
             }

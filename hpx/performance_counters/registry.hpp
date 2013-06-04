@@ -116,8 +116,7 @@ namespace hpx { namespace performance_counters
         ///        on given base counter name and given base time interval
         ///        (milliseconds).
         counter_status create_arithmetics_counter(counter_info const& info,
-            std::string const& base_counter_name1,
-            std::string const& base_counter_name2,
+            std::vector<std::string> const& base_counter_names,
             naming::gid_type& id, error_code& ec = throws);
 
         /// \brief Add an existing performance counter instance to the registry

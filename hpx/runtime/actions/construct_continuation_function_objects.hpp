@@ -101,7 +101,7 @@ namespace detail
                 func(HPX_ENUM_MOVE_ARGS(N, arg));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 // make sure hpx::exceptions are propagated back to the client
                 cont->trigger_error(boost::current_exception());
             }
@@ -153,7 +153,7 @@ namespace detail
                     func(HPX_ENUM_MOVE_ARGS(N, arg))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 // make sure hpx::exceptions are propagated back to the client
                 cont->trigger_error(boost::current_exception());
             }

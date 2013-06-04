@@ -64,6 +64,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -227,6 +234,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -443,6 +457,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -606,6 +627,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -822,6 +850,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -985,6 +1020,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -1201,6 +1243,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -1364,6 +1413,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -1580,6 +1636,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -1743,6 +1806,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -1959,6 +2029,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -2122,6 +2199,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -2338,6 +2422,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -2501,6 +2592,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -2717,6 +2815,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -2880,6 +2985,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -3096,6 +3208,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -3259,6 +3378,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -3475,6 +3601,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -3638,6 +3771,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -3854,6 +3994,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -4017,6 +4164,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -4233,6 +4387,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -4396,6 +4557,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -4612,6 +4780,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -4775,6 +4950,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -4991,6 +5173,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -5154,6 +5343,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -5370,6 +5566,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -5533,6 +5736,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -5749,6 +5959,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -5912,6 +6129,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -6128,6 +6352,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -6291,6 +6522,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -6507,6 +6745,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -6670,6 +6915,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -6886,6 +7138,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -7049,6 +7308,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
@@ -7265,6 +7531,13 @@ namespace hpx { namespace actions
                         hpx::report_error(boost::current_exception());
                     }
                 }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
+                }
                 
                 
                 
@@ -7428,6 +7701,13 @@ namespace hpx { namespace actions
                         
                         hpx::report_error(boost::current_exception());
                     }
+                }
+                catch (...) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>() << ")";
+                    
+                    hpx::report_error(boost::current_exception());
                 }
                 
                 
