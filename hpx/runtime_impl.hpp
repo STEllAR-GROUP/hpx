@@ -25,11 +25,6 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/thread_mapper.hpp>
 
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/util/security/root_certificate_authority.hpp>
-#include <hpx/util/security/subordinate_certificate_authority.hpp>
-#endif
-
 #include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/shared_ptr.hpp>
@@ -215,6 +210,11 @@ namespace hpx {
 
         /// \brief Allow access to the parcel handler instance used by the HPX
         ///        runtime.
+        parcelset::parcelhandler const& get_parcel_handler() const
+        {
+            return parcel_handler_;
+        }
+
         parcelset::parcelhandler& get_parcel_handler()
         {
             return parcel_handler_;
@@ -336,14 +336,6 @@ namespace hpx {
         /// return zero.
         hpx::util::io_service_pool* get_thread_pool(char const* name);
 
-#if defined(HPX_HAVE_SECURITY)
-        // Initialize the subordinate CA for this locality
-        void initialize_locality_certificate_authority(
-            components::security::server::signed_type<
-                components::security::server::certificate
-            > const & root_certificate);
-#endif
-
     private:
         void init_tss(char const* context, std::size_t num, char const* postfix,
             bool service_thread);
@@ -367,10 +359,6 @@ namespace hpx {
         applier::applier applier_;
         actions::action_manager action_manager_;
         boost::signals2::scoped_connection default_error_sink_;
-#if defined(HPX_HAVE_SECURITY)
-        util::security::root_certificate_authority root_certificate_authority_;
-        util::security::subordinate_certificate_authority subordinate_certificate_authority_;
-#endif
     };
 }
 

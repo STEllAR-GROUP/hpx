@@ -23,12 +23,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/spinlock.hpp>
 
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/server/signed_type.hpp>
-#include <hpx/components/security/server/certificate.hpp>
-#include <hpx/components/security/server/certificate_store.hpp>
-#endif
-
 #include <hpx/config/warnings_prefix.hpp>
 
 #include <map>
@@ -97,12 +91,7 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<parcelport> pp,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
 
-        ~parcelhandler()
-        {
-#if defined(HPX_HAVE_SECURITY)
-            delete cert_store_;
-#endif
-        }
+        ~parcelhandler() {}
 
         /// \brief Attach the given parcel port to this handler
         void attach_parcelport(boost::shared_ptr<parcelport> pp, bool run = true);
@@ -377,21 +366,6 @@ namespace hpx { namespace parcelset
         /// Return the reference to an existing io_service
         util::io_service_pool* get_thread_pool(char const* name);
 
-#if defined(HPX_HAVE_SECURITY)
-        // set the certificate for the root certificate locality
-        void set_root_certificate(
-            components::security::server::signed_type<
-                components::security::server::certificate> const& cert);
-
-        // add a certificate for another locality
-        void add_locality_certificate(
-            components::security::server::signed_type<
-                components::security::server::certificate> const& cert);
-
-        components::security::server::signed_certificate const&
-            get_locality_certificate(naming::gid_type const&, error_code& ec) const;
-#endif
-
         ///////////////////////////////////////////////////////////////////////
         policies::message_handler* get_message_handler(char const* action,
             char const* message_handler_type, std::size_t num_messages,
@@ -489,11 +463,6 @@ namespace hpx { namespace parcelset
 
         /// Count number of (outbound) parcels routed
         boost::atomic<boost::int64_t> count_routed_;
-
-#if defined(HPX_HAVE_SECURITY)
-        /// certificate store
-        components::security::server::certificate_store* cert_store_;
-#endif
     };
 }}
 

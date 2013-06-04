@@ -16,6 +16,12 @@
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/query_counters.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/server/certificate_store.hpp>
+#include <hpx/util/security/root_certificate_authority.hpp>
+#include <hpx/util/security/subordinate_certificate_authority.hpp>
+#endif
+
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,6 +65,9 @@ namespace hpx
             // allow to reuse instance number if this was the only instance
             if (0 == instance_number_counter_)
                 --instance_number_counter_;
+#if defined(HPX_HAVE_SECURITY)
+            delete cert_store_;
+#endif
         }
 
         /// \brief Manage list of functions to call on exit
@@ -164,6 +173,7 @@ namespace hpx
         virtual void stop(bool blocking = true) = 0;
 
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
+        virtual parcelset::parcelhandler const& get_parcel_handler() const = 0;
 
         virtual threads::threadmanager_base& get_thread_manager() = 0;
 
@@ -207,14 +217,6 @@ namespace hpx
         /// return zero.
         virtual hpx::util::io_service_pool* get_thread_pool(char const* name) = 0;
 
-#if defined(HPX_HAVE_SECURITY)
-        // Initialize the subordinate CA for this locality
-        virtual void initialize_locality_certificate_authority(
-            components::security::server::signed_type<
-                components::security::server::certificate
-            > const & root_certificate) = 0;
-#endif
-
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
@@ -236,6 +238,24 @@ namespace hpx
         util::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
             error_code& ec = throws);
+
+#if defined(HPX_HAVE_SECURITY)
+        components::security::server::signed_certificate const&
+            get_root_certificate(error_code& ec = throws) const;
+        components::security::server::signed_certificate const&
+            get_certificate(error_code& ec = throws) const;
+
+        // set the certificate for the root certificate locality
+        void set_root_certificate(
+            components::security::server::signed_certificate const& cert);
+
+        // add a certificate for another locality
+        void add_locality_certificate(
+            components::security::server::signed_certificate const& cert);
+
+        components::security::server::signed_certificate const&
+            get_locality_certificate(naming::gid_type const&, error_code& ec) const;
+#endif
 
     protected:
         void init_tss();
@@ -269,6 +289,15 @@ namespace hpx
 
         components::server::memory memory_;
         components::server::runtime_support runtime_support_;
+
+#if defined(HPX_HAVE_SECURITY)
+        // manage certificates for root-CA and sub-CA
+        util::security::root_certificate_authority root_certificate_authority_;
+        util::security::subordinate_certificate_authority subordinate_certificate_authority_;
+
+        /// certificate store
+        components::security::server::certificate_store* cert_store_;
+#endif
     };
 
     ///////////////////////////////////////////////////////////////////////////
