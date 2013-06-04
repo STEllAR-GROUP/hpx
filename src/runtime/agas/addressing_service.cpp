@@ -53,6 +53,20 @@ addressing_service::addressing_service(
         launch_bootstrap(ini_);
     else
         launch_hosted();
+}
+
+void addressing_service::initialize()
+{
+    if (service_type == service_mode_bootstrap)
+    {
+        get_big_boot_barrier().wait();
+    }
+    else
+    {
+        get_big_boot_barrier().wait(&hosted->primary_ns_server_);
+    }
+
+    set_status(running);
 } // }}}
 
 naming::locality const& addressing_service::get_here() const
@@ -143,18 +157,16 @@ void addressing_service::launch_bootstrap(
     get_id_range(ep, HPX_INITIAL_GID_RANGE, lower, upper);
     get_runtime().get_id_pool().set_range(lower, upper);
 
-    get_big_boot_barrier().wait();
-
-    set_status(running);
+//    get_big_boot_barrier().wait();
+//    set_status(running);
 } // }}}
 
 void addressing_service::launch_hosted()
 { // {{{
     hosted = boost::make_shared<hosted_data_type>();
 
-    get_big_boot_barrier().wait(&hosted->primary_ns_server_);
-
-    set_status(running);
+//    get_big_boot_barrier().wait(&hosted->primary_ns_server_);
+//    set_status(running);
 } // }}}
 
 void addressing_service::adjust_local_cache_size()

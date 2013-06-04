@@ -124,7 +124,7 @@ namespace hpx {
             SchedulingPolicy, NotificationPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
         agas_client_(*parcel_port_, ini_, mode_),
-        parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
+        parcel_handler_(agas_client_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, *thread_manager_,
@@ -133,6 +133,18 @@ namespace hpx {
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
+
+        // in AGAS v2, the runtime pointer (accessible through get_runtime
+        // and get_runtime_ptr) is already initialized at this point.
+        applier_.init_tss();
+
+#if defined(HPX_HAVE_SECURITY)
+        // once all has been initialized, finalize security data for bootstrap
+        this->init_security();
+#endif
+        // now, launch AGAS and register all nodes, launch all other components
+        agas_client_.initialize();
+        parcel_handler_.initialize(parcel_port_);
 
         // copy over all startup functions registered so far
         BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_pre_startup_functions)
@@ -180,6 +192,9 @@ namespace hpx {
         // Change our thread description, as we're about to call pre_main
         threads::set_thread_description(threads::get_self_id(), "pre_main");
 
+#if defined(HPX_HAVE_SECURITY)
+        init_subordinate_certificate_authority();
+#endif
         // Finish the bootstrap
         if (!hpx::pre_main(mode_)) {
             LBT_(info) << "runtime_impl::run_helper: bootstrap "
@@ -217,10 +232,6 @@ namespace hpx {
 
         // initialize instrumentation system
         util::apex_init();
-
-        // in AGAS v2, the runtime pointer (accessible through get_runtime
-        // and get_runtime_ptr) is already initialized at this point.
-        applier_.init_tss();
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 

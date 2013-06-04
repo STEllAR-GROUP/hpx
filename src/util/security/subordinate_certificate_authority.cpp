@@ -55,11 +55,16 @@ namespace hpx { namespace util { namespace security
                           , naming::id_type::unmanaged));
     }
 
-    components::security::server::signed_type<
-        components::security::server::certificate
-    > subordinate_certificate_authority::get_certificate() const
+    components::security::server::signed_certificate
+        subordinate_certificate_authority::get_certificate(error_code& ec) const
     {
-        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+        if (0 == subordinate_certificate_authority_)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "subordinate_certificate_authority::get_certificate",
+                "subordinate_certificate_authority is not initialized yet");
+            return components::security::server::signed_certificate::invalid_signed_type;
+        }
 
         // Bind the certificate_authority_get_certificate symbol dynamically and invoke it.
         typedef void (*function_type)(

@@ -306,6 +306,10 @@ namespace hpx { namespace util
                     LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
                 }
+                catch (...) {
+                    LRT_(info) << "skipping " << curr.string()
+                               << ": unexpected exception";
+                }
 
                 try {
                     // get the handle of the library
@@ -322,6 +326,10 @@ namespace hpx { namespace util
                 catch (std::exception const& e) {
                     LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
+                }
+                catch (...) {
+                    LRT_(info) << "skipping " << curr.string()
+                               << ": unexpected exception";
                 }
             }
         }

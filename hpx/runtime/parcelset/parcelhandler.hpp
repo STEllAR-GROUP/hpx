@@ -88,10 +88,11 @@ namespace hpx { namespace parcelset
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(naming::resolver_client& resolver,
-            boost::shared_ptr<parcelport> pp,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
 
         ~parcelhandler() {}
+
+        void initialize(boost::shared_ptr<parcelport> pp);
 
         /// \brief Attach the given parcel port to this handler
         void attach_parcelport(boost::shared_ptr<parcelport> pp, bool run = true);

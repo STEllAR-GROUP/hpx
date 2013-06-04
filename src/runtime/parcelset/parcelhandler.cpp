@@ -122,14 +122,16 @@ namespace hpx { namespace parcelset
     }
 
     parcelhandler::parcelhandler(naming::resolver_client& resolver,
-            boost::shared_ptr<parcelport> pp, threads::threadmanager_base* tm,
-            parcelhandler_queue_base* policy)
+            threads::threadmanager_base* tm, parcelhandler_queue_base* policy)
       : resolver_(resolver),
         pports_(connection_last),
         tm_(tm),
         parcels_(policy),
         use_alternative_parcelports_(false),
         count_routed_(0)
+    {}
+
+    void parcelhandler::initialize(boost::shared_ptr<parcelport> pp)
     {
         BOOST_ASSERT(parcels_);
 
