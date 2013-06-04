@@ -180,7 +180,6 @@ namespace hpx
             HPX_STD_UNIQUE_PTR<components::security::server::certificate_store> cert_store_;
         };
     }
-#endif
 
     // this is called on node zero during runtime construction
     void runtime::init_security()
