@@ -1338,6 +1338,7 @@ namespace hpx
         typedef signed_type<certificate> signed_certificate;
     }}}
 
+#if defined(HPX_HAVE_SECURITY)
     /// \brief Return the certificate for this locality
     ///
     /// \returns This function returns the signed certificate for this locality.
@@ -1361,6 +1362,7 @@ namespace hpx
     HPX_API_EXPORT void add_locality_certificate(
         components::security::server::signed_certificate const& cert,
         error_code& ec = throws);
+#endif
 #endif
 }
 
