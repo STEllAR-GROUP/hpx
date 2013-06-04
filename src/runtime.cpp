@@ -19,6 +19,12 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/server/certificate_store.hpp>
+#include <hpx/util/security/root_certificate_authority.hpp>
+#include <hpx/util/security/subordinate_certificate_authority.hpp>
+#endif
+
 #include <iostream>
 #include <vector>
 
@@ -161,6 +167,19 @@ namespace hpx
         return runtime_mode_invalid;
     }
 
+    namespace detail
+    {
+        struct manage_security_data
+        {
+            // manage certificates for root-CA and sub-CA
+            util::security::root_certificate_authority root_certificate_authority_;
+            util::security::subordinate_certificate_authority subordinate_certificate_authority_;
+
+            /// certificate store
+            components::security::server::certificate_store* cert_store_;
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(util::runtime_configuration const& rtcfg)
       : ini_(rtcfg),
@@ -168,7 +187,7 @@ namespace hpx
         topology_(threads::create_topology()),
         state_(state_invalid)
 #if defined(HPX_HAVE_SECURITY)
-      , cert_store_(0)
+      , security_data_(new detail::manage_security_data)
 #endif
     {
         // initialize our TSS
@@ -181,12 +200,19 @@ namespace hpx
         if (ini_.get_agas_service_mode() == agas::service_mode_bootstrap)
         {
             // Initialize root-CA
-            root_certificate_authority_.initialize();
+            security_data_->root_certificate_authority_.initialize();
         }
 
         // always initialize the subordinate CA
-        subordinate_certificate_authority_.initialize();
+        security_data_->subordinate_certificate_authority_.initialize();
 #endif
+    }
+
+    runtime::~runtime()
+    {
+        // allow to reuse instance number if this was the only instance
+        if (0 == instance_number_counter_)
+            --instance_number_counter_;
     }
 
 #if defined(HPX_HAVE_SECURITY)
@@ -200,44 +226,49 @@ namespace hpx
                 "the root's certificate is available on node zero only");
             return components::security::server::signed_certificate::invalid_signed_type;
         }
-        return root_certificate_authority_.get_certificate();
+        BOOST_ASSERT(security_data_.get() != 0);
+        return security_data_->root_certificate_authority_.get_certificate();
     }
 
 
     components::security::server::signed_certificate const&
     runtime::get_certificate(error_code& ec) const
     {
-        return subordinate_certificate_authority_.get_certificate();
+        BOOST_ASSERT(security_data_.get() != 0);
+        return security_data_->subordinate_certificate_authority_.get_certificate();
     }
 
     // set the certificate for the root certificate locality
     void runtime::set_root_certificate(
         components::security::server::signed_certificate const& cert)
     {
-        BOOST_ASSERT(0 == cert_store_);     // should be called only once
-        cert_store_ = new components::security::server::certificate_store(cert);
+        BOOST_ASSERT(security_data_.get() != 0);
+        BOOST_ASSERT(0 == security_data_->cert_store_);     // should be called only once
+        security_data_->cert_store_ = new components::security::server::certificate_store(cert);
     }
 
     // set the certificate for another locality
     void runtime::add_locality_certificate(
         components::security::server::signed_certificate const& cert)
     {
-        BOOST_ASSERT(0 != cert_store_);     // should have been created
-        cert_store_->insert(cert);
+        BOOST_ASSERT(security_data_.get() != 0);
+        BOOST_ASSERT(0 != security_data_->cert_store_);     // should have been created
+        security_data_->cert_store_->insert(cert);
     }
 
     components::security::server::signed_certificate const&
         runtime::get_locality_certificate(naming::gid_type const& gid,
         error_code& ec) const
     {
-        if (0 == cert_store_)     // should have been created
+        BOOST_ASSERT(security_data_.get() != 0);
+        if (0 == security_data_->cert_store_)     // should have been created
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "runtime::get_locality_certificate",
                 "the parcel handler is not operational at this point");
             return components::security::server::signed_certificate::invalid_signed_type;
         }
-        return cert_store_->at(!gid ? get_parcel_handler().get_locality() : gid, ec);
+        return security_data_->cert_store_->at(!gid ? get_parcel_handler().get_locality() : gid, ec);
     }
 #endif
 
