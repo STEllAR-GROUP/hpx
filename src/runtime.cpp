@@ -182,23 +182,6 @@ namespace hpx
     }
 #endif
 
-    ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(util::runtime_configuration const& rtcfg)
-      : ini_(rtcfg),
-        instance_number_(++instance_number_counter_),
-        topology_(threads::create_topology()),
-        state_(state_invalid)
-#if defined(HPX_HAVE_SECURITY)
-      , security_data_(new detail::manage_security_data)
-#endif
-    {
-        // initialize our TSS
-        runtime::init_tss();
-
-        counters_.reset(new performance_counters::registry());
-    }
-
-#if defined(HPX_HAVE_SECURITY)
     // this is called on node zero during runtime construction
     void runtime::init_security()
     {
@@ -234,18 +217,9 @@ namespace hpx
         security_data_->subordinate_certificate_authority_.initialize();
         add_locality_certificate(get_certificate());
     }
-#endif
 
-    runtime::~runtime()
-    {
-        // allow to reuse instance number if this was the only instance
-        if (0 == instance_number_counter_)
-            --instance_number_counter_;
-    }
-
-#if defined(HPX_HAVE_SECURITY)
     components::security::server::signed_certificate
-    runtime::get_root_certificate(error_code& ec) const
+        runtime::get_root_certificate(error_code& ec) const
     {
         if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
         {
@@ -295,6 +269,29 @@ namespace hpx
         return security_data_->cert_store_->at(!gid ? get_parcel_handler().get_locality() : gid, ec);
     }
 #endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    runtime::runtime(util::runtime_configuration const& rtcfg)
+      : ini_(rtcfg),
+        instance_number_(++instance_number_counter_),
+        topology_(threads::create_topology()),
+        state_(state_invalid)
+#if defined(HPX_HAVE_SECURITY)
+      , security_data_(new detail::manage_security_data)
+#endif
+    {
+        // initialize our TSS
+        runtime::init_tss();
+
+        counters_.reset(new performance_counters::registry());
+    }
+
+    runtime::~runtime()
+    {
+        // allow to reuse instance number if this was the only instance
+        if (0 == instance_number_counter_)
+            --instance_number_counter_;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     boost::atomic<int> runtime::instance_number_counter_(-1);
