@@ -1277,7 +1277,7 @@ namespace hpx
     HPX_API_EXPORT util::binary_filter* create_binary_filter(
         char const* binary_filter_type, bool compress, error_code& ec = throws);
 
-#if defined(HPX_HAVE_SECURITY)
+#if defined(HPX_HAVE_SODIUM)
     namespace components { namespace security { namespace server
     {
         class certificate;
@@ -1293,7 +1293,7 @@ namespace hpx
 
     /// \brief Return the certificate for the given locality
     ///
-    /// \param id The id representing the locality for which to retrieve 
+    /// \param id The id representing the locality for which to retrieve
     ///           the signed certificate.
     ///
     /// \returns This function returns the signed certificate for the locality

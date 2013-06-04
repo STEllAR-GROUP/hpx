@@ -167,6 +167,7 @@ namespace hpx
         return runtime_mode_invalid;
     }
 
+#if defined(HPX_HAVE_SECURITY)
     namespace detail
     {
         struct manage_security_data
@@ -179,6 +180,7 @@ namespace hpx
             HPX_STD_UNIQUE_PTR<components::security::server::certificate_store> cert_store_;
         };
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     runtime::runtime(util::runtime_configuration const& rtcfg)
