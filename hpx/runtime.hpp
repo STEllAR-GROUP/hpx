@@ -16,12 +16,6 @@
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/query_counters.hpp>
 
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/server/certificate_store.hpp>
-#include <hpx/util/security/root_certificate_authority.hpp>
-#include <hpx/util/security/subordinate_certificate_authority.hpp>
-#endif
-
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,6 +26,11 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     class HPX_EXPORT runtime_impl;
+
+    namespace detail
+    {
+        struct manage_security_data;
+    }
 
     class HPX_EXPORT runtime
     {
@@ -60,15 +59,7 @@ namespace hpx
         /// construct a new instance of a runtime
         runtime(util::runtime_configuration const& rtcfg);
 
-        virtual ~runtime()
-        {
-            // allow to reuse instance number if this was the only instance
-            if (0 == instance_number_counter_)
-                --instance_number_counter_;
-#if defined(HPX_HAVE_SECURITY)
-            delete cert_store_;
-#endif
-        }
+        virtual ~runtime();
 
         /// \brief Manage list of functions to call on exit
         void on_exit(HPX_STD_FUNCTION<void()> f)
@@ -346,12 +337,8 @@ namespace hpx
         components::server::runtime_support runtime_support_;
 
 #if defined(HPX_HAVE_SECURITY)
-        // manage certificates for root-CA and sub-CA
-        util::security::root_certificate_authority root_certificate_authority_;
-        util::security::subordinate_certificate_authority subordinate_certificate_authority_;
-
-        /// certificate store
-        components::security::server::certificate_store* cert_store_;
+        // allocate dynamically to reduce dependencies
+        HPX_STD_UNIQUE_PTR<detail::manage_security_data> security_data_;
 #endif
     };
 
