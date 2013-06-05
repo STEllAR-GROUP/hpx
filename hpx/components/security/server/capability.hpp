@@ -53,6 +53,14 @@ namespace hpx { namespace components { namespace security
                 bits_.set(position, value);
             }
 
+            friend std::ostream & operator<<(std::ostream & os,
+                                             capability const & capability)
+            {
+                return os << "<capability "
+                          << capability.bits_.to_string()
+                          << ">";
+            }
+
         private:
             friend class boost::serialization::access;
 

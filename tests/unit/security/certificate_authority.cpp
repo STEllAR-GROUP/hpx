@@ -12,6 +12,8 @@
 #include <hpx/util/security/root_certificate_authority.hpp>
 #include <hpx/util/security/subordinate_certificate_authority.hpp>
 
+#include <iostream>
+
 int hpx_main(boost::program_options::variables_map &)
 {
     {
@@ -24,10 +26,14 @@ int hpx_main(boost::program_options::variables_map &)
         server::signed_type<server::certificate> const & root_certificate =
             root_certificate_authority.get_certificate();
 
+        std::cout << root_certificate << std::endl;
+
         server::certificate_store store(root_certificate);
 
         server::public_key const & root_public_key =
             root_certificate.get_type().get_subject_public_key();
+
+        std::cout << root_public_key << std::endl;
 
         HPX_TEST(root_public_key.verify(root_certificate));
 
@@ -39,6 +45,8 @@ int hpx_main(boost::program_options::variables_map &)
         server::signed_type<server::certificate> const &
             subordinate_certificate =
                 subordinate_certificate_authority.get_certificate();
+
+        std::cout << subordinate_certificate << std::endl;
 
         store.insert(subordinate_certificate);
 

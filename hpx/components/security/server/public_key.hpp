@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_SECURITY_SERVER_PUBLIC_KEY_HPP
 
 #include <boost/array.hpp>
+#include <boost/io/ios_state.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <sodium.h>
 
@@ -29,6 +30,25 @@ namespace hpx { namespace components { namespace security { namespace server
                 reinterpret_cast<unsigned char const *>(&signed_type),
                 sizeof signed_type,
                 bytes_.data()) == 0;
+        }
+
+        friend std::ostream & operator<<(std::ostream & os,
+                                         public_key const & public_key)
+        {
+            boost::io::ios_flags_saver ifs(os);
+
+            os << "<public_key \"";
+
+            for (std::size_t i = 0; i < crypto_sign_PUBLICKEYBYTES; ++i)
+            {
+                os << std::hex
+                   << std::nouppercase
+                   << std::setfill('0')
+                   << std::setw(2)
+                   << static_cast<unsigned int>(public_key.bytes_[i]);
+            }
+
+            return os << "\">";
         }
 
     private:

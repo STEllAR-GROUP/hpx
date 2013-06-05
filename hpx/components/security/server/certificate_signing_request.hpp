@@ -46,6 +46,18 @@ namespace hpx { namespace components { namespace security { namespace server
             return capability_;
         }
 
+        friend std::ostream & operator<<(std::ostream & os,
+                                         certificate_signing_request const & certificate_signing_request)
+        {
+            return os << "<certificate_signing_request "
+                      << certificate_signing_request.subject_
+                      << " "
+                      << certificate_signing_request.subject_public_key_
+                      << " "
+                      << certificate_signing_request.capability_
+                      << ">";
+        }
+
     private:
         friend class boost::serialization::access;
 

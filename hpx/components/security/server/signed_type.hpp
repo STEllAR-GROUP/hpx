@@ -28,6 +28,16 @@ namespace hpx { namespace components { namespace security { namespace server
 
         static signed_type invalid_signed_type;
 
+        friend std::ostream & operator<<(std::ostream & os,
+                                         signed_type<T> const & signed_type)
+        {
+            return os << "<signed_type "
+                      << signed_type.signature_
+                      << " "
+                      << signed_type.type_
+                      << ">";
+        }
+
     private:
         friend class boost::serialization::access;
 

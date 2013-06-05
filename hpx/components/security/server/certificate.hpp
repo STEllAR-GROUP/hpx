@@ -2,6 +2,7 @@
 #define HPX_SECURITY_CERTIFICATE_HPP
 
 #include <boost/serialization/serialization.hpp>
+#include <boost/io/ios_state.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
 #include "certificate_signing_request.hpp"
@@ -54,6 +55,20 @@ namespace hpx { namespace components { namespace security { namespace server
         capability const & get_capability() const
         {
             return capability_;
+        }
+
+        friend std::ostream & operator<<(std::ostream & os,
+                                         certificate const & certificate)
+        {
+            return os << "<certificate "
+                      << certificate.issuer_
+                      << " "
+                      << certificate.subject_
+                      << " "
+                      << certificate.subject_public_key_
+                      << " "
+                      << certificate.capability_
+                      << ">";
         }
 
     private:
