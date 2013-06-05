@@ -15,7 +15,7 @@
 
 namespace hpx { namespace util { namespace security
 {
-    class root_certificate_authority
+    class HPX_EXPORT root_certificate_authority
     {
         typedef components::security::server::root_certificate_authority
             certificate_authority_type;

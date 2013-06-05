@@ -63,5 +63,5 @@ int main(int argc, char *argv[])
     boost::program_options::options_description desc_commandline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
-    return hpx::init(desc_commandline, argc, argv);
-}
+    HPX_TEST_EQ(hpx::init(desc_commandline, argc, argv), 0);
+    return hpx::util::report_errors();
