@@ -15,7 +15,6 @@
 
 namespace hpx { namespace components { namespace security { namespace server
 {
-    
     class HPX_COMPONENT_EXPORT root_certificate_authority
       : public certificate_authority_base
       , public fixed_component_base<root_certificate_authority>

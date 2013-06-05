@@ -39,6 +39,16 @@ namespace hpx { namespace components { namespace security { namespace server
             return public_key_.verify(signed_type);
         }
 
+        friend std::ostream & operator<<(std::ostream & os,
+                                         key_pair const & key_pair)
+        {
+            return os << "<key_pair "
+                      << key_pair.public_key_
+                      << " "
+                      << key_pair.secret_key_
+                      << ">";
+        }
+
     private:
         friend class boost::serialization::access;
 

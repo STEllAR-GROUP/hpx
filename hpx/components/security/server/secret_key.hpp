@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_SECURITY_SERVER_SECRET_KEY_HPP
 
 #include <boost/array.hpp>
+#include <boost/io/ios_state.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <hpx/exception.hpp>
 #include <sodium.h>
@@ -54,6 +55,25 @@ namespace hpx { namespace components { namespace security { namespace server
             }
 
             return signed_type;
+        }
+
+        friend std::ostream & operator<<(std::ostream & os,
+                                         secret_key const & secret_key)
+        {
+            boost::io::ios_flags_saver ifs(os);
+
+            os << "<secret_key \"";
+
+            for (std::size_t i = 0; i < crypto_sign_SECRETKEYBYTES; ++i)
+            {
+                os << std::hex
+                   << std::nouppercase
+                   << std::setfill('0')
+                   << std::setw(2)
+                   << static_cast<unsigned int>(secret_key.bytes_[i]);
+            }
+
+            return os << "\">";
         }
 
     private:

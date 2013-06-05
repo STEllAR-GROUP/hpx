@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_SECURITY_SERVER_SIGNATURE_HPP
 
 #include <boost/array.hpp>
+#include <boost/io/ios_state.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <sodium.h>
 
@@ -18,6 +19,25 @@ namespace hpx { namespace components { namespace security { namespace server
         signature()
         {
             std::fill(bytes_.begin(), bytes_.end(), 0);
+        }
+
+        friend std::ostream & operator<<(std::ostream & os,
+                                         signature const & signature)
+        {
+            boost::io::ios_flags_saver ifs(os);
+
+            os << "<signature \"";
+
+            for (std::size_t i = 0; i < crypto_sign_BYTES; ++i)
+            {
+                os << std::hex
+                   << std::nouppercase
+                   << std::setfill('0')
+                   << std::setw(2)
+                   << static_cast<unsigned int>(signature.bytes_[i]);
+            }
+
+            return os << "\">";
         }
 
     private:
