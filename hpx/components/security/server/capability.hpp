@@ -56,9 +56,9 @@ namespace hpx { namespace components { namespace security
             friend std::ostream & operator<<(std::ostream & os,
                                              capability const & capability)
             {
-                return os << "<capability "
+                return os << "<capability \""
                           << capability.bits_.to_string()
-                          << ">";
+                          << "\">";
             }
 
         private:
