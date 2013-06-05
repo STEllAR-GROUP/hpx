@@ -73,3 +73,4 @@ int main(int argc, char *argv[])
 
     HPX_TEST_EQ(hpx::init(desc_commandline, argc, argv), 0);
     return hpx::util::report_errors();
+}
