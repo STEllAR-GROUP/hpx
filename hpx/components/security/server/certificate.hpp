@@ -10,6 +10,10 @@
 
 namespace hpx { namespace components { namespace security { namespace server
 {
+#if defined(_MSC_VER)
+#  pragma pack(push, 1)
+#endif
+
     class certificate
     {
     public:
@@ -92,6 +96,10 @@ namespace hpx { namespace components { namespace security { namespace server
 
         capability capability_;
     };
+
+#if defined(_MSC_VER)
+#  pragma pack(pop)
+#endif
 }}}}
 
 #endif

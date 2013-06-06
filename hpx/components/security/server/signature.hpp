@@ -13,6 +13,10 @@
 
 namespace hpx { namespace components { namespace security { namespace server
 {
+#if defined(_MSC_VER)
+#  pragma pack(push, 1)
+#endif
+
     class signature
     {
     public:
@@ -53,6 +57,10 @@ namespace hpx { namespace components { namespace security { namespace server
             unsigned char, crypto_sign_BYTES
         > bytes_;
     };
+
+#if defined(_MSC_VER)
+#  pragma pack(pop)
+#endif
 }}}}
 
 #endif

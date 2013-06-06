@@ -14,6 +14,10 @@
 
 namespace hpx { namespace components { namespace security { namespace server
 {
+#if defined(_MSC_VER)
+#  pragma pack(push, 1)
+#endif
+
     class key_pair
     {
     public:
@@ -62,6 +66,10 @@ namespace hpx { namespace components { namespace security { namespace server
         public_key public_key_;
         secret_key secret_key_;
     };
+
+#if defined(_MSC_VER)
+#  pragma pack(pop)
+#endif
 }}}}
 
 #endif

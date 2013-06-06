@@ -15,6 +15,10 @@
 
 namespace hpx { namespace components { namespace security { namespace server
 {
+#if defined(_MSC_VER)
+#  pragma pack(push, 1)
+#endif
+
     class public_key
     {
     public:
@@ -66,6 +70,10 @@ namespace hpx { namespace components { namespace security { namespace server
             unsigned char, crypto_sign_PUBLICKEYBYTES
         > bytes_;
     };
+
+#if defined(_MSC_VER)
+#  pragma pack(pop)
+#endif
 }}}}
 
 #endif

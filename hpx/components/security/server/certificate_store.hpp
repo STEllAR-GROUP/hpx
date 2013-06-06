@@ -32,7 +32,9 @@ namespace hpx { namespace components { namespace security { namespace server
                 HPX_THROW_EXCEPTION(
                     hpx::security_error
                   , "certificate_store::certificate_store"
-                  , "The certificate is not self-signed"
+                  , boost::str(boost::format(
+                        "the certificate is not self-signed: %1%") %
+                        signed_certificate)
                 )
             }
 
@@ -43,7 +45,9 @@ namespace hpx { namespace components { namespace security { namespace server
                 HPX_THROW_EXCEPTION(
                     hpx::security_error
                   , "certificate_store::certificate_store"
-                  , "The certificate signature is invalid"
+                  , boost::str(boost::format(
+                        "the certificate signature is invalid: %1%") %
+                        signed_certificate)
                 )
             }
 
@@ -68,7 +72,9 @@ namespace hpx { namespace components { namespace security { namespace server
                 HPX_THROW_EXCEPTION(
                     hpx::security_error
                   , "certificate_store::insert"
-                  , "The certificate issuer is unknown"
+                  , boost::str(boost::format(
+                        "the certificate issuer is unknown: %1%") %
+                        signed_certificate)
                 )
             }
 
@@ -81,7 +87,9 @@ namespace hpx { namespace components { namespace security { namespace server
                 HPX_THROW_EXCEPTION(
                     hpx::security_error
                   , "certificate_store::insert"
-                  , "The certificate signature is invalid"
+                  , boost::str(boost::format(
+                        "the certificate signature is invalid: %1%") %
+                        signed_certificate)
                 )
             }
 
@@ -98,7 +106,9 @@ namespace hpx { namespace components { namespace security { namespace server
                 HPX_THROWS_IF(
                     ec, hpx::security_error
                   , "certificate_store::certificate_store"
-                  , "Requesting a certificate for an unknown subject"
+                  , boost::str(boost::format(
+                        "requesting a certificate for an unknown subject: %1%") %
+                        subject)
                 );
                 return signed_type<certificate>::invalid_signed_type;
             }
