@@ -12,6 +12,10 @@
 
 namespace hpx { namespace components { namespace security { namespace server
 {
+#if defined(_MSC_VER)
+#  pragma pack(push, 1)
+#endif
+
     template <typename T>
     class signed_type
     {
@@ -51,6 +55,10 @@ namespace hpx { namespace components { namespace security { namespace server
         signature signature_;
         T type_;
     };
+
+#if defined(_MSC_VER)
+#  pragma pack(pop)
+#endif
 
     template <typename T>
     signed_type<T> signed_type<T>::invalid_signed_type =
