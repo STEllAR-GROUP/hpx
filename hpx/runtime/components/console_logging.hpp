@@ -56,6 +56,7 @@ namespace hpx { namespace components
         messages_type queue_;
 
         boost::atomic<bool> activated_;
+        boost::atomic<bool> is_sending_;
     };
 
     struct pending_logs_tag {};
