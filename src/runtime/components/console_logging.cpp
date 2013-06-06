@@ -202,18 +202,30 @@ namespace hpx { namespace components
         // WARNING: Never, ever call this outside of a HPX-thread.
         BOOST_ASSERT(threads::get_self_ptr());
 
-        if (!ensure_prefix())
-            return;             // some other thread tries to do logging
+        bool expected = false;
+        if (!is_sending_.compare_exchange_strong(expected, true))
+            return;
 
-        messages_type msgs;
-        {
-            queue_mutex_type::scoped_lock l(queue_mtx_);
-            if (queue_.empty())
-                return;         // some other thread did the deed
-            queue_.swap(msgs);
+        try {
+            if (!ensure_prefix())
+                return;             // some other thread tries to do logging
+
+            messages_type msgs;
+            {
+                queue_mutex_type::scoped_lock l(queue_mtx_);
+                if (queue_.empty())
+                    return;         // some other thread did the deed
+                queue_.swap(msgs);
+            }
+
+            console_logging_locked(prefix_, msgs);
+        }
+        catch(...) {
+            is_sending_ = false;
+            throw;
         }
 
-        console_logging_locked(prefix_, msgs);
+        is_sending_ = false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
