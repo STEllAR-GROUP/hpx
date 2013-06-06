@@ -187,12 +187,18 @@ namespace hpx
         // this is the AGAS booststrap node (node zero)
         if (ini_.get_agas_service_mode() == agas::service_mode_bootstrap)
         {
-            // Initialize the root-CA
-            boost::mutex::scoped_lock l(mtx_);
-            security_data_->root_certificate_authority_.initialize();
-            security_data_->cert_store_.reset(
-                new components::security::server::certificate_store(
-                    security_data_->root_certificate_authority_.get_certificate()));
+            {
+                // Initialize the root-CA
+                boost::mutex::scoped_lock l(mtx_);
+                security_data_->root_certificate_authority_.initialize();
+                security_data_->cert_store_.reset(
+                    new components::security::server::certificate_store(
+                        security_data_->root_certificate_authority_.get_certificate()));
+            }
+
+            LSEC_(debug) << (boost::format(
+                "runtime::init_security: initialized root certificate authority: %1%") % 
+                security_data_->root_certificate_authority_.get_certificate());
         }
     }
 
@@ -204,6 +210,10 @@ namespace hpx
         // point, the root locality was already initialized (see above).
         if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
         {
+            LSEC_(debug) << (boost::format(
+                "runtime::store_root_certificate: received root "
+                "certificate: %1%") %  cert);
+
             boost::mutex::scoped_lock l(mtx_);
             security_data_->cert_store_.reset(
                 new components::security::server::certificate_store(cert));
@@ -214,7 +224,14 @@ namespace hpx
     void runtime::init_subordinate_certificate_authority()
     {
         security_data_->subordinate_certificate_authority_.initialize();
-        add_locality_certificate(get_certificate());
+        components::security::server::signed_certificate cert =
+            get_certificate();
+
+        LSEC_(debug) << (boost::format(
+            "runtime::init_subordinate_certificate_authority: initialized "
+            "subordinate certificate authority: %1%") % cert);
+
+        add_locality_certificate(cert);
     }
 
     components::security::server::signed_certificate
@@ -245,6 +262,10 @@ namespace hpx
         components::security::server::signed_certificate const& cert)
     {
         BOOST_ASSERT(security_data_.get() != 0);
+
+        LSEC_(debug) << (boost::format(
+            "runtime::add_locality_certificate: locality(%1%): adding locality "
+            "certificate: %2%") % here() % cert);
 
         boost::mutex::scoped_lock l(mtx_);
         BOOST_ASSERT(0 != security_data_->cert_store_);     // should have been created
