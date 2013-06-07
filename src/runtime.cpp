@@ -286,7 +286,15 @@ namespace hpx
         }
 
         boost::mutex::scoped_lock l(mtx_);
-        return security_data_->cert_store_->at(!gid ? get_parcel_handler().get_locality() : gid, ec);
+
+        if (!gid) {
+            using util::security::get_subordinate_certificate_authority_gid;
+            return security_data_->cert_store_->at(
+                get_subordinate_certificate_authority_gid(get_locality_id())
+              , ec);
+        }
+
+        return security_data_->cert_store_->at(gid, ec);
     }
 #endif
 
