@@ -5,8 +5,7 @@
 
 #include <hpx/components/security/certificate_authority_base.hpp>
 #include <hpx/components/security/server/subordinate_certificate_authority.hpp>
-
-#include <iostream>
+#include <hpx/runtime/naming/name.hpp>
 
 namespace hpx { namespace components { namespace security { namespace server
 {

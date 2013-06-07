@@ -28,15 +28,10 @@ namespace hpx { namespace util { namespace security
                 "delete_subordinate_certificate_authority");
 
         (*function.first)(subordinate_certificate_authority_);
-
-        delete key_pair_;
     }
 
     void subordinate_certificate_authority::initialize()
     {
-        BOOST_ASSERT(0 == key_pair_);
-        key_pair_ = new components::security::server::key_pair;
-
         // Bind the new_subordinate_certificate_authority symbol dynamically and invoke it.
         typedef certificate_authority_type* (*function_type)(
             components::security::server::key_pair const&
@@ -50,7 +45,7 @@ namespace hpx { namespace util { namespace security
                 "new_subordinate_certificate_authority");
 
         BOOST_ASSERT(0 == subordinate_certificate_authority_);
-        subordinate_certificate_authority_ = (*function.first)(*key_pair_,
+        subordinate_certificate_authority_ = (*function.first)(key_pair_,
             naming::id_type(root_certificate_authority::get_gid()
                           , naming::id_type::unmanaged));
     }
@@ -112,6 +107,12 @@ namespace hpx { namespace util { namespace security
         (*function.first)(subordinate_certificate_authority_, &gid);
 
         return gid;
+    }
+
+    components::security::server::key_pair const &
+        subordinate_certificate_authority::get_key_pair() const
+    {
+        return key_pair_;
     }
 }}}
 

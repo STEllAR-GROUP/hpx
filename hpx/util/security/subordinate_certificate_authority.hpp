@@ -22,8 +22,7 @@ namespace hpx { namespace util { namespace security
 
     public:
         subordinate_certificate_authority()
-          : key_pair_(0)
-          , subordinate_certificate_authority_(0)
+          : subordinate_certificate_authority_(0)
         {
         }
 
@@ -36,8 +35,10 @@ namespace hpx { namespace util { namespace security
 
         naming::gid_type get_gid() const;
 
+        components::security::server::key_pair const & get_key_pair() const;
+
     private:
-        components::security::server::key_pair* key_pair_;
+        components::security::server::key_pair key_pair_;
         certificate_authority_type* subordinate_certificate_authority_;
     };
 

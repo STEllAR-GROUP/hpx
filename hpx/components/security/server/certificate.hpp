@@ -1,5 +1,10 @@
-#ifndef HPX_SECURITY_CERTIFICATE_HPP
-#define HPX_SECURITY_CERTIFICATE_HPP
+//  Copyright (c) 2013 Jeroen Habraken
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_HPP
+#define HPX_COMPONENTS_SECURITY_SERVER_CERTIFICATE_HPP
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/io/ios_state.hpp>
