@@ -10,7 +10,7 @@
 
 #include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/binary_filter_factory.hpp>
-#include <hpx/plugins/compression/snappy_serialization_filter.hpp>
+#include <hpx/plugins/binary_filter/snappy_serialization_filter.hpp>
 
 #include <boost/format.hpp>
 
@@ -43,16 +43,16 @@ namespace hpx { namespace plugins { namespace compression
             snappy_serialization_filter, util::binary_filter>();
     }
 
-    void snappy_serialization_filter::set_max_compression_length(std::size_t size)
+    void snappy_serialization_filter::set_max_length(std::size_t size)
     {
         buffer_.reserve(size);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t snappy_serialization_filter::init_decompression_data(
-        char const* buffer, std::size_t size, std::size_t decompressed_size)
+    std::size_t snappy_serialization_filter::init_data(
+        char const* buffer, std::size_t size, std::size_t buffer_size)
     {
-        buffer_.resize(decompressed_size);
+        buffer_.resize(buffer_size);
         snappy::RawUncompress(buffer, size, buffer_.data());
         current_ = 0;
         return buffer_.size();

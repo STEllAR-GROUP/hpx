@@ -12,7 +12,9 @@
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/server/certificate.hpp>
+#include <hpx/components/security/server/parcel_suffix.hpp>
 #include <hpx/components/security/server/signed_type.hpp>
+#include <hpx/components/security/server/hash.hpp>
 #endif
 
 #include <stdexcept>
@@ -86,20 +88,26 @@ namespace hpx { namespace parcelset { namespace tcp
 
             out_buffer_.reserve(arg_size*2);
 
+#if defined(HPX_HAVE_SECURITY)
+            // calculate hash of whole message
+            bool has_certificate = false;
+#endif
             // mark start of serialization
             util::high_resolution_timer timer;
 
             {
                 // Serialize the data
-                util::binary_filter* filter = pv[0].get_serialization_filter();
+                HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
+                    pv[0].get_serialization_filter());
+
                 int archive_flags = archive_flags_;
-                if (filter) {
-                    filter->set_max_compression_length(out_buffer_.capacity());
+                if (filter.get() != 0) {
+                    filter->set_max_length(out_buffer_.capacity());
                     archive_flags |= util::enable_compression;
                 }
 
                 util::portable_binary_oarchive archive(
-                    out_buffer_, filter, archive_flags);
+                    out_buffer_, filter.get(), archive_flags);
 
 #if defined(HPX_HAVE_SECURITY)
                 if (first_message_)
@@ -109,10 +117,10 @@ namespace hpx { namespace parcelset { namespace tcp
                         hpx::get_locality_certificate(ec);
                     if (!ec) {
                         archive << first_message_ << certificate;
+                        has_certificate = true;
                         first_message_ = false;
                     }
                     else {
-                        bool has_certificate = false;
                         archive << has_certificate;
                     }
                 }
@@ -129,10 +137,44 @@ namespace hpx { namespace parcelset { namespace tcp
                 }
 
                 arg_size = archive.bytes_written();
+                out_buffer_.resize(arg_size);
             }
 
             // store the time required for serialization
             send_data_.serialization_time_ = timer.elapsed_nanoseconds();
+
+#if defined(HPX_HAVE_SECURITY)
+            // calculate and sign the hash, but only after everything has
+            // been initialized
+            if (!first_message_) {
+                // mark start of security work
+                util::high_resolution_timer timer_sec;
+
+                // calculate hash of overall message
+                components::security::server::hash hash;
+                hash.update(
+                    reinterpret_cast<unsigned char const*>(&out_buffer_.front()),
+                    arg_size);
+
+                using components::security::server::parcel_suffix;
+                using components::security::server::signed_parcel_suffix;
+
+                signed_parcel_suffix suffix;
+                sign_parcel_suffix(
+                    parcel_suffix(pv[0].get_parcel_id(), hash),
+                    suffix);
+
+                // append the signed parcel suffix to the message
+                arg_size += sizeof(signed_parcel_suffix);
+                out_buffer_.reserve(arg_size);
+
+                std::copy_n(reinterpret_cast<char const *>(&suffix),
+                    sizeof(signed_parcel_suffix), std::back_inserter(out_buffer_));
+
+                // store the time required for security
+                send_data_.security_time_ = timer_sec.elapsed_nanoseconds();
+            }
+#endif
         }
         catch (boost::archive::archive_exception const& e) {
             // We have to repackage all exceptions thrown by the

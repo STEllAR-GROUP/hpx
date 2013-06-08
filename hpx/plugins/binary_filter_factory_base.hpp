@@ -29,7 +29,8 @@ namespace hpx { namespace plugins
         ///
         /// return Returns the newly created instance of the binary filter
         ///        supported by this factory
-        virtual util::binary_filter* create(bool compress) = 0;
+        virtual util::binary_filter* create(bool compress,
+            util::binary_filter* next_filter = 0) = 0;
     };
 }}
 

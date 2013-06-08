@@ -73,11 +73,11 @@ namespace hpx { namespace util
         struct container_type : erase_container_type
         {
             container_type(Container& cont)
-              : cont_(cont), current_(0)
+              : cont_(cont), current_(0), filter_(0)
             {}
             ~container_type()
             {
-                if (filter_.get()) {
+                if (filter_) {
                     std::size_t written = 0;
                     do {
                         bool flushed = filter_->flush(&cont_[current_],
@@ -98,7 +98,8 @@ namespace hpx { namespace util
 
             void set_filter(binary_filter* filter)
             {
-                filter_.reset(filter);
+                BOOST_ASSERT(0 == filter_);
+                filter_ = filter;
             }
 
             void save_binary(void const* address, std::size_t count)
@@ -106,7 +107,7 @@ namespace hpx { namespace util
                 if (count != 0)
                 {
                     cont_.resize(cont_.size() + count);
-                    if (filter_.get()) {
+                    if (filter_) {
                         filter_->save(address, count);
                     }
                     else {
@@ -127,7 +128,7 @@ namespace hpx { namespace util
 
             Container& cont_;
             std::size_t current_;
-            HPX_STD_UNIQUE_PTR<binary_filter> filter_;
+            binary_filter* filter_;
         };
     }
 

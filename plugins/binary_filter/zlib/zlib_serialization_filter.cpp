@@ -10,7 +10,7 @@
 
 #include <hpx/plugins/plugin_registry.hpp>
 #include <hpx/plugins/binary_filter_factory.hpp>
-#include <hpx/plugins/compression/zlib_serialization_filter.hpp>
+#include <hpx/plugins/binary_filter/zlib_serialization_filter.hpp>
 
 #include <boost/format.hpp>
 
@@ -88,7 +88,7 @@ namespace hpx { namespace plugins { namespace compression
             zlib_serialization_filter, util::binary_filter>();
     }
 
-    void zlib_serialization_filter::set_max_compression_length(std::size_t size)
+    void zlib_serialization_filter::set_max_length(std::size_t size)
     {
         buffer_.reserve(size);
     }
@@ -104,11 +104,11 @@ namespace hpx { namespace plugins { namespace compression
         return src_begin-static_cast<char const*>(src);
     }
 
-    std::size_t zlib_serialization_filter::init_decompression_data(
-        char const* buffer, std::size_t size, std::size_t decompressed_size)
+    std::size_t zlib_serialization_filter::init_data(
+        char const* buffer, std::size_t size, std::size_t buffer_size)
     {
-        buffer_.resize(decompressed_size);
-        std::size_t s = load_impl(buffer_.data(), decompressed_size, buffer, size);
+        buffer_.resize(buffer_size);
+        std::size_t s = load_impl(buffer_.data(), buffer_size, buffer, size);
         if (s != size)
         {
             HPX_THROW_EXCEPTION(serialization_error,

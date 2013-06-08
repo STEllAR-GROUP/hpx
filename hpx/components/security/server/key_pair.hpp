@@ -32,9 +32,9 @@ namespace hpx { namespace components { namespace security { namespace server
         }
 
         template <typename T>
-        signed_type<T> sign(T const & type) const
+        signed_type<T> sign(T const & type, error_code& ec = throws) const
         {
-            return secret_key_.sign(type);
+            return secret_key_.sign(type, ec);
         }
 
         template <typename T>

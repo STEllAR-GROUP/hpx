@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace security
                 ar & bits_;
             }
 
-            std::bitset<traits::capability<>::size> bits_;
+            std::bitset<security::traits::capability<>::size> bits_;
         };
     }
 }}}

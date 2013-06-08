@@ -3,12 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_ACTION_BZIP2_SERIALIZATION_FILTER_FEB_18_2013_1240AM)
-#define HPX_ACTION_BZIP2_SERIALIZATION_FILTER_FEB_18_2013_1240AM
+#if !defined(HPX_ACTION_ZLIB_SERIALIZATION_FILTER_FEB_15_2013_0935AM)
+#define HPX_ACTION_ZLIB_SERIALIZATION_FILTER_FEB_15_2013_0935AM
 
 #include <hpx/hpx_fwd.hpp>
 
-#if defined(HPX_HAVE_COMPRESSION_BZIP2)
+#if defined(HPX_HAVE_COMPRESSION_ZLIB)
 
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
@@ -18,7 +18,7 @@
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/export.hpp>
-#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 
 #include <memory>
 
@@ -29,20 +29,19 @@ namespace hpx { namespace plugins { namespace compression
 {
     namespace detail
     {
-        class bzip2_compdecomp
-          : public boost::iostreams::detail::bzip2_base,
-            public boost::iostreams::detail::bzip2_allocator<std::allocator<char> >
+        class zlib_compdecomp
+          : public boost::iostreams::detail::zlib_base,
+            public boost::iostreams::detail::zlib_allocator<std::allocator<char> >
         {
             typedef
-                boost::iostreams::detail::bzip2_allocator<std::allocator<char> >
+                boost::iostreams::detail::zlib_allocator<std::allocator<char> >
             allocator_type;
 
         public:
-            bzip2_compdecomp();             // used for decompression
-            bzip2_compdecomp(bool compress,
-                boost::iostreams::bzip2_params const& params =
-                    boost::iostreams::bzip2_params());
-            ~bzip2_compdecomp();
+            zlib_compdecomp(bool compress = false,
+                boost::iostreams::zlib_params const& params =
+                    boost::iostreams::zlib::default_compression);
+            ~zlib_compdecomp();
 
             bool save(char const*& src_begin, char const* src_end,
                 char*& dest_begin, char* dest_end, bool flush = false);
@@ -53,40 +52,31 @@ namespace hpx { namespace plugins { namespace compression
 
             bool eof() const { return eof_; }
 
-        protected:
-            void init()
-            {
-                boost::iostreams::detail::bzip2_base::init(compress_,
-                    static_cast<allocator_type&>(*this));
-            }
-
         private:
             bool compress_;
             bool eof_;
         };
     }
 
-    struct HPX_LIBRARY_EXPORT bzip2_serialization_filter : public util::binary_filter
+    struct HPX_LIBRARY_EXPORT zlib_serialization_filter
+      : public util::binary_filter
     {
-        bzip2_serialization_filter()
-          : current_(0)
-        {}
-
-        bzip2_serialization_filter(bool compress)
+        zlib_serialization_filter(bool compress = false,
+                util::binary_filter* next_filter = 0)
           : compdecomp_(compress), current_(0)
         {}
-        ~bzip2_serialization_filter();
+        ~zlib_serialization_filter();
 
         void load(void* dst, std::size_t dst_count);
         void save(void const* src, std::size_t src_count);
         bool flush(void* dst, std::size_t dst_count, std::size_t& written);
 
+        void set_max_length(std::size_t size);
+        std::size_t init_data(char const* buffer,
+            std::size_t size, std::size_t buffer_size);
+
         /// serialization support
         static void register_base();
-
-        void set_max_compression_length(std::size_t size);
-        std::size_t init_decompression_data(char const* buffer, 
-            std::size_t size, std::size_t decompressed_size);
 
     protected:
         std::size_t load_impl(void* dst, std::size_t dst_count,
@@ -99,7 +89,7 @@ namespace hpx { namespace plugins { namespace compression
         template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
 
-        detail::bzip2_compdecomp compdecomp_;
+        detail::zlib_compdecomp compdecomp_;
         std::vector<char> buffer_;
         std::size_t current_;
     };
@@ -108,10 +98,10 @@ namespace hpx { namespace plugins { namespace compression
 #include <hpx/config/warnings_suffix.hpp>
 
 HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
-    hpx::plugins::compression::bzip2_serialization_filter);
+    hpx::plugins::compression::zlib_serialization_filter);
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_ACTION_USES_BZIP2_COMPRESSION(action)                             \
+#define HPX_ACTION_USES_ZLIB_COMPRESSION(action)                              \
     namespace hpx { namespace traits                                          \
     {                                                                         \
         template <>                                                           \
@@ -122,7 +112,7 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
             static util::binary_filter* call(parcelset::parcel const& p)      \
             {                                                                 \
                 return hpx::create_binary_filter(                             \
-                    "bzip2_serialization_filter", true);                      \
+                    "zlib_serialization_filter", true);                       \
             }                                                                 \
         };                                                                    \
     }}                                                                        \
@@ -130,7 +120,7 @@ HPX_SERIALIZATION_REGISTER_TYPE_DECLARATION(
 
 #else
 
-#define HPX_ACTION_USES_BZIP2_COMPRESSION(action)
+#define HPX_ACTION_USES_ZLIB_COMPRESSION(action)
 
 #endif
 
