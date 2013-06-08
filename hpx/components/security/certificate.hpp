@@ -13,6 +13,7 @@
 #include "public_key.hpp"
 
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/is_bitwise_serializable.hpp>
 #include <boost/io/ios_state.hpp>
 
 namespace hpx { namespace components { namespace security

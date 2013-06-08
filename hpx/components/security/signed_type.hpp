@@ -6,7 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_SIGNED_TYPE_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_SIGNED_TYPE_HPP
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/is_bitwise_serializable.hpp>
 
 #include <hpx/components/security/signature.hpp>
 

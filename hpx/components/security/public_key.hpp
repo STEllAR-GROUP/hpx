@@ -6,9 +6,13 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_PUBLIC_KEY_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_PUBLIC_KEY_HPP
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/is_bitwise_serializable.hpp>
+
 #include <sodium.h>
 
 #include "signed_type.hpp"

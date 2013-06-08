@@ -6,9 +6,13 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_SIGNATURE_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_SIGNATURE_HPP
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/is_bitwise_serializable.hpp>
+
 #include <sodium.h>
 
 namespace hpx { namespace components { namespace security
