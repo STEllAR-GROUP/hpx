@@ -82,8 +82,7 @@ namespace hpx { namespace components { namespace security
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int)
         {
-            ar & boost::serialization::make_array(begin(),
-                sizeof(certificate_signing_request));
+            ar & boost::serialization::make_array(begin(), size());
         }
 
         naming::gid_type subject_;

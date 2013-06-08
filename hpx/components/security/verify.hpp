@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace security
                 naming::gid_type& parcel_id,
                 error_code& ec = throws)
     {
-        if (parcel_data.size() < sizeof(signed_type<parcel_suffix>))
+        if (parcel_data.size() < signed_type<parcel_suffix>::size())
         {
             HPX_THROWS_IF(
                 ec

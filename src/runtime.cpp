@@ -191,7 +191,7 @@ namespace hpx
         {
             {
                 // Initialize the root-CA
-                boost::mutex::scoped_lock l(mtx_);
+                lcos::local::spinlock::scoped_lock l(security_mtx_);
                 security_data_->root_certificate_authority_.initialize();
                 security_data_->cert_store_.reset(
                     new components::security::certificate_store(
@@ -216,7 +216,7 @@ namespace hpx
                 "runtime::store_root_certificate: received root "
                 "certificate: %1%") %  cert);
 
-            boost::mutex::scoped_lock l(mtx_);
+            lcos::local::spinlock::scoped_lock l(security_mtx_);
             security_data_->cert_store_.reset(
                 new components::security::certificate_store(cert));
         }
@@ -270,7 +270,7 @@ namespace hpx
             "runtime::add_locality_certificate: locality(%1%): adding locality "
             "certificate: %2%") % here() % cert);
 
-        boost::mutex::scoped_lock l(mtx_);
+        lcos::local::spinlock::scoped_lock l(security_mtx_);
         BOOST_ASSERT(0 != security_data_->cert_store_);     // should have been created
         security_data_->cert_store_->insert(cert);
     }
@@ -288,7 +288,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        boost::mutex::scoped_lock l(mtx_);
+        lcos::local::spinlock::scoped_lock l(security_mtx_);
 
         if (!gid) {
             using util::security::get_subordinate_certificate_authority_gid;
@@ -331,6 +331,7 @@ namespace hpx
             return false;
         }
 
+        lcos::local::spinlock::scoped_lock l(security_mtx_);
         return components::security::verify(
             *security_data_->cert_store_, data, parcel_id);
     }
