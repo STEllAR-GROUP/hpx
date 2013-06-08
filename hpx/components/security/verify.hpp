@@ -6,10 +6,10 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_VERIFY_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_VERIFY_HPP
 
-#include <boost/shared_ptr.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+
 #include <vector>
 
 #include "certificate_store.hpp"

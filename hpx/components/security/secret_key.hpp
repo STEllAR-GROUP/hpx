@@ -6,10 +6,11 @@
 #ifndef HPX_COMPONENTS_SECURITY_SERVER_SECRET_KEY_HPP
 #define HPX_COMPONENTS_SECURITY_SERVER_SECRET_KEY_HPP
 
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <hpx/exception.hpp>
+
 #include <sodium.h>
 
 #include "public_key.hpp"
