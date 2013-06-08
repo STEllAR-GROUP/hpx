@@ -11,10 +11,10 @@
 #include <hpx/traits/type_size.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/server/certificate.hpp>
-#include <hpx/components/security/server/parcel_suffix.hpp>
-#include <hpx/components/security/server/signed_type.hpp>
-#include <hpx/components/security/server/hash.hpp>
+#include <hpx/components/security/certificate.hpp>
+#include <hpx/components/security/parcel_suffix.hpp>
+#include <hpx/components/security/signed_type.hpp>
+#include <hpx/components/security/hash.hpp>
 #endif
 
 #include <stdexcept>
@@ -113,7 +113,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 if (first_message_)
                 {
                     error_code ec(lightweight);
-                    components::security::server::signed_certificate const& certificate =
+                    components::security::signed_certificate const& certificate =
                         hpx::get_locality_certificate(ec);
                     if (!ec) {
                         archive << first_message_ << certificate;
@@ -151,13 +151,13 @@ namespace hpx { namespace parcelset { namespace tcp
                 util::high_resolution_timer timer_sec;
 
                 // calculate hash of overall message
-                components::security::server::hash hash;
+                components::security::hash hash;
                 hash.update(
                     reinterpret_cast<unsigned char const*>(&out_buffer_.front()),
                     arg_size);
 
-                using components::security::server::parcel_suffix;
-                using components::security::server::signed_parcel_suffix;
+                using components::security::parcel_suffix;
+                using components::security::signed_parcel_suffix;
 
                 signed_parcel_suffix suffix;
                 sign_parcel_suffix(
@@ -165,11 +165,10 @@ namespace hpx { namespace parcelset { namespace tcp
                     suffix);
 
                 // append the signed parcel suffix to the message
-                arg_size += sizeof(signed_parcel_suffix);
+                arg_size += signed_parcel_suffix::size();
                 out_buffer_.reserve(arg_size);
 
-                std::copy_n(reinterpret_cast<char const *>(&suffix),
-                    sizeof(signed_parcel_suffix), std::back_inserter(out_buffer_));
+                std::copy(suffix.begin(), suffix.end(), std::back_inserter(out_buffer_));
 
                 // store the time required for security
                 send_data_.security_time_ = timer_sec.elapsed_nanoseconds();

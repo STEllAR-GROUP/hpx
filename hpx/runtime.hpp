@@ -286,28 +286,28 @@ namespace hpx
             util::binary_filter* next_filter, error_code& ec = throws);
 
 #if defined(HPX_HAVE_SECURITY)
-        components::security::server::signed_certificate
+        components::security::signed_certificate
             get_root_certificate(error_code& ec = throws) const;
-        components::security::server::signed_certificate
+        components::security::signed_certificate
             get_certificate(error_code& ec = throws) const;
 
         // add a certificate for another locality
         void add_locality_certificate(
-            components::security::server::signed_certificate const& cert);
+            components::security::signed_certificate const& cert);
 
-        components::security::server::signed_certificate const&
+        components::security::signed_certificate const&
             get_locality_certificate(naming::gid_type const&, error_code& ec) const;
 
         void sign_parcel_suffix(
-            components::security::server::parcel_suffix const& suffix,
-            components::security::server::signed_parcel_suffix& signed_suffix,
+            components::security::parcel_suffix const& suffix,
+            components::security::signed_parcel_suffix& signed_suffix,
             error_code& ec) const;
         bool verify_parcel_suffix(std::vector<char> const& data,
             naming::gid_type& parcel_id, error_code& ec) const;
 
         void init_subordinate_certificate_authority();
         void store_root_certificate(
-            components::security::server::signed_certificate const&);
+            components::security::signed_certificate const&);
 #endif
 
     protected:

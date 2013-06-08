@@ -15,7 +15,7 @@
 #include "public_key.hpp"
 #include "signed_type.hpp"
 
-namespace hpx { namespace components { namespace security { namespace server
+namespace hpx { namespace components { namespace security
 {
 #if defined(_MSC_VER)
 #  pragma pack(push, 1)
@@ -36,10 +36,10 @@ namespace hpx { namespace components { namespace security { namespace server
             unsigned long long signed_type_length;
 
             if (crypto_sign(
-                    reinterpret_cast<unsigned char *>(&signed_type),
+                    signed_type.begin(),
                     &signed_type_length,
-                    reinterpret_cast<unsigned char const *>(&type),
-                    sizeof type,
+                    type.begin(),
+                    type.size(),
                     bytes_.data()) != 0)
             {
                 HPX_THROWS_IF(
@@ -88,14 +88,6 @@ namespace hpx { namespace components { namespace security { namespace server
         }
 
     private:
-        friend class boost::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive & ar, const unsigned int)
-        {
-            ar & bytes_;
-        }
-
         boost::array<
             unsigned char, crypto_sign_SECRETKEYBYTES
         > bytes_;
@@ -104,6 +96,6 @@ namespace hpx { namespace components { namespace security { namespace server
 #if defined(_MSC_VER)
 #  pragma pack(pop)
 #endif
-}}}}
+}}}
 
 #endif

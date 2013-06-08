@@ -35,14 +35,14 @@ namespace hpx { namespace components { namespace security
         {
         }
 
-        server::signed_type<server::certificate> sign_certificate_signing_request(
-            server::signed_type<server::certificate_signing_request> const & signed_csr) const
+        signed_type<certificate> sign_certificate_signing_request(
+            signed_type<certificate_signing_request> const & signed_csr) const
         {
             return this->base_type::sign_certificate_signing_request(
                 this->get_gid(), signed_csr);
         }
 
-        server::signed_type<server::certificate> get_certificate() const
+        signed_type<certificate> get_certificate() const
         {
             return this->base_type::get_certificate(this->get_gid());
         }

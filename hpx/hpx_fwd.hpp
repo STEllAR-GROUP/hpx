@@ -1332,7 +1332,7 @@ namespace hpx
         util::binary_filter* next_filter = 0, error_code& ec = throws);
 
 #if defined(HPX_HAVE_SODIUM)
-    namespace components { namespace security { namespace server
+    namespace components { namespace security
     {
         class certificate;
         class parcel_suffix;
@@ -1341,13 +1341,13 @@ namespace hpx
         template <typename T> class signed_type;
         typedef signed_type<certificate> signed_certificate;
         typedef signed_type<parcel_suffix> signed_parcel_suffix;
-    }}}
+    }}
 
 #if defined(HPX_HAVE_SECURITY)
     /// \brief Return the certificate for this locality
     ///
     /// \returns This function returns the signed certificate for this locality.
-    HPX_API_EXPORT components::security::server::signed_certificate const&
+    HPX_API_EXPORT components::security::signed_certificate const&
         get_locality_certificate(error_code& ec = throws);
 
     /// \brief Return the certificate for the given locality
@@ -1357,7 +1357,7 @@ namespace hpx
     ///
     /// \returns This function returns the signed certificate for the locality
     ///          identified by the parameter \a id.
-    HPX_API_EXPORT components::security::server::signed_certificate const&
+    HPX_API_EXPORT components::security::signed_certificate const&
         get_locality_certificate(naming::id_type const& id, error_code& ec = throws);
 
     /// \brief Add the given certificate to the certificate store of this locality.
@@ -1365,7 +1365,7 @@ namespace hpx
     /// \param cert The certificate to add to the certificate store of this
     ///             locality
     HPX_API_EXPORT void add_locality_certificate(
-        components::security::server::signed_certificate const& cert,
+        components::security::signed_certificate const& cert,
         error_code& ec = throws);
 
     /// \brief Sign the given parcel-suffix
@@ -1374,8 +1374,8 @@ namespace hpx
     /// \param signed_suffix  The signed parcel suffix will be placed here
     ///
     HPX_API_EXPORT void sign_parcel_suffix(
-        components::security::server::parcel_suffix const& suffix,
-        components::security::server::signed_parcel_suffix& signed_suffix,
+        components::security::parcel_suffix const& suffix,
+        components::security::signed_parcel_suffix& signed_suffix,
         error_code& ec = throws);
 
     /// \brief Verify the certificate in the given byte sequence

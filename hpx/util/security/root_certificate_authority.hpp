@@ -8,10 +8,11 @@
 
 #if defined(HPX_HAVE_SODIUM)
 
-#include <boost/assert.hpp>
-#include <hpx/components/security/server/key_pair.hpp>
-#include <hpx/components/security/server/root_certificate_authority.hpp>
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/components/security/key_pair.hpp>
+#include <hpx/components/security/server/root_certificate_authority.hpp>
+
+#include <boost/assert.hpp>
 
 namespace hpx { namespace util { namespace security
 {
@@ -31,13 +32,13 @@ namespace hpx { namespace util { namespace security
 
         void initialize();
 
-        components::security::server::signed_certificate
+        components::security::signed_certificate
             get_certificate(error_code& ec = throws) const;
 
         static naming::gid_type get_gid();
 
     private:
-        components::security::server::key_pair* key_pair_;
+        components::security::key_pair* key_pair_;
         certificate_authority_type* root_certificate_authority_;
     };
 }}}

@@ -12,8 +12,12 @@
 
 #include "hash.hpp"
 
-namespace hpx { namespace components { namespace security { namespace server
+namespace hpx { namespace components { namespace security
 {
+#if defined(_MSC_VER)
+#  pragma pack(push, 1)
+#endif
+
     class parcel_suffix
     {
     public:
@@ -57,10 +61,28 @@ namespace hpx { namespace components { namespace security { namespace server
             return os << "\">";
         }
 
+        unsigned char const* begin() const
+        {
+            return reinterpret_cast<unsigned char const*>(this);
+        }
+        unsigned char const* end() const
+        {
+            return reinterpret_cast<unsigned char const*>(this) + size();
+        }
+
+        BOOST_CONSTEXPR static std::size_t size()
+        {
+            return sizeof(parcel_suffix);
+        }
+
     private:
         naming::gid_type parcel_id_;
         traits::hash<>::final_type hash_;
     };
-}}}}
+
+#if defined(_MSC_VER)
+#  pragma pack(pop)
+#endif
+}}}
 
 #endif

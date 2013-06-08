@@ -14,7 +14,7 @@
 #include "public_key.hpp"
 #include "signed_type.hpp"
 
-namespace hpx { namespace components { namespace security { namespace server
+namespace hpx { namespace components { namespace security
 {
     class certificate_store
     {
@@ -118,6 +118,6 @@ namespace hpx { namespace components { namespace security { namespace server
     private:
         store_type store_;
     };
-}}}}
+}}}
 
 #endif

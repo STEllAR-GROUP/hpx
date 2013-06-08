@@ -11,7 +11,7 @@
 #include <hpx/include/components.hpp>
 
 #include "certificate_authority_base.hpp"
-#include "key_pair.hpp"
+#include <hpx/components/security/key_pair.hpp>
 
 namespace hpx { namespace components { namespace security { namespace server
 {

@@ -34,7 +34,7 @@ namespace hpx { namespace util { namespace security
     {
         // Bind the new_subordinate_certificate_authority symbol dynamically and invoke it.
         typedef certificate_authority_type* (*function_type)(
-            components::security::server::key_pair const&
+            components::security::key_pair const&
           , naming::id_type const&);
         typedef boost::function<void(function_type)> deleter_type;
 
@@ -50,7 +50,7 @@ namespace hpx { namespace util { namespace security
                           , naming::id_type::unmanaged));
     }
 
-    components::security::server::signed_certificate
+    components::security::signed_certificate
         subordinate_certificate_authority::get_certificate(error_code& ec) const
     {
         if (0 == subordinate_certificate_authority_)
@@ -58,15 +58,13 @@ namespace hpx { namespace util { namespace security
             HPX_THROWS_IF(ec, invalid_status,
                 "subordinate_certificate_authority::get_certificate",
                 "subordinate_certificate_authority is not initialized yet");
-            return components::security::server::signed_certificate::invalid_signed_type;
+            return components::security::signed_certificate::invalid_signed_type;
         }
 
         // Bind the certificate_authority_get_certificate symbol dynamically and invoke it.
         typedef void (*function_type)(
             components::security::server::certificate_authority_base*
-          , components::security::server::signed_type<
-                components::security::server::certificate
-            >*);
+          , components::security::signed_type<components::security::certificate>*);
 
         typedef boost::function<void(function_type)> deleter_type;
 
@@ -76,8 +74,8 @@ namespace hpx { namespace util { namespace security
             dll.get<function_type, deleter_type>(
                 "certificate_authority_get_certificate");
 
-        components::security::server::signed_type<
-            components::security::server::certificate
+        components::security::signed_type<
+            components::security::certificate
         > certificate;
 
         (*function.first)(subordinate_certificate_authority_, &certificate);
@@ -109,7 +107,7 @@ namespace hpx { namespace util { namespace security
         return gid;
     }
 
-    components::security::server::key_pair const &
+    components::security::key_pair const &
         subordinate_certificate_authority::get_key_pair() const
     {
         return key_pair_;

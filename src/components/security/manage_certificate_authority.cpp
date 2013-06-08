@@ -12,7 +12,7 @@ extern "C"
 
     // Manage root_certificate_authority
     security::server::root_certificate_authority*
-        new_root_certificate_authority(security::server::key_pair const & key_pair)
+        new_root_certificate_authority(security::key_pair const & key_pair)
     {
         return new security::server::root_certificate_authority(key_pair);
     }
@@ -26,7 +26,7 @@ extern "C"
     // Manage subordinate_certificate_authority
     security::server::subordinate_certificate_authority*
         new_subordinate_certificate_authority(
-            security::server::key_pair const & key_pair
+            security::key_pair const & key_pair
           , hpx::naming::id_type const & gid)
     {
         return new security::server::subordinate_certificate_authority(
@@ -43,9 +43,7 @@ extern "C"
     // Helpers
     void certificate_authority_get_certificate(
         security::server::certificate_authority_base* certificate_authority
-      , security::server::signed_type<
-            security::server::certificate
-        >* certificate)
+      , security::signed_type<security::certificate>* certificate)
     {
         *certificate = certificate_authority->get_certificate();
     }
