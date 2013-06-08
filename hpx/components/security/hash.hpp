@@ -10,8 +10,12 @@
 #include <hpx/exception.hpp>
 #include <sodium.h>
 
-namespace hpx { namespace components { namespace security { namespace server
+namespace hpx { namespace components { namespace security
 {
+#if defined(_MSC_VER)
+#  pragma pack(push, 1)
+#endif
+
     namespace traits
     {
         template <typename Enable = void>
@@ -99,6 +103,10 @@ namespace hpx { namespace components { namespace security { namespace server
     private:
         traits::hash<>::state_type state_;
     };
-}}}}
+
+#if defined(_MSC_VER)
+#  pragma pack(pop)
+#endif
+}}}
 
 #endif

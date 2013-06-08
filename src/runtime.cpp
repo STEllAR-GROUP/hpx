@@ -20,9 +20,9 @@
 #include <hpx/util/query_counters.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/server/parcel_suffix.hpp>
-#include <hpx/components/security/server/certificate_store.hpp>
-#include <hpx/components/security/server/verify.hpp>
+#include <hpx/components/security/parcel_suffix.hpp>
+#include <hpx/components/security/certificate_store.hpp>
+#include <hpx/components/security/verify.hpp>
 #include <hpx/util/security/root_certificate_authority.hpp>
 #include <hpx/util/security/subordinate_certificate_authority.hpp>
 #endif
@@ -179,7 +179,7 @@ namespace hpx
             util::security::subordinate_certificate_authority subordinate_certificate_authority_;
 
             // certificate store
-            HPX_STD_UNIQUE_PTR<components::security::server::certificate_store> cert_store_;
+            HPX_STD_UNIQUE_PTR<components::security::certificate_store> cert_store_;
         };
     }
 
@@ -194,7 +194,7 @@ namespace hpx
                 boost::mutex::scoped_lock l(mtx_);
                 security_data_->root_certificate_authority_.initialize();
                 security_data_->cert_store_.reset(
-                    new components::security::server::certificate_store(
+                    new components::security::certificate_store(
                         security_data_->root_certificate_authority_.get_certificate()));
             }
 
@@ -206,7 +206,7 @@ namespace hpx
 
     // this is called on all localities during locality registration
     void runtime::store_root_certificate(
-        components::security::server::signed_certificate const& cert)
+        components::security::signed_certificate const& cert)
     {
         // Only worker nodes need to store the root certificate at this
         // point, the root locality was already initialized (see above).
@@ -218,7 +218,7 @@ namespace hpx
 
             boost::mutex::scoped_lock l(mtx_);
             security_data_->cert_store_.reset(
-                new components::security::server::certificate_store(cert));
+                new components::security::certificate_store(cert));
         }
     }
 
@@ -226,7 +226,7 @@ namespace hpx
     void runtime::init_subordinate_certificate_authority()
     {
         security_data_->subordinate_certificate_authority_.initialize();
-        components::security::server::signed_certificate cert =
+        components::security::signed_certificate cert =
             get_certificate();
 
         LSEC_(debug) << (boost::format(
@@ -237,7 +237,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    components::security::server::signed_certificate
+    components::security::signed_certificate
         runtime::get_root_certificate(error_code& ec) const
     {
         if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
@@ -245,14 +245,14 @@ namespace hpx
             HPX_THROWS_IF(ec, invalid_status,
                 "runtime::get_root_certificate",
                 "the root's certificate is available on node zero only");
-            return components::security::server::signed_certificate::invalid_signed_type;
+            return components::security::signed_certificate::invalid_signed_type;
         }
 
         BOOST_ASSERT(security_data_.get() != 0);
         return security_data_->root_certificate_authority_.get_certificate(ec);
     }
 
-    components::security::server::signed_certificate
+    components::security::signed_certificate
         runtime::get_certificate(error_code& ec) const
     {
         BOOST_ASSERT(security_data_.get() != 0);
@@ -262,7 +262,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // set the certificate for another locality
     void runtime::add_locality_certificate(
-        components::security::server::signed_certificate const& cert)
+        components::security::signed_certificate const& cert)
     {
         BOOST_ASSERT(security_data_.get() != 0);
 
@@ -275,7 +275,7 @@ namespace hpx
         security_data_->cert_store_->insert(cert);
     }
 
-    components::security::server::signed_certificate const&
+    components::security::signed_certificate const&
         runtime::get_locality_certificate(naming::gid_type const& gid,
             error_code& ec) const
     {
@@ -285,7 +285,7 @@ namespace hpx
             HPX_THROWS_IF(ec, invalid_status,
                 "runtime::get_locality_certificate",
                 "the runtime system is not operational at this point");
-            return components::security::server::signed_certificate::invalid_signed_type;
+            return components::security::signed_certificate::invalid_signed_type;
         }
 
         boost::mutex::scoped_lock l(mtx_);
@@ -302,8 +302,8 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     void runtime::sign_parcel_suffix(
-        components::security::server::parcel_suffix const& suffix,
-        components::security::server::signed_parcel_suffix& signed_suffix,
+        components::security::parcel_suffix const& suffix,
+        components::security::signed_parcel_suffix& signed_suffix,
         error_code& ec) const
     {
         BOOST_ASSERT(security_data_.get() != 0);
@@ -331,7 +331,7 @@ namespace hpx
             return false;
         }
 
-        return components::security::server::verify(
+        return components::security::verify(
             *security_data_->cert_store_, data, parcel_id);
     }
 #endif
@@ -939,7 +939,7 @@ namespace hpx
     /// \brief Return the certificate for this locality
     ///
     /// \returns This function returns the signed certificate for this locality.
-    components::security::server::signed_certificate const&
+    components::security::signed_certificate const&
         get_locality_certificate(error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
@@ -950,7 +950,7 @@ namespace hpx
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
                 "the runtime system is not operational at this point");
-            return components::security::server::signed_certificate::invalid_signed_type;
+            return components::security::signed_certificate::invalid_signed_type;
         }
 
         return rt->get_locality_certificate(naming::invalid_gid, ec);
@@ -963,7 +963,7 @@ namespace hpx
     ///
     /// \returns This function returns the signed certificate for the locality
     ///          identified by the parameter \a id.
-    components::security::server::signed_certificate const&
+    components::security::signed_certificate const&
         get_locality_certificate(naming::id_type const& id, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
@@ -974,7 +974,7 @@ namespace hpx
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
                 "the runtime system is not operational at this point");
-            return components::security::server::signed_certificate::invalid_signed_type;
+            return components::security::signed_certificate::invalid_signed_type;
         }
 
         return rt->get_locality_certificate(id.get_gid(), ec);
@@ -985,7 +985,7 @@ namespace hpx
     /// \param cert The certificate to add to the certificate store of this
     ///             locality
     void add_locality_certificate(
-        components::security::server::signed_certificate const& cert,
+        components::security::signed_certificate const& cert,
         error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
@@ -1008,8 +1008,8 @@ namespace hpx
     /// \param signed_suffix  The signed parcel suffix will be placed here
     ///
     void sign_parcel_suffix(
-        components::security::server::parcel_suffix const& suffix,
-        components::security::server::signed_parcel_suffix& signed_suffix,
+        components::security::parcel_suffix const& suffix,
+        components::security::signed_parcel_suffix& signed_suffix,
         error_code& ec)
     {
         runtime* rt = get_runtime_ptr();

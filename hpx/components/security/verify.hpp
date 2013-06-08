@@ -16,7 +16,7 @@
 #include "parcel_suffix.hpp"
 #include "signed_type.hpp"
 
-namespace hpx { namespace components { namespace security { namespace server
+namespace hpx { namespace components { namespace security
 {
     bool verify(certificate_store const & certificate_store,
                 std::vector<char> const& parcel_data,
@@ -40,9 +40,9 @@ namespace hpx { namespace components { namespace security { namespace server
 //            parcel_data.size() - sizeof(signed_parcel_suffix));
 //        hash.final();
 
-        signed_parcel_suffix const * parcel_suffix_ptr =
-            reinterpret_cast<signed_parcel_suffix const *>(
-                &(parcel_data.back()) - sizeof(signed_parcel_suffix));
+        signed_type<parcel_suffix> const * parcel_suffix_ptr =
+            reinterpret_cast<signed_type<parcel_suffix> const *>(
+                &(parcel_data.back()) - signed_type<parcel_suffix>::size() + 1);
 
         parcel_id = parcel_suffix_ptr->get_type().get_parcel_id();
 
@@ -61,6 +61,6 @@ namespace hpx { namespace components { namespace security { namespace server
 
         return true;
     }
-}}}}
+}}}
 
 #endif

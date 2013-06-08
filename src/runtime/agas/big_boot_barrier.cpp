@@ -25,8 +25,8 @@
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/server/certificate.hpp>
-#include <hpx/components/security/server/signed_type.hpp>
+#include <hpx/components/security/certificate.hpp>
+#include <hpx/components/security/signed_type.hpp>
 #endif
 
 #include <boost/format.hpp>
@@ -178,7 +178,7 @@ struct notification_header
     naming::address component_ns_address;
     naming::address symbol_ns_address;
 #if defined(HPX_HAVE_SECURITY)
-    components::security::server::signed_certificate root_certificate;
+    components::security::signed_certificate root_certificate;
 #endif
 
     template <typename Archive>

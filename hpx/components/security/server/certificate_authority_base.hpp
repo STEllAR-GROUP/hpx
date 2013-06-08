@@ -10,10 +10,10 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 
-#include "certificate.hpp"
-#include "certificate_signing_request.hpp"
-#include "key_pair.hpp"
-#include "signed_type.hpp"
+#include <hpx/components/security/certificate.hpp>
+#include <hpx/components/security/certificate_signing_request.hpp>
+#include <hpx/components/security/key_pair.hpp>
+#include <hpx/components/security/signed_type.hpp>
 
 namespace hpx { namespace components { namespace security { namespace server
 {

@@ -12,7 +12,7 @@
 #include "secret_key.hpp"
 #include "signed_type.hpp"
 
-namespace hpx { namespace components { namespace security { namespace server
+namespace hpx { namespace components { namespace security
 {
 #if defined(_MSC_VER)
 #  pragma pack(push, 1)
@@ -54,15 +54,6 @@ namespace hpx { namespace components { namespace security { namespace server
         }
 
     private:
-        friend class boost::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive & ar, const unsigned int)
-        {
-            ar & public_key_;
-            ar & secret_key_;
-        }
-
         public_key public_key_;
         secret_key secret_key_;
     };
@@ -70,6 +61,6 @@ namespace hpx { namespace components { namespace security { namespace server
 #if defined(_MSC_VER)
 #  pragma pack(pop)
 #endif
-}}}}
+}}}
 
 #endif

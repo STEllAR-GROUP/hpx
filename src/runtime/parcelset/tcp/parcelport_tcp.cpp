@@ -19,10 +19,10 @@
 #include <hpx/util/logging.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
-#include <hpx/components/security/server/hash.hpp>
-#include <hpx/components/security/server/parcel_suffix.hpp>
-#include <hpx/components/security/server/certificate.hpp>
-#include <hpx/components/security/server/signed_type.hpp>
+#include <hpx/components/security/hash.hpp>
+#include <hpx/components/security/parcel_suffix.hpp>
+#include <hpx/components/security/certificate.hpp>
+#include <hpx/components/security/signed_type.hpp>
 #endif
 
 #include <boost/version.hpp>
@@ -602,7 +602,7 @@ namespace hpx { namespace parcelset { namespace tcp
                     archive >> has_certificate;
 
                     if (first_message && has_certificate) {
-                        components::security::server::signed_certificate certificate;
+                        components::security::signed_certificate certificate;
                         archive >> certificate;
                         add_locality_certificate(certificate);
                         first_message = false;

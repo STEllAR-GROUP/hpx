@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
-#include <hpx/components/security/server/key_pair.hpp>
+#include <hpx/components/security/key_pair.hpp>
 #include <hpx/components/security/server/root_certificate_authority.hpp>
 #include <hpx/components/security/server/subordinate_certificate_authority.hpp>
 
@@ -20,7 +20,7 @@ extern "C"
     // Manage root_certificate_authority
     HPX_COMPONENT_EXPORT
         security::server::root_certificate_authority*
-            new_root_certificate_authority(security::server::key_pair const &);
+            new_root_certificate_authority(security::key_pair const &);
     HPX_COMPONENT_EXPORT
         void delete_root_certificate_authority(
             security::server::root_certificate_authority*);
@@ -29,7 +29,7 @@ extern "C"
     HPX_COMPONENT_EXPORT
         security::server::subordinate_certificate_authority*
             new_subordinate_certificate_authority(
-                security::server::key_pair const &
+                security::key_pair const &
               , hpx::naming::id_type const &);
     HPX_COMPONENT_EXPORT
         void delete_subordinate_certificate_authority(
@@ -39,9 +39,7 @@ extern "C"
     HPX_COMPONENT_EXPORT
         void certificate_authority_get_certificate(
             security::server::certificate_authority_base*
-          , security::server::signed_type<
-                security::server::certificate
-            >*);
+          , security::signed_type<security::certificate>*);
 
     HPX_COMPONENT_EXPORT
         void certificate_authority_get_gid(
