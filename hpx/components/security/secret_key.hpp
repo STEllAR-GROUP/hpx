@@ -52,7 +52,7 @@ namespace hpx { namespace components { namespace security
                 return signed_type;
             }
 
-            if (sizeof type + crypto_sign_BYTES != signed_type_length)
+            if (type.size() + crypto_sign_BYTES != signed_type_length)
             {
                 HPX_THROWS_IF(
                     ec

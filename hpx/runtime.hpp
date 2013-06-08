@@ -294,6 +294,7 @@ namespace hpx
 
 #if defined(HPX_HAVE_SECURITY)
         // allocate dynamically to reduce dependencies
+        mutable lcos::local::spinlock security_mtx_;
         HPX_STD_UNIQUE_PTR<detail::manage_security_data> security_data_;
 #endif
     };
