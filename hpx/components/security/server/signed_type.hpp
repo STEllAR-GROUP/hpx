@@ -8,7 +8,7 @@
 
 #include <boost/serialization/serialization.hpp>
 
-#include "signature.hpp"
+#include <hpx/components/security/server/signature.hpp>
 
 namespace hpx { namespace components { namespace security { namespace server
 {

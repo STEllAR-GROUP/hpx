@@ -228,7 +228,7 @@ namespace hpx
             std::size_t interval, error_code& ec = throws);
         util::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
-            error_code& ec = throws);
+            util::binary_filter* next_filter, error_code& ec = throws);
 
 #if defined(HPX_HAVE_SECURITY)
         components::security::server::signed_certificate
@@ -242,6 +242,13 @@ namespace hpx
 
         components::security::server::signed_certificate const&
             get_locality_certificate(naming::gid_type const&, error_code& ec) const;
+
+        void sign_parcel_suffix(
+            components::security::server::parcel_suffix const& suffix,
+            components::security::server::signed_parcel_suffix& signed_suffix,
+            error_code& ec) const;
+        bool verify_parcel_suffix(std::vector<char> const& data,
+            naming::gid_type& parcel_id, error_code& ec) const;
 
         void init_subordinate_certificate_authority();
         void store_root_certificate(

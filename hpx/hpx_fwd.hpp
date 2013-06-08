@@ -1275,14 +1275,19 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     HPX_API_EXPORT util::binary_filter* create_binary_filter(
-        char const* binary_filter_type, bool compress, error_code& ec = throws);
+        char const* binary_filter_type, bool compress, 
+        util::binary_filter* next_filter = 0, error_code& ec = throws);
 
 #if defined(HPX_HAVE_SODIUM)
     namespace components { namespace security { namespace server
     {
         class certificate;
+        class parcel_suffix;
+        class hash;
+
         template <typename T> class signed_type;
         typedef signed_type<certificate> signed_certificate;
+        typedef signed_type<parcel_suffix> signed_parcel_suffix;
     }}}
 
 #if defined(HPX_HAVE_SECURITY)
@@ -1309,6 +1314,26 @@ namespace hpx
     HPX_API_EXPORT void add_locality_certificate(
         components::security::server::signed_certificate const& cert,
         error_code& ec = throws);
+
+    /// \brief Sign the given parcel-suffix
+    ///
+    /// \param suffix         The parcel suffoix to be signed
+    /// \param signed_suffix  The signed parcel suffix will be placed here
+    ///
+    HPX_API_EXPORT void sign_parcel_suffix(
+        components::security::server::parcel_suffix const& suffix,
+        components::security::server::signed_parcel_suffix& signed_suffix,
+        error_code& ec = throws);
+
+    /// \brief Verify the certificate in the given byte sequence
+    ///
+    /// \param data      The full received message buffer, assuming that it
+    ///                  has a parcel_suffix appended.
+    /// \param parcel_id The parcel id of the first parcel in side the message
+    ///
+    HPX_API_EXPORT bool verify_parcel_suffix(std::vector<char> const& data,
+        naming::gid_type& parcel_id, error_code& ec = throws);
+
 #endif
 #endif
 }

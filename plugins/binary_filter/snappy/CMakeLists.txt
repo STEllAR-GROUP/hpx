@@ -11,14 +11,14 @@ if(HPX_USE_COMPRESSION_SNAPPY)
 endif()
 
 macro(add_snappy_module)
-  hpx_debug("add_zlib_module" "SNAPPY_FOUND: ${SNAPPY_FOUND}")
+  hpx_debug("add_snappy_module" "SNAPPY_FOUND: ${SNAPPY_FOUND}")
   if(HPX_USE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
     hpx_include_sys_directories(${SNAPPY_INCLUDE_DIR})
     hpx_link_sys_directories(${SNAPPY_LIBRARY_DIR})
 
     add_hpx_library(compress_snappy
-      SOURCES ${hpx_SOURCE_DIR}/plugins/compression/snappy/snappy_serialization_filter.cpp
-      HEADERS ${hpx_SOURCE_DIR}/hpx/plugins/compression/snappy_serialization_filter.hpp
+      SOURCES ${hpx_SOURCE_DIR}/plugins/binary_filter/snappy/snappy_serialization_filter.cpp
+      HEADERS ${hpx_SOURCE_DIR}/hpx/plugins/binary_filter/snappy_serialization_filter.hpp
       FOLDER "Core/Plugins/Compression"
       DEPENDENCIES ${SNAPPY_LIBRARY})
 

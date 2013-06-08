@@ -190,25 +190,6 @@ if(HPX_USE_MORE_THAN_64_THREADS)
 endif()
 
 ###############################################################################
-# Configure compression and other plugins
-###############################################################################
-add_hpx_pseudo_target(plugins)
-add_subdirectory(plugins)
-
-if(HPX_USE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_BZIP2)
-endif()
-if(HPX_USE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_SNAPPY)
-endif()
-if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_ZLIB)
-endif()
-
-# Parcel coalescing is used by the main HPX library, enable it always
-hpx_add_definitions(-DHPX_HAVE_PARCEL_COALESCING)
-
-###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 
@@ -500,6 +481,25 @@ if(SODIUM_FOUND)
 elseif(HPX_HAVE_SECURITY)
   hpx_error("security" "The libsodium library has to be available to enable security features.")
 endif()
+
+###############################################################################
+# Configure compression and other plugins
+###############################################################################
+add_hpx_pseudo_target(plugins)
+add_subdirectory(plugins)
+
+if(HPX_USE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
+  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_BZIP2)
+endif()
+if(HPX_USE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
+  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_SNAPPY)
+endif()
+if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
+  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_ZLIB)
+endif()
+
+# Parcel coalescing is used by the main HPX library, enable it always
+hpx_add_definitions(-DHPX_HAVE_PARCEL_COALESCING)
 
 ################################################################################
 # Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)

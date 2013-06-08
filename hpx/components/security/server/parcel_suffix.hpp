@@ -21,7 +21,7 @@ namespace hpx { namespace components { namespace security { namespace server
         {
         }
 
-        parcel_suffix(naming::gid_type parcel_id, hash & hash)
+        parcel_suffix(naming::gid_type const& parcel_id, hash & hash)
           : parcel_id_(parcel_id), hash_(hash.final())
         {
         }

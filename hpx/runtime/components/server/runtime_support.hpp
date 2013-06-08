@@ -282,7 +282,8 @@ namespace hpx { namespace components { namespace server
             parcelset::parcelport* pp, std::size_t num_messages,
             std::size_t interval, error_code& ec);
         util::binary_filter* create_binary_filter(
-            char const* binary_filter_type, bool compress, error_code& ec);
+            char const* binary_filter_type, bool compress, 
+            util::binary_filter* next_filter, error_code& ec);
 
     protected:
         // Load all components from the ini files found in the configuration

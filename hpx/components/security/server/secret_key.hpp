@@ -30,7 +30,7 @@ namespace hpx { namespace components { namespace security { namespace server
         }
 
         template <typename T>
-        signed_type<T> sign(T const & type) const
+        signed_type<T> sign(T const & type, error_code& ec = throws) const
         {
             signed_type<T> signed_type;
             unsigned long long signed_type_length;
@@ -42,21 +42,28 @@ namespace hpx { namespace components { namespace security { namespace server
                     sizeof type,
                     bytes_.data()) != 0)
             {
-                HPX_THROW_EXCEPTION(
-                    hpx::security_error
+                HPX_THROWS_IF(
+                    ec
+                  , hpx::security_error
                   , "secret_key::sign"
                   , "Failed to sign type"
                 )
+                return signed_type;
             }
 
             if (sizeof type + crypto_sign_BYTES != signed_type_length)
             {
-                HPX_THROW_EXCEPTION(
-                    hpx::security_error
+                HPX_THROWS_IF(
+                    ec
+                  , hpx::security_error
                   , "secret_key::sign"
                   , "Signature of incorrect length"
                 )
+                return signed_type;
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
 
             return signed_type;
         }

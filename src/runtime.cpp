@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,9 @@
 #include <hpx/util/query_counters.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/server/parcel_suffix.hpp>
 #include <hpx/components/security/server/certificate_store.hpp>
+#include <hpx/components/security/server/verify.hpp>
 #include <hpx/util/security/root_certificate_authority.hpp>
 #include <hpx/util/security/subordinate_certificate_authority.hpp>
 #endif
@@ -234,6 +236,7 @@ namespace hpx
         add_locality_certificate(cert);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     components::security::server::signed_certificate
         runtime::get_root_certificate(error_code& ec) const
     {
@@ -249,7 +252,6 @@ namespace hpx
         return security_data_->root_certificate_authority_.get_certificate(ec);
     }
 
-
     components::security::server::signed_certificate
         runtime::get_certificate(error_code& ec) const
     {
@@ -257,6 +259,7 @@ namespace hpx
         return security_data_->subordinate_certificate_authority_.get_certificate(ec);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     // set the certificate for another locality
     void runtime::add_locality_certificate(
         components::security::server::signed_certificate const& cert)
@@ -281,7 +284,7 @@ namespace hpx
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "runtime::get_locality_certificate",
-                "the parcel handler is not operational at this point");
+                "the runtime system is not operational at this point");
             return components::security::server::signed_certificate::invalid_signed_type;
         }
 
@@ -295,6 +298,41 @@ namespace hpx
         }
 
         return security_data_->cert_store_->at(gid, ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime::sign_parcel_suffix(
+        components::security::server::parcel_suffix const& suffix,
+        components::security::server::signed_parcel_suffix& signed_suffix,
+        error_code& ec) const
+    {
+        BOOST_ASSERT(security_data_.get() != 0);
+        if (0 == security_data_->cert_store_)     // should have been created
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "runtime::sign_parcel_suffix",
+                "the runtime system is not operational at this point");
+            return;
+        }
+
+        signed_suffix = security_data_->subordinate_certificate_authority_.
+            get_key_pair().sign(suffix, ec);
+    }
+
+    bool runtime::verify_parcel_suffix(std::vector<char> const& data,
+        naming::gid_type& parcel_id, error_code& ec) const
+    {
+        BOOST_ASSERT(security_data_.get() != 0);
+        if (0 == security_data_->cert_store_)     // should have been created
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "runtime::verify_parcel_suffix",
+                "the runtime system is not operational at this point");
+            return false;
+        }
+
+        return components::security::server::verify(
+            *security_data_->cert_store_, data, parcel_id);
     }
 #endif
 
@@ -399,10 +437,11 @@ namespace hpx
     }
 
     util::binary_filter* runtime::create_binary_filter(
-        char const* binary_filter_type, bool compress, error_code& ec)
+        char const* binary_filter_type, bool compress, 
+        util::binary_filter* next_filter, error_code& ec)
     {
         return runtime_support_.create_binary_filter(binary_filter_type,
-            compress, ec);
+            compress, next_filter, ec);
     }
 
     /// \brief Register all performance counter types related to this runtime
@@ -962,6 +1001,54 @@ namespace hpx
 
         rt->add_locality_certificate(cert);
     }
+
+    /// \brief Sign the given parcel-suffix
+    ///
+    /// \param suffix         The parcel suffoix to be signed
+    /// \param signed_suffix  The signed parcel suffix will be placed here
+    ///
+    void sign_parcel_suffix(
+        components::security::server::parcel_suffix const& suffix,
+        components::security::server::signed_parcel_suffix& signed_suffix,
+        error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (0 == rt ||
+            rt->get_state() < runtime::state_initialized ||
+            rt->get_state() >= runtime::state_stopped)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::sign_parcel_suffix",
+                "the runtime system is not operational at this point");
+            return;
+        }
+
+        rt->sign_parcel_suffix(suffix, signed_suffix, ec);
+    }
+
+    /// \brief Verify the certificate in the given byte sequence
+    ///
+    /// \param data      The full received message buffer, assuming that it
+    ///                  has a parcel_suffix appended.
+    /// \param hash      The has object for the received data.
+    /// \param parcel_id The parcel id of the first parcel in side the message
+    ///
+    bool verify_parcel_suffix(std::vector<char> const& data,
+        naming::gid_type& parcel_id, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (0 == rt ||
+            rt->get_state() < runtime::state_initialized ||
+            rt->get_state() >= runtime::state_stopped)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::verify_parcel_suffix",
+                "the runtime system is not operational at this point");
+            return false;
+        }
+
+        return rt->verify_parcel_suffix(data, parcel_id, ec);
+    }
 }
 #endif
 
@@ -1063,11 +1150,11 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a binary filter plugin
     util::binary_filter* create_binary_filter(char const* binary_filter_type,
-        bool compress, error_code& ec)
+        bool compress, util::binary_filter* next_filter, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt)
-            return rt->create_binary_filter(binary_filter_type, compress, ec);
+            return rt->create_binary_filter(binary_filter_type, compress, next_filter, ec);
 
         HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
             "the runtime system is not available at this time");

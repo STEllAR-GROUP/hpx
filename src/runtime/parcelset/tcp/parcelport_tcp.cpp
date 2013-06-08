@@ -19,6 +19,8 @@
 #include <hpx/util/logging.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/server/hash.hpp>
+#include <hpx/components/security/server/parcel_suffix.hpp>
 #include <hpx/components/security/server/certificate.hpp>
 #include <hpx/components/security/server/signed_type.hpp>
 #endif
@@ -595,8 +597,6 @@ namespace hpx { namespace parcelset { namespace tcp
                     util::portable_binary_iarchive archive(*parcel_data,
                         inbound_data_size, boost::archive::no_header);
 
-                    std::size_t parcel_count = 0;
-
 #if defined(HPX_HAVE_SECURITY)
                     bool has_certificate = false;
                     archive >> has_certificate;
@@ -607,14 +607,36 @@ namespace hpx { namespace parcelset { namespace tcp
                         add_locality_certificate(certificate);
                         first_message = false;
                     }
+
+                    // calculate and verify the hash, but only after everything has
+                    // been initialized
+                    naming::gid_type parcel_id;
+                    if (!first_message) {
+                        // mark start of security work
+                        util::high_resolution_timer timer_sec;
+
+                        if (!verify_parcel_suffix(*parcel_data, parcel_id)) {
+                            // all hell breaks loose!
+                        }
+
+                        // store the time required for security
+                        receive_data.security_time_ = timer_sec.elapsed_nanoseconds();
+                    }
 #endif
+                    std::size_t parcel_count = 0;
                     archive >> parcel_count;
-                    for(std::size_t i = 0; i < parcel_count; ++i)
+                    for(std::size_t i = 0; i != parcel_count; ++i)
                     {
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
                         archive >> p;
 
+#if defined(HPX_HAVE_SECURITY)
+                        // verify parcel id
+                        if (!first_message && i == 0 && parcel_id != p.get_parcel_id()) {
+                            // again, all hell breaks loose
+                        }
+#endif
                         // make sure this parcel ended up on the right locality
                         BOOST_ASSERT(p.get_destination_locality() == pp.here());
 
