@@ -7,7 +7,7 @@
 #define HPX_COMPRESSION_BZIP2_FEB_26_2013_0415AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/plugins/compression/bzip2_serialization_filter.hpp>
+#include <hpx/plugins/binary_filter/bzip2_serialization_filter.hpp>
 
 #endif
 
