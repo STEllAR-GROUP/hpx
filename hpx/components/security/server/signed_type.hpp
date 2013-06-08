@@ -30,6 +30,11 @@ namespace hpx { namespace components { namespace security { namespace server
             return type_;
         }
 
+        operator T const & () const
+        {
+            return type_;
+        }
+
         static signed_type invalid_signed_type;
 
         friend std::ostream & operator<<(std::ostream & os,
