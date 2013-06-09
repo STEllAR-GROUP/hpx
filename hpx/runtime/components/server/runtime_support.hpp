@@ -285,6 +285,11 @@ namespace hpx { namespace components { namespace server
             char const* binary_filter_type, bool compress, 
             util::binary_filter* next_filter, error_code& ec);
 
+#if defined(HPX_HAVE_SECURITY)
+        components::security::capability get_factory_capabilities(
+            components::component_type type);
+#endif
+
     protected:
         // Load all components from the ini files found in the configuration
         bool load_components(util::section& ini, naming::gid_type const& prefix,
@@ -342,7 +347,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (component not found in map)";
+                << " (component type not found in map)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 hpx::util::osstream_get_string(strm));
@@ -439,6 +444,10 @@ HPX_REGISTER_ACTION_DECLARATION(
 #else
 #  include <hpx/runtime/components/server/runtime_support_implementations.hpp>
 #endif  // defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+
+#if defined(HPX_HAVE_SECURITY)
+#  include <hpx/runtime/components/server/runtime_support_create_component_capabilities.hpp>
+#endif
 
 #endif  // HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM
 

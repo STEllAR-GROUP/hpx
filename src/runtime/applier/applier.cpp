@@ -17,6 +17,11 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/capability.hpp>
+#include <hpx/components/security/certificate.hpp>
+#include <hpx/components/security/signed_type.hpp>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace applier
@@ -54,7 +59,7 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread_nullary(
         BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func, char const* desc,
         threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread, 
+        threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -68,7 +73,7 @@ namespace hpx { namespace applier
 
         threads::thread_init_data data(
             HPX_STD_BIND(&thread_function_nullary, boost::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread, 
+            desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
@@ -77,7 +82,7 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread(
         BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* desc, threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread, 
+        threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -100,7 +105,7 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread_plain(
         BOOST_RV_REF(HPX_STD_FUNCTION<threads::thread_function_type>) func,
         char const* desc, threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread, 
+        threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -113,7 +118,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::move(func), desc ? desc : "<unknown>", 0, priority, 
+            boost::move(func), desc ? desc : "<unknown>", 0, priority,
             os_thread, threads::get_stack_size(stacksize));
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
@@ -162,7 +167,7 @@ namespace hpx { namespace applier
     void register_work(
         BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* desc, threads::thread_state_enum state,
-        threads::thread_priority priority, std::size_t os_thread, 
+        threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -329,6 +334,13 @@ namespace hpx { namespace applier
         // decode the action-type in the parcel
         actions::continuation_type cont = p.get_continuation();
         actions::action_type act = p.get_action();
+
+#if defined(HPX_HAVE_SECURITY)
+        components::security::signed_certificate const& cert =
+            get_locality_certificate(p.get_source());
+        components::security::capability caps_sender =
+            cert.get_type().get_capability();
+#endif
         int comptype = act->get_component_type();
         naming::locality dest = p.get_destination_locality();
 
@@ -358,6 +370,20 @@ namespace hpx { namespace applier
             if (0 == lva)
                 lva = get_runtime_support_raw_gid().get_lsb();
 
+#if defined(HPX_HAVE_SECURITY)
+            components::security::capability caps_action =
+                act->get_required_capabilities(lva);
+
+//            if (!(caps_sender & ~caps_action))
+//            {
+//                HPX_THROW_EXCEPTION(security_error,
+//                    "applier::schedule_action",
+//                    boost::format("sender has insufficient capabilities "
+//                        "to execution the action (sender: %1%, action %2%)") % 
+//                        caps_sender % caps_action);
+//                return;
+//            }
+#endif
             // make sure the component_type of the action matches the
             // component type in the destination address
             if (HPX_UNLIKELY(!components::types_are_compatible(
@@ -375,7 +401,7 @@ namespace hpx { namespace applier
             // dispatch action, register work item either with or without
             // continuation support
             if (!cont) {
-                // No continuation is to be executed, register the plain 
+                // No continuation is to be executed, register the plain
                 // action and the local-virtual address with the TM only.
                 threads::thread_init_data data;
                 tm.register_work(
@@ -383,9 +409,9 @@ namespace hpx { namespace applier
                     threads::pending);
             }
             else {
-                // This parcel carries a continuation, register a wrapper 
-                // which first executes the original thread function as 
-                // required by the action and triggers the continuations 
+                // This parcel carries a continuation, register a wrapper
+                // which first executes the original thread function as
+                // required by the action and triggers the continuations
                 // afterwards.
                 threads::thread_init_data data;
                 tm.register_work(

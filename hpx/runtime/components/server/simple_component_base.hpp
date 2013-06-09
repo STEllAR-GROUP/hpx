@@ -128,6 +128,14 @@ namespace hpx { namespace components
             return boost::move(f);
         }
 
+#if defined(HPX_HAVE_SECURITY)
+        static components::security::capability get_required_capabilities(
+            components::security::traits::capability<>::capabilities caps)
+        {
+            return components::default_component_creation_capabilities(caps);
+        }
+#endif
+
     private:
         mutable naming::gid_type gid_;
     };

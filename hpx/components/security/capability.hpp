@@ -32,7 +32,10 @@ namespace hpx { namespace components { namespace security
 
             enum capabilities
             {
-                capability_certificate_authority = 0
+                capability_certificate_authority = 0,
+                capability_create = 1,
+                capability_read = 2,
+                capability_write = 3,
             };
         };
     }

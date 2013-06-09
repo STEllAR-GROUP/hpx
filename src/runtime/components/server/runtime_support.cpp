@@ -1323,5 +1323,46 @@ namespace hpx { namespace components { namespace server
         }
         return true;    // component got loaded
     }
+
+#if defined(HPX_HAVE_SECURITY)
+    components::security::capability
+        runtime_support::get_factory_capabilities(components::component_type type)
+    {
+        components::security::capability caps;
+
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end()) {
+            hpx::util::osstream strm;
+            strm << "attempt to extract capabilities for component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (component type not found in map)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::get_factory_capabilities",
+                hpx::util::osstream_get_string(strm));
+            return caps;
+        }
+
+        if (!(*it).second.first) {
+            hpx::util::osstream strm;
+            strm << "attempt to extract capabilities for component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (map entry is NULL)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::get_factory_capabilities",
+                hpx::util::osstream_get_string(strm));
+            return caps;
+        }
+
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            caps = factory->get_required_capabilities();
+        }
+        return caps;
+    }
+#endif
 }}}
 

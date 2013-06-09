@@ -248,6 +248,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
+        lcos::local::spinlock::scoped_lock l(security_mtx_);
         BOOST_ASSERT(security_data_.get() != 0);
         return security_data_->root_certificate_authority_.get_certificate(ec);
     }
@@ -255,6 +256,7 @@ namespace hpx
     components::security::signed_certificate
         runtime::get_certificate(error_code& ec) const
     {
+        lcos::local::spinlock::scoped_lock l(security_mtx_);
         BOOST_ASSERT(security_data_.get() != 0);
         return security_data_->subordinate_certificate_authority_.get_certificate(ec);
     }
@@ -315,6 +317,7 @@ namespace hpx
             return;
         }
 
+        lcos::local::spinlock::scoped_lock l(security_mtx_);
         signed_suffix = security_data_->subordinate_certificate_authority_.
             get_key_pair().sign(suffix, ec);
     }
