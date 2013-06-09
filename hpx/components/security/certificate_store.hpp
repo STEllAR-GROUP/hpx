@@ -33,7 +33,7 @@ namespace hpx { namespace components { namespace security
                     hpx::security_error
                   , "certificate_store::certificate_store"
                   , boost::str(boost::format(
-                        "the certificate is not self-signed: %1%") %
+                        "The certificate is not self-signed: %1%") %
                         signed_certificate)
                 )
             }
@@ -46,7 +46,7 @@ namespace hpx { namespace components { namespace security
                     hpx::security_error
                   , "certificate_store::certificate_store"
                   , boost::str(boost::format(
-                        "the certificate signature is invalid: %1%") %
+                        "The certificate signature is invalid: %1%") %
                         signed_certificate)
                 )
             }
@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace security
         }
 
         signed_type<certificate> const&
-        at(naming::gid_type const & subject, error_code&ec = throws) const
+        at(naming::gid_type const & subject, error_code& ec = throws) const
         {
             store_type::const_iterator iterator = store_.find(subject);
 
@@ -112,7 +112,23 @@ namespace hpx { namespace components { namespace security
                 );
                 return signed_type<certificate>::invalid_signed_type;
             }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
             return iterator->second;
+        }
+
+        signed_type<certificate> const&
+        at_locality(naming::gid_type const & gid, error_code& ec = throws) const
+        {
+            naming::gid_type subject(
+                hpx::naming::replace_locality_id(
+                    HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB
+                  , get_locality_id_from_gid(gid))
+              , HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB);
+
+            return at(subject, ec);
         }
 
     private:
