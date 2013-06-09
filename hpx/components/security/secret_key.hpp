@@ -7,6 +7,7 @@
 #define HPX_COMPONENTS_SECURITY_SERVER_SECRET_KEY_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 
 #include <boost/array.hpp>
 #include <boost/io/ios_state.hpp>
