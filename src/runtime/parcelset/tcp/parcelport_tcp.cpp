@@ -617,6 +617,10 @@ namespace hpx { namespace parcelset { namespace tcp
 
                         if (!verify_parcel_suffix(*parcel_data, parcel_id)) {
                             // all hell breaks loose!
+                            HPX_THROW_EXCEPTION(security_error,
+                                "decode_message(tcp)", 
+                                "verify_parcel_suffix failed");
+                            return false;
                         }
 
                         // store the time required for security
@@ -635,6 +639,10 @@ namespace hpx { namespace parcelset { namespace tcp
                         // verify parcel id
                         if (!first_message && i == 0 && parcel_id != p.get_parcel_id()) {
                             // again, all hell breaks loose
+                            HPX_THROW_EXCEPTION(security_error,
+                                "decode_message(tcp)", 
+                                "parcel id mismatch");
+                            return false;
                         }
 #endif
                         // make sure this parcel ended up on the right locality
