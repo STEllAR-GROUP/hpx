@@ -160,7 +160,7 @@ namespace hpx { namespace components
         ///         sequential in a row.
         naming::gid_type create(std::size_t count = 1)
         {
-            if (isenabled_) 
+            if (isenabled_)
             {
                 naming::gid_type id = server::create<Component>(count);
                 if (id)
@@ -182,7 +182,7 @@ namespace hpx { namespace components
         ///           initialize the newly allocated object.
         ///
         /// \return   Returns the GID of the first newly created component
-        ///           instance. 
+        ///           instance.
         naming::gid_type create_with_args(HPX_STD_FUNCTION<void(void*)> const& ctor)
         {
             if (isenabled_)
@@ -219,6 +219,21 @@ namespace hpx { namespace components
         {
             return refcnt_;
         }
+
+#if defined(HPX_HAVE_SECURITY)
+        /// \brief Return the required capabilities necessary to create an
+        ///        instance of a component using this factory instance.
+        ///
+        /// \return Returns required capabilities necessary to create a new
+        ///         instance of a component using this factory instance.
+        virtual components::security::capability
+            get_required_capabilities() const
+        {
+            using namespace components::security;
+            return Component::get_required_capabilities(
+                traits::capability<>::capability_create);
+        }
+#endif
 
     protected:
         util::section global_settings_;

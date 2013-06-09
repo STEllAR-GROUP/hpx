@@ -11,6 +11,9 @@
 #include <hpx/exception.hpp>
 #include <hpx/traits/component_type_database.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/capability.hpp>
+#endif
 
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
@@ -65,6 +68,22 @@ namespace hpx { namespace components
         }
         return lhs_base == rhs_base;
     }
+
+#if defined(HPX_HAVE_SECURITY)
+    inline components::security::capability default_component_creation_capabilities(
+        components::security::traits::capability<>::capabilities caps)
+    {
+        using namespace components::security;
+
+        // if we're asked for required capabilities related to creating
+        // an instance of this component then require 'write' capabilities
+        if (caps & traits::capability<>::capability_create)
+            return capability(traits::capability<>::capability_write);
+
+        // otherwise require no capabilities
+        return capability();
+    }
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

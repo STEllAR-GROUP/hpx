@@ -180,6 +180,20 @@ namespace hpx { namespace components
             return 1;   // there is always exactly one instance
         }
 
+#if defined(HPX_HAVE_SECURITY)
+        /// \brief Return the required capabilities necessary to create an
+        ///        instance of a component using this factory instance.
+        ///
+        /// \return Returns required capabilities necessary to create a new
+        ///         instance of a component using this factory instance.
+        virtual components::security::capability
+            get_required_capabilities() const
+        {
+            // by default we don't require any capabilities
+            return components::security::capability();
+        }
+#endif
+
     protected:
         bool isenabled_;
     };

@@ -68,6 +68,11 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct action_message_handler;
 
+#if defined(HPX_HAVE_SECURITY)
+    template <typename Action, typename Enable = void>
+    struct action_capability_provider;
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for type_size
     template <typename T, typename Enable = void>

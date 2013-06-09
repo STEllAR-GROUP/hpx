@@ -268,7 +268,6 @@ namespace hpx { namespace components
         {
             return boost::move(f);
         }
-
     private:
         template <typename, typename>
         friend class managed_component;
@@ -594,9 +593,16 @@ namespace hpx { namespace components
         ///         determine a correct allocation strategy
         static factory_property get_factory_properties()
         {
-            // components derived from this template can be allocated in blocks
-            return factory_none; // factory_is_multi_instance;
+            return factory_none;
         }
+
+#if defined(HPX_HAVE_SECURITY)
+        static components::security::capability get_required_capabilities(
+            components::security::traits::capability<>::capabilities caps)
+        {
+            return components::default_component_creation_capabilities(caps);
+        }
+#endif
 
     public:
 
