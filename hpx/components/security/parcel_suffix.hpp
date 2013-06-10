@@ -25,8 +25,8 @@ namespace hpx { namespace components { namespace security
         {
         }
 
-        parcel_suffix(naming::gid_type const& parcel_id, hash & hash)
-          : parcel_id_(parcel_id), hash_(hash.final())
+        parcel_suffix(naming::gid_type const& parcel_id, hash const& hash)
+          : parcel_id_(parcel_id), hash_(hash)
         {
         }
 
@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace security
             return parcel_id_;
         }
 
-        traits::hash<>::final_type const & get_hash() const
+        hash const & get_hash() const
         {
             return hash_;
         }
@@ -43,28 +43,18 @@ namespace hpx { namespace components { namespace security
         friend std::ostream & operator<<(std::ostream & os,
                                          parcel_suffix const & parcel_suffix)
         {
-            boost::io::ios_flags_saver ifs(os);
-
-            os << "<parcel_suffix "
-               << parcel_suffix.parcel_id_
-               << " \"";
-
-            for (std::size_t i = 0; i < traits::hash<>::final_type::static_size; ++i)
-            {
-                os << std::hex
-                   << std::nouppercase
-                   << std::setfill('0')
-                   << std::setw(2)
-                   << static_cast<unsigned int>(parcel_suffix.hash_[i]);
-            }
-
-            return os << "\">";
+            return os << "<parcel_suffix "
+                      << parcel_suffix.parcel_id_
+                      << " "
+                      << parcel_suffix.hash_
+                      << ">";
         }
 
         unsigned char const* begin() const
         {
             return reinterpret_cast<unsigned char const*>(this);
         }
+
         unsigned char const* end() const
         {
             return reinterpret_cast<unsigned char const*>(this) + size();
@@ -77,7 +67,7 @@ namespace hpx { namespace components { namespace security
 
     private:
         naming::gid_type parcel_id_;
-        traits::hash<>::final_type hash_;
+        hash hash_;
     };
 
 #if defined(_MSC_VER)

@@ -59,9 +59,9 @@ int hpx_main(boost::program_options::variables_map &)
         HPX_TEST(root_public_key.verify(subordinate_certificate));
 
 
-        hash hash;
-        hash.update(
-            reinterpret_cast<unsigned char const *>("Hello, world!"), 13);
+        char const data[] = "Hello, world!";
+
+        hash hash(reinterpret_cast<unsigned char const *>(data), sizeof(data));
 
         parcel_suffix parcel_suffix(
             hpx::parcelset::parcel::generate_unique_id(), hash);
@@ -72,7 +72,10 @@ int hpx_main(boost::program_options::variables_map &)
                     parcel_suffix);
 
         std::vector<char> parcel_data(
-            signed_parcel_suffix.begin(), signed_parcel_suffix.end());
+            data, data + sizeof(data));
+
+        parcel_data.insert(
+            parcel_data.end(), signed_parcel_suffix.begin(), signed_parcel_suffix.end());
 
         hpx::naming::gid_type parcel_id;
 

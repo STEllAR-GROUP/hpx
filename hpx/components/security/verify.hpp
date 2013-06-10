@@ -14,6 +14,7 @@
 
 #include "certificate.hpp"
 #include "certificate_store.hpp"
+#include "hash.hpp"
 #include "parcel_suffix.hpp"
 #include "signed_type.hpp"
 
@@ -61,11 +62,22 @@ namespace hpx { namespace components { namespace security
             return false;
         }
 
-//        server::hash hash;
-//        hash.update(
-//            reinterpret_cast<unsigned char const*>(&parcel_data.front()),
-//            parcel_data.size() - sizeof(signed_parcel_suffix));
-//        hash.final();
+        hash hash(
+            reinterpret_cast<unsigned char const*>(&parcel_data.front()),
+            parcel_data.size() - sizeof(signed_parcel_suffix));
+
+        if (parcel_suffix_ptr->get_type().get_hash() != hash)
+        {
+            HPX_THROWS_IF(
+                ec
+              , hpx::security_error
+              , "verify"
+              , boost::str(boost::format(
+                    "The parcel_suffix hash is invalid: %1% %2%") %
+                    *parcel_suffix_ptr % hash)
+            );
+            return false;
+        }
 
         if (&ec != &throws)
             ec = make_success_code();

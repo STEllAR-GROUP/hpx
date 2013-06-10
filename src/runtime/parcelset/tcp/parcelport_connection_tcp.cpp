@@ -151,8 +151,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 util::high_resolution_timer timer_sec;
 
                 // calculate hash of overall message
-                components::security::hash hash;
-                hash.update(
+                components::security::hash hash(
                     reinterpret_cast<unsigned char const*>(&out_buffer_.front()),
                     arg_size);
 
@@ -206,7 +205,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
         out_priority_ = boost::integer::ulittle8_t(priority);
         out_size_ = out_buffer_.size();
-        out_data_size_ = arg_size; 
+        out_data_size_ = arg_size;
 
         send_data_.num_parcels_ = pv.size();
         send_data_.bytes_ = arg_size;
