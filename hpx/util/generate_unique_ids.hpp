@@ -41,8 +41,7 @@ namespace hpx { namespace util
         {}
 
         /// Generate next unique component id
-        naming::gid_type get_id(naming::locality const& here,
-            naming::resolver_client& resolver, std::size_t count = 1);
+        naming::gid_type get_id(std::size_t count = 1);
 
         /// Not thread-safe
         void set_range(
@@ -57,61 +56,6 @@ namespace hpx { namespace util
         /// The range of available ids for components
         naming::gid_type lower_;
         naming::gid_type upper_;
-    };
-
-    /// The unique_ids class is a restricted form of unique_id_ranges, which
-    /// only allocates one gid at a time.
-    struct HPX_EXPORT unique_ids
-    {
-        typedef hpx::util::spinlock mutex_type;
-
-      private:
-        mutex_type leapfrog_mtx;
-        mutex_type allocation_mtx;
-
-        naming::gid_type current_lower;
-        naming::gid_type current_i;
-        naming::gid_type current_upper;
-        naming::gid_type next_lower;
-        naming::gid_type next_upper;
-        bool requested_range;
-        const std::size_t step;
-        const std::size_t leapfrog;
-
-      public:
-        unique_ids(
-            std::size_t step_ = HPX_INITIAL_GID_RANGE
-          , std::size_t leapfrog_ = 4
-            )
-          : current_lower(0)
-          , current_i(0)
-          , current_upper(0)
-          , next_lower(0)
-          , next_upper(0)
-          , requested_range(false)
-          , step(step_)
-          , leapfrog(leapfrog_)
-        {
-            BOOST_ASSERT(leapfrog_ != 0);
-        }
-
-        /// Generate next unique id
-        naming::gid_type get_id(
-            naming::locality const& here,
-            naming::resolver_client& resolver
-            );
-
-        /// Not thread-safe
-        void set_range(
-            naming::gid_type const& lower
-          , naming::gid_type const& upper
-            )
-        {
-            mutex_type::scoped_lock al(allocation_mtx);
-            current_lower = lower;
-            current_i = lower;
-            current_upper = upper;
-        }
     };
 }}
 

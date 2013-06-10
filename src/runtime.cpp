@@ -234,6 +234,8 @@ namespace hpx
             "subordinate certificate authority: %1%") % cert);
 
         add_locality_certificate(cert);
+
+        hpx::applier::get_applier().enable_verify_capabilities();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -809,12 +811,12 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        naming::gid_type get_next_id()
+        naming::gid_type get_next_id(std::size_t count)
         {
             if (NULL == get_runtime_ptr())
                 return naming::invalid_gid;
 
-            return get_runtime().get_next_id();
+            return get_runtime().get_next_id(count);
         }
     }
 

@@ -79,6 +79,11 @@ namespace hpx { namespace components { namespace security
                 bits_[position / CHAR_BIT] &= ~detail::array_bits[position % CHAR_BIT];
         }
 
+        bool allow(capability const& requestor)
+        {
+            return true;
+        }
+
         friend std::ostream & operator<<(std::ostream & os,
                                             capability const & capability)
         {

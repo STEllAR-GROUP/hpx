@@ -154,7 +154,7 @@ void addressing_service::launch_bootstrap(
     }
 
     naming::gid_type lower, upper;
-    get_id_range(ep, HPX_INITIAL_GID_RANGE, lower, upper);
+    get_id_range(ep, 20*HPX_INITIAL_GID_RANGE, lower, upper);
     get_runtime().get_id_pool().set_range(lower, upper);
 
 //    get_big_boot_barrier().wait();

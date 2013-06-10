@@ -550,9 +550,9 @@ namespace hpx {
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     naming::gid_type
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::get_next_id()
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::get_next_id(std::size_t count)
     {
-        return id_pool.get_id(parcel_handler_.here(), agas_client_);
+        return id_pool_.get_id(count);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>

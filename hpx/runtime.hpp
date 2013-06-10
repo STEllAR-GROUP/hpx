@@ -183,9 +183,9 @@ namespace hpx
 
         virtual void report_error(boost::exception_ptr const& e) = 0;
 
-        virtual naming::gid_type get_next_id() = 0;
+        virtual naming::gid_type get_next_id(std::size_t count = 1) = 0;
 
-        virtual util::unique_ids& get_id_pool() = 0;
+        virtual util::unique_id_ranges& get_id_pool() = 0;
 
         virtual void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f) = 0;
 
