@@ -656,7 +656,8 @@ void notify_worker(notification_header const& header)
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
-    rt.get_id_pool().set_range(header.parcelport_lower_gid
+    rt.get_id_pool().set_range(
+        header.parcelport_lower_gid
       , header.parcelport_upper_gid);
 
     // assign the initial gid range to the unique id range allocator that our
@@ -759,7 +760,7 @@ void big_boot_barrier::wait(void* primary_ns_server)
                 new actions::transfer_action<register_console_action>(
                     registration_header(
                         rt.here()
-                      , HPX_INITIAL_GID_RANGE
+                      , 20*HPX_INITIAL_GID_RANGE
                       , response_heap_type::block_type::heap_step
                       , rt.get_runtime_support_lva()
                       , rt.get_memory_lva()
@@ -779,7 +780,7 @@ void big_boot_barrier::wait(void* primary_ns_server)
                 new actions::transfer_action<register_worker_action>(
                     registration_header(
                         rt.here()
-                      , HPX_INITIAL_GID_RANGE
+                      , 20*HPX_INITIAL_GID_RANGE
                       , response_heap_type::block_type::heap_step
                       , rt.get_runtime_support_lva()
                       , rt.get_memory_lva()

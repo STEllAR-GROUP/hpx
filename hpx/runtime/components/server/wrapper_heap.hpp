@@ -262,7 +262,7 @@ namespace hpx { namespace components { namespace detail
                     // this is the first call to get_gid() for this heap - allocate
                     // a sufficiently large range of global ids
                     util::unlock_the_lock<scoped_lock> ul(l);
-                    base_gid = ids.get_id(appl.here(), appl.get_agas_client(), step_);
+                    base_gid = ids.get_id(step_);
                 }
 
                 // register the global ids and the base address of this heap

@@ -272,11 +272,11 @@ namespace hpx {
             return reinterpret_cast<boost::uint64_t>(&memory_);
         }
 
-        naming::gid_type get_next_id();
+        naming::gid_type get_next_id(std::size_t count = 1);
 
-        util::unique_ids& get_id_pool()
+        util::unique_id_ranges& get_id_pool()
         {
-            return id_pool;
+            return id_pool_;
         }
 
         /// Add a function to be executed inside a HPX thread before hpx_main
@@ -357,7 +357,7 @@ namespace hpx {
         void deinit_tss();
 
     private:
-        util::unique_ids id_pool;
+        util::unique_id_ranges id_pool_;
         runtime_mode mode_;
         int result_;
         std::size_t num_threads_;

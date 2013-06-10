@@ -334,5 +334,21 @@ boost::uint32_t get_locality_id(error_code& ec)
     return l ? naming::get_locality_id_from_gid(l) : naming::invalid_locality_id;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+naming::gid_type get_next_id(
+    std::size_t count
+  , error_code& ec
+    )
+{
+    if (get_runtime_ptr() == 0)
+        return naming::invalid_gid;
+
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    naming::gid_type lower_bound, upper_bound;
+    if (agas_.get_id_range(agas_.get_here(), count, lower_bound, upper_bound, ec))
+        return lower_bound;
+
+    return naming::invalid_gid;
+}
 }}
 
