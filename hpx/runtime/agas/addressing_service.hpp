@@ -313,10 +313,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         return locality_;
     }
 
-    void set_local_locality(naming::gid_type const& g)
-    {
-        locality_ = g;
-    }
+    void set_local_locality(naming::gid_type const& g);
 
     bool is_bootstrap() const
     {
@@ -685,6 +682,16 @@ public:
       , naming::gid_type& upper_bound
       , error_code& ec = throws
         );
+
+    bool get_id_range(
+        boost::uint64_t count
+      , naming::gid_type& lower_bound
+      , naming::gid_type& upper_bound
+      , error_code& ec = throws
+        )
+    {
+        return get_id_range(get_here(), count, lower_bound, upper_bound, ec);
+    }
 
     /// \brief Bind a global address to a local address.
     ///

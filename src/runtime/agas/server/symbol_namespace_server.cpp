@@ -98,6 +98,7 @@ response symbol_namespace::service(
         case primary_ns_unbind_gid:
         case primary_ns_change_credit_non_blocking:
         case primary_ns_change_credit_sync:
+        case primary_ns_allocate:
         {
             LAGAS_(warning) <<
                 "symbol_namespace::service, redirecting request to "

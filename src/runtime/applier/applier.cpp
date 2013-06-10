@@ -339,22 +339,22 @@ namespace hpx { namespace applier
         actions::action_type act = p.get_action();
 
 #if defined(HPX_HAVE_SECURITY)
-        error_code ec(lightweight);
-        components::security::signed_certificate const& cert =
-            get_locality_certificate(p.get_source(), ec);
-        if (verify_capabilities_ && ec) {
-            // we should have received the sender's certificate by now
-            HPX_THROW_EXCEPTION(security_error,
-                "applier::schedule_action",
-                boost::str(boost::format(
-                    "couldn't extract sender's certificate (sender: %1%)") %
-                    p.get_source()));
-            return;
-        }
+        //error_code ec(lightweight);
+        //components::security::signed_certificate const& cert =
+        //    get_locality_certificate(p.get_source(), ec);
+        //if (verify_capabilities_ && ec) {
+        //    // we should have received the sender's certificate by now
+        //    HPX_THROW_EXCEPTION(security_error,
+        //        "applier::schedule_action",
+        //        boost::str(boost::format(
+        //            "couldn't extract sender's certificate (sender: %1%)") %
+        //            p.get_source()));
+        //    return;
+        //}
 
-        components::security::capability caps_sender;
-        if (verify_capabilities_)
-            caps_sender = cert.get_type().get_capability();
+        //components::security::capability caps_sender;
+        //if (verify_capabilities_)
+        //    caps_sender = cert.get_type().get_capability();
 #endif
         int comptype = act->get_component_type();
         naming::locality dest = p.get_destination_locality();
@@ -386,19 +386,19 @@ namespace hpx { namespace applier
                 lva = get_runtime_support_raw_gid().get_lsb();
 
 #if defined(HPX_HAVE_SECURITY)
-            if (verify_capabilities_) {
-                components::security::capability caps_action =
-                    act->get_required_capabilities(lva);
+            //if (verify_capabilities_) {
+            //    components::security::capability caps_action =
+            //        act->get_required_capabilities(lva);
 
-                if (!caps_action.allow(caps_sender)) {
-                    HPX_THROW_EXCEPTION(security_error,
-                        "applier::schedule_action",
-                        boost::str(boost::format("sender has insufficient capabilities "
-                            "to execute the action (%1%, sender: %2%, action %3%)") %
-                            act->get_action_name() % caps_sender % caps_action));
-                    return;
-                }
-            }
+            //    if (!caps_action.allow(caps_sender)) {
+            //        HPX_THROW_EXCEPTION(security_error,
+            //            "applier::schedule_action",
+            //            boost::str(boost::format("sender has insufficient capabilities "
+            //                "to execute the action (%1%, sender: %2%, action %3%)") %
+            //                act->get_action_name() % caps_sender % caps_action));
+            //        return;
+            //    }
+            //}
 #endif
             // make sure the component_type of the action matches the
             // component type in the destination address

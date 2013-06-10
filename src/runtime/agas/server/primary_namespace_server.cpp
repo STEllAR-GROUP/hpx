@@ -99,6 +99,15 @@ response primary_namespace::service(
                 counter_data_.increment_change_credit_count();
                 return change_credit_sync(req, ec);
             }
+        case primary_ns_allocate:
+            {
+                update_time_on_exit update(
+                    counter_data_
+                  , counter_data_.allocate_.time_
+                );
+                counter_data_.increment_allocate_count();
+                return allocate(req, ec);
+            }
         case primary_ns_statistics_counter:
             return statistics_counter(req, ec);
 
@@ -628,6 +637,72 @@ response primary_namespace::change_credit_sync(
     return response(primary_ns_change_credit_sync);
 }
 
+response primary_namespace::allocate(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ allocate implementation
+    boost::uint64_t const count = req.get_count();
+    boost::uint64_t const real_count = (count) ? (count - 1) : (0);
+
+    // Just return the prefix
+    // REVIEW: Should this be an error?
+    if (0 == count)
+    {
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::allocate, count(%1%), "
+            "lower(%1%), upper(%3%), prefix(%4%), response(repeated_request)")
+            % count % next_id_ % next_id_
+            % naming::get_locality_id_from_gid(next_id_));
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return response(primary_ns_allocate, next_id_, next_id_
+          , naming::get_locality_id_from_gid(next_id_), success);
+    }
+
+    // Compute the new allocation.
+    naming::gid_type lower(next_id_ + 1);
+    naming::gid_type upper(lower + real_count);
+
+    // Check for overflow.
+    if (upper.get_msb() != lower.get_msb())
+    {
+        // Check for address space exhaustion (we currently use 80 bis of
+        // the gid for the actual id)
+        if (HPX_UNLIKELY((lower.get_msb() & ~0xFF) == 0xFF))
+        {
+            HPX_THROWS_IF(ec, internal_server_error
+                , "locality_namespace::allocate"
+                , "primary namespace has been exhausted");
+            return response();
+        }
+
+        // Otherwise, correct
+        lower = naming::gid_type(upper.get_msb(), 0);
+        upper = lower + real_count;
+    }
+
+    // Store the new upper bound.
+    next_id_ = upper;
+
+    // Set the initial credit count.
+    naming::detail::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
+    naming::detail::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
+
+    LAGAS_(info) << (boost::format(
+        "primary_namespace::allocate, count(%1%), "
+        "lower(%2%), upper(%3%), prefix(%4%), response(repeated_request)")
+        % count % lower % upper % naming::get_locality_id_from_gid(next_id_));
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(locality_ns_allocate, lower, upper
+      , naming::get_locality_id_from_gid(next_id_), success);
+} // }}}
+
 void primary_namespace::increment(
     naming::gid_type const& lower
   , naming::gid_type const& upper
@@ -1154,6 +1229,9 @@ response primary_namespace::statistics_counter(
         case primary_ns_change_credit_sync:
             get_data_func = boost::bind(&cd::get_change_credit_count, &counter_data_, ::_1);
             break;
+        case primary_ns_allocate:
+            get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
+            break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
               , "primary_namespace::statistics"
@@ -1179,6 +1257,9 @@ response primary_namespace::statistics_counter(
         case primary_ns_change_credit_non_blocking:
         case primary_ns_change_credit_sync:
             get_data_func = boost::bind(&cd::get_change_credit_time, &counter_data_, ::_1);
+            break;
+        case primary_ns_allocate:
+            get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1236,6 +1317,12 @@ boost::int64_t primary_namespace::counter_data::get_change_credit_count(bool res
     return util::get_and_reset_value(change_credit_.count_, reset);
 }
 
+boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(allocate_.count_, reset);
+}
+
 // access execution time counters
 boost::int64_t primary_namespace::counter_data::get_route_time(bool reset)
 {
@@ -1267,6 +1354,12 @@ boost::int64_t primary_namespace::counter_data::get_change_credit_time(bool rese
     return util::get_and_reset_value(change_credit_.time_, reset);
 }
 
+boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(allocate_.time_, reset);
+}
+
 // increment counter values
 void primary_namespace::counter_data::increment_route_count()
 {
@@ -1296,6 +1389,12 @@ void primary_namespace::counter_data::increment_change_credit_count()
 {
     mutex_type::scoped_lock l(mtx_);
     ++change_credit_.count_;
+}
+
+void primary_namespace::counter_data::increment_allocate_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++allocate_.count_;
 }
 
 }}}

@@ -98,16 +98,12 @@ struct registration_header
     // TODO: pass head address as a GVA
     registration_header(
         naming::locality const& locality_
-      , boost::uint64_t parcelport_allocation_
-      , boost::uint64_t response_allocation_
       , boost::uint64_t component_runtime_support_ptr_
       , boost::uint64_t component_memory_ptr_
       , boost::uint64_t primary_ns_ptr_
       , boost::uint32_t num_threads_
     ) :
         locality(locality_)
-      , parcelport_allocation(parcelport_allocation_)
-      , response_allocation(response_allocation_)
       , component_runtime_support_ptr(component_runtime_support_ptr_)
       , component_memory_ptr(component_memory_ptr_)
       , primary_ns_ptr(primary_ns_ptr_)
@@ -115,8 +111,6 @@ struct registration_header
     {}
 
     naming::locality locality;
-    boost::uint64_t parcelport_allocation;
-    boost::uint64_t response_allocation;
 
     boost::uint64_t component_runtime_support_ptr;
     boost::uint64_t component_memory_ptr;
@@ -128,8 +122,6 @@ struct registration_header
     void serialize(Archive & ar, const unsigned int)
     {
         ar & locality;
-        ar & parcelport_allocation;
-        ar & response_allocation;
         ar & component_runtime_support_ptr;
         ar & component_memory_ptr;
         ar & primary_ns_ptr;
@@ -148,20 +140,12 @@ struct notification_header
 
     notification_header(
         naming::gid_type const& prefix_
-      , naming::gid_type const& response_lower_gid_
-      , naming::gid_type const& response_upper_gid_
-      , naming::gid_type const& parcelport_lower_gid_
-      , naming::gid_type const& parcelport_upper_gid_
       , naming::address const& locality_ns_address_
       , naming::address const& primary_ns_address_
       , naming::address const& component_ns_address_
       , naming::address const& symbol_ns_address_
     ) :
         prefix(prefix_)
-      , response_lower_gid(response_lower_gid_)
-      , response_upper_gid(response_upper_gid_)
-      , parcelport_lower_gid(parcelport_lower_gid_)
-      , parcelport_upper_gid(parcelport_upper_gid_)
       , locality_ns_address(locality_ns_address_)
       , primary_ns_address(primary_ns_address_)
       , component_ns_address(component_ns_address_)
@@ -169,10 +153,6 @@ struct notification_header
     {}
 
     naming::gid_type prefix;
-    naming::gid_type response_lower_gid;
-    naming::gid_type response_upper_gid;
-    naming::gid_type parcelport_lower_gid;
-    naming::gid_type parcelport_upper_gid;
     naming::address locality_ns_address;
     naming::address primary_ns_address;
     naming::address component_ns_address;
@@ -185,10 +165,6 @@ struct notification_header
     void serialize(Archive & ar, const unsigned int)
     {
         ar & prefix;
-        ar & response_lower_gid;
-        ar & response_upper_gid;
-        ar & parcelport_lower_gid;
-        ar & parcelport_upper_gid;
         ar & locality_ns_address;
         ar & primary_ns_address;
         ar & component_ns_address;
@@ -287,14 +263,6 @@ void register_console(registration_header const& header)
         return;
     }
 
-    naming::gid_type parcel_lower, parcel_upper;
-    agas_client.get_id_range(header.locality, header.parcelport_allocation
-      , parcel_lower, parcel_upper);
-
-    naming::gid_type heap_lower, heap_upper;
-    agas_client.get_id_range(header.locality, header.response_allocation
-      , heap_lower, heap_upper);
-
     naming::gid_type runtime_support_gid(prefix.get_msb()
       , header.component_runtime_support_ptr);
     naming::address runtime_support_address(header.locality
@@ -331,9 +299,8 @@ void register_console(registration_header const& header)
         server::symbol_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server_));
 
-    notification_header hdr (
-        prefix, heap_lower, heap_upper, parcel_lower, parcel_upper,
-        locality_addr, primary_addr, component_addr, symbol_addr);
+    notification_header hdr (prefix, locality_addr, primary_addr
+      , component_addr, symbol_addr);
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -430,30 +397,34 @@ void notify_console(notification_header const& header)
     rt.store_root_certificate(header.root_certificate);
 #endif
 
+    naming::gid_type parcel_lower, parcel_upper;
+    agas_client.get_id_range(rt.here(), response_heap_type::block_type::heap_step
+      , parcel_lower, parcel_upper);
+
+    naming::gid_type heap_lower, heap_upper;
+    agas_client.get_id_range(rt.here(), response_heap_type::block_type::heap_step
+      , heap_lower, heap_upper);
+
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
-    rt.get_id_pool().set_range(
-        header.parcelport_lower_gid
-      , header.parcelport_upper_gid);
+    rt.get_id_pool().set_range(parcel_lower, parcel_upper);
 
     // assign the initial gid range to the unique id range allocator that our
     // response heap is using
-    response_heap_type::get_heap().set_range(
-        header.response_lower_gid
-      , header.response_upper_gid);
+    response_heap_type::get_heap().set_range(heap_lower, heap_upper);
 
     // allocate our first heap
     response_heap_type::block_type* p = response_heap_type::alloc_heap();
 
     // set the base gid that we bound to this heap
-    p->set_gid(header.response_lower_gid);
+    p->set_gid(heap_lower);
 
     // push the heap onto the OSHL
     response_heap_type::get_heap().add_heap(p);
 
     // bind range of GIDs to head addresses
     agas_client.bind_range(
-        header.response_lower_gid
+        heap_lower
       , response_heap_type::block_type::heap_step
       , p->get_address()
       , response_heap_type::block_type::heap_size);
@@ -509,14 +480,6 @@ void register_worker(registration_header const& header)
         return;
     }
 
-    naming::gid_type parcel_lower, parcel_upper;
-    agas_client.get_id_range(header.locality, header.parcelport_allocation
-      , parcel_lower, parcel_upper);
-
-    naming::gid_type heap_lower, heap_upper;
-    agas_client.get_id_range(header.locality, header.response_allocation
-      , heap_lower, heap_upper);
-
     naming::gid_type runtime_support_gid(prefix.get_msb()
       , header.component_runtime_support_ptr);
     naming::address runtime_support_address(header.locality
@@ -551,9 +514,8 @@ void register_worker(registration_header const& header)
         server::symbol_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server_));
 
-    notification_header hdr (
-        prefix, heap_lower, heap_upper, parcel_lower, parcel_upper,
-        locality_addr, primary_addr, component_addr, symbol_addr);
+    notification_header hdr (prefix, locality_addr, primary_addr
+      , component_addr, symbol_addr);
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -654,30 +616,34 @@ void notify_worker(notification_header const& header)
     rt.store_root_certificate(header.root_certificate);
 #endif
 
+    naming::gid_type parcel_lower, parcel_upper;
+    agas_client.get_id_range(rt.here(), response_heap_type::block_type::heap_step
+      , parcel_lower, parcel_upper);
+
+    naming::gid_type heap_lower, heap_upper;
+    agas_client.get_id_range(rt.here(), response_heap_type::block_type::heap_step
+      , heap_lower, heap_upper);
+
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
-    rt.get_id_pool().set_range(
-        header.parcelport_lower_gid
-      , header.parcelport_upper_gid);
+    rt.get_id_pool().set_range(parcel_lower, parcel_upper);
 
     // assign the initial gid range to the unique id range allocator that our
     // response heap is using
-    response_heap_type::get_heap().set_range(
-        header.response_lower_gid
-      , header.response_upper_gid);
+    response_heap_type::get_heap().set_range(heap_lower, heap_upper);
 
     // allocate our first heap
     response_heap_type::block_type* p = response_heap_type::alloc_heap();
 
     // set the base gid that we bound to this heap
-    p->set_gid(header.response_lower_gid);
+    p->set_gid(heap_lower);
 
     // push the heap onto the OSHL
     response_heap_type::get_heap().add_heap(p);
 
     // bind range of GIDs to head addresses
     agas_client.bind_range(
-        header.response_lower_gid
+        heap_lower
       , response_heap_type::block_type::heap_step
       , p->get_address()
       , response_heap_type::block_type::heap_size);
@@ -760,8 +726,6 @@ void big_boot_barrier::wait(void* primary_ns_server)
                 new actions::transfer_action<register_console_action>(
                     registration_header(
                         rt.here()
-                      , 20*HPX_INITIAL_GID_RANGE
-                      , response_heap_type::block_type::heap_step
                       , rt.get_runtime_support_lva()
                       , rt.get_memory_lva()
                       , reinterpret_cast<boost::uint64_t>(primary_ns_server)
@@ -780,8 +744,6 @@ void big_boot_barrier::wait(void* primary_ns_server)
                 new actions::transfer_action<register_worker_action>(
                     registration_header(
                         rt.here()
-                      , 20*HPX_INITIAL_GID_RANGE
-                      , response_heap_type::block_type::heap_step
                       , rt.get_runtime_support_lva()
                       , rt.get_memory_lva()
                       , reinterpret_cast<boost::uint64_t>(primary_ns_server)

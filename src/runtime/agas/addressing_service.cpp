@@ -154,7 +154,7 @@ void addressing_service::launch_bootstrap(
     }
 
     naming::gid_type lower, upper;
-    get_id_range(ep, 20*HPX_INITIAL_GID_RANGE, lower, upper);
+    get_id_range(ep, HPX_INITIAL_GID_RANGE, lower, upper);
     get_runtime().get_id_pool().set_range(lower, upper);
 
 //    get_big_boot_barrier().wait();
@@ -190,6 +190,15 @@ void addressing_service::adjust_local_cache_size()
             % local_cache_size % local_cache_size_per_thread % cache_size);
     }
 } // }}}
+
+void addressing_service::set_local_locality(naming::gid_type const& g)
+{
+    locality_ = g;
+    if (is_bootstrap())
+        bootstrap->primary_ns_server_.set_local_locality(g);
+    else
+        hosted->primary_ns_server_.set_local_locality(g);
+}
 
 response addressing_service::service(
     request const& req
@@ -749,51 +758,14 @@ bool addressing_service::get_id_range(
   , error_code& ec
     )
 { // {{{ get_id_range implementation
-    typedef lcos::packaged_action<server::locality_namespace::service_action>
-        future_type;
-
-    future_type* f = 0;
-
     try {
-        request req(locality_ns_allocate, ep, count, boost::uint32_t(-1));
+        request req(primary_ns_allocate, ep, count, boost::uint32_t(-1));
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-
-        else if (get_status() == running)
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
-
+            rep = bootstrap->primary_ns_server_.service(req, ec);
         else
-        {
-            // WARNING: this deadlocks if AGAS is unresponsive and all response
-            // futures are checked out and pending.
-
-            // get a future
-            typedef checkout_promise<
-                locality_promise_pool_type
-              , future_type
-            > checkout_promise_type;
-
-            checkout_promise_type cf(
-                hosted->promise_pool_semaphore_
-              , hosted->locality_promise_pool_
-              , f);
-
-            if (0 == f)
-            {
-                HPX_THROWS_IF(ec, invalid_status
-                  , "addressing_service::get_id_range"
-                  , "could not check out future object instance during bootstrap");
-                return false;
-            }
-
-            // execute the action (synchronously)
-            f->apply(launch::async, bootstrap_locality_namespace_id(), req);
-            rep = f->get_future().get(ec);
-
-            cf.set_ok();
-        }
+            rep = hosted->primary_ns_server_.service(req, ec);
 
         error const s = rep.get_status();
 
@@ -806,22 +778,6 @@ bool addressing_service::get_id_range(
         return success == s;
     }
     catch (hpx::exception const& e) {
-        if (f && !is_bootstrap())
-        {
-            // Replace the future in the pool. To be able to return the future to
-            // the pool, we'd have to ensure that all threads (pending, suspended,
-            // active, or in flight) that might read/write from it are aborted.
-            // There's no guarantee that the future isn't corrupted in some other
-            // way, and the aforementioned code would be lengthy, and would have to
-            // be meticulously exception-free. So, for now, we just allocate a new
-            // future for the pool, and let the old future stay in memory.
-            {
-                lock_semaphore lock(hosted->promise_pool_semaphore_);
-                hosted->locality_promise_pool_.enqueue(new future_type);
-            }
-            f->set_exception(boost::current_exception());
-        }
-
         HPX_RETHROWS_IF(ec, e, "addressing_service::get_id_range");
         return false;
     }
