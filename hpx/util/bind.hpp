@@ -48,13 +48,13 @@ namespace hpx { namespace util {
             template <typename Env, typename T>
             struct eval<Env, boost::reference_wrapper<T const> >
             {
-                typedef T const & t;
+                typedef T const & type;
             };
 
             template <typename Env, typename T>
             struct eval<Env, boost::reference_wrapper<T> >
             {
-                typedef T & t;
+                typedef T & type;
             };
         }
 
@@ -1111,6 +1111,18 @@ namespace hpx { namespace util
                 f = boost::move(other.f);
                 BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MOVE_MEMBER, _)
                 return *this;
+            }
+
+            BOOST_FORCEINLINE
+            typename result_of::BOOST_PP_CAT(bound_functor, N)<
+                F()
+              , BOOST_PP_ENUM_PARAMS(N, Arg)
+            >::type
+            operator()()
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return eval(env, f)(BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _));
             }
 
             BOOST_FORCEINLINE
