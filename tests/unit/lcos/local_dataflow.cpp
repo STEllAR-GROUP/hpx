@@ -93,16 +93,27 @@ void function_pointers()
         vf.push_back(dataflow(unwrap(&int_f1), make_ready_future(42)));
     }
     future<int> f4 = dataflow(unwrap(&int_f_vector), vf);
-
+    
+    future<int>
+        f5 = dataflow(
+            unwrap(&int_f1)
+          , dataflow(
+                unwrap(&int_f1)
+              , make_ready_future(42))
+          , dataflow(
+                unwrap(&void_f)
+              , make_ready_future())
+        );
 
     hpx::wait(f1);
     HPX_TEST_EQ(f2.get(), 126);
     HPX_TEST_EQ(f3.get(), 163);
     HPX_TEST_EQ(f4.get(), 10 * 84);
-    HPX_TEST_EQ(void_f_count, 0u);
+    HPX_TEST_EQ(f5.get(), 126);
+    HPX_TEST_EQ(void_f_count, 1u);
     HPX_TEST_EQ(int_f_count, 1u);
     HPX_TEST_EQ(void_f1_count, 1u);
-    HPX_TEST_EQ(int_f1_count, 14u);
+    HPX_TEST_EQ(int_f1_count, 16u);
     HPX_TEST_EQ(int_f2_count, 1u);
 }
 
@@ -111,15 +122,16 @@ void function_pointers()
 boost::atomic<boost::uint32_t> future_void_f1_count;
 boost::atomic<boost::uint32_t> future_void_f2_count;
 
-void future_void_f1(future<void>) {++future_void_f1_count;}
-void future_void_f2(future<void>, future<void>) {++future_void_f2_count;}
+void future_void_f1(future<void> f1) { HPX_TEST(f1.ready()); ++future_void_f1_count;}
+void future_void_f2(future<void> f1, future<void> f2) { HPX_TEST(f1.ready()); HPX_TEST(f2.ready()); ++future_void_f2_count;}
 
 boost::atomic<boost::uint32_t> future_int_f1_count;
 boost::atomic<boost::uint32_t> future_int_f2_count;
 
-int future_int_f1(future<void>) {++future_int_f1_count; return 1;}
+int future_int_f1(future<void> f1) { HPX_TEST(f1.ready()); ++future_int_f1_count; return 1;}
 int future_int_f2(future<int> f1, future<int> f2)
 {
+    HPX_TEST(f1.ready()); HPX_TEST(f2.ready());
     ++future_int_f2_count;
     return f1.get() + f2.get();
 }
@@ -129,8 +141,10 @@ boost::atomic<boost::uint32_t> future_int_f_vector_count;
 int future_int_f_vector(std::vector<future<int> > const & vf)
 {
     int sum = 0;
+    int i = 0;
     BOOST_FOREACH(future<int> f, vf)
     {
+        HPX_TEST(f.ready());
         sum += f.get();
     }
     return sum;
