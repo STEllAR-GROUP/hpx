@@ -341,14 +341,18 @@ naming::gid_type get_next_id(
     )
 {
     if (get_runtime_ptr() == 0)
+    {
+        HPX_THROWS_IF(ec, invalid_status,
+            "get_next_id", "the runtime system is has not been started yet.");
         return naming::invalid_gid;
+    }
 
     naming::resolver_client& agas_ = naming::get_agas_client();
     naming::gid_type lower_bound, upper_bound;
-    if (agas_.get_id_range(agas_.get_here(), count, lower_bound, upper_bound, ec))
-        return lower_bound;
+    agas_.get_id_range(agas_.get_here(), count, lower_bound, upper_bound, ec);
+    if (ec) return naming::invalid_gid;
 
-    return naming::invalid_gid;
+    return lower_bound;
 }
 }}
 

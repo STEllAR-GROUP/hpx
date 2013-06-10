@@ -40,7 +40,8 @@ enum namespace_action_code
     primary_ns_unbind_gid                   = BOOST_BINARY_U(1000101),
     primary_ns_change_credit_non_blocking   = BOOST_BINARY_U(1000110),
     primary_ns_change_credit_sync           = BOOST_BINARY_U(1000111),
-    primary_ns_statistics_counter           = BOOST_BINARY_U(1001000),
+    primary_ns_allocate                     = BOOST_BINARY_U(1001000),
+    primary_ns_statistics_counter           = BOOST_BINARY_U(1001001),
 
     component_ns_service                    = BOOST_BINARY_U(0100000),
     component_ns_bulk_service               = BOOST_BINARY_U(0100001),
@@ -163,12 +164,7 @@ namespace detail
     static counter_service_data const locality_namespace_services[] =
     {
         // counters exposing API invocation counts
-        {   "count/allocate"
-          , ""
-          , counter_target_count
-          , locality_ns_allocate
-          , locality_ns_statistics_counter }
-      , {   "count/free"
+        {   "count/free"
           , ""
           , counter_target_count
           , locality_ns_free
@@ -199,11 +195,6 @@ namespace detail
           , locality_ns_resolved_localities
           , locality_ns_statistics_counter }
       // counters exposing API timings
-      , {   "time/allocate"
-          , "ns"
-          , counter_target_time
-          , locality_ns_allocate
-          , locality_ns_statistics_counter }
       , {   "time/free"
           , "ns"
           , counter_target_time
@@ -267,6 +258,11 @@ namespace detail
           , counter_target_count
           , primary_ns_change_credit_non_blocking
           , primary_ns_statistics_counter }
+      , {   "count/allocate"
+          , ""
+          , counter_target_count
+          , primary_ns_allocate
+          , primary_ns_statistics_counter }
       // counters exposing API timings
       , {   "time/route"
           , "ns"
@@ -292,6 +288,11 @@ namespace detail
           , "ns"
           , counter_target_time
           , primary_ns_change_credit_non_blocking
+          , primary_ns_statistics_counter }
+      , {   "time/allocate"
+          , "ns"
+          , counter_target_time
+          , primary_ns_allocate
           , primary_ns_statistics_counter }
     };
     static std::size_t const num_primary_namespace_services =
