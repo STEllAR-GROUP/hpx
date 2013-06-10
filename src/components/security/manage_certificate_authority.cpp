@@ -48,7 +48,7 @@ extern "C"
         *certificate = certificate_authority->get_certificate();
     }
 
-    void ca_get_gid(
+    void certificate_authority_get_gid(
         security::server::certificate_authority_base* certificate_authority
       , hpx::naming::gid_type* gid)
     {
