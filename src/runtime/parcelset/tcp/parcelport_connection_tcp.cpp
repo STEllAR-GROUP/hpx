@@ -163,7 +163,6 @@ namespace hpx { namespace parcelset { namespace tcp
                     suffix);
 
                 // append the signed parcel suffix to the message
-                arg_size += signed_parcel_suffix::size();
                 out_buffer_.reserve(out_buffer_.size() + signed_parcel_suffix::size());
 
                 std::copy(suffix.begin(), suffix.end(), std::back_inserter(out_buffer_));
