@@ -23,11 +23,18 @@ namespace hpx { namespace components { namespace security { namespace server
         typedef certificate_authority_base base_type_holder;
 
         subordinate_certificate_authority();
+        subordinate_certificate_authority(key_pair const &);
         subordinate_certificate_authority(naming::id_type const &);
-        subordinate_certificate_authority(key_pair const &, naming::id_type const &);
+        subordinate_certificate_authority(
+            key_pair const &, naming::id_type const &);
+
+        signed_type<certificate_signing_request>
+            get_certificate_signing_request() const;
 
         signed_type<certificate> sign_certificate_signing_request(
             signed_type<certificate_signing_request> const &) const;
+
+        void set_certificate(signed_type<certificate> const &);
 
         naming::gid_type get_base_gid() const
         {

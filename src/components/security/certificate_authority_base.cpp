@@ -26,3 +26,7 @@ HPX_REGISTER_ACTION(
 HPX_REGISTER_ACTION(
     certificate_authority_base_type::get_certificate_action
   , certificate_authority_base_get_certificate_action);
+
+HPX_REGISTER_ACTION(
+    certificate_authority_base_type::is_valid_action
+  , certificate_authority_base_is_valid_action);

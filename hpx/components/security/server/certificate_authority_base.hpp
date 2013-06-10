@@ -36,6 +36,8 @@ namespace hpx { namespace components { namespace security { namespace server
 
         signed_type<certificate> get_certificate() const;
 
+        bool is_valid() const;
+
         HPX_DEFINE_COMPONENT_CONST_ACTION(
             certificate_authority_base
           , sign_certificate_signing_request_nonvirt
@@ -45,12 +47,18 @@ namespace hpx { namespace components { namespace security { namespace server
             certificate_authority_base
           , get_certificate);
 
+        HPX_DEFINE_COMPONENT_CONST_ACTION(
+            certificate_authority_base
+          , is_valid);
+
         virtual naming::gid_type get_base_gid() const = 0;
 
     protected:
         key_pair key_pair_;
 
         signed_type<certificate> certificate_;
+
+        bool valid_;
     };
 }}}}
 
@@ -61,5 +69,9 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::security::server::certificate_authority_base::get_certificate_action
   , certificate_authority_base_get_certificate_action);
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::security::server::certificate_authority_base::is_valid_action
+  , certificate_authority_base_is_valid_action);
 
 #endif

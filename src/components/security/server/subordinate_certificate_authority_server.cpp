@@ -25,6 +25,15 @@ namespace hpx { namespace components { namespace security { namespace server
     }
 
     subordinate_certificate_authority::subordinate_certificate_authority(
+        key_pair const & key_pair)
+      : certificate_authority_base(key_pair)
+      , fixed_component_base<subordinate_certificate_authority>(
+            get_subordinate_certificate_authority_msb()
+          , HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB)
+    {
+    }
+
+    subordinate_certificate_authority::subordinate_certificate_authority(
         naming::id_type const & issuer_id)
       : certificate_authority_base()
       , fixed_component_base<subordinate_certificate_authority>(
@@ -33,11 +42,8 @@ namespace hpx { namespace components { namespace security { namespace server
     {
         security::certificate_authority_base issuer(issuer_id);
 
-        signed_type<certificate_signing_request> signed_csr =
-            key_pair_.sign(certificate_signing_request(
-                get_gid().get_gid(), key_pair_.get_public_key()));
-
-        certificate_ = issuer.sign_certificate_signing_request(signed_csr);
+        set_certificate(issuer.sign_certificate_signing_request(
+            get_certificate_signing_request()));
     }
 
     subordinate_certificate_authority::subordinate_certificate_authority(
@@ -50,11 +56,15 @@ namespace hpx { namespace components { namespace security { namespace server
     {
         security::certificate_authority_base issuer(issuer_id);
 
-        signed_type<certificate_signing_request> signed_csr =
-            key_pair_.sign(certificate_signing_request(
-                get_gid().get_gid(), key_pair_.get_public_key()));
+        set_certificate(issuer.sign_certificate_signing_request(
+            get_certificate_signing_request()));
+    }
 
-        certificate_ = issuer.sign_certificate_signing_request(signed_csr);
+    signed_type<certificate_signing_request>
+    subordinate_certificate_authority::get_certificate_signing_request() const
+    {
+        return key_pair_.sign(certificate_signing_request(
+            get_gid().get_gid(), key_pair_.get_public_key()));
     }
 
     signed_type<certificate>
@@ -62,13 +72,14 @@ namespace hpx { namespace components { namespace security { namespace server
         signed_type<certificate_signing_request> const & signed_csr) const
     {
         certificate_signing_request const & csr = signed_csr.get_type();
+
         if (csr.get_subject_public_key().verify(signed_csr) == false)
         {
             HPX_THROW_EXCEPTION(
                 hpx::security_error
-              , "root_certificate_authority::sign_certificate_signing_request"
+              , "subordinate_certificate_authority::sign_certificate_signing_request"
               , boost::str(boost::format(
-                    "the certificate signing request signature is invalid: %1%") %
+                    "The certificate signing request signature is invalid: %1%") %
                     signed_csr)
             )
         }
@@ -81,5 +92,14 @@ namespace hpx { namespace components { namespace security { namespace server
             get_gid().get_gid(), csr));
 
         return signed_certificate;
+    }
+
+    void
+    subordinate_certificate_authority::set_certificate(
+        signed_type<certificate> const & signed_certificate)
+    {
+        certificate_ = signed_certificate;
+
+        valid_ = true;
     }
 }}}}

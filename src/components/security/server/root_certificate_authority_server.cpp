@@ -16,11 +16,11 @@ namespace hpx { namespace components { namespace security { namespace server
         capability capability;
         capability.set(traits::capability<>::capability_certificate_authority);
 
+        naming::gid_type gid = get_gid().get_gid();
         certificate_ = key_pair_.sign(certificate(
-            get_gid().get_gid()
-          , get_gid().get_gid()
-          , key_pair_.get_public_key()
-          , capability));
+            gid, gid, key_pair_.get_public_key(), capability));
+
+        valid_ = true;
     }
 
     root_certificate_authority::root_certificate_authority(
@@ -32,11 +32,11 @@ namespace hpx { namespace components { namespace security { namespace server
         capability capability;
         capability.set(traits::capability<>::capability_certificate_authority);
 
+        naming::gid_type gid = get_gid().get_gid();
         certificate_ = key_pair_.sign(certificate(
-            get_gid().get_gid()
-          , get_gid().get_gid()
-          , key_pair_.get_public_key()
-          , capability));
+            gid, gid, key_pair_.get_public_key(), capability));
+
+        valid_ = true;
     }
 
     signed_type<certificate>
