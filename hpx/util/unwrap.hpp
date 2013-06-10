@@ -162,11 +162,15 @@ namespace hpx { namespace util {
             typename result<unwrap_param_value(Tuple, Future)>::type
             invoke(Tuple t, Future & f, boost::mpl::false_, boost::mpl::false_) const
             {
+                BOOST_ASSERT(f.ready());
+                typename lcos::future_traits<Future>::value_type
+                    val(boost::move(f.get()));
+                f = Future();
                 return
                     boost::move(
                         boost::fusion::push_back(
                             boost::move(t)
-                          , boost::move(f.get())
+                          , boost::move(val)
                         )
                     );
             }
@@ -175,7 +179,9 @@ namespace hpx { namespace util {
             typename result<unwrap_param_value(Tuple, Future)>::type
             invoke(Tuple t, Future & f, boost::mpl::false_, boost::mpl::true_) const
             {
+                BOOST_ASSERT(f.ready());
                 f.get();
+                f = Future();
                 return boost::move(t);
             }
 
@@ -187,10 +193,12 @@ namespace hpx { namespace util {
                 
                 res.reserve(r.size());
 
-                BOOST_FOREACH(typename Range::value_type const & f, r)
+                BOOST_FOREACH(typename Range::value_type & f, r)
                 {
+                    BOOST_ASSERT(f.ready());
                     res.push_back(boost::move(f.get()));
                 }
+                r = Range();
 
                 return
                     boost::move(
@@ -208,8 +216,10 @@ namespace hpx { namespace util {
 
                 BOOST_FOREACH(typename Range::value_type const & f, r)
                 {
+                    BOOST_ASSERT(f.ready());
                     f.get();
                 }
+                r = Range();
 
                 return boost::move(t);
             }
@@ -222,6 +232,16 @@ namespace hpx { namespace util {
 
             template <typename Sig>
             struct result;
+            
+            template <typename This>
+            struct result<This()>
+            {
+                typedef hpx::util::unused_type type;
+            };
+
+            hpx::util::unused_type operator()();
+            hpx::util::unused_type operator()() const;
+
 
 #define     HPX_UTIL_UNWRAP_IMPL_OPERATOR(Z, N, D)                              \
             template <typename This, BOOST_PP_ENUM_PARAMS(N, typename A)>       \
@@ -234,7 +254,7 @@ namespace hpx { namespace util {
                     typename boost::fusion::result_of::invoke<                  \
                         F                                                       \
                       , typename boost::fusion::result_of::fold<                \
-                            params_type const                                   \
+                            params_type                                         \
                           , hpx::util::tuple0<>                                 \
                           , unwrap_param_value                                  \
                         >::type                                                 \
@@ -244,17 +264,19 @@ namespace hpx { namespace util {
                                                                                 \
             template <BOOST_PP_ENUM_PARAMS(N, typename A)>                      \
             typename result<unwrap_impl(BOOST_PP_ENUM_PARAMS(N, A))>::type      \
-            operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                    \
+            operator()(HPX_ENUM_FWD_ARGS(N, A, a))                              \
             {                                                                   \
                 typedef                                                         \
                     BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_ENUM_PARAMS(N, A)>\
                     params_type;                                                \
                                                                                 \
+                params_type params(HPX_ENUM_FORWARD_ARGS(N, A, a));             \
+                                                                                \
                 return                                                          \
                     boost::fusion::invoke(                                      \
                         f_                                                      \
                       , boost::fusion::fold(                                    \
-                            params_type(HPX_ENUM_FORWARD_ARGS(N, A, a))         \
+                            params                                              \
                           , hpx::util::tuple0<>()                               \
                           , unwrap_param_value()                                \
                         )                                                       \
