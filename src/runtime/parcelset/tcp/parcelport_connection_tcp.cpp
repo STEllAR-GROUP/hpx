@@ -137,7 +137,6 @@ namespace hpx { namespace parcelset { namespace tcp
                 }
 
                 arg_size = archive.bytes_written();
-                out_buffer_.resize(arg_size);
             }
 
             // store the time required for serialization
@@ -153,7 +152,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 // calculate hash of overall message
                 components::security::hash hash(
                     reinterpret_cast<unsigned char const*>(&out_buffer_.front()),
-                    arg_size);
+                    out_buffer_.size());
 
                 using components::security::parcel_suffix;
                 using components::security::signed_parcel_suffix;
@@ -165,7 +164,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
                 // append the signed parcel suffix to the message
                 arg_size += signed_parcel_suffix::size();
-                out_buffer_.reserve(arg_size);
+                out_buffer_.reserve(out_buffer_.size() + signed_parcel_suffix::size());
 
                 std::copy(suffix.begin(), suffix.end(), std::back_inserter(out_buffer_));
 
