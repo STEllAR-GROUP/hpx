@@ -199,7 +199,7 @@ namespace hpx
             }
 
             LSEC_(debug) << (boost::format(
-                "runtime::init_security: initialized root certificate authority: %1%") % 
+                "runtime::init_security: initialized root certificate authority: %1%") %
                 security_data_->root_certificate_authority_.get_certificate());
         }
     }
@@ -275,7 +275,7 @@ namespace hpx
             "certificate: %2%") % here() % cert);
 
         lcos::local::spinlock::scoped_lock l(security_mtx_);
-        BOOST_ASSERT(0 != security_data_->cert_store_);     // should have been created
+        BOOST_ASSERT(0 != security_data_->cert_store_.get());     // should have been created
         security_data_->cert_store_->insert(cert);
     }
 
@@ -284,7 +284,7 @@ namespace hpx
             error_code& ec) const
     {
         BOOST_ASSERT(security_data_.get() != 0);
-        if (0 == security_data_->cert_store_)     // should have been created
+        if (0 == security_data_->cert_store_.get())     // should have been created
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "runtime::get_locality_certificate",
@@ -311,7 +311,7 @@ namespace hpx
         error_code& ec) const
     {
         BOOST_ASSERT(security_data_.get() != 0);
-        if (0 == security_data_->cert_store_)     // should have been created
+        if (0 == security_data_->cert_store_.get())     // should have been created
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "runtime::sign_parcel_suffix",
@@ -328,7 +328,7 @@ namespace hpx
         naming::gid_type& parcel_id, error_code& ec) const
     {
         BOOST_ASSERT(security_data_.get() != 0);
-        if (0 == security_data_->cert_store_)     // should have been created
+        if (0 == security_data_->cert_store_.get())     // should have been created
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "runtime::verify_parcel_suffix",
@@ -443,7 +443,7 @@ namespace hpx
     }
 
     util::binary_filter* runtime::create_binary_filter(
-        char const* binary_filter_type, bool compress, 
+        char const* binary_filter_type, bool compress,
         util::binary_filter* next_filter, error_code& ec)
     {
         return runtime_support_.create_binary_filter(binary_filter_type,
