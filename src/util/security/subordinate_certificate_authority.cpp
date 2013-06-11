@@ -34,8 +34,7 @@ namespace hpx { namespace util { namespace security
     {
         // Bind the new_subordinate_certificate_authority symbol dynamically and invoke it.
         typedef certificate_authority_type* (*function_type)(
-            components::security::key_pair const&
-          , naming::id_type const&);
+            components::security::key_pair const&);
         typedef boost::function<void(function_type)> deleter_type;
 
         hpx::util::plugin::dll dll(
@@ -45,9 +44,84 @@ namespace hpx { namespace util { namespace security
                 "new_subordinate_certificate_authority");
 
         BOOST_ASSERT(0 == subordinate_certificate_authority_);
-        subordinate_certificate_authority_ = (*function.first)(key_pair_,
-            naming::id_type(root_certificate_authority::get_gid()
-                          , naming::id_type::unmanaged));
+        subordinate_certificate_authority_ = (*function.first)(key_pair_);
+    }
+
+    components::security::signed_certificate_signing_request
+        subordinate_certificate_authority::get_certificate_signing_request() const
+    {
+        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+
+        // Bind the certificate_authority_sign_certificate_signing_request symbol dynamically and invoke it.
+        typedef void (*function_type)(
+            components::security::server::subordinate_certificate_authority*
+          , components::security::signed_certificate_signing_request*);
+
+        typedef boost::function<void(function_type)> deleter_type;
+
+        hpx::util::plugin::dll dll(
+            HPX_MAKE_DLL_STRING(std::string("security")));
+        std::pair<function_type, deleter_type> function =
+            dll.get<function_type, deleter_type>(
+                "subordinate_certificate_authority_get_certificate_signing_request");
+
+        components::security::signed_certificate_signing_request signed_csr;
+
+        (*function.first)(subordinate_certificate_authority_, &signed_csr);
+
+        return signed_csr;
+    }
+
+    components::security::signed_certificate
+        subordinate_certificate_authority::sign_certificate_signing_request(
+            components::security::signed_certificate_signing_request const & signed_csr) const
+    {
+        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+
+        // Bind the certificate_authority_sign_certificate_signing_request symbol dynamically and invoke it.
+        typedef void (*function_type)(
+            components::security::server::certificate_authority_base*
+          , components::security::signed_certificate_signing_request const &
+          , components::security::signed_certificate*);
+
+        typedef boost::function<void(function_type)> deleter_type;
+
+        hpx::util::plugin::dll dll(
+            HPX_MAKE_DLL_STRING(std::string("security")));
+        std::pair<function_type, deleter_type> function =
+            dll.get<function_type, deleter_type>(
+                "certificate_authority_sign_certificate_signing_request");
+
+        components::security::signed_certificate signed_certificate;
+
+        (*function.first)(
+            subordinate_certificate_authority_
+          , signed_csr
+          , &signed_certificate);
+
+        return signed_certificate;
+    }
+
+    void subordinate_certificate_authority::set_certificate(
+        components::security::signed_certificate const & signed_certificate)
+    {
+        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+
+        // Bind the subordinate_certificate_authority_set_certificate symbol dynamically and invoke it.
+        typedef void (*function_type)(
+            components::security::server::subordinate_certificate_authority*
+          , components::security::signed_certificate const &);
+
+        typedef boost::function<void(function_type)> deleter_type;
+
+        hpx::util::plugin::dll dll(
+            HPX_MAKE_DLL_STRING(std::string("security")));
+        std::pair<function_type, deleter_type> function =
+            dll.get<function_type, deleter_type>(
+                "subordinate_certificate_authority_set_certificate");
+
+        (*function.first)(
+            subordinate_certificate_authority_, signed_certificate);
     }
 
     components::security::signed_certificate
@@ -64,7 +138,7 @@ namespace hpx { namespace util { namespace security
         // Bind the certificate_authority_get_certificate symbol dynamically and invoke it.
         typedef void (*function_type)(
             components::security::server::certificate_authority_base*
-          , components::security::signed_type<components::security::certificate>*);
+          , components::security::signed_certificate*);
 
         typedef boost::function<void(function_type)> deleter_type;
 
@@ -74,13 +148,12 @@ namespace hpx { namespace util { namespace security
             dll.get<function_type, deleter_type>(
                 "certificate_authority_get_certificate");
 
-        components::security::signed_type<
-            components::security::certificate
-        > certificate;
+        components::security::signed_certificate signed_certificate;
 
-        (*function.first)(subordinate_certificate_authority_, &certificate);
+        (*function.first)(
+            subordinate_certificate_authority_, &signed_certificate);
 
-        return certificate;
+        return signed_certificate;
     }
 
     naming::gid_type subordinate_certificate_authority::get_gid() const
@@ -105,6 +178,30 @@ namespace hpx { namespace util { namespace security
         (*function.first)(subordinate_certificate_authority_, &gid);
 
         return gid;
+    }
+
+    bool subordinate_certificate_authority::is_valid() const
+    {
+        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+
+        // Bind the certificate_authority_is_valid symbol dynamically and invoke it.
+        typedef void (*function_type)(
+            components::security::server::certificate_authority_base*
+          , bool*);
+
+        typedef boost::function<void(function_type)> deleter_type;
+
+        hpx::util::plugin::dll dll(
+            HPX_MAKE_DLL_STRING(std::string("security")));
+        std::pair<function_type, deleter_type> function =
+            dll.get<function_type, deleter_type>(
+                "certificate_authority_is_valid");
+
+        bool valid;
+
+        (*function.first)(subordinate_certificate_authority_, &valid);
+
+        return valid;
     }
 
     components::security::key_pair const &

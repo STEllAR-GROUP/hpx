@@ -31,10 +31,22 @@ namespace hpx { namespace util { namespace security
 
         void initialize();
 
+        components::security::signed_certificate_signing_request
+            get_certificate_signing_request() const;
+
+        components::security::signed_certificate
+            sign_certificate_signing_request(
+                components::security::signed_certificate_signing_request const &) const;
+
+        void set_certificate(
+            components::security::signed_certificate const &);
+
         components::security::signed_certificate
             get_certificate(error_code& ec = throws) const;
 
         naming::gid_type get_gid() const;
+
+        bool is_valid() const;
 
         components::security::key_pair const & get_key_pair() const;
 
@@ -42,22 +54,6 @@ namespace hpx { namespace util { namespace security
         components::security::key_pair key_pair_;
         certificate_authority_type* subordinate_certificate_authority_;
     };
-
-    inline boost::uint64_t 
-    get_subordinate_certificate_authority_msb(boost::uint32_t locality_id)
-    {
-        return naming::replace_locality_id(
-            HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB
-          , locality_id);
-    }
-
-    inline naming::gid_type
-    get_subordinate_certificate_authority_gid(boost::uint32_t locality_id)
-    {
-        return naming::gid_type(
-            get_subordinate_certificate_authority_msb(locality_id)
-          , HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB);
-    }
 }}}
 
 #endif

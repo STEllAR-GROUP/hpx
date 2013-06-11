@@ -29,22 +29,43 @@ extern "C"
     HPX_COMPONENT_EXPORT
         security::server::subordinate_certificate_authority*
             new_subordinate_certificate_authority(
-                security::key_pair const &
-              , hpx::naming::id_type const &);
+                security::key_pair const &);
     HPX_COMPONENT_EXPORT
         void delete_subordinate_certificate_authority(
             security::server::subordinate_certificate_authority*);
 
+    // subordinate_certificate_authority helpers
+    HPX_COMPONENT_EXPORT
+        void subordinate_certificate_authority_get_certificate_signing_request(
+            security::server::subordinate_certificate_authority*
+          , security::signed_certificate_signing_request*);
+
+    HPX_COMPONENT_EXPORT
+        void subordinate_certificate_authority_set_certificate(
+            security::server::subordinate_certificate_authority*
+          , security::signed_certificate const &);
+
     // Helpers
+    HPX_COMPONENT_EXPORT
+        void certificate_authority_sign_certificate_signing_request(
+            security::server::certificate_authority_base*
+          , security::signed_certificate_signing_request const &
+          , security::signed_certificate*);
+
     HPX_COMPONENT_EXPORT
         void certificate_authority_get_certificate(
             security::server::certificate_authority_base*
-          , security::signed_type<security::certificate>*);
+          , security::signed_certificate*);
 
     HPX_COMPONENT_EXPORT
         void certificate_authority_get_gid(
             security::server::certificate_authority_base*
           , hpx::naming::gid_type*);
+
+    HPX_COMPONENT_EXPORT
+        void certificate_authority_is_valid(
+            security::server::certificate_authority_base*
+          , bool*);
 }
 
 #endif
