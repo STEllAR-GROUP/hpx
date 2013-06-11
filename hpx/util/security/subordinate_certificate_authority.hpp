@@ -54,6 +54,22 @@ namespace hpx { namespace util { namespace security
         components::security::key_pair key_pair_;
         certificate_authority_type* subordinate_certificate_authority_;
     };
+
+    inline boost::uint64_t
+    get_subordinate_certificate_authority_msb(boost::uint32_t locality_id)
+    {
+        return naming::replace_locality_id(
+            HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB
+          , locality_id);
+    }
+
+    inline naming::gid_type
+    get_subordinate_certificate_authority_gid(boost::uint32_t locality_id)
+    {
+        return naming::gid_type(
+            get_subordinate_certificate_authority_msb(locality_id)
+          , HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB);
+    }
 }}}
 
 #endif
