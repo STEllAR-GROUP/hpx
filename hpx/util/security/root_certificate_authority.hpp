@@ -33,9 +33,15 @@ namespace hpx { namespace util { namespace security
         void initialize();
 
         components::security::signed_certificate
+            sign_certificate_signing_request(
+                components::security::signed_certificate_signing_request const &) const;
+
+        components::security::signed_certificate
             get_certificate(error_code& ec = throws) const;
 
         static naming::gid_type get_gid();
+
+        bool is_valid() const;
 
     private:
         components::security::key_pair* key_pair_;

@@ -29,6 +29,8 @@ int hpx_main(boost::program_options::variables_map &)
             root_certificate_authority;
         root_certificate_authority.initialize();
 
+        HPX_TEST(root_certificate_authority.is_valid());
+
         signed_type<certificate> const & root_certificate =
             root_certificate_authority.get_certificate();
 
@@ -39,14 +41,18 @@ int hpx_main(boost::program_options::variables_map &)
         public_key const & root_public_key =
             root_certificate.get_type().get_subject_public_key();
 
-        std::cout << root_public_key << std::endl;
-
         HPX_TEST(root_public_key.verify(root_certificate));
 
 
         hpx::util::security::subordinate_certificate_authority
             subordinate_certificate_authority;
         subordinate_certificate_authority.initialize();
+
+        subordinate_certificate_authority.set_certificate(
+            root_certificate_authority.sign_certificate_signing_request(
+                subordinate_certificate_authority.get_certificate_signing_request()));
+
+        HPX_TEST(subordinate_certificate_authority.is_valid());
 
         signed_type<certificate> const &
             subordinate_certificate =
@@ -70,6 +76,8 @@ int hpx_main(boost::program_options::variables_map &)
             signed_parcel_suffix =
                 subordinate_certificate_authority.get_key_pair().sign(
                     parcel_suffix);
+
+        std::cout << signed_parcel_suffix << std::endl;
 
         std::vector<char> parcel_data(
             data, data + sizeof(data));

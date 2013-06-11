@@ -26,11 +26,10 @@ extern "C"
     // Manage subordinate_certificate_authority
     security::server::subordinate_certificate_authority*
         new_subordinate_certificate_authority(
-            security::key_pair const & key_pair
-          , hpx::naming::id_type const & gid)
+            security::key_pair const & key_pair)
     {
         return new security::server::subordinate_certificate_authority(
-            key_pair, gid);
+            key_pair);
     }
 
     void delete_subordinate_certificate_authority(
@@ -40,19 +39,52 @@ extern "C"
         delete certificate_authority;
     }
 
+    // subordinate_certificate_authority helpers
+    void subordinate_certificate_authority_get_certificate_signing_request(
+        security::server::subordinate_certificate_authority*
+            certificate_authority
+      , security::signed_certificate_signing_request* signed_csr)
+    {
+        *signed_csr = certificate_authority->get_certificate_signing_request();
+    }
+
+    void subordinate_certificate_authority_set_certificate(
+        security::server::subordinate_certificate_authority*
+            certificate_authority
+      , security::signed_certificate const & signed_certificate)
+    {
+        certificate_authority->set_certificate(signed_certificate);
+    }
+
     // Helpers
+    void certificate_authority_sign_certificate_signing_request(
+        security::server::certificate_authority_base* certificate_authority
+      , security::signed_certificate_signing_request const & signed_csr
+      , security::signed_certificate* signed_certificate)
+    {
+        *signed_certificate =
+            certificate_authority->sign_certificate_signing_request(
+                signed_csr);
+    }
+
     void certificate_authority_get_certificate(
         security::server::certificate_authority_base* certificate_authority
-      , security::signed_type<security::certificate>* certificate)
+      , security::signed_certificate* certificate)
     {
         *certificate = certificate_authority->get_certificate();
     }
 
     void certificate_authority_get_gid(
         security::server::certificate_authority_base* certificate_authority
-      , hpx::naming::gid_type* gid)
+      , hpx::naming::gid_type* base_gid)
     {
-        *gid = certificate_authority->get_base_gid();
+        *base_gid = certificate_authority->get_base_gid();
+    }
+
+    void certificate_authority_is_valid(
+        security::server::certificate_authority_base* certificate_authority
+      , bool* valid)
+    {
+        *valid = certificate_authority->is_valid();
     }
 }
-

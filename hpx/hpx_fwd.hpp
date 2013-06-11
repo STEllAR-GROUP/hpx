@@ -1275,18 +1275,21 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     HPX_API_EXPORT util::binary_filter* create_binary_filter(
-        char const* binary_filter_type, bool compress, 
+        char const* binary_filter_type, bool compress,
         util::binary_filter* next_filter = 0, error_code& ec = throws);
 
 #if defined(HPX_HAVE_SODIUM)
     namespace components { namespace security
     {
         class certificate;
+        class certificate_signing_request;
         class parcel_suffix;
         class hash;
 
         template <typename T> class signed_type;
         typedef signed_type<certificate> signed_certificate;
+        typedef signed_type<certificate_signing_request>
+            signed_certificate_signing_request;
         typedef signed_type<parcel_suffix> signed_parcel_suffix;
     }}
 
