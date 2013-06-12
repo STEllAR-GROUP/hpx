@@ -183,12 +183,14 @@ namespace hpx
         };
     }
 
-    // this is called on node zero during runtime construction
+    // this is called on all nodes during runtime construction
     void runtime::init_security()
     {
         // this is the AGAS booststrap node (node zero)
         if (ini_.get_agas_service_mode() == agas::service_mode_bootstrap)
         {
+            components::security::signed_certificate cert;
+
             {
                 // Initialize the root-CA
                 lcos::local::spinlock::scoped_lock l(security_mtx_);
@@ -196,7 +198,21 @@ namespace hpx
                 security_data_->cert_store_.reset(
                     new components::security::certificate_store(
                         security_data_->root_certificate_authority_.get_certificate()));
+
+                // initialize the sub-CA
+                security_data_->subordinate_certificate_authority_.initialize();
+
+                // sign the sub-CA's certificate
+                components::security::signed_certificate_signing_request csr =
+                    security_data_->subordinate_certificate_authority_.get_certificate_signing_request();
+                cert = security_data_->root_certificate_authority_.sign_certificate_signing_request(csr);
+
+                // finalize initialization of sub-CA
+                security_data_->subordinate_certificate_authority_.set_certificate(cert);
             }
+
+            // add the sub-CA's certificate to the local certificate store
+            add_locality_certificate(cert);
 
             LSEC_(debug) << (boost::format(
                 "runtime::init_security: initialized root certificate authority: %1%") %
@@ -204,38 +220,85 @@ namespace hpx
         }
     }
 
-    // this is called on all localities during locality registration
+    components::security::signed_certificate_signing_request
+        runtime::get_certificate_signing_request() const
+    {
+        lcos::local::spinlock::scoped_lock l(security_mtx_);
+
+        // Initialize the sub-CA
+        security_data_->subordinate_certificate_authority_.initialize();
+        return security_data_->subordinate_certificate_authority_.
+            get_certificate_signing_request();
+    }
+
+    components::security::signed_certificate
+        runtime::sign_certificate_signing_request(
+            components::security::signed_certificate_signing_request csr)
+    {
+        LSEC_(debug) << (boost::format(
+            "runtime::sign_certificate_signing_request: received csr(%1%)") %
+            csr);
+
+        components::security::signed_certificate cert;
+
+        {
+            // tend to the given CSR
+            lcos::local::spinlock::scoped_lock l(security_mtx_);
+            cert = security_data_->root_certificate_authority_.
+                sign_certificate_signing_request(csr);
+        }
+
+        LSEC_(debug) << (boost::format(
+            "runtime::sign_certificate_signing_request: signed certificate(%1%)") %
+            cert);
+
+        // store the certificate into our store
+        add_locality_certificate(cert);
+        return cert;
+    }
+
+    // this is called on all non-root localities during locality registration
     void runtime::store_root_certificate(
-        components::security::signed_certificate const& cert)
+        components::security::signed_certificate const& root_cert)
     {
         // Only worker nodes need to store the root certificate at this
         // point, the root locality was already initialized (see above).
         if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
         {
             LSEC_(debug) << (boost::format(
-                "runtime::store_root_certificate: received root "
-                "certificate: %1%") %  cert);
+                "runtime::store_root_certificate: received certificate "
+                "root-CA(%1%)") % root_cert);
 
+            // initialize our certificate store
             lcos::local::spinlock::scoped_lock l(security_mtx_);
             security_data_->cert_store_.reset(
-                new components::security::certificate_store(cert));
+                new components::security::certificate_store(root_cert));
         }
     }
 
-    // this is called right before pre-main on all localities
-    void runtime::init_subordinate_certificate_authority()
+    void runtime::store_subordinate_certificate(
+        components::security::signed_certificate const& root_subca_cert,
+        components::security::signed_certificate const& subca_cert)
     {
-        security_data_->subordinate_certificate_authority_.initialize();
-        components::security::signed_certificate cert =
-            get_certificate();
+        // Only worker nodes need to store the root certificate at this
+        // point, the root locality was already initialized (see above).
+        if (ini_.get_agas_service_mode() != agas::service_mode_bootstrap)
+        {
+            LSEC_(debug) << (boost::format(
+                "runtime::store_subordinate_certificate: received certificates "
+                "root-sub-CA(%1%), sub-CA(%3%)") %
+                root_subca_cert % subca_cert);
 
-        LSEC_(debug) << (boost::format(
-            "runtime::init_subordinate_certificate_authority: initialized "
-            "subordinate certificate authority: %1%") % cert);
+            {
+                // finish initializing our sub-CA
+                lcos::local::spinlock::scoped_lock l(security_mtx_);
+                security_data_->subordinate_certificate_authority_.set_certificate(subca_cert);
+            }
 
-        add_locality_certificate(cert);
-
-        hpx::applier::get_applier().enable_verify_capabilities();
+            // add the certificates of the root's sub-CA and our own
+            add_locality_certificate(subca_cert);
+            add_locality_certificate(root_subca_cert);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -293,15 +356,13 @@ namespace hpx
         }
 
         lcos::local::spinlock::scoped_lock l(security_mtx_);
+        boost::uint32_t locality_id =
+            (!gid) ? get_locality_id() : naming::get_locality_id_from_gid(gid);
 
-        if (!gid) {
-            using util::security::get_subordinate_certificate_authority_gid;
-            return security_data_->cert_store_->at(
-                get_subordinate_certificate_authority_gid(get_locality_id())
-              , ec);
-        }
-
-        return security_data_->cert_store_->at(gid, ec);
+        using util::security::get_subordinate_certificate_authority_gid;
+        return security_data_->cert_store_->at(
+            get_subordinate_certificate_authority_gid(locality_id)
+          , ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -973,9 +1034,7 @@ namespace hpx
         get_locality_certificate(naming::id_type const& id, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+        if (0 == rt)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
@@ -995,9 +1054,7 @@ namespace hpx
         error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+        if (0 == rt)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
@@ -1019,9 +1076,7 @@ namespace hpx
         error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+        if (0 == rt)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::sign_parcel_suffix",
@@ -1043,9 +1098,7 @@ namespace hpx
         naming::gid_type& parcel_id, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (0 == rt ||
-            rt->get_state() < runtime::state_initialized ||
-            rt->get_state() >= runtime::state_stopped)
+        if (0 == rt)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::verify_parcel_suffix",

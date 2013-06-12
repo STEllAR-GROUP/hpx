@@ -695,71 +695,16 @@ components::component_type addressing_service::register_factory(
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-struct lock_semaphore
-{
-    lock_semaphore(lcos::local::counting_semaphore& sem)
-      : sem_(sem)
-    {
-        // this needs to be invoked from a px-thread
-        BOOST_ASSERT(NULL != threads::get_self_ptr());
-        sem_.wait(1);
-    }
-
-    ~lock_semaphore()
-    {
-        sem_.signal(1);
-    }
-
-    lcos::local::counting_semaphore& sem_;
-};
-
-template <typename Pool, typename Promise>
-struct checkout_promise
-{
-    checkout_promise(lcos::local::counting_semaphore& sem, Pool& pool, Promise*& promise)
-      : sem_(sem), result_ok_(false), pool_(pool), promise_(promise)
-    {
-        {
-            // wait for the semaphore to become available
-            lock_semaphore lock(sem_);
-            pool_.dequeue(promise_);
-        }
-
-        BOOST_ASSERT(promise_);
-        promise_->reset();          // reset the promise
-    }
-    ~checkout_promise()
-    {
-        // return the future to the pool
-        if (result_ok_)
-        {
-            // wait for the semaphore to become available
-            lock_semaphore lock(sem_);
-            pool_.enqueue(promise_);
-        }
-    }
-
-    void set_ok() { result_ok_ = true; }
-
-private:
-    // wait for the semaphore to become available
-    lcos::local::counting_semaphore& sem_;
-    bool result_ok_;
-    Pool& pool_;
-    Promise*& promise_;
-};
-
-///////////////////////////////////////////////////////////////////////////////
 bool addressing_service::get_id_range(
-    naming::locality const& ep
-  , boost::uint64_t count
+    boost::uint64_t count
   , naming::gid_type& lower_bound
   , naming::gid_type& upper_bound
   , error_code& ec
     )
 { // {{{ get_id_range implementation
     try {
-        request req(primary_ns_allocate, ep, count, boost::uint32_t(-1));
+        // naming::locality() is an obsolete, dummy argument
+        request req(primary_ns_allocate, naming::locality(), count, boost::uint32_t(-1));
         response rep;
 
         if (is_bootstrap())

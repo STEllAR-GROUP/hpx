@@ -50,10 +50,9 @@ struct HPX_EXPORT locality_namespace
 
     typedef boost::int32_t component_type;
 
-    // stores the locality id, next gid available to this locality, and number
-    // of OS-threads running on this locality
-    typedef boost::fusion::vector3<
-        boost::uint32_t, naming::gid_type, boost::uint32_t>
+    // stores the locality id, and number of OS-threads running on this locality
+    typedef boost::fusion::vector2<
+        boost::uint32_t, boost::uint32_t>
     partition_type;
 
     typedef std::map<naming::locality, partition_type>

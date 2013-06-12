@@ -146,6 +146,9 @@ namespace hpx {
         agas_client_.initialize();
         parcel_handler_.initialize(parcel_port_);
 
+        // enable parcel capability checking
+        applier_.enable_verify_capabilities();
+
         // copy over all startup functions registered so far
         BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_pre_startup_functions)
         {
@@ -192,9 +195,6 @@ namespace hpx {
         // Change our thread description, as we're about to call pre_main
         threads::set_thread_description(threads::get_self_id(), "pre_main");
 
-#if defined(HPX_HAVE_SECURITY)
-        init_subordinate_certificate_authority();
-#endif
         // Finish the bootstrap
         if (!hpx::pre_main(mode_)) {
             LBT_(info) << "runtime_impl::run_helper: bootstrap "

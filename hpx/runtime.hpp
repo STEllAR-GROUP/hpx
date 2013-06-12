@@ -250,9 +250,21 @@ namespace hpx
         bool verify_parcel_suffix(std::vector<char> const& data,
             naming::gid_type& parcel_id, error_code& ec) const;
 
-        void init_subordinate_certificate_authority();
+        components::security::signed_certificate_signing_request
+            get_certificate_signing_request() const;
+        components::security::signed_certificate
+            sign_certificate_signing_request(
+                components::security::signed_certificate_signing_request csr);
+
         void store_root_certificate(
-            components::security::signed_certificate const&);
+            components::security::signed_certificate const& root_cert);
+
+        void store_subordinate_certificate(
+            components::security::signed_certificate const& root_subca_cert,
+            components::security::signed_certificate const& subca_cert);
+
+    protected:
+        void init_security();
 #endif
 
     protected:
@@ -261,10 +273,6 @@ namespace hpx
 
         friend bool hpx::pre_main(runtime_mode);
         void set_state(state s) { state_ = s; }
-
-#if defined(HPX_HAVE_SECURITY)
-        void init_security();
-#endif
 
     protected:
         util::reinit_helper reinit_;

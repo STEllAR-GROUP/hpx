@@ -160,10 +160,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     > gva_cache_type;
     // }}}
 
-    typedef boost::lockfree::fifo<
-        lcos::packaged_action<server::locality_namespace::service_action>*
-    > locality_promise_pool_type;
-
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;
 
@@ -208,10 +204,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     struct hosted_data_type
     { // {{{
-        hosted_data_type()
-          : locality_promise_pool_(16)
-        {}
-
         void register_counter_types()
         {
             server::locality_namespace::register_counter_types();
@@ -237,9 +229,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         symbol_namespace symbol_ns_;
 
         server::primary_namespace primary_ns_server_;
-
-        hpx::lcos::local::counting_semaphore promise_pool_semaphore_;
-        locality_promise_pool_type locality_promise_pool_;
     }; // }}}
 
     mutable cache_mutex_type gva_cache_mtx_;
@@ -676,21 +665,21 @@ public:
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     bool get_id_range(
-        naming::locality const& l
-      , boost::uint64_t count
+        boost::uint64_t count
       , naming::gid_type& lower_bound
       , naming::gid_type& upper_bound
       , error_code& ec = throws
         );
 
     bool get_id_range(
-        boost::uint64_t count
+        naming::locality const& l           // obsolete, ignored
+      , boost::uint64_t count
       , naming::gid_type& lower_bound
       , naming::gid_type& upper_bound
       , error_code& ec = throws
         )
     {
-        return get_id_range(get_here(), count, lower_bound, upper_bound, ec);
+        return get_id_range(count, lower_bound, upper_bound, ec);
     }
 
     /// \brief Bind a global address to a local address.
