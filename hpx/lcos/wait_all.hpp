@@ -161,7 +161,10 @@ namespace hpx
         protected:
             void on_future_ready(threads::thread_id_type id)
             {
-                if (ready_count_.fetch_add(1) + 1 == lazy_values_.size())
+                std::size_t oldcount = ready_count_.fetch_add(1);
+                BOOST_ASSERT(oldcount < lazy_values_.size());
+
+                if (oldcount + 1 == lazy_values_.size())
                 {
                     // reactivate waiting thread only if it's not us
                     if (id != threads::get_self_id())
