@@ -51,8 +51,6 @@ addressing_service::addressing_service(
 
     if (service_type == service_mode_bootstrap)
         launch_bootstrap(ini_);
-    else
-        launch_hosted();
 }
 
 void addressing_service::initialize()
@@ -63,6 +61,7 @@ void addressing_service::initialize()
     }
     else
     {
+        launch_hosted();
         get_big_boot_barrier().wait(&hosted->primary_ns_server_);
     }
 
