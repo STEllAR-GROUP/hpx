@@ -288,7 +288,7 @@ namespace hpx
         {
             LSEC_(debug) << (boost::format(
                 "runtime::store_subordinate_certificate: received certificates "
-                "root-sub-CA(%1%), sub-CA(%3%)") %
+                "root-sub-CA(%1%), sub-CA(%2%)") %
                 root_subca_cert % subca_cert);
 
             {
