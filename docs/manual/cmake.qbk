@@ -326,6 +326,11 @@ variables are used more seldom and are mainly useful for debugging purposes.
       system having more than 64 processing units, like the XeonPhi device).
       The variable is set to `OFF` by default.]
     ]
+    [[`HPX_HAVE_SECURITY:BOOL`]
+     [Sets whether HPX should be configured to include security related code which
+      currently secures inter-locality related traffic and inter-locality action
+      invocations.]
+    ]
 ]
 
 Here is a list of additional libraries and tools which are either optionally
@@ -358,7 +363,7 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
     ]
     [[`PAPI_ROOT:PATH`]
      [Specifies where to look for the __papi__ library. The PAPI library is
-      need to compile a special component exposing PAPI hardware events and
+      necessary to compile a special component exposing PAPI hardware events and
       counters as __hpx__ performance counters. This is not available on
       the Windows platform.]
     ]
@@ -376,6 +381,11 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
       with the mentioned Intel tools, which customizes the generated
       information for your application and improves the generated
       diagnostics.]
+    ]
+    [[`SODIUM_ROOT:PATH`]
+     [Specifies where to look for the __sodium__ library. The Sodium library
+      is necessary to enable the security related functionality (see 
+      `HPX_HAVE_SECURITY`).]
     ]
 ]
 

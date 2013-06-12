@@ -204,8 +204,10 @@ namespace hpx
 
                 // sign the sub-CA's certificate
                 components::security::signed_certificate_signing_request csr =
-                    security_data_->subordinate_certificate_authority_.get_certificate_signing_request();
-                cert = security_data_->root_certificate_authority_.sign_certificate_signing_request(csr);
+                    security_data_->subordinate_certificate_authority_.
+                        get_certificate_signing_request();
+                cert = security_data_->root_certificate_authority_.
+                    sign_certificate_signing_request(csr);
 
                 // finalize initialization of sub-CA
                 security_data_->subordinate_certificate_authority_.set_certificate(cert);

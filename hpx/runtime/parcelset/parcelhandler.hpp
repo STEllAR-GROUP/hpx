@@ -408,6 +408,16 @@ namespace hpx { namespace parcelset
         // operations (nanoseconds)
         boost::int64_t get_receiving_serialization_time(connection_type, bool) const;
 
+#if defined(HPX_HAVE_SECURITY)
+        // the total time it took for all sender-side security operations
+        // (nanoseconds)
+        boost::int64_t get_sending_security_time(connection_type, bool) const;
+
+        // the total time it took for all receiver-side security
+        // operations (nanoseconds)
+        boost::int64_t get_receiving_security_time(connection_type, bool) const;
+#endif
+
         // total data sent (bytes)
         std::size_t get_data_sent(connection_type, bool) const;
 
