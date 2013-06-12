@@ -146,8 +146,10 @@ namespace hpx {
         agas_client_.initialize();
         parcel_handler_.initialize(parcel_port_);
 
+#if defined(HPX_HAVE_SECURITY)
         // enable parcel capability checking
         applier_.enable_verify_capabilities();
+#endif
 
         // copy over all startup functions registered so far
         BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_pre_startup_functions)
