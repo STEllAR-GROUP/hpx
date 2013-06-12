@@ -479,20 +479,6 @@ namespace hpx { namespace util
         return 1;
     }
 
-    std::size_t
-    runtime_configuration::get_agas_promise_pool_size() const
-    {
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
-                    sec->get_entry("promise_pool_size",
-                        4 * get_os_thread_count())); //-V112
-            }
-        }
-        return 16;
-    }
-
     std::size_t runtime_configuration::get_agas_local_cache_size(std::size_t dflt) const
     {
         std::size_t cache_size = dflt;
