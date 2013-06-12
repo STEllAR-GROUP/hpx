@@ -9,6 +9,7 @@
 #include <boost/optional.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/stringstream.hpp>
 
 #include "certificate.hpp"
 #include "public_key.hpp"
@@ -69,12 +70,21 @@ namespace hpx { namespace components { namespace security
                 store_.find(certificate.get_issuer());
             if (issuer == store_.end())
             {
+                hpx::util::osstream strm;
+                strm << boost::str(boost::format(
+                    "the certificate issuer is unknown: %1%\n") % subject);
+                strm << "  known certificate subjects:\n";
+
+                store_type::const_iterator end = store_.end();
+                for(store_type::const_iterator it = store_.begin(); it != end; ++it)
+                {
+                    strm << "    " << (*it).first << "\n";
+                }
+
                 HPX_THROW_EXCEPTION(
                     hpx::security_error
                   , "certificate_store::insert"
-                  , boost::str(boost::format(
-                        "the certificate issuer is unknown: %1%") %
-                        signed_certificate)
+                  , hpx::util::osstream_get_string(strm)
                 )
             }
 
@@ -103,13 +113,24 @@ namespace hpx { namespace components { namespace security
 
             if (iterator == store_.end())
             {
+                hpx::util::osstream strm;
+                strm << boost::str(boost::format(
+                    "requesting a certificate for an unknown subject: %1%\n") %
+                    subject);
+                strm << "  known certificate subjects:\n";
+
+                store_type::const_iterator end = store_.end();
+                for(store_type::const_iterator it = store_.begin(); it != end; ++it)
+                {
+                    strm << "    " << (*it).first << "\n";
+                }
+
                 HPX_THROWS_IF(
                     ec, hpx::security_error
                   , "certificate_store::certificate_store"
-                  , boost::str(boost::format(
-                        "requesting a certificate for an unknown subject: %1%") %
-                        subject)
+                  , hpx::util::osstream_get_string(strm)
                 );
+
                 return signed_type<certificate>::invalid_signed_type;
             }
 
