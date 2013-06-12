@@ -115,10 +115,6 @@ bool pre_main(runtime_mode mode)
     {
         LBT_(info) << "(2nd stage) pre_main: locality is in connect mode, "
                       "skipping 2nd and 3rd stage startup synchronization";
-
-        // Unblock the AGAS router by adding the initial pool size to the
-        // promise pool semaphores.
-        agas_client.hosted->promise_pool_semaphore_.signal(pool_size);
         LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
@@ -139,18 +135,7 @@ bool pre_main(runtime_mode mode)
 
     else
     {
-        // {{{ unblock addressing_service
-        if (!agas_client.is_bootstrap())
-        {
-            // Unblock the local addressing_service by adding the initial pool
-            // size to the promise pool semaphores. This ensures that no AGAS
-            // requests are sent after first-stage AGAS bootstrap and before
-            // second-stage bootstrap.
-            agas_client.hosted->promise_pool_semaphore_.signal(pool_size);
-
-            LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
-        }
-        // }}}
+        LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
         exit_requested = !runtime_support::load_components(find_here());

@@ -404,7 +404,8 @@ namespace hpx { namespace parcelset
         }
 
         // generate unique parcel id
-        static naming::gid_type generate_unique_id();
+        static naming::gid_type generate_unique_id(
+            boost::uint32_t locality_id = naming::invalid_locality_id);
 
     private:
         friend std::ostream& operator<< (std::ostream& os, parcel const& req);

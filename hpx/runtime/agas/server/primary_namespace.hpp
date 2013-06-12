@@ -366,6 +366,7 @@ struct HPX_EXPORT primary_namespace
       , namespace_unbind_gid                    = primary_ns_unbind_gid
       , namespace_change_credit_non_blocking    = primary_ns_change_credit_non_blocking
       , namespace_change_credit_sync            = primary_ns_change_credit_sync
+      , namespace_allocate                      = primary_ns_allocate
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
 

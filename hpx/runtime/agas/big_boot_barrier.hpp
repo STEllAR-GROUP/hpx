@@ -80,7 +80,8 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     }
 
     void apply(
-        boost::uint32_t prefix
+        boost::uint32_t source_prefix
+      , boost::uint32_t prefix
       , naming::address const& addr
       , actions::base_action* act
         );
