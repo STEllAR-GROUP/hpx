@@ -449,11 +449,14 @@ void notify_worker(notification_header const& header)
       , heap_lower, heap_upper);
 
     // register runtime support component
-    naming::gid_type const runtime_support_gid(header.prefix.get_msb()
+    naming::gid_type runtime_support_gid(header.prefix.get_msb()
       , rt.get_runtime_support_lva());
     naming::address const runtime_support_address(here
       , components::get_component_type<components::server::runtime_support>()
       , rt.get_runtime_support_lva());
+    agas_client.bind(runtime_support_gid, runtime_support_address);
+
+    runtime_support_gid.set_lsb(boost::uint64_t(0));
     agas_client.bind(runtime_support_gid, runtime_support_address);
 
     naming::gid_type const memory_gid(header.prefix.get_msb()

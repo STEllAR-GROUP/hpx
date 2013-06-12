@@ -40,10 +40,11 @@ namespace hpx { namespace components { namespace security
             reinterpret_cast<signed_type<parcel_suffix> const *>(
                 &(parcel_data.back()) - signed_type<parcel_suffix>::size() + 1);
 
-        parcel_id = parcel_suffix_ptr->get_type().get_parcel_id();
+        parcel_suffix const& suffix = parcel_suffix_ptr->get_type();
+        parcel_id = suffix.get_parcel_id();
 
         signed_type<certificate> subject_certificate =
-            certificate_store.at_locality(parcel_id, ec);
+            certificate_store.at_locality(suffix.get_locality_id(), ec);
 
         if (ec)
             return false;

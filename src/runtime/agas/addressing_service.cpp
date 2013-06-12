@@ -86,6 +86,8 @@ void addressing_service::launch_bootstrap(
 { // {{{
     bootstrap = boost::make_shared<bootstrap_data_type>();
 
+    runtime& rt = get_runtime();
+
     const naming::locality ep = ini_.get_agas_locality();
     const naming::gid_type here
         = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
@@ -123,7 +125,7 @@ void addressing_service::launch_bootstrap(
             static_cast<void*>(&bootstrap->symbol_ns_server_));
 
     set_local_locality(here);
-    get_runtime().get_config().parse("assigned locality",
+    rt.get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
@@ -133,12 +135,23 @@ void addressing_service::launch_bootstrap(
     request locality_req(locality_ns_allocate, ep, 4, num_threads);
     bootstrap->locality_ns_server_.remote_service(locality_req);
 
+    naming::gid_type runtime_support_gid1(here);
+    runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
+    naming::gid_type runtime_support_gid2(here);
+    runtime_support_gid2.set_lsb(boost::uint64_t(0));
+
+    gva runtime_support_address(ep
+      , components::get_component_type<components::server::runtime_support>()
+      , 1U, rt.get_runtime_support_lva());
+
     request reqs[] =
     {
         request(primary_ns_bind_gid, locality_gid, locality_gva)
       , request(primary_ns_bind_gid, primary_gid, primary_gva)
       , request(primary_ns_bind_gid, component_gid, component_gva)
       , request(primary_ns_bind_gid, symbol_gid, symbol_gva)
+//      , request(primary_ns_bind_gid, runtime_support_gid1, runtime_support_address)
+//      , request(primary_ns_bind_gid, runtime_support_gid2, runtime_support_address)
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
@@ -154,7 +167,7 @@ void addressing_service::launch_bootstrap(
 
     naming::gid_type lower, upper;
     get_id_range(ep, HPX_INITIAL_GID_RANGE, lower, upper);
-    get_runtime().get_id_pool().set_range(lower, upper);
+    rt.get_id_pool().set_range(lower, upper);
 
 //    get_big_boot_barrier().wait();
 //    set_status(running);
@@ -185,7 +198,7 @@ void addressing_service::adjust_local_cache_size()
 
         LAGAS_(info) << (boost::format(
             "addressing_service::adjust_local_cache_size, local_cache_size(%1%), "
-            "local_cache_size_per_thread(%2%), cache_size(%1%)")
+            "local_cache_size_per_thread(%2%), cache_size(%3%)")
             % local_cache_size % local_cache_size_per_thread % cache_size);
     }
 } // }}}

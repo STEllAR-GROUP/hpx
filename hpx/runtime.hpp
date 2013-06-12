@@ -296,7 +296,9 @@ namespace hpx
             components::security::signed_certificate const& cert);
 
         components::security::signed_certificate const&
-            get_locality_certificate(naming::gid_type const&, error_code& ec) const;
+            get_locality_certificate(error_code& ec) const;
+        components::security::signed_certificate const&
+            get_locality_certificate(boost::uint32_t locality_id, error_code& ec) const;
 
         void sign_parcel_suffix(
             components::security::parcel_suffix const& suffix,

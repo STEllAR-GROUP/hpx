@@ -97,7 +97,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 acceptor_->bind(ep);
                 acceptor_->listen();
                 acceptor_->async_accept(conn->socket(),
-                    boost::bind(&parcelport::handle_accept, 
+                    boost::bind(&parcelport::handle_accept,
                         this->shared_from_this(),
                         boost::asio::placeholders::error, conn));
             }
@@ -178,7 +178,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 io_service_pool_.get_io_service(), *this));
 
             acceptor_->async_accept(conn->socket(),
-                boost::bind(&parcelport::handle_accept, 
+                boost::bind(&parcelport::handle_accept,
                     this->shared_from_this(),
                     boost::asio::placeholders::error, conn));
 
@@ -196,7 +196,7 @@ namespace hpx { namespace parcelset { namespace tcp
             // now accept the incoming connection by starting to read from the
             // socket
             c->async_read(
-                boost::bind(&parcelport::handle_read_completion, 
+                boost::bind(&parcelport::handle_read_completion,
                     this->shared_from_this(),
                     boost::asio::placeholders::error, c));
         }
@@ -327,7 +327,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
     ///////////////////////////////////////////////////////////////////////////
     void parcelport::send_parcels_or_reclaim_connection(
-        naming::locality const& locality_id, 
+        naming::locality const& locality_id,
         parcelport_connection_ptr const& client_connection)
     {
         typedef pending_parcels_map::iterator iterator;
@@ -355,7 +355,7 @@ namespace hpx { namespace parcelset { namespace tcp
                     return;
                 }
             }
-            else 
+            else
             {
                 // Give this connection back to the cache as it's not
                 // needed anymore.
@@ -391,7 +391,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
         // Create a new HPX thread which sends parcels that are still pending.
         hpx::applier::register_thread_nullary(
-            HPX_STD_BIND(&parcelport::retry_sending_parcels, 
+            HPX_STD_BIND(&parcelport::retry_sending_parcels,
                 this->shared_from_this(), locality_id), "retry_sending_parcels",
                 threads::pending, true, threads::thread_priority_critical);
     }
@@ -426,7 +426,7 @@ namespace hpx { namespace parcelset { namespace tcp
         // ... start an asynchronous write operation now.
         client_connection->async_write(
             hpx::parcelset::detail::call_for_each(handlers),
-            boost::bind(&parcelport::send_pending_parcels_trampoline, 
+            boost::bind(&parcelport::send_pending_parcels_trampoline,
                 this->shared_from_this(),
                 boost::asio::placeholders::error, ::_2, ::_3));
     }
@@ -601,11 +601,12 @@ namespace hpx { namespace parcelset { namespace tcp
                     bool has_certificate = false;
                     archive >> has_certificate;
 
-                    if (first_message && has_certificate) {
-                        components::security::signed_certificate certificate;
+                    components::security::signed_certificate certificate;
+                    if (has_certificate) {
                         archive >> certificate;
                         add_locality_certificate(certificate);
-                        first_message = false;
+                        if (first_message)
+                            first_message = false;
                     }
 
                     // calculate and verify the hash, but only after everything has
@@ -618,7 +619,7 @@ namespace hpx { namespace parcelset { namespace tcp
                         if (!verify_parcel_suffix(*parcel_data, parcel_id)) {
                             // all hell breaks loose!
                             HPX_THROW_EXCEPTION(security_error,
-                                "decode_message(tcp)", 
+                                "decode_message(tcp)",
                                 "verify_parcel_suffix failed");
                             return false;
                         }
@@ -640,7 +641,7 @@ namespace hpx { namespace parcelset { namespace tcp
                         if (!first_message && i == 0 && parcel_id != p.get_parcel_id()) {
                             // again, all hell breaks loose
                             HPX_THROW_EXCEPTION(security_error,
-                                "decode_message(tcp)", 
+                                "decode_message(tcp)",
                                 "parcel id mismatch");
                             return false;
                         }
@@ -789,7 +790,7 @@ namespace hpx { namespace parcelset { namespace tcp
         // Check if we need to create the new connection.
         if (!client_connection)
             return create_connection(l, ec);
-    
+
         if (&ec != &throws)
             ec = make_success_code();
 

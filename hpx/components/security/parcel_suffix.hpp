@@ -25,9 +25,15 @@ namespace hpx { namespace components { namespace security
         {
         }
 
-        parcel_suffix(naming::gid_type const& parcel_id, hash const& hash)
-          : parcel_id_(parcel_id), hash_(hash)
+        parcel_suffix(boost::uint32_t locality_id, 
+                naming::gid_type const& parcel_id, hash const& hash)
+          : locality_id_(locality_id), parcel_id_(parcel_id), hash_(hash)
         {
+        }
+
+        boost::uint32_t get_locality_id() const
+        {
+            return locality_id_;
         }
 
         naming::gid_type const & get_parcel_id() const
@@ -44,6 +50,8 @@ namespace hpx { namespace components { namespace security
                                          parcel_suffix const & parcel_suffix)
         {
             return os << "<parcel_suffix "
+                      << parcel_suffix.locality_id_
+                      << " "
                       << parcel_suffix.parcel_id_
                       << " "
                       << parcel_suffix.hash_
@@ -66,6 +74,7 @@ namespace hpx { namespace components { namespace security
         }
 
     private:
+        boost::uint32_t locality_id_;
         naming::gid_type parcel_id_;
         hash hash_;
     };
