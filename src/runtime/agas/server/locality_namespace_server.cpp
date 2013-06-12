@@ -268,7 +268,6 @@ response locality_namespace::allocate(
     // parameters
     naming::locality ep = req.get_locality();
     boost::uint64_t const count = req.get_count();
-    boost::uint64_t const real_count = (count) ? (count - 1) : (0);
     boost::uint32_t const num_threads = req.get_num_threads();
 
     mutex_type::scoped_lock l(mutex_);
