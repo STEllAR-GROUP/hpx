@@ -339,16 +339,20 @@ namespace hpx { namespace applier
         actions::action_type act = p.get_action();
 
 #if defined(HPX_HAVE_SECURITY)
+        // we look up the certificate of the originating locality, no matter
+        // whether this parcel was roiuted through another locality or not
+        boost::uint32_t locality_id =
+            naming::get_locality_id_from_gid(p.get_parcel_id());
         error_code ec(lightweight);
         components::security::signed_certificate const& cert =
-            get_locality_certificate(p.get_source(), ec);
+            get_locality_certificate(locality_id, ec);
+
         if (verify_capabilities_ && ec) {
             // we should have received the sender's certificate by now
             HPX_THROW_EXCEPTION(security_error,
                 "applier::schedule_action",
-                boost::str(boost::format(
-                    "couldn't extract sender's certificate (sender: %1%)") %
-                    p.get_source()));
+                boost::str(boost::format("couldn't extract sender's "
+                    "certificate (sender locality id: %1%)") % locality_id));
             return;
         }
 

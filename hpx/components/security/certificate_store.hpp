@@ -11,13 +11,15 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/stringstream.hpp>
 
+#include <boost/noncopyable.hpp>
+
 #include "certificate.hpp"
 #include "public_key.hpp"
 #include "signed_type.hpp"
 
 namespace hpx { namespace components { namespace security
 {
-    class certificate_store
+    class certificate_store : private boost::noncopyable
     {
         typedef std::map<
             naming::gid_type, signed_type<certificate>
@@ -147,6 +149,18 @@ namespace hpx { namespace components { namespace security
                 hpx::naming::replace_locality_id(
                     HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB
                   , get_locality_id_from_gid(gid))
+              , HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB);
+
+            return at(subject, ec);
+        }
+
+        signed_type<certificate> const&
+        at_locality(boost::uint32_t locality_id, error_code& ec = throws) const
+        {
+            naming::gid_type subject(
+                hpx::naming::replace_locality_id(
+                    HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB
+                  , locality_id)
               , HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB);
 
             return at(subject, ec);

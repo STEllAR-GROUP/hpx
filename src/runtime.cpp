@@ -180,6 +180,7 @@ namespace hpx
 
             // certificate store
             HPX_STD_UNIQUE_PTR<components::security::certificate_store> cert_store_;
+            components::security::signed_certificate locality_certificate_;
         };
     }
 
@@ -195,6 +196,8 @@ namespace hpx
                 // Initialize the root-CA
                 lcos::local::spinlock::scoped_lock l(security_mtx_);
                 security_data_->root_certificate_authority_.initialize();
+
+                BOOST_ASSERT(security_data_->cert_store_.get() == 0);
                 security_data_->cert_store_.reset(
                     new components::security::certificate_store(
                         security_data_->root_certificate_authority_.get_certificate()));
@@ -210,6 +213,7 @@ namespace hpx
                     sign_certificate_signing_request(csr);
 
                 // finalize initialization of sub-CA
+                security_data_->locality_certificate_ = cert;
                 security_data_->subordinate_certificate_authority_.set_certificate(cert);
             }
 
@@ -273,6 +277,8 @@ namespace hpx
 
             // initialize our certificate store
             lcos::local::spinlock::scoped_lock l(security_mtx_);
+
+            BOOST_ASSERT(security_data_->cert_store_.get() == 0);
             security_data_->cert_store_.reset(
                 new components::security::certificate_store(root_cert));
         }
@@ -294,6 +300,7 @@ namespace hpx
             {
                 // finish initializing our sub-CA
                 lcos::local::spinlock::scoped_lock l(security_mtx_);
+                security_data_->locality_certificate_ = subca_cert;
                 security_data_->subordinate_certificate_authority_.set_certificate(subca_cert);
             }
 
@@ -345,7 +352,23 @@ namespace hpx
     }
 
     components::security::signed_certificate const&
-        runtime::get_locality_certificate(naming::gid_type const& gid,
+        runtime::get_locality_certificate(error_code& ec) const
+    {
+        BOOST_ASSERT(security_data_.get() != 0);
+        if (0 == security_data_->cert_store_.get())     // should have been created
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "runtime::get_locality_certificate",
+                "the runtime system is not operational at this point");
+            return components::security::signed_certificate::invalid_signed_type;
+        }
+
+        lcos::local::spinlock::scoped_lock l(security_mtx_);
+        return security_data_->locality_certificate_;
+    }
+
+    components::security::signed_certificate const&
+        runtime::get_locality_certificate(boost::uint32_t locality_id,
             error_code& ec) const
     {
         BOOST_ASSERT(security_data_.get() != 0);
@@ -358,8 +381,6 @@ namespace hpx
         }
 
         lcos::local::spinlock::scoped_lock l(security_mtx_);
-        boost::uint32_t locality_id =
-            (!gid) ? get_locality_id() : naming::get_locality_id_from_gid(gid);
 
         using util::security::get_subordinate_certificate_authority_gid;
         return security_data_->cert_store_->at(
@@ -945,6 +966,12 @@ namespace hpx
             return rt->get_state() == runtime::state_running;
         return false;
     }
+
+    bool is_starting()
+    {
+        runtime* rt = get_runtime_ptr();
+        return NULL != rt ? rt->get_state() <= runtime::state_startup : true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1022,7 +1049,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        return rt->get_locality_certificate(naming::invalid_gid, ec);
+        return rt->get_locality_certificate(ec);
     }
 
     /// \brief Return the certificate for the given locality
@@ -1033,10 +1060,12 @@ namespace hpx
     /// \returns This function returns the signed certificate for the locality
     ///          identified by the parameter \a id.
     components::security::signed_certificate const&
-        get_locality_certificate(naming::id_type const& id, error_code& ec)
+        get_locality_certificate(boost::uint32_t locality_id, error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (0 == rt)
+        if (0 == rt ||
+            rt->get_state() < runtime::state_initialized ||
+            rt->get_state() >= runtime::state_stopped)
         {
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::get_locality_certificate",
@@ -1044,7 +1073,7 @@ namespace hpx
             return components::security::signed_certificate::invalid_signed_type;
         }
 
-        return rt->get_locality_certificate(id.get_gid(), ec);
+        return rt->get_locality_certificate(locality_id, ec);
     }
 
     /// \brief Add the given certificate to the certificate store of this locality.
@@ -1059,7 +1088,7 @@ namespace hpx
         if (0 == rt)
         {
             HPX_THROWS_IF(ec, invalid_status,
-                "hpx::get_locality_certificate",
+                "hpx::add_locality_certificate",
                 "the runtime system is not operational at this point");
             return;
         }

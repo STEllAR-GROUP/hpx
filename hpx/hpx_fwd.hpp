@@ -1308,7 +1308,7 @@ namespace hpx
     /// \returns This function returns the signed certificate for the locality
     ///          identified by the parameter \a id.
     HPX_API_EXPORT components::security::signed_certificate const&
-        get_locality_certificate(naming::id_type const& id, error_code& ec = throws);
+        get_locality_certificate(boost::uint32_t locality_id, error_code& ec = throws);
 
     /// \brief Add the given certificate to the certificate store of this locality.
     ///

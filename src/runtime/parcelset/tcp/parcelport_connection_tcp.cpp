@@ -23,6 +23,11 @@
 #include <boost/archive/basic_binary_oarchive.hpp>
 #include <boost/format.hpp>
 
+namespace hpx
+{
+    HPX_EXPORT bool is_starting();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace tcp
 {
@@ -88,10 +93,6 @@ namespace hpx { namespace parcelset { namespace tcp
 
             out_buffer_.reserve(arg_size*2);
 
-#if defined(HPX_HAVE_SECURITY)
-            // calculate hash of whole message
-            bool has_certificate = false;
-#endif
             // mark start of serialization
             util::high_resolution_timer timer;
 
@@ -110,22 +111,44 @@ namespace hpx { namespace parcelset { namespace tcp
                     out_buffer_, filter.get(), archive_flags);
 
 #if defined(HPX_HAVE_SECURITY)
-                if (first_message_)
+                // We send the certificate corresponding to the originating locality
+                // of the parcel if this is the first message over this connection
+                // or if the originating locality is not the current one.
+                bool has_certificate = false;
+                error_code ec(lightweight);
+                boost::uint32_t locality_id =
+                    naming::get_locality_id_from_gid(pv[0].get_parcel_id());
+                boost::uint32_t this_locality_id = get_locality_id(ec);
+                if (ec)
                 {
-                    error_code ec(lightweight);
+                    // this should only happen during bootstrap
+                    BOOST_ASSERT(hpx::is_starting());
+                    this_locality_id = locality_id;
+                }
+
+                if (first_message_ || locality_id != this_locality_id)
+                {
+                    // the first message must originate from this locality
+                    BOOST_ASSERT(!first_message_ || locality_id == this_locality_id);
+
                     components::security::signed_certificate const& certificate =
-                        hpx::get_locality_certificate(ec);
+                        hpx::get_locality_certificate(locality_id, ec);
+
                     if (!ec) {
-                        archive << first_message_ << certificate;
                         has_certificate = true;
-                        first_message_ = false;
+                        if (locality_id == this_locality_id)
+                            first_message_ = false;
+                        archive << has_certificate << certificate;
                     }
                     else {
+                        // if the certificate is not available we have to still be on
+                        // the 'first' message (it's too early for a certificate)
+                        BOOST_ASSERT(first_message_);
                         archive << has_certificate;
                     }
                 }
                 else {
-                    archive << first_message_;
+                    archive << has_certificate;
                 }
 #endif
                 std::size_t count = pv.size();
@@ -159,7 +182,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
                 signed_parcel_suffix suffix;
                 sign_parcel_suffix(
-                    parcel_suffix(pv[0].get_parcel_id(), hash),
+                    parcel_suffix(get_locality_id(), pv[0].get_parcel_id(), hash),
                     suffix);
 
                 // append the signed parcel suffix to the message
