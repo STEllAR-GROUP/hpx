@@ -71,7 +71,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 738] - Dedicated AGAS server runs don't work; console ignores -a option.
 * [issue 737] - Missing bind overloads
 * [issue 736] - Performance counter wildcards do not always work
-* [issue 735] - Creat native ibverbs parcelport based on rdma operations
+* [issue 735] - Create native ibverbs parcelport based on rdma operations
 * [issue 734] - Threads stolen performance counter total is incorrect
 * [issue 733] - Test benchmarks need to be checked and fixed
 * [issue 732] - Build fails with Mac, using mac ports clang-3.3 on latest git
