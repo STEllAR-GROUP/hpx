@@ -21,6 +21,7 @@
 #include <boost/throw_exception.hpp>
 
 #include <hpx/util/plugin/config.hpp>
+#include <hpx/exception.hpp>
 
 #include <windows.h>
 #include <Shlwapi.h>
@@ -54,15 +55,11 @@ namespace hpx { namespace util { namespace plugin {
     public:
         dll()
         :   dll_handle(NULL)
-        {
-            LoadLibrary();
-        }
+        {}
 
         dll(dll const& rhs)
         :   dll_name(rhs.dll_name), map_name(rhs.map_name), dll_handle(NULL)
-        {
-            LoadLibrary();
-        }
+        {}
 
         dll(std::string const& libname)
         :   dll_name(libname), map_name(""), dll_handle(NULL)
@@ -76,15 +73,16 @@ namespace hpx { namespace util { namespace plugin {
             fs::path dll_path(dll_name);
 #endif
             map_name = fs::basename(dll_path);
+        }
 
-            LoadLibrary();
+        void load_library(error_code& ec = throws)
+        {
+            LoadLibrary(ec);
         }
 
         dll(std::string const& libname, std::string const& mapname)
         :   dll_name(libname), map_name(mapname), dll_handle(NULL)
-        {
-            LoadLibrary();
-        }
+        {}
 
         dll &operator=(dll const& rhs)
         {
@@ -110,8 +108,11 @@ namespace hpx { namespace util { namespace plugin {
 
         template<typename SymbolType, typename Deleter>
         std::pair<SymbolType, Deleter>
-        get(std::string const& symbol_name) const
+        get(std::string const& symbol_name, error_code& ec = throws) const
         {
+            const_cast<dll&>(*this).LoadLibrary(ec);      // make sure everything is initialized
+            if (ec) return std::pair<SymbolType, Deleter>();
+
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
             typedef typename boost::remove_pointer<SymbolType>::type PointedType;
 
@@ -125,8 +126,10 @@ namespace hpx { namespace util { namespace plugin {
                 str << "Hpx.Plugin: Could not open shared library '"
                     << dll_name << "'";
 
-                boost::throw_exception(
-                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
+                // report error
+                HPX_THROWS_IF(ec, filesystem_error,
+                    "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                return std::pair<SymbolType, Deleter>();
             }
             BOOST_ASSERT(handle == dll_handle);
 
@@ -140,54 +143,76 @@ namespace hpx { namespace util { namespace plugin {
                     << dll_name << "'";
 
                 ::FreeLibrary(handle);
-                boost::throw_exception(
-                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
+
+                // report error
+                HPX_THROWS_IF(ec, filesystem_error,
+                    "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                return std::pair<SymbolType, Deleter>();
             }
             return std::make_pair(address, detail::free_dll<SymbolType>(handle));
         }
 
-        void keep_alive()
+        void keep_alive(error_code& ec = throws)
         {
-            LoadLibrary();
+            LoadLibrary(ec, true);
         }
 
     protected:
-        void LoadLibrary()
+        void LoadLibrary(error_code& ec = throws, bool force = false)
         {
-            if (dll_name.empty()) {
-            // load main module
-                char buffer[_MAX_PATH];
-                ::GetModuleFileName(NULL, buffer, sizeof(buffer));
-                dll_name = buffer;
+            if (!dll_handle || force)
+            {
+                if (dll_name.empty()) {
+                // load main module
+                    char buffer[_MAX_PATH];
+                    ::GetModuleFileName(NULL, buffer, sizeof(buffer));
+                    dll_name = buffer;
+                }
+
+                dll_handle = ::LoadLibrary(dll_name.c_str());
+                if (!dll_handle) {
+                    HPX_PLUGIN_OSSTREAM str;
+                    str << "Hpx.Plugin: Could not open shared library '"
+                        << dll_name << "'";
+
+                    HPX_THROWS_IF(ec, filesystem_error,
+                        "plugin::LoadLibrary",
+                        HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                    return;
+                }
             }
 
-            dll_handle = ::LoadLibrary(dll_name.c_str());
-            if (!dll_handle) {
-                HPX_PLUGIN_OSSTREAM str;
-                str << "Hpx.Plugin: Could not open shared library '"
-                    << dll_name << "'";
-
-                boost::throw_exception(
-                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
-            }
+            if (&ec != &throws)
+                ec = make_success_code();
         }
 
     public:
-        std::string get_directory() const
+        std::string get_directory(error_code& ec = throws) const
         {
-            char buffer[_MAX_PATH];
+            char buffer[_MAX_PATH] = { '\0' };
+
+            const_cast<dll&>(*this).LoadLibrary(ec);      // make sure everything is initialized
+            if (ec) return buffer;
+
             DWORD name_length =
                 GetModuleFileName(dll_handle, buffer, sizeof(buffer));
+
             if (name_length <= 0) {
                 HPX_PLUGIN_OSSTREAM str;
                 str << "Hpx.Plugin: Could not extract path the shared "
                        "library '" << dll_name << "' has been loaded from.";
-                boost::throw_exception(
-                    std::logic_error(HPX_PLUGIN_OSSTREAM_GETSTRING(str)));
+
+                HPX_THROWS_IF(ec, filesystem_error,
+                    "plugin::get_directory", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                return buffer;
             }
 
             // extract the directory name
             PathRemoveFileSpec(buffer);
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
             return buffer;
         }
 

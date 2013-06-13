@@ -180,14 +180,15 @@ namespace hpx { namespace util
     // iterate over all shared libraries in the given directory and construct
     // default ini settings assuming all of those are components
     void load_component_factory(hpx::util::plugin::dll& d, util::section& ini,
-        std::string const& curr, std::string name)
+        std::string const& curr, std::string name, error_code& ec)
     {
         hpx::util::plugin::plugin_factory<components::component_registry_base>
             pf(d, "registry");
 
         // retrieve the names of all known registries
         std::vector<std::string> names;
-        pf.get_names(names);      // throws on error
+        pf.get_names(names, ec);
+        if (ec) return;
 
         std::vector<std::string> ini_data;
         if (names.empty()) {
@@ -212,7 +213,9 @@ namespace hpx { namespace util
             {
                 // create the component registry object
                 boost::shared_ptr<components::component_registry_base>
-                    registry (pf.create(s));
+                    registry (pf.create(s, ec));
+                if (ec) return;
+
                 registry->get_component_info(ini_data);
             }
         }
@@ -223,14 +226,15 @@ namespace hpx { namespace util
     }
 
     void load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
-        std::string const& curr, std::string const& name)
+        std::string const& curr, std::string const& name, error_code& ec)
     {
         hpx::util::plugin::plugin_factory<plugins::plugin_registry_base>
             pf(d, "plugin");
 
         // retrieve the names of all known registries
         std::vector<std::string> names;
-        pf.get_names(names);      // throws on error
+        pf.get_names(names, ec);      // throws on error
+        if (ec) return;
 
         std::vector<std::string> ini_data;
         if (!names.empty()) {
@@ -239,7 +243,9 @@ namespace hpx { namespace util
             {
                 // create the plugin registry object
                 boost::shared_ptr<plugins::plugin_registry_base>
-                    registry(pf.create(s));
+                    registry(pf.create(s, ec));
+                if (ec) return;
+
                 registry->get_plugin_info(ini_data);
             }
         }
@@ -289,14 +295,21 @@ namespace hpx { namespace util
                 if (0 == name.find("lib"))
                     name = name.substr(3);
 #endif
-
                 try {
                     // get the handle of the library
+                    error_code ec;
                     hpx::util::plugin::dll d(curr.string(), name);
 
-                    // get the component factory
-                    std::string curr_fullname(curr.parent_path().string());
-                    load_component_factory(d, ini, curr_fullname, name);
+                    d.load_library(ec);
+                    if (!ec) {
+                        // get the component factory
+                        std::string curr_fullname(curr.parent_path().string());
+                        load_component_factory(d, ini, curr_fullname, name, ec);
+                    }
+                    if (ec) {
+                        LRT_(info) << "skipping " << curr.string()
+                                   << ": " << get_error_what(ec);
+                    }
                 }
                 catch (std::logic_error const& e) {
                     LRT_(info) << "skipping " << curr.string()
@@ -306,14 +319,26 @@ namespace hpx { namespace util
                     LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
                 }
+                catch (...) {
+                    LRT_(info) << "skipping " << curr.string()
+                               << ": unexpected exception";
+                }
 
                 try {
                     // get the handle of the library
+                    error_code ec;
                     hpx::util::plugin::dll d(curr.string(), name);
 
-                    // get the component factory
-                    std::string curr_fullname(curr.parent_path().string());
-                    load_plugin_factory(d, ini, curr_fullname, name);
+                    d.load_library(ec);
+                    if (!ec) {
+                        // get the component factory
+                        std::string curr_fullname(curr.parent_path().string());
+                        load_plugin_factory(d, ini, curr_fullname, name, ec);
+                    }
+                    if (ec) {
+                        LRT_(info) << "skipping " << curr.string()
+                                   << ": " << get_error_what(ec);
+                    }
                 }
                 catch (std::logic_error const& e) {
                     LRT_(info) << "skipping " << curr.string()
@@ -322,6 +347,10 @@ namespace hpx { namespace util
                 catch (std::exception const& e) {
                     LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
+                }
+                catch (...) {
+                    LRT_(info) << "skipping " << curr.string()
+                               << ": unexpected exception";
                 }
             }
         }
