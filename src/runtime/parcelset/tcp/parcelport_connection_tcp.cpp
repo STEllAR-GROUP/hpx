@@ -117,6 +117,34 @@ namespace hpx { namespace parcelset { namespace tcp
             archive << has_certificate;
         }
     }
+
+    void parcelport_connection::create_message_suffix(
+        naming::gid_type const& parcel_id)
+    {
+        // mark start of security work
+        util::high_resolution_timer timer_sec;
+
+        // calculate hash of overall message
+        components::security::hash hash(
+            reinterpret_cast<unsigned char const*>(&out_buffer_.front()),
+            out_buffer_.size());
+
+        using components::security::parcel_suffix;
+        using components::security::signed_parcel_suffix;
+
+        signed_parcel_suffix suffix;
+        sign_parcel_suffix(
+            parcel_suffix(get_locality_id(), parcel_id, hash),
+            suffix);
+
+        // append the signed parcel suffix to the message
+        out_buffer_.reserve(out_buffer_.size() + signed_parcel_suffix::size());
+
+        std::copy(suffix.begin(), suffix.end(), std::back_inserter(out_buffer_));
+
+        // store the time required for security
+        send_data_.security_time_ = timer_sec.elapsed_nanoseconds();
+    }
 #endif
 
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
@@ -133,7 +161,6 @@ namespace hpx { namespace parcelset { namespace tcp
             BOOST_ASSERT(locality_id == destination());
         }
 #endif
-
         // we choose the highest priority of all parcels for this message
         threads::thread_priority priority = threads::thread_priority_default;
 
@@ -187,38 +214,14 @@ namespace hpx { namespace parcelset { namespace tcp
                 arg_size = archive.bytes_written();
             }
 
-            // store the time required for serialization
-            send_data_.serialization_time_ = timer.elapsed_nanoseconds();
-
 #if defined(HPX_HAVE_SECURITY)
             // calculate and sign the hash, but only after everything has
             // been initialized
-            if (!first_message_) {
-                // mark start of security work
-                util::high_resolution_timer timer_sec;
-
-                // calculate hash of overall message
-                components::security::hash hash(
-                    reinterpret_cast<unsigned char const*>(&out_buffer_.front()),
-                    out_buffer_.size());
-
-                using components::security::parcel_suffix;
-                using components::security::signed_parcel_suffix;
-
-                signed_parcel_suffix suffix;
-                sign_parcel_suffix(
-                    parcel_suffix(get_locality_id(), pv[0].get_parcel_id(), hash),
-                    suffix);
-
-                // append the signed parcel suffix to the message
-                out_buffer_.reserve(out_buffer_.size() + signed_parcel_suffix::size());
-
-                std::copy(suffix.begin(), suffix.end(), std::back_inserter(out_buffer_));
-
-                // store the time required for security
-                send_data_.security_time_ = timer_sec.elapsed_nanoseconds();
-            }
+            if (!first_message_)
+                create_message_suffix(pv[0].get_parcel_id());
 #endif
+            // store the time required for serialization
+            send_data_.serialization_time_ = timer.elapsed_nanoseconds();
         }
         catch (boost::archive::archive_exception const& e) {
             // We have to repackage all exceptions thrown by the
