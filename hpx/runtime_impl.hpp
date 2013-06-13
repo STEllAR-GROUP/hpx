@@ -331,6 +331,13 @@ namespace hpx {
         /// return zero.
         hpx::util::io_service_pool* get_thread_pool(char const* name);
 
+        /// Register an external OS-thread with HPX
+        bool register_thread(char const* name, std::size_t num = 0,
+            bool service_thread = true);
+
+        /// Unregister an external OS-thread with HPX
+        bool unregister_thread();
+
     private:
         void init_tss(char const* context, std::size_t num, char const* postfix,
             bool service_thread);
