@@ -592,11 +592,10 @@ namespace hpx { namespace parcelset { namespace tcp
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_SECURITY)
+    // read the certificate, if available, and add it to the local certificate
+    // store
     template <typename Archive>
-    bool deserialize_certificate(Archive& archive,
-        std::vector<char> const& parcel_data,
-        performance_counters::parcels::data_point& receive_data,
-        naming::gid_type& parcel_id, bool first_message)
+    bool deserialize_certificate(Archive& archive, bool first_message)
     {
         bool has_certificate = false;
         archive >> has_certificate;
@@ -608,25 +607,28 @@ namespace hpx { namespace parcelset { namespace tcp
             if (first_message)
                 first_message = false;
         }
-
-        // calculate and verify the hash, but only after everything has
-        // been initialized
-        if (!first_message) {
-            // mark start of security work
-            util::high_resolution_timer timer_sec;
-
-            if (!verify_parcel_suffix(parcel_data, parcel_id)) {
-                // all hell breaks loose!
-                HPX_THROW_EXCEPTION(security_error,
-                    "decode_message(tcp)",
-                    "verify_parcel_suffix failed");
-                return false;
-            }
-
-            // store the time required for security
-            receive_data.security_time_ = timer_sec.elapsed_nanoseconds();
-        }
         return first_message;
+    }
+
+    // calculate and verify the hash
+    void verify_message_suffix(
+        std::vector<char> const& parcel_data,
+        performance_counters::parcels::data_point& receive_data,
+        naming::gid_type& parcel_id)
+    {
+        // mark start of security work
+        util::high_resolution_timer timer_sec;
+
+        if (!verify_parcel_suffix(parcel_data, parcel_id)) {
+            // all hell breaks loose!
+            HPX_THROW_EXCEPTION(security_error,
+                "decode_message(tcp)",
+                "verify_message_suffix failed");
+            return;
+        }
+
+        // store the time required for security
+        receive_data.security_time_ = timer_sec.elapsed_nanoseconds();
     }
 #endif
 
@@ -653,16 +655,17 @@ namespace hpx { namespace parcelset { namespace tcp
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
 #if defined(HPX_HAVE_SECURITY)
+                        // handle certificate and verify parcel suffix once
                         naming::gid_type parcel_id;
-                        first_message = deserialize_certificate(archive,
-                            *parcel_data, receive_data, parcel_id, first_message);
-#endif
+                        first_message = deserialize_certificate(archive, first_message);
+                        if (!first_message && i == 0)
+                            verify_message_suffix(*parcel_data, receive_data, parcel_id);
+
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
                         archive >> p;
 
-#if defined(HPX_HAVE_SECURITY)
-                        // verify parcel id
+                        // verify parcel id, but only once while handling the first parcel
                         if (!first_message && i == 0 && parcel_id != p.get_parcel_id()) {
                             // again, all hell breaks loose
                             HPX_THROW_EXCEPTION(security_error,
@@ -670,6 +673,10 @@ namespace hpx { namespace parcelset { namespace tcp
                                 "parcel id mismatch");
                             return false;
                         }
+#else
+                        // de-serialize parcel and add it to incoming parcel queue
+                        parcel p;
+                        archive >> p;
 #endif
                         // make sure this parcel ended up on the right locality
                         BOOST_ASSERT(p.get_destination_locality() == pp.here());

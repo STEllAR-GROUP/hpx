@@ -189,6 +189,8 @@ namespace hpx { namespace parcelset { namespace tcp
         template <typename Archive>
         void serialize_certificate(Archive& archive,
             std::set<boost::uint32_t>& localities, parcel const& p);
+
+        void create_message_suffix(naming::gid_type const& parcel_id);
 #endif
 
     private:
