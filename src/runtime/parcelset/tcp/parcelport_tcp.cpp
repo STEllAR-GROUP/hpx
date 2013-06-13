@@ -33,6 +33,18 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 
+namespace hpx
+{
+    /// \brief Verify the certificate in the given byte sequence
+    ///
+    /// \param data      The full received message buffer, assuming that it
+    ///                  has a parcel_suffix appended.
+    /// \param parcel_id The parcel id of the first parcel in side the message
+    ///
+    HPX_API_EXPORT bool verify_parcel_suffix(std::vector<char> const& data,
+        naming::gid_type& parcel_id, error_code& ec = throws);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace tcp
 {
@@ -579,6 +591,45 @@ namespace hpx { namespace parcelset { namespace tcp
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_SECURITY)
+    template <typename Archive>
+    bool deserialize_certificate(Archive& archive,
+        std::vector<char> const& parcel_data,
+        performance_counters::parcels::data_point& receive_data,
+        naming::gid_type& parcel_id, bool first_message)
+    {
+        bool has_certificate = false;
+        archive >> has_certificate;
+
+        components::security::signed_certificate certificate;
+        if (has_certificate) {
+            archive >> certificate;
+            add_locality_certificate(certificate);
+            if (first_message)
+                first_message = false;
+        }
+
+        // calculate and verify the hash, but only after everything has
+        // been initialized
+        if (!first_message) {
+            // mark start of security work
+            util::high_resolution_timer timer_sec;
+
+            if (!verify_parcel_suffix(parcel_data, parcel_id)) {
+                // all hell breaks loose!
+                HPX_THROW_EXCEPTION(security_error,
+                    "decode_message(tcp)",
+                    "verify_parcel_suffix failed");
+                return false;
+            }
+
+            // store the time required for security
+            receive_data.security_time_ = timer_sec.elapsed_nanoseconds();
+        }
+        return first_message;
+    }
+#endif
+
     bool decode_message(parcelport& pp,
         boost::shared_ptr<std::vector<char> > parcel_data,
         boost::uint64_t inbound_data_size,
@@ -597,41 +648,15 @@ namespace hpx { namespace parcelset { namespace tcp
                     util::portable_binary_iarchive archive(*parcel_data,
                         inbound_data_size, boost::archive::no_header);
 
-#if defined(HPX_HAVE_SECURITY)
-                    bool has_certificate = false;
-                    archive >> has_certificate;
-
-                    components::security::signed_certificate certificate;
-                    if (has_certificate) {
-                        archive >> certificate;
-                        add_locality_certificate(certificate);
-                        if (first_message)
-                            first_message = false;
-                    }
-
-                    // calculate and verify the hash, but only after everything has
-                    // been initialized
-                    naming::gid_type parcel_id;
-                    if (!first_message) {
-                        // mark start of security work
-                        util::high_resolution_timer timer_sec;
-
-                        if (!verify_parcel_suffix(*parcel_data, parcel_id)) {
-                            // all hell breaks loose!
-                            HPX_THROW_EXCEPTION(security_error,
-                                "decode_message(tcp)",
-                                "verify_parcel_suffix failed");
-                            return false;
-                        }
-
-                        // store the time required for security
-                        receive_data.security_time_ = timer_sec.elapsed_nanoseconds();
-                    }
-#endif
                     std::size_t parcel_count = 0;
                     archive >> parcel_count;
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
+#if defined(HPX_HAVE_SECURITY)
+                        naming::gid_type parcel_id;
+                        first_message = deserialize_certificate(archive,
+                            *parcel_data, receive_data, parcel_id, first_message);
+#endif
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
                         archive >> p;

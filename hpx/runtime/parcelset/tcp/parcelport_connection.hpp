@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c) 2011 Bryce Lelbach 
+//  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 
 #include <sstream>
 #include <vector>
+#include <set>
 
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/connection_cache.hpp>
@@ -153,24 +154,24 @@ namespace hpx { namespace parcelset { namespace tcp
             socket_.set_option(quickack);
 #endif
 
-            void (parcelport_connection::*f)(boost::system::error_code const&, 
+            void (parcelport_connection::*f)(boost::system::error_code const&,
                       boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
 
-            boost::asio::async_read(socket_, 
+            boost::asio::async_read(socket_,
                 boost::asio::buffer(&ack_, sizeof(ack_)),
                 boost::bind(f, shared_from_this(), ::_1, handler));
         }
 
         template <typename Handler, typename ParcelPostprocess>
-        void handle_read_ack(boost::system::error_code const& e, 
-            boost::tuple<Handler, ParcelPostprocess> handler) 
+        void handle_read_ack(boost::system::error_code const& e,
+            boost::tuple<Handler, ParcelPostprocess> handler)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_handle_read_ack;
 #endif
-            // Call post-processing handler, which will send remaining pending 
-            // parcels. Pass along the connection so it can be reused if more 
+            // Call post-processing handler, which will send remaining pending
+            // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
             boost::get<1>(handler)(e, there_, shared_from_this());
         }
@@ -181,6 +182,13 @@ namespace hpx { namespace parcelset { namespace tcp
         {
             state_ = newstate;
         }
+#endif
+
+#if defined(HPX_HAVE_SECURITY)
+    protected:
+        template <typename Archive>
+        void serialize_certificate(Archive& archive,
+            std::set<boost::uint32_t>& localities, parcel const& p);
 #endif
 
     private:

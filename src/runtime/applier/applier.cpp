@@ -340,7 +340,7 @@ namespace hpx { namespace applier
 
 #if defined(HPX_HAVE_SECURITY)
         // we look up the certificate of the originating locality, no matter
-        // whether this parcel was roiuted through another locality or not
+        // whether this parcel was routed through another locality or not
         boost::uint32_t locality_id =
             naming::get_locality_id_from_gid(p.get_parcel_id());
         error_code ec(lightweight);

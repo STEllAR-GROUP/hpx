@@ -25,7 +25,17 @@
 
 namespace hpx
 {
-    HPX_EXPORT bool is_starting();
+    HPX_API_EXPORT bool is_starting();
+
+    /// \brief Sign the given parcel-suffix
+    ///
+    /// \param suffix         The parcel suffoix to be signed
+    /// \param signed_suffix  The signed parcel suffix will be placed here
+    ///
+    HPX_API_EXPORT void sign_parcel_suffix(
+        components::security::parcel_suffix const& suffix,
+        components::security::signed_parcel_suffix& signed_suffix,
+        error_code& ec = throws);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,6 +69,56 @@ namespace hpx { namespace parcelset { namespace tcp
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_SECURITY)
+    template <typename Archive>
+    void parcelport_connection::serialize_certificate(Archive& archive,
+        std::set<boost::uint32_t>& localities, parcel const& p)
+    {
+        // We send the certificate corresponding to the originating locality
+        // of the parcel if this is the first message over this connection
+        // or if the originating locality is not the current one.
+        boost::uint32_t locality_id =
+            naming::get_locality_id_from_gid(p.get_parcel_id());
+        error_code ec(lightweight);
+        boost::uint32_t this_locality_id = get_locality_id(ec);
+        if (ec) {
+            // this should only happen during bootstrap
+            BOOST_ASSERT(hpx::is_starting());
+            this_locality_id = locality_id;
+        }
+
+        bool has_certificate = false;
+        if ((first_message_ || locality_id != this_locality_id) &&
+            localities.find(locality_id) == localities.end())
+        {
+            // the first message must originate from this locality
+            BOOST_ASSERT(!first_message_ || locality_id == this_locality_id);
+
+            components::security::signed_certificate const& certificate =
+                hpx::get_locality_certificate(locality_id, ec);
+
+            if (!ec) {
+                has_certificate = true;
+                if (locality_id == this_locality_id)
+                    first_message_ = false;
+                archive << has_certificate << certificate;
+
+                // keep track of all certificates already prepended for this message
+                localities.insert(locality_id);
+            }
+            else {
+                // if the certificate is not available we have to still be on
+                // the 'first' message (it's too early for a certificate)
+                BOOST_ASSERT(first_message_);
+                archive << has_certificate;
+            }
+        }
+        else {
+            archive << has_certificate;
+        }
+    }
+#endif
+
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
@@ -111,51 +171,16 @@ namespace hpx { namespace parcelset { namespace tcp
                     out_buffer_, filter.get(), archive_flags);
 
 #if defined(HPX_HAVE_SECURITY)
-                // We send the certificate corresponding to the originating locality
-                // of the parcel if this is the first message over this connection
-                // or if the originating locality is not the current one.
-                bool has_certificate = false;
-                error_code ec(lightweight);
-                boost::uint32_t locality_id =
-                    naming::get_locality_id_from_gid(pv[0].get_parcel_id());
-                boost::uint32_t this_locality_id = get_locality_id(ec);
-                if (ec)
-                {
-                    // this should only happen during bootstrap
-                    BOOST_ASSERT(hpx::is_starting());
-                    this_locality_id = locality_id;
-                }
-
-                if (first_message_ || locality_id != this_locality_id)
-                {
-                    // the first message must originate from this locality
-                    BOOST_ASSERT(!first_message_ || locality_id == this_locality_id);
-
-                    components::security::signed_certificate const& certificate =
-                        hpx::get_locality_certificate(locality_id, ec);
-
-                    if (!ec) {
-                        has_certificate = true;
-                        if (locality_id == this_locality_id)
-                            first_message_ = false;
-                        archive << has_certificate << certificate;
-                    }
-                    else {
-                        // if the certificate is not available we have to still be on
-                        // the 'first' message (it's too early for a certificate)
-                        BOOST_ASSERT(first_message_);
-                        archive << has_certificate;
-                    }
-                }
-                else {
-                    archive << has_certificate;
-                }
+                std::set<boost::uint32_t> localities;
 #endif
                 std::size_t count = pv.size();
                 archive << count;
 
-                BOOST_FOREACH(parcel const & p, pv)
+                BOOST_FOREACH(parcel const& p, pv)
                 {
+#if defined(HPX_HAVE_SECURITY)
+                    serialize_certificate(archive, localities, p);
+#endif
                     archive << p;
                 }
 

@@ -1317,26 +1317,6 @@ namespace hpx
     HPX_API_EXPORT void add_locality_certificate(
         components::security::signed_certificate const& cert,
         error_code& ec = throws);
-
-    /// \brief Sign the given parcel-suffix
-    ///
-    /// \param suffix         The parcel suffoix to be signed
-    /// \param signed_suffix  The signed parcel suffix will be placed here
-    ///
-    HPX_API_EXPORT void sign_parcel_suffix(
-        components::security::parcel_suffix const& suffix,
-        components::security::signed_parcel_suffix& signed_suffix,
-        error_code& ec = throws);
-
-    /// \brief Verify the certificate in the given byte sequence
-    ///
-    /// \param data      The full received message buffer, assuming that it
-    ///                  has a parcel_suffix appended.
-    /// \param parcel_id The parcel id of the first parcel in side the message
-    ///
-    HPX_API_EXPORT bool verify_parcel_suffix(std::vector<char> const& data,
-        naming::gid_type& parcel_id, error_code& ec = throws);
-
 #endif
 #endif
 }
