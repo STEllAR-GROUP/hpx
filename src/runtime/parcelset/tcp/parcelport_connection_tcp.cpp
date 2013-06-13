@@ -23,6 +23,7 @@
 #include <boost/archive/basic_binary_oarchive.hpp>
 #include <boost/format.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
 namespace hpx
 {
     HPX_API_EXPORT bool is_starting();
@@ -37,6 +38,7 @@ namespace hpx
         components::security::signed_parcel_suffix& signed_suffix,
         error_code& ec = throws);
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace tcp
