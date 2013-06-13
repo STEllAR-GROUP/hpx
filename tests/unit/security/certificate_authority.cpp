@@ -70,7 +70,9 @@ int hpx_main(boost::program_options::variables_map &)
         hash hash(reinterpret_cast<unsigned char const *>(data), sizeof(data));
 
         parcel_suffix parcel_suffix(
-            hpx::parcelset::parcel::generate_unique_id(), hash);
+            hpx::get_locality_id()
+          , hpx::parcelset::parcel::generate_unique_id()
+          , hash);
 
         signed_type<hpx::components::security::parcel_suffix>
             signed_parcel_suffix =
