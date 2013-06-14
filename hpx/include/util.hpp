@@ -15,7 +15,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 #endif
 
