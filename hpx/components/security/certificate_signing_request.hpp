@@ -29,9 +29,11 @@ namespace hpx { namespace components { namespace security
         }
 
         certificate_signing_request(naming::gid_type const & subject,
-                                    public_key const & subject_public_key)
+                                    public_key const & subject_public_key,
+                                    capability const & capability)
           : subject_(subject)
           , subject_public_key_(subject_public_key)
+          , capability_(capability)
         {
         }
 

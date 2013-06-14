@@ -77,8 +77,10 @@ namespace hpx { namespace components
 
         // if we're asked for required capabilities related to creating
         // an instance of this component then require 'write' capabilities
-        if (caps & traits::capability<>::capability_create)
-            return capability(traits::capability<>::capability_write);
+        if (caps & traits::capability<>::capability_create_component)
+        {
+            return capability(traits::capability<>::capability_non_const);
+        }
 
         // otherwise require no capabilities
         return capability();
