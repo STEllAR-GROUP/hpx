@@ -28,23 +28,25 @@ namespace hpx { namespace components { namespace security
         struct capability
         {
             static std::size_t const size = 8;
-            static std::size_t const array_size = (size + CHAR_BIT - 1) / CHAR_BIT;
 
+            // NOTE: Each second capability is assumed to be a delegation capability
             enum capabilities
             {
                 capability_certificate_authority = 0,
-                capability_create = 1,
-                capability_read = 2,
-                capability_write = 3,
+                capability_certificate_authority_delegation = 1,
+                capability_create_component = 2,
+                capability_create_component_delegation = 3,
+                capability_const = 4,
+                capability_const_delegation = 5,
+                capability_non_const = 6,
+                capability_non_const_delegation = 7
             };
-        };
-    }
 
-    namespace detail
-    {
-        static unsigned char const array_bits[] =
-        {
-            0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
+            static boost::uint64_t const root_certificate_authority_capability =
+                (1 << capability_certificate_authority) +
+                (1 << capability_create_component_delegation) +
+                (1 << capability_const_delegation) +
+                (1 << capability_non_const_delegation);
         };
     }
 
@@ -56,16 +58,13 @@ namespace hpx { namespace components { namespace security
             std::fill(bits_.begin(), bits_.end(), 0);
         }
 
-        capability(unsigned long bits)
+        capability(boost::uint64_t bits)
         {
-            std::fill(bits_.begin(), bits_.end(), 0);
-
-            unsigned long mask = 0x1ul;
-            for (std::size_t i = 0; i != security::traits::capability<>::size; ++i)
+            for (std::size_t i = 0;
+                 i != security::traits::capability<>::size;
+                 ++i)
             {
-                if (bits & mask)
-                    set(i);
-                mask <<= 1;
+                set(i, (bits & (1 << i)) != 0);
             }
         }
 
@@ -74,39 +73,76 @@ namespace hpx { namespace components { namespace security
             BOOST_ASSERT(position < security::traits::capability<>::size);
 
             if (value)
-                bits_[position / CHAR_BIT] |= detail::array_bits[position % CHAR_BIT];
+            {
+                bits_[position / CHAR_BIT] |= (1 << (position % CHAR_BIT));
+            }
             else
-                bits_[position / CHAR_BIT] &= ~detail::array_bits[position % CHAR_BIT];
+            {
+                bits_[position / CHAR_BIT] &= ~(1 << (position % CHAR_BIT));
+            }
         }
 
-        bool allow(capability const& requestor)
+        bool test(std::size_t position) const
         {
+            BOOST_ASSERT(position < security::traits::capability<>::size);
+
+            return bits_[position / CHAR_BIT] & (1 << (position % CHAR_BIT));
+        }
+
+        bool verify(capability const & sender) const
+        {
+            // Verify sender has the capabilities to this
+
+            for (std::size_t i = 0; i < traits::capability<>::size; ++i)
+            {
+                if (test(i) == true && sender.test(i) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool verify_delegation(capability const & subject) const
+        {
+            // Verify that this can delegate the capabilities requested by subject
+
+            for (std::size_t i = 0; i < traits::capability<>::size; i += 2)
+            {
+                if (subject.test(i) == true && test(i + 1) == false)
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 
         friend std::ostream & operator<<(std::ostream & os,
                                             capability const & capability)
         {
-            boost::io::ios_flags_saver ifs(os);
             os << "<capability \"";
 
-            for (std::size_t i = 0; i != security::traits::capability<>::array_size; ++i)
+            for (std::size_t i = 0;
+                 i != ((traits::capability<>::size + CHAR_BIT - 1) / CHAR_BIT);
+                 ++i)
             {
-                os << std::hex
-                    << std::nouppercase
-                    << std::setfill('0')
-                    << std::setw(2)
-                    << static_cast<unsigned int>(capability.bits_[i]);
+                for (std::size_t j = CHAR_BIT; j != 0; --j)
+                {
+                    os << ((capability.bits_[i] & (1 << (j - 1))) == 0 ? "0"
+                                                                       : "1");
+                }
             }
 
-            os << "\">";
-            return os;
+            return os << "\">";
         }
 
         unsigned char const* begin() const
         {
             return reinterpret_cast<unsigned char const*>(this);
         }
+
         unsigned char const* end() const
         {
             return reinterpret_cast<unsigned char const*>(this) + size();
@@ -127,7 +163,8 @@ namespace hpx { namespace components { namespace security
         }
 
         boost::array<
-            unsigned char, security::traits::capability<>::array_size
+            unsigned char
+          , (traits::capability<>::size + CHAR_BIT - 1) / CHAR_BIT
         > bits_;
     };
 

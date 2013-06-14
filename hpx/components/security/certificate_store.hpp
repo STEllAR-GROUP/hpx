@@ -72,25 +72,23 @@ namespace hpx { namespace components { namespace security
                 store_.find(certificate.get_issuer());
             if (issuer == store_.end())
             {
-                hpx::util::osstream strm;
-                strm << boost::str(boost::format(
-                    "the certificate issuer is unknown: %1%\n") % subject);
-                strm << "  known certificate subjects:\n";
+                hpx::util::osstream oss;
+                oss << boost::str(boost::format(
+                    "The certificate issuer is unknown: %1%\n") % subject);
+                oss << "Known certificate subjects:\n";
 
                 store_type::const_iterator end = store_.end();
                 for(store_type::const_iterator it = store_.begin(); it != end; ++it)
                 {
-                    strm << "    " << (*it).first << "\n";
+                    oss << "    " << it->first << "\n";
                 }
 
                 HPX_THROW_EXCEPTION(
                     hpx::security_error
                   , "certificate_store::insert"
-                  , hpx::util::osstream_get_string(strm)
+                  , hpx::util::osstream_get_string(oss)
                 )
             }
-
-            // TODO, verify capabilities
 
             public_key const & issuer_public_key =
                 issuer->second.get_type().get_subject_public_key();
@@ -100,8 +98,22 @@ namespace hpx { namespace components { namespace security
                     hpx::security_error
                   , "certificate_store::insert"
                   , boost::str(boost::format(
-                        "the certificate signature is invalid: %1%") %
+                        "The certificate signature is invalid: %1%") %
                         signed_certificate)
+                )
+            }
+
+            capability const & issuer_capability =
+                issuer->second.get_type().get_capability();
+            if (issuer_capability.verify_delegation(
+                    certificate.get_capability()) == false)
+            {
+                HPX_THROW_EXCEPTION(
+                    hpx::security_error
+                  , "certificate_store::insert"
+                  , boost::str(boost::format(
+                        "The issuer can't delegated the requested capabilities: %1% %2%") %
+                        issuer_capability % certificate.get_capability())
                 )
             }
 

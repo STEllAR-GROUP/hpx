@@ -394,7 +394,7 @@ namespace hpx { namespace applier
                 components::security::capability caps_action =
                     act->get_required_capabilities(lva);
 
-                if (!caps_action.allow(caps_sender)) {
+                if (caps_action.verify(caps_sender) == false) {
                     HPX_THROW_EXCEPTION(security_error,
                         "applier::schedule_action",
                         boost::str(boost::format("sender has insufficient capabilities "

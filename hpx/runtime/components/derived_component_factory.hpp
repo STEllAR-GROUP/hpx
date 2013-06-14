@@ -231,7 +231,7 @@ namespace hpx { namespace components
         {
             using namespace components::security;
             return Component::get_required_capabilities(
-                traits::capability<>::capability_create);
+                traits::capability<>::capability_create_component);
         }
 #endif
 

@@ -63,8 +63,11 @@ namespace hpx { namespace components { namespace security { namespace server
     signed_type<certificate_signing_request>
     subordinate_certificate_authority::get_certificate_signing_request() const
     {
+        // TODO, request capabilities
+        capability capability(0x54);
+
         return key_pair_.sign(certificate_signing_request(
-            get_gid().get_gid(), key_pair_.get_public_key()));
+            get_gid().get_gid(), key_pair_.get_public_key(), capability));
     }
 
     signed_type<certificate>
@@ -84,7 +87,18 @@ namespace hpx { namespace components { namespace security { namespace server
             )
         }
 
-        // TODO, capability checks
+        capability const & issuer_capability =
+            certificate_.get_type().get_capability();
+        if (issuer_capability.verify_delegation(csr.get_capability()) == false)
+        {
+            HPX_THROW_EXCEPTION(
+                hpx::security_error
+              , "subordinate_certificate_authority::sign_certificate_signing_request"
+              , boost::str(boost::format(
+                    "The certificate signing request its capabilities can't be delegated: %1% %2%") %
+                    issuer_capability % csr.get_capability())
+            )
+        }
 
         signed_type<certificate> signed_certificate;
 
