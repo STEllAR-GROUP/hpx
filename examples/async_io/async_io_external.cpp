@@ -11,26 +11,52 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/iostreams.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
+struct registration_wrapper
+{
+    registration_wrapper(hpx::runtime* rt, char const* name)
+      : rt_(rt)
+    {
+        // Register this thread with HPX, this should be done once for
+        // each external OS-thread intended to invoke HPX functionality.
+        // Calling this function more than once will silently fail (will
+        // return false).
+        rt_->register_thread("external-io");
+    }
+    ~registration_wrapper()
+    {
+        // Unregister the thread from HPX, this should be done once in the
+        // end before the external thread exists.
+        rt_->unregister_thread();
+    }
+
+    hpx::runtime* rt_;
+};
+
+// this function will be executed by an HPX thread
+void set_value(
+    boost::shared_ptr<hpx::lcos::local::promise<int> > p,
+    int result)
+{
+    // notify the waiting HPX thread and return a value
+    p->set_value(result);
+}
+
 // this function will be executed by a dedicated OS thread
 void do_async_io(char const* string_to_write,
     boost::shared_ptr<hpx::lcos::local::promise<int> > p,
     hpx::runtime* rt)
 {
-    // Register this thread with HPX, this should be done once for
-    // each external OS-thread intended to invoke HPX functionality.
-    // Calling this function more than once will silently fail (will
-    // return false).
-    rt->register_thread("external-io");
+    // register this thread in order to be able to call HPX functionality
+    registration_wrapper wrap(rt, "external-io");
 
     // This IO operation will possibly block the IO thread in the
     // kernel.
     std::cout << "OS-thread: " << string_to_write << std::endl;
 
-    p->set_value(0);    // notify the waiting HPX thread and return a value
-
-    // Unregister the thread from HPX, this should be done once in the
-    // end before the external thread exists.
-    rt->unregister_thread();
+    // Create an HPX thread to guarantee that the promise::set_value
+    // function can be invoked safely.
+    hpx::threads::register_thread(hpx::util::bind(&set_value, p, 0));
 }
 
 // This function will be executed by an HPX thread
