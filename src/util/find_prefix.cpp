@@ -37,7 +37,7 @@ namespace hpx { namespace util
             error_code ec;
             hpx::util::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
 
-            d.load_library(ec);
+            dll.load_library(ec);
             if (ec) return HPX_PREFIX;
 
             using boost::filesystem::path;

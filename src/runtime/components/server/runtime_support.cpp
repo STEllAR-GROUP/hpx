@@ -1104,9 +1104,8 @@ namespace hpx { namespace components { namespace server
 
         try {
             // get the handle of the library
-            error_code ec;
+            error_code ec(lightweight);
             hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
-
             d.load_library(ec);
             if (ec) {
                 LRT_(warning) << "dynamic loading failed: " << lib.string()
@@ -1181,6 +1180,7 @@ namespace hpx { namespace components { namespace server
             if (startup_handled.find(d.get_name()) == startup_handled.end()) {
                 startup_handled.insert(d.get_name());
                 load_commandline_options(d, options, ec);
+                if (ec) ec = error_code(lightweight);
                 load_startup_shutdown_functions(d, ec);
             }
         }

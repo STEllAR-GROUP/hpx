@@ -15,6 +15,8 @@
 
 #include <string>
 #include <iostream>
+#include <algorithm>
+#include <vector>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -24,6 +26,7 @@
 #include <hpx/util/plugin.hpp>
 #include <boost/foreach.hpp>
 #include <boost/assign/std/vector.hpp>
+#include <boost/range/iterator_range.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -255,9 +258,33 @@ namespace hpx { namespace util
         ini.parse("plugin registry", ini_data, false);
     }
 
+    namespace detail
+    {
+        inline bool cmppath_less(
+            std::pair<boost::filesystem::path, std::string> const& lhs,
+            std::pair<boost::filesystem::path, std::string> const& rhs)
+        {
+            return lhs.first < rhs.first;
+        }
+
+        inline bool cmppath_equal(
+            std::pair<boost::filesystem::path, std::string> const& lhs,
+            std::pair<boost::filesystem::path, std::string> const& rhs)
+        {
+            return lhs.first == rhs.first;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void init_ini_data_default(std::string const& libs, util::section& ini)
     {
         namespace fs = boost::filesystem;
+
+        typedef std::vector<std::pair<fs::path, std::string> >::iterator
+            iterator_type;
+
+        std::vector<std::pair<fs::path, std::string> > libdata;
+        iterator_type end;
 
         try {
             fs::directory_iterator nodir;
@@ -275,10 +302,6 @@ namespace hpx { namespace util
                 hpx_sec->add_section("components", comp_sec);
             }
 
-// FIXME: make sure this isn't needed anymore for sure
-//             util::section* components_sec = ini.get_section("hpx.components");
-//             BOOST_ASSERT(NULL != components_sec);
-
             // generate component sections for all found shared libraries
             // this will create too many sections, but the non-components will
             // be filtered out during loading
@@ -295,67 +318,53 @@ namespace hpx { namespace util
                 if (0 == name.find("lib"))
                     name = name.substr(3);
 #endif
-                try {
-                    // get the handle of the library
-                    error_code ec;
-                    hpx::util::plugin::dll d(curr.string(), name);
-
-                    d.load_library(ec);
-                    if (!ec) {
-                        // get the component factory
-                        std::string curr_fullname(curr.parent_path().string());
-                        load_component_factory(d, ini, curr_fullname, name, ec);
-                    }
-                    if (ec) {
-                        LRT_(info) << "skipping " << curr.string()
-                                   << ": " << get_error_what(ec);
-                    }
-                }
-                catch (std::logic_error const& e) {
-                    LRT_(info) << "skipping " << curr.string()
-                               << ": " << e.what();
-                }
-                catch (std::exception const& e) {
-                    LRT_(info) << "skipping " << curr.string()
-                               << ": " << e.what();
-                }
-                catch (...) {
-                    LRT_(info) << "skipping " << curr.string()
-                               << ": unexpected exception";
-                }
-
-                try {
-                    // get the handle of the library
-                    error_code ec;
-                    hpx::util::plugin::dll d(curr.string(), name);
-
-                    d.load_library(ec);
-                    if (!ec) {
-                        // get the component factory
-                        std::string curr_fullname(curr.parent_path().string());
-                        load_plugin_factory(d, ini, curr_fullname, name, ec);
-                    }
-                    if (ec) {
-                        LRT_(info) << "skipping " << curr.string()
-                                   << ": " << get_error_what(ec);
-                    }
-                }
-                catch (std::logic_error const& e) {
-                    LRT_(info) << "skipping " << curr.string()
-                               << ": " << e.what();
-                }
-                catch (std::exception const& e) {
-                    LRT_(info) << "skipping " << curr.string()
-                               << ": " << e.what();
-                }
-                catch (...) {
-                    LRT_(info) << "skipping " << curr.string()
-                               << ": unexpected exception";
-                }
+                // ensure base directory, remove symlinks, etc.
+                boost::system::error_code fsec;
+                fs::path canonical_curr = util::canonical_path(curr, fsec);
+                libdata.push_back(std::make_pair(!fsec ? canonical_curr : curr, name));
             }
         }
-        catch (fs::filesystem_error const& /*e*/) {
-            ;
+        catch (fs::filesystem_error const& e) {
+            LRT_(info) << "caught filesystem error: " << e.what();
+        }
+
+        // make file name unique
+        std::sort(libdata.begin(), libdata.end(), detail::cmppath_less);
+        end = std::unique(libdata.begin(), libdata.end(), detail::cmppath_equal);
+
+        // make sure each node loads libraries in a different order
+        std::srand(static_cast<unsigned>(std::time(0)));
+        std::random_shuffle(libdata.begin(), end);
+
+        typedef std::pair<fs::path, std::string> libdata_type;
+        BOOST_FOREACH(libdata_type const& p,
+            boost::iterator_range<iterator_type>(libdata.begin(), end))
+        {
+            // get the handle of the library
+            error_code ec(lightweight);
+            hpx::util::plugin::dll d(p.first.string(), p.second);
+            d.load_library(ec);
+            if (ec) {
+                LRT_(info) << "skipping " << p.first.string()
+                    << ": " << get_error_what(ec);
+                continue;
+            }
+
+            // get the component factory
+            std::string curr_fullname(p.first.parent_path().string());
+            load_component_factory(d, ini, curr_fullname, p.second, ec);
+            if (ec) {
+                LRT_(info) << "skipping " << p.first.string()
+                    << ": " << get_error_what(ec);
+                ec = error_code(lightweight);   // reinit ec
+            }
+
+            // get the plugin factory
+            load_plugin_factory(d, ini, curr_fullname, p.second, ec);
+            if (ec) {
+                LRT_(info) << "skipping " << p.first.string()
+                    << ": " << get_error_what(ec);
+            }
         }
     }
 }}
