@@ -47,20 +47,6 @@ int hpx_main(variables_map& vm)
 
             std::pair<elem_type, index_type> pp=std::make_pair(elem,id);
             it = field_index_map_.insert(pp);
-
-#if 0
-			// unordered_multimap with any as value succeeds
-            typedef boost::unordered_multimap<index_type, elem_type> index_field_map_type;
-            typedef index_field_map_type::iterator index_field_map_iterator_type;
-
-            index_field_map_type index_field_map_;
-            index_field_map_iterator_type it;
-            elem_type elem(std::string("first string"));
-            index_type id = 1;
-
-            std::pair<index_type, elem_type> pp=std::make_pair(id, elem);
-            it = index_field_map_.insert(pp);
-#endif
         }
 
         // test equality

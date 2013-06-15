@@ -61,12 +61,12 @@ namespace hpx { namespace util
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/lib/hpx"
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/../lib/hpx",
             "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME,
-#if HPX_USE_ITTNOTIFY != 0
-            "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
+#if HPX_HAVE_ITTNOTIFY != 0
+            "use_itt_notify = ${HPX_HAVE_ITTNOTIFY:0}",
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
-#if HPX_VERIFY_LOCKS
+#if HPX_HAVE_VERIFY_LOCKS
             "lock_detection = ${HPX_LOCK_DETECTION:0}",
 #endif
 
@@ -159,8 +159,8 @@ namespace hpx { namespace util
             "dedicated_server = 0",
             "local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE) "}",
-            "local_cache_size_per_node = ${HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE:"
-                BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE_PER_NODE) "}",
+            "local_cache_size_per_thread = ${HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD:"
+                BOOST_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) "}",
             "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",
             "use_caching = ${HPX_AGAS_USE_CACHING:1}",
 
@@ -273,7 +273,7 @@ namespace hpx { namespace util
         pre_initialize_ini();
 
         // set global config options
-#if HPX_USE_ITTNOTIFY != 0
+#if HPX_HAVE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         BOOST_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
@@ -287,7 +287,7 @@ namespace hpx { namespace util
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
-#if HPX_VERIFY_LOCKS
+#if HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
 #endif
@@ -320,7 +320,7 @@ namespace hpx { namespace util
         post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
-#if HPX_USE_ITTNOTIFY != 0
+#if HPX_HAVE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
         BOOST_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
@@ -333,7 +333,7 @@ namespace hpx { namespace util
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
         coroutines::detail::posix::use_guard_pages = init_use_stack_guard_pages();
 #endif
-#if HPX_VERIFY_LOCKS
+#if HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
 #endif
@@ -582,7 +582,7 @@ namespace hpx { namespace util
 
     bool runtime_configuration::get_itt_notify_mode() const
     {
-#if HPX_USE_ITTNOTIFY != 0
+#if HPX_HAVE_ITTNOTIFY != 0
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
@@ -597,7 +597,7 @@ namespace hpx { namespace util
     // Enable lock detection during suspension
     bool runtime_configuration::enable_lock_detection() const
     {
-#if HPX_VERIFY_LOCKS
+#if HPX_HAVE_VERIFY_LOCKS
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {

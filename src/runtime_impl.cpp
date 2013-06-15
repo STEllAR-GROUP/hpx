@@ -33,7 +33,7 @@
 
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
-#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
 #endif
 
@@ -209,7 +209,7 @@ namespace hpx {
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
         HPX_STD_FUNCTION<hpx_main_function_type> const& func, bool blocking)
     {
-#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
         // needs to be called to avoid problems at system startup
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
         _isatty(0);
@@ -597,6 +597,34 @@ namespace hpx {
             return &main_pool_;
 
         return 0;
+    }
+
+    /// Register an external OS-thread with HPX
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        register_thread(char const* name, std::size_t num, bool service_thread)
+    {
+        if (NULL != runtime::thread_name_.get())
+            return false;       // already registered
+
+        std::string thread_name(name);
+        thread_name += "-thread";
+
+        init_tss(thread_name.c_str(), num, 0, service_thread);
+
+        return true;
+    }
+
+    /// Unregister an external OS-thread with HPX
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        unregister_thread()
+    {
+        if (NULL == runtime::thread_name_.get())
+            return false;       // never registered
+
+        deinit_tss();
+        return true;
     }
 }
 

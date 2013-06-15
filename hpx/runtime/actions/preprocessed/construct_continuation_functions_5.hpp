@@ -32,7 +32,7 @@
                 (obj->*func)();
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -58,7 +58,7 @@
                 (obj->*func)();
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -117,7 +117,7 @@
                     (obj->*func)()
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -144,7 +144,7 @@
                     (obj->*func)()
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -203,7 +203,7 @@
                 (obj->*func)(boost::move(arg0));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -229,7 +229,7 @@
                 (obj->*func)(boost::move(arg0));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -288,7 +288,7 @@
                     (obj->*func)(boost::move(arg0))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -315,7 +315,7 @@
                     (obj->*func)(boost::move(arg0))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -374,7 +374,7 @@
                 (obj->*func)(boost::move(arg0) , boost::move(arg1));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -400,7 +400,7 @@
                 (obj->*func)(boost::move(arg0) , boost::move(arg1));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -459,7 +459,7 @@
                     (obj->*func)(boost::move(arg0) , boost::move(arg1))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -486,7 +486,7 @@
                     (obj->*func)(boost::move(arg0) , boost::move(arg1))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -545,7 +545,7 @@
                 (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -571,7 +571,7 @@
                 (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -630,7 +630,7 @@
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -657,7 +657,7 @@
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -716,7 +716,7 @@
                 (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -742,7 +742,7 @@
                 (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -801,7 +801,7 @@
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -828,7 +828,7 @@
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -887,7 +887,7 @@
                 (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -913,7 +913,7 @@
                 (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
                 cont->trigger();
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -972,7 +972,7 @@
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }
@@ -999,7 +999,7 @@
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4))
                 ));
             }
-            catch (hpx::exception const&) {
+            catch (...) {
                 
                 cont->trigger_error(boost::current_exception());
             }

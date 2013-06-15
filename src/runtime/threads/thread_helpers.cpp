@@ -448,7 +448,7 @@ namespace hpx { namespace this_thread
         threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
             // verify that there are no more registered locks for this OS-thread
-#if HPX_VERIFY_LOCKS
+#if HPX_HAVE_VERIFY_LOCKS
             util::verify_no_locks();
 #endif
 #if HPX_THREAD_MAINTAIN_DESCRIPTION
@@ -496,7 +496,7 @@ namespace hpx { namespace this_thread
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
-#if HPX_VERIFY_LOCKS
+#if HPX_HAVE_VERIFY_LOCKS
             // verify that there are no more registered locks for this OS-thread
             util::verify_no_locks();
 #endif
@@ -548,7 +548,7 @@ namespace hpx { namespace this_thread
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
-#if HPX_VERIFY_LOCKS
+#if HPX_HAVE_VERIFY_LOCKS
             // verify that there are no more registered locks for this OS-thread
             util::verify_no_locks();
 #endif

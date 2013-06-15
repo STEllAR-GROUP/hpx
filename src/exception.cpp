@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -102,7 +102,8 @@ namespace hpx { namespace detail
         std::string const& file, long line, std::string const& back_trace,
         boost::uint32_t node, std::string const& hostname_, boost::int64_t pid_,
         std::size_t shepherd, std::size_t thread_id,
-        std::string const& thread_name, std::string const& env)
+        std::string const& thread_name, std::string const& env, 
+        std::string const& config)
     {
         // create a boost::exception_ptr object encapsulating the Exception to
         // be thrown and annotate it with all the local information we have
@@ -119,7 +120,8 @@ namespace hpx { namespace detail
                     << hpx::detail::throw_function(func)
                     << hpx::detail::throw_file(file)
                     << hpx::detail::throw_line(static_cast<int>(line))
-                    << hpx::detail::throw_env(env));
+                    << hpx::detail::throw_env(env)
+                    << hpx::detail::throw_config(config));
         }
         catch (...) {
             return boost::current_exception();
@@ -166,8 +168,9 @@ namespace hpx { namespace detail
         }
 
         std::string env(get_execution_environment());
+        std::string config(configuration_string());
         return construct_exception(e, func, file, line, back_trace, node,
-            hostname_, pid_, shepherd, thread_id, thread_name, env);
+            hostname_, pid_, shepherd, thread_id, thread_name, env, config);
     }
 
     template <typename Exception>
@@ -326,12 +329,6 @@ namespace hpx
         if (env && !env->empty())
             strm << "{env}: " << *env;
 
-        // Try a cast to std::exception - this should handle boost.system
-        // error codes in addition to the standard library exceptions.
-        std::exception const* se = dynamic_cast<std::exception const*>(&e);
-        if (se)
-            strm << "{what}: " << se->what() << "\n";
-
         boost::uint32_t const* locality =
             boost::get_error_info<hpx::detail::throw_locality>(e);
         if (locality)
@@ -393,6 +390,13 @@ namespace hpx
 
         // add full build information
         strm << full_build_string();
+
+        // Try a cast to std::exception - this should handle boost.system
+        // error codes in addition to the standard library exceptions.
+        std::exception const* se = dynamic_cast<std::exception const*>(&e);
+        if (se)
+            strm << "{what}: " << se->what() << "\n";
+
         return util::osstream_get_string(strm);
     }
 
@@ -890,6 +894,42 @@ namespace hpx
     std::string get_error_thread_description(hpx::error_code const& e)
     {
         return get_error_thread_description(detail::access_exception(e));
+    }
+
+    /// Return the HPX configuration information point from which the
+    /// exception was thrown.
+    std::string get_error_config(boost::exception const& e)
+    {
+        std::string const* config_info =
+            boost::get_error_info<hpx::detail::throw_config>(e);
+        if (config_info && !config_info->empty())
+            return *config_info;
+        return std::string();
+    }
+
+    std::string get_error_config(boost::exception_ptr const& e)
+    {
+        if (!e) return std::string();
+
+        try {
+            boost::rethrow_exception(e);
+        }
+        catch (boost::exception const& be) {
+            return get_error_config(be);
+        }
+        catch (...) {
+            return std::string();
+        }
+    }
+
+    std::string get_error_config(hpx::exception const& e)
+    {
+        return get_error_config(dynamic_cast<boost::exception const&>(e));
+    }
+
+    std::string get_error_config(hpx::error_code const& e)
+    {
+        return get_error_config(detail::access_exception(e));
     }
 }
 

@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This is a purely local version demonstrating the proposed extension to
-// C++ implementing resumable functions (see N3564, 
+// C++ implementing resumable functions (see N3564,
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3564.pdf). The
 // necessary transformations are performed by hand.
 

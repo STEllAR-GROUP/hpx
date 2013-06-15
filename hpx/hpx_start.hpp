@@ -92,7 +92,7 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     HPX_EXPORT int start(int (*f)(boost::program_options::variables_map& vm),
-        boost::program_options::options_description& desc_cmdline,
+        boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& cfg,
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
         HPX_STD_FUNCTION<void()> const& shutdown = HPX_STD_FUNCTION<void()>(),
@@ -148,7 +148,7 @@ namespace hpx
     ///                     parameter\p mode.
     inline void
     start(int (*f)(boost::program_options::variables_map& vm),
-        boost::program_options::options_description& desc_cmdline,
+        boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[],
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
         HPX_STD_FUNCTION<void()> const& shutdown = HPX_STD_FUNCTION<void()>(),
@@ -203,7 +203,7 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline void
-    start(boost::program_options::options_description& desc_cmdline,
+    start(boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[],
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
         HPX_STD_FUNCTION<void()> const& shutdown = HPX_STD_FUNCTION<void()>(),
@@ -264,7 +264,7 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline void
-    start(boost::program_options::options_description& desc_cmdline,
+    start(boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& cfg,
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
         HPX_STD_FUNCTION<void()> const& shutdown = HPX_STD_FUNCTION<void()>(),
@@ -312,7 +312,7 @@ namespace hpx
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
     inline void
-    start(boost::program_options::options_description& desc_cmdline, int argc,
+    start(boost::program_options::options_description const& desc_cmdline, int argc,
         char* argv[], hpx::runtime_mode mode);
 
     /// \fn int start(std::string const& app_name, int argc = 0, char* argv[] = 0)

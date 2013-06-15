@@ -12,12 +12,29 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
+#include <hpx/config/bind.hpp>
+#include <hpx/config/tuple.hpp>
+#include <hpx/config/function.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/type_size.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/needs_guid_initialization.hpp>
+#include <hpx/runtime/get_lva.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/serialize_sequence.hpp>
+#include <hpx/util/serialize_exception.hpp>
+#include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/base_object.hpp>
+#include <hpx/util/void_cast.hpp>
+#include <hpx/util/register_locks.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/lcos/async_fwd.hpp>
 
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -45,22 +62,6 @@
 #endif
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/cat.hpp>
-
-#include <hpx/config/bind.hpp>
-#include <hpx/config/tuple.hpp>
-#include <hpx/config/function.hpp>
-#include <hpx/traits/needs_guid_initialization.hpp>
-#include <hpx/runtime/get_lva.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/util/serialize_sequence.hpp>
-#include <hpx/util/serialize_exception.hpp>
-#include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/base_object.hpp>
-#include <hpx/util/void_cast.hpp>
-#include <hpx/util/register_locks.hpp>
-#include <hpx/util/detail/count_num_args.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -95,6 +96,20 @@ namespace hpx { namespace actions
             );
             return util::type_id<Action>::typeid_.type_id();
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        // If an action returns a future, we need to do special things
+        template <typename Result>
+        struct remote_action_result
+        {
+            typedef Result type;
+        };
+
+        template <typename Result>
+        struct remote_action_result<lcos::future<Result> >
+        {
+            typedef Result type;
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -621,7 +636,7 @@ namespace hpx { namespace actions
     {
         typedef Component component_type;
         typedef Derived derived_type;
-        typedef Result result_type;
+        typedef Result remote_result_type;
         typedef Arguments arguments_type;
 
         typedef void action_tag;
@@ -661,6 +676,7 @@ namespace hpx { namespace actions
         #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
         typedef typename traits::promise_local_result<Result>::type local_result_type;
+        typedef typename traits::is_future<local_result_type>::type is_future_pred;
 
         // bring in the definition for all overloads for operator()
         template <typename IdType>
@@ -671,9 +687,56 @@ namespace hpx { namespace actions
                 boost::is_same<IdType, naming::id_type>,
                 boost::is_same<local_result_type, void> >
         >::type
+        operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id, error_code& ec = throws) const
+        {
+            hpx::async<action>(policy, id).get(ec);
+        }
+
+        template <typename IdType>
+        BOOST_FORCEINLINE typename boost::enable_if<
+            boost::mpl::and_<
+                boost::mpl::bool_<
+                    boost::fusion::result_of::size<arguments_type>::value == 0>,
+                boost::is_same<IdType, naming::id_type>,
+                boost::is_same<local_result_type, void> >
+        >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
-            hpx::async(*this, id).get(ec);
+            hpx::async<action>(launch::sync, id).get(ec);
+        }
+
+        template <typename LocalResult>
+        struct sync_invoke_0
+        {
+            BOOST_FORCEINLINE static LocalResult call(
+                boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
+                naming::id_type const& id, error_code& ec)
+            {
+                return hpx::async<action>(policy, id).move(ec);
+            }
+
+            BOOST_FORCEINLINE static LocalResult call(
+                boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
+                naming::id_type const& id, error_code& ec)
+            {
+                return hpx::async<action>(policy, id);
+            }
+        };
+
+        template <typename IdType>
+        BOOST_FORCEINLINE typename boost::enable_if<
+            boost::mpl::and_<
+                boost::mpl::bool_<
+                    boost::fusion::result_of::size<arguments_type>::value == 0>,
+                boost::is_same<IdType, naming::id_type>,
+                boost::mpl::not_<boost::is_same<local_result_type, void> > >,
+            local_result_type
+        >::type
+        operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
+            error_code& ec = throws) const
+        {
+            return sync_invoke_0<local_result_type>::call(is_future_pred(),
+                policy, id, ec);
         }
 
         template <typename IdType>
@@ -687,7 +750,8 @@ namespace hpx { namespace actions
         >::type
         operator()(IdType const& id, error_code& ec = throws) const
         {
-            return boost::move(hpx::async(*this, id).move(ec));
+            return sync_invoke_0<local_result_type>::call(is_future_pred(),
+                launch::sync, id, ec);
         }
 
         #include <hpx/runtime/actions/define_function_operators.hpp>
@@ -867,24 +931,6 @@ namespace hpx { namespace actions
         HPX_MAKE_DIRECT_ACTION_TPL(component::f)                              \
     /**/
 #endif
-
-    ///////////////////////////////////////////////////////////////////////////
-    // This template meta function can be used to extract the action type, no
-    // matter whether it got specified directly or by passing the
-    // corresponding make_action<> specialization.
-    template <typename Action, typename Enable = void>
-    struct extract_action
-    {
-        typedef typename Action::derived_type type;
-        typedef typename type::result_type result_type;
-    };
-
-    template <typename Action>
-    struct extract_action<Action, typename Action::type>
-    {
-        typedef typename Action::type type;
-        typedef typename type::result_type result_type;
-    };
 
     /// \endcond
 }}

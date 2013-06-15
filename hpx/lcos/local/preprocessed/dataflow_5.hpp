@@ -8,94 +8,334 @@
 // Do not edit manually.
 
 
-                    
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
         template <typename Func, typename F0>
         struct dataflow_frame_1
-          : boost::enable_shared_from_this<
-                dataflow_frame_1<
-                    Func, F0
-                >
+          : hpx::lcos::detail::future_data<
+                typename boost::result_of<
+                    typename hpx::util::detail::remove_reference<Func>::type(
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type
+                    )
+                >::type
             >
         {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_;
             
+            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type;
+            typedef
+                hpx::util::tuple1<
+                    f0_type
+                >
+                futures_type;
+            typedef
+                typename boost::fusion::result_of::end<futures_type>::type
+                end_type;
             typedef
                 typename boost::result_of<
                     func_type(
-                        f0_result_type
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type
                     )
                 >::type
                 result_type;
-            typedef hpx::future<result_type> future_result_type;
-            typedef hpx::lcos::local::promise<result_type> promise_result_type;
-            template <typename FFunc, typename FF0>
+            typedef
+                boost::intrusive_ptr<dataflow_frame_1>
+                future_base_type;
+            typedef hpx::lcos::future<result_type> type;
+            typedef
+                typename boost::mpl::if_<
+                    boost::is_void<result_type>
+                  , void(dataflow_frame_1::*)(boost::mpl::true_)
+                  , void(dataflow_frame_1::*)(boost::mpl::false_)
+                >::type
+                execute_function_type;
+            futures_type futures_;
+            BOOST_SCOPED_ENUM(launch) policy_;
+            func_type func_;
+            template <typename FFunc, typename A0>
             dataflow_frame_1(
-                BOOST_FWD_REF(FFunc) func, BOOST_FWD_REF(FF0) f0
+                BOOST_SCOPED_ENUM(launch) policy
+              , BOOST_FWD_REF(FFunc) func
+              , BOOST_FWD_REF(A0) f0
             )
-              : func_(boost::forward<FFunc>(func))
-              , f0_( boost::forward<FF0>(f0) )
-              , state_(0)
+              : futures_(
+                    boost::forward<A0>(f0)
+                )
+              , policy_(policy)
+              , func_(boost::forward<FFunc>(func))
             {}
-            BOOST_FORCEINLINE void await()
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::false_)
             {
-                switch (state_)
+                result_type res(
+                    boost::move(boost::fusion::invoke(func_, futures_))
+                );
+                boost::fusion::at_c< 0 >(futures_) = f0_type();
+                this->set_data(boost::move(res));
+            }
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::true_)
+            {
+                boost::fusion::invoke(func_, futures_);
+                boost::fusion::at_c< 0 >(futures_) = f0_type();
+                this->set_data(util::unused_type());
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                if(policy_ == hpx::launch::sync)
                 {
-                    case 1 : goto L0;
-                }
-                if(!f0_.ready())
-                {
-                    state_ = 1;
-                    if(!result_.valid())
-                    {
-                        result_ = result_promise_.get_future();
-                    }
-                    f0_.then(
-                        boost::bind(
-                            &dataflow_frame_1::await
-                          , this->shared_from_this()
-                        )
-                    );
+                    execute(is_void());
                     return;
                 }
-                
-L0:
-                f0_result_
-                    = f0_.get();
-                if(state_ == 0)
+                execute_function_type f = &dataflow_frame_1::execute;
+                hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_range(Iter next, Iter end)
+            {
+                if(next == end) return;
+                typedef
+                    typename std::iterator_traits<
+                        Iter
+                    >::value_type
+                    future_type;
+                if(!next->ready())
                 {
-                    result_
-                        = hpx::make_ready_future(
-                            func_(
-                                f0_result_
+                    void (dataflow_frame_1::*f)
+                        (Iter, Iter)
+                        = &dataflow_frame_1::await_range;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(*next)
+                            ->set_on_completed(
+                                completed_callback_type()
                             )
                         );
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , boost::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(next)
+                                      , boost::move(end)
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                boost::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(next)
+                                  , boost::move(end)
+                                )
+                            )
+                        );
+                    }
+                    return;
                 }
-                else
-                {
-                    result_promise_.set_value(
-                        func_(
-                            f0_result_
-                        )
-                    );
-                }
+                await_range(boost::move(++next), boost::move(end));
             }
-            future_result_type result_;
-            promise_result_type result_promise_;
-            int state_;
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::true_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                await_range(
+                    boost::move(boost::begin(boost::fusion::deref(iter)))
+                  , boost::move(boost::end(boost::fusion::deref(iter)))
+                );
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename util::detail::remove_reference<
+                        typename boost::fusion::result_of::deref<Iter>::type
+                    >::type
+                    future_type;
+                future_type & f_ =
+                    boost::fusion::deref(iter);
+                if(!f_.ready())
+                {
+                    void (dataflow_frame_1::*f)
+                        (Iter, boost::mpl::false_)
+                        = &dataflow_frame_1::await_next;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(f_)
+                            ->set_on_completed(
+                                completed_callback_type()
+                            )
+                        );
+                    
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , hpx::util::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(iter)
+                                      , boost::mpl::false_()
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                hpx::util::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(iter)
+                                  , boost::mpl::false_()
+                                )
+                            )
+                        );
+                    }
+                    return;
+                }
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::deref<Iter>::type
+                    future_type;
+                typedef typename traits::is_future_range<
+                    future_type
+                >::type is_range;
+                await_next(boost::move(iter), is_range());
+            }
+            BOOST_FORCEINLINE void await()
+            {
+                typedef
+                    typename boost::fusion::result_of::begin<futures_type>::type
+                    begin_type;
+                await(
+                    boost::move(boost::fusion::begin(futures_))
+                  , boost::mpl::bool_<
+                        boost::is_same<begin_type, end_type>::value
+                    >()
+                );
+            }
+            BOOST_FORCEINLINE
+            type get_future()
+            {
+                await();
+                return
+                    lcos::detail::make_future_from_data(
+                        boost::intrusive_ptr<
+                            lcos::detail::future_data_base<result_type>
+                        >(this)
+                    );
+            }
         };
     }
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_1<
-        Func
-      , F0
-    >::future_result_type
+    typename boost::lazy_disable_if<
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_1<
+            Func
+          , F0
+        >
+    >::type
+    dataflow(
+        BOOST_SCOPED_ENUM(launch) policy
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0
+    )
+    {
+        typedef
+            detail::dataflow_frame_1<
+                Func
+              , F0
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                policy
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        boost::is_same<
+            hpx::launch
+          , typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<
+                    Func
+                >::type
+            >::type
+        >
+      , detail::dataflow_frame_1<
+            Func
+          , F0
+        >
+    >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0)
     {
         typedef
@@ -104,102 +344,343 @@ L0:
               , F0
             >
             frame_type;
-        boost::shared_ptr<frame_type> frame =
-            boost::make_shared<frame_type>(
-                boost::forward<Func>(func)
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                launch::all
+              , boost::forward<Func>(func)
               , boost::forward<F0>( f0 )
             );
-        frame->await();
-        return frame->result_;
+        return frame->get_future();
     }
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
         template <typename Func, typename F0 , typename F1>
         struct dataflow_frame_2
-          : boost::enable_shared_from_this<
-                dataflow_frame_2<
-                    Func, F0 , F1
-                >
+          : hpx::lcos::detail::future_data<
+                typename boost::result_of<
+                    typename hpx::util::detail::remove_reference<Func>::type(
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type
+                    )
+                >::type
             >
         {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename hpx::util::detail::remove_reference<F1>::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_;
             
+            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type;
+            typedef
+                hpx::util::tuple2<
+                    f0_type , f1_type
+                >
+                futures_type;
+            typedef
+                typename boost::fusion::result_of::end<futures_type>::type
+                end_type;
             typedef
                 typename boost::result_of<
                     func_type(
-                        f0_result_type , f1_result_type
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type
                     )
                 >::type
                 result_type;
-            typedef hpx::future<result_type> future_result_type;
-            typedef hpx::lcos::local::promise<result_type> promise_result_type;
-            template <typename FFunc, typename FF0 , typename FF1>
+            typedef
+                boost::intrusive_ptr<dataflow_frame_2>
+                future_base_type;
+            typedef hpx::lcos::future<result_type> type;
+            typedef
+                typename boost::mpl::if_<
+                    boost::is_void<result_type>
+                  , void(dataflow_frame_2::*)(boost::mpl::true_)
+                  , void(dataflow_frame_2::*)(boost::mpl::false_)
+                >::type
+                execute_function_type;
+            futures_type futures_;
+            BOOST_SCOPED_ENUM(launch) policy_;
+            func_type func_;
+            template <typename FFunc, typename A0 , typename A1>
             dataflow_frame_2(
-                BOOST_FWD_REF(FFunc) func, BOOST_FWD_REF(FF0) f0 , BOOST_FWD_REF(FF1) f1
+                BOOST_SCOPED_ENUM(launch) policy
+              , BOOST_FWD_REF(FFunc) func
+              , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1
             )
-              : func_(boost::forward<FFunc>(func))
-              , f0_( boost::forward<FF0>(f0) ) , f1_( boost::forward<FF1>(f1) )
-              , state_(0)
+              : futures_(
+                    boost::forward<A0>(f0) , boost::forward<A1>(f1)
+                )
+              , policy_(policy)
+              , func_(boost::forward<FFunc>(func))
             {}
-            BOOST_FORCEINLINE void await()
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::false_)
             {
-                switch (state_)
+                result_type res(
+                    boost::move(boost::fusion::invoke(func_, futures_))
+                );
+                boost::fusion::at_c< 0 >(futures_) = f0_type(); boost::fusion::at_c< 1 >(futures_) = f1_type();
+                this->set_data(boost::move(res));
+            }
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::true_)
+            {
+                boost::fusion::invoke(func_, futures_);
+                boost::fusion::at_c< 0 >(futures_) = f0_type(); boost::fusion::at_c< 1 >(futures_) = f1_type();
+                this->set_data(util::unused_type());
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                if(policy_ == hpx::launch::sync)
                 {
-                    case 1 : goto L0; case 2 : goto L1;
-                }
-                if(!f0_.ready())
-                {
-                    state_ = 1;
-                    if(!result_.valid())
-                    {
-                        result_ = result_promise_.get_future();
-                    }
-                    f0_.then(
-                        boost::bind(
-                            &dataflow_frame_2::await
-                          , this->shared_from_this()
-                        )
-                    );
+                    execute(is_void());
                     return;
                 }
-                L0: f0_result_ = f0_.get(); if(!f1_.ready()) { state_ = 2; if(!result_.valid()) { result_ = result_promise_.get_future(); } f1_. then( boost::bind( &dataflow_frame_2::await , this->shared_from_this() ) ); return; }
-L1:
-                f1_result_
-                    = f1_.get();
-                if(state_ == 0)
+                execute_function_type f = &dataflow_frame_2::execute;
+                hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_range(Iter next, Iter end)
+            {
+                if(next == end) return;
+                typedef
+                    typename std::iterator_traits<
+                        Iter
+                    >::value_type
+                    future_type;
+                if(!next->ready())
                 {
-                    result_
-                        = hpx::make_ready_future(
-                            func_(
-                                f0_result_ , f1_result_
+                    void (dataflow_frame_2::*f)
+                        (Iter, Iter)
+                        = &dataflow_frame_2::await_range;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(*next)
+                            ->set_on_completed(
+                                completed_callback_type()
                             )
                         );
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , boost::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(next)
+                                      , boost::move(end)
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                boost::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(next)
+                                  , boost::move(end)
+                                )
+                            )
+                        );
+                    }
+                    return;
                 }
-                else
-                {
-                    result_promise_.set_value(
-                        func_(
-                            f0_result_ , f1_result_
-                        )
-                    );
-                }
+                await_range(boost::move(++next), boost::move(end));
             }
-            future_result_type result_;
-            promise_result_type result_promise_;
-            int state_;
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::true_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                await_range(
+                    boost::move(boost::begin(boost::fusion::deref(iter)))
+                  , boost::move(boost::end(boost::fusion::deref(iter)))
+                );
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename util::detail::remove_reference<
+                        typename boost::fusion::result_of::deref<Iter>::type
+                    >::type
+                    future_type;
+                future_type & f_ =
+                    boost::fusion::deref(iter);
+                if(!f_.ready())
+                {
+                    void (dataflow_frame_2::*f)
+                        (Iter, boost::mpl::false_)
+                        = &dataflow_frame_2::await_next;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(f_)
+                            ->set_on_completed(
+                                completed_callback_type()
+                            )
+                        );
+                    
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , hpx::util::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(iter)
+                                      , boost::mpl::false_()
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                hpx::util::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(iter)
+                                  , boost::mpl::false_()
+                                )
+                            )
+                        );
+                    }
+                    return;
+                }
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::deref<Iter>::type
+                    future_type;
+                typedef typename traits::is_future_range<
+                    future_type
+                >::type is_range;
+                await_next(boost::move(iter), is_range());
+            }
+            BOOST_FORCEINLINE void await()
+            {
+                typedef
+                    typename boost::fusion::result_of::begin<futures_type>::type
+                    begin_type;
+                await(
+                    boost::move(boost::fusion::begin(futures_))
+                  , boost::mpl::bool_<
+                        boost::is_same<begin_type, end_type>::value
+                    >()
+                );
+            }
+            BOOST_FORCEINLINE
+            type get_future()
+            {
+                await();
+                return
+                    lcos::detail::make_future_from_data(
+                        boost::intrusive_ptr<
+                            lcos::detail::future_data_base<result_type>
+                        >(this)
+                    );
+            }
         };
     }
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_2<
-        Func
-      , F0 , F1
-    >::future_result_type
+    typename boost::lazy_disable_if<
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_2<
+            Func
+          , F0 , F1
+        >
+    >::type
+    dataflow(
+        BOOST_SCOPED_ENUM(launch) policy
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1
+    )
+    {
+        typedef
+            detail::dataflow_frame_2<
+                Func
+              , F0 , F1
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                policy
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        boost::is_same<
+            hpx::launch
+          , typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<
+                    Func
+                >::type
+            >::type
+        >
+      , detail::dataflow_frame_2<
+            Func
+          , F0 , F1
+        >
+    >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1)
     {
         typedef
@@ -208,102 +689,343 @@ L1:
               , F0 , F1
             >
             frame_type;
-        boost::shared_ptr<frame_type> frame =
-            boost::make_shared<frame_type>(
-                boost::forward<Func>(func)
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                launch::all
+              , boost::forward<Func>(func)
               , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 )
             );
-        frame->await();
-        return frame->result_;
+        return frame->get_future();
     }
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
         template <typename Func, typename F0 , typename F1 , typename F2>
         struct dataflow_frame_3
-          : boost::enable_shared_from_this<
-                dataflow_frame_3<
-                    Func, F0 , F1 , F2
-                >
+          : hpx::lcos::detail::future_data<
+                typename boost::result_of<
+                    typename hpx::util::detail::remove_reference<Func>::type(
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type
+                    )
+                >::type
             >
         {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename hpx::util::detail::remove_reference<F1>::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_; typedef typename hpx::util::detail::remove_reference<F2>::type f2_type; typedef typename future_traits< f2_type >::value_type f2_result_type; f2_type f2_; f2_result_type f2_result_;
             
+            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type;
+            typedef
+                hpx::util::tuple3<
+                    f0_type , f1_type , f2_type
+                >
+                futures_type;
+            typedef
+                typename boost::fusion::result_of::end<futures_type>::type
+                end_type;
             typedef
                 typename boost::result_of<
                     func_type(
-                        f0_result_type , f1_result_type , f2_result_type
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type
                     )
                 >::type
                 result_type;
-            typedef hpx::future<result_type> future_result_type;
-            typedef hpx::lcos::local::promise<result_type> promise_result_type;
-            template <typename FFunc, typename FF0 , typename FF1 , typename FF2>
+            typedef
+                boost::intrusive_ptr<dataflow_frame_3>
+                future_base_type;
+            typedef hpx::lcos::future<result_type> type;
+            typedef
+                typename boost::mpl::if_<
+                    boost::is_void<result_type>
+                  , void(dataflow_frame_3::*)(boost::mpl::true_)
+                  , void(dataflow_frame_3::*)(boost::mpl::false_)
+                >::type
+                execute_function_type;
+            futures_type futures_;
+            BOOST_SCOPED_ENUM(launch) policy_;
+            func_type func_;
+            template <typename FFunc, typename A0 , typename A1 , typename A2>
             dataflow_frame_3(
-                BOOST_FWD_REF(FFunc) func, BOOST_FWD_REF(FF0) f0 , BOOST_FWD_REF(FF1) f1 , BOOST_FWD_REF(FF2) f2
+                BOOST_SCOPED_ENUM(launch) policy
+              , BOOST_FWD_REF(FFunc) func
+              , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2
             )
-              : func_(boost::forward<FFunc>(func))
-              , f0_( boost::forward<FF0>(f0) ) , f1_( boost::forward<FF1>(f1) ) , f2_( boost::forward<FF2>(f2) )
-              , state_(0)
+              : futures_(
+                    boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2)
+                )
+              , policy_(policy)
+              , func_(boost::forward<FFunc>(func))
             {}
-            BOOST_FORCEINLINE void await()
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::false_)
             {
-                switch (state_)
+                result_type res(
+                    boost::move(boost::fusion::invoke(func_, futures_))
+                );
+                boost::fusion::at_c< 0 >(futures_) = f0_type(); boost::fusion::at_c< 1 >(futures_) = f1_type(); boost::fusion::at_c< 2 >(futures_) = f2_type();
+                this->set_data(boost::move(res));
+            }
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::true_)
+            {
+                boost::fusion::invoke(func_, futures_);
+                boost::fusion::at_c< 0 >(futures_) = f0_type(); boost::fusion::at_c< 1 >(futures_) = f1_type(); boost::fusion::at_c< 2 >(futures_) = f2_type();
+                this->set_data(util::unused_type());
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                if(policy_ == hpx::launch::sync)
                 {
-                    case 1 : goto L0; case 2 : goto L1; case 3 : goto L2;
-                }
-                if(!f0_.ready())
-                {
-                    state_ = 1;
-                    if(!result_.valid())
-                    {
-                        result_ = result_promise_.get_future();
-                    }
-                    f0_.then(
-                        boost::bind(
-                            &dataflow_frame_3::await
-                          , this->shared_from_this()
-                        )
-                    );
+                    execute(is_void());
                     return;
                 }
-                L0: f0_result_ = f0_.get(); if(!f1_.ready()) { state_ = 2; if(!result_.valid()) { result_ = result_promise_.get_future(); } f1_. then( boost::bind( &dataflow_frame_3::await , this->shared_from_this() ) ); return; } L1: f1_result_ = f1_.get(); if(!f2_.ready()) { state_ = 3; if(!result_.valid()) { result_ = result_promise_.get_future(); } f2_. then( boost::bind( &dataflow_frame_3::await , this->shared_from_this() ) ); return; }
-L2:
-                f2_result_
-                    = f2_.get();
-                if(state_ == 0)
+                execute_function_type f = &dataflow_frame_3::execute;
+                hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_range(Iter next, Iter end)
+            {
+                if(next == end) return;
+                typedef
+                    typename std::iterator_traits<
+                        Iter
+                    >::value_type
+                    future_type;
+                if(!next->ready())
                 {
-                    result_
-                        = hpx::make_ready_future(
-                            func_(
-                                f0_result_ , f1_result_ , f2_result_
+                    void (dataflow_frame_3::*f)
+                        (Iter, Iter)
+                        = &dataflow_frame_3::await_range;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(*next)
+                            ->set_on_completed(
+                                completed_callback_type()
                             )
                         );
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , boost::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(next)
+                                      , boost::move(end)
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                boost::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(next)
+                                  , boost::move(end)
+                                )
+                            )
+                        );
+                    }
+                    return;
                 }
-                else
-                {
-                    result_promise_.set_value(
-                        func_(
-                            f0_result_ , f1_result_ , f2_result_
-                        )
-                    );
-                }
+                await_range(boost::move(++next), boost::move(end));
             }
-            future_result_type result_;
-            promise_result_type result_promise_;
-            int state_;
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::true_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                await_range(
+                    boost::move(boost::begin(boost::fusion::deref(iter)))
+                  , boost::move(boost::end(boost::fusion::deref(iter)))
+                );
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename util::detail::remove_reference<
+                        typename boost::fusion::result_of::deref<Iter>::type
+                    >::type
+                    future_type;
+                future_type & f_ =
+                    boost::fusion::deref(iter);
+                if(!f_.ready())
+                {
+                    void (dataflow_frame_3::*f)
+                        (Iter, boost::mpl::false_)
+                        = &dataflow_frame_3::await_next;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(f_)
+                            ->set_on_completed(
+                                completed_callback_type()
+                            )
+                        );
+                    
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , hpx::util::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(iter)
+                                      , boost::mpl::false_()
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                hpx::util::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(iter)
+                                  , boost::mpl::false_()
+                                )
+                            )
+                        );
+                    }
+                    return;
+                }
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::deref<Iter>::type
+                    future_type;
+                typedef typename traits::is_future_range<
+                    future_type
+                >::type is_range;
+                await_next(boost::move(iter), is_range());
+            }
+            BOOST_FORCEINLINE void await()
+            {
+                typedef
+                    typename boost::fusion::result_of::begin<futures_type>::type
+                    begin_type;
+                await(
+                    boost::move(boost::fusion::begin(futures_))
+                  , boost::mpl::bool_<
+                        boost::is_same<begin_type, end_type>::value
+                    >()
+                );
+            }
+            BOOST_FORCEINLINE
+            type get_future()
+            {
+                await();
+                return
+                    lcos::detail::make_future_from_data(
+                        boost::intrusive_ptr<
+                            lcos::detail::future_data_base<result_type>
+                        >(this)
+                    );
+            }
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_3<
-        Func
-      , F0 , F1 , F2
-    >::future_result_type
+    typename boost::lazy_disable_if<
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_3<
+            Func
+          , F0 , F1 , F2
+        >
+    >::type
+    dataflow(
+        BOOST_SCOPED_ENUM(launch) policy
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2
+    )
+    {
+        typedef
+            detail::dataflow_frame_3<
+                Func
+              , F0 , F1 , F2
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                policy
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        boost::is_same<
+            hpx::launch
+          , typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<
+                    Func
+                >::type
+            >::type
+        >
+      , detail::dataflow_frame_3<
+            Func
+          , F0 , F1 , F2
+        >
+    >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2)
     {
         typedef
@@ -312,102 +1034,343 @@ L2:
               , F0 , F1 , F2
             >
             frame_type;
-        boost::shared_ptr<frame_type> frame =
-            boost::make_shared<frame_type>(
-                boost::forward<Func>(func)
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                launch::all
+              , boost::forward<Func>(func)
               , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 )
             );
-        frame->await();
-        return frame->result_;
+        return frame->get_future();
     }
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
         template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
         struct dataflow_frame_4
-          : boost::enable_shared_from_this<
-                dataflow_frame_4<
-                    Func, F0 , F1 , F2 , F3
-                >
+          : hpx::lcos::detail::future_data<
+                typename boost::result_of<
+                    typename hpx::util::detail::remove_reference<Func>::type(
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type
+                    )
+                >::type
             >
         {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename hpx::util::detail::remove_reference<F1>::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_; typedef typename hpx::util::detail::remove_reference<F2>::type f2_type; typedef typename future_traits< f2_type >::value_type f2_result_type; f2_type f2_; f2_result_type f2_result_; typedef typename hpx::util::detail::remove_reference<F3>::type f3_type; typedef typename future_traits< f3_type >::value_type f3_result_type; f3_type f3_; f3_result_type f3_result_;
             
+            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type;
+            typedef
+                hpx::util::tuple4<
+                    f0_type , f1_type , f2_type , f3_type
+                >
+                futures_type;
+            typedef
+                typename boost::fusion::result_of::end<futures_type>::type
+                end_type;
             typedef
                 typename boost::result_of<
                     func_type(
-                        f0_result_type , f1_result_type , f2_result_type , f3_result_type
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type
                     )
                 >::type
                 result_type;
-            typedef hpx::future<result_type> future_result_type;
-            typedef hpx::lcos::local::promise<result_type> promise_result_type;
-            template <typename FFunc, typename FF0 , typename FF1 , typename FF2 , typename FF3>
+            typedef
+                boost::intrusive_ptr<dataflow_frame_4>
+                future_base_type;
+            typedef hpx::lcos::future<result_type> type;
+            typedef
+                typename boost::mpl::if_<
+                    boost::is_void<result_type>
+                  , void(dataflow_frame_4::*)(boost::mpl::true_)
+                  , void(dataflow_frame_4::*)(boost::mpl::false_)
+                >::type
+                execute_function_type;
+            futures_type futures_;
+            BOOST_SCOPED_ENUM(launch) policy_;
+            func_type func_;
+            template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3>
             dataflow_frame_4(
-                BOOST_FWD_REF(FFunc) func, BOOST_FWD_REF(FF0) f0 , BOOST_FWD_REF(FF1) f1 , BOOST_FWD_REF(FF2) f2 , BOOST_FWD_REF(FF3) f3
+                BOOST_SCOPED_ENUM(launch) policy
+              , BOOST_FWD_REF(FFunc) func
+              , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3
             )
-              : func_(boost::forward<FFunc>(func))
-              , f0_( boost::forward<FF0>(f0) ) , f1_( boost::forward<FF1>(f1) ) , f2_( boost::forward<FF2>(f2) ) , f3_( boost::forward<FF3>(f3) )
-              , state_(0)
+              : futures_(
+                    boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3)
+                )
+              , policy_(policy)
+              , func_(boost::forward<FFunc>(func))
             {}
-            BOOST_FORCEINLINE void await()
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::false_)
             {
-                switch (state_)
+                result_type res(
+                    boost::move(boost::fusion::invoke(func_, futures_))
+                );
+                boost::fusion::at_c< 0 >(futures_) = f0_type(); boost::fusion::at_c< 1 >(futures_) = f1_type(); boost::fusion::at_c< 2 >(futures_) = f2_type(); boost::fusion::at_c< 3 >(futures_) = f3_type();
+                this->set_data(boost::move(res));
+            }
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::true_)
+            {
+                boost::fusion::invoke(func_, futures_);
+                boost::fusion::at_c< 0 >(futures_) = f0_type(); boost::fusion::at_c< 1 >(futures_) = f1_type(); boost::fusion::at_c< 2 >(futures_) = f2_type(); boost::fusion::at_c< 3 >(futures_) = f3_type();
+                this->set_data(util::unused_type());
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                if(policy_ == hpx::launch::sync)
                 {
-                    case 1 : goto L0; case 2 : goto L1; case 3 : goto L2; case 4 : goto L3;
-                }
-                if(!f0_.ready())
-                {
-                    state_ = 1;
-                    if(!result_.valid())
-                    {
-                        result_ = result_promise_.get_future();
-                    }
-                    f0_.then(
-                        boost::bind(
-                            &dataflow_frame_4::await
-                          , this->shared_from_this()
-                        )
-                    );
+                    execute(is_void());
                     return;
                 }
-                L0: f0_result_ = f0_.get(); if(!f1_.ready()) { state_ = 2; if(!result_.valid()) { result_ = result_promise_.get_future(); } f1_. then( boost::bind( &dataflow_frame_4::await , this->shared_from_this() ) ); return; } L1: f1_result_ = f1_.get(); if(!f2_.ready()) { state_ = 3; if(!result_.valid()) { result_ = result_promise_.get_future(); } f2_. then( boost::bind( &dataflow_frame_4::await , this->shared_from_this() ) ); return; } L2: f2_result_ = f2_.get(); if(!f3_.ready()) { state_ = 4; if(!result_.valid()) { result_ = result_promise_.get_future(); } f3_. then( boost::bind( &dataflow_frame_4::await , this->shared_from_this() ) ); return; }
-L3:
-                f3_result_
-                    = f3_.get();
-                if(state_ == 0)
+                execute_function_type f = &dataflow_frame_4::execute;
+                hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_range(Iter next, Iter end)
+            {
+                if(next == end) return;
+                typedef
+                    typename std::iterator_traits<
+                        Iter
+                    >::value_type
+                    future_type;
+                if(!next->ready())
                 {
-                    result_
-                        = hpx::make_ready_future(
-                            func_(
-                                f0_result_ , f1_result_ , f2_result_ , f3_result_
+                    void (dataflow_frame_4::*f)
+                        (Iter, Iter)
+                        = &dataflow_frame_4::await_range;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(*next)
+                            ->set_on_completed(
+                                completed_callback_type()
                             )
                         );
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , boost::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(next)
+                                      , boost::move(end)
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                boost::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(next)
+                                  , boost::move(end)
+                                )
+                            )
+                        );
+                    }
+                    return;
                 }
-                else
-                {
-                    result_promise_.set_value(
-                        func_(
-                            f0_result_ , f1_result_ , f2_result_ , f3_result_
-                        )
-                    );
-                }
+                await_range(boost::move(++next), boost::move(end));
             }
-            future_result_type result_;
-            promise_result_type result_promise_;
-            int state_;
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::true_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                await_range(
+                    boost::move(boost::begin(boost::fusion::deref(iter)))
+                  , boost::move(boost::end(boost::fusion::deref(iter)))
+                );
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename util::detail::remove_reference<
+                        typename boost::fusion::result_of::deref<Iter>::type
+                    >::type
+                    future_type;
+                future_type & f_ =
+                    boost::fusion::deref(iter);
+                if(!f_.ready())
+                {
+                    void (dataflow_frame_4::*f)
+                        (Iter, boost::mpl::false_)
+                        = &dataflow_frame_4::await_next;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(f_)
+                            ->set_on_completed(
+                                completed_callback_type()
+                            )
+                        );
+                    
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , hpx::util::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(iter)
+                                      , boost::mpl::false_()
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                hpx::util::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(iter)
+                                  , boost::mpl::false_()
+                                )
+                            )
+                        );
+                    }
+                    return;
+                }
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::deref<Iter>::type
+                    future_type;
+                typedef typename traits::is_future_range<
+                    future_type
+                >::type is_range;
+                await_next(boost::move(iter), is_range());
+            }
+            BOOST_FORCEINLINE void await()
+            {
+                typedef
+                    typename boost::fusion::result_of::begin<futures_type>::type
+                    begin_type;
+                await(
+                    boost::move(boost::fusion::begin(futures_))
+                  , boost::mpl::bool_<
+                        boost::is_same<begin_type, end_type>::value
+                    >()
+                );
+            }
+            BOOST_FORCEINLINE
+            type get_future()
+            {
+                await();
+                return
+                    lcos::detail::make_future_from_data(
+                        boost::intrusive_ptr<
+                            lcos::detail::future_data_base<result_type>
+                        >(this)
+                    );
+            }
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_4<
-        Func
-      , F0 , F1 , F2 , F3
-    >::future_result_type
+    typename boost::lazy_disable_if<
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_4<
+            Func
+          , F0 , F1 , F2 , F3
+        >
+    >::type
+    dataflow(
+        BOOST_SCOPED_ENUM(launch) policy
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3
+    )
+    {
+        typedef
+            detail::dataflow_frame_4<
+                Func
+              , F0 , F1 , F2 , F3
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                policy
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        boost::is_same<
+            hpx::launch
+          , typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<
+                    Func
+                >::type
+            >::type
+        >
+      , detail::dataflow_frame_4<
+            Func
+          , F0 , F1 , F2 , F3
+        >
+    >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3)
     {
         typedef
@@ -416,102 +1379,343 @@ L3:
               , F0 , F1 , F2 , F3
             >
             frame_type;
-        boost::shared_ptr<frame_type> frame =
-            boost::make_shared<frame_type>(
-                boost::forward<Func>(func)
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                launch::all
+              , boost::forward<Func>(func)
               , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 )
             );
-        frame->await();
-        return frame->result_;
+        return frame->get_future();
     }
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
         template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
         struct dataflow_frame_5
-          : boost::enable_shared_from_this<
-                dataflow_frame_5<
-                    Func, F0 , F1 , F2 , F3 , F4
-                >
+          : hpx::lcos::detail::future_data<
+                typename boost::result_of<
+                    typename hpx::util::detail::remove_reference<Func>::type(
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type
+                    )
+                >::type
             >
         {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            func_type func_;
-            typedef typename hpx::util::detail::remove_reference<F0>::type f0_type; typedef typename future_traits< f0_type >::value_type f0_result_type; f0_type f0_; f0_result_type f0_result_; typedef typename hpx::util::detail::remove_reference<F1>::type f1_type; typedef typename future_traits< f1_type >::value_type f1_result_type; f1_type f1_; f1_result_type f1_result_; typedef typename hpx::util::detail::remove_reference<F2>::type f2_type; typedef typename future_traits< f2_type >::value_type f2_result_type; f2_type f2_; f2_result_type f2_result_; typedef typename hpx::util::detail::remove_reference<F3>::type f3_type; typedef typename future_traits< f3_type >::value_type f3_result_type; f3_type f3_; f3_result_type f3_result_; typedef typename hpx::util::detail::remove_reference<F4>::type f4_type; typedef typename future_traits< f4_type >::value_type f4_result_type; f4_type f4_; f4_result_type f4_result_;
             
+            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type;
+            typedef
+                hpx::util::tuple5<
+                    f0_type , f1_type , f2_type , f3_type , f4_type
+                >
+                futures_type;
+            typedef
+                typename boost::fusion::result_of::end<futures_type>::type
+                end_type;
             typedef
                 typename boost::result_of<
                     func_type(
-                        f0_result_type , f1_result_type , f2_result_type , f3_result_type , f4_result_type
+                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type
                     )
                 >::type
                 result_type;
-            typedef hpx::future<result_type> future_result_type;
-            typedef hpx::lcos::local::promise<result_type> promise_result_type;
-            template <typename FFunc, typename FF0 , typename FF1 , typename FF2 , typename FF3 , typename FF4>
+            typedef
+                boost::intrusive_ptr<dataflow_frame_5>
+                future_base_type;
+            typedef hpx::lcos::future<result_type> type;
+            typedef
+                typename boost::mpl::if_<
+                    boost::is_void<result_type>
+                  , void(dataflow_frame_5::*)(boost::mpl::true_)
+                  , void(dataflow_frame_5::*)(boost::mpl::false_)
+                >::type
+                execute_function_type;
+            futures_type futures_;
+            BOOST_SCOPED_ENUM(launch) policy_;
+            func_type func_;
+            template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
             dataflow_frame_5(
-                BOOST_FWD_REF(FFunc) func, BOOST_FWD_REF(FF0) f0 , BOOST_FWD_REF(FF1) f1 , BOOST_FWD_REF(FF2) f2 , BOOST_FWD_REF(FF3) f3 , BOOST_FWD_REF(FF4) f4
+                BOOST_SCOPED_ENUM(launch) policy
+              , BOOST_FWD_REF(FFunc) func
+              , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4
             )
-              : func_(boost::forward<FFunc>(func))
-              , f0_( boost::forward<FF0>(f0) ) , f1_( boost::forward<FF1>(f1) ) , f2_( boost::forward<FF2>(f2) ) , f3_( boost::forward<FF3>(f3) ) , f4_( boost::forward<FF4>(f4) )
-              , state_(0)
+              : futures_(
+                    boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4)
+                )
+              , policy_(policy)
+              , func_(boost::forward<FFunc>(func))
             {}
-            BOOST_FORCEINLINE void await()
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::false_)
             {
-                switch (state_)
+                result_type res(
+                    boost::move(boost::fusion::invoke(func_, futures_))
+                );
+                boost::fusion::at_c< 0 >(futures_) = f0_type(); boost::fusion::at_c< 1 >(futures_) = f1_type(); boost::fusion::at_c< 2 >(futures_) = f2_type(); boost::fusion::at_c< 3 >(futures_) = f3_type(); boost::fusion::at_c< 4 >(futures_) = f4_type();
+                this->set_data(boost::move(res));
+            }
+            BOOST_FORCEINLINE
+            void execute(boost::mpl::true_)
+            {
+                boost::fusion::invoke(func_, futures_);
+                boost::fusion::at_c< 0 >(futures_) = f0_type(); boost::fusion::at_c< 1 >(futures_) = f1_type(); boost::fusion::at_c< 2 >(futures_) = f2_type(); boost::fusion::at_c< 3 >(futures_) = f3_type(); boost::fusion::at_c< 4 >(futures_) = f4_type();
+                this->set_data(util::unused_type());
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                if(policy_ == hpx::launch::sync)
                 {
-                    case 1 : goto L0; case 2 : goto L1; case 3 : goto L2; case 4 : goto L3; case 5 : goto L4;
-                }
-                if(!f0_.ready())
-                {
-                    state_ = 1;
-                    if(!result_.valid())
-                    {
-                        result_ = result_promise_.get_future();
-                    }
-                    f0_.then(
-                        boost::bind(
-                            &dataflow_frame_5::await
-                          , this->shared_from_this()
-                        )
-                    );
+                    execute(is_void());
                     return;
                 }
-                L0: f0_result_ = f0_.get(); if(!f1_.ready()) { state_ = 2; if(!result_.valid()) { result_ = result_promise_.get_future(); } f1_. then( boost::bind( &dataflow_frame_5::await , this->shared_from_this() ) ); return; } L1: f1_result_ = f1_.get(); if(!f2_.ready()) { state_ = 3; if(!result_.valid()) { result_ = result_promise_.get_future(); } f2_. then( boost::bind( &dataflow_frame_5::await , this->shared_from_this() ) ); return; } L2: f2_result_ = f2_.get(); if(!f3_.ready()) { state_ = 4; if(!result_.valid()) { result_ = result_promise_.get_future(); } f3_. then( boost::bind( &dataflow_frame_5::await , this->shared_from_this() ) ); return; } L3: f3_result_ = f3_.get(); if(!f4_.ready()) { state_ = 5; if(!result_.valid()) { result_ = result_promise_.get_future(); } f4_. then( boost::bind( &dataflow_frame_5::await , this->shared_from_this() ) ); return; }
-L4:
-                f4_result_
-                    = f4_.get();
-                if(state_ == 0)
+                execute_function_type f = &dataflow_frame_5::execute;
+                hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_range(Iter next, Iter end)
+            {
+                if(next == end) return;
+                typedef
+                    typename std::iterator_traits<
+                        Iter
+                    >::value_type
+                    future_type;
+                if(!next->ready())
                 {
-                    result_
-                        = hpx::make_ready_future(
-                            func_(
-                                f0_result_ , f1_result_ , f2_result_ , f3_result_ , f4_result_
+                    void (dataflow_frame_5::*f)
+                        (Iter, Iter)
+                        = &dataflow_frame_5::await_range;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(*next)
+                            ->set_on_completed(
+                                completed_callback_type()
                             )
                         );
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , boost::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(next)
+                                      , boost::move(end)
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(*next)
+                        ->set_on_completed(
+                            boost::move(
+                                boost::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(next)
+                                  , boost::move(end)
+                                )
+                            )
+                        );
+                    }
+                    return;
                 }
-                else
-                {
-                    result_promise_.set_value(
-                        func_(
-                            f0_result_ , f1_result_ , f2_result_ , f3_result_ , f4_result_
-                        )
-                    );
-                }
+                await_range(boost::move(++next), boost::move(end));
             }
-            future_result_type result_;
-            promise_result_type result_promise_;
-            int state_;
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::true_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                await_range(
+                    boost::move(boost::begin(boost::fusion::deref(iter)))
+                  , boost::move(boost::end(boost::fusion::deref(iter)))
+                );
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await_next(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::next<Iter>::type
+                    next_type;
+                typedef
+                    typename util::detail::remove_reference<
+                        typename boost::fusion::result_of::deref<Iter>::type
+                    >::type
+                    future_type;
+                future_type & f_ =
+                    boost::fusion::deref(iter);
+                if(!f_.ready())
+                {
+                    void (dataflow_frame_5::*f)
+                        (Iter, boost::mpl::false_)
+                        = &dataflow_frame_5::await_next;
+                    typedef
+                        typename extract_completed_callback_type<
+                            future_type
+                        >::type
+                        completed_callback_type;
+                    completed_callback_type cb 
+                        = boost::move(
+                            hpx::lcos::detail::get_future_data(f_)
+                            ->set_on_completed(
+                                completed_callback_type()
+                            )
+                        );
+                    
+                    if(cb)
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                compose_cb(
+                                    boost::move(cb)
+                                  , hpx::util::bind(
+                                        f
+                                      , future_base_type(this)
+                                      , boost::move(iter)
+                                      , boost::mpl::false_()
+                                    )
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        hpx::lcos::detail::get_future_data(f_)
+                        ->set_on_completed(
+                            boost::move(
+                                hpx::util::bind(
+                                    f
+                                  , future_base_type(this)
+                                  , boost::move(iter)
+                                  , boost::mpl::false_()
+                                )
+                            )
+                        );
+                    }
+                    return;
+                }
+                await(
+                    boost::move(boost::fusion::next(iter))
+                  , boost::mpl::bool_<
+                        boost::is_same<next_type, end_type>::value
+                    >()
+                );
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(Iter iter, boost::mpl::false_)
+            {
+                typedef
+                    typename boost::fusion::result_of::deref<Iter>::type
+                    future_type;
+                typedef typename traits::is_future_range<
+                    future_type
+                >::type is_range;
+                await_next(boost::move(iter), is_range());
+            }
+            BOOST_FORCEINLINE void await()
+            {
+                typedef
+                    typename boost::fusion::result_of::begin<futures_type>::type
+                    begin_type;
+                await(
+                    boost::move(boost::fusion::begin(futures_))
+                  , boost::mpl::bool_<
+                        boost::is_same<begin_type, end_type>::value
+                    >()
+                );
+            }
+            BOOST_FORCEINLINE
+            type get_future()
+            {
+                await();
+                return
+                    lcos::detail::make_future_from_data(
+                        boost::intrusive_ptr<
+                            lcos::detail::future_data_base<result_type>
+                        >(this)
+                    );
+            }
         };
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
-    typename detail::dataflow_frame_5<
-        Func
-      , F0 , F1 , F2 , F3 , F4
-    >::future_result_type
+    typename boost::lazy_disable_if<
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_5<
+            Func
+          , F0 , F1 , F2 , F3 , F4
+        >
+    >::type
+    dataflow(
+        BOOST_SCOPED_ENUM(launch) policy
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4
+    )
+    {
+        typedef
+            detail::dataflow_frame_5<
+                Func
+              , F0 , F1 , F2 , F3 , F4
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                policy
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        boost::is_same<
+            hpx::launch
+          , typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<
+                    Func
+                >::type
+            >::type
+        >
+      , detail::dataflow_frame_5<
+            Func
+          , F0 , F1 , F2 , F3 , F4
+        >
+    >::type
     dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4)
     {
         typedef
@@ -520,12 +1724,12 @@ L4:
               , F0 , F1 , F2 , F3 , F4
             >
             frame_type;
-        boost::shared_ptr<frame_type> frame =
-            boost::make_shared<frame_type>(
-                boost::forward<Func>(func)
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                launch::all
+              , boost::forward<Func>(func)
               , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 )
             );
-        frame->await();
-        return frame->result_;
+        return frame->get_future();
     }
 }}}

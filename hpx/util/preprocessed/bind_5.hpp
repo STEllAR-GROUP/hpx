@@ -740,6 +740,17 @@ namespace hpx { namespace util
                 F()
               , Arg0
             >::type
+            operator()()
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return eval(env, f)(::hpx::util::detail::eval(env, arg0));
+            }
+            BOOST_FORCEINLINE
+            typename result_of::bound_functor1<
+                F()
+              , Arg0
+            >::type
             operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
@@ -1604,6 +1615,17 @@ namespace hpx { namespace util
                 f = boost::move(other.f);
                 arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1);
                 return *this;
+            }
+            BOOST_FORCEINLINE
+            typename result_of::bound_functor2<
+                F()
+              , Arg0 , Arg1
+            >::type
+            operator()()
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor2<
@@ -2480,6 +2502,17 @@ namespace hpx { namespace util
                 F()
               , Arg0 , Arg1 , Arg2
             >::type
+            operator()()
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
+            }
+            BOOST_FORCEINLINE
+            typename result_of::bound_functor3<
+                F()
+              , Arg0 , Arg1 , Arg2
+            >::type
             operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
@@ -3344,6 +3377,17 @@ namespace hpx { namespace util
                 f = boost::move(other.f);
                 arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3);
                 return *this;
+            }
+            BOOST_FORCEINLINE
+            typename result_of::bound_functor4<
+                F()
+              , Arg0 , Arg1 , Arg2 , Arg3
+            >::type
+            operator()()
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor4<
@@ -4220,6 +4264,17 @@ namespace hpx { namespace util
                 F()
               , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
             >::type
+            operator()()
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
+            }
+            BOOST_FORCEINLINE
+            typename result_of::bound_functor5<
+                F()
+              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
+            >::type
             operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
@@ -5084,6 +5139,17 @@ namespace hpx { namespace util
                 f = boost::move(other.f);
                 arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5);
                 return *this;
+            }
+            BOOST_FORCEINLINE
+            typename result_of::bound_functor6<
+                F()
+              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
+            >::type
+            operator()()
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor6<
@@ -5960,6 +6026,17 @@ namespace hpx { namespace util
                 F()
               , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
             >::type
+            operator()()
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
+            }
+            BOOST_FORCEINLINE
+            typename result_of::bound_functor7<
+                F()
+              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
+            >::type
             operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
@@ -6824,6 +6901,17 @@ namespace hpx { namespace util
                 f = boost::move(other.f);
                 arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5); arg6 = boost::move(other.arg6); arg7 = boost::move(other.arg7);
                 return *this;
+            }
+            BOOST_FORCEINLINE
+            typename result_of::bound_functor8<
+                F()
+              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
+            >::type
+            operator()()
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor8<

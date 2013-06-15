@@ -262,7 +262,7 @@ bool is_local_lva_encoded_address(
     naming::gid_type const& gid
     )
 {
-    return naming::get_agas_client().is_local_lva_encoded_address(gid);
+    return naming::get_agas_client().is_local_lva_encoded_address(gid.get_msb());
 }
 
 void garbage_collect_non_blocking(

@@ -22,14 +22,13 @@ namespace hpx { namespace agas
 
 naming::gid_type bootstrap_component_namespace_gid()
 {
-    return naming::gid_type
-        (HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB);
+    return naming::gid_type(HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB);
 }
 
 naming::id_type bootstrap_component_namespace_id()
 {
-    return naming::id_type
-        (bootstrap_component_namespace_gid(), naming::id_type::unmanaged);
+    return naming::id_type(HPX_AGAS_COMPONENT_NS_MSB, HPX_AGAS_COMPONENT_NS_LSB
+      , naming::id_type::unmanaged);
 }
 
 namespace server

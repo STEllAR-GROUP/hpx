@@ -12,7 +12,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/storage/tuple.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/include/local_lcos.hpp>
 
 #include "tuples_warehouse.hpp"
 
@@ -56,19 +56,16 @@ namespace examples { namespace server
     ///
     //[simple_central_tuplespace_server_inherit
     class simple_central_tuplespace
-      : public hpx::components::locking_hook<
-            hpx::components::simple_component_base<simple_central_tuplespace> >
+      : public hpx::components::simple_component_base<simple_central_tuplespace> 
     //]
     {
         public:
 
             typedef hpx::util::storage::tuple tuple_type;
             typedef hpx::util::storage::tuple::elem_type elem_type;
-            typedef hpx::lcos::local::mutex mutex_type;
+            typedef hpx::lcos::local::spinlock mutex_type;
             
             typedef examples::server::tuples_warehouse tuples_type;
-//            typedef tuples_type::iterator tuples_iterator_type;
-//            typedef tuples_type::const_iterator tuples_const_iterator_type;
 
             // pre-defined timeout values
             enum {
@@ -77,7 +74,7 @@ namespace examples { namespace server
             };
 
             //[simple_central_tuplespace_server_ctor
-            simple_central_tuplespace() /*: mutex_(mutex_desc)*/ {}
+            simple_central_tuplespace() {}
             //]
 
             ///////////////////////////////////////////////////////////////////////
@@ -87,21 +84,25 @@ namespace examples { namespace server
 
             // put tuple into tuplespace
             // out function
-            int write(const tuple_type tp)
+            int write(const tuple_type& tp)
             {
                 if(tp.empty())
                 {
                     return -1;
                 }
 
-                tuples_.insert(tp);
+                {
+                    mutex_type::scoped_lock l(mtx_); 
+
+                    tuples_.insert(tp);
+                }
 
                 return 0;
             }
 
             // read from tuplespace
             // rd function
-            tuple_type read(const tuple_type tp, long timeout) const
+            tuple_type read(const tuple_type& tp, const long timeout) const
             {
                 tuple_type result;
                 hpx::util::high_resolution_timer t;
@@ -113,8 +114,11 @@ namespace examples { namespace server
                         continue; 
                     }
 
+                    {
+                        mutex_type::scoped_lock l(mtx_); 
 
-                    result = tuples_.match(tp);
+                        result = tuples_.match(tp);
+                    }
 
 
                     if(!result.empty())
@@ -128,7 +132,7 @@ namespace examples { namespace server
 
             // take from tuplespace
             // in function
-            tuple_type take(const tuple_type tp, long timeout)
+            tuple_type take(const tuple_type& tp, const long timeout)
             {
                 tuple_type result;
                 hpx::util::high_resolution_timer t;
@@ -141,8 +145,11 @@ namespace examples { namespace server
                         continue; 
                     }
 
+                    {
+                        mutex_type::scoped_lock l(mtx_); 
 
-                    result = tuples_.match_and_erase(tp);
+                        result = tuples_.match_and_erase(tp);
+                    }
 
 
                     if(!result.empty())
@@ -165,13 +172,14 @@ namespace examples { namespace server
 
             //[simple_central_tuplespace_action_types
             HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, write);
-            HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, read);
+            HPX_DEFINE_COMPONENT_CONST_ACTION(simple_central_tuplespace, read);
             HPX_DEFINE_COMPONENT_ACTION(simple_central_tuplespace, take);
             //]
 
             //[simple_central_tuplespace_server_data_member
         private:
             tuples_type tuples_;
+            mutable mutex_type mtx_;
             //]
     };
 }} // examples::server

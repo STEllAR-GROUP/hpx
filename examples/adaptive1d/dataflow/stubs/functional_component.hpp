@@ -62,7 +62,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
                 action_type;
 
             lcos::packaged_action<action_type, naming::id_type> p;
-            p.apply(gid, item, maxitems, row, interp_src_data,time,par);
+            p.apply(launch::async, gid, item, maxitems, row, interp_src_data,time,par);
             return p.get_future();
         }
 

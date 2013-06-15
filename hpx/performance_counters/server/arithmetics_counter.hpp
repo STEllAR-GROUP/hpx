@@ -33,8 +33,7 @@ namespace hpx { namespace performance_counters { namespace server
         arithmetics_counter() {}
 
         arithmetics_counter(counter_info const& info,
-            std::string const& base_counter_name1,
-            std::string const& base_counter_name2);
+            std::vector<std::string> const& base_counter_names);
 
         /// Overloads from the base_counter base class.
         hpx::performance_counters::counter_value
@@ -67,10 +66,8 @@ namespace hpx { namespace performance_counters { namespace server
         typedef lcos::local::spinlock mutex_type;
         mutable mutex_type mtx_;
 
-        std::string base_counter_name1_;  ///< names of base counters to be queried
-        std::string base_counter_name2_;
-        naming::id_type base_counter_id1_;
-        naming::id_type base_counter_id2_;
+        std::vector<std::string> base_counter_names_;  ///< names of base counters to be queried
+        std::vector<naming::id_type> base_counter_ids_;
     };
 }}}
 

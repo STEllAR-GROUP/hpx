@@ -157,8 +157,12 @@ else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
 if(HPX_USE_GENERIC_COROUTINE_CONTEXT)
-  hpx_add_definitions("-DHPX_COROUTINE_USE_GENERIC_CONTEXT=1")
-  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} context)
+  if(${BOOST_MINOR_VERSION} GREATER 50)
+    hpx_add_definitions("-DHPX_HAVE_GENERIC_CONTEXT_COROUTINES=1")
+    set(BOOST_LIBRARIES ${BOOST_LIBRARIES} context)
+  else()
+    hpx_error("boost_version" "Boost V1.51.0 or higher is required to use the Boost.Context library.")
+  endif()
 endif()
 if(${BOOST_MINOR_VERSION} LESS 53)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
@@ -392,15 +396,15 @@ endif()
 # Additional debug support
 ################################################################################
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  hpx_option(HPX_VERIFY_LOCKS BOOL "Enable lock verification code (default: ON)" ON ADVANCED)
+  hpx_option(HPX_HAVE_VERIFY_LOCKS BOOL "Enable lock verification code (default: ON)" ON ADVANCED)
 else()
-  hpx_option(HPX_VERIFY_LOCKS BOOL "Enable lock verification code (default: OFF)" OFF ADVANCED)
+  hpx_option(HPX_HAVE_VERIFY_LOCKS BOOL "Enable lock verification code (default: OFF)" OFF ADVANCED)
 endif()
 
-if(HPX_VERIFY_LOCKS)
-  hpx_add_definitions(-DHPX_VERIFY_LOCKS=1)
+if(HPX_HAVE_VERIFY_LOCKS)
+  hpx_add_definitions(-DHPX_HAVE_VERIFY_LOCKS=1)
 else()
-  hpx_add_definitions(-DHPX_VERIFY_LOCKS=0)
+  hpx_add_definitions(-DHPX_HAVE_VERIFY_LOCKS=0)
 endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -503,15 +507,15 @@ endif()
 # Emulation of SwapContext on Windows
 ################################################################################
 if(MSVC)
-  hpx_option(HPX_EMULATE_SWAP_CONTEXT BOOL "Emulate SwapContext API for coroutines (default: OFF)" OFF ADVANCED)
+  hpx_option(HPX_HAVE_SWAP_CONTEXT_EMULATION BOOL "Emulate SwapContext API for coroutines (default: OFF)" OFF ADVANCED)
 
-  if(HPX_EMULATE_SWAP_CONTEXT)
+  if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     enable_language(ASM_MASM)
     if(CMAKE_ASM_MASM_COMPILER)
       hpx_info("swap_context" "SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
     else()
       hpx_warn("swap_context" "SwitchToFiber emulation will be disabled, try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe)")
-      set(HPX_EMULATE_SWAP_CONTEXT OFF CACHE BOOL "Emulate SwitchToFiber API for coroutines (default: OFF)" FORCE)
+      set(HPX_HAVE_SWAP_CONTEXT_EMULATION OFF CACHE BOOL "Emulate SwitchToFiber API for coroutines (default: OFF)" FORCE)
     endif()
   endif()
 endif()
@@ -519,18 +523,18 @@ endif()
 ################################################################################
 # Enable integration with Intel Amplifier and Inspector tools
 ################################################################################
-hpx_option(HPX_USE_ITTNOTIFY BOOL "Bind to Intel Amplifier Tool (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_HAVE_ITTNOTIFY BOOL "Bind to Intel Amplifier Tool (default: OFF)" OFF ADVANCED)
 
-if(HPX_USE_ITTNOTIFY)
+if(HPX_HAVE_ITTNOTIFY)
   find_package(HPX_Amplifier)
   if(AMPLIFIER_FOUND)
     hpx_info("itt" "Binding to Intel Amplifier tool is enabled.")
-    hpx_add_definitions(-DHPX_USE_ITTNOTIFY=1)
+    hpx_add_definitions(-DHPX_HAVE_ITTNOTIFY=1)
     hpx_include_sys_directories(${AMPLIFIER_INCLUDE_DIR})
     hpx_link_sys_directories(${AMPLIFIER_LIBRARY_DIR})
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${AMPLIFIER_LIBRARY})
   else()
-    set(HPX_USE_ITTNOTIFY OFF FORCE)
+    set(HPX_HAVE_ITTNOTIFY OFF FORCE)
     hpx_warn("itt" "Binding to Intel Amplifier tool will be disabled, try setting the AMPLIFIER_ROOT variable to the Intel Amplifier installation directory.")
   endif()
 endif()
@@ -775,6 +779,11 @@ if(MSVC)
     # which is benign
     hpx_append_flag(-wd4307)
 
+    if(MSVC11)
+      # MSVC2012 is overeager to report 'qualifier applied to function type has no meaning; ignored'
+      hpx_append_flag(-wd4180)
+    endif()
+
     # According to the ifort Windows manual, W3 isn't supported
     hpx_append_flag(-W1 LANGUAGES Fortran)
   endif()
@@ -803,7 +812,7 @@ if(MSVC)
 
   hpx_add_definitions(-DBOOST_USE_WINDOWS_H)
   hpx_add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
-  hpx_add_definitions(-DHPX_COROUTINE_USE_FIBERS)
+  hpx_add_definitions(-DHPX_HAVE_FIBER_BASED_COROUTINES)
   hpx_add_definitions(-DPSAPI_VERSION=1)
 
   hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
@@ -1543,7 +1552,7 @@ set(boost_library_info "")
 
 foreach(library ${BOOST_LIBRARIES})
   string(TOUPPER ${library} library_uc)
-  string(REGEX REPLACE "([ ()])" "\\\\\\1" BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})
+  string(REGEX REPLACE "([ ()])" "\\\\\\1" "BOOST_${library_uc}_LIBRARY" "${BOOST_${library_uc}_LIBRARY}")
   set(boost_library_info
     "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
   set(boost_library_info

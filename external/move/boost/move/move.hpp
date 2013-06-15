@@ -333,11 +333,11 @@
       const ::boost::rv< TYPE >& \
    //
 
-   #define BOOST_MOVE_COPY_ASSIGN_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)\
+   #define BOOST_COPY_ASSIGN_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)\
       const ::boost::rv< TYPE<ARG1, ARG2> >& \
    //
 
-   #define BOOST_MOVE_COPY_ASSIGN_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)\
+   #define BOOST_COPY_ASSIGN_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)\
       const ::boost::rv< TYPE<ARG1, ARG2, ARG3> >& \
    //
 
@@ -568,7 +568,7 @@
    //
 
    #define BOOST_COPY_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)\
-      TYPE<ARG1, ARG2, ARG3>& \
+      const TYPE<ARG1, ARG2, ARG3>& \
    //
 
    #define BOOST_CATCH_CONST_RLVALUE(TYPE)\

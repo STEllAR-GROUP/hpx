@@ -22,7 +22,7 @@
 #include <iostream>
 #include <vector>
 
-#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_COROUTINE_USE_FIBERS)
+#if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
 #endif
 
@@ -825,7 +825,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create an instance of a message handler plugin
+    // Create an instance of a message handler plugin
     parcelset::policies::message_handler* create_message_handler(
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,
@@ -843,7 +843,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create an instance of a binary filter plugin
+    // Create an instance of a binary filter plugin
     util::binary_filter* create_binary_filter(char const* binary_filter_type,
         bool compress, error_code& ec)
     {

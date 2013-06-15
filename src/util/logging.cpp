@@ -161,8 +161,10 @@ namespace hpx { namespace util
         {
             boost::uint32_t locality_id = naming::invalid_locality_id;
             applier::applier* appl = applier::get_applier_ptr();
-            if (appl)
-                locality_id = appl->get_locality_id();
+            if (appl) {
+                error_code ec(lightweight);
+                locality_id = appl->get_locality_id(ec);
+            }
 
             if (naming::invalid_locality_id != locality_id) {
                 std::stringstream out;

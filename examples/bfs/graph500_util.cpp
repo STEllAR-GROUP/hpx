@@ -6,6 +6,8 @@
 #include<iostream>
 #include<vector>
 #include<math.h>
+
+#include <hpx/hpx_fwd.hpp>
 #include "graph500/point.hpp"
 
 static int compare_doubles(const void* a, const void* b) {

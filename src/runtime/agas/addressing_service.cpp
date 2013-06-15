@@ -171,6 +171,11 @@ void addressing_service::adjust_local_cache_size()
                 local_cache_size_per_thread * std::size_t(get_num_overall_threads()));
         if (cache_size > gva_cache_.capacity())
             gva_cache_.reserve(cache_size);
+
+        LAGAS_(info) << (boost::format(
+            "addressing_service::adjust_local_cache_size, local_cache_size(%1%), "
+            "local_cache_size_per_thread(%2%), cache_size(%1%)")
+            % local_cache_size % local_cache_size_per_thread % cache_size);
     }
 } // }}}
 
@@ -772,7 +777,7 @@ bool addressing_service::get_id_range(
             }
 
             // execute the action (synchronously)
-            f->apply(bootstrap_locality_namespace_id(), req);
+            f->apply(launch::async, bootstrap_locality_namespace_id(), req);
             rep = f->get_future().get(ec);
 
             cf.set_ok();
@@ -963,22 +968,23 @@ bool addressing_service::is_local_address(
 }
 
 bool addressing_service::is_local_lva_encoded_address(
-    naming::gid_type const& id
+    boost::uint64_t msb
     )
 {
     // NOTE: This should still be migration safe.
-    return naming::detail::strip_credit_from_gid(id.get_msb())
-        == get_local_locality().get_msb();
+    return msb == get_local_locality().get_msb();
 }
 
 bool addressing_service::resolve_locally_known_addresses(
     naming::gid_type const& id
   , naming::address& addr
-  , error_code& ec
     )
 {
     // LVA-encoded GIDs (located on this machine)
-    if (is_local_lva_encoded_address(id))
+    boost::uint64_t lsb = id.get_lsb();
+    boost::uint64_t msb = naming::detail::strip_credit_from_gid(id.get_msb());
+
+    if (is_local_lva_encoded_address(msb))
     {
         addr.locality_ = get_here();
 
@@ -986,59 +992,44 @@ bool addressing_service::resolve_locally_known_addresses(
         if (!rts_lva_)
             rts_lva_ = get_runtime().get_runtime_support_lva();
 
-        if (0 == id.get_lsb() || id.get_lsb() == rts_lva_)
+        if (0 == lsb || lsb == rts_lva_)
         {
             addr.type_ = components::component_runtime_support;
             addr.address_ = rts_lva_;
         }
-
         else
         {
             addr.type_ = components::component_memory;
-            addr.address_ = id.get_lsb();
+            addr.address_ = lsb;
         }
-
-        if (&ec != &throws)
-            ec = make_success_code();
 
         return true;
     }
 
     // authoritative AGAS component address resolution
-    else if (id == bootstrap_locality_namespace_gid())
+    if (HPX_AGAS_LOCALITY_NS_MSB == msb && HPX_AGAS_LOCALITY_NS_LSB == lsb)
     {
         addr = locality_ns_addr_;
-        if (&ec != &throws)
-            ec = make_success_code();
         return true;
     }
 
-    else if (id == bootstrap_primary_namespace_gid())
+    if (HPX_AGAS_PRIMARY_NS_MSB == msb && HPX_AGAS_PRIMARY_NS_LSB == lsb)
     {
         addr = primary_ns_addr_;
-        if (&ec != &throws)
-            ec = make_success_code();
         return true;
     }
 
-    else if (id == bootstrap_component_namespace_gid())
+    if (HPX_AGAS_COMPONENT_NS_MSB == msb && HPX_AGAS_COMPONENT_NS_LSB == lsb)
     {
         addr = component_ns_addr_;
-        if (&ec != &throws)
-            ec = make_success_code();
         return true;
     }
 
-    else if (id == bootstrap_symbol_namespace_gid())
+    if (HPX_AGAS_SYMBOL_NS_MSB == msb && HPX_AGAS_SYMBOL_NS_LSB == lsb)
     {
         addr = symbol_ns_addr_;
-        if (&ec != &throws)
-            ec = make_success_code();
         return true;
     }
-
-    if (&ec != &throws)
-        ec = make_success_code();
 
     return false;
 } // }}}
@@ -1051,7 +1042,7 @@ bool addressing_service::resolve_full(
 { // {{{ resolve implementation
     try {
         // special cases
-        if (resolve_locally_known_addresses(id, addr, ec))
+        if (resolve_locally_known_addresses(id, addr))
             return true;
         if (ec) return false;
 
@@ -1106,7 +1097,7 @@ bool addressing_service::resolve_cached(
 { // {{{ resolve_cached implementation
 
     // special cases
-    if (resolve_locally_known_addresses(id, addr, ec))
+    if (resolve_locally_known_addresses(id, addr))
         return true;
     if (ec) return false;
 
@@ -1190,9 +1181,7 @@ bool addressing_service::resolve_full(
         {
             if (!addrs[i])
             {
-                bool is_local = resolve_locally_known_addresses(gids[i], addrs[i], ec);
-                if (ec)
-                    return false;
+                bool is_local = resolve_locally_known_addresses(gids[i], addrs[i]);
                 locals.set(i, is_local);
             }
             else
@@ -1708,10 +1697,13 @@ void addressing_service::update_cache_entry(
             gva_cache_type::entry_type e;
 
             if (!gva_cache_.get_entry(key, idbase, e))
+            {
                 // This is impossible under sane conditions.
                 HPX_THROWS_IF(ec, invalid_data
                   , "addressing_service::update_cache_entry"
                   , "data corruption or lock error occurred in cache");
+                return;
+            }
 
             LAS_(warning) <<
                 ( boost::format(

@@ -36,6 +36,6 @@ if(APEX_FOUND)
   # APEX can support the amplifier interface, so enable that, too
   if(NOT AMPLIFIER_ROOT)
     set(AMPLIFIER_ROOT ${APEX_ROOT})
-    set(HPX_USE_ITTNOTIFY ON)
+    set(HPX_HAVE_ITTNOTIFY ON)
   endif()
 endif()

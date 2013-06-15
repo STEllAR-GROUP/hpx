@@ -42,7 +42,7 @@ What's so special about HPX?
   hand-held devices to very large scale systems.
 * It is the first fully functional implementation of the ParalleX execution
   model.
-* HPX is published under a liberal open-source license and has a open,
+* HPX is published under a liberal open-source license and has an open,
   active, and thriving developer community.
 
 
@@ -75,7 +75,7 @@ Version 1.0 (See accompanying file LICENSE_1_0.txt or an online copy available
 `here <http://www.boost.org/LICENSE_1_0.txt>`_).
 
 Before starting to build HPX, please read about the
-`prerequisites <http://stellar.cct.lsu.edu/files/hpx_0.9.0/docs/hpx/tutorial/getting_started.html>`_.
+`prerequisites <http://stellar.cct.lsu.edu/files/hpx_0.9.5/docs/hpx/tutorial/getting_started.html>`_.
 
 Linux
 -----
@@ -94,10 +94,13 @@ Linux
 3) Invoke CMake from your build directory, pointing the CMake driver to the root
    of your HPX source tree::
 
-    $ cmake -DBOOST_ROOT=/your_boost_directory [other CMake variable definitions] /path/to/hpx/source/tree
+    $ cmake -DBOOST_ROOT=/your_boost_directory \
+         -DHWLOC_ROOT=/your_hwloc_directory \
+         [other CMake variable definitions] \
+         /path/to/hpx/source/tree
 
 4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
-   add the -jN flag to your make invocation, where N is the number of nodes
+   add the -jN flag to your make invocation, where N is the number of cores
    on your machine plus one::
 
     $ gmake -j5
@@ -188,15 +191,18 @@ Windows
 3) Open up the CMake GUI. In the input box labelled "Where is the source code:",
    enter the full path to the source folder. In the input box labelled
    "Where to build the binaries:", enter the full path to the build folder you
-   created in step 1.
+   created in step 2.
 
 4) Add CMake variable definitions (if any) by clicking the "Add Entry" button.
-   Most probably you will need to at least add the directory where Boost is
-   located as BOOST_ROOT.
+   Most probably you will need to at least add the directories where `Boost <http://www.boost.org>`_
+   is located as BOOST_ROOT and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is 
+   located as HWLOC_ROOT.
 
-5) Press the "Configure" button. A window will pop up asking you which compilers
-   to use. Select the x64 Visual Studio 10 compiler (Visual Studio 2012 is
-   supported as well).
+5) Press the "Configure" button. A window will pop up asking you which compiler
+   to use. Select the x64 Visual Studio 10 compiler (x64 Visual Studio 2012 is
+   supported as well). Note that while it is possible to build HPX for x86 
+   we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit 
+   Windows system limitation affecting the number of HPX threads you can create.
 
 6) If the "Generate" button is not clickable, press "Configure" again. Repeat
    this step until the "Generate" button becomes clickable.

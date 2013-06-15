@@ -13,7 +13,6 @@ set(example_programs
     event_synchronization
     factorial
     fibonacci
-    fibonacci_await
     fibonacci_one
     fibonacci_futures
     fractals
@@ -35,7 +34,21 @@ if(HPX_HAVE_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
       hello_world
       1d_wave_equation
-      fibonacci_dataflow
+     )
+
+  # MSVC 2010 is not able to cope with this example
+  if(NOT MSVC10)
+    set(example_programs ${example_programs}
+        fibonacci_dataflow
+        )
+  endif()
+endif()
+
+# MSVC 2010 is not able to cope with this example
+if(NOT MSVC10)
+  set(example_programs ${example_programs}
+      fibonacci_await
+      fibonacci_futures_distributed
      )
 endif()
 

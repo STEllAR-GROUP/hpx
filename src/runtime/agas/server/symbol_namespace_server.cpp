@@ -18,14 +18,13 @@ namespace hpx { namespace agas
 
 naming::gid_type bootstrap_symbol_namespace_gid()
 {
-    return naming::gid_type
-        (HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB);
+    return naming::gid_type(HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB);
 }
 
 naming::id_type bootstrap_symbol_namespace_id()
 {
-    return naming::id_type
-        (bootstrap_symbol_namespace_gid(), naming::id_type::unmanaged);
+    return naming::id_type(HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB
+      , naming::id_type::unmanaged);
 }
 
 namespace server

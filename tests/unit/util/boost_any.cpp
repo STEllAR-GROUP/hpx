@@ -106,7 +106,7 @@ namespace any_tests // test definitions
     void test_converting_ctor()
     {
         std::string text = "test message";
-        any value = text;
+        any value = any(text);
 
         HPX_TEST_EQ_MSG(false, value.empty(), "empty");
         HPX_TEST_EQ_MSG(value.type(), typeid(std::string), "type");
@@ -123,7 +123,7 @@ namespace any_tests // test definitions
     void test_copy_ctor()
     {
         std::string text = "test message";
-        any original = text, copy = original;
+        any original = any(text), copy = any(original);
 
         HPX_TEST_EQ_MSG(false, copy.empty(), "empty");
         HPX_TEST_EQ_MSG(original.type(), copy.type(), "type");
@@ -142,7 +142,7 @@ namespace any_tests // test definitions
     void test_copy_assign()
     {
         std::string text = "test message";
-        any original = text, copy;
+        any original = any(text), copy;
         any * assign_result = &(copy = original);
 
         HPX_TEST_EQ_MSG(false, copy.empty(), "empty");
@@ -183,7 +183,7 @@ namespace any_tests // test definitions
     void test_bad_cast()
     {
         std::string text = "test message";
-        any value = text;
+        any value = any(text);
 
         {
             bool caught_exception = false;
@@ -203,7 +203,7 @@ namespace any_tests // test definitions
     void test_swap()
     {
         std::string text = "test message";
-        any original = text, swapped;
+        any original = any(text), swapped;
         std::string * original_ptr = any_cast<std::string>(&original);
         any * swap_result = &original.swap(swapped);
 
@@ -220,8 +220,8 @@ namespace any_tests // test definitions
             "comparing address in swapped against original");
         HPX_TEST_EQ_MSG(swap_result, &original, "address of swap result");
 
-        any copy1 = copy_counter();
-        any copy2 = copy_counter();
+        any copy1 = any(copy_counter());
+        any copy2 = any(copy_counter());
         int count = copy_counter::get_count();
         swap(copy1, copy2);
         HPX_TEST_EQ_MSG(count, copy_counter::get_count(), "checking that free swap doesn't make any copies.");
