@@ -168,6 +168,54 @@ namespace hpx { namespace util
     }
 #endif
 
+#if BOOST_VERSION < 104600 || BOOST_FILESYSTEM_VERSION < 3
+    inline boost::filesystem::path resolve(
+        boost::filesystem::path const& p,
+        boost::filesystem::path const& base = current_path())
+    {
+        boost::filesystem abs_p = boost::filesystem::absolute(p,base);
+        boost::filesystem::path result;
+        for(boost::filesystem::path::iterator it=abs_p.begin();
+            it!=abs_p.end();
+            ++it)
+        {
+            if(*it == "..")
+            {
+                // /a/b/.. is not necessarily /a if b is a symbolic link
+                if(boost::filesystem::is_symlink(result) )
+                    result /= *it;
+                // /a/b/../.. is not /a/b/.. under most circumstances
+                // We can end up with ..s in our result because of symbolic links
+                else if(result.filename() == "..")
+                    result /= *it;
+                // Otherwise it should be safe to resolve the parent
+                else
+                    result = result.parent_path();
+            }
+            else if(*it == ".")
+            {
+                // Ignore
+            }
+            else
+            {
+                // Just cat other path entries
+                result /= *it;
+            }
+        }
+        return result;
+    }
+#endif
+
+    inline boost::filesystem::path canonical_path(
+        boost::filesystem::path const& p, boost::system::error_code& ec)
+    {
+#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+        return boost::filesystem::canonical(p, initial_path(), ec);
+#else
+        return resolve(p, initial_path());
+#endif
+    }
+
 #undef HPX_FILESYSTEM3
 }}
 
