@@ -11,14 +11,14 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/util/unwrapped.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/thread/thread.hpp>
 
-using hpx::util::unwrap;
+using hpx::util::unwrapped;
 
 typedef hpx::lcos::future< double > future_type;
 
@@ -37,8 +37,8 @@ double dummy(double x, double) { std::cout << "dummy: " << x << "\n"; return x; 
 void future_swap( future_type &f1 , future_type &f2 )
 {
     future_type tmp = f1;
-    f1 = hpx::lcos::local::dataflow( unwrap( &dummy ) , f2 , f1 );
-    f2 = hpx::lcos::local::dataflow( unwrap( &dummy ) , tmp, f1 );
+    f1 = hpx::lcos::local::dataflow( unwrapped( &dummy ) , f2 , f1 );
+    f2 = hpx::lcos::local::dataflow( unwrapped( &dummy ) , tmp, f1 );
 }
 
 int main()
@@ -46,7 +46,7 @@ int main()
     future_type f1 = hpx::make_ready_future( 2.0 );
     future_type f2 = hpx::make_ready_future( 3.0 );
 
-    f1 = hpx::lcos::local::dataflow( unwrap(mul()) , f1 , f2 );
+    f1 = hpx::lcos::local::dataflow( unwrapped(mul()) , f1 , f2 );
 
     future_swap( f1 , f2 );
 
