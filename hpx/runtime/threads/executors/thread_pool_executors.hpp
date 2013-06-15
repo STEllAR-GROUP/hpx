@@ -108,13 +108,13 @@ namespace hpx { namespace threads { namespace executors
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct local_queue_executor : public executor
+    struct HPX_EXPORT local_queue_executor : public executor
     {
         local_queue_executor(std::size_t max_punits = 1, 
             std::size_t min_punits = 1);
     };
 
-    struct local_priority_queue_executor : public executor
+    struct HPX_EXPORT local_priority_queue_executor : public executor
     {
         local_priority_queue_executor(std::size_t max_punits = 1, 
             std::size_t min_punits = 1);
