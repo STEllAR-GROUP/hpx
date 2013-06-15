@@ -344,7 +344,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     bool resolve_locally_known_addresses(
         naming::gid_type const& id
       , naming::address& addr
-      , error_code& ec
       );
 
     /// \brief Register performance counter types exposing properties from the
