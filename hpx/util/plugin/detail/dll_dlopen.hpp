@@ -270,7 +270,7 @@ namespace hpx { namespace util { namespace plugin {
         }
 
     public:
-        std::string get_directory() const
+        std::string get_directory(error_code& ec = throws) const
         {
             // now find the full path of the loaded library
             char directory[PATH_MAX] = { '\0' };
