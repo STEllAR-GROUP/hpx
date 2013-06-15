@@ -740,7 +740,7 @@ namespace hpx
             }
 #endif
             // scheduling policy
-            typedef hpx::threads::policies::local_priority_queue_scheduler
+            typedef hpx::threads::policies::local_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,

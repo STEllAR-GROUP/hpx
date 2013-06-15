@@ -1508,7 +1508,7 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
-    hpx::threads::policies::local_priority_queue_scheduler,
+    hpx::threads::policies::local_priority_queue_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
