@@ -245,7 +245,7 @@ namespace hpx { namespace util { namespace plugin {
     protected:
         void LoadLibrary(error_code& ec = throws, bool force = false)
         {
-            if (!dll_handle || force)
+            if (!dll_handle || force) {
                 initialize_mutex();
                 boost::mutex::scoped_lock lock(mutex_instance());
 
