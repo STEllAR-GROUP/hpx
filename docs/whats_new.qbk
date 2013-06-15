@@ -33,6 +33,7 @@ Here is a list of the tickets we closed for this release.
 
 * [issue 785] - Create an API allowing to register external threads with HPX
 * [issue 784] - util::plugin is throwing an error when a symbol is not found
+* [issue 783] - How does hpx:bind work?
 * [issue 782] - Added quotes around STRING REPLACE potentially empty arguments
 * [issue 781] - Make sure no exceptions propagate into the thread manager
 * [issue 780] - Allow arithmetics performance counters to expand its parameters
