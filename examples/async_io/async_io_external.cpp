@@ -21,7 +21,7 @@ struct registration_wrapper
         // each external OS-thread intended to invoke HPX functionality.
         // Calling this function more than once will silently fail (will
         // return false).
-        rt_->register_thread("external-io");
+        rt_->register_thread(name);
     }
     ~registration_wrapper()
     {
