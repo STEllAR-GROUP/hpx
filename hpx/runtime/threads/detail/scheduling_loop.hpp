@@ -208,7 +208,7 @@ namespace hpx { namespace threads { namespace detail
                             // thread returns new required state
                             // store the returned state in the thread
                             {
-#if defined(HPX_USE_ITTNOTIFY)
+#if HPX_HAVE_ITTNOTIFY != 0
                                 util::itt::caller_context cctx(ctx);
                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
