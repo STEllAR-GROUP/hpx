@@ -646,7 +646,7 @@ template class HPX_EXPORT hpx::runtime_impl<
 
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::local_priority_queue_scheduler,
+    hpx::threads::policies::local_priority_queue_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 
 #if defined(HPX_ABP_SCHEDULER)
