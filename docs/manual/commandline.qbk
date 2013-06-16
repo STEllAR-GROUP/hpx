@@ -58,17 +58,18 @@ described in the table below:
                                  --hpx:queuing=local and priority_local only]]
     [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
                                  instance of __hpx__ (default: 1), valid for
-                                 --hpx:queuing=local and priority_local only]]
+                                 `--hpx:queuing=local` and priority_local only]]
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this __hpx__ locality (default: 1, using 'all' will
                                  spawn one thread for each processing unit)]]
     [[`--hpx:affinity arg`]     [the affinity domain the OS threads will be confined to,
                                  possible values: pu, core, numa, machine (default: pu), valid for
-                                 --hpx:queuing=local and priority_local only]]
+                                 `--hpx:queuing=local` and priority_local only]]
     [[`--hpx:bind arg`]         [the detailed affinity description for the OS threads, see
-                                 the documentation for a detailed description of possible
-                                 values. Do not use with --hpx:pu-step, --hpx:pu-offset, or
-                                 --hpx:affinity options. Implies --hpx:numa-sensitive.]]
+                                 [link hpx.manual.init.commandline.details the additional documentation] 
+                                 for a detailed description of possible
+                                 values. Do not use with `--hpx:pu-step`, `--hpx:pu-offset`, or
+                                 `--hpx:affinity` options. Implies `--hpx:numa-sensitive`.]]
     [[`--hpx:print-bind`]       [print to the console the bit masks calculated from the
                                  arguments specified to all `--hpx:bind` options.]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
@@ -81,7 +82,7 @@ described in the table below:
                                  number of OS threads), valid for
                                  --hpx:queuing=priority_local only]]
     [[`--hpx:numa-sensitive`]   [makes the priority_local scheduler NUMA sensitive, valid for
-                                 --hpx:queuing=local and priority_local only]]
+                                 `--hpx:queuing=local` and priority_local only]]
 
     [[[*__hpx__ configuration options]]]
     [[`--hpx:app-config arg`]   [load the specified application configuration
@@ -104,11 +105,11 @@ described in the table below:
 
     [[[*__hpx__ options related to performance counters]]]
     [[`--hpx:print-counter`]    [print the specified performance counter either repeatedly or
-                                 before shutting down the system (see option --hpx:print-counter-interval)]]
+                                 before shutting down the system (see option `--hpx:print-counter-interval`)]]
     [[`--hpx:print-counter-interval`][print the performance counter(s) specified with --hpx:print-counter
                                  repeatedly after the time interval (specified in milliseconds)
                                  (default: 0, which means print once at shutdown)]]
-    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with --hpx:print-counter
+    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with `--hpx:print-counter`
                                  to the given file (default: console)]]
     [[`--hpx:list-counters`]    [list the names of all registered performance counters, possible
                                  values: 'minimal' (prints counter name skeletons),
