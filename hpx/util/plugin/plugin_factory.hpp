@@ -261,7 +261,6 @@ namespace hpx { namespace util { namespace plugin {
                 return r.first->create(r.second, a1);
             }
 
-            using Base::create;
             BasePlugin* create(std::string const& name, error_code& ec, A1 a1) const
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r =

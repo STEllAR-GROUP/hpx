@@ -168,7 +168,7 @@ namespace hpx { namespace util
     }
 #endif
 
-#if BOOST_VERSION < 104600 || BOOST_FILESYSTEM_VERSION < 3
+#if BOOST_VERSION <= 104900 || BOOST_FILESYSTEM_VERSION < 3
     inline boost::filesystem::path resolve(
         boost::filesystem::path const& p,
         boost::filesystem::path const& base = current_path())
@@ -209,7 +209,7 @@ namespace hpx { namespace util
     inline boost::filesystem::path canonical_path(
         boost::filesystem::path const& p, boost::system::error_code& ec)
     {
-#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+#if BOOST_VERSION > 104900 && BOOST_FILESYSTEM_VERSION >= 3
         return boost::filesystem::canonical(p, initial_path(), ec);
 #else
         return resolve(p, initial_path());
