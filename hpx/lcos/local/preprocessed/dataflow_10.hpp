@@ -99,7 +99,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -444,7 +443,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -789,7 +787,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -1134,7 +1131,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -1479,7 +1475,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -1824,7 +1819,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -2169,7 +2163,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -2514,7 +2507,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -2859,7 +2851,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -3204,7 +3195,6 @@ namespace hpx { namespace lcos { namespace local {
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
