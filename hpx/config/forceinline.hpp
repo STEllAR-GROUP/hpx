@@ -7,15 +7,17 @@
 #define HPX_CONFIG_FORCEINLINE_HPP
 
 #include <boost/config/suffix.hpp>
+#include <hpx/config/compiler_specific.hpp>
 
 #if !defined(BOOST_FORCEINLINE)
 #   if defined(_MSC_VER)
 #       define BOOST_FORCEINLINE __forceinline
-#   elif defined(__GNUC__) && __GNUC__ > 3
+#   elif HPX_GCC_VERSION > 40500
 #       define BOOST_FORCEINLINE inline __attribute__ ((always_inline))
 #   else
 #       define BOOST_FORCEINLINE inline
 #   endif
 #endif
+
 
 #endif
