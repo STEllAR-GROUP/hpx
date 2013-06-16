@@ -291,7 +291,6 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
