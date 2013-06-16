@@ -23,7 +23,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type;
             typedef
                 hpx::util::tuple1<
@@ -117,12 +116,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -201,14 +198,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -367,7 +361,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type;
             typedef
                 hpx::util::tuple2<
@@ -461,12 +454,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -545,14 +536,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -711,7 +699,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type;
             typedef
                 hpx::util::tuple3<
@@ -805,12 +792,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -889,14 +874,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -1055,7 +1037,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type;
             typedef
                 hpx::util::tuple4<
@@ -1149,12 +1130,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -1233,14 +1212,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -1399,7 +1375,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type;
             typedef
                 hpx::util::tuple5<
@@ -1493,12 +1468,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -1577,14 +1550,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -1743,7 +1713,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type;
             typedef
                 hpx::util::tuple6<
@@ -1837,12 +1806,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -1921,14 +1888,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -2087,7 +2051,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type;
             typedef
                 hpx::util::tuple7<
@@ -2181,12 +2144,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -2265,14 +2226,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -2431,7 +2389,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type;
             typedef
                 hpx::util::tuple8<
@@ -2525,12 +2482,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -2609,14 +2564,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -2775,7 +2727,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type;
             typedef
                 hpx::util::tuple9<
@@ -2869,12 +2820,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -2953,14 +2902,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -3119,7 +3065,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type;
             typedef
                 hpx::util::tuple10<
@@ -3213,12 +3158,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -3297,14 +3240,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -3463,7 +3403,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type;
             typedef
                 hpx::util::tuple11<
@@ -3557,12 +3496,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -3641,14 +3578,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -3807,7 +3741,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F11 >::type >::type f11_type;
             typedef
                 hpx::util::tuple12<
@@ -3901,12 +3834,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -3985,14 +3916,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -4151,7 +4079,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F11 >::type >::type f11_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F12 >::type >::type f12_type;
             typedef
                 hpx::util::tuple13<
@@ -4245,12 +4172,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -4329,14 +4254,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -4495,7 +4417,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F11 >::type >::type f11_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F12 >::type >::type f12_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F13 >::type >::type f13_type;
             typedef
                 hpx::util::tuple14<
@@ -4589,12 +4510,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -4673,14 +4592,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -4839,7 +4755,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F11 >::type >::type f11_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F12 >::type >::type f12_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F13 >::type >::type f13_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F14 >::type >::type f14_type;
             typedef
                 hpx::util::tuple15<
@@ -4933,12 +4848,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -5017,14 +4930,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -5183,7 +5093,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F11 >::type >::type f11_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F12 >::type >::type f12_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F13 >::type >::type f13_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F14 >::type >::type f14_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F15 >::type >::type f15_type;
             typedef
                 hpx::util::tuple16<
@@ -5277,12 +5186,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -5361,14 +5268,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -5527,7 +5431,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F11 >::type >::type f11_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F12 >::type >::type f12_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F13 >::type >::type f13_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F14 >::type >::type f14_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F15 >::type >::type f15_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F16 >::type >::type f16_type;
             typedef
                 hpx::util::tuple17<
@@ -5621,12 +5524,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -5705,14 +5606,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -5871,7 +5769,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F11 >::type >::type f11_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F12 >::type >::type f12_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F13 >::type >::type f13_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F14 >::type >::type f14_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F15 >::type >::type f15_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F16 >::type >::type f16_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F17 >::type >::type f17_type;
             typedef
                 hpx::util::tuple18<
@@ -5965,12 +5862,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -6049,14 +5944,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -6215,7 +6107,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F11 >::type >::type f11_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F12 >::type >::type f12_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F13 >::type >::type f13_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F14 >::type >::type f14_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F15 >::type >::type f15_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F16 >::type >::type f16_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F17 >::type >::type f17_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F18 >::type >::type f18_type;
             typedef
                 hpx::util::tuple19<
@@ -6309,12 +6200,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -6393,14 +6282,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -6559,7 +6445,6 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
             typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F10 >::type >::type f10_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F11 >::type >::type f11_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F12 >::type >::type f12_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F13 >::type >::type f13_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F14 >::type >::type f14_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F15 >::type >::type f15_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F16 >::type >::type f16_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F17 >::type >::type f17_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F18 >::type >::type f18_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F19 >::type >::type f19_type;
             typedef
                 hpx::util::tuple20<
@@ -6653,12 +6538,10 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
                     if(cb)
                     {
@@ -6737,14 +6620,11 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
