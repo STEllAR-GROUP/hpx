@@ -173,26 +173,27 @@ namespace hpx { namespace util
         boost::filesystem::path const& p,
         boost::filesystem::path const& base = current_path())
     {
-        boost::filesystem abs_p = boost::filesystem::absolute(p,base);
+        boost::filesystem::path abspath = boost::filesystem::absolute(p, base);
         boost::filesystem::path result;
-        for(boost::filesystem::path::iterator it=abs_p.begin();
-            it!=abs_p.end();
-            ++it)
+        for(boost::filesystem::path::iterator it = abspath.begin();
+            it != abspath.end(); ++it)
         {
-            if(*it == "..")
+            if (*it == "..")
             {
                 // /a/b/.. is not necessarily /a if b is a symbolic link
-                if(boost::filesystem::is_symlink(result) )
+                if (boost::filesystem::is_symlink(result))
                     result /= *it;
+
                 // /a/b/../.. is not /a/b/.. under most circumstances
                 // We can end up with ..s in our result because of symbolic links
-                else if(result.filename() == "..")
+                else if (result.filename() == "..")
                     result /= *it;
+
                 // Otherwise it should be safe to resolve the parent
                 else
                     result = result.parent_path();
             }
-            else if(*it == ".")
+            else if (*it == ".")
             {
                 // Ignore
             }
