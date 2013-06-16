@@ -324,7 +324,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
@@ -669,7 +669,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
@@ -1014,7 +1014,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
@@ -1359,7 +1359,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
@@ -1704,7 +1704,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
@@ -2049,7 +2049,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
@@ -2394,7 +2394,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
@@ -2739,7 +2739,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
@@ -3084,7 +3084,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
@@ -3429,7 +3429,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func
