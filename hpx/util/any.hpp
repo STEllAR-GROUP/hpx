@@ -34,6 +34,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/assert.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
+#include <boost/functional/hash.hpp>
 
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/base_object.hpp>
@@ -1090,7 +1091,7 @@ namespace hpx { namespace util
 
             // now 'data' has the serialized binary byte stream
 
-            return std::hash<std::string>()(std::string(data.begin(), data.end()));
+            return boost::hash_range(data.begin(), data.end());
         }
     };
 

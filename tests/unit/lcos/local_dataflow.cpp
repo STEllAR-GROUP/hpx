@@ -8,7 +8,7 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -26,7 +26,7 @@ using hpx::init;
 using hpx::finalize;
 
 using hpx::util::report_errors;
-using hpx::util::unwrap;
+using hpx::util::unwrapped;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -65,23 +65,23 @@ void function_pointers()
     int_f1_count.store(0);
     int_f2_count.store(0);
 
-    future<void> f1 = dataflow(unwrap(&void_f1), async(bind(&int_f)));
+    future<void> f1 = dataflow(unwrapped(&void_f1), async(bind(&int_f)));
     future<int>
         f2 = dataflow(
-            unwrap(&int_f1)
+            unwrapped(&int_f1)
           , dataflow(
-                unwrap(&int_f1)
+                unwrapped(&int_f1)
               , make_ready_future(42))
         );
     future<int>
         f3 = dataflow(
-            unwrap(&int_f2)
+            unwrapped(&int_f2)
           , dataflow(
-                unwrap(&int_f1)
+                unwrapped(&int_f1)
               , make_ready_future(42)
             )
           , dataflow(
-                unwrap(&int_f1)
+                unwrapped(&int_f1)
               , make_ready_future(37)
             )
         );
@@ -90,18 +90,18 @@ void function_pointers()
     std::vector<future<int> > vf;
     for(std::size_t i = 0; i < 10; ++i)
     {
-        vf.push_back(dataflow(unwrap(&int_f1), make_ready_future(42)));
+        vf.push_back(dataflow(unwrapped(&int_f1), make_ready_future(42)));
     }
-    future<int> f4 = dataflow(unwrap(&int_f_vector), vf);
+    future<int> f4 = dataflow(unwrapped(&int_f_vector), vf);
     
     future<int>
         f5 = dataflow(
-            unwrap(&int_f1)
+            unwrapped(&int_f1)
           , dataflow(
-                unwrap(&int_f1)
+                unwrapped(&int_f1)
               , make_ready_future(42))
           , dataflow(
-                unwrap(&void_f)
+                unwrapped(&void_f)
               , make_ready_future())
         );
 
@@ -141,7 +141,6 @@ boost::atomic<boost::uint32_t> future_int_f_vector_count;
 int future_int_f_vector(std::vector<future<int> > const & vf)
 {
     int sum = 0;
-    int i = 0;
     BOOST_FOREACH(future<int> f, vf)
     {
         HPX_TEST(f.ready());

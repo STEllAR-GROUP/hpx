@@ -138,7 +138,7 @@ namespace detail
             set_on_completed(BOOST_RV_REF(completed_callback_type)) = 0;
         virtual completed_callback_type
             set_on_completed_locked(BOOST_RV_REF(completed_callback_type)) = 0;
-        virtual void reset_on_completed() = 0;
+        virtual completed_callback_type reset_on_completed() = 0;
 
         // wait support
         void wake_me_up(threads::thread_id_type id)
@@ -458,10 +458,10 @@ namespace detail
             return boost::move(retval);
         }
 
-        void reset_on_completed()
+        completed_callback_type reset_on_completed()
         {
             typename mutex_type::scoped_lock l(this->mtx_);
-            on_completed_.clear();
+            return boost::move(on_completed_);
         }
 
     private:

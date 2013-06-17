@@ -19,7 +19,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::size_t count = 0;
         BOOST_FOREACH(mask_cref_type m, masks)
         {
-            if(!any(m))
+            if(any(m))
                 ++count;
         }
         return count;

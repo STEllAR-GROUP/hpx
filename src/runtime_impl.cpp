@@ -610,6 +610,34 @@ namespace hpx {
 
         return 0;
     }
+
+    /// Register an external OS-thread with HPX
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        register_thread(char const* name, std::size_t num, bool service_thread)
+    {
+        if (NULL != runtime::thread_name_.get())
+            return false;       // already registered
+
+        std::string thread_name(name);
+        thread_name += "-thread";
+
+        init_tss(thread_name.c_str(), num, 0, service_thread);
+
+        return true;
+    }
+
+    /// Unregister an external OS-thread with HPX
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        unregister_thread()
+    {
+        if (NULL == runtime::thread_name_.get())
+            return false;       // never registered
+
+        deinit_tss();
+        return true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -53,6 +53,16 @@ namespace detail {
                 get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename);
             return r.first->create(r.second, BOOST_PP_ENUM_PARAMS(N, a));
         }
+
+        BasePlugin* create(std::string const& name, error_code& ec,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+        {
+            std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
+                get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename, ec);
+            if (ec) return 0;
+
+            return r.first->create(r.second, BOOST_PP_ENUM_PARAMS(N, a));
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -72,6 +82,17 @@ namespace detail {
             std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                 get_abstract_factory_static<BasePlugin>(
                     this->f, &empty_deleter, name);
+            return r.first->create(r.second, BOOST_PP_ENUM_PARAMS(N, a));
+        }
+
+        BasePlugin* create(std::string const& name, error_code& ec,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+        {
+            std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
+                get_abstract_factory_static<BasePlugin>(
+                    this->f, &empty_deleter, name, ec);
+            if (ec) return 0;
+
             return r.first->create(r.second, BOOST_PP_ENUM_PARAMS(N, a));
         }
     };

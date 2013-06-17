@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/lcos/detail/extract_completed_callback_type.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -93,17 +94,37 @@ namespace hpx
             result_type operator()()
             {
                 using lcos::detail::get_future_data;
+                using lcos::local::detail::extract_completed_callback_type;
+
+                typedef typename extract_completed_callback_type<
+                    lcos::future<T>
+                >::type completed_callback_type;
 
                 index_.store(static_cast<std::size_t>(index_error));
 
                 std::size_t size = lazy_values_.size();
+                std::vector<completed_callback_type> callbacks(size);
 
+                // set callback functions to execute when future is ready
+                threads::thread_id_type id = threads::get_self_id();
+                for (std::size_t i = 0; i != size; ++i)
                 {
-                    // set callback functions to execute when future is ready
-                    threads::thread_id_type id = threads::get_self_id();
-                    for (std::size_t i = 0; i != size; ++i)
-                    {
-                        get_future_data(lazy_values_[i])->set_on_completed(
+                    lcos::detail::future_data_base<T>* current =
+                        get_future_data(lazy_values_[i]);
+
+                    completed_callback_type cb = boost::move(
+                        current->reset_on_completed());
+
+                    if (cb) {
+                        callbacks[i] = cb;
+                        current->set_on_completed(boost::move(
+                            lcos::local::detail::compose_cb(
+                                boost::move(cb)
+                              , util::bind(&when_any::on_future_ready, this, i, id)
+                            )));
+                    }
+                    else {
+                        current->set_on_completed(
                             util::bind(&when_any::on_future_ready, this, i, id));
                     }
                 }
@@ -116,11 +137,21 @@ namespace hpx
                     this_thread::suspend(threads::suspended);
                 }
 
-                BOOST_ASSERT(index_.load() != static_cast<std::size_t>(index_error));       // that should not happen
+                // that should not happen
+                BOOST_ASSERT(index_.load() != static_cast<std::size_t>(index_error));
 
                 // reset all pending callback functions
                 for (std::size_t i = 0; i < size; ++i)
-                    get_future_data(lazy_values_[i])->reset_on_completed();
+                {
+                    lcos::detail::future_data_base<T>* current =
+                        get_future_data(lazy_values_[i]);
+
+                    completed_callback_type cb = boost::move(
+                        current->reset_on_completed());
+
+                    if (cb && callbacks[i])
+                        current->set_on_completed(boost::move(callbacks[i]));
+                }
 
                 return result_type(static_cast<int>(index_), lazy_values_[index_]);
             }
@@ -136,35 +167,74 @@ namespace hpx
         private:
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_any_tuple)
 
+            typedef typename lcos::local::detail::extract_completed_callback_type<
+                lcos::future<T>
+            >::type completed_callback_type;
+
             struct init_when
             {
-                init_when(when_any_tuple& outer, threads::thread_id_type id)
-                  : outer_(&outer), id_(id)
+                init_when(when_any_tuple& outer, threads::thread_id_type id,
+                        std::vector<completed_callback_type>& callbacks)
+                  : outer_(&outer), id_(id), callbacks_(callbacks)
                 {}
 
                 typedef std::size_t result_type;
 
                 result_type operator()(std::size_t i, lcos::future<T> f) const
                 {
-                    lcos::detail::get_future_data(f)->set_on_completed(
-                        util::bind(&when_any_tuple::on_future_ready,
-                            outer_, i++, id_));
-                    return i;
-                };
+                    lcos::detail::future_data_base<T>* current =
+                        lcos::detail::get_future_data(f);
+
+                    completed_callback_type cb = boost::move(
+                        current->set_on_completed(completed_callback_type()));
+
+                    if (cb) {
+                        callbacks_[i] = cb;
+                        current->set_on_completed(boost::move(
+                            lcos::local::detail::compose_cb(
+                                boost::move(cb)
+                              , util::bind(&when_any_tuple::on_future_ready,
+                                    outer_, i, id_)
+                            )));
+                    }
+                    else {
+                        current->set_on_completed(
+                            util::bind(&when_any_tuple::on_future_ready,
+                                outer_, i, id_));
+                    }
+
+                    return ++i;
+                }
 
                 when_any_tuple* outer_;
                 threads::thread_id_type id_;
+                std::vector<completed_callback_type>& callbacks_;
             };
             friend struct init_when;
 
             struct reset_when
             {
-                typedef void result_type;
+                reset_when(std::vector<completed_callback_type>& callbacks)
+                  : callbacks_(callbacks)
+                {}
 
-                result_type operator()(lcos::future<T> f) const
+                typedef std::size_t result_type;
+
+                result_type operator()(std::size_t i, lcos::future<T> f) const
                 {
-                    lcos::detail::get_future_data(f)->reset_on_completed();
-                };
+                    lcos::detail::future_data_base<T>* current =
+                        lcos::detail::get_future_data(f);
+
+                    completed_callback_type cb = boost::move(
+                        current->reset_on_completed());
+
+                    if (cb && callbacks_[i])
+                        current->set_on_completed(boost::move(callbacks_[i]));
+
+                    return ++i;
+                }
+
+                std::vector<completed_callback_type>& callbacks_;
             };
 
             enum { index_error = -1 };
@@ -254,9 +324,12 @@ namespace hpx
             {
                 index_.store(static_cast<std::size_t>(index_error));
 
+                std::vector<completed_callback_type> callbacks(
+                    boost::fusion::size(lazy_values_));
+
                 // set callback functions to execute when future is ready
                 boost::fusion::accumulate(lazy_values_, std::size_t(0),
-                    init_when(*this, threads::get_self_id()));
+                    init_when(*this, threads::get_self_id(), boost::ref(callbacks)));
 
                 // If one of the futures is already set then our callback above 
                 // has already been called, otherwise we suspend ourselves.
@@ -266,10 +339,12 @@ namespace hpx
                     this_thread::suspend(threads::suspended);
                 }
 
-                BOOST_ASSERT(index_.load() != static_cast<std::size_t>(index_error));       // that should not happen
+                // that should not happen
+                BOOST_ASSERT(index_.load() != static_cast<std::size_t>(index_error));
 
                 // reset all pending callback functions
-                boost::fusion::for_each(lazy_values_, reset_when());
+                boost::fusion::accumulate(lazy_values_, std::size_t(0),
+                    reset_when(boost::ref(callbacks)));
 
                 return result_type(static_cast<int>(index_),
                     get_element(lazy_values_, index_));

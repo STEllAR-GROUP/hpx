@@ -208,6 +208,53 @@ namespace hpx
         /// return zero.
         virtual hpx::util::io_service_pool* get_thread_pool(char const* name) = 0;
 
+        /// \brief Register an external OS-thread with HPX
+        ///
+        /// This function should be called from any OS-thread which is external to
+        /// HPX (not created by HPX), but which needs to access HPX functionality,
+        /// such as setting a value on a promise or similar.
+        ///
+        /// \param name             [in] The name to use for thread registration.
+        /// \param num              [in] The sequence number to use for thread 
+        ///                         registration. The default for this parameter
+        ///                         is zero.
+        /// \param service_thread   [in] The thread should be registered as a
+        ///                         service thread. The default for this parameter
+        ///                         is 'true'. Any service threads will be pinned
+        ///                         to cores not currently used by any of the HPX
+        ///                         worker threads.
+        ///
+        /// \note The function will compose a thread name of the form 
+        ///       '<name>-thread#<num>' which is used to register the thread. It
+        ///       is the user's responsibility to ensure that each (composed) 
+        ///       thread name is unique. HPX internally uses the following names
+        ///       for the threads it creates, do not reuse those:
+        ///
+        ///         'main', 'io', 'timer', 'parcel', 'worker'
+        ///
+        /// \note This function should be called for each thread exactly once. It
+        ///       will fail if it is called more than once.
+        ///
+        /// \returns This function will return whether th erequested operation
+        ///          succeeded or not.
+        ///
+        virtual bool register_thread(char const* name, std::size_t num = 0,
+            bool service_thread = true) = 0;
+
+        /// \brief Unregister an external OS-thread with HPX
+        ///
+        /// This function will unregister any external OS-thread from HPX.
+        ///
+        /// \note This function should be called for each thread exactly once. It
+        ///       will fail if it is called more than once. It will fail as well
+        ///       if the thread has not been registered before (see 
+        ///       \a register_thread).
+        ///
+        /// \returns This function will return whether th erequested operation
+        ///          succeeded or not.
+        ///
+        virtual bool unregister_thread() = 0;
+
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(

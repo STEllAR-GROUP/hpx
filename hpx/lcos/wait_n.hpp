@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -109,14 +109,37 @@ namespace hpx
             result_type operator()()
             {
                 using lcos::detail::get_future_data;
+                using lcos::local::detail::extract_completed_callback_type;
+
+                typedef typename extract_completed_callback_type<
+                    lcos::future<T>
+                >::type completed_callback_type;
 
                 // set callback functions to executed when future is ready
                 std::size_t size = lazy_values_.size();
+                std::vector<completed_callback_type> callbacks(size);
+
                 threads::thread_id_type id = threads::get_self_id();
                 for (std::size_t i = 0; i != size; ++i)
                 {
-                    get_future_data(lazy_values_[i])->set_on_completed(
-                        util::bind(&when_n::on_future_ready, this, i, id));
+                    lcos::detail::future_data_base<T>* current =
+                        get_future_data(lazy_values_[i]);
+
+                    completed_callback_type cb = boost::move(
+                        current->reset_on_completed());
+
+                    if (cb) {
+                        callbacks[i] = cb;
+                        current->set_on_completed(boost::move(
+                            lcos::local::detail::compose_cb(
+                                boost::move(cb)
+                              , util::bind(&when_n::on_future_ready, this, i, id)
+                            )));
+                    }
+                    else {
+                        current->set_on_completed(
+                            util::bind(&when_n::on_future_ready, this, i, id));
+                    }
                 }
 
                 // if all of the requested futures are already set, our
@@ -142,7 +165,16 @@ namespace hpx
 
                 // reset all pending callback functions
                 for (std::size_t i = 0; i < size; ++i)
-                    get_future_data(lazy_values_[i])->reset_on_completed();
+                {
+                    lcos::detail::future_data_base<T>* current =
+                        get_future_data(lazy_values_[i]);
+
+                    completed_callback_type cb = boost::move(
+                        current->reset_on_completed());
+
+                    if (cb && callbacks[i])
+                        current->set_on_completed(boost::move(callbacks[i]));
+                }
 
                 return result;
             }

@@ -11,7 +11,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
-#include <hpx/util/unwrap.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 using hpx::lcos::local::dataflow;
 
@@ -20,6 +20,8 @@ typedef hpx::lcos::future< double > future_type;
 template< typename Value >
 struct mul
 {
+    typedef double result_type;
+
     const Value a;
 
     mul( const Value alpha )
@@ -34,7 +36,7 @@ struct mul
 
 int main()
 {
-    auto functor = hpx::util::unwrap(mul<double>( 0.5 ));
+    auto functor = hpx::util::unwrapped(mul<double>( 0.5 ));
     future_type f1 = hpx::make_ready_future( 1.0 );
 
     future_type f2 = dataflow( hpx::launch::sync, functor , f1 , f1 );

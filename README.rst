@@ -42,7 +42,7 @@ What's so special about HPX?
   hand-held devices to very large scale systems.
 * It is the first fully functional implementation of the ParalleX execution
   model.
-* HPX is published under a liberal open-source license and has a open,
+* HPX is published under a liberal open-source license and has an open,
   active, and thriving developer community.
 
 

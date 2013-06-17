@@ -999,7 +999,8 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::load_startup_shutdown_functions(hpx::util::plugin::dll& d)
+    bool runtime_support::load_startup_shutdown_functions(hpx::util::plugin::dll& d,
+        error_code& ec)
     {
         try {
             // get the factory, may fail
@@ -1008,7 +1009,12 @@ namespace hpx { namespace components { namespace server
 
             // create the startup_shutdown object
             boost::shared_ptr<component_startup_shutdown_base>
-                startup_shutdown(pf.create("startup_shutdown"));
+                startup_shutdown(pf.create("startup_shutdown", ec));
+            if (ec) {
+                LRT_(debug) << "loading of command-line options failed: "
+                            << d.get_name() << ": " << get_error_what(ec);
+                return false;
+            }
 
             startup_function_type startup;
             bool pre_startup = true;
@@ -1048,7 +1054,7 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_commandline_options(hpx::util::plugin::dll& d,
-        boost::program_options::options_description& options)
+        boost::program_options::options_description& options, error_code& ec)
     {
         try {
             // get the factory, may fail
@@ -1057,7 +1063,12 @@ namespace hpx { namespace components { namespace server
 
             // create the startup_shutdown object
             boost::shared_ptr<component_commandline_base>
-                commandline_options(pf.create("commandline_options"));
+                commandline_options(pf.create("commandline_options", ec));
+            if (ec) {
+                LRT_(debug) << "loading of command-line options failed: "
+                            << d.get_name() << ": " << get_error_what(ec);
+                return false;
+            }
 
             options.add(commandline_options->add_commandline_options());
         }
@@ -1094,7 +1105,14 @@ namespace hpx { namespace components { namespace server
 
         try {
             // get the handle of the library
+            error_code ec(lightweight);
             hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
+            d.load_library(ec);
+            if (ec) {
+                LRT_(warning) << "dynamic loading failed: " << lib.string()
+                              << ": " << instance << ": " << get_error_what(ec);
+                return false;
+            }
 
             // initialize the factory instance using the preferences from the
             // ini files
@@ -1115,7 +1133,12 @@ namespace hpx { namespace components { namespace server
 
                 // create the component factory object, if not disabled
                 boost::shared_ptr<component_factory_base> factory (
-                    pf.create(instance, glob_ini, component_ini, isenabled));
+                    pf.create(instance, ec, glob_ini, component_ini, isenabled));
+                if (ec) {
+                    LRT_(warning) << "dynamic loading failed: " << lib.string()
+                                  << ": " << instance << ": " << get_error_what(ec);
+                    return false;
+                }
 
                 component_type t = factory->get_component_type(
                     prefix, agas_client);
@@ -1157,8 +1180,9 @@ namespace hpx { namespace components { namespace server
             // module, same for plugins
             if (startup_handled.find(d.get_name()) == startup_handled.end()) {
                 startup_handled.insert(d.get_name());
-                load_commandline_options(d, options);
-                load_startup_shutdown_functions(d);
+                load_commandline_options(d, options, ec);
+                if (ec) ec = error_code(lightweight);
+                load_startup_shutdown_functions(d, ec);
             }
         }
         catch (hpx::exception const&) {
@@ -1271,7 +1295,15 @@ namespace hpx { namespace components { namespace server
 
         try {
             // get the handle of the library
+            error_code ec;
             hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(plugin));
+
+            d.load_library(ec);
+            if (ec) {
+                LRT_(warning) << "dynamic loading failed: " << lib.string()
+                              << ": " << instance << ": " << get_error_what(ec);
+                return false;
+            }
 
             // initialize the factory instance using the preferences from the
             // ini files
@@ -1293,7 +1325,12 @@ namespace hpx { namespace components { namespace server
 
             // create the component factory object, if not disabled
             boost::shared_ptr<plugins::plugin_factory_base> factory (
-                pf.create(instance, glob_ini, plugin_ini, isenabled));
+                pf.create(instance, ec, glob_ini, plugin_ini, isenabled));
+            if (ec) {
+                LRT_(warning) << "dynamic loading failed: " << lib.string()
+                              << ": " << instance << ": " << get_error_what(ec);
+                return false;
+            }
 
             // store component factory and module for later use
             plugin_factory_type data(factory, d, isenabled);

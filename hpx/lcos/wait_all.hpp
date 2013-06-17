@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/lcos/detail/extract_completed_callback_type.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -49,25 +50,33 @@ namespace hpx
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_all)
 
             template <typename Index>
-            void on_future_ready_(Index i, threads::thread_id_type id, boost::mpl::false_)
+            void on_future_ready_(Index i, threads::thread_id_type id,
+                boost::mpl::false_)
             {
                 if (this->base_type::lazy_values_[i].has_value()) {
                     if (success_counter_)
                         ++*success_counter_;
-                    f_(i, this->base_type::lazy_values_[i].get());  // invoke callback function
+                    // invoke callback function
+                    f_(i, this->base_type::lazy_values_[i].get());
                 }
-                this->base_type::on_future_ready(id);   // keep track of ready futures
+
+                // keep track of ready futures
+                this->base_type::on_future_ready(id);
             }
 
             template <typename Index>
-            void on_future_ready_(Index i, threads::thread_id_type id, boost::mpl::true_)
+            void on_future_ready_(Index i, threads::thread_id_type id,
+                boost::mpl::true_)
             {
                 if (this->base_type::lazy_values_[i].has_value()) {
                     if (success_counter_)
                         ++*success_counter_;
-                    f_(i);                              // invoke callback function
+                    // invoke callback function
+                    f_(i);
                 }
-                this->base_type::on_future_ready(id);   // keep track of ready futures
+
+                // keep track of ready futures
+                this->base_type::on_future_ready(id);
             }
 
             void on_future_ready(std::size_t i, threads::thread_id_type id)
@@ -117,6 +126,12 @@ namespace hpx
             result_type operator()()
             {
                 using lcos::detail::get_future_data;
+                using lcos::local::detail::extract_completed_callback_type;
+
+                typedef typename extract_completed_callback_type<
+                    lcos::future<T>
+                >::type completed_callback_type;
+
                 this->base_type::ready_count_.store(0);
 
                 // set callback functions to executed when future is ready
@@ -124,8 +139,23 @@ namespace hpx
                 threads::thread_id_type id = threads::get_self_id();
                 for (std::size_t i = 0; i != size; ++i)
                 {
-                    get_future_data(this->base_type::lazy_values_[i])->set_on_completed(
-                        util::bind(&when_all::on_future_ready, this, i, id));
+                    lcos::detail::future_data_base<T>* current =
+                        get_future_data(this->base_type::lazy_values_[i]);
+
+                    completed_callback_type cb = boost::move(
+                        current->reset_on_completed());
+
+                    if (cb) {
+                        current->set_on_completed(boost::move(
+                            lcos::local::detail::compose_cb(
+                                boost::move(cb)
+                              , util::bind(&when_all::on_future_ready, this, i, id)
+                            )));
+                    }
+                    else {
+                        current->set_on_completed(
+                            util::bind(&when_all::on_future_ready, this, i, id));
+                    }
                 }
 
                 // If all of the requested futures are already set then our
@@ -140,10 +170,15 @@ namespace hpx
                 // all futures should be ready
                 BOOST_ASSERT(this->base_type::ready_count_ == size);
 
-                // reset all pending callback functions
-                for (std::size_t i = 0; i < size; ++i) 
-                    get_future_data(this->base_type::lazy_values_[i])->reset_on_completed();
-
+#if defined(HPX_DEBUG)
+                // make sure no callback functions are registered anymore (all
+                // should have been called by no)
+                for (std::size_t i = 0; i < size; ++i)
+                {
+                    BOOST_ASSERT(!get_future_data(
+                        this->base_type::lazy_values_[i])->reset_on_completed());
+                }
+#endif
                 return this->base_type::lazy_values_;
             }
 
@@ -206,6 +241,11 @@ namespace hpx
             result_type operator()()
             {
                 using lcos::detail::get_future_data;
+                using lcos::local::detail::extract_completed_callback_type;
+
+                typedef typename extract_completed_callback_type<
+                    lcos::future<T>
+                >::type completed_callback_type;
 
                 ready_count_.store(0);
 
@@ -214,8 +254,23 @@ namespace hpx
                 threads::thread_id_type id = threads::get_self_id();
                 for (std::size_t i = 0; i != size; ++i)
                 {
-                    get_future_data(lazy_values_[i])->set_on_completed(
-                        util::bind(&when_all::on_future_ready, this, id));
+                    lcos::detail::future_data_base<T>* current =
+                        get_future_data(lazy_values_[i]);
+
+                    completed_callback_type cb = boost::move(
+                        current->reset_on_completed());
+
+                    if (cb) {
+                        current->set_on_completed(boost::move(
+                            lcos::local::detail::compose_cb(
+                                boost::move(cb)
+                              , util::bind(&when_all::on_future_ready, this, id)
+                            )));
+                    }
+                    else {
+                        current->set_on_completed(
+                            util::bind(&when_all::on_future_ready, this, id));
+                    }
                 }
 
                 // If all of the requested futures are already set then our
@@ -230,10 +285,15 @@ namespace hpx
                 // all futures should be ready
                 BOOST_ASSERT(ready_count_ == size);
 
-                // reset all pending callback functions
-                for (std::size_t i = 0; i < size; ++i) 
-                    get_future_data(lazy_values_[i])->reset_on_completed();
-
+#if defined(HPX_DEBUG)
+                // make sure no callback functions are registered anymore (all
+                // should have been called by no)
+                for (std::size_t i = 0; i < size; ++i)
+                {
+                    BOOST_ASSERT(!get_future_data(lazy_values_[i])->
+                        reset_on_completed());
+                }
+#endif
                 return lazy_values_;
             }
 
