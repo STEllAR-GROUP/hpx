@@ -93,6 +93,7 @@ namespace hpx
         duplicate_component_id = 46,                ///< The component type has already been registered
         unknown_error = 47,                         ///< An unknown error occurred
         bad_plugin_type = 48,                       ///< The specified plugin type is not known or otherwise invalid
+        filesystem_error = 49,                      ///< The specified file does not exist or other filesystem related error
 
         /// \cond NOINTERNAL
         last_error,
@@ -150,7 +151,9 @@ namespace hpx
         /* 44 */ "thread_interrupted",
         /* 45 */ "thread_not_interruptable",
         /* 46 */ "duplicate_component_id",
-        /* 47 */ "unknown_error"
+        /* 47 */ "unknown_error",
+        /* 48 */ "bad_plugin_type",
+        /* 49 */ "filesystem_error",
         /*    */ ""
     };
     /// \endcond
@@ -426,6 +429,12 @@ namespace hpx
             this->boost::system::error_code::assign(success, get_hpx_category());
             exception_ = boost::exception_ptr();
         }
+
+        /// Assignment operator for error_code
+        ///
+        /// \note This function maintains the error category of the left hand 
+        ///       side if the right hand side is a success code.
+        inline error_code& operator=(error_code const& rhs);
 
     private:
         friend boost::exception_ptr detail::access_exception(error_code const&);
@@ -1496,6 +1505,25 @@ namespace hpx
         }
         return "";
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline error_code& error_code::operator=(error_code const& rhs)
+    {
+        if (this != &rhs) {
+            if (rhs.value() == success) {
+                // if the rhs is a success code, we maintain our throw mode
+                this->boost::system::error_code::operator=(
+                    make_success_code(
+                        (category() == get_lightweight_hpx_category()) ?
+                            hpx::lightweight : hpx::plain));
+            }
+            else {
+                this->boost::system::error_code::operator=(rhs);
+            }
+            exception_ = rhs.exception_;
+        }
+        return *this;
+    }
     // \endcond
 }
 
@@ -1553,7 +1581,7 @@ namespace boost
 
 #define HPX_RETHROW_EXCEPTION(e, f)                                           \
     HPX_THROW_EXCEPTION_(hpx::exception, e.get_error(), f, e.what(),          \
-        hpx::rethrow, hpx::get_error_file_name(e), hpx::get_error_line_number(e))         \
+        hpx::rethrow, hpx::get_error_file_name(e), hpx::get_error_line_number(e)) \
     /**/
 
 #define HPX_RETHROWS_IF(ec, e, f)                                             \
@@ -1562,7 +1590,7 @@ namespace boost
             HPX_RETHROW_EXCEPTION(e, f);                                      \
         } else {                                                              \
             ec = make_error_code(e.get_error(), e.what(),                     \
-                f, hpx::get_error_file_name(e).c_str(), hpx::get_error_line_number(e),    \
+                f, hpx::get_error_file_name(e).c_str(), hpx::get_error_line_number(e), \
                 (ec.category() == hpx::get_lightweight_hpx_category()) ?      \
                     hpx::lightweight_rethrow : hpx::rethrow);                 \
         }                                                                     \

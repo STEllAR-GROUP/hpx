@@ -12,6 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/detail/extract_completed_callback_type.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
@@ -39,79 +40,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     struct is_future_or_future_range
       : boost::mpl::or_<traits::is_future<T>, traits::is_future_range<T> >
     {};
-
-    template <
-        typename Future
-      , typename IsFutureRange = typename traits::is_future_range<Future>::type
-    >
-    struct extract_completed_callback_type;
-
-    template <typename Future>
-    struct extract_completed_callback_type<Future, boost::mpl::true_>
-    {
-        typedef
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Future
-                >::type
-            >::type::value_type::future_data_type
-            future_data_type;
-
-        typedef
-            typename future_data_type::completed_callback_type
-            type;
-    };
-
-    template <typename Future>
-    struct extract_completed_callback_type<Future, boost::mpl::false_>
-    {
-        typedef
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Future
-                >::type
-            >::type::future_data_type
-            future_data_type;
-
-        typedef
-            typename future_data_type::completed_callback_type
-            type;
-    };
-
-    template <typename F1, typename F2>
-    struct compose_cb_impl
-    {
-        typename util::detail::remove_reference<F1>::type f1_;
-        typename util::detail::remove_reference<F2>::type f2_;
-
-        template <typename A1, typename A2>
-        compose_cb_impl(BOOST_FWD_REF(A1) f1, BOOST_FWD_REF(A2) f2)
-          : f1_(boost::forward<A1>(f1))
-          , f2_(boost::forward<A2>(f2))
-        {}
-
-        typedef void result_type;
-
-        template <typename Future>
-        void operator()(Future & f)
-        {
-            f1_(f);
-            f2_(f);
-        }
-    };
-
-    template <typename F1, typename F2>
-    compose_cb_impl<F1, F2>
-    compose_cb(BOOST_FWD_REF(F1) f1, BOOST_FWD_REF(F2) f2)
-    {
-        return
-            boost::move(
-                compose_cb_impl<F1, F2>(
-                    boost::forward<F1>(f1)
-                  , boost::forward<F2>(f2)
-                )
-            );
-    }
 }}}}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -195,7 +123,7 @@ namespace hpx { namespace lcos { namespace local {
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            
+
             BOOST_PP_REPEAT(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER_TYPES, _)
             typedef
                 BOOST_PP_CAT(hpx::util::tuple, N)<
@@ -291,7 +219,6 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             template <typename Iter>
-            BOOST_FORCEINLINE
             void await_range(Iter next, Iter end)
             {
                 if(next == end) return;
@@ -314,12 +241,10 @@ namespace hpx { namespace lcos { namespace local {
                         >::type
                         completed_callback_type;
 
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(*next)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
 
                     if(cb)
@@ -408,14 +333,12 @@ namespace hpx { namespace lcos { namespace local {
                         >::type
                         completed_callback_type;
 
-                    completed_callback_type cb 
+                    completed_callback_type cb
                         = boost::move(
                             hpx::lcos::detail::get_future_data(f_)
-                            ->set_on_completed(
-                                completed_callback_type()
-                            )
+                            ->reset_on_completed()
                         );
-                    
+
                     if(cb)
                     {
                         hpx::lcos::detail::get_future_data(f_)
@@ -543,7 +466,7 @@ namespace hpx { namespace lcos { namespace local {
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         boost::is_same<
-            hpx::launch
+            BOOST_SCOPED_ENUM(launch)
           , typename boost::remove_const<
                 typename hpx::util::detail::remove_reference<
                     Func

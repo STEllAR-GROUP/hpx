@@ -34,14 +34,18 @@ namespace hpx { namespace util
     {
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__) && !defined(__MIC)
         try {
+            error_code ec;
             hpx::util::plugin::dll dll(HPX_MAKE_DLL_STRING(library));
+
+            dll.load_library(ec);
+            if (ec) return HPX_PREFIX;
 
             using boost::filesystem::path;
 
             std::string const prefix =
-                path(dll.get_directory()).parent_path().parent_path().string();
+                path(dll.get_directory(ec)).parent_path().parent_path().string();
 
-            if (prefix.empty())
+            if (ec || prefix.empty())
                 return HPX_PREFIX;
 
             return prefix;

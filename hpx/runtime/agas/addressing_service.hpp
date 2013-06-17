@@ -309,7 +309,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     naming::gid_type const& get_local_locality(error_code& ec = throws) const
     {
-        if (!locality_) {
+        if (locality_ == naming::invalid_gid) {
             HPX_THROWS_IF(ec, invalid_status,
                 "addressing_service::get_local_locality",
                 "local locality has not been initialized (yet)");

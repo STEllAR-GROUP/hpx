@@ -141,7 +141,6 @@ boost::atomic<boost::uint32_t> future_int_f_vector_count;
 int future_int_f_vector(std::vector<future<int> > const & vf)
 {
     int sum = 0;
-    int i = 0;
     BOOST_FOREACH(future<int> f, vf)
     {
         HPX_TEST(f.ready());

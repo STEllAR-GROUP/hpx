@@ -295,9 +295,11 @@ namespace hpx { namespace components { namespace server
             boost::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
-        bool load_startup_shutdown_functions(hpx::util::plugin::dll& d);
+        bool load_startup_shutdown_functions(hpx::util::plugin::dll& d,
+            error_code& ec);
         bool load_commandline_options(hpx::util::plugin::dll& d,
-            boost::program_options::options_description& options);
+            boost::program_options::options_description& options,
+            error_code& ec);
 
         // Load all plugins from the ini files found in the configuration
         bool load_plugins(util::section& ini);
