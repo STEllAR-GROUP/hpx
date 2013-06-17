@@ -713,7 +713,8 @@ namespace hpx
     /// \brief Return the global id representing the root locality
     ///
     /// The function \a find_root_locality() can be used to retrieve the global
-    /// id usable to refer to the root locality locality.
+    /// id usable to refer to the root locality. The root locality is the
+    /// locality where the main AGAS service is hosted.
     ///
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
