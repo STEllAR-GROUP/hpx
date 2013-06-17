@@ -31,6 +31,7 @@ The major new fetures in this release are:
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 786] - Memory issues during benchmarking.
 * [issue 785] - Create an API allowing to register external threads with HPX
 * [issue 784] - util::plugin is throwing an error when a symbol is not found
 * [issue 783] - How does hpx:bind work?
@@ -59,6 +60,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 759] - make install doesn't give a complete install
 * [issue 758] - Stack overflow when using locking_hook<>
 * [issue 757] - copy paste error; unsupported function overloading
+* [issue 756] - GTCX runtime issue in Gordon
 * [issue 755] - Papi counters don't work with reset and evaluate API's
 * [issue 753] - cmake bugfix and improved component action docs
 * [issue 752] - hpx simple component docs
