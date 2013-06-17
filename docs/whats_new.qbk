@@ -117,6 +117,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 704] - Create performance counter to expose thread queue waiting time
 * [issue 703] - Add support to HPX build system to find librcrtool.a and
                 related headers
+* [issue 699] - Generalize instrumentation support
 * [issue 698] - compilation failure with hwloc absent
 * [issue 697] - Performance counter counts should be zero indexed
 * [issue 696] - Distributed problem
