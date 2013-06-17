@@ -35,7 +35,8 @@ namespace hpx { namespace  threads
     /// * Initial Allocation: Allocating resources to executors when executors 
     ///   are created.
     /// * Dynamic Migration: Constantly monitoring utilization of resources 
-    ///   by executors, and dynamically migrating resources between them.
+    ///   by executors, and dynamically migrating resources between them
+    ///   (not implemented yet).
     ///
     class resource_manager
     {
@@ -81,7 +82,7 @@ namespace hpx { namespace  threads
         {
             punit_data() : use_count_(0) {}
 
-            std::size_t use_count_;   // number of schedulers using this code
+            std::size_t use_count_;   // number of schedulers using this core
         };
 
         typedef std::vector<punit_data> punit_array_type;

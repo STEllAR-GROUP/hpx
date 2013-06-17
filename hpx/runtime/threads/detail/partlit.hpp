@@ -261,7 +261,7 @@ namespace boost { namespace spirit { namespace qi
 {
     // Parser generators: make_xxx function (objects)
 
-    // lit("...")
+    // partlit("...")
     template <typename Modifiers, typename A0>
     struct make_primitive<
         terminal_ex<hpx::threads::detail::tag::partlit, fusion::vector1<A0> >
