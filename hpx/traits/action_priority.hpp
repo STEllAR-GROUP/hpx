@@ -7,6 +7,7 @@
 #define HPX_TRAITS_ACTION_PRIORITY_SEP_03_2012_1138AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -19,7 +20,8 @@ namespace hpx { namespace traits
     };
 
     template <typename Action>
-    struct action_priority<Action, typename Action::type>
+    struct action_priority<Action
+      , typename util::always_void<typename Action::type>::type>
       : action_priority<typename Action::type>
     {};
 }}
