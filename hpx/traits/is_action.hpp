@@ -7,9 +7,9 @@
 #define HPX_TRAITS_IS_ACTION_APR_15_2012_0601PM
 
 #include <hpx/traits.hpp>
+#include <hpx/util/always_void.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/has_xxx.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
 
 namespace hpx { namespace traits
 {
@@ -24,7 +24,8 @@ namespace hpx { namespace traits
     {};
 
     template <typename Action>
-    struct is_action<Action, typename Action::type>
+    struct is_action<Action
+      , typename util::always_void<typename Action::type>::type>
       : is_action<typename Action::type>
     {};
 }}
