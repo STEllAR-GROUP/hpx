@@ -11,6 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
+#include <hpx/util/always_void.hpp>
 #include <hpx/util/move.hpp>
 
 #include <boost/preprocessor/repeat.hpp>
@@ -37,7 +38,8 @@ namespace hpx { namespace actions
     };
 
     template <typename Action>
-    struct extract_action<Action, typename Action::type>
+    struct extract_action<Action
+      , typename util::always_void<typename Action::type>::type>
     {
         typedef typename Action::type type;
         typedef typename type::result_type result_type;
