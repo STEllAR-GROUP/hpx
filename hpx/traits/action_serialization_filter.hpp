@@ -8,9 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/binary_filter.hpp>
-
-#include <boost/mpl/has_xxx.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -27,7 +25,8 @@ namespace hpx { namespace traits
     };
 
     template <typename Action>
-    struct action_serialization_filter<Action, typename Action::type>
+    struct action_serialization_filter<Action
+      , typename util::always_void<typename Action::type>::type>
       : action_serialization_filter<typename Action::type>
     {};
 }}
