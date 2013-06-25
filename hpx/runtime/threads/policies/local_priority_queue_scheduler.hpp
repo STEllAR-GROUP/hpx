@@ -104,9 +104,17 @@ namespace hpx { namespace threads { namespace policies
             numa_sensitive_(init.numa_sensitive_),
             topology_(get_topology()),
             steals_in_numa_domain_(init.num_queues_),
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS)
             numa_domain_masks_(init.num_queues_),
+#else
+            numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask()),
+#endif
             steals_outside_numa_domain_(init.num_queues_),
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS)
             outside_numa_domain_masks_(init.num_queues_)
+#else
+            outside_numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask())
+#endif
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
