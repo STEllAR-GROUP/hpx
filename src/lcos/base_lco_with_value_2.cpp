@@ -1,3 +1,4 @@
+
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -21,17 +22,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/export.hpp>
 
-
-namespace hpx { namespace lcos
-{
-}}
-
-///////////////////////////////////////////////////////////////////////////////
-// FIXME: Do we still need these? Don't these auto-register?
-//        For the time being: Yes we still need them
-HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::naming::gid_type, gid_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(std::vector<hpx::naming::gid_type>,
-    vector_gid_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(hpx::naming::id_type, id_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE(std::vector<hpx::naming::id_type>,
-    vector_id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::int16_t, int16_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::uint16_t, uint16_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::int32_t, int32_t)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(boost::uint32_t, uint32_t)
