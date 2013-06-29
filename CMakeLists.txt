@@ -673,6 +673,12 @@ if(HPX_LOCAL_SCHEDULER)
   hpx_add_definitions(-DHPX_LOCAL_SCHEDULER)
 endif()
 
+hpx_option(HPX_STATIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=static (default: On)" On ADVANCED)
+
+if(HPX_STATIC_PRIORITY_SCHEDULER)
+  hpx_add_definitions(-DHPX_STATIC_PRIORITY_SCHEDULER)
+endif()
+
 hpx_option(HPX_ABP_SCHEDULER BOOL "Enable the use of --queueing=abp (default: OFF)" OFF ADVANCED)
 
 if(HPX_ABP_SCHEDULER)

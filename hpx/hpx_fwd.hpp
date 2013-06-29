@@ -151,6 +151,9 @@ namespace hpx
 #if defined(HPX_LOCAL_SCHEDULER)
             class HPX_API_EXPORT local_queue_scheduler;
 #endif
+#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+            class HPX_API_EXPORT static_priority_queue_scheduler;
+#endif
 #if defined(HPX_ABP_SCHEDULER)
             struct HPX_API_EXPORT abp_queue_scheduler;
 #endif
