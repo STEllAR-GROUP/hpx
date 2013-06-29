@@ -2217,6 +2217,14 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::callback_notifier>;
 #endif
 
+#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
+
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
+    hpx::threads::policies::static_priority_queue_scheduler,
+    hpx::threads::policies::callback_notifier>;
+#endif
+
 #if defined(HPX_ABP_SCHEDULER)
 #include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
 
