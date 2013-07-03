@@ -513,6 +513,8 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
         hpx::actions::typed_continuation<Result>)                             \
 /**/
 
+HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(hpx::util::unused_type, hpx_unused_typed_continuation);
+
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif

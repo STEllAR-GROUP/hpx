@@ -124,4 +124,6 @@ HPX_REGISTER_ACTION_DECLARATION(
   , remote_object_set_dtor_action
 )
 
+HPX_UTIL_REGISTER_FUNCTION_DECLARATION(void(void**), hpx::util::function<void(void**)>, hpx_remote_object_dtor_functor)
+
 #endif

@@ -12,3 +12,5 @@ namespace hpx { namespace components { namespace server
         dtor = f;
     }
 }}}
+
+HPX_UTIL_REGISTER_FUNCTION(void(void**), hpx::util::function<void(void**)>, hpx_remote_object_dtor_functor)
