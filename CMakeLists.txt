@@ -1161,6 +1161,9 @@ else()
   hpx_cpuid("rdtscp" HPX_RDTSCP
     DEFINITIONS HPX_HAVE_RDTSCP)
 
+  hpx_option(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
+      "Disable automatic registration with Boost.Serialization (Default: Off)" Off ADVANCED)
+
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
@@ -1250,6 +1253,10 @@ else()
     hpx_warn("malloc"
       "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
   endif()
+endif()
+  
+if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
+  hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
 ################################################################################

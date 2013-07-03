@@ -30,4 +30,14 @@ namespace hpx { namespace components
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(
     hpx::components::remote_object::new_impl_action)
 
+#include <hpx/components/remote_object/server/remote_object.hpp>
+
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::create_component_action0<hpx::components::server::remote_object>,
+    hpx_components_server_create_component_action0_hpx_components_server_remote_object
+    )
+HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::remote_object_apply_action1<hpx::util::function<void(void**)> >,
+    hpx_components_server_remote_object_apply_action1_hpx_util_function_void_void__)
+
+
 #endif

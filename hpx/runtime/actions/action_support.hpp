@@ -84,6 +84,9 @@ namespace hpx { namespace actions
 
         template <typename Action>
         char const* get_action_name()
+#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+        ;
+#else
         {
             /// If you encounter this assert while compiling code, that means that
             /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
@@ -96,6 +99,7 @@ namespace hpx { namespace actions
             );
             return util::type_id<Action>::typeid_.type_id();
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // If an action returns a future, we need to do special things

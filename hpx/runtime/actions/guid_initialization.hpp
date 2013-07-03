@@ -15,6 +15,8 @@
 #include <boost/serialization/export.hpp>
 #include <boost/archive/detail/check.hpp>
 
+#include <boost/mpl/assert.hpp>
+
 namespace hpx { namespace actions
 {
     namespace detail
@@ -33,8 +35,12 @@ namespace hpx { namespace actions
         template <typename Target>
         void guid_initialization()
         {
+#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+            BOOST_MPL_ASSERT_NOT((traits::needs_guid_initialization<Target> ));
+#endif
             guid_initialization<Target>(
-                typename traits::needs_guid_initialization<Target>::type());
+                typename traits::needs_guid_initialization<Target>::type()
+            );
         }
 
         ///////////////////////////////////////////////////////////////////////

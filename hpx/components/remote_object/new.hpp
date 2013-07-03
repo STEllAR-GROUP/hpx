@@ -90,7 +90,6 @@ namespace hpx { namespace components
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
 }}
-
 #endif
 
 #else
