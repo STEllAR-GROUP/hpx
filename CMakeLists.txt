@@ -1240,6 +1240,10 @@ endif()
 if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
+  
+if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
+  hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
+endif()
 
 ################################################################################
 # target specification
