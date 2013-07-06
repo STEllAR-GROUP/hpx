@@ -39,10 +39,9 @@ namespace hpx { namespace util
     {
         typedef boost::chrono::nanoseconds duration_type;
         typedef duration_type::rep rep_type;
-        rep_type d = boost::chrono::duration_cast<duration_type>(
-            from.count()).count();
-        rep_type sec = d / 1000000000;
-        rep_type nsec = d % 1000000000;
+        rep_type d = boost::chrono::duration_cast<duration_type>(from);
+        rep_type sec = d.count() / 1000000000;
+        rep_type nsec = d.count() % 1000000000;
         return boost::posix_time::seconds(static_cast<long>(sec)) +
 #ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
             boost::posix_time::nanoseconds(nsec);
