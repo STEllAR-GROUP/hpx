@@ -46,7 +46,7 @@ macro(get_boost_version)
 
     if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
       set(boost_possible_suffixes
-        "boost-1_54" "boost-1_53" "boost-1_52" "boost-1_51" "boost-1_49" "boost-1_48"
+        "boost-1_54" "boost-1_54" "boost-1_53" "boost-1_52" "boost-1_51" "boost-1_49" "boost-1_48"
         "boost-1_47" "boost-1_46" "boost-1_45" "boost-1.44" "boost-1_43" "boost-1_42")
 
       if(NOT BOOST_INCLUDE_DIR)
