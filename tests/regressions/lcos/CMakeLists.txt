@@ -8,6 +8,7 @@ set(tests
     async_callback_non_deduced_context
     future_hang_on_get
     dataflow_launch
+    regression_future_790
    )
 
 # MSVC 2010 is not able to cope with this test
