@@ -57,10 +57,6 @@
 #define EXEC_PAGESIZE PAGE_SIZE
 #endif
 
-#if !defined(HPX_USE_MMAP) && defined(HPX_TBB)
-#include <tbb/cache_aligned_allocator.h>
-#endif
-
 /**
  * Stack allocation routines and trampolines for setcontext
  */
@@ -166,11 +162,7 @@ HPX_EXPORT extern bool use_guard_pages;
    */
   inline
   void* alloc_stack(std::size_t size) {
-#if defined(HPX_TBB)
-    return tbb::cache_aligned_allocator<stack_aligner>().allocate(size);
-#else
     return new stack_aligner[size/sizeof(stack_aligner)];
-#endif
   }
 
   inline
@@ -185,11 +177,7 @@ HPX_EXPORT extern bool use_guard_pages;
 
   inline
   void free_stack(void* stack, std::size_t size) {
-#if defined(HPX_TBB)
-    tbb::cache_aligned_allocator<stack_aligner>().deallocate(static_cast<stack_aligner*>(stack), size);
-#else
     delete [] static_cast<stack_aligner*>(stack);
-#endif
   }
 
 #endif  // non-mmap() implementation of alloc_stack()/free_stack()
