@@ -798,6 +798,16 @@ if(MSVC)
       hpx_add_definitions(-DBOOST_RESULT_OF_USE_DECLTYPE)
     endif()
 
+    if(MSVC12)
+      hpx_option(HPX_HAVE_CXX11_VARIADIC_TEMPLATES BOOL "Compiler supports C++11 variadic templates (default: ON)." ON ADVANCED)
+    else()
+      hpx_option(HPX_HAVE_CXX11_VARIADIC_TEMPLATES BOOL "Compiler supports C++11 variadic templates (default: OFF)." OFF ADVANCED)
+    endif()
+
+    if(HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
+      hpx_add_definitions(-DHPX_HAVE_CXX11_VARIADIC_TEMPLATES)
+    endif()
+
     hpx_option(HPX_HAVE_CXX11_UNIQUE_PTR BOOL "Compiler supports C++11 std::unique_ptr (default: ON)." ON ADVANCED)
     if(HPX_HAVE_CXX11_UNIQUE_PTR)
       hpx_add_definitions(-DHPX_HAVE_CXX11_STD_UNIQUE_PTR)
