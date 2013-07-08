@@ -25,13 +25,6 @@ using hpx::lcos::local::dataflow;
 using hpx::util::unwrapped;
 
 struct block {
-    template<class Archive>
-        void serialize(Archive & ar, const unsigned int version)
-        {
-            ar & size;
-            ar & start;
-            ar & height;
-        }
     int size;
     int start;
     int height;
@@ -53,39 +46,21 @@ void InitMatrix3();
 void initLoop(int i);
 
 
-HPX_PLAIN_ACTION( ProcessBlockOnColumn, column_action );
-HPX_PLAIN_ACTION( ProcessBlockOnRow, row_action );
-HPX_PLAIN_ACTION( ProcessInnerBlock, innerBlock_action );
-HPX_PLAIN_ACTION( initLoop, init_action );
-HPX_PLAIN_ACTION( ProcessDiagonalBlock, diag_action );
-
 vector<double> A;
 vector<double> L;
 vector<double> U;
-int size = 100;
+int size = 1000;
 
 boost::uint64_t get_tick_count()
 {
     return hpx::util::high_resolution_clock::now() / 1000;
 }
 
-int main(int argc, char *argv[])
-{
-    // We force this test to use several threads by default.
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
-
-    // Initialize and run HPX
-    return hpx::init(argc, argv, cfg);
-}
-
 int hpx_main (int argc, char *argv[])
 {
     boost::uint64_t t1, t2;
     vector<double> originalA;
-    int numBlocks = 1;
+    int numBlocks = 20;
 
     if( argc > 1 )
         size = atoi(argv[1]);
@@ -117,6 +92,18 @@ int hpx_main (int argc, char *argv[])
     checkResult( originalA );
 
     return hpx::finalize();
+}
+
+int main(int argc, char *argv[])
+{
+    // We force this test to use several threads by default.
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.os_threads=" +
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
+
+    // Initialize and run HPX
+    return hpx::init(argc, argv, cfg);
 }
 
 void LU( int numBlocks)
