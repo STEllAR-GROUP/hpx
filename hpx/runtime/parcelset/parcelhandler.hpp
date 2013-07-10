@@ -153,7 +153,8 @@ namespace hpx { namespace parcelset
         ///          remote locality known by AGAS
         ///          (!prefixes.empty()).
         bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            components::component_type type = components::component_invalid,
+            error_code& ec = throws) const;
 
         /// Return the list of all localities supporting the given
         /// component type

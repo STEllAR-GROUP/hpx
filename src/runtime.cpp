@@ -544,19 +544,33 @@ namespace hpx
     }
 
     std::vector<naming::id_type>
-    find_remote_localities(components::component_type type)
+    find_remote_localities(components::component_type type, error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL != hpx::applier::get_applier_ptr())
-            hpx::applier::get_applier().get_remote_localities(locality_ids, type);
+        if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_remote_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
+        hpx::applier::get_applier().get_remote_localities(locality_ids, type, ec);
         return locality_ids;
     }
 
-    std::vector<naming::id_type> find_remote_localities()
+    std::vector<naming::id_type> find_remote_localities(error_code& ec)
     {
         std::vector<naming::id_type> locality_ids;
-        if (NULL != hpx::applier::get_applier_ptr())
-            hpx::applier::get_applier().get_remote_localities(locality_ids);
+        if (NULL == hpx::applier::get_applier_ptr())
+        {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::find_remote_localities",
+                "the runtime system is not available at this time");
+            return locality_ids;
+        }
+
+        hpx::applier::get_applier().get_remote_localities(locality_ids,
+            components::component_invalid, ec);
+
         return locality_ids;
     }
 

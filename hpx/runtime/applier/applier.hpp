@@ -98,10 +98,12 @@ namespace hpx { namespace applier
         ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
         bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            components::component_type type = components::component_invalid,
+            error_code& ec = throws) const;
 
         bool get_remote_localities(std::vector<naming::id_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            components::component_type type = components::component_invalid,
+            error_code& ec = throws) const;
 
         /// \brief Return list of locality_ids of all localities
         ///        registered with the AGAS service for a specific component

@@ -262,16 +262,16 @@ namespace hpx { namespace applier
     }
 
     bool applier::get_raw_remote_localities(std::vector<naming::gid_type>& prefixes,
-        components::component_type type) const
+        components::component_type type, error_code& ec) const
     {
-        return parcel_handler_.get_raw_remote_localities(prefixes, type);
+        return parcel_handler_.get_raw_remote_localities(prefixes, type, ec);
     }
 
     bool applier::get_remote_localities(std::vector<naming::id_type>& prefixes,
-        components::component_type type) const
+        components::component_type type, error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_remote_localities(raw_prefixes, type))
+        if (!parcel_handler_.get_raw_remote_localities(raw_prefixes, type, ec))
             return false;
 
         BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
