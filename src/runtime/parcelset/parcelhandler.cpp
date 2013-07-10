@@ -245,16 +245,17 @@ namespace hpx { namespace parcelset
 
     bool parcelhandler::get_raw_remote_localities(
         std::vector<naming::gid_type>& locality_ids,
-        components::component_type type) const
+        components::component_type type, error_code& ec) const
     {
         std::vector<naming::gid_type> allprefixes;
-        error_code ec(lightweight);
+
         bool result = resolver_.get_localities(allprefixes, type, ec);
         if (ec || !result) return false;
 
         using boost::lambda::_1;
         std::remove_copy_if(allprefixes.begin(), allprefixes.end(),
             std::back_inserter(locality_ids), _1 == locality_);
+
         return !locality_ids.empty();
     }
 

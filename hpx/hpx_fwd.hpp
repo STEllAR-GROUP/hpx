@@ -837,7 +837,8 @@ namespace hpx
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities();
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
+        error_code& ec = throws);
 
     /// \brief Return the list of locality ids of remote localities supporting
     ///        the given component type. By default this function will return
@@ -871,7 +872,7 @@ namespace hpx
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
     HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
-        components::component_type);
+        components::component_type type, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing an arbitrary locality which
@@ -926,8 +927,21 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     ///
-    /// \see      \a hpx::find_all_localities
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities_async
     HPX_API_EXPORT boost::uint32_t get_num_localities(error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Asynchronously return the number of localities which are
+    ///        currently registered for the running application.
+    ///
+    /// The function \a get_num_localities_async asynchronously returns the
+    /// number of localities currently connected to the console. The returned
+    /// future represents the actual result.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return 0 otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
     HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async();
 
     /// \brief Return the number of localities which are currently registered
@@ -951,9 +965,25 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     ///
-    /// \see      \a hpx::find_all_localities
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities_async
     HPX_API_EXPORT boost::uint32_t get_num_localities(
         components::component_type t, error_code& ec = throws);
+
+    /// \brief Asynchronously return the number of localities which are
+    ///        currently registered for the running application.
+    ///
+    /// The function \a get_num_localities_async asynchronously returns the
+    /// number of localities currently connected to the console which support
+    /// the creation of the given component type. The returned future represents
+    /// the actual result.
+    ///
+    /// \param t  The component type for which the number of connected
+    ///           localities should be retrieved.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return 0 otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
     HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async(
         components::component_type t);
 
@@ -1134,6 +1164,10 @@ namespace hpx
     /// \brief Return the id of the locality where the object referenced by the
     ///        given id is currently located on
     ///
+    /// The function hpx::get_colocation_id() returns the id of the locality
+    /// where the given object is currently located.
+    ///
+    /// \param id [in] The id of the object to locate.
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
     ///           on error instead.
@@ -1142,8 +1176,15 @@ namespace hpx
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
+    ///
+    /// \see    \a hpx::get_colocation_id_async()
     HPX_API_EXPORT naming::id_type get_colocation_id(naming::id_type id,
         error_code& ec = throws);
+
+    /// \brief Asynchronously return the id of the locality where the object 
+    ///        referenced by the given id is currently located on
+    ///
+    /// \see    \a hpx::get_colocation_id()
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(
         naming::id_type id);
 
@@ -1254,6 +1295,14 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a message handler plugin
     ///
+    /// The function hpx::create_message_handler() creates an instance of a
+    /// message handler plugin based on the parameters specified.
+    ///
+    /// \param message_handler_type
+    /// \param action
+    /// \param pp
+    /// \param num_messages
+    /// \param interval
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
     ///           on error instead.

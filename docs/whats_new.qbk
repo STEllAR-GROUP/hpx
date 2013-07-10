@@ -31,6 +31,10 @@ The major new fetures in this release are:
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 790] - wait_for() doesn't compile
+* [issue 789] - HPX with Intel compiler segfaults
+* [issue 788] - Intel compiler support
+* [issue 787] - Fixed SFINAEd specializations
 * [issue 786] - Memory issues during benchmarking.
 * [issue 785] - Create an API allowing to register external threads with HPX
 * [issue 784] - util::plugin is throwing an error when a symbol is not found
@@ -92,8 +96,8 @@ Here is a list of the tickets we closed for this release.
 * [issue 727] - Memory counters on Mac OS X
 * [issue 725] - Restore original thread priority on resume
 * [issue 724] - Performance benchmarks do not depend on main HPX libraries
-* [issue 723] - --hpx:nodes=`cat $PBS_NODEFILE` works; --hpx:nodefile=$PBS_NODEFILE
-                does not.
+* [issue 723] - [teletype]--hpx:nodes=`cat $PBS_NODEFILE` works; --hpx:nodefile=$PBS_NODEFILE
+                does not.[c++]
 * [issue 722] - Fix binding const member functions as actions
 * [issue 719] - Create performance counter exposing compression ratio
 * [issue 718] - Add possibility to compress parcel data
