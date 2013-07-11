@@ -4,6 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_HAVE_SODIUM)
 #include <sodium.h>
 
 namespace hpx { namespace components { namespace security
@@ -19,3 +21,5 @@ namespace hpx { namespace components { namespace security
 
     init_sodium init;
 }}}
+
+#endif

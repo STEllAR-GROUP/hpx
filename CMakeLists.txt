@@ -490,19 +490,20 @@ endif()
 find_package(HPX_Sodium)
 if(SODIUM_FOUND)
   hpx_option(HPX_HAVE_SECURITY BOOL "Enable enable security options (default: OFF)" OFF ADVANCED)
+
+  hpx_add_definitions(-DHPX_HAVE_SODIUM)
+
+  hpx_include_sys_directories(${SODIUM_INCLUDE_DIR})
+  hpx_link_sys_directories(${SODIUM_LIBRARY_DIR})
+  if(MSVC)
+    hpx_add_definitions(-DSODIUM_STATIC)
+  endif()
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${SODIUM_LIBRARY})
+
   if(HPX_HAVE_SECURITY)
-    # add sodium libraries to build only if required
-    hpx_add_definitions(-DHPX_HAVE_SODIUM)
-
-    hpx_include_sys_directories(${SODIUM_INCLUDE_DIR})
-    hpx_link_sys_directories(${SODIUM_LIBRARY_DIR})
-    if(MSVC)
-      hpx_add_definitions(-DSODIUM_STATIC)
-    endif()
-    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${SODIUM_LIBRARY})
-
     hpx_add_definitions(-DHPX_HAVE_SECURITY)
   endif()
+
 elseif(HPX_HAVE_SECURITY)
   hpx_error("security" "The libsodium library has to be available to enable security features.")
   set(HPX_HAVE_SECURITY OFF)
