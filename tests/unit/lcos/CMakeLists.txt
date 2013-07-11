@@ -8,6 +8,7 @@ set(tests
     apply_local
     apply_remote
     async_continue
+    composable_guard
     async_local
     async_remote
     barrier

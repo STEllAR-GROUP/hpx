@@ -9,6 +9,7 @@ set(example_programs
     component_in_executable
     component_inheritance
     component_inheritance_simple
+    composable_guard
     error_handling
     event_synchronization
     factorial
