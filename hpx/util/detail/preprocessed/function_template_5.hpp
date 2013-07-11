@@ -72,8 +72,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                const bool is_small = sizeof(functor_type) <= sizeof(void *);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
                 }
@@ -134,13 +133,17 @@ namespace hpx { namespace util {
                       IArchive
                     , OArchive
                   >();
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
-                vptr->destruct(&object);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
+                    vptr->destruct(&object);
                     new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else if (object)
+                {
+                    vptr->destruct(&object);
+                    new (object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
@@ -149,15 +152,15 @@ namespace hpx { namespace util {
             }
             else
             {
-                if(!empty())
+                if (!empty())
                 {
-                    vptr->destruct(&object);
+                    vptr->static_delete(&object);
                     vptr = 0;
                     object = 0;
                 }
                 if (!detail::is_empty_function(f))
                 {
-                    if(is_small)
+                    if (sizeof(functor_type) <= sizeof(void *)) 
                     {
                         new (&object) functor_type(boost::forward<Functor>(f));
                     }
@@ -299,8 +302,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                const bool is_small = sizeof(functor_type) <= sizeof(void *);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
                 }
@@ -361,13 +363,17 @@ namespace hpx { namespace util {
                       IArchive
                     , OArchive
                   >();
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
-                vptr->destruct(&object);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
+                    vptr->destruct(&object);
                     new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else if (object)
+                {
+                    vptr->destruct(&object);
+                    new (object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
@@ -376,15 +382,15 @@ namespace hpx { namespace util {
             }
             else
             {
-                if(!empty())
+                if (!empty())
                 {
-                    vptr->destruct(&object);
+                    vptr->static_delete(&object);
                     vptr = 0;
                     object = 0;
                 }
                 if (!detail::is_empty_function(f))
                 {
-                    if(is_small)
+                    if (sizeof(functor_type) <= sizeof(void *)) 
                     {
                         new (&object) functor_type(boost::forward<Functor>(f));
                     }
@@ -526,8 +532,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                const bool is_small = sizeof(functor_type) <= sizeof(void *);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
                 }
@@ -588,13 +593,17 @@ namespace hpx { namespace util {
                       IArchive
                     , OArchive
                   >();
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
-                vptr->destruct(&object);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
+                    vptr->destruct(&object);
                     new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else if (object)
+                {
+                    vptr->destruct(&object);
+                    new (object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
@@ -603,15 +612,15 @@ namespace hpx { namespace util {
             }
             else
             {
-                if(!empty())
+                if (!empty())
                 {
-                    vptr->destruct(&object);
+                    vptr->static_delete(&object);
                     vptr = 0;
                     object = 0;
                 }
                 if (!detail::is_empty_function(f))
                 {
-                    if(is_small)
+                    if (sizeof(functor_type) <= sizeof(void *)) 
                     {
                         new (&object) functor_type(boost::forward<Functor>(f));
                     }
@@ -753,8 +762,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                const bool is_small = sizeof(functor_type) <= sizeof(void *);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
                 }
@@ -815,13 +823,17 @@ namespace hpx { namespace util {
                       IArchive
                     , OArchive
                   >();
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
-                vptr->destruct(&object);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
+                    vptr->destruct(&object);
                     new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else if (object)
+                {
+                    vptr->destruct(&object);
+                    new (object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
@@ -830,15 +842,15 @@ namespace hpx { namespace util {
             }
             else
             {
-                if(!empty())
+                if (!empty())
                 {
-                    vptr->destruct(&object);
+                    vptr->static_delete(&object);
                     vptr = 0;
                     object = 0;
                 }
                 if (!detail::is_empty_function(f))
                 {
-                    if(is_small)
+                    if (sizeof(functor_type) <= sizeof(void *)) 
                     {
                         new (&object) functor_type(boost::forward<Functor>(f));
                     }
@@ -980,8 +992,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                const bool is_small = sizeof(functor_type) <= sizeof(void *);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
                 }
@@ -1042,13 +1053,17 @@ namespace hpx { namespace util {
                       IArchive
                     , OArchive
                   >();
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
-                vptr->destruct(&object);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
+                    vptr->destruct(&object);
                     new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else if (object)
+                {
+                    vptr->destruct(&object);
+                    new (object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
@@ -1057,15 +1072,15 @@ namespace hpx { namespace util {
             }
             else
             {
-                if(!empty())
+                if (!empty())
                 {
-                    vptr->destruct(&object);
+                    vptr->static_delete(&object);
                     vptr = 0;
                     object = 0;
                 }
                 if (!detail::is_empty_function(f))
                 {
-                    if(is_small)
+                    if (sizeof(functor_type) <= sizeof(void *)) 
                     {
                         new (&object) functor_type(boost::forward<Functor>(f));
                     }
@@ -1207,8 +1222,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                const bool is_small = sizeof(functor_type) <= sizeof(void *);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
                 }
@@ -1269,13 +1283,17 @@ namespace hpx { namespace util {
                       IArchive
                     , OArchive
                   >();
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
-                vptr->destruct(&object);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
+                    vptr->destruct(&object);
                     new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else if (object)
+                {
+                    vptr->destruct(&object);
+                    new (object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
@@ -1284,15 +1302,15 @@ namespace hpx { namespace util {
             }
             else
             {
-                if(!empty())
+                if (!empty())
                 {
-                    vptr->destruct(&object);
+                    vptr->static_delete(&object);
                     vptr = 0;
                     object = 0;
                 }
                 if (!detail::is_empty_function(f))
                 {
-                    if(is_small)
+                    if (sizeof(functor_type) <= sizeof(void *)) 
                     {
                         new (&object) functor_type(boost::forward<Functor>(f));
                     }
@@ -1434,8 +1452,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                const bool is_small = sizeof(functor_type) <= sizeof(void *);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
                 }
@@ -1496,13 +1513,17 @@ namespace hpx { namespace util {
                       IArchive
                     , OArchive
                   >();
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
-                vptr->destruct(&object);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
+                    vptr->destruct(&object);
                     new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else if (object)
+                {
+                    vptr->destruct(&object);
+                    new (object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
@@ -1511,15 +1532,15 @@ namespace hpx { namespace util {
             }
             else
             {
-                if(!empty())
+                if (!empty())
                 {
-                    vptr->destruct(&object);
+                    vptr->static_delete(&object);
                     vptr = 0;
                     object = 0;
                 }
                 if (!detail::is_empty_function(f))
                 {
-                    if(is_small)
+                    if (sizeof(functor_type) <= sizeof(void *)) 
                     {
                         new (&object) functor_type(boost::forward<Functor>(f));
                     }
@@ -1661,8 +1682,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                const bool is_small = sizeof(functor_type) <= sizeof(void *);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
                 }
@@ -1723,13 +1743,17 @@ namespace hpx { namespace util {
                       IArchive
                     , OArchive
                   >();
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
-                vptr->destruct(&object);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
+                    vptr->destruct(&object);
                     new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else if (object)
+                {
+                    vptr->destruct(&object);
+                    new (object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
@@ -1738,15 +1762,15 @@ namespace hpx { namespace util {
             }
             else
             {
-                if(!empty())
+                if (!empty())
                 {
-                    vptr->destruct(&object);
+                    vptr->static_delete(&object);
                     vptr = 0;
                     object = 0;
                 }
                 if (!detail::is_empty_function(f))
                 {
-                    if(is_small)
+                    if (sizeof(functor_type) <= sizeof(void *)) 
                     {
                         new (&object) functor_type(boost::forward<Functor>(f));
                     }
@@ -1888,8 +1912,7 @@ namespace hpx { namespace util {
                             IArchive
                           , OArchive
                         >();
-                const bool is_small = sizeof(functor_type) <= sizeof(void *);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
                 }
@@ -1950,13 +1973,17 @@ namespace hpx { namespace util {
                       IArchive
                     , OArchive
                   >();
-            const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(vptr == f_vptr && !empty())
             {
-                vptr->destruct(&object);
-                if(is_small)
+                if (sizeof(functor_type) <= sizeof(void *)) 
                 {
+                    vptr->destruct(&object);
                     new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else if (object)
+                {
+                    vptr->destruct(&object);
+                    new (object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
@@ -1965,15 +1992,15 @@ namespace hpx { namespace util {
             }
             else
             {
-                if(!empty())
+                if (!empty())
                 {
-                    vptr->destruct(&object);
+                    vptr->static_delete(&object);
                     vptr = 0;
                     object = 0;
                 }
                 if (!detail::is_empty_function(f))
                 {
-                    if(is_small)
+                    if (sizeof(functor_type) <= sizeof(void *)) 
                     {
                         new (&object) functor_type(boost::forward<Functor>(f));
                     }
