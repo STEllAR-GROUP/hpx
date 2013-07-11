@@ -49,7 +49,7 @@ void initLoop(int i);
 vector<double> A;
 vector<double> L;
 vector<double> U;
-int size = 1000;
+int size = 2000;
 
 boost::uint64_t get_tick_count()
 {
