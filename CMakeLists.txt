@@ -184,18 +184,6 @@ endif()
 ###############################################################################
 # Configure option to automatically set all required settings to use the
 # XeonPhi
-<<<<<<< HEAD
-###############################################################################
-hpx_option(HPX_NATIVE_MIC BOOL
-    "Build HPX to run natively on the Intel MIC coprocessor (default: OFF)."
-    OFF ADVANCED)
-
-if(HPX_NATIVE_MIC)
-  if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
-    hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
-  endif()
-  set(HPX_MALLOC "tbbmalloc")
-=======
 ###############################################################################
 hpx_option(HPX_NATIVE_MIC BOOL
     "Build HPX to run natively on the Intel MIC coprocessor (default: OFF)."
@@ -215,7 +203,6 @@ hpx_option(HPX_USE_MORE_THAN_64_THREADS BOOL
     "HPX applications will use more than 64 threads (default: OFF)." OFF ADVANCED)
 if(HPX_USE_MORE_THAN_64_THREADS OR HPX_NATIVE_MIC)
   hpx_add_definitions(-DHPX_HAVE_MORE_THAN_64_THREADS)
->>>>>>> master
 endif()
 
 ###############################################################################
@@ -504,7 +491,6 @@ if(NOT HPX_DISABLE_HWLOC)
     hpx_add_definitions(-DHPX_HAVE_HWLOC)
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
   endif()
-<<<<<<< HEAD
 endif()
 
 ################################################################################
@@ -527,8 +513,6 @@ if(SODIUM_FOUND)
   endif()
 elseif(HPX_HAVE_SECURITY)
   hpx_error("security" "The libsodium library has to be available to enable security features.")
-=======
->>>>>>> master
 endif()
 
 ###############################################################################

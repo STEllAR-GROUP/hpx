@@ -335,10 +335,6 @@ namespace hpx { namespace util
         // make sure each node loads libraries in a different order
         std::srand(static_cast<unsigned>(std::time(0)));
         std::random_shuffle(libdata.begin(), end);
-                catch (...) {
-                    LRT_(info) << "skipping " << curr.string()
-                               << ": unexpected exception";
-                }
 
         typedef std::pair<fs::path, std::string> libdata_type;
         BOOST_FOREACH(libdata_type const& p,
@@ -361,10 +357,6 @@ namespace hpx { namespace util
                 LRT_(info) << "skipping " << p.first.string()
                     << ": " << get_error_what(ec);
                 ec = error_code(lightweight);   // reinit ec
-                catch (...) {
-                    LRT_(info) << "skipping " << curr.string()
-                               << ": unexpected exception";
-                }
             }
 
             // get the plugin factory
