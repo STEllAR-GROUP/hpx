@@ -43,10 +43,10 @@ namespace hpx { namespace components { namespace security
             };
 
             static boost::uint64_t const root_certificate_authority_capability =
-                (1 << capability_certificate_authority) +
-                (1 << capability_create_component_delegation) +
-                (1 << capability_const_delegation) +
-                (1 << capability_non_const_delegation);
+                (1ull << capability_certificate_authority) +
+                (1ull << capability_create_component_delegation) +
+                (1ull << capability_const_delegation) +
+                (1ull << capability_non_const_delegation);
         };
     }
 
@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace security
                  i != security::traits::capability<>::size;
                  ++i)
             {
-                set(i, (bits & (1 << i)) != 0);
+                set(i, (bits & (1ull << i)) != 0);
             }
         }
 
@@ -74,11 +74,11 @@ namespace hpx { namespace components { namespace security
 
             if (value)
             {
-                bits_[position / CHAR_BIT] |= (1 << (position % CHAR_BIT));
+                bits_[position / CHAR_BIT] |= (1ull << (position % CHAR_BIT));
             }
             else
             {
-                bits_[position / CHAR_BIT] &= ~(1 << (position % CHAR_BIT));
+                bits_[position / CHAR_BIT] &= ~(1ull << (position % CHAR_BIT));
             }
         }
 
@@ -86,7 +86,7 @@ namespace hpx { namespace components { namespace security
         {
             BOOST_ASSERT(position < security::traits::capability<>::size);
 
-            return bits_[position / CHAR_BIT] & (1 << (position % CHAR_BIT));
+            return bits_[position / CHAR_BIT] & (1ull << (position % CHAR_BIT)) ? true : false;
         }
 
         bool verify(capability const & sender) const
@@ -130,8 +130,8 @@ namespace hpx { namespace components { namespace security
             {
                 for (std::size_t j = CHAR_BIT; j != 0; --j)
                 {
-                    os << ((capability.bits_[i] & (1 << (j - 1))) == 0 ? "0"
-                                                                       : "1");
+                    os << ((capability.bits_[i] & (1ull << (j - 1))) == 0 ? "0"
+                                                                          : "1");
                 }
             }
 
