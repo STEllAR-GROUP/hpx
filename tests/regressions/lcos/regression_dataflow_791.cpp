@@ -17,6 +17,8 @@
 #include <hpx/util/unwrapped.hpp>
 #include <vector>
 
+#include <hpx/util/lightweight_test.hpp>
+
 using std::vector;
 using hpx::lcos::future;
 using hpx::lcos::wait;
@@ -49,7 +51,7 @@ void initLoop(int i);
 vector<double> A;
 vector<double> L;
 vector<double> U;
-int size = 1000;
+int size = 2000;
 
 boost::uint64_t get_tick_count()
 {
@@ -91,7 +93,8 @@ int hpx_main (int argc, char *argv[])
 
     checkResult( originalA );
 
-    return hpx::finalize();
+    hpx::finalize();
+    return hpx::util::report_errors();
 }
 
 int main(int argc, char *argv[])
@@ -121,6 +124,7 @@ void LU( int numBlocks)
             dfArray[i][j].resize(numBlocks, hpx::make_ready_future(block()));
         }
     }
+    //first iteration through matrix, initialized vector of futures
     dfArray[0][0][0] = async( ProcessDiagonalBlock, blockList[0][0] );
     diag_block = &dfArray[0][0][0];
     for(int i = 1; i < numBlocks; i++) {
@@ -133,6 +137,7 @@ void LU( int numBlocks)
             dfArray[0][i][j] = dataflow( unwrapped( &ProcessInnerBlock ), hpx::make_ready_future( blockList[i][j]), dfArray[0][0][j], *first_col );
         }
     }
+    //all calcultion after initialization. Each iteration, the number of tasks/blocks spawned is decreased.
     for(int i = 1; i < numBlocks; i++) {
         dfArray[i][i][i] = dataflow( unwrapped( &ProcessDiagonalBlock ), dfArray[i-1][i][i]);
         diag_block = &dfArray[i][i][i];
@@ -238,7 +243,7 @@ void checkResult( vector<double> &originalA )
     for(int i=0;i<size;i++)
         L[i*size+i] = 1;
 
-    for(int i=0;i<size;i++)
+    for(int i=0;i<size;i++) {
         for(int j=0;j<size;j++){
             temp2=0;
             for(int k=0;k<size;k++)
@@ -248,14 +253,8 @@ void checkResult( vector<double> &originalA )
                 errors++;
             }
         }
-    if(errors > 0){
-        printf("A:\n");
-        Print_Matrix(A);
-        printf("originalA:\n");
-        Print_Matrix(originalA);
+        HPX_TEST_EQ(errors, 0);
     }
-
-    printf("Errors = %d \n", errors);
 }
 
 void Print_Matrix(vector<double> &v)
