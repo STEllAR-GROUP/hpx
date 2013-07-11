@@ -56,11 +56,11 @@ struct stage_data : public DebugObject {
 };
 
 void run_guarded(guard& g,guard_task *task) {
-    ASSERTX(task != NULL);
+    BOOST_ASSERT(task != NULL);
     task->check();
     guard_task *prev = g.task.exchange(task);
     if(prev != NULL) {
-    	prev->check();
+        prev->check();
         guard_task *zero = NULL;
         if(!prev->next.compare_exchange_strong(zero,task)) {
             run_async(task);
@@ -84,10 +84,10 @@ struct stage_task_cleanup {
         for(std::size_t k=0;k<n;k++) {
             guard_task *lt = sd->stages[k];
             lt->check();
-            ASSERTX(!lt->single_guard);
+            BOOST_ASSERT(!lt->single_guard);
             zero = NULL;
             if(!lt->next.compare_exchange_strong(zero,lt)) {
-                ASSERTX(zero != lt);
+                BOOST_ASSERT(zero != lt);
                 run_async(zero);
                 free(lt);
             }
@@ -105,7 +105,7 @@ void stage_task(stage_data *sd,std::size_t i,std::size_t n) {
         std::size_t k = i + 1;
         guard_task *stage = sd->stages[k];
         stage->run = boost::bind(stage_task,sd,k,n);
-        ASSERTX(!stage->single_guard);
+        BOOST_ASSERT(!stage->single_guard);
         run_guarded(*sd->gs.get(k),stage);
     }
 }
@@ -147,7 +147,7 @@ void run_guarded(guard& guard,boost::function<void()> task) {
 }
 
 void run_async(guard_task *task) {
-    ASSERTX(task != NULL);
+    BOOST_ASSERT(task != NULL);
     task->check();
     hpx::apply(&run_composable,task);
 }
@@ -165,10 +165,10 @@ struct run_composable_cleanup {
         // setup tasks for a multi-guarded task. By not setting
         // the next field, we halt processing on items queued
         // to this guard.
-        ASSERTX(task != NULL);
+        BOOST_ASSERT(task != NULL);
         task->check();
         if(!task->next.compare_exchange_strong(zero,task)) {
-            ASSERTX(task->next.load()!=NULL);
+            BOOST_ASSERT(task->next.load()!=NULL);
             run_async(zero);
             free(task);
         }
@@ -176,7 +176,7 @@ struct run_composable_cleanup {
 };
 
 void run_composable(guard_task *task) {
-    ASSERTX(task != NULL);
+    BOOST_ASSERT(task != NULL);
     task->check();
     if(task->single_guard) {
         run_composable_cleanup rcc(task);
@@ -185,4 +185,4 @@ void run_composable(guard_task *task) {
         task->run();
     }
 }
-}}};
+}}}
