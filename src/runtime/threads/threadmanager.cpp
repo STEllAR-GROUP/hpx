@@ -1955,11 +1955,15 @@ namespace hpx { namespace threads
                     // do background work in parcel layer
                     hpx::parcelset::flush_buffers();
                 }
+
+                ++idle_loop_count;
             }
 
             // Clean up all terminated threads for all thread queues once in a
             // while.
-            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX) {
+            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX ||
+                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+            {
                 // do background work in the scheduler
                 busy_loop_count = 0;
                 scheduler_.cleanup_terminated(true);
