@@ -116,15 +116,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -140,8 +147,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -198,15 +204,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -222,8 +235,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -454,15 +466,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -478,8 +497,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -536,15 +554,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -560,8 +585,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -792,15 +816,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -816,8 +847,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -874,15 +904,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -898,8 +935,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -1130,15 +1166,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -1154,8 +1197,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -1212,15 +1254,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -1236,8 +1285,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -1468,15 +1516,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -1492,8 +1547,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -1550,15 +1604,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -1574,8 +1635,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -1806,15 +1866,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -1830,8 +1897,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -1888,15 +1954,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -1912,8 +1985,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -2144,15 +2216,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -2168,8 +2247,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -2226,15 +2304,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -2250,8 +2335,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -2482,15 +2566,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -2506,8 +2597,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -2564,15 +2654,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -2588,8 +2685,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -2820,15 +2916,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -2844,8 +2947,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -2902,15 +3004,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -2926,8 +3035,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -3158,15 +3266,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -3182,8 +3297,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -3240,15 +3354,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -3264,8 +3385,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -3496,15 +3616,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -3520,8 +3647,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -3578,15 +3704,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -3602,8 +3735,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -3834,15 +3966,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -3858,8 +3997,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -3916,15 +4054,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -3940,8 +4085,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -4172,15 +4316,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -4196,8 +4347,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -4254,15 +4404,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -4278,8 +4435,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -4510,15 +4666,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -4534,8 +4697,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -4592,15 +4754,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -4616,8 +4785,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -4848,15 +5016,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -4872,8 +5047,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -4930,15 +5104,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -4954,8 +5135,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -5186,15 +5366,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -5210,8 +5397,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -5268,15 +5454,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -5292,8 +5485,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -5524,15 +5716,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -5548,8 +5747,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -5606,15 +5804,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -5630,8 +5835,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -5862,15 +6066,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -5886,8 +6097,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -5944,15 +6154,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -5968,8 +6185,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -6200,15 +6416,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -6224,8 +6447,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -6282,15 +6504,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -6306,8 +6535,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
@@ -6538,15 +6766,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(*next);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(*next)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -6562,8 +6797,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(*next)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 boost::bind(
                                     f
@@ -6620,15 +6854,22 @@ namespace hpx { namespace lcos { namespace local {
                             future_type
                         >::type
                         completed_callback_type;
+                    typedef
+                        typename lcos::future_traits<
+                            future_type
+                        >::value_type
+                        future_result_type;
+                    boost::intrusive_ptr<
+                        lcos::detail::future_data_base<future_result_type>
+                    > next_future_data
+                        = hpx::lcos::detail::get_future_data(f_);
                     completed_callback_type cb
                         = boost::move(
-                            hpx::lcos::detail::get_future_data(f_)
-                            ->reset_on_completed()
+                            next_future_data->reset_on_completed()
                         );
                     if(cb)
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 compose_cb(
                                     boost::move(cb)
@@ -6644,8 +6885,7 @@ namespace hpx { namespace lcos { namespace local {
                     }
                     else
                     {
-                        hpx::lcos::detail::get_future_data(f_)
-                        ->set_on_completed(
+                        next_future_data->set_on_completed(
                             boost::move(
                                 hpx::util::bind(
                                     f
