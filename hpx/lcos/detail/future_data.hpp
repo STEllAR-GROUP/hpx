@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -408,17 +408,17 @@ namespace detail
     public:
         bool has_value() const
         {
-            return ready() && data_.peek(&has_data_helper);
+            return !data_.is_empty() && data_.peek(&has_data_helper);
         }
 
         bool has_exception() const
         {
-            return ready() && !data_.peek(&has_data_helper);
+            return !data_.is_empty() && !data_.peek(&has_data_helper);
         }
 
         BOOST_SCOPED_ENUM(future_status) get_state() const
         {
-            return ready() ? future_status::ready : future_status::deferred;
+            return !data_.is_empty() ? future_status::ready : future_status::deferred;
         }
 
         /// Reset the promise to allow to restart an asynchronous
@@ -447,7 +447,7 @@ namespace detail
 
             completed_callback_type retval = boost::move(on_completed_);
 
-            if (!data_sink.empty() && this->ready()) {
+            if (!data_sink.empty() && !data_.is_empty()) {
                 // invoke the callback (continuation) function right away
                 data_sink(f);
             }
@@ -460,8 +460,12 @@ namespace detail
 
         completed_callback_type reset_on_completed()
         {
-            typename mutex_type::scoped_lock l(this->mtx_);
-            return boost::move(on_completed_);
+            completed_callback_type cb;
+            {
+                typename mutex_type::scoped_lock l(this->mtx_);
+                cb = boost::move(on_completed_);
+            }
+            return boost::move(cb);
         }
 
     private:
