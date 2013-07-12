@@ -18,32 +18,28 @@ boost::shared_ptr<hpx::lcos::local::guard> l2(new hpx::lcos::local::guard());
 void incr1() {
     // implicitly lock l1
     int tmp = i1.load();
-    ASSERTX(i1.compare_exchange_strong(tmp,tmp+1));
+    HPX_TEST(i1.compare_exchange_strong(tmp,tmp+1));
     // implicitly unlock l1
 }
 void incr2() {
     // implicitly lock l2
     int tmp = i2.load();
-    ASSERTX(i2.compare_exchange_strong(tmp,tmp+1));
+    HPX_TEST(i2.compare_exchange_strong(tmp,tmp+1));
     // implicitly unlock l2
 }
 void both() {
     // implicitly lock l1 and l2
     int tmp = i1.load();
-    ASSERTX(i1.compare_exchange_strong(tmp,tmp+1));
+    HPX_TEST(i1.compare_exchange_strong(tmp,tmp+1));
     tmp = i2.load();
-    ASSERTX(i2.compare_exchange_strong(tmp,tmp+1));
+    HPX_TEST(i2.compare_exchange_strong(tmp,tmp+1));
     // implicitly unlock l1 and l2
 }
 
 std::size_t increments = 3000;
 
 void check() {
-    if(2*increments == i1 && 2*increments == i2) {
-        std::cout << "Test passed" << std::endl;
-    } else {
-        std::cout << "Test failed: i1=" << i1 << " i2=" << i2 << std::endl;
-    }
+    HPX_TEST(2*increments == i1 && 2*increments == i2);
 }
 
 int hpx_main(boost::program_options::variables_map& vm) {
