@@ -18,7 +18,6 @@ set(example_programs
     fibonacci_futures
     fractals
     fractals_struct
-    #fractals_oclm
     interest_calculator
     non_atomic_rma
     pingpong
