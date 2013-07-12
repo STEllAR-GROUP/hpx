@@ -83,15 +83,15 @@ public:
     typedef detail::atomic::internal_atomic<void *, sizeof(void *), int> super;
 
     atomic() {}
-    explicit atomic(T * p) : super(reinterpret_cast<intptr_t>(p)) {}
+    explicit atomic(T * p) : super(static_cast<void *>(p)) {}
 
     T *load(memory_order order=memory_order_seq_cst) const volatile
     {
-        return reinterpret_cast<T*>(super::load(order));
+        return static_cast<T*>(super::load(order));
     }
     void store(T *v, memory_order order=memory_order_seq_cst) volatile
     {
-        super::store(reinterpret_cast<intptr_t>(v), order);
+        super::store(static_cast<void *>(v), order);
     }
     bool compare_exchange_strong(
         T * &expected,
@@ -113,9 +113,9 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        intptr_t expected_=reinterpret_cast<intptr_t>(expected), desired_=reinterpret_cast<intptr_t>(desired);
+        void * expected_=static_cast<void *>(expected), desired_=static_cast<void *>(desired);
         bool success=super::compare_exchange_weak(expected_, desired_, success_order, failure_order);
-        expected=reinterpret_cast<T*>(expected_);
+        expected=static_cast<T*>(expected_);
         return success;
     }
     bool compare_exchange_strong(
@@ -124,14 +124,14 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        intptr_t expected_=reinterpret_cast<intptr_t>(expected), desired_=reinterpret_cast<intptr_t>(desired);
+        void * expected_=static_cast<void *>(expected), desired_=static_cast<void *>(desired);
         bool success=super::compare_exchange_strong(expected_, desired_, success_order, failure_order);
-        expected=reinterpret_cast<T*>(expected_);
+        expected=static_cast<T*>(expected_);
         return success;
     }
     T *exchange(T * replacement, memory_order order=memory_order_seq_cst) volatile
     {
-        return reinterpret_cast<T*>(super::exchange(reinterpret_cast<intptr_t>(replacement), order));
+        return static_cast<T*>(super::exchange(static_cast<void *>(replacement), order));
     }
     using super::is_lock_free;
 
@@ -140,11 +140,11 @@ public:
 
     T * fetch_add(ptrdiff_t diff, memory_order order=memory_order_seq_cst) volatile
     {
-        return reinterpret_cast<T*>(super::fetch_add(diff*sizeof(T), order));
+        return static_cast<T*>(super::fetch_add(diff*sizeof(T), order));
     }
     T * fetch_sub(ptrdiff_t diff, memory_order order=memory_order_seq_cst) volatile
     {
-        return reinterpret_cast<T*>(super::fetch_sub(diff*sizeof(T), order));
+        return static_cast<T*>(super::fetch_sub(diff*sizeof(T), order));
     }
 
     T *operator++(void) volatile {return fetch_add(1)+1;}
