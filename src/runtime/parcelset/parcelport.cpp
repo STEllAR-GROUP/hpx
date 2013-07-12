@@ -82,6 +82,14 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    parcelport::parcelport(util::runtime_configuration const& ini)
+        : parcels_(),
+        here_(ini.get_parcelport_address()),
+        max_message_size_(ini.get_max_message_size())
+    {
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // default implementation, just forward to single parcel version
     void parcelport::put_parcels(std::vector<parcel> const & parcels,
             std::vector<write_handler_type> const& handlers)

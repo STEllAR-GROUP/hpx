@@ -61,8 +61,9 @@ namespace hpx { namespace parcelset { namespace tcp
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-                naming::locality const& locality_id,
-                performance_counters::parcels::gatherer& parcels_sent);
+            naming::locality const& locality_id,
+            performance_counters::parcels::gatherer& parcels_sent,
+            boost::uint64_t max_outbound_size);
 
         ~parcelport_connection()
         {
@@ -202,6 +203,9 @@ namespace hpx { namespace parcelset { namespace tcp
         boost::integer::ulittle64_t out_size_;
         boost::integer::ulittle64_t out_data_size_;
         std::vector<char> out_buffer_;
+
+        boost::uint64_t max_outbound_size_;
+
         bool ack_;
 
 #if defined(HPX_HAVE_SECURITY)

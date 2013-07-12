@@ -59,10 +59,7 @@ namespace hpx { namespace parcelset
         > read_handler_type;
 
         /// Construct the parcelport on the given locality.
-        parcelport(naming::locality here)
-          : parcels_(), here_(here)
-        {
-        }
+        parcelport(util::runtime_configuration const& ini);
 
         /// Start the parcelport I/O thread pool.
         ///
@@ -304,6 +301,12 @@ namespace hpx { namespace parcelset
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
+        /// Return the configured maximal allowed message data size
+        boost::uint64_t get_max_message_size() const
+        {
+            return max_message_size_;
+        }
+
     protected:
         void report_potential_connection_error(naming::locality const& locality_id,
             naming::gid_type const& parcel_id, error_code const& ec);
@@ -323,6 +326,9 @@ namespace hpx { namespace parcelset
 
         /// The local locality
         naming::locality here_;
+
+        /// The maximally allowed message size
+        boost::uint64_t const max_message_size_;
 
         /// Parcel timers and their data containers.
         performance_counters::parcels::gatherer parcels_sent_;

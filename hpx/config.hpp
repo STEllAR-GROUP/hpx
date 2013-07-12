@@ -211,6 +211,18 @@
 #  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 4
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the maximally allowed message size for messages transferred
+/// between localities. This value can be changed at runtime by
+/// setting the configuration parameter:
+///
+///   hpx.parcel.max_message_size = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_MAX_MESSAGE_SIZE).
+#if !defined(HPX_MAX_MESSAGE_SIZE)
+#  define HPX_MAX_MESSAGE_SIZE 1000000000
+#endif
 
 /// This defines the number of AGAS address translations kept in the local
 /// cache on a per OS-thread basis (system wide used OS threads).

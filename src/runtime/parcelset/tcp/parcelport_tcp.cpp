@@ -52,7 +52,7 @@ namespace hpx { namespace parcelset { namespace tcp
     parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
+      : parcelset::parcelport(ini),
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_tcp", "-tcp"),
         acceptor_(NULL),
@@ -476,7 +476,7 @@ namespace hpx { namespace parcelset { namespace tcp
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
         parcelport_connection_ptr client_connection(new parcelport_connection(
-            io_service, l, parcels_sent_));
+            io_service, l, parcels_sent_, this->get_max_message_size()));
 
         // Connect to the target locality, retry if needed
         boost::system::error_code error = boost::asio::error::try_again;
@@ -701,19 +701,19 @@ namespace hpx { namespace parcelset { namespace tcp
             }
             catch (hpx::exception const& e) {
                 LPT_(error)
-                    << "decode_message: caught hpx::exception: "
+                    << "decode_message(tcp): caught hpx::exception: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
             }
             catch (boost::system::system_error const& e) {
                 LPT_(error)
-                    << "decode_message: caught boost::system::error: "
+                    << "decode_message(tcp): caught boost::system::error: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
             }
             catch (boost::exception const&) {
                 LPT_(error)
-                    << "decode_message: caught boost::exception.";
+                    << "decode_message(tcp): caught boost::exception.";
                 hpx::report_error(boost::current_exception());
             }
             catch (std::exception const& e) {
@@ -726,11 +726,17 @@ namespace hpx { namespace parcelset { namespace tcp
         }
         catch (...) {
             LPT_(error)
-                << "decode_message: caught unknown exception.";
+                << "decode_message(tcp): caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
 
         return first_message;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    boost::uint64_t get_max_inbound_size(parcelport& pp)
+    {
+        return pp.get_max_message_size();
     }
 
     ///////////////////////////////////////////////////////////////////////////

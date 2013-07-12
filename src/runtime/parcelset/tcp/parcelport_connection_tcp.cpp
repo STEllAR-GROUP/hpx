@@ -45,8 +45,10 @@ namespace hpx { namespace parcelset { namespace tcp
 {
     parcelport_connection::parcelport_connection(boost::asio::io_service& io_service,
             naming::locality const& locality_id,
-            performance_counters::parcels::gatherer& parcels_sent)
+            performance_counters::parcels::gatherer& parcels_sent,
+            boost::uint64_t max_outbound_size)
       : socket_(io_service), out_priority_(0), out_size_(0), out_data_size_(0)
+      , max_outbound_size_(max_outbound_size)
 #if defined(HPX_HAVE_SECURITY)
       , first_message_(true)
 #endif
@@ -251,6 +253,19 @@ namespace hpx { namespace parcelset { namespace tcp
                 boost::str(boost::format(
                     "parcelport: parcel serialization failed, caught "
                     "std::exception: %s") % e.what()));
+            return;
+        }
+
+        // make sure outgoing message is not larger than allowed
+        if (out_buffer_.size() > max_outbound_size_)
+        {
+            HPX_THROW_EXCEPTION(serialization_error,
+                "tcp::parcelport_connection::set_parcel",
+                boost::str(boost::format(
+                    "parcelport: parcel serialization created message larger "
+                    "than allowed (created: %ld, allowed: %ld), consider"
+                    "configuring larger hpx.parcel.max_message_size") %
+                        out_buffer_.size() % max_outbound_size_));
             return;
         }
 

@@ -43,6 +43,8 @@ namespace hpx { namespace parcelset { namespace tcp
         boost::uint64_t inbound_data_size,
         performance_counters::parcels::data_point receive_data,
         bool first_message = false);
+
+    boost::uint64_t get_max_inbound_size(parcelport&);
 }}}
 
 namespace hpx { namespace parcelset { namespace server { namespace tcp
@@ -58,6 +60,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 parcelset::tcp::parcelport& parcelport)
           : socket_(io_service), in_priority_(0), in_size_(0), in_data_size_(0)
           , in_buffer_()
+          , max_inbound_size_(get_max_inbound_size(parcelport))
 #if defined(HPX_HAVE_SECURITY)
           , first_message_(true)
 #endif
@@ -134,6 +137,15 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
             else {
                 // Determine the length of the serialized data.
                 boost::uint64_t inbound_size = in_size_;
+
+                if (inbound_size > max_inbound_size_)
+                {
+                    // report this problem back to the handler
+                    boost::get<0>(handler)(boost::asio::error::make_error_code(
+                        boost::asio::error::operation_not_supported));
+                    return;
+                }
+
                 receive_data_.bytes_ = std::size_t(inbound_size);
 
                 // Start an asynchronous call to receive the data.
@@ -218,6 +230,9 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         boost::integer::ulittle64_t in_size_;
         boost::integer::ulittle64_t in_data_size_;
         boost::shared_ptr<std::vector<char> > in_buffer_;
+
+        boost::uint64_t max_inbound_size_;
+
         bool ack_;
 
 #if defined(HPX_HAVE_SECURITY)
