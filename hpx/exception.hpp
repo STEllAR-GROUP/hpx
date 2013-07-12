@@ -152,7 +152,7 @@ namespace hpx
         /* 44 */ "thread_interrupted",
         /* 45 */ "thread_not_interruptable",
         /* 46 */ "duplicate_component_id",
-        /* 47 */ "unknown_error"
+        /* 47 */ "unknown_error",
         /* 48 */ "bad_plugin_type",
         /* 49 */ "filesystem_error",
         /* 50 */ "security_error",
