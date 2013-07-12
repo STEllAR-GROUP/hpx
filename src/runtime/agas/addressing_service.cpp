@@ -1239,7 +1239,7 @@ void addressing_service::route(
 
     // Determine whether the gid is local or remote
     naming::address addr;
-    if (agas::is_local_address(target, addr))
+    if (is_local_address(target.get_gid(), addr))
     {
         // route through the local AGAS service instance
         applier::detail::apply_l_p<action_type>(addr, action_priority_, req);

@@ -97,6 +97,15 @@ struct HPX_EXPORT primary_namespace
     static naming::gid_type get_service_instance(naming::gid_type const& dest)
     {
         boost::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
+        if (service_locality_id == naming::invalid_locality_id)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "primary_namespace::get_service_instance",
+                boost::str(boost::format(
+                        "can't retrieve a valid locality id from global address: "
+                    ) % dest));
+            return naming::gid_type();
+        }
         naming::gid_type service(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB);
         return naming::replace_locality_id(service, service_locality_id);
     }
