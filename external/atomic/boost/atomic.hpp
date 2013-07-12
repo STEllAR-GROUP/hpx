@@ -113,7 +113,8 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        void * expected_=static_cast<void *>(expected), desired_=static_cast<void *>(desired);
+        void * expected_=static_cast<void *>(expected);
+        void * desired_=static_cast<void *>(desired);
         bool success=super::compare_exchange_weak(expected_, desired_, success_order, failure_order);
         expected=static_cast<T*>(expected_);
         return success;
@@ -124,7 +125,8 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        void * expected_=static_cast<void *>(expected), desired_=static_cast<void *>(desired);
+        void * expected_=static_cast<void *>(expected);
+        void * desired_=static_cast<void *>(desired);
         bool success=super::compare_exchange_strong(expected_, desired_, success_order, failure_order);
         expected=static_cast<T*>(expected_);
         return success;
