@@ -15,21 +15,21 @@ boost::shared_ptr<hpx::lcos::local::guard> l2(new hpx::lcos::local::guard());
 void incr1() {
     // implicitly lock l1
     int tmp = i1.load();
-    ASSERTX(i1.compare_exchange_strong(tmp,tmp+1));
+    BOOST_ASSERT(i1.compare_exchange_strong(tmp,tmp+1));
     // implicitly unlock l1
 }
 void incr2() {
     // implicitly lock l2
     int tmp = i2.load();
-    ASSERTX(i2.compare_exchange_strong(tmp,tmp+1));
+    BOOST_ASSERT(i2.compare_exchange_strong(tmp,tmp+1));
     // implicitly unlock l2
 }
 void both() {
     // implicitly lock l1 and l2
     int tmp = i1.load();
-    ASSERTX(i1.compare_exchange_strong(tmp,tmp+1));
+    BOOST_ASSERT(i1.compare_exchange_strong(tmp,tmp+1));
     tmp = i2.load();
-    ASSERTX(i2.compare_exchange_strong(tmp,tmp+1));
+    BOOST_ASSERT(i2.compare_exchange_strong(tmp,tmp+1));
     // implicitly unlock l1 and l2
 }
 
