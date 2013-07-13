@@ -308,15 +308,18 @@ namespace hpx { namespace threads { namespace detail
 
             // Clean up all terminated threads for all thread queues once in a
             // while.
-            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX ||
-                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
             {
                 busy_loop_count = 0;
                 scheduler.cleanup_terminated(true);
             }
+            else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+            {
+                scheduler.cleanup_terminated(true);
+            }
         }
 
-        // after tfunc loop broke, record total time elapsed
+        // record total time elapsed after the main scheduling loop exited
         tfunc_time = util::hardware::timestamp() - overall_timestamp;
     }
 }}}

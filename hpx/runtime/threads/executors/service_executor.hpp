@@ -52,7 +52,7 @@ namespace hpx { namespace threads { namespace executors
             std::size_t num_pending_closures(error_code& ec) const;
 
             // helper function
-            void add_no_count(HPX_STD_FUNCTION<void()> f);
+            void add_no_count(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f);
 
         private:
             void thread_wrapper(HPX_STD_FUNCTION<void()> const& f);
