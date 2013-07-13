@@ -93,8 +93,9 @@ namespace hpx
         duplicate_component_id = 46,                ///< The component type has already been registered
         unknown_error = 47,                         ///< An unknown error occurred
         bad_plugin_type = 48,                       ///< The specified plugin type is not known or otherwise invalid
-        filesystem_error = 49,                      ///< The specified file does not exist or other filesystem related error
-        security_error = 50,                        ///< An error occurred in the security component
+        security_error = 49,                        ///< An error occurred in the security component
+        filesystem_error = 50,                      ///< The specified file does not exist or other filesystem related error
+
 
         /// \cond NOINTERNAL
         last_error,
@@ -154,8 +155,9 @@ namespace hpx
         /* 46 */ "duplicate_component_id",
         /* 47 */ "unknown_error",
         /* 48 */ "bad_plugin_type",
-        /* 49 */ "filesystem_error",
-        /* 50 */ "security_error",
+        /* 49 */ "security_error",
+        /* 50 */ "filesystem_error",
+
         /*    */ ""
     };
     /// \endcond
