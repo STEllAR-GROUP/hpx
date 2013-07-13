@@ -52,7 +52,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             &service_executor::thread_wrapper, this, boost::move(f)));
     }
 
-    void service_executor::add_no_count(HPX_STD_FUNCTION<void()> f)
+    void service_executor::add_no_count(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f)
     {
         pool_->get_io_service().post(util::bind(
             &service_executor::thread_wrapper, this, boost::move(f)));

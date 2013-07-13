@@ -275,8 +275,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         state expected = starting;
         states_[virt_core].compare_exchange_strong(expected, running);
 
-        ++current_concurrency_;
         ++max_current_concurrency_;
+        ++current_concurrency_;
 
         {
             on_run_exit on_exit(current_concurrency_, shutdown_sem_);
