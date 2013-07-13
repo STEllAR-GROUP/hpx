@@ -36,7 +36,7 @@ void both() {
     // implicitly unlock l1 and l2
 }
 
-std::size_t increments = 3000;
+int increments = 3000;
 
 void check() {
     HPX_TEST(2*increments == i1 && 2*increments == i2);
@@ -44,13 +44,13 @@ void check() {
 
 int hpx_main(boost::program_options::variables_map& vm) {
     if (vm.count("increments"))
-        increments = vm["increments"].as<std::size_t>();
+        increments = vm["increments"].as<int>();
 
     // create the guard set
     guards.add(l1);
     guards.add(l2);
 
-    for(unsigned int i=0;i<increments;i++) {
+    for(int i=0;i<increments;i++) {
         // spawn 3 asynchronous tasks
         run_guarded(guards,both);
         run_guarded(*l1,incr1);
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("increments,n", boost::program_options::value<std::size_t>()->default_value(3000),
+        ("increments,n", boost::program_options::value<int>()->default_value(3000),
             "the number of times to increment the counters")
         ;
 
