@@ -146,7 +146,7 @@ namespace hpx { namespace threads { namespace policies
         {
 #if defined(HPX_DEBUG)
             // make sure our mutex is locked at this point
-            mutex_type::scoped_try_lock l(mtx_);
+            typename mutex_type::scoped_try_lock l(mtx_);
             BOOST_ASSERT(!l);
 #endif
 
@@ -327,7 +327,7 @@ namespace hpx { namespace threads { namespace policies
     public:
         bool cleanup_terminated(bool delete_all = false)
         {
-            mutex_type::scoped_lock lk(mtx_);
+            typename mutex_type::scoped_lock lk(mtx_);
             return cleanup_terminated_locked(delete_all);
         }
 
@@ -421,7 +421,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread, error_code& ec)
         {
             if (run_now) {
-                mutex_type::scoped_lock lk(mtx_);
+                typename mutex_type::scoped_lock lk(mtx_);
 
                 HPX_STD_UNIQUE_PTR<threads::thread_data> thrd (
                     new (memory_pool_) threads::thread_data(
@@ -602,7 +602,7 @@ namespace hpx { namespace threads { namespace policies
             if (terminated == state)
                 return terminated_items_count_;
 
-            mutex_type::scoped_lock lk(mtx_);
+            typename mutex_type::scoped_lock lk(mtx_);
             if (unknown == state)
             {
                 BOOST_ASSERT((thread_map_.size() + new_tasks_count_) <
@@ -629,7 +629,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads(std::size_t num_thread)
         {
-            mutex_type::scoped_lock lk(mtx_);
+            typename mutex_type::scoped_lock lk(mtx_);
             thread_map_type::iterator end =  thread_map_.end();
             for (thread_map_type::iterator it = thread_map_.begin();
                  it != end; ++it)
@@ -702,7 +702,7 @@ namespace hpx { namespace threads { namespace policies
 #if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             return false;
 #else
-            mutex_type::scoped_lock lk(mtx_);
+            typename mutex_type::scoped_lock lk(mtx_);
             return detail::dump_suspended_threads(num_thread, thread_map_
               , idle_loop_count, running);
 #endif

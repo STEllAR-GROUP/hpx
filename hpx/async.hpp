@@ -594,7 +594,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type 
+            boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type 
         result_type;
 
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));

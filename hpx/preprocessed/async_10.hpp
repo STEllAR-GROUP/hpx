@@ -251,7 +251,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0)>::type 
+            boost::result_of<F(Arg0)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
@@ -523,7 +523,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0 , A1)>::type 
+            boost::result_of<F(Arg0 , Arg1)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
@@ -795,7 +795,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0 , A1 , A2)>::type 
+            boost::result_of<F(Arg0 , Arg1 , Arg2)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
@@ -1067,7 +1067,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0 , A1 , A2 , A3)>::type 
+            boost::result_of<F(Arg0 , Arg1 , Arg2 , Arg3)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
@@ -1339,7 +1339,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0 , A1 , A2 , A3 , A4)>::type 
+            boost::result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
@@ -1611,7 +1611,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5)>::type 
+            boost::result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
@@ -1883,7 +1883,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::type 
+            boost::result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
@@ -2155,7 +2155,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::type 
+            boost::result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
@@ -2427,7 +2427,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::type 
+            boost::result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
@@ -2699,7 +2699,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename 
-            boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::type 
+            boost::result_of<F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9)>::type 
         result_type;
         lcos::local::futures_factory<result_type()> p(sched, boost::move(bound));
         p.apply();
