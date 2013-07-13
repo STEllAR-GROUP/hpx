@@ -18,7 +18,7 @@
 
 The major new fetures in this release are:
 
-* We implemented a firstversion of a distributed AGAS service which essentially
+* We implemented a first version of a distributed AGAS service which essentially
   eliminates all explicit AGAS network traffic.
 * We created a native ibverbs parcelport allowing to take advantage of the
   superior latency and bandwidth characteristics of Infiniband networks.
@@ -26,11 +26,25 @@ The major new fetures in this release are:
 * Support for the SLURM scheduling system was implemented.
 * Major efforts have been dedicated to improving the performance counter
   framework, numerous new counters were implemented and new APIs were added.
+* We added a modular parcel compression system allowing to improve bandwidth
+  utilization (by reducing the overall size of the tranferred data).
+* We added a modular parcel coalescing system allowing to combine several
+  parcels into larger messages. This reduces latencies introduced by the
+  communication layer.
+* Added an experimental executors API allowing to use different scheduling
+  policies for different parts of the code. This API has been modelled after
+  the Standards proposal N3562. This API is bound to change in the future,
+  though.
+* Added minimal security support for localities which is enforced on the 
+  parcelport level. This support is preliminary and experimental and might
+  change in the future.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 793] - Changing dataflow test case to hang consistently
+* [issue 792] - CMake Error
 * [issue 790] - wait_for() doesn't compile
 * [issue 789] - HPX with Intel compiler segfaults
 * [issue 788] - Intel compiler support
@@ -54,7 +68,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 769] - Make compile time configuration information available
 * [issue 768] - Const correctness problem in local dataflow
 * [issue 767] - Add launch policies to async
-* [issue 766] - Mark data structures for optimized (array based) serialization 
+* [issue 766] - Mark data structures for optimized (array based) serialization
 * [issue 765] - Align hpx::any with N3508: Any Library Proposal (Revision 2)
 * [issue 764] - Align hpx::future with newest N3558: A Standardized Representation
                 of Asynchronous Operations
