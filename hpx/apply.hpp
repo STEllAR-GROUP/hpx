@@ -23,6 +23,7 @@
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
+#include <boost/mpl/identity.hpp>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/preprocessed/apply.hpp>
@@ -65,7 +66,7 @@ namespace hpx
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
     typename boost::lazy_enable_if<                                           \
         traits::is_callable<F>                                                \
-      , bool                                                                  \
+      , boost::mpl::identity<bool>                                            \
     >::type                                                                   \
     apply(threads::executor& sched, BOOST_FWD_REF(F) f,                       \
         HPX_ENUM_FWD_ARGS(N, A, a))                                           \
@@ -77,7 +78,7 @@ namespace hpx
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
     typename boost::lazy_enable_if<                                           \
         traits::is_callable<F>                                                \
-      , bool                                                                  \
+      , boost::mpl::identity<bool>                                            \
     >::type                                                                   \
     apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                     \
     {                                                                         \
