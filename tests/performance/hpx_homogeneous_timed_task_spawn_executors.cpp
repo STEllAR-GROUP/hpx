@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //  Copyright (c)      2013 Patricia Grubel
 //
@@ -9,6 +9,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/thread_executors.hpp>
 
 #include <stdexcept>
 
@@ -88,34 +89,61 @@ int hpx_main(
     // delay in seconds
     delay_sec = delay * 1.0E-6;
 
+    std::size_t num_os_threads = hpx::get_os_thread_count();
+
+    int num_executors = vm["executors"].as<int>();
+    if (num_executors <= 0)
+        throw std::invalid_argument("number of executors to use must be larger than 0");
+
+    if (num_executors > num_os_threads)
+        throw std::invalid_argument("number of executors to use must be smaller than number of OS threads");
+
+    std::size_t num_cores_per_executor = vm["cores"].as<int>();
+
+    if ((num_executors - 1) * num_cores_per_executor > num_os_threads)
+        throw std::invalid_argument("number of cores per executor should not cause oversubscription");
+
+    if (0 == tasks)
+        throw std::invalid_argument("count of 0 tasks specified\n");
+
+    // Reset performance counters (if specified on command line)
+    reset_active_counters();
+
+    // Start the clock.
+    high_resolution_timer t;
+
+    // create the executor instances
+    using hpx::threads::executors::local_priority_queue_executor;
+
     {
-        if (0 == tasks)
-            throw std::invalid_argument("count of 0 tasks specified\n");
+        std::vector<local_priority_queue_executor> executors;
+        for (std::size_t i = 0; i != num_executors; ++i)
+        {
+            // make sure we don't oversubscribe the cores, the last executor will
+            // be bound to the remaining number of cores
+            if ((i + 1) * num_cores_per_executor > num_os_threads)
+            {
+                BOOST_ASSERT(i == num_executors - 1);
+                num_cores_per_executor = num_os_threads - i * num_cores_per_executor;
+            }
+            executors.push_back(local_priority_queue_executor(num_cores_per_executor));
+        }
 
-        // Reset performance counters (if specified on command line)
-        reset_active_counters();
-
-        // Start the clock.
-        high_resolution_timer t;
+        t.restart();
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(HPX_STD_BIND(&invoke_worker_timed, delay_sec));
+            executors[i % num_executors].add(HPX_STD_BIND(&invoke_worker_timed, delay_sec));
 
-        // Reschedule hpx_main until all other hpx-threads have finished. We
-        // should be resumed after most of the null px-threads have been
-        // executed. If we haven't, we just reschedule ourselves again.
-        do {
-            suspend();
-        } while (get_thread_count(hpx::threads::thread_priority_normal) > 1);
-
-        // Stop the clock
-        double time_elapsed = t.elapsed();
-
-        // Evaluate Performance Counters
-        evaluate_active_counters();
-
-        print_results(get_os_thread_count(), time_elapsed);
+    // destructors of executors will wait for all tasks to finish executing
     }
+
+    // Stop the clock
+    double time_elapsed = t.elapsed();
+
+    // Evaluate Performance Counters
+    evaluate_active_counters();
+
+    print_results(get_os_thread_count(), time_elapsed);
 
     return finalize();
 }
@@ -137,6 +165,14 @@ int main(
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "time in micro-seconds for the delay loop")
+
+        ( "executors,e"
+        , value<int>()->default_value(1)
+        , "number of executor instances to use")
+
+        ( "cores"
+        , value<int>()->default_value(1)
+        , "number of cores to bind to each of the executor instances")
 
         ( "no-header"
         , "do not print out the csv header row")
