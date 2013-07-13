@@ -51,7 +51,7 @@ int hpx_main(boost::program_options::variables_map& vm) {
     guards.add(l1);
     guards.add(l2);
 
-    for(unsigned int i=0;i<increments;i++) {
+    for(int i=0;i<increments;i++) {
         // spawn 3 asynchronous tasks
         run_guarded(guards,both);
         run_guarded(*l1,incr1);
