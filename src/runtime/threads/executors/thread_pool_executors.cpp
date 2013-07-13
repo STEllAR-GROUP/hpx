@@ -7,6 +7,7 @@
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
 #include <hpx/runtime/threads/detail/scheduling_loop.hpp>
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
