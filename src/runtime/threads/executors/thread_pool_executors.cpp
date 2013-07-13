@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime/threads/resource_manager.hpp>
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
@@ -13,8 +14,6 @@
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/util/register_locks.hpp>
-
-#include <boost/scope_exit.hpp>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
@@ -73,11 +72,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
       : scheduler_(max_punits), shutdown_sem_(0),
         states_(max_punits), puinits_(max_punits),
         current_concurrency_(0), tasks_scheduled_(0), tasks_completed_(0),
-        min_punits_(min_punits), max_punits_(max_punits), cookie_(0)
+        max_punits_(max_punits), min_punits_(min_punits), cookie_(0)
     {
         states_.resize(max_punits);
         for (std::size_t i = 0; i != max_punits; ++i)
-            states_[i] = starting;
+            states_[i].store(starting);
 
         // Inform the resource manager about this new executor. This causes the
         // resource manager to interact with this executor using the
@@ -105,7 +104,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // all resources should have been stopped at this point
         for (std::size_t i = 0; i != states_.size(); ++i)
         {
-            BOOST_ASSERT(states_[i] == stopping);
+            BOOST_ASSERT(states_[i].load() == stopping);
         }
 
         // all scheduled tasks should have completed executing
@@ -238,6 +237,25 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         return scheduler_.get_queue_length();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    struct on_run_exit
+    {
+        on_run_exit(boost::atomic<std::size_t>& current_concurrency,
+                lcos::local::counting_semaphore& shutdown_sem)
+          : current_concurrency_(current_concurrency),
+            shutdown_sem_(shutdown_sem)
+        {}
+
+        ~on_run_exit()
+        {
+            --current_concurrency_;
+            shutdown_sem_.signal();
+        }
+
+        boost::atomic<std::size_t>& current_concurrency_;
+        lcos::local::counting_semaphore& shutdown_sem_;
+    };
+
     // execute all work
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::run(std::size_t virt_core)
@@ -250,15 +268,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
         ++current_concurrency_;
 
-        BOOST_SCOPE_EXIT(&current_concurrency_, &shutdown_sem_) {
-            --current_concurrency_;
-            shutdown_sem_.signal();
-        } BOOST_SCOPE_EXIT_END
+        {
+            on_run_exit on_exit(current_concurrency_, shutdown_sem_);
 
-        boost::int64_t executed_threads = 0;
-        boost::uint64_t overall_times = 0, thread_times = 0;
-        threads::detail::scheduling_loop(virt_core, scheduler_, 
-            states_[virt_core], executed_threads, overall_times, thread_times);
+            boost::int64_t executed_threads = 0;
+            boost::uint64_t overall_times = 0, thread_times = 0;
+            threads::detail::scheduling_loop(virt_core, scheduler_, 
+                states_[virt_core], executed_threads, overall_times, thread_times);
+        }
     }
 
     // Return statistics collected by this scheduler
@@ -317,7 +334,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         std::size_t virt_core, error_code& ec)
     {
         // inform the scheduler to stop the virtual core
-        states_[virt_core] = stopping;
+        states_[virt_core].store(stopping);
     }
 }}}}
 
