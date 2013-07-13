@@ -24,6 +24,7 @@
 #include <boost/serialization/export.hpp>
 #include <boost/archive/detail/check.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/mpl/identity.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -46,8 +47,8 @@ namespace hpx
     // MSVC complains about async_continue beeing ambiguous if it sees this
     // forward declaration
     template <typename F, typename Arg1, typename Arg2>
-    inline typename boost::enable_if<
-        traits::is_callable<F>, bool
+    inline typename boost::lazy_enable_if<
+        traits::is_callable<F>, boost::mpl::identity<bool>
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
 
