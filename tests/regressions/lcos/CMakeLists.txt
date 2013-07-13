@@ -8,6 +8,7 @@ set(tests
     async_callback_non_deduced_context
     future_hang_on_get
     dataflow_launch
+    regression_future_790
    )
 
 # MSVC 2010 is not able to cope with this test
@@ -17,6 +18,7 @@ if(NOT MSVC10)
   set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
   set(tests ${tests}
       dataflow_future_swap
+      regression_dataflow_791
      )
   if(HPX_HAVE_CXX11_LAMBDAS)
     set(tests ${tests}

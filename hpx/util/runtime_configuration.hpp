@@ -48,8 +48,6 @@ namespace hpx { namespace util
         // AGAS server only: get number of localities served
         std::size_t get_num_localities() const;
 
-        std::size_t get_agas_promise_pool_size() const;
-
         // Get the AGAS locality to use
         naming::locality get_agas_locality() const;
 
@@ -111,6 +109,9 @@ namespace hpx { namespace util
 
         // Return the endianess to be used for out-serialization
         std::string get_endian_out() const;
+
+        // Return maximally allowed message size
+        boost::uint64_t get_max_message_size() const;
 
     private:
         std::ptrdiff_t init_stack_size(char const* entryname, 

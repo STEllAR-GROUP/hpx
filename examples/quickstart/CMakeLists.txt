@@ -9,6 +9,7 @@ set(example_programs
     component_in_executable
     component_inheritance
     component_inheritance_simple
+    composable_guard
     error_handling
     event_synchronization
     factorial
@@ -18,7 +19,6 @@ set(example_programs
     fractals
     fractals_executor
     fractals_struct
-    #fractals_oclm
     interest_calculator
     non_atomic_rma
     pingpong

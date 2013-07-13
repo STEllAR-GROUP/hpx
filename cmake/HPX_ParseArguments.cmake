@@ -41,6 +41,22 @@ macro(hpx_parse_arguments prefix arg_names option_names)
     endif()
   endforeach()
 
+  foreach(arg ${arg_names})
+      if(${arg})
+        if(NOT ${prefix}_${arg})
+          set(${prefix}_${arg} ${${arg}})
+        endif()
+      endif()
+  endforeach()
+
+  foreach(option ${option_names})
+      if(${option})
+        if(NOT ${prefix}_${option})
+          set(${prefix}_${option} TRUE)
+        endif()
+      endif()
+  endforeach()
+
   set(${prefix}_${current_arg_name} ${current_arg_list})
 endmacro()
 

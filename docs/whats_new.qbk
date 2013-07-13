@@ -31,6 +31,11 @@ The major new fetures in this release are:
 
 Here is a list of the tickets we closed for this release.
 
+* [issue 790] - wait_for() doesn't compile
+* [issue 789] - HPX with Intel compiler segfaults
+* [issue 788] - Intel compiler support
+* [issue 787] - Fixed SFINAEd specializations
+* [issue 786] - Memory issues during benchmarking.
 * [issue 785] - Create an API allowing to register external threads with HPX
 * [issue 784] - util::plugin is throwing an error when a symbol is not found
 * [issue 783] - How does hpx:bind work?
@@ -59,6 +64,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 759] - make install doesn't give a complete install
 * [issue 758] - Stack overflow when using locking_hook<>
 * [issue 757] - copy paste error; unsupported function overloading
+* [issue 756] - GTCX runtime issue in Gordon
 * [issue 755] - Papi counters don't work with reset and evaluate API's
 * [issue 753] - cmake bugfix and improved component action docs
 * [issue 752] - hpx simple component docs
@@ -77,7 +83,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 738] - Dedicated AGAS server runs don't work; console ignores -a option.
 * [issue 737] - Missing bind overloads
 * [issue 736] - Performance counter wildcards do not always work
-* [issue 735] - Creat native ibverbs parcelport based on rdma operations
+* [issue 735] - Create native ibverbs parcelport based on rdma operations
 * [issue 734] - Threads stolen performance counter total is incorrect
 * [issue 733] - Test benchmarks need to be checked and fixed
 * [issue 732] - Build fails with Mac, using mac ports clang-3.3 on latest git
@@ -90,8 +96,8 @@ Here is a list of the tickets we closed for this release.
 * [issue 727] - Memory counters on Mac OS X
 * [issue 725] - Restore original thread priority on resume
 * [issue 724] - Performance benchmarks do not depend on main HPX libraries
-* [issue 723] - --hpx:nodes=`cat $PBS_NODEFILE` works; --hpx:nodefile=$PBS_NODEFILE
-                does not.
+* [issue 723] - [teletype]--hpx:nodes=`cat $PBS_NODEFILE` works; --hpx:nodefile=$PBS_NODEFILE
+                does not.[c++]
 * [issue 722] - Fix binding const member functions as actions
 * [issue 719] - Create performance counter exposing compression ratio
 * [issue 718] - Add possibility to compress parcel data
@@ -117,6 +123,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 704] - Create performance counter to expose thread queue waiting time
 * [issue 703] - Add support to HPX build system to find librcrtool.a and
                 related headers
+* [issue 699] - Generalize instrumentation support
 * [issue 698] - compilation failure with hwloc absent
 * [issue 697] - Performance counter counts should be zero indexed
 * [issue 696] - Distributed problem

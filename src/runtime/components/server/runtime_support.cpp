@@ -778,7 +778,8 @@ namespace hpx { namespace components { namespace server
     }
 
     util::binary_filter* runtime_support::create_binary_filter(
-        char const* binary_filter_type, bool compress, error_code& ec)
+        char const* binary_filter_type, bool compress, 
+        util::binary_filter* next_filter, error_code& ec)
     {
         // locate the factory for the requested plugin type
         plugin_map_mutex_type::scoped_lock l(p_mtx_);
@@ -802,7 +803,7 @@ namespace hpx { namespace components { namespace server
             boost::static_pointer_cast<plugins::binary_filter_factory_base>(
                 (*it).second.first));
 
-        util::binary_filter* bf = factory->create(compress);
+        util::binary_filter* bf = factory->create(compress, next_filter);
         if (0 == bf) {
             hpx::util::osstream strm;
             strm << "couldn't to create binary filter plugin of type: "
@@ -1359,5 +1360,46 @@ namespace hpx { namespace components { namespace server
         }
         return true;    // component got loaded
     }
+
+#if defined(HPX_HAVE_SECURITY)
+    components::security::capability
+        runtime_support::get_factory_capabilities(components::component_type type)
+    {
+        components::security::capability caps;
+
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end()) {
+            hpx::util::osstream strm;
+            strm << "attempt to extract capabilities for component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (component type not found in map)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::get_factory_capabilities",
+                hpx::util::osstream_get_string(strm));
+            return caps;
+        }
+
+        if (!(*it).second.first) {
+            hpx::util::osstream strm;
+            strm << "attempt to extract capabilities for component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (map entry is NULL)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::get_factory_capabilities",
+                hpx::util::osstream_get_string(strm));
+            return caps;
+        }
+
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            caps = factory->get_required_capabilities();
+        }
+        return caps;
+    }
+#endif
 }}}
 

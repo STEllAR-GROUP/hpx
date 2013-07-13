@@ -211,6 +211,18 @@
 #  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 4
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the maximally allowed message size for messages transferred
+/// between localities. This value can be changed at runtime by
+/// setting the configuration parameter:
+///
+///   hpx.parcel.max_message_size = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_MAX_MESSAGE_SIZE).
+#if !defined(HPX_MAX_MESSAGE_SIZE)
+#  define HPX_MAX_MESSAGE_SIZE 1000000000
+#endif
 
 /// This defines the number of AGAS address translations kept in the local
 /// cache on a per OS-thread basis (system wide used OS threads).
@@ -599,18 +611,25 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_AGAS_BOOTSTRAP_PREFIX   0U
+#define HPX_AGAS_BOOTSTRAP_PREFIX                    0U
 
-#define HPX_AGAS_NS_MSB             0x0000000000000001ULL
+#define HPX_AGAS_NS_MSB                              0x0000000000000001ULL
 
-#define HPX_AGAS_PRIMARY_NS_MSB     0x0000000100000001ULL
-#define HPX_AGAS_PRIMARY_NS_LSB     0x0000000000000001ULL
-#define HPX_AGAS_COMPONENT_NS_MSB   0x0000000100000001ULL
-#define HPX_AGAS_COMPONENT_NS_LSB   0x0000000000000002ULL
-#define HPX_AGAS_SYMBOL_NS_MSB      0x0000000100000001ULL
-#define HPX_AGAS_SYMBOL_NS_LSB      0x0000000000000003ULL
-#define HPX_AGAS_LOCALITY_NS_MSB    0x0000000100000001ULL
-#define HPX_AGAS_LOCALITY_NS_LSB    0x0000000000000004ULL
+#define HPX_AGAS_PRIMARY_NS_MSB                      0x0000000100000001ULL
+#define HPX_AGAS_PRIMARY_NS_LSB                      0x0000000000000001ULL
+#define HPX_AGAS_COMPONENT_NS_MSB                    0x0000000100000001ULL
+#define HPX_AGAS_COMPONENT_NS_LSB                    0x0000000000000002ULL
+#define HPX_AGAS_SYMBOL_NS_MSB                       0x0000000100000001ULL
+#define HPX_AGAS_SYMBOL_NS_LSB                       0x0000000000000003ULL
+#define HPX_AGAS_LOCALITY_NS_MSB                     0x0000000100000001ULL
+#define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
+
+#if defined(HPX_HAVE_SODIUM)
+#  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB           0x0000000100000001ULL
+#  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB           0x0000000000000005ULL
+#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB    0x0000000000000001ULL      // this is made locality specific
+#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB    0x0000000000000006ULL
+#endif
 
 #if !defined(HPX_NO_DEPRECATED)
 #  define HPX_DEPRECATED_MSG "This function is deprecated and will be removed in the future."
@@ -630,5 +649,3 @@
 #include <hpx/config/defaults.hpp>
 
 #endif
-
-

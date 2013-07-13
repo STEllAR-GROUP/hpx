@@ -8,6 +8,13 @@
 #include <hpx/components/remote_object/new_impl.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
 
+HPX_REGISTER_ACTION(hpx::components::server::create_component_action0<hpx::components::server::remote_object>,
+    hpx_components_server_create_component_action0_hpx_components_server_remote_object
+)
+
+HPX_REGISTER_ACTION(hpx::components::server::remote_object_apply_action1<hpx::util::function<void(void**)> >,
+    hpx_components_server_remote_object_apply_action1_hpx_util_function_void_void__)
+
 namespace hpx { namespace components { namespace remote_object
 {
     HPX_COMPONENT_EXPORT naming::id_type
@@ -31,3 +38,5 @@ namespace hpx { namespace components { namespace remote_object
     }
 }}}
 
+/*
+*/

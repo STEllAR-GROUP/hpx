@@ -104,6 +104,8 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS) "}",
             "max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:"
                 BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY) "}",
+            "max_message_size = ${HPX_MAX_MESSAGE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_MAX_MESSAGE_SIZE) "}",
 #ifdef BOOST_BIG_ENDIAN
             "endian_out=${HPX_ENDIAN_OUT:big}",
 #else
@@ -479,20 +481,6 @@ namespace hpx { namespace util
         return 1;
     }
 
-    std::size_t
-    runtime_configuration::get_agas_promise_pool_size() const
-    {
-        if (has_section("hpx.agas")) {
-            util::section const* sec = get_section("hpx.agas");
-            if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
-                    sec->get_entry("promise_pool_size",
-                        4 * get_os_thread_count())); //-V112
-            }
-        }
-        return 16;
-    }
-
     std::size_t runtime_configuration::get_agas_local_cache_size(std::size_t dflt) const
     {
         std::size_t cache_size = dflt;
@@ -721,6 +709,20 @@ namespace hpx { namespace util
     {
         return init_stack_size("huge_size",
             BOOST_PP_STRINGIZE(HPX_HUGE_STACK_SIZE), HPX_HUGE_STACK_SIZE);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Return maximally allowed message size
+    boost::uint64_t runtime_configuration::get_max_message_size() const
+    {
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx.parcel");
+            if (NULL != sec) {
+                return boost::lexical_cast<boost::uint64_t>(
+                    sec->get_entry("max_message_size", HPX_MAX_MESSAGE_SIZE));
+            }
+        }
+        return HPX_MAX_MESSAGE_SIZE;    // default is 1GByte
     }
 
     ///////////////////////////////////////////////////////////////////////////

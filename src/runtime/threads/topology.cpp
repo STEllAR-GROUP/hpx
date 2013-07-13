@@ -25,7 +25,7 @@
 
 namespace hpx { namespace threads
 {
-    mask_type noop_topology::empty_mask = mask_type();
+    mask_type noop_topology::empty_mask = mask_type(hardware_concurrency());
 }}
 
 #else

@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file new_.hpp
+/// \file new.hpp
 
 #ifndef BOOST_PP_IS_ITERATING
 
@@ -41,9 +41,9 @@ namespace hpx { namespace components
     /// \returns The function returns an \a hpx::future object instance
     ///          which can be used to retrieve the global address of the
     ///          newly created component.
-    template <typename Component, typename Arg0, ..., typename ArgN>
+    template <typename Component, typename ArgN, ...>
     hpx::future<hpx::id_type>
-    new_(hpx::id_type const& locality, Arg0 arg0, ..., ArgN argN);
+    new_(hpx::id_type const& locality, Arg0 argN, ...);
 #else
     template <typename Component>
     inline typename boost::enable_if<

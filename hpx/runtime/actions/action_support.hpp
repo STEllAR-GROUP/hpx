@@ -36,6 +36,10 @@
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/traits/action_capability_provider.hpp>
+#endif
+
 #include <boost/version.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at.hpp>
@@ -84,6 +88,9 @@ namespace hpx { namespace actions
 
         template <typename Action>
         char const* get_action_name()
+#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+        ;
+#else
         {
             /// If you encounter this assert while compiling code, that means that
             /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
@@ -96,6 +103,7 @@ namespace hpx { namespace actions
             );
             return util::type_id<Action>::typeid_.type_id();
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // If an action returns a future, we need to do special things
@@ -213,6 +221,12 @@ namespace hpx { namespace actions
         virtual parcelset::policies::message_handler* get_message_handler(
             parcelset::parcelhandler* ph, naming::locality const& loc,
             parcelset::connection_type t, parcelset::parcel const& p) const = 0;
+
+#if defined(HPX_HAVE_SECURITY)
+        /// Return the set of capabilities required to invoke this action
+        virtual components::security::capability get_required_capabilities(
+            naming::address::address_type lva) const = 0;
+#endif
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -556,6 +570,14 @@ namespace hpx { namespace actions
                 call(ph, loc, t, p);
         }
 
+#if defined(HPX_HAVE_SECURITY)
+        /// Return the set of capabilities required to invoke this action
+        components::security::capability get_required_capabilities(
+            naming::address::address_type lva) const
+        {
+            return traits::action_capability_provider<derived_type>::call(lva);
+        }
+#endif
     public:
         /// retrieve the N's argument
         template <int N>

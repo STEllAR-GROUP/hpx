@@ -231,6 +231,12 @@ HPX_API_EXPORT void garbage_collect(
 HPX_API_EXPORT naming::id_type get_console_locality(
     error_code& ec = throws
     );
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT naming::gid_type get_next_id(
+    std::size_t count
+  , error_code& ec = throws
+    );
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

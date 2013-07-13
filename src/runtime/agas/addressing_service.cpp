@@ -51,8 +51,21 @@ addressing_service::addressing_service(
 
     if (service_type == service_mode_bootstrap)
         launch_bootstrap(ini_);
+}
+
+void addressing_service::initialize()
+{
+    if (service_type == service_mode_bootstrap)
+    {
+        get_big_boot_barrier().wait();
+    }
     else
+    {
         launch_hosted();
+        get_big_boot_barrier().wait(&hosted->primary_ns_server_);
+    }
+
+    set_status(running);
 } // }}}
 
 naming::locality const& addressing_service::get_here() const
@@ -72,6 +85,8 @@ void addressing_service::launch_bootstrap(
     )
 { // {{{
     bootstrap = boost::make_shared<bootstrap_data_type>();
+
+    runtime& rt = get_runtime();
 
     const naming::locality ep = ini_.get_agas_locality();
     const naming::gid_type here
@@ -110,7 +125,7 @@ void addressing_service::launch_bootstrap(
             static_cast<void*>(&bootstrap->symbol_ns_server_));
 
     set_local_locality(here);
-    get_runtime().get_config().parse("assigned locality",
+    rt.get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
@@ -120,12 +135,23 @@ void addressing_service::launch_bootstrap(
     request locality_req(locality_ns_allocate, ep, 4, num_threads);
     bootstrap->locality_ns_server_.remote_service(locality_req);
 
+    naming::gid_type runtime_support_gid1(here);
+    runtime_support_gid1.set_lsb(rt.get_runtime_support_lva());
+    naming::gid_type runtime_support_gid2(here);
+    runtime_support_gid2.set_lsb(boost::uint64_t(0));
+
+    gva runtime_support_address(ep
+      , components::get_component_type<components::server::runtime_support>()
+      , 1U, rt.get_runtime_support_lva());
+
     request reqs[] =
     {
         request(primary_ns_bind_gid, locality_gid, locality_gva)
       , request(primary_ns_bind_gid, primary_gid, primary_gva)
       , request(primary_ns_bind_gid, component_gid, component_gva)
       , request(primary_ns_bind_gid, symbol_gid, symbol_gva)
+//      , request(primary_ns_bind_gid, runtime_support_gid1, runtime_support_address)
+//      , request(primary_ns_bind_gid, runtime_support_gid2, runtime_support_address)
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
@@ -141,20 +167,18 @@ void addressing_service::launch_bootstrap(
 
     naming::gid_type lower, upper;
     get_id_range(ep, HPX_INITIAL_GID_RANGE, lower, upper);
-    get_runtime().get_id_pool().set_range(lower, upper);
+    rt.get_id_pool().set_range(lower, upper);
 
-    get_big_boot_barrier().wait();
-
-    set_status(running);
+//    get_big_boot_barrier().wait();
+//    set_status(running);
 } // }}}
 
 void addressing_service::launch_hosted()
 { // {{{
     hosted = boost::make_shared<hosted_data_type>();
 
-    get_big_boot_barrier().wait(&hosted->primary_ns_server_);
-
-    set_status(running);
+//    get_big_boot_barrier().wait(&hosted->primary_ns_server_);
+//    set_status(running);
 } // }}}
 
 void addressing_service::adjust_local_cache_size()
@@ -174,10 +198,19 @@ void addressing_service::adjust_local_cache_size()
 
         LAGAS_(info) << (boost::format(
             "addressing_service::adjust_local_cache_size, local_cache_size(%1%), "
-            "local_cache_size_per_thread(%2%), cache_size(%1%)")
+            "local_cache_size_per_thread(%2%), cache_size(%3%)")
             % local_cache_size % local_cache_size_per_thread % cache_size);
     }
 } // }}}
+
+void addressing_service::set_local_locality(naming::gid_type const& g)
+{
+    locality_ = g;
+    if (is_bootstrap())
+        bootstrap->primary_ns_server_.set_local_locality(g);
+    else
+        hosted->primary_ns_server_.set_local_locality(g);
+}
 
 response addressing_service::service(
     request const& req
@@ -674,114 +707,22 @@ components::component_type addressing_service::register_factory(
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-struct lock_semaphore
-{
-    lock_semaphore(lcos::local::counting_semaphore& sem)
-      : sem_(sem)
-    {
-        // this needs to be invoked from a px-thread
-        BOOST_ASSERT(NULL != threads::get_self_ptr());
-        sem_.wait(1);
-    }
-
-    ~lock_semaphore()
-    {
-        sem_.signal(1);
-    }
-
-    lcos::local::counting_semaphore& sem_;
-};
-
-template <typename Pool, typename Promise>
-struct checkout_promise
-{
-    checkout_promise(lcos::local::counting_semaphore& sem, Pool& pool, Promise*& promise)
-      : sem_(sem), result_ok_(false), pool_(pool), promise_(promise)
-    {
-        {
-            // wait for the semaphore to become available
-            lock_semaphore lock(sem_);
-            pool_.dequeue(promise_);
-        }
-
-        BOOST_ASSERT(promise_);
-        promise_->reset();          // reset the promise
-    }
-    ~checkout_promise()
-    {
-        // return the future to the pool
-        if (result_ok_)
-        {
-            // wait for the semaphore to become available
-            lock_semaphore lock(sem_);
-            pool_.enqueue(promise_);
-        }
-    }
-
-    void set_ok() { result_ok_ = true; }
-
-private:
-    // wait for the semaphore to become available
-    lcos::local::counting_semaphore& sem_;
-    bool result_ok_;
-    Pool& pool_;
-    Promise*& promise_;
-};
-
-///////////////////////////////////////////////////////////////////////////////
 bool addressing_service::get_id_range(
-    naming::locality const& ep
-  , boost::uint64_t count
+    boost::uint64_t count
   , naming::gid_type& lower_bound
   , naming::gid_type& upper_bound
   , error_code& ec
     )
 { // {{{ get_id_range implementation
-    typedef lcos::packaged_action<server::locality_namespace::service_action>
-        future_type;
-
-    future_type* f = 0;
-
     try {
-        request req(locality_ns_allocate, ep, count, boost::uint32_t(-1));
+        // naming::locality() is an obsolete, dummy argument
+        request req(primary_ns_allocate, naming::locality(), count, boost::uint32_t(-1));
         response rep;
 
         if (is_bootstrap())
-            rep = bootstrap->locality_ns_server_.service(req, ec);
-
-        else if (get_status() == running)
-            rep = hosted->locality_ns_.service(req, action_priority_, ec);
-
+            rep = bootstrap->primary_ns_server_.service(req, ec);
         else
-        {
-            // WARNING: this deadlocks if AGAS is unresponsive and all response
-            // futures are checked out and pending.
-
-            // get a future
-            typedef checkout_promise<
-                locality_promise_pool_type
-              , future_type
-            > checkout_promise_type;
-
-            checkout_promise_type cf(
-                hosted->promise_pool_semaphore_
-              , hosted->locality_promise_pool_
-              , f);
-
-            if (0 == f)
-            {
-                HPX_THROWS_IF(ec, invalid_status
-                  , "addressing_service::get_id_range"
-                  , "could not check out future object instance during bootstrap");
-                return false;
-            }
-
-            // execute the action (synchronously)
-            f->apply(launch::async, bootstrap_locality_namespace_id(), req);
-            rep = f->get_future().get(ec);
-
-            cf.set_ok();
-        }
+            rep = hosted->primary_ns_server_.service(req, ec);
 
         error const s = rep.get_status();
 
@@ -794,22 +735,6 @@ bool addressing_service::get_id_range(
         return success == s;
     }
     catch (hpx::exception const& e) {
-        if (f && !is_bootstrap())
-        {
-            // Replace the future in the pool. To be able to return the future to
-            // the pool, we'd have to ensure that all threads (pending, suspended,
-            // active, or in flight) that might read/write from it are aborted.
-            // There's no guarantee that the future isn't corrupted in some other
-            // way, and the aforementioned code would be lengthy, and would have to
-            // be meticulously exception-free. So, for now, we just allocate a new
-            // future for the pool, and let the old future stay in memory.
-            {
-                lock_semaphore lock(hosted->promise_pool_semaphore_);
-                hosted->locality_promise_pool_.enqueue(new future_type);
-            }
-            f->set_exception(boost::current_exception());
-        }
-
         HPX_RETHROWS_IF(ec, e, "addressing_service::get_id_range");
         return false;
     }
@@ -1314,7 +1239,7 @@ void addressing_service::route(
 
     // Determine whether the gid is local or remote
     naming::address addr;
-    if (agas::is_local_address(target, addr))
+    if (is_local_address(target.get_gid(), addr))
     {
         // route through the local AGAS service instance
         applier::detail::apply_l_p<action_type>(addr, action_priority_, req);

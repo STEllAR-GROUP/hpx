@@ -230,7 +230,8 @@ sections, one for each component.
     address = ${HPX_PARCEL_SERVER_ADDRESS:<hpx_initial_ip_address>}
     port = ${HPX_PARCEL_SERVER_PORT:<hpx_initial_ip_port>}
     max_connections = ${HPX_MAX_PARCEL_CONNECTIONS:<hpx_max_parcel_connections>}
-    max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:<hpx_max_parcel_connections_per_locality}
+    max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:<hpx_max_parcel_connections_per_locality>}
+    max_message_size = ${HPX_MAX_MESSAGE_SIZE:<hpx_max_message_size>}
 ``
 [c++]
 
@@ -261,6 +262,11 @@ sections, one for each component.
       locality will open to another locality.]
      [static information, the default depends on the compile time preprocessor
       constant `HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY` (`4`)]]
+    [[`hpx.parcel.max_message_size`]
+     [This property defines the maximum allowed message size which will be 
+      transferrable through the parcel layer.]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_MAX_MESSAGE_SIZE` (`1000000000`) bytes.]]
 ]
 
 The following setting relate to the shared memory parcelport (which is usable

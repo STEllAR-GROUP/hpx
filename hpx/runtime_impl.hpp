@@ -210,6 +210,11 @@ namespace hpx {
 
         /// \brief Allow access to the parcel handler instance used by the HPX
         ///        runtime.
+        parcelset::parcelhandler const& get_parcel_handler() const
+        {
+            return parcel_handler_;
+        }
+
         parcelset::parcelhandler& get_parcel_handler()
         {
             return parcel_handler_;
@@ -267,11 +272,11 @@ namespace hpx {
             return reinterpret_cast<boost::uint64_t>(&memory_);
         }
 
-        naming::gid_type get_next_id();
+        naming::gid_type get_next_id(std::size_t count = 1);
 
-        util::unique_ids& get_id_pool()
+        util::unique_id_ranges& get_id_pool()
         {
-            return id_pool;
+            return id_pool_;
         }
 
         /// Add a function to be executed inside a HPX thread before hpx_main
@@ -338,13 +343,21 @@ namespace hpx {
         /// Unregister an external OS-thread with HPX
         bool unregister_thread();
 
+#if defined(HPX_HAVE_SECURITY)
+        // Initialize the subordinate CA for this locality
+        void initialize_locality_certificate_authority(
+            components::security::server::signed_type<
+                components::security::server::certificate
+            > const & root_certificate);
+#endif
+
     private:
         void init_tss(char const* context, std::size_t num, char const* postfix,
             bool service_thread);
         void deinit_tss();
 
     private:
-        util::unique_ids id_pool;
+        util::unique_id_ranges id_pool_;
         runtime_mode mode_;
         int result_;
         std::size_t num_threads_;

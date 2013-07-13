@@ -88,12 +88,11 @@ namespace hpx { namespace parcelset
         ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(naming::resolver_client& resolver,
-            boost::shared_ptr<parcelport> pp,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
 
-        ~parcelhandler()
-        {
-        }
+        ~parcelhandler() {}
+
+        void initialize(boost::shared_ptr<parcelport> pp);
 
         /// \brief Attach the given parcel port to this handler
         void attach_parcelport(boost::shared_ptr<parcelport> pp, bool run = true);
@@ -153,7 +152,8 @@ namespace hpx { namespace parcelset
         ///          remote locality known by AGAS
         ///          (!prefixes.empty()).
         bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            components::component_type type = components::component_invalid,
+            error_code& ec = throws) const;
 
         /// Return the list of all localities supporting the given
         /// component type
@@ -407,6 +407,16 @@ namespace hpx { namespace parcelset
         // the total time it took for all receiver-side serialization
         // operations (nanoseconds)
         boost::int64_t get_receiving_serialization_time(connection_type, bool) const;
+
+#if defined(HPX_HAVE_SECURITY)
+        // the total time it took for all sender-side security operations
+        // (nanoseconds)
+        boost::int64_t get_sending_security_time(connection_type, bool) const;
+
+        // the total time it took for all receiver-side security
+        // operations (nanoseconds)
+        boost::int64_t get_receiving_security_time(connection_type, bool) const;
+#endif
 
         // total data sent (bytes)
         std::size_t get_data_sent(connection_type, bool) const;

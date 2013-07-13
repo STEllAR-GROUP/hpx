@@ -90,6 +90,14 @@ char const* const primary_namespace_service_name = "primary_namespace/";
 ///     00000001000000010000000000000003
 ///         Address of the symbol_namespace component on the bootstrap AGAS
 ///         locality.
+///     00000001000000010000000000000004
+///         Address of the locality_namespace component on the bootstrap AGAS
+///         locality.
+///     00000001000000010000000000000005
+///         Address of the root-CA component
+///     xxxxxxxx000000010000000000000006
+///         Address of the locality based sub-CA, xxxxxxxx is replaced with the 
+///         correct locality id
 ///
 struct HPX_EXPORT primary_namespace
   : components::fixed_component_base<primary_namespace>
@@ -115,6 +123,7 @@ struct HPX_EXPORT primary_namespace
     refcnt_table_type refcnts_;
     std::string instance_name_;
     naming::locality locality_;
+    naming::gid_type next_id_;      // next available gid
 
     struct update_time_on_exit;
 
@@ -144,12 +153,14 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_resolve_gid_count(bool);
         boost::int64_t get_unbind_gid_count(bool);
         boost::int64_t get_change_credit_count(bool);
+        boost::int64_t get_allocate_count(bool);
 
         boost::int64_t get_route_time(bool);
         boost::int64_t get_bind_gid_time(bool);
         boost::int64_t get_resolve_gid_time(bool);
         boost::int64_t get_unbind_gid_time(bool);
         boost::int64_t get_change_credit_time(bool);
+        boost::int64_t get_allocate_time(bool);
 
         // increment counter values
         void increment_route_count();
@@ -157,6 +168,7 @@ struct HPX_EXPORT primary_namespace
         void increment_resolve_gid_count();
         void increment_unbind_gid_count();
         void increment_change_credit_count();
+        void increment_allocate_count();
 
     private:
         friend struct update_time_on_exit;
@@ -169,6 +181,7 @@ struct HPX_EXPORT primary_namespace
         api_counter_data unbind_gid_;           // primary_ns_unbind_gid
         api_counter_data change_credit_;        // primary_ns_change_credit_non_blocking
                                                 // primary_ns_change_credit_sync
+        api_counter_data allocate_;             // primary_ns_allocate
     };
     counter_data counter_data_;
 
@@ -197,6 +210,11 @@ struct HPX_EXPORT primary_namespace
     {}
 
     void finalize();
+
+    void set_local_locality(naming::gid_type const& g)
+    {
+        next_id_ = naming::gid_type(g.get_msb() + 1, 0x1000);
+    }
 
     response remote_service(
         request const& req
@@ -265,6 +283,11 @@ struct HPX_EXPORT primary_namespace
         );
 
     response change_credit_sync(
+        request const& req
+      , error_code& ec = throws
+        );
+
+    response allocate(
         request const& req
       , error_code& ec = throws
         );
@@ -343,6 +366,7 @@ struct HPX_EXPORT primary_namespace
       , namespace_unbind_gid                    = primary_ns_unbind_gid
       , namespace_change_credit_non_blocking    = primary_ns_change_credit_non_blocking
       , namespace_change_credit_sync            = primary_ns_change_credit_sync
+      , namespace_allocate                      = primary_ns_allocate
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
 

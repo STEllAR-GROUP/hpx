@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(plugin_categories
-    compression
+    binary_filter
     parcel)
 
 foreach(category ${plugin_categories})
@@ -14,6 +14,6 @@ foreach(category ${plugin_categories})
 endforeach()
 
 macro(add_plugin_modules)
-  add_compression_modules()
+  add_binary_filter_modules()
   add_parcel_modules()
 endmacro()

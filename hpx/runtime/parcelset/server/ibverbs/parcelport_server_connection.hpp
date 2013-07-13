@@ -88,7 +88,6 @@ namespace hpx { namespace parcelset { namespace server { namespace ibverbs
                     boost::tuple<Handler>)
                 = &parcelport_connection::handle_read_data<Handler>;
 
-                
             in_buffer_.clear();
 
             context_.async_read(in_buffer_,
@@ -119,19 +118,18 @@ namespace hpx { namespace parcelset { namespace server { namespace ibverbs
                     receive_data_.time_;
 
                 // now send acknowledgment message
-                void (parcelport_connection::*f)(boost::system::error_code const&, 
+                void (parcelport_connection::*f)(boost::system::error_code const&,
                           boost::tuple<Handler>)
                     = &parcelport_connection::handle_write_ack<Handler>;
 
-
                 // add parcel data to incoming parcel queue
-                performance_counters::parcels::data_point receive_data = 
+                performance_counters::parcels::data_point receive_data =
                     receive_data_;
-                
+
                 decode_message(parcelport_, in_buffer_, in_buffer_.size(), receive_data_);
 
                 context_.async_write_ack(
-                    boost::bind(f, shared_from_this(), 
+                    boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
 
                 // Inform caller that data has been received ok.
@@ -156,7 +154,7 @@ namespace hpx { namespace parcelset { namespace server { namespace ibverbs
 
         /// The handler used to process the incoming request.
         parcelset::ibverbs::parcelport& parcelport_;
-        
+
         /// Counters and timers for parcels received.
         util::high_resolution_timer timer_;
         performance_counters::parcels::data_point receive_data_;

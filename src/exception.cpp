@@ -149,7 +149,9 @@ namespace hpx { namespace detail
 
         // if this is not a HPX thread we do not need to query neither for
         // the shepherd thread nor for the thread id
-        boost::uint32_t node = 0;
+        error_code ec(lightweight);
+        boost::uint32_t node = get_locality_id(ec);
+
         std::size_t shepherd = std::size_t(-1);
         std::size_t thread_id = 0;
         std::string thread_name;
@@ -158,10 +160,7 @@ namespace hpx { namespace detail
         if (NULL != self)
         {
             if (threads::threadmanager_is(running))
-            {
-                node = get_locality_id();
                 shepherd = threads::threadmanager_base::get_worker_thread_num();
-            }
 
             thread_id = reinterpret_cast<std::size_t>(self->get_thread_id());
             thread_name = threads::get_thread_description(self->get_thread_id());

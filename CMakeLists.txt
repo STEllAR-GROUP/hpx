@@ -1,7 +1,9 @@
 # Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2011-2013 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
+# Copyright (c)      2013 Jeroen Habraken
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -180,32 +182,28 @@ else()
 endif()
 
 ###############################################################################
+# Configure option to automatically set all required settings to use the
+# XeonPhi
+###############################################################################
+hpx_option(HPX_NATIVE_MIC BOOL
+    "Build HPX to run natively on the Intel MIC coprocessor (default: OFF)."
+    OFF ADVANCED)
+
+if(HPX_NATIVE_MIC)
+  if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+    hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
+  endif()
+  set(HPX_MALLOC "tbbmalloc")
+endif()
+
+###############################################################################
 # Configure upper limit for number of threads, this is important for XeonPhi
 ###############################################################################
 hpx_option(HPX_USE_MORE_THAN_64_THREADS BOOL
     "HPX applications will use more than 64 threads (default: OFF)." OFF ADVANCED)
-if(HPX_USE_MORE_THAN_64_THREADS)
+if(HPX_USE_MORE_THAN_64_THREADS OR HPX_NATIVE_MIC)
   hpx_add_definitions(-DHPX_HAVE_MORE_THAN_64_THREADS)
 endif()
-
-###############################################################################
-# Configure compression and other plugins
-###############################################################################
-add_hpx_pseudo_target(plugins)
-add_subdirectory(plugins)
-
-if(HPX_USE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_BZIP2)
-endif()
-if(HPX_USE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_SNAPPY)
-endif()
-if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_ZLIB)
-endif()
-
-# Parcel coalescing is used by the main HPX library, enable it always
-hpx_add_definitions(-DHPX_HAVE_PARCEL_COALESCING)
 
 ###############################################################################
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -254,7 +252,7 @@ if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     hpx_error("gcc_config" "GCC 4.4.5 or higher is required. Specify HPX_IGNORE_GCC_VERSION=ON to overwrite this error.")
   endif()
 elseif(MSVC)
-  if(NOT (MSVC10 OR MSVC11))
+  if(NOT (MSVC10 OR MSVC11 OR MSVC12))
     hpx_error("msvc_config" "MSVC x64 2010 or higher is required.")
   elseif(NOT CMAKE_CL_64)
     hpx_warn("msvc_config" "MSVC (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
@@ -328,15 +326,14 @@ endif()
 ################################################################################
 # Decide whether to use rdma based ibverbs parcelport
 ################################################################################
-find_package(HPX_Ibverbs)
-find_package(HPX_Rdmacm)
-if(IBVERBS_FOUND AND RDMACM_FOUND)
-  hpx_option(HPX_USE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
-  if(HPX_USE_PARCELPORT_IBVERBS)
+hpx_option(HPX_USE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
+if(HPX_USE_PARCELPORT_IBVERBS)
+  find_package(HPX_Ibverbs)
+  find_package(HPX_Rdmacm)
+  if(IBVERBS_FOUND AND RDMACM_FOUND)
     hpx_add_definitions(-DHPX_HAVE_PARCELPORT_IBVERBS)
   endif()
 endif()
-
 
 ################################################################################
 # Logging configuration
@@ -421,6 +418,13 @@ if(NOT MSVC)
     hpx_add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
   endif()
 endif()
+  
+if(NOT MSVC) 
+  hpx_option(HPX_USE_MMAP BOOL "Use mmap for stack allocation (default: ON)" ON ADVANCED)
+  if(HPX_USE_MMAP)
+    hpx_add_definitions(-DHPX_USE_MMAP)
+  endif()
+endif()
 
 if(HPX_THREAD_DEBUG_INFO)
   hpx_add_definitions(-DHPX_THREAD_MAINTAIN_PARENT_REFERENCE=1)
@@ -470,13 +474,59 @@ find_package(HPX_APEX)
 ################################################################################
 # hwloc
 ################################################################################
-find_package(HPX_Hwloc)
-if(HWLOC_FOUND)
-  hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
-  hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
-  hpx_add_definitions(-DHPX_HAVE_HWLOC)
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
+if(NOT HPX_DISABLE_HWLOC)
+  find_package(HPX_Hwloc)
+  if(HWLOC_FOUND)
+    hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
+    hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
+    hpx_add_definitions(-DHPX_HAVE_HWLOC)
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
+  endif()
 endif()
+
+################################################################################
+# Security, libsodium: P(ortable|ackageable) NaCl
+################################################################################
+find_package(HPX_Sodium)
+if(SODIUM_FOUND)
+  hpx_option(HPX_HAVE_SECURITY BOOL "Enable enable security options (default: OFF)" OFF ADVANCED)
+
+  hpx_add_definitions(-DHPX_HAVE_SODIUM)
+
+  hpx_include_sys_directories(${SODIUM_INCLUDE_DIR})
+  hpx_link_sys_directories(${SODIUM_LIBRARY_DIR})
+  if(MSVC)
+    hpx_add_definitions(-DSODIUM_STATIC)
+  endif()
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${SODIUM_LIBRARY})
+
+  if(HPX_HAVE_SECURITY)
+    hpx_add_definitions(-DHPX_HAVE_SECURITY)
+  endif()
+
+elseif(HPX_HAVE_SECURITY)
+  hpx_error("security" "The libsodium library has to be available to enable security features.")
+  set(HPX_HAVE_SECURITY OFF)
+endif()
+
+###############################################################################
+# Configure compression and other plugins
+###############################################################################
+add_hpx_pseudo_target(plugins)
+add_subdirectory(plugins)
+
+if(HPX_USE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
+  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_BZIP2)
+endif()
+if(HPX_USE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
+  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_SNAPPY)
+endif()
+if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
+  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_ZLIB)
+endif()
+
+# Parcel coalescing is used by the main HPX library, enable it always
+hpx_add_definitions(-DHPX_HAVE_PARCEL_COALESCING)
 
 ################################################################################
 # Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
@@ -574,6 +624,19 @@ foreach(language CXX C Fortran)
   set(CMAKE_${language}_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (${language})" FORCE)
 endforeach()
 
+if(HPX_NATIVE_MIC)
+  foreach(language CXX C Fortran)
+    set(CMAKE_${language}_FLAGS_DEBUG
+        "${CMAKE_${language}_FLAGS_DEBUG} -mmic")
+    set(CMAKE_${language}_FLAGS_RELWITHDEBINFO
+        "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} -mmic")
+    set(CMAKE_${language}_FLAGS_MINSIZEREL
+        "${CMAKE_${language}_FLAGS_MINSIZEREL} -mmic")
+    set(CMAKE_${language}_FLAGS_RELEASE
+        "${CMAKE_${language}_FLAGS_RELEASE} -mmic")
+  endforeach()
+endif()
+
 if(MSVC)
   add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
   foreach(language CXX C Fortran)
@@ -649,6 +712,12 @@ if(HPX_LOCAL_SCHEDULER)
   hpx_add_definitions(-DHPX_LOCAL_SCHEDULER)
 endif()
 
+hpx_option(HPX_STATIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=static (default: On)" On ADVANCED)
+
+if(HPX_STATIC_PRIORITY_SCHEDULER)
+  hpx_add_definitions(-DHPX_STATIC_PRIORITY_SCHEDULER)
+endif()
+
 hpx_option(HPX_ABP_SCHEDULER BOOL "Enable the use of --queueing=abp (default: OFF)" OFF ADVANCED)
 
 if(HPX_ABP_SCHEDULER)
@@ -672,6 +741,25 @@ hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=pe
 if(HPX_PERIODIC_PRIORITY_SCHEDULER)
   hpx_add_definitions(-DHPX_PERIODIC_PRIORITY_SCHEDULER)
 endif()
+  
+hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
+           "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
+
+if(HPX_GOOGLE_PERFTOOLS)
+  find_package(HPX_GooglePerftools)
+  if(GOOGLE_PERFTOOLS_FOUND)
+    set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
+    hpx_include_sys_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+    hpx_link_sys_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
+    hpx_add_definitions(-DHPX_GOOGLE_PERFTOOLS)
+  endif()
+endif()
+
+if(NOT HPX_MALLOC)
+  set(HPX_MALLOC "TCMalloc")
+endif()
+set(hpx_MALLOC_LIBRARY "")
+hpx_include(SetAllocator)
 
 ################################################################################
 # MSVC configuration
@@ -736,6 +824,16 @@ if(MSVC)
     if(HPX_HAVE_CXX11_DECLTYPE)
       hpx_add_definitions(-DHPX_HAVE_CXX11_DECLTYPE)
       hpx_add_definitions(-DBOOST_RESULT_OF_USE_DECLTYPE)
+    endif()
+
+    if(MSVC12)
+      hpx_option(HPX_HAVE_CXX11_VARIADIC_TEMPLATES BOOL "Compiler supports C++11 variadic templates (default: ON)." ON ADVANCED)
+    else()
+      hpx_option(HPX_HAVE_CXX11_VARIADIC_TEMPLATES BOOL "Compiler supports C++11 variadic templates (default: OFF)." OFF ADVANCED)
+    endif()
+
+    if(HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
+      hpx_add_definitions(-DHPX_HAVE_CXX11_VARIADIC_TEMPLATES)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_UNIQUE_PTR BOOL "Compiler supports C++11 std::unique_ptr (default: ON)." ON ADVANCED)
@@ -814,44 +912,6 @@ if(MSVC)
   hpx_add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
   hpx_add_definitions(-DHPX_HAVE_FIBER_BASED_COROUTINES)
   hpx_add_definitions(-DPSAPI_VERSION=1)
-
-  hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
-             "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
-
-  if(HPX_GOOGLE_PERFTOOLS)
-    find_package(HPX_GooglePerftools)
-    if(GOOGLE_PERFTOOLS_FOUND)
-      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
-      hpx_include_sys_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-      hpx_link_sys_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
-      hpx_add_definitions(-DHPX_GOOGLE_PERFTOOLS)
-    endif()
-  endif()
-
-  if(NOT HPX_MALLOC)
-    set(HPX_MALLOC "TCMalloc")
-  endif()
-  find_package(HPX_TCMalloc)
-
-  if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC" AND NOT TCMALLOC_FOUND)
-    hpx_warn("malloc" "tcmalloc allocator not found.")
-  endif()
-
-  set(hpx_MALLOC_LIBRARY "")
-
-  if(NOT "${HPX_MALLOC}" MATCHES "system|System|SYSTEM")
-    if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
-      hpx_info("malloc" "Using tcmalloc allocator.")
-      set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
-      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-      set(HPX_LINK_FLAG_TARGET_PROPERTIES "/INCLUDE:__tcmalloc")
-      hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
-      hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
-      hpx_add_definitions(-DHPX_TCMALLOC)
-    endif()
-  else()
-    hpx_info("malloc" "Using system allocator.")
-  endif()
 
 ################################################################################
 # GCC-compatible compiler configuration
@@ -1064,9 +1124,9 @@ else()
       #hpx_use_flag_if_available(-opt-class-analysis)
       #hpx_use_flag_if_available(-opt-multi-version-aggressive)
       #hpx_use_flag_if_available(-xHost)
-      hpx_use_flag_if_available(-fno-alias)
-      hpx_use_flag_if_available(-fbuiltin)
-      hpx_use_flag_if_available(-finline)
+      #hpx_use_flag_if_available(-fno-alias)
+      #hpx_use_flag_if_available(-fbuiltin)
+      #hpx_use_flag_if_available(-finline)
       #hpx_use_flag_if_available(-fma)
       #hpx_use_flag_if_available(-fno-implicit-inline-templates)
       #hpx_use_flag_if_available(-fno-implicit-templates)
@@ -1154,6 +1214,9 @@ else()
   hpx_cpuid("rdtscp" HPX_RDTSCP
     DEFINITIONS HPX_HAVE_RDTSCP)
 
+  hpx_option(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
+      "Disable automatic registration with Boost.Serialization (Default: Off)" Off ADVANCED)
+
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
@@ -1175,74 +1238,14 @@ else()
 
   hpx_use_flag_if_available(-pthread LANGUAGES CXX C)
 
-  hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
-             "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
-
-  if(HPX_GOOGLE_PERFTOOLS)
-    find_package(HPX_GooglePerftools)
-    if(GOOGLE_PERFTOOLS_FOUND)
-      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
-      hpx_include_sys_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-      hpx_link_sys_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
-      hpx_add_definitions(-DHPX_GOOGLE_PERFTOOLS)
-    endif()
-  endif()
-
-  if(NOT HPX_MALLOC)
-    set(HPX_MALLOC "TCMalloc")
-  endif()
-
-  find_package(HPX_TCMalloc)
-  find_package(HPX_Jemalloc)
-
-  if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC" AND NOT TCMALLOC_FOUND)
-    hpx_warn("malloc" "tcmalloc allocator not found.")
-  endif()
-
-  if("${HPX_MALLOC}" MATCHES "jemalloc|Jemalloc|JEMALLOC" AND NOT JEMALLOC_FOUND)
-    hpx_warn("malloc" "jemalloc allocator not found.")
-  endif()
-
-  set(hpx_MALLOC_LIBRARY "")
-
-  if(NOT "${HPX_MALLOC}" MATCHES "system|System|SYSTEM")
-    if(TCMALLOC_FOUND)
-      if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
-        hpx_info("malloc" "Using tcmalloc allocator.")
-        set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
-        set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-        hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
-        hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
-        hpx_add_definitions(-DHPX_TCMALLOC)
-      endif()
-    elseif(JEMALLOC_FOUND)
-      if("${HPX_MALLOC}" MATCHES "jemalloc|Jemalloc|JEMALLOC")
-        hpx_info("malloc" "Using jemalloc allocator.")
-        set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
-        set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
-        hpx_include_sys_directories(${JEMALLOC_INCLUDE_DIR})
-        hpx_link_sys_directories(${JEMALLOC_LIBRARY_DIR})
-        hpx_add_definitions(-DHPX_JEMALLOC)
-      endif()
-    endif()
-
-    if(JEMALLOC_FOUND OR TCMALLOC_FOUND)
-      hpx_use_flag_if_available(-fno-builtin-cfree LANGUAGES CXX C)
-      hpx_use_flag_if_available(-fno-builtin-pvalloc LANGUAGES CXX C)
-      hpx_use_flag_if_available(-fno-builtin-malloc LANGUAGES CXX C)
-      hpx_use_flag_if_available(-fno-builtin-free LANGUAGES CXX C)
-      hpx_use_flag_if_available(-fno-builtin-calloc LANGUAGES CXX C)
-      hpx_use_flag_if_available(-fno-builtin-realloc LANGUAGES CXX C)
-      hpx_use_flag_if_available(-fno-builtin-valloc LANGUAGES CXX C)
-      hpx_use_flag_if_available(-fno-builtin-memalign LANGUAGES CXX C)
-      hpx_use_flag_if_available(-fno-builtin-posix_memalign LANGUAGES CXX C)
-    endif()
-  else()
-    hpx_info("malloc" "Using system allocator.")
-
-    hpx_warn("malloc"
-      "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
-  endif()
+endif()
+  
+if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
+  hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
+endif()
+  
+if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
+  hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
 ################################################################################

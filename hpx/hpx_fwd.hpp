@@ -149,6 +149,9 @@ namespace hpx
 #if defined(HPX_GLOBAL_SCHEDULER)
             class HPX_EXPORT global_queue_scheduler;
 #endif
+#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+            class HPX_API_EXPORT static_priority_queue_scheduler;
+#endif
 #if defined(HPX_ABP_SCHEDULER)
             struct HPX_EXPORT abp_queue_scheduler;
 #endif
@@ -497,6 +500,12 @@ namespace hpx
             // AGAS symbolic naming services.
             component_agas_symbol_namespace = 10,
 
+#if defined(HPX_HAVE_SODIUM)
+            // root CA, subordinate CA
+            component_root_certificate_authority = 11,
+            component_subordinate_certificate_authority = 12,
+#endif
+
             component_last,
             component_first_dynamic = component_last,
 
@@ -590,7 +599,7 @@ namespace hpx
         class future;
 
         template <typename Result>
-        future<typename util::detail::remove_reference<Result>::type> 
+        future<typename util::detail::remove_reference<Result>::type>
         make_ready_future(BOOST_FWD_REF(Result));
 
         future<void> make_ready_future();
@@ -708,8 +717,9 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing the root locality
     ///
-    /// The function \a find_root_locality() can be used to retrieve the global 
-    /// id usable to refer to the root locality locality.
+    /// The function \a find_root_locality() can be used to retrieve the global
+    /// id usable to refer to the root locality. The root locality is the
+    /// locality where the main AGAS service is hosted.
     ///
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
@@ -719,7 +729,7 @@ namespace hpx
     ///           create new instances of components and to invoke plain actions
     ///           (global functions).
     ///
-    /// \returns  The global id representing the root locality for this 
+    /// \returns  The global id representing the root locality for this
     ///           application.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
@@ -829,7 +839,8 @@ namespace hpx
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities();
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
+        error_code& ec = throws);
 
     /// \brief Return the list of locality ids of remote localities supporting
     ///        the given component type. By default this function will return
@@ -863,7 +874,7 @@ namespace hpx
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
     HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
-        components::component_type);
+        components::component_type type, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing an arbitrary locality which
@@ -918,8 +929,21 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     ///
-    /// \see      \a hpx::find_all_localities
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities_async
     HPX_API_EXPORT boost::uint32_t get_num_localities(error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Asynchronously return the number of localities which are
+    ///        currently registered for the running application.
+    ///
+    /// The function \a get_num_localities_async asynchronously returns the
+    /// number of localities currently connected to the console. The returned
+    /// future represents the actual result.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return 0 otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
     HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async();
 
     /// \brief Return the number of localities which are currently registered
@@ -943,9 +967,25 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     ///
-    /// \see      \a hpx::find_all_localities
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities_async
     HPX_API_EXPORT boost::uint32_t get_num_localities(
         components::component_type t, error_code& ec = throws);
+
+    /// \brief Asynchronously return the number of localities which are
+    ///        currently registered for the running application.
+    ///
+    /// The function \a get_num_localities_async asynchronously returns the
+    /// number of localities currently connected to the console which support
+    /// the creation of the given component type. The returned future represents
+    /// the actual result.
+    ///
+    /// \param t  The component type for which the number of connected
+    ///           localities should be retrieved.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return 0 otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
     HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async(
         components::component_type t);
 
@@ -1106,11 +1146,11 @@ namespace hpx
     HPX_API_EXPORT std::string const* get_thread_name();
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the number of worker OS- threads used to execute HPX 
+    /// \brief Return the number of worker OS- threads used to execute HPX
     ///        threads
     ///
-    /// This function returns the number of OS-threads used to execute HPX 
-    /// threads. If the function is called while no HPX runtime system is active, 
+    /// This function returns the number of OS-threads used to execute HPX
+    /// threads. If the function is called while no HPX runtime system is active,
     /// it will return zero.
     HPX_API_EXPORT std::size_t get_num_worker_threads();
 
@@ -1126,6 +1166,10 @@ namespace hpx
     /// \brief Return the id of the locality where the object referenced by the
     ///        given id is currently located on
     ///
+    /// The function hpx::get_colocation_id() returns the id of the locality
+    /// where the given object is currently located.
+    ///
+    /// \param id [in] The id of the object to locate.
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
     ///           on error instead.
@@ -1134,8 +1178,15 @@ namespace hpx
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
+    ///
+    /// \see    \a hpx::get_colocation_id_async()
     HPX_API_EXPORT naming::id_type get_colocation_id(naming::id_type id,
         error_code& ec = throws);
+
+    /// \brief Asynchronously return the id of the locality where the object 
+    ///        referenced by the given id is currently located on
+    ///
+    /// \see    \a hpx::get_colocation_id()
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(
         naming::id_type id);
 
@@ -1246,6 +1297,14 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create an instance of a message handler plugin
     ///
+    /// The function hpx::create_message_handler() creates an instance of a
+    /// message handler plugin based on the parameters specified.
+    ///
+    /// \param message_handler_type
+    /// \param action
+    /// \param pp
+    /// \param num_messages
+    /// \param interval
     /// \param ec [in,out] this represents the error status on exit, if this
     ///           is pre-initialized to \a hpx#throws the function will throw
     ///           on error instead.
@@ -1271,7 +1330,50 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     HPX_API_EXPORT util::binary_filter* create_binary_filter(
-        char const* binary_filter_type, bool compress, error_code& ec = throws);
+        char const* binary_filter_type, bool compress,
+        util::binary_filter* next_filter = 0, error_code& ec = throws);
+
+#if defined(HPX_HAVE_SODIUM)
+    namespace components { namespace security
+    {
+        class certificate;
+        class certificate_signing_request;
+        class parcel_suffix;
+        class hash;
+
+        template <typename T> class signed_type;
+        typedef signed_type<certificate> signed_certificate;
+        typedef signed_type<certificate_signing_request>
+            signed_certificate_signing_request;
+        typedef signed_type<parcel_suffix> signed_parcel_suffix;
+    }}
+
+#if defined(HPX_HAVE_SECURITY)
+    /// \brief Return the certificate for this locality
+    ///
+    /// \returns This function returns the signed certificate for this locality.
+    HPX_API_EXPORT components::security::signed_certificate const&
+        get_locality_certificate(error_code& ec = throws);
+
+    /// \brief Return the certificate for the given locality
+    ///
+    /// \param id The id representing the locality for which to retrieve
+    ///           the signed certificate.
+    ///
+    /// \returns This function returns the signed certificate for the locality
+    ///          identified by the parameter \a id.
+    HPX_API_EXPORT components::security::signed_certificate const&
+        get_locality_certificate(boost::uint32_t locality_id, error_code& ec = throws);
+
+    /// \brief Add the given certificate to the certificate store of this locality.
+    ///
+    /// \param cert The certificate to add to the certificate store of this
+    ///             locality
+    HPX_API_EXPORT void add_locality_certificate(
+        components::security::signed_certificate const& cert,
+        error_code& ec = throws);
+#endif
+#endif
 }
 
 #include <hpx/lcos/async_fwd.hpp>

@@ -215,6 +215,7 @@ namespace hpx { namespace util { namespace detail
 #define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
 #define LAS_(lvl)   LHPX_(lvl, "  [AS] ")   /* addressing service */
 #define LBT_(lvl)   LHPX_(lvl, "  [BT] ")   /* bootstrap */
+#define LSEC_(lvl)  LHPX_(lvl, " [SEC] ")   /* security */
 
 #endif
 

@@ -64,7 +64,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail { names
 
 HPX_EXPORT extern bool use_guard_pages;
 
-#if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
+#if defined(HPX_USE_MMAP) && defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 
   inline
   void*

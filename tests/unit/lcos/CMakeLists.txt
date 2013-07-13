@@ -8,6 +8,7 @@ set(tests
     apply_local
     apply_remote
     async_continue
+    composable_guard
     async_local
     async_remote
     barrier
@@ -25,8 +26,6 @@ set(tests
    )
 
 set(async_continue_PARAMETERS LOCALITIES 2)
-
-set(barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(dataflow_FLAGS DEPENDENCIES dataflow_component)
 set(dataflow_PARAMETERS THREADS_PER_LOCALITY 4)

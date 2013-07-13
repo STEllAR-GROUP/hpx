@@ -17,6 +17,11 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/include/async.hpp>
+#if defined(HPX_HAVE_SECURITY)
+#include <hpx/components/security/capability.hpp>
+#include <hpx/components/security/certificate.hpp>
+#include <hpx/components/security/signed_type.hpp>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace applier
@@ -54,7 +59,7 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread_nullary(
         BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func, char const* desc,
         threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread, 
+        threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -68,7 +73,7 @@ namespace hpx { namespace applier
 
         threads::thread_init_data data(
             HPX_STD_BIND(&thread_function_nullary, boost::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread, 
+            desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(stacksize));
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
@@ -77,7 +82,7 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread(
         BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* desc, threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread, 
+        threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -100,7 +105,7 @@ namespace hpx { namespace applier
     threads::thread_id_type register_thread_plain(
         BOOST_RV_REF(HPX_STD_FUNCTION<threads::thread_function_type>) func,
         char const* desc, threads::thread_state_enum state, bool run_now,
-        threads::thread_priority priority, std::size_t os_thread, 
+        threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -113,7 +118,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::move(func), desc ? desc : "<unknown>", 0, priority, 
+            boost::move(func), desc ? desc : "<unknown>", 0, priority,
             os_thread, threads::get_stack_size(stacksize));
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
@@ -162,7 +167,7 @@ namespace hpx { namespace applier
     void register_work(
         BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* desc, threads::thread_state_enum state,
-        threads::thread_priority priority, std::size_t os_thread, 
+        threads::thread_priority priority, std::size_t os_thread,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -224,11 +229,14 @@ namespace hpx { namespace applier
 
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm,
                 boost::uint64_t rts, boost::uint64_t mem)
-      : parcel_handler_(ph), thread_manager_(tm),
-        runtime_support_id_(parcel_handler_.get_locality().get_msb(),
-            rts, naming::id_type::unmanaged),
-        memory_id_(parcel_handler_.get_locality().get_msb(),
+      : parcel_handler_(ph), thread_manager_(tm)
+      , runtime_support_id_(parcel_handler_.get_locality().get_msb(),
+            rts, naming::id_type::unmanaged)
+      , memory_id_(parcel_handler_.get_locality().get_msb(),
             mem, naming::id_type::unmanaged)
+#if defined(HPX_HAVE_SECURITY)
+      , verify_capabilities_(false)
+#endif
     {}
 
     naming::resolver_client& applier::get_agas_client()
@@ -262,16 +270,16 @@ namespace hpx { namespace applier
     }
 
     bool applier::get_raw_remote_localities(std::vector<naming::gid_type>& prefixes,
-        components::component_type type) const
+        components::component_type type, error_code& ec) const
     {
-        return parcel_handler_.get_raw_remote_localities(prefixes, type);
+        return parcel_handler_.get_raw_remote_localities(prefixes, type, ec);
     }
 
     bool applier::get_remote_localities(std::vector<naming::id_type>& prefixes,
-        components::component_type type) const
+        components::component_type type, error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_remote_localities(raw_prefixes, type))
+        if (!parcel_handler_.get_raw_remote_localities(raw_prefixes, type, ec))
             return false;
 
         BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
@@ -329,6 +337,29 @@ namespace hpx { namespace applier
         // decode the action-type in the parcel
         actions::continuation_type cont = p.get_continuation();
         actions::action_type act = p.get_action();
+
+#if defined(HPX_HAVE_SECURITY)
+        // we look up the certificate of the originating locality, no matter
+        // whether this parcel was routed through another locality or not
+        boost::uint32_t locality_id =
+            naming::get_locality_id_from_gid(p.get_parcel_id());
+        error_code ec(lightweight);
+        components::security::signed_certificate const& cert =
+            get_locality_certificate(locality_id, ec);
+
+        if (verify_capabilities_ && ec) {
+            // we should have received the sender's certificate by now
+            HPX_THROW_EXCEPTION(security_error,
+                "applier::schedule_action",
+                boost::str(boost::format("couldn't extract sender's "
+                    "certificate (sender locality id: %1%)") % locality_id));
+            return;
+        }
+
+        components::security::capability caps_sender;
+        if (verify_capabilities_)
+            caps_sender = cert.get_type().get_capability();
+#endif
         int comptype = act->get_component_type();
         naming::locality dest = p.get_destination_locality();
 
@@ -358,6 +389,21 @@ namespace hpx { namespace applier
             if (0 == lva)
                 lva = get_runtime_support_raw_gid().get_lsb();
 
+#if defined(HPX_HAVE_SECURITY)
+            if (verify_capabilities_) {
+                components::security::capability caps_action =
+                    act->get_required_capabilities(lva);
+
+                if (caps_action.verify(caps_sender) == false) {
+                    HPX_THROW_EXCEPTION(security_error,
+                        "applier::schedule_action",
+                        boost::str(boost::format("sender has insufficient capabilities "
+                            "to execute the action (%1%, sender: %2%, action %3%)") %
+                            act->get_action_name() % caps_sender % caps_action));
+                    return;
+                }
+            }
+#endif
             // make sure the component_type of the action matches the
             // component type in the destination address
             if (HPX_UNLIKELY(!components::types_are_compatible(
@@ -375,7 +421,7 @@ namespace hpx { namespace applier
             // dispatch action, register work item either with or without
             // continuation support
             if (!cont) {
-                // No continuation is to be executed, register the plain 
+                // No continuation is to be executed, register the plain
                 // action and the local-virtual address with the TM only.
                 threads::thread_init_data data;
                 tm.register_work(
@@ -383,9 +429,9 @@ namespace hpx { namespace applier
                     threads::pending);
             }
             else {
-                // This parcel carries a continuation, register a wrapper 
-                // which first executes the original thread function as 
-                // required by the action and triggers the continuations 
+                // This parcel carries a continuation, register a wrapper
+                // which first executes the original thread function as
+                // required by the action and triggers the continuations
                 // afterwards.
                 threads::thread_init_data data;
                 tm.register_work(

@@ -98,10 +98,12 @@ namespace hpx { namespace applier
         ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
         bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            components::component_type type = components::component_invalid,
+            error_code& ec = throws) const;
 
         bool get_remote_localities(std::vector<naming::id_type>& locality_ids,
-            components::component_type type = components::component_invalid) const;
+            components::component_type type = components::component_invalid,
+            error_code& ec = throws) const;
 
         /// \brief Return list of locality_ids of all localities
         ///        registered with the AGAS service for a specific component
@@ -158,6 +160,13 @@ namespace hpx { namespace applier
         /// Schedule  threads based on the given parcel
         void schedule_action(parcelset::parcel const& p);
 
+#if defined(HPX_HAVE_SECURITY)
+        void enable_verify_capabilities()
+        {
+            verify_capabilities_ = true;
+        }
+#endif
+
     public:
         // the TSS holds a pointer to the applier associated with a given
         // OS thread
@@ -171,6 +180,9 @@ namespace hpx { namespace applier
         threads::threadmanager_base& thread_manager_;
         naming::id_type runtime_support_id_;
         naming::id_type memory_id_;
+#if defined(HPX_HAVE_SECURITY)
+        bool verify_capabilities_;
+#endif
     };
 }}
 

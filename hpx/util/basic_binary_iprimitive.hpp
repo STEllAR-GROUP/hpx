@@ -221,7 +221,7 @@ namespace hpx { namespace util
         {
             filter_.reset(filter);
             if (filter) {
-                current_ = filter->init_decompression_data(&buffer_[current_],
+                current_ = filter->init_data(&buffer_[current_],
                     size_-current_, decompressed_size_);
 
                 if (decompressed_size_ < current_)

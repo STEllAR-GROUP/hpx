@@ -124,7 +124,7 @@ namespace hpx {
             SchedulingPolicy, NotificationPolicy>(
                 timer_pool_, scheduler_, notifier_, num_threads)),
         agas_client_(*parcel_port_, ini_, mode_),
-        parcel_handler_(agas_client_, parcel_port_, thread_manager_.get(),
+        parcel_handler_(agas_client_, thread_manager_.get(),
             new parcelset::policies::global_parcelhandler_queue),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, *thread_manager_,
@@ -133,6 +133,23 @@ namespace hpx {
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
+
+        // in AGAS v2, the runtime pointer (accessible through get_runtime
+        // and get_runtime_ptr) is already initialized at this point.
+        applier_.init_tss();
+
+#if defined(HPX_HAVE_SECURITY)
+        // once all has been initialized, finalize security data for bootstrap
+        this->init_security();
+#endif
+        // now, launch AGAS and register all nodes, launch all other components
+        agas_client_.initialize();
+        parcel_handler_.initialize(parcel_port_);
+
+#if defined(HPX_HAVE_SECURITY)
+        // enable parcel capability checking
+        applier_.enable_verify_capabilities();
+#endif
 
         // copy over all startup functions registered so far
         BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_pre_startup_functions)
@@ -168,7 +185,6 @@ namespace hpx {
         LRT_(debug) << "~runtime_impl(finished)";
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     bool pre_main(hpx::runtime_mode);
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -218,10 +234,6 @@ namespace hpx {
 
         // initialize instrumentation system
         util::apex_init();
-
-        // in AGAS v2, the runtime pointer (accessible through get_runtime
-        // and get_runtime_ptr) is already initialized at this point.
-        applier_.init_tss();
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
@@ -540,9 +552,9 @@ namespace hpx {
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     naming::gid_type
-    runtime_impl<SchedulingPolicy, NotificationPolicy>::get_next_id()
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::get_next_id(std::size_t count)
     {
-        return id_pool.get_id(parcel_handler_.here(), agas_client_);
+        return id_pool_.get_id(count);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -641,6 +653,13 @@ template class HPX_EXPORT hpx::runtime_impl<
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
     hpx::threads::policies::local_queue_scheduler<>,
+    hpx::threads::policies::callback_notifier>;
+#endif
+
+#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+#include <hpx/runtime/threads/policies/static_priority_queue_scheduler.hpp>
+template class HPX_EXPORT hpx::runtime_impl<
+    hpx::threads::policies::static_priority_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
 

@@ -119,6 +119,7 @@ response locality_namespace::service(
         case primary_ns_unbind_gid:
         case primary_ns_change_credit_non_blocking:
         case primary_ns_change_credit_sync:
+        case primary_ns_allocate:
         {
             LAGAS_(warning) <<
                 "locality_namespace::service, redirecting request to "
@@ -267,7 +268,6 @@ response locality_namespace::allocate(
     // parameters
     naming::locality ep = req.get_locality();
     boost::uint64_t const count = req.get_count();
-    boost::uint64_t const real_count = (count) ? (count - 1) : (0);
     boost::uint32_t const num_threads = req.get_num_threads();
 
     mutex_type::scoped_lock l(mutex_);
@@ -284,64 +284,24 @@ response locality_namespace::allocate(
         {
             LAGAS_(info) << (boost::format(
                 "locality_namespace::allocate, ep(%1%), count(%2%), "
-                "lower(%3%), upper(%4%), prefix(%5%), "
-                "response(repeated_request)")
+                "prefix(%3%), response(repeated_request)")
                 % ep
                 % count
-                % at_c<1>(it->second)
-                % at_c<1>(it->second)
                 % at_c<0>(it->second));
 
             if (&ec != &throws)
                 ec = make_success_code();
 
             return response(locality_ns_allocate
-                          , at_c<1>(it->second)
-                          , at_c<1>(it->second)
                           , at_c<0>(it->second)
                           , repeated_request);
         }
 
-        // Compute the new allocation.
-        naming::gid_type lower(at_c<1>(it->second) + 1),
-                         upper(lower + real_count);
-
-        // Check for overflow.
-        if (upper.get_msb() != lower.get_msb())
-        {
-            // Check for address space exhaustion (we currently use 80 bis of
-            // the gid for the actual id)
-            if (HPX_UNLIKELY((lower.get_msb() & ~0xFF) == 0xFF))
-            {
-                HPX_THROWS_IF(ec, internal_server_error
-                  , "locality_namespace::allocate"
-                  , "primary namespace has been exhausted");
-                return response();
-            }
-
-            // Otherwise, correct
-            lower = naming::gid_type(upper.get_msb(), 0);
-            upper = lower + real_count;
-        }
-
-        // Store the new upper bound.
-        at_c<1>(it->second) = upper;
-
-        // Set the initial credit count.
-        naming::detail::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-        naming::detail::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
-
-        LAGAS_(info) << (boost::format(
-            "locality_namespace::allocate, ep(%1%), count(%2%), "
-            "lower(%3%), upper(%4%), prefix(%5%), response(repeated_request)")
-            % ep % count % lower % upper % at_c<0>(it->second));
 
         if (&ec != &throws)
             ec = make_success_code();
 
         return response(locality_ns_allocate
-                      , lower
-                      , upper
                       , at_c<0>(it->second)
                       , repeated_request);
     }
@@ -360,19 +320,13 @@ response locality_namespace::allocate(
 
         // Compute the locality's prefix.
         boost::uint32_t prefix = prefix_counter_++;
-        naming::gid_type id(naming::get_gid_from_locality_id(prefix));
-
-        // Start assigning ids with the second block of 64bit numbers only.
-        // The first block is reserved for components with LVA-encoded GIDs.
-        naming::gid_type lower_id(id.get_msb() + 1, 0);
 
         // We need to create an entry in the partition table for this
         // locality.
         partition_table_type::iterator pit;
 
         if (HPX_UNLIKELY(!util::insert_checked(partitions_.insert(
-                std::make_pair(ep,
-                    partition_type(prefix, lower_id, num_threads))), pit)))
+                std::make_pair(ep, partition_type(prefix, num_threads))), pit)))
         {
             // If this branch is taken, then the partition table was updated
             // at some point after we first checked it, which would indicate
@@ -382,20 +336,9 @@ response locality_namespace::allocate(
               , boost::str(boost::format(
                     "partition table insertion failed due to a locking "
                     "error or memory corruption, endpoint(%1%), "
-                    "prefix(%2%), lower_id(%3%)")
-                    % ep % prefix % lower_id));
+                    "prefix(%2%)") % ep % prefix));
             return response();
         }
-
-        // Generate the requested GID range
-        naming::gid_type lower = lower_id + 1;
-        naming::gid_type upper = lower + real_count;
-
-        at_c<1>((*pit).second) = upper;
-
-        // Set the initial credit count.
-        naming::detail::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-        naming::detail::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
 
         // Now that we've inserted the locality into the partition table
         // successfully, we need to put the locality's GID into the GVA
@@ -404,6 +347,7 @@ response locality_namespace::allocate(
         {
             const gva g(ep, components::component_runtime_support, count);
 
+            naming::gid_type id(naming::get_gid_from_locality_id(prefix));
             request req(primary_ns_bind_gid, id, g);
             response resp = primary_->service(req, ec);
             if (ec) return resp;
@@ -411,15 +355,13 @@ response locality_namespace::allocate(
 
         LAGAS_(info) << (boost::format(
             "locality_namespace::allocate, ep(%1%), count(%2%), "
-            "lower(%3%), upper(%4%), prefix(%5%)")
-            % ep % count % lower % upper % prefix);
+            "prefix(%3%)")
+            % ep % count % prefix);
 
         if (&ec != &throws)
             ec = make_success_code();
 
         return response(locality_ns_allocate
-                      , lower
-                      , upper
                       , prefix);
     }
 } // }}}
@@ -529,7 +471,7 @@ response locality_namespace::localities(
     partition_table_type::const_iterator it = partitions_.begin()
                                        , end = partitions_.end();
 
-    for (; it != end; ++it)
+    for (/**/; it != end; ++it)
         p.push_back(at_c<0>(it->second));
 
     LAGAS_(info) << (boost::format(
@@ -603,7 +545,7 @@ response locality_namespace::get_num_threads(
          it != end; ++it)
     {
         using boost::fusion::at_c;
-        num_threads.push_back(at_c<2>(it->second));
+        num_threads.push_back(at_c<1>(it->second));
     }
 
     LAGAS_(info) << (boost::format(

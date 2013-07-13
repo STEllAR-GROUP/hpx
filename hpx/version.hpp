@@ -23,7 +23,7 @@
 //  HPX_VERSION_FULL & 0x00FF00 is the minor version
 //  HPX_VERSION_FULL & 0xFF0000 is the major version
 //
-#define HPX_VERSION_FULL         0x090506
+#define HPX_VERSION_FULL         0x000906
 
 #define HPX_VERSION_MAJOR        0
 #define HPX_VERSION_MINOR        9

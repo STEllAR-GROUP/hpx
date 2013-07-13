@@ -27,6 +27,11 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy>
     class HPX_EXPORT runtime_impl;
 
+    namespace detail
+    {
+        struct manage_security_data;
+    }
+
     class HPX_EXPORT runtime
     {
     public:
@@ -54,17 +59,12 @@ namespace hpx
         /// construct a new instance of a runtime
         runtime(util::runtime_configuration const& rtcfg);
 
-        virtual ~runtime()
-        {
-            // allow to reuse instance number if this was the only instance
-            if (0 == instance_number_counter_)
-                --instance_number_counter_;
-        }
+        virtual ~runtime();
 
         /// \brief Manage list of functions to call on exit
         void on_exit(HPX_STD_FUNCTION<void()> f)
         {
-            boost::mutex::scoped_lock l(on_exit_functions_mtx_);
+            boost::mutex::scoped_lock l(mtx_);
             on_exit_functions_.push_back(f);
         }
 
@@ -81,7 +81,7 @@ namespace hpx
 
             typedef HPX_STD_FUNCTION<void()> value_type;
 
-            boost::mutex::scoped_lock l(on_exit_functions_mtx_);
+            boost::mutex::scoped_lock l(mtx_);
             BOOST_FOREACH(value_type f, on_exit_functions_)
                 f();
         }
@@ -164,6 +164,7 @@ namespace hpx
         virtual void stop(bool blocking = true) = 0;
 
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
+        virtual parcelset::parcelhandler const& get_parcel_handler() const = 0;
 
         virtual threads::threadmanager_base& get_thread_manager() = 0;
 
@@ -182,9 +183,9 @@ namespace hpx
 
         virtual void report_error(boost::exception_ptr const& e) = 0;
 
-        virtual naming::gid_type get_next_id() = 0;
+        virtual naming::gid_type get_next_id(std::size_t count = 1) = 0;
 
-        virtual util::unique_ids& get_id_pool() = 0;
+        virtual util::unique_id_ranges& get_id_pool() = 0;
 
         virtual void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f) = 0;
 
@@ -254,6 +255,14 @@ namespace hpx
         ///
         virtual bool unregister_thread() = 0;
 
+#if defined(HPX_HAVE_SECURITY)
+        // Initialize the subordinate CA for this locality
+        virtual void initialize_locality_certificate_authority(
+            components::security::server::signed_type<
+                components::security::server::certificate
+            > const & root_certificate) = 0;
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
@@ -274,7 +283,46 @@ namespace hpx
             std::size_t interval, error_code& ec = throws);
         util::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
-            error_code& ec = throws);
+            util::binary_filter* next_filter, error_code& ec = throws);
+
+#if defined(HPX_HAVE_SECURITY)
+        components::security::signed_certificate
+            get_root_certificate(error_code& ec = throws) const;
+        components::security::signed_certificate
+            get_certificate(error_code& ec = throws) const;
+
+        // add a certificate for another locality
+        void add_locality_certificate(
+            components::security::signed_certificate const& cert);
+
+        components::security::signed_certificate const&
+            get_locality_certificate(error_code& ec) const;
+        components::security::signed_certificate const&
+            get_locality_certificate(boost::uint32_t locality_id, error_code& ec) const;
+
+        void sign_parcel_suffix(
+            components::security::parcel_suffix const& suffix,
+            components::security::signed_parcel_suffix& signed_suffix,
+            error_code& ec) const;
+        bool verify_parcel_suffix(std::vector<char> const& data,
+            naming::gid_type& parcel_id, error_code& ec) const;
+
+        components::security::signed_certificate_signing_request
+            get_certificate_signing_request() const;
+        components::security::signed_certificate
+            sign_certificate_signing_request(
+                components::security::signed_certificate_signing_request csr);
+
+        void store_root_certificate(
+            components::security::signed_certificate const& root_cert);
+
+        void store_subordinate_certificate(
+            components::security::signed_certificate const& root_subca_cert,
+            components::security::signed_certificate const& subca_cert);
+
+    protected:
+        void init_security();
+#endif
 
     protected:
         void init_tss();
@@ -289,7 +337,7 @@ namespace hpx
         // list of functions to call on exit
         typedef std::vector<HPX_STD_FUNCTION<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
-        boost::mutex on_exit_functions_mtx_;
+        mutable boost::mutex mtx_;
 
         util::runtime_configuration ini_;
         boost::shared_ptr<performance_counters::registry> counters_;
@@ -308,6 +356,12 @@ namespace hpx
 
         components::server::memory memory_;
         components::server::runtime_support runtime_support_;
+
+#if defined(HPX_HAVE_SECURITY)
+        // allocate dynamically to reduce dependencies
+        mutable lcos::local::spinlock security_mtx_;
+        HPX_STD_UNIQUE_PTR<detail::manage_security_data> security_data_;
+#endif
     };
 
     ///////////////////////////////////////////////////////////////////////////

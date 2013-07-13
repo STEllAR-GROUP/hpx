@@ -31,7 +31,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
     parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : parcelset::parcelport(naming::locality(ini.get_parcelport_address())),
+      : parcelset::parcelport(ini),
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_ibverbs", "-ibverbs"),
         acceptor_(NULL),

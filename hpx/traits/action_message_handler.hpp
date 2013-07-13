@@ -8,9 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
-
-#include <boost/mpl/has_xxx.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <hpx/util/always_void.hpp>
 
 namespace hpx { namespace traits
 {
@@ -29,7 +27,8 @@ namespace hpx { namespace traits
     };
 
     template <typename Action>
-    struct action_message_handler<Action, typename Action::type>
+    struct action_message_handler<Action
+      , typename util::always_void<typename Action::type>::type>
       : action_message_handler<typename Action::type>
     {};
 }}

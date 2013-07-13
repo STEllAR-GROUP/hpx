@@ -269,16 +269,17 @@ namespace hpx { namespace lcos
         {
             return future_data_->wait_for(p);
         }
+
         template <typename Clock, typename Duration>
         BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time) const
+        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time) 
         {
             return wait_until(util::to_ptime(abs_time));
         }
 
         template <typename Rep, typename Period>
         BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::chrono::duration<Rep, Period> const& rel_time) const
+        wait_for(boost::chrono::duration<Rep, Period> const& rel_time)
         {
             return wait_for(util::to_time_duration(rel_time));
         }
@@ -501,14 +502,14 @@ namespace hpx { namespace lcos
 
         template <typename Clock, typename Duration>
         BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time) const
+        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time)
         {
             return wait_until(util::to_ptime(abs_time));
         }
 
         template <typename Rep, typename Period>
         BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::chrono::duration<Rep, Period> const& rel_time) const
+        wait_for(boost::chrono::duration<Rep, Period> const& rel_time)
         {
             return wait_for(util::to_time_duration(rel_time));
         }

@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c) 2011 Bryce Lelbach 
+//  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 
 #include <sstream>
 #include <vector>
+#include <set>
 
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/connection_cache.hpp>
@@ -60,8 +61,9 @@ namespace hpx { namespace parcelset { namespace tcp
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-                naming::locality const& locality_id,
-                performance_counters::parcels::gatherer& parcels_sent);
+            naming::locality const& locality_id,
+            performance_counters::parcels::gatherer& parcels_sent,
+            boost::uint64_t max_outbound_size);
 
         ~parcelport_connection()
         {
@@ -153,24 +155,24 @@ namespace hpx { namespace parcelset { namespace tcp
             socket_.set_option(quickack);
 #endif
 
-            void (parcelport_connection::*f)(boost::system::error_code const&, 
+            void (parcelport_connection::*f)(boost::system::error_code const&,
                       boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_read_ack<Handler, ParcelPostprocess>;
 
-            boost::asio::async_read(socket_, 
+            boost::asio::async_read(socket_,
                 boost::asio::buffer(&ack_, sizeof(ack_)),
                 boost::bind(f, shared_from_this(), ::_1, handler));
         }
 
         template <typename Handler, typename ParcelPostprocess>
-        void handle_read_ack(boost::system::error_code const& e, 
-            boost::tuple<Handler, ParcelPostprocess> handler) 
+        void handle_read_ack(boost::system::error_code const& e,
+            boost::tuple<Handler, ParcelPostprocess> handler)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_handle_read_ack;
 #endif
-            // Call post-processing handler, which will send remaining pending 
-            // parcels. Pass along the connection so it can be reused if more 
+            // Call post-processing handler, which will send remaining pending
+            // parcels. Pass along the connection so it can be reused if more
             // parcels have to be sent.
             boost::get<1>(handler)(e, there_, shared_from_this());
         }
@@ -183,6 +185,15 @@ namespace hpx { namespace parcelset { namespace tcp
         }
 #endif
 
+#if defined(HPX_HAVE_SECURITY)
+    protected:
+        template <typename Archive>
+        void serialize_certificate(Archive& archive,
+            std::set<boost::uint32_t>& localities, parcel const& p);
+
+        void create_message_suffix(naming::gid_type const& parcel_id);
+#endif
+
     private:
         /// Socket for the parcelport_connection.
         boost::asio::ip::tcp::socket socket_;
@@ -192,7 +203,14 @@ namespace hpx { namespace parcelset { namespace tcp
         boost::integer::ulittle64_t out_size_;
         boost::integer::ulittle64_t out_data_size_;
         std::vector<char> out_buffer_;
+
+        boost::uint64_t max_outbound_size_;
+
         bool ack_;
+
+#if defined(HPX_HAVE_SECURITY)
+        bool first_message_;
+#endif
 
         /// the other (receiving) end of this connection
         naming::locality there_;

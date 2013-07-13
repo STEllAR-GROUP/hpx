@@ -14,6 +14,10 @@ set(subdirs
     util
    )
 
+if(NOT HPX_HAVE_SECURITY AND SODIUM_FOUND)
+    set(subdirs ${subdirs} security)
+endif()
+
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.unit.${subdir})
   add_subdirectory(${subdir})

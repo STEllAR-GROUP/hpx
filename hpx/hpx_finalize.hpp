@@ -68,6 +68,34 @@ namespace hpx
     HPX_EXPORT int finalize(double shutdown_timeout,
         double localwait = -1.0, error_code& ec = throws);
 
+    /// \brief Main function to gracefully terminate the the HPX runtime system.
+    ///
+    /// The function \a hpx::finalize is the main way to (gracefully) exit any
+    /// HPX application. It should be called from one locality only (usually
+    /// the console) and it will notify all connected localities to finish
+    /// execution. Only after all other localities have exited this function
+    /// will return, allowing to exit the console locality as well.
+    ///
+    /// During the execution of this function the runtime system will invoke
+    /// all registered shutdown functions (see \a hpx::init) on all localities.
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \returns  This function will always return zero.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// This function will block and wait for all connected localities to exit
+    /// before returning to the caller. It should be the last HPX-function
+    /// called by any application.
+    ///
+    /// Using this function is an alternative to \a hpx::disconnect, these
+    /// functions do not need to be called both.
     inline int finalize(error_code& ec = throws)
     {
         return finalize(-1.0, -1.0, ec);
@@ -133,6 +161,29 @@ namespace hpx
     HPX_EXPORT int disconnect(double shutdown_timeout,
         double localwait = -1.0, error_code& ec = throws);
 
+    /// \brief Disconnect this locality from the application.
+    ///
+    /// The function \a hpx::disconnect can be used to disconnect a locality
+    /// from a running HPX application.
+    ///
+    /// During the execution of this function the runtime system will invoke
+    /// all registered shutdown functions (see \a hpx::init) on this locality.
+    ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \returns  This function will always return zero.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// This function will block and wait for this locality to finish executing
+    /// before returning to the caller. It should be the last HPX-function
+    /// called by any locality being disconnected.
+    ///
     inline int disconnect(error_code& ec = throws)
     {
         return disconnect(-1.0, -1.0, ec);
