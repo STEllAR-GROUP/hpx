@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace policies
             {}
 
             init_parameter(std::size_t num_queues,
-                    std::size_t num_high_priority_queues,
+                    std::size_t num_high_priority_queues = std::size_t(-1),
                     std::size_t max_queue_thread_count = max_thread_count,
                     std::size_t pu_offset = 0,
                     std::size_t pu_step = 1,
@@ -578,7 +578,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         // no-op for local scheduling
-        void do_some_work(std::size_t num_thread) {}
+        void do_some_work(std::size_t num_thread = std::size_t(-1)) {}
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
