@@ -18,7 +18,7 @@
 #include <boost/ref.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
-namespace hpx { namespace threads { namespace detail 
+namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
@@ -43,7 +43,7 @@ namespace hpx { namespace threads { namespace detail
             void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
                 &periodic_maintenance_handler<SchedulingPolicy>;
 
-            t.async_wait(boost::bind(handler, boost::ref(scheduler), 
+            t.async_wait(boost::bind(handler, boost::ref(scheduler),
                 boost::ref(global_state), boost::mpl::true_()));
         }
     }
@@ -70,7 +70,7 @@ namespace hpx { namespace threads { namespace detail
         void (*handler)(SchedulingPolicy&, boost::atomic<hpx::state>&, boost::mpl::true_) =
             &periodic_maintenance_handler<SchedulingPolicy>;
 
-        t.async_wait(boost::bind(handler, boost::ref(scheduler), 
+        t.async_wait(boost::bind(handler, boost::ref(scheduler),
             boost::ref(global_state), boost::mpl::true_()));
     }
 
@@ -308,7 +308,9 @@ namespace hpx { namespace threads { namespace detail
 
             // Clean up all terminated threads for all thread queues once in a
             // while.
-            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX) {
+            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX ||
+                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+            {
                 busy_loop_count = 0;
                 scheduler.cleanup_terminated(true);
             }

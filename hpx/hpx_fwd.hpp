@@ -150,6 +150,7 @@ namespace hpx
             class HPX_EXPORT global_queue_scheduler;
 #endif
 #if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+            template <typename Mutex = boost::mutex>
             class HPX_API_EXPORT static_priority_queue_scheduler;
 #endif
 #if defined(HPX_ABP_SCHEDULER)

@@ -665,7 +665,7 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // local static scheduler with priority queue (one queue for each OS
         // threads plus one separate queue for high priority PX-threads). Doesn't
-        // steal
+        // steal.
         int run_static(startup_function_type const& startup,
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
@@ -736,7 +736,7 @@ namespace hpx
             }
 #endif
             // scheduling policy
-            typedef hpx::threads::policies::static_priority_queue_scheduler
+            typedef hpx::threads::policies::static_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,

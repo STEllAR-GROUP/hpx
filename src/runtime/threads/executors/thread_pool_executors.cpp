@@ -337,4 +337,14 @@ namespace hpx { namespace threads { namespace executors
             policies::local_priority_queue_scheduler<lcos::local::spinlock> >(
                 max_punits, min_punits))
     {}
+
+#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+    ///////////////////////////////////////////////////////////////////////////
+    static_priority_queue_executor::static_priority_queue_executor(
+            std::size_t max_punits, std::size_t min_punits)
+      : executor(new detail::thread_pool_executor<
+            policies::static_priority_queue_scheduler<lcos::local::spinlock> >(
+                max_punits, min_punits))
+    {}
+#endif
 }}}

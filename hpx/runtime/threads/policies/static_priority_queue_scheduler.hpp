@@ -39,6 +39,7 @@ namespace hpx { namespace threads { namespace policies
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
     /// This scheduler does not do any work stealing.
+    template <typename Mutex>
     class static_priority_queue_scheduler : boost::noncopyable
     {
     private:
@@ -103,13 +104,13 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
-                queues_[i] = new thread_queue<false>(init.max_queue_thread_count_);
+                queues_[i] = new thread_queue<Mutex>(init.max_queue_thread_count_);
 
             BOOST_ASSERT(init.num_high_priority_queues_ != 0);
             BOOST_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
             for (std::size_t i = 0; i < init.num_high_priority_queues_; ++i) {
                 high_priority_queues_[i] =
-                    new thread_queue<false>(init.max_queue_thread_count_);
+                    new thread_queue<Mutex>(init.max_queue_thread_count_);
             }
         }
 
@@ -612,9 +613,9 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        std::vector<thread_queue<false>*> queues_;   ///< this manages all the PX threads
-        std::vector<thread_queue<false>*> high_priority_queues_;
-        thread_queue<false> low_priority_queue_;
+        std::vector<thread_queue<Mutex>*> queues_;   ///< this manages all the PX threads
+        std::vector<thread_queue<Mutex>*> high_priority_queues_;
+        thread_queue<Mutex> low_priority_queue_;
         boost::atomic<std::size_t> curr_queue_;
         detail::affinity_data affinity_data_;
         topology const& topology_;

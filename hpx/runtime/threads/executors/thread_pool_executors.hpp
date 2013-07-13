@@ -119,6 +119,14 @@ namespace hpx { namespace threads { namespace executors
         local_priority_queue_executor(std::size_t max_punits = 1, 
             std::size_t min_punits = 1);
     };
+
+#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+    struct HPX_EXPORT static_priority_queue_executor : public executor
+    {
+        static_priority_queue_executor(std::size_t max_punits = 1, 
+            std::size_t min_punits = 1);
+    };
+#endif
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>
