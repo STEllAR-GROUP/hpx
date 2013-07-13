@@ -18,6 +18,7 @@ set(benchmarks
     function_object_wrapper_overhead
     hpx_tls_overhead
     hpx_homogeneous_task_spawn
+    hpx_homogeneous_task_spawn_executors
     hpx_homogeneous_timed_task_spawn
     hpx_heterogeneous_task_spawn
     native_tls_overhead
@@ -67,7 +68,7 @@ if(UNIX)
         DEPENDENCIES ${boost_library_dependencies}
                      ${QTHREADS_LIBRARY} test_worker_lib)
 
-	set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
+    set(qthreads_homogeneous_timed_task_spawn_FLAGS NOLIBS
         DEPENDENCIES ${boost_library_dependencies}
                      ${QTHREADS_LIBRARY} test_worker_timed_lib)
 
@@ -123,6 +124,7 @@ set(hpx_tls_overhead_FLAGS NOLIBS
     DEPENDENCIES ${boost_library_dependencies})
 
 set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
+set(hpx_homogeneous_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
 set(hpx_homogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_timed_lib)
 
 set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)

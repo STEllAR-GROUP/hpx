@@ -76,7 +76,9 @@ namespace hpx { namespace threads { namespace policies
                     std::string const& affinity = "pu",
                     std::string const& affinity_desc = "")
               : num_queues_(num_queues),
-                num_high_priority_queues_(num_high_priority_queues),
+                num_high_priority_queues_(
+                    num_high_priority_queues == std::size_t(-1) ?
+                        num_queues : num_high_priority_queues),
                 max_queue_thread_count_(max_queue_thread_count),
                 pu_offset_(pu_offset), pu_step_(pu_step),
                 affinity_domain_(affinity),

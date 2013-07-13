@@ -155,7 +155,7 @@ namespace hpx { namespace threads
         /// Schedule the specified function for execution in this executor.
         /// Depending on the subclass implementation, this may block in some
         /// situations.
-        void add(HPX_STD_FUNCTION<void()> f, char const* desc = 0,
+        void add(HPX_STD_FUNCTION<void()> f, char const* desc = "",
             threads::thread_state_enum initial_state = threads::pending,
             bool run_now = true, error_code& ec = throws)
         {
@@ -214,7 +214,7 @@ namespace hpx { namespace threads
         /// Error conditions: If invoking closure throws an exception, the 
         /// executor shall call terminate.
         void add_at(boost::posix_time::ptime const& abs_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
+            HPX_STD_FUNCTION<void()> f, char const* desc = "",
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
@@ -223,7 +223,7 @@ namespace hpx { namespace threads
 
         template <typename Clock, typename Duration>
         void add_at(boost::chrono::time_point<Clock, Duration> const& abs_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
+            HPX_STD_FUNCTION<void()> f, char const* desc = "",
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
@@ -241,7 +241,7 @@ namespace hpx { namespace threads
         /// executor shall call terminate.
         void add_after(
             boost::posix_time::time_duration const& rel_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
+            HPX_STD_FUNCTION<void()> f, char const* desc = "",
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
@@ -250,7 +250,7 @@ namespace hpx { namespace threads
 
         template <typename Rep, typename Period>
         void add_after(boost::chrono::duration<Rep, Period> const& rel_time,
-            HPX_STD_FUNCTION<void()> f, char const* desc = 0,
+            HPX_STD_FUNCTION<void()> f, char const* desc = "",
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(

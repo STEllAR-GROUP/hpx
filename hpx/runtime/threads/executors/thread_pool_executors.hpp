@@ -95,6 +95,7 @@ namespace hpx { namespace threads { namespace executors
 
             // collect statistics
             boost::atomic<std::size_t> current_concurrency_;
+            boost::atomic<std::size_t> max_current_concurrency_;
             boost::atomic<boost::uint64_t> tasks_scheduled_;
             boost::atomic<boost::uint64_t> tasks_completed_;
 
@@ -110,20 +111,26 @@ namespace hpx { namespace threads { namespace executors
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT local_queue_executor : public executor
     {
-        local_queue_executor(std::size_t max_punits = 1, 
+        local_queue_executor() {}
+
+        local_queue_executor(std::size_t max_punits,
             std::size_t min_punits = 1);
     };
 
     struct HPX_EXPORT local_priority_queue_executor : public executor
     {
-        local_priority_queue_executor(std::size_t max_punits = 1, 
+        local_priority_queue_executor() {}
+
+        local_priority_queue_executor(std::size_t max_punits,
             std::size_t min_punits = 1);
     };
 
 #if defined(HPX_STATIC_PRIORITY_SCHEDULER)
     struct HPX_EXPORT static_priority_queue_executor : public executor
     {
-        static_priority_queue_executor(std::size_t max_punits = 1, 
+        static_priority_queue_executor() {}
+
+        static_priority_queue_executor(std::size_t max_punits,
             std::size_t min_punits = 1);
     };
 #endif

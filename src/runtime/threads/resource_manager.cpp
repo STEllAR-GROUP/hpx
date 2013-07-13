@@ -114,7 +114,7 @@ namespace hpx { namespace threads
         {
             if (available_punits[i] == punit_status::reserved)
             {
-                proxy->add_processing_unit(i, punits, ec);
+                proxy->add_processing_unit(punits, i, ec);
                 if (ec) break;
 
                 core_ids.push_back(std::make_pair(i, punits));

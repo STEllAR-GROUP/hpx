@@ -71,9 +71,18 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             std::size_t min_punits)
       : scheduler_(max_punits), shutdown_sem_(0),
         states_(max_punits), puinits_(max_punits),
-        current_concurrency_(0), tasks_scheduled_(0), tasks_completed_(0),
+        current_concurrency_(0), max_current_concurrency_(0),
+        tasks_scheduled_(0), tasks_completed_(0),
         max_punits_(max_punits), min_punits_(min_punits), cookie_(0)
     {
+        if (max_punits < min_punits)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "thread_pool_executor<Scheduler>::thread_pool_executor",
+                "max_punit shouldn't be smaller than min_punit");
+            return;
+        }
+
         states_.resize(max_punits);
         for (std::size_t i = 0; i != max_punits; ++i)
             states_[i].store(starting);
@@ -95,7 +104,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         rm.stop_executor(cookie_);
 
         // wait for executor to finish executing
-        shutdown_sem_.wait();
+        shutdown_sem_.wait(max_current_concurrency_.load());
 
         // detach this executor from resource manager
         rm.detach(cookie_);     // this releases proxy (manage_thread_pool_executor)
@@ -267,6 +276,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         states_[virt_core].compare_exchange_strong(expected, running);
 
         ++current_concurrency_;
+        ++max_current_concurrency_;
 
         {
             on_run_exit on_exit(current_concurrency_, shutdown_sem_);
