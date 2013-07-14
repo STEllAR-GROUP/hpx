@@ -11,6 +11,7 @@ set(tests
     thread_launching
     thread_mf
     thread_stacksize
+    thread_suspension_executor
    )
 
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -22,8 +23,6 @@ set(thread_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_id_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_launching_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(thread_mf_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_mf_PARAMETERS THREADS_PER_LOCALITY 4)
 
