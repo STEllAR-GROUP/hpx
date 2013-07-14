@@ -27,7 +27,7 @@ namespace hpx { namespace threads { namespace executors
         //////////////////////////////////////////////////////////////////////
         template <typename Scheduler>
         class HPX_EXPORT thread_pool_executor
-          : public threads::detail::executor_base
+          : public threads::detail::scheduled_executor_base
         {
         public:
             thread_pool_executor(std::size_t max_punits = 1,
@@ -80,7 +80,7 @@ namespace hpx { namespace threads { namespace executors
 
         private:
             // internal run method
-            void run(std::size_t num_thread);
+            void run(std::size_t virt_core, std::size_t num_thread);
 
             threads::thread_state_enum thread_function_nullary(
                 HPX_STD_FUNCTION<void()> const& func);
@@ -89,9 +89,6 @@ namespace hpx { namespace threads { namespace executors
             Scheduler scheduler_;
             lcos::local::counting_semaphore shutdown_sem_;
             boost::ptr_vector<boost::atomic<hpx::state> > states_;
-
-            // map internal virtual core number to punit numbers
-            std::vector<std::size_t> puinits_;
 
             // collect statistics
             boost::atomic<std::size_t> current_concurrency_;
@@ -109,7 +106,7 @@ namespace hpx { namespace threads { namespace executors
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT local_queue_executor : public executor
+    struct HPX_EXPORT local_queue_executor : public scheduled_executor
     {
         local_queue_executor() {}
 
@@ -117,7 +114,7 @@ namespace hpx { namespace threads { namespace executors
             std::size_t min_punits = 1);
     };
 
-    struct HPX_EXPORT local_priority_queue_executor : public executor
+    struct HPX_EXPORT local_priority_queue_executor : public scheduled_executor
     {
         local_priority_queue_executor() {}
 
@@ -126,7 +123,7 @@ namespace hpx { namespace threads { namespace executors
     };
 
 #if defined(HPX_STATIC_PRIORITY_SCHEDULER)
-    struct HPX_EXPORT static_priority_queue_executor : public executor
+    struct HPX_EXPORT static_priority_queue_executor : public scheduled_executor
     {
         static_priority_queue_executor() {}
 

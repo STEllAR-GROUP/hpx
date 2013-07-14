@@ -24,12 +24,21 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::atomic<scheduled_executor*> default_executor_instance;
+    boost::atomic<scheduled_executor> default_executor_instance;
 
-    scheduled_executor* default_executor()
+    scheduled_executor default_executor()
     {
-        scheduled_executor* retval = default_executor_instance.load();
-        return retval ? retval : &scheduled_executor::default_executor();
+        if (!default_executor_instance.load())
+        {
+            default_executor_instance.store(
+                scheduled_executor::default_executor());
+        }
+        return default_executor_instance.load();
+    }
+
+    void set_default_executor(scheduled_executor executor)
+    {
+        default_executor_instance.store(executor);
     }
 }}
 

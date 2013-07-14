@@ -25,7 +25,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     resource_manager::resource_manager()
       : next_cookie_(0),
-        punits_(hardware_concurrency()),
+        punits_(get_os_thread_count()),
         topology_(get_topology())
     {}
 
@@ -45,7 +45,7 @@ namespace hpx { namespace threads
         std::size_t min_punits = proxy->get_policy_element(detail::min_concurrency, ec1);
         if (ec1) min_punits = 1;
         std::size_t max_punits = proxy->get_policy_element(detail::max_concurrency, ec1);
-        if (ec1) max_punits = threads::hardware_concurrency();
+        if (ec1) max_punits = get_os_thread_count();
 
         // lock the resource manager from this point on
         mutex_type::scoped_lock l(mtx_);
@@ -97,7 +97,7 @@ namespace hpx { namespace threads
 
         // array of available processing units
         std::vector<BOOST_SCOPED_ENUM(punit_status)> available_punits(
-            hardware_concurrency(), punit_status::unassigned);
+            get_os_thread_count(), punit_status::unassigned);
 
         // find all available processing units with zero use count
         std::size_t reserved = reserve_processing_units(0, max_punits,
@@ -109,26 +109,26 @@ namespace hpx { namespace threads
         }
 
         // processing units found, inform scheduler
-        std::size_t punits = 0;
+        std::size_t punit = 0;
         for (std::size_t i = 0; i != available_punits.size(); ++i)
         {
             if (available_punits[i] == punit_status::reserved)
             {
-                proxy->add_processing_unit(punits, i, ec);
+                proxy->add_processing_unit(punit, i, ec);
                 if (ec) break;
 
-                core_ids.push_back(std::make_pair(i, punits));
-                ++punits;
+                core_ids.push_back(std::make_pair(i, punit));
+                ++punit;
 
                 // update use count for reserved processing units
                 ++punits_[i].use_count_;
             }
         }
-        BOOST_ASSERT(punits <= max_punits);
+        BOOST_ASSERT(punit <= max_punits);
 
         if (ec) {
             // on error, remove the already assigned virtual cores
-            for (std::size_t j = 0; j != punits; ++j)
+            for (std::size_t j = 0; j != punit; ++j)
             {
                 proxy->remove_processing_unit(j, ec);
                 --punits_[j].use_count_;

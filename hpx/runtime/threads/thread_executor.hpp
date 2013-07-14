@@ -263,17 +263,17 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Returns: a non-null pointer to the default executor defined by the 
+    /// Returns: the default executor defined by the 
     /// active process. If set_default_executor hasn’t been called then the 
     /// return value is a pointer to an executor of unspecified type.
-    HPX_EXPORT scheduled_executor* default_executor();
+    HPX_EXPORT scheduled_executor default_executor();
 
     /// Effect: the default executor of the active process is set to the given 
     /// executor instance. 
     /// Requires: executor shall not be null.
     /// Synchronization: Changing and using the default executor is sequentially 
     /// consistent.
-    HPX_EXPORT void set_default_executor(scheduled_executor* executor);
+    HPX_EXPORT void set_default_executor(scheduled_executor executor);
 }}
 
 #include <hpx/config/warnings_suffix.hpp>
