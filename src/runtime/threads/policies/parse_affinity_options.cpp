@@ -249,6 +249,8 @@ namespace hpx { namespace threads { namespace detail
             index = thread_index;
 
         mask_type pu_mask = mask_type();
+        resize(pu_mask, size);
+
         std::size_t pu_index = 0;
         for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++pu_index)
         {
@@ -297,7 +299,9 @@ namespace hpx { namespace threads { namespace detail
         if (m[2].type_ == spec_type::unknown && b.size() > 1)
             index = thread_index;
 
-        mask_type core_mask= mask_type();
+        mask_type core_mask = mask_type();
+        resize(core_mask, size);
+
         std::size_t core_index = 0;
         for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++core_index)
         {
@@ -369,6 +373,8 @@ namespace hpx { namespace threads { namespace detail
         }
 
         mask_type mask = mask_type();
+        resize(mask, size);
+
         std::size_t socket_index = 0;
         for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++socket_index)
         {
@@ -404,6 +410,8 @@ namespace hpx { namespace threads { namespace detail
         }
 
         mask_type mask = mask_type();
+        resize(mask, size);
+
         std::size_t node_index = 0;
         for (bounds_type::const_iterator it = b.begin(); it != b.end(); ++it, ++node_index)
         {
