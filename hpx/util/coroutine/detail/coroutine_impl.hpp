@@ -292,8 +292,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
           typedef typename coroutine_type::self self_type;
           {
-              self_type self(this);
-              reset_self_on_exit on_exit(&self);
+              self_type* old_self = super_type::get_self();
+              self_type self(this, old_self);
+              reset_self_on_exit on_exit(&self, old_self);
+
               this->m_result_last = m_fun(*this->args());
 
               // if this thread returned 'terminated' we need to reset the functor
@@ -343,14 +345,17 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     {
         typedef typename coroutine_type::self self_type;
 
-        reset_self_on_exit(self_type* val)
+        reset_self_on_exit(self_type* val, self_type* old_val = NULL)
+          : old_self(old_val)
         {
             super_type::set_self(val);
         }
         ~reset_self_on_exit()
         {
-            super_type::set_self(NULL);
+            super_type::set_self(old_self);
         }
+
+        self_type* old_self;
     };
 
   public:
@@ -377,9 +382,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       typedef typename coroutine_type::result_slot_type result_slot_type;
 
       {
-//           boost::optional<self_type> self (coroutine_accessor::in_place(this));
-          self_type self(this);
-          reset_self_on_exit on_exit(&self);
+          self_type* old_self = super_type::get_self();
+          self_type self(this, old_self);
+          reset_self_on_exit on_exit(&self, old_self);
           detail::unpack(m_fun, *this->args(),
               detail::trait_tag<typename coroutine_type::arg_slot_traits>());
       }
@@ -400,9 +405,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       typedef typename coroutine_type::result_slot_type result_slot_type;
 
       {
-//           boost::optional<self_type> self (coroutine_accessor::in_place(this));
-          self_type self(this);
-          reset_self_on_exit on_exit(&self);
+          self_type* old_self = super_type::get_self();
+          self_type self(this, old_self);
+          reset_self_on_exit on_exit(&self, old_self);
+
           this->m_result_last = boost::in_place(result_slot_type(
                   detail::unpack(m_fun, *this->args(), detail::trait_tag<traits>())
               ));
