@@ -43,6 +43,7 @@
 
 #include <hpx/util/coroutine/detail/arg_max.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 #include <hpx/util/coroutine/detail/is_callable.hpp>
 #include <hpx/util/coroutine/detail/argument_packer.hpp>
 #include <hpx/util/coroutine/detail/argument_unpacker.hpp>
