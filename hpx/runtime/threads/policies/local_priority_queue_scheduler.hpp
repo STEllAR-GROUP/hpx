@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
@@ -38,7 +39,7 @@ namespace hpx { namespace threads { namespace policies
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
     template <typename Mutex>
-    class local_priority_queue_scheduler : boost::noncopyable
+    class local_priority_queue_scheduler : public scheduler_base
     {
     private:
         // The maximum number of active threads this thread manager should
@@ -107,15 +108,12 @@ namespace hpx { namespace threads { namespace policies
             numa_sensitive_(init.numa_sensitive_),
             topology_(get_topology()),
             steals_in_numa_domain_(init.num_queues_),
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS)
-            numa_domain_masks_(init.num_queues_),
-#else
-            numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask()),
-#endif
             steals_outside_numa_domain_(init.num_queues_),
 #if !defined(HPX_HAVE_MORE_THAN_64_THREADS)
+            numa_domain_masks_(init.num_queues_),
             outside_numa_domain_masks_(init.num_queues_)
 #else
+            numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask()),
             outside_numa_domain_masks_(init.num_queues_, topology_.get_machine_affinity_mask())
 #endif
         {
@@ -340,7 +338,7 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread_last(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            schedule_thread(thrd, num_thread, priority);
+            local_priority_queue_scheduler::schedule_thread(thrd, num_thread, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -689,8 +687,15 @@ namespace hpx { namespace threads { namespace policies
             return result;
         }
 
+        ///////////////////////////////////////////////////////////////////////
         // no-op for local scheduling
         void do_some_work(std::size_t num_thread = std::size_t(-1)) {}
+
+        ///////////////////////////////////////////////////////////////////////
+        void add_punit(std::size_t virt_core, std::size_t thread_num)
+        {
+            affinity_data_.add_punit(virt_core, thread_num);
+        }
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
@@ -761,8 +766,8 @@ namespace hpx { namespace threads { namespace policies
         bool numa_sensitive_;
         topology const& topology_;
         mask_type steals_in_numa_domain_;
-        std::vector<mask_type> numa_domain_masks_;
         mask_type steals_outside_numa_domain_;
+        std::vector<mask_type> numa_domain_masks_;
         std::vector<mask_type> outside_numa_domain_masks_;
     };
 }}}

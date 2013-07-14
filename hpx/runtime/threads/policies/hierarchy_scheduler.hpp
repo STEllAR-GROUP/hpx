@@ -16,8 +16,8 @@
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
@@ -28,7 +28,7 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The hierarchy_scheduler maintains a tree of queues of work items
     /// (threads). Every OS threads walks that tree to obtain new work
-    class hierarchy_scheduler : boost::noncopyable
+    class hierarchy_scheduler : public scheduler_base
     {
     private:
         // The maximum number of active threads this thread manager should
@@ -418,7 +418,7 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread_last(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            schedule_thread(thrd, num_thread, priority);
+            hierarchy_scheduler::schedule_thread(thrd, num_thread, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -514,12 +514,14 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
+        void add_punit(std::size_t virt_core, std::size_t thread_num) {}
+
+        ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
         {
             BOOST_ASSERT(tree.size());
             BOOST_ASSERT(num_thread < tree.at(0).size());
             tree.at(0).at(num_thread)->on_start_thread(num_thread);
-            //queues_[num_thread]->on_start_thread(num_thread);
         }
         void on_stop_thread(std::size_t num_thread)
         {

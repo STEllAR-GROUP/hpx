@@ -25,15 +25,26 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return count;
     }
 
+    void affinity_data::init_cached_pu_nums(std::size_t hardware_concurrency)
+    {
+        pu_nums_.resize(num_threads_);
+        for (std::size_t i = 0; i != num_threads_; ++i)
+            pu_nums_[i] = get_pu_num(i, hardware_concurrency);
+    }
+
     affinity_data::affinity_data(std::size_t num_threads,
             std::size_t pu_offset, std::size_t pu_step,
             std::string const& affinity_domain, std::string const& affinity_desc)
-      : pu_offset_(pu_offset), pu_step_(pu_step),
+      : num_threads_(num_threads), pu_offset_(pu_offset), pu_step_(pu_step),
         affinity_domain_(affinity_domain), affinity_masks_(), pu_nums_()
     {
+        std::size_t num_system_pus = hardware_concurrency();
 #if defined(HPX_HAVE_HWLOC)
         if (!affinity_desc.empty()) {
-            affinity_masks_.resize(num_threads);
+            affinity_masks_.resize(num_threads_);
+            for (std::size_t i = 0; i != num_threads_; ++i)
+                threads::resize(affinity_masks_[i], num_system_pus);
+
             parse_affinity_options(affinity_desc, affinity_masks_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
@@ -47,10 +58,34 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             }
         }
 #endif
+        init_cached_pu_nums(num_system_pus);
+    }
+
+    // means of adding a processing unit after initialization
+    void affinity_data::add_punit(std::size_t virt_core, std::size_t thread_num)
+    {
         std::size_t num_system_pus = hardware_concurrency();
-        pu_nums_.reserve(num_threads);
-        for (std::size_t i = 0; i != num_threads; ++i)
-            pu_nums_.push_back(init_pu_num(i, num_system_pus));
+
+        // initialize affinity_masks and set the mask for the given virt_core
+        if (affinity_masks_.empty()) 
+        {
+            affinity_masks_.resize(num_threads_);
+            for (std::size_t i = 0; i != num_threads_; ++i)
+                threads::resize(affinity_masks_[i], num_system_pus);
+        }
+        threads::set(affinity_masks_[virt_core], thread_num);
+
+        // find first used pu, which is then stored as the pu_offset
+        std::size_t first_pu = std::size_t(-1);
+        for (std::size_t i = 0; i != num_threads_; ++i)
+        {
+            std::size_t first = threads::find_first(affinity_masks_[i]);
+            first_pu = (std::min)(first_pu, first);
+        }
+        if (first_pu != std::size_t(-1))
+            pu_offset_ = first_pu;
+
+        init_cached_pu_nums(num_system_pus);
     }
 
     mask_cref_type affinity_data::get_pu_mask(topology const& topology,
@@ -86,7 +121,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return topology.get_machine_affinity_mask();
     }
 
-    std::size_t affinity_data::init_pu_num(std::size_t num_thread,
+    std::size_t affinity_data::get_pu_num(std::size_t num_thread,
         std::size_t hardware_concurrency) const
     {
         // The offset shouldn't be larger than the number of available

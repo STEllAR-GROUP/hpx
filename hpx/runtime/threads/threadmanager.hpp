@@ -20,6 +20,7 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -436,6 +437,9 @@ namespace hpx { namespace threads
         // Returns the mask identifying all processing units used by this
         // thread manager.
         virtual mask_cref_type get_used_processing_units() const = 0;
+
+        // Return the executor associated with th egiven thread
+        virtual executor get_executor(thread_id_type id, error_code& ec) const = 0;
 
         ///////////////////////////////////////////////////////////////////////
         static std::size_t get_worker_thread_num(bool* numa_sensitive = 0);

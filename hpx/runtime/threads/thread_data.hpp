@@ -165,7 +165,8 @@ namespace hpx { namespace threads
             requested_interrupt_(false),
             enabled_interrupt_(true),
             ran_exit_funcs_(false),
-            exit_funcs_(0)
+            exit_funcs_(0),
+            scheduler_base_(init_data.scheduler_base)
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << get_description() << ")";
@@ -571,6 +572,11 @@ namespace hpx { namespace threads
         void run_thread_exit_callbacks();
         void free_thread_exit_callbacks();
 
+        policies::scheduler_base* get_scheduler_base() const
+        {
+            return scheduler_base_;
+        }
+
     private:
         coroutine_type coroutine_;
         mutable boost::atomic<thread_state> current_state_;
@@ -612,6 +618,9 @@ namespace hpx { namespace threads
 
         // Singly linked list (heap-allocated)
         detail::thread_exit_callback_node* exit_funcs_;
+
+        // reference to scheduler which created/manages this thread
+        policies::scheduler_base* scheduler_base_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

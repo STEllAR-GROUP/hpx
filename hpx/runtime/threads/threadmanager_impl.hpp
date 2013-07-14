@@ -501,6 +501,9 @@ namespace hpx { namespace threads
             return used_processing_units_;
         }
 
+        // Return the executor associated with th egiven thread
+        executor get_executor(thread_id_type id, error_code& ec) const;
+
     private:
         // counter creator functions
         naming::gid_type queue_length_counter_creator(

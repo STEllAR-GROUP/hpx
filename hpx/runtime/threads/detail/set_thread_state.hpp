@@ -20,15 +20,13 @@
 namespace hpx { namespace threads { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
-    thread_state set_thread_state(SchedulingPolicy& scheduler,
+    inline thread_state set_thread_state(
         thread_id_type id, thread_state_enum new_state,
         thread_state_ex_enum new_state_ex, thread_priority priority,
         std::size_t thread_num = std::size_t(-1), error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
-    thread_state_enum set_active_state(SchedulingPolicy& scheduler,
+    inline thread_state_enum set_active_state(
         thread_id_type id, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority,
         thread_state previous_state)
@@ -60,13 +58,12 @@ namespace hpx { namespace threads { namespace detail
 
         // just retry, set_state will create new thread if target is still active
         error_code ec(lightweight);      // do not throw
-        set_thread_state(id, newstate, newstate_ex, priority, ec);
+        detail::set_thread_state(id, newstate, newstate_ex, priority, std::size_t(-1), ec);
         return terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
-    thread_state set_thread_state(SchedulingPolicy& scheduler,
+    inline thread_state set_thread_state(
         thread_id_type id, thread_state_enum new_state,
         thread_state_ex_enum new_state_ex, thread_priority priority,
         std::size_t thread_num, error_code& ec)
@@ -126,12 +123,12 @@ namespace hpx { namespace threads { namespace detail
                     << get_thread_state_name(new_state) << ")";
 
                 thread_init_data data(
-                    boost::bind(&set_active_state<SchedulingPolicy>,
-                        boost::ref(scheduler), id, new_state, new_state_ex,
+                    boost::bind(&set_active_state,
+                        id, new_state, new_state_ex,
                         priority, previous_state),
                     "set state for active thread", 0, priority);
 
-                create_work(scheduler, data, pending, ec);
+                create_work(thrd->get_scheduler_base(), data, pending, ec);
 
                 if (&ec != &throws)
                     ec = make_success_code();
@@ -201,8 +198,8 @@ namespace hpx { namespace threads { namespace detail
         if (new_state == pending) {
             // REVIEW: Passing a specific target thread may interfere with the
             // round robin queuing.
-            scheduler.schedule_thread(thrd, thread_num, priority);
-            scheduler.do_some_work();
+            thrd->get_scheduler_base()->schedule_thread(thrd, thread_num, priority);
+            thrd->get_scheduler_base()->do_some_work();
         }
 
         if (&ec != &throws)
@@ -233,8 +230,7 @@ namespace hpx { namespace threads { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     /// This thread function is used by the at_timer thread below to trigger
     /// the required action.
-    template <typename SchedulingPolicy>
-    thread_state_enum wake_timer_thread(SchedulingPolicy& scheduler,
+    inline thread_state_enum wake_timer_thread(
         thread_id_type id, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority,
         thread_id_type timer_id,
@@ -257,13 +253,13 @@ namespace hpx { namespace threads { namespace detail
         if (triggered->compare_exchange_strong(oldvalue, true)) //-V601
         {
             // timer has not been canceled yet, trigger the requested set_state
-            set_thread_state(scheduler, id, newstate, newstate_ex, priority);
+            detail::set_thread_state(id, newstate, newstate_ex, priority);
         }
 
         // then re-activate the thread holding the deadline_timer
         // REVIEW: Why do we ignore errors here?
         error_code ec(lightweight);    // do not throw
-        set_thread_state(scheduler, timer_id, pending, wait_timeout,
+        detail::set_thread_state(timer_id, pending, wait_timeout,
             thread_priority_normal, std::size_t(-1), ec);
         return terminated;
     }
@@ -292,19 +288,19 @@ namespace hpx { namespace threads { namespace detail
             boost::make_shared<boost::atomic<bool> >(false));
 
         thread_init_data data(
-            boost::bind(&wake_timer_thread<SchedulingPolicy>,
-                boost::ref(scheduler), id, newstate, newstate_ex, priority,
+            boost::bind(&wake_timer_thread,
+                id, newstate, newstate_ex, priority,
                 self_id, triggered),
             "wake_timer", 0, priority);
-        thread_id_type wake_id = create_thread(scheduler, data, suspended, true);
+        thread_id_type wake_id = create_thread(&scheduler, data, suspended, true);
 
         // create timer firing in correspondence with given time
         boost::asio::deadline_timer t (
             get_thread_pool("timer-pool")->get_io_service(), expire);
 
         // let the timer invoke the set_state on the new (suspended) thread
-        t.async_wait(boost::bind(&set_thread_state<SchedulingPolicy>,
-            boost::ref(scheduler), wake_id, pending, wait_timeout, priority,
+        t.async_wait(boost::bind(&detail::set_thread_state,
+            wake_id, pending, wait_timeout, priority,
             std::size_t(-1), boost::ref(throws)));
 
         // this waits for the thread to be reactivated when the timer fired
@@ -347,7 +343,7 @@ namespace hpx { namespace threads { namespace detail
                 priority),
             "at_timer (expire at)", 0, priority, thread_num);
 
-        return create_thread(scheduler, data, pending, true, ec);
+        return create_thread(&scheduler, data, pending, true, ec);
     }
 
     template <typename SchedulingPolicy>
@@ -383,7 +379,7 @@ namespace hpx { namespace threads { namespace detail
                 priority),
             "at_timer (from now)", 0, priority, thread_num);
 
-        return create_thread(scheduler, data, pending, true, ec);
+        return create_thread(&scheduler, data, pending, true, ec);
     }
 
     template <typename SchedulingPolicy>

@@ -22,17 +22,18 @@ namespace hpx { namespace threads
         thread_init_data()
           : func(),
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
-            lva(0), 
+            lva(0),
 #endif
 #if HPX_THREAD_MAINTAIN_DESCRIPTION
-            description(0), 
+            description(0),
 #endif
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
-            parent_locality_id(0), parent_id(0), parent_phase(0), 
+            parent_locality_id(0), parent_id(0), parent_phase(0),
 #endif
             priority(thread_priority_normal),
             num_os_thread(std::size_t(-1)),
-            stacksize(get_default_stack_size())
+            stacksize(get_default_stack_size()),
+            scheduler_base(0)
         {}
 
         thread_init_data(BOOST_RV_REF(thread_init_data) rhs)
@@ -41,15 +42,16 @@ namespace hpx { namespace threads
             lva(rhs.lva),
 #endif
 #if HPX_THREAD_MAINTAIN_DESCRIPTION
-            description(rhs.description), 
+            description(rhs.description),
 #endif
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_id(rhs.parent_locality_id), parent_id(rhs.parent_id),
-            parent_phase(rhs.parent_phase), 
+            parent_phase(rhs.parent_phase),
 #endif
             priority(rhs.priority),
             num_os_thread(rhs.num_os_thread),
-            stacksize(rhs.stacksize)
+            stacksize(rhs.stacksize),
+            scheduler_base(rhs.scheduler_base)
         {}
 
         template <typename F>
@@ -57,20 +59,22 @@ namespace hpx { namespace threads
                 naming::address::address_type lva_ = 0,
                 thread_priority priority_ = thread_priority_normal,
                 std::size_t os_thread = std::size_t(-1),
-                std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1))
-          : func(boost::forward<F>(f)), 
+                std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1),
+                policies::scheduler_base* scheduler_base_ = 0)
+          : func(boost::forward<F>(f)),
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
-            lva(lva_), 
+            lva(lva_),
 #endif
 #if HPX_THREAD_MAINTAIN_DESCRIPTION
-            description(desc), 
+            description(desc),
 #endif
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_id(0), parent_id(0), parent_phase(0),
 #endif
             priority(priority_), num_os_thread(os_thread),
             stacksize(stacksize_ == std::ptrdiff_t(-1) ?
-                get_default_stack_size() : stacksize_)
+                get_default_stack_size() : stacksize_),
+            scheduler_base(scheduler_base_)
         {}
 
         HPX_STD_FUNCTION<threads::thread_function_type> func;
@@ -90,6 +94,8 @@ namespace hpx { namespace threads
         thread_priority priority;
         std::size_t num_os_thread;
         std::ptrdiff_t stacksize;
+
+        policies::scheduler_base* scheduler_base;
 
     private:
         // we don't use the assignment operator

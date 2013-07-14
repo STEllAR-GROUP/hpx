@@ -10,12 +10,13 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/util/logging.hpp>
 
 namespace hpx { namespace threads { namespace detail
 {
-    template <typename SchedulingPolicy>
-    void create_work(SchedulingPolicy& scheduler, thread_init_data& data,
+    inline void create_work(policies::scheduler_base* scheduler,
+        thread_init_data& data,
         thread_state_enum initial_state = threads::pending,
         error_code& ec = throws)
     {
@@ -68,13 +69,17 @@ namespace hpx { namespace threads { namespace detail
             data.parent_locality_id = get_locality_id();
 #endif
 
+        if (0 == data.scheduler_base)
+            data.scheduler_base = scheduler;
+
+        // create the new thread
         if (thread_priority_critical == data.priority) {
             // For critical priority threads, create the thread immediately.
-            scheduler.create_thread(data, initial_state, true, ec, data.num_os_thread);
+            scheduler->create_thread(data, initial_state, true, ec, data.num_os_thread);
         }
         else {
             // Create a task description for the new thread.
-            scheduler.create_thread(data, initial_state, false, ec, data.num_os_thread);
+            scheduler->create_thread(data, initial_state, false, ec, data.num_os_thread);
         }
     }
 }}}

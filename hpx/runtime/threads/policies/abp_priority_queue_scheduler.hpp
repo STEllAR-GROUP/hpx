@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_deque.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
@@ -26,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
-    class abp_priority_queue_scheduler : boost::noncopyable
+    class abp_priority_queue_scheduler : public scheduler_base
     {
     private:
         // The maximum number of active threads this thread manager should
@@ -608,8 +609,12 @@ namespace hpx { namespace threads { namespace policies
             return result;
         }
 
+        ///////////////////////////////////////////////////////////////////////
         // no-op for local scheduling
         void do_some_work(std::size_t num_thread = std::size_t(-1)) {}
+
+        ///////////////////////////////////////////////////////////////////////
+        void add_punit(std::size_t virt_core, std::size_t thread_num) {}
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)

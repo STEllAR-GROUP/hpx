@@ -9,6 +9,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/register_locks.hpp>
@@ -382,6 +383,20 @@ namespace hpx { namespace threads
             ec = make_success_code();
 
         return app->get_thread_manager().set_backtrace(id, bt);
+    }
+
+    threads::executor get_executor(thread_id_type id, error_code& ec)
+    {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::threads::get_executor",
+                "global applier object is not accessible");
+            return default_executor();
+        }
+
+        return app->get_thread_manager().get_executor(id, ec);
     }
 }}
 

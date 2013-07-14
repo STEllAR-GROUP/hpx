@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/runtime/threads/detail/create_work.hpp>
 #include <hpx/runtime/threads/detail/set_thread_state.hpp>
+#include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -179,7 +180,7 @@ namespace hpx { namespace threads
             return invalid_thread_id;
         }
 
-        return detail::create_thread(scheduler_, data, initial_state, run_now, ec);
+        return detail::create_thread(&scheduler_, data, initial_state, run_now, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -199,7 +200,7 @@ namespace hpx { namespace threads
             return;
         }
 
-        detail::create_work(scheduler_, data, initial_state, ec);
+        detail::create_work(&scheduler_, data, initial_state, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -211,7 +212,7 @@ namespace hpx { namespace threads
             thread_state_ex_enum new_state_ex, thread_priority priority,
             error_code& ec)
     {
-        return detail::set_thread_state(scheduler_, id, new_state,
+        return detail::set_thread_state(id, new_state,
             new_state_ex, priority, get_worker_thread_num(), ec);
     }
 
@@ -542,6 +543,28 @@ namespace hpx { namespace threads
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (0 != thrd)
             thrd->free_thread_exit_callbacks();
+    }
+
+    // Return the executor associated with th egiven thread
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    executor threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_executor(thread_id_type id, error_code& ec) const
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::get_executor",
+                "NULL thread id encountered");
+            return default_executor();
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (0 == thrd)
+            return default_executor();
+
+        return executors::generic_thread_pool_executor(thrd->get_scheduler_base());
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -14,12 +14,11 @@
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/global_thread_queue.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
 #include <boost/mpl/bool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-// TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -27,7 +26,7 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The global_queue_scheduler maintains exactly one global queue of work
     /// items (threads), where all OS threads pull their next work item from.
-    class global_queue_scheduler
+    class global_queue_scheduler : public scheduler_base
     {
     private:
         // The maximum number of active threads this thread manager should
@@ -136,7 +135,7 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread_last(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            schedule_thread(thrd, num_thread, priority);
+            global_queue_scheduler::schedule_thread(thrd, num_thread, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -163,6 +162,9 @@ namespace hpx { namespace threads { namespace policies
         {
             queue_.do_some_work();
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        void add_punit(std::size_t virt_core, std::size_t thread_num) {}
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)

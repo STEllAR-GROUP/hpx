@@ -146,6 +146,8 @@ namespace hpx
     {
         namespace policies
         {
+            struct scheduler_base;
+
 #if defined(HPX_GLOBAL_SCHEDULER)
             class HPX_EXPORT global_queue_scheduler;
 #endif

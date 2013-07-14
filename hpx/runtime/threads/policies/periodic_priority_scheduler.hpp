@@ -18,6 +18,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
@@ -38,7 +39,7 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    class local_periodic_priority_scheduler : boost::noncopyable
+    class local_periodic_priority_scheduler : public scheduler_base
     {
     private:
         // The maximum number of active threads this thread manager should
@@ -287,7 +288,7 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread_last(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            schedule_thread(thrd, num_thread, priority);
+            local_periodic_priority_scheduler::schedule_thread(thrd, num_thread, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -770,6 +771,9 @@ namespace hpx { namespace threads { namespace policies
                 low_priority_queue_.do_some_work();
             }
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        void add_punit(std::size_t virt_core, std::size_t thread_num) {}
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)

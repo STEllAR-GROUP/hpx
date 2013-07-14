@@ -164,7 +164,8 @@ namespace hpx { namespace threads { namespace detail
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
         boost::atomic<hpx::state>& global_state, boost::int64_t& executed_threads,
-        boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
+        boost::uint64_t& tfunc_time, boost::uint64_t& exec_time,
+        util::function_nonser<void()> const& cb = util::function_nonser<void()>())
     {
         util::itt::stack_context ctx;        // helper for itt support
         util::itt::domain domain(get_thread_name()->data());
@@ -182,7 +183,7 @@ namespace hpx { namespace threads { namespace detail
         while (true) {
             // Get the next HPX thread from the queue
             thread_data* thrd = NULL;
-            if (scheduler.get_next_thread(num_thread,
+            if (scheduler.SchedulingPolicy::get_next_thread(num_thread,
                     global_state == running, idle_loop_count, thrd))
             {
                 idle_loop_count = 0;
@@ -256,15 +257,15 @@ namespace hpx { namespace threads { namespace detail
                     // now we just keep it in the map of threads.
                     if (state_val == pending) {
                         // schedule other work
-                        scheduler.wait_or_add_new(num_thread,
+                        scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
                             global_state == running, idle_loop_count);
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
                         // REVIEW: Passing a specific target thread may screw
                         // with the round robin queuing.
-                        scheduler.schedule_thread_last(thrd, num_thread);
-                        scheduler.do_some_work(num_thread);
+                        scheduler.SchedulingPolicy::schedule_thread_last(thrd, num_thread);
+                        scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
                 }
                 else if (active == state_val) {
@@ -279,7 +280,7 @@ namespace hpx { namespace threads { namespace detail
                     // yet
                     // REVIEW: Passing a specific target thread may screw
                     // with the round robin queuing.
-                    scheduler.schedule_thread(thrd, num_thread);
+                    scheduler.SchedulingPolicy::schedule_thread(thrd, num_thread);
                 }
 
                 // Remove the mapping from thread_map_ if PX thread is depleted
@@ -287,14 +288,16 @@ namespace hpx { namespace threads { namespace detail
                 // references go out of scope.
                 // REVIEW: what has to be done with depleted PX threads?
                 if (state_val == depleted || state_val == terminated)
-                    scheduler.destroy_thread(thrd, busy_loop_count);
+                    scheduler.SchedulingPolicy::destroy_thread(thrd, busy_loop_count);
 
                 tfunc_time = util::hardware::timestamp() - overall_timestamp;
             }
 
             // if nothing else has to be done either wait or terminate
             else {
-                if (scheduler.wait_or_add_new(num_thread,
+                ++idle_loop_count;
+
+                if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
                         global_state == running, idle_loop_count))
                 {
                     break;
@@ -311,11 +314,16 @@ namespace hpx { namespace threads { namespace detail
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
             {
                 busy_loop_count = 0;
-                scheduler.cleanup_terminated(true);
+                scheduler.SchedulingPolicy::cleanup_terminated(true);
             }
             else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
             {
-                scheduler.cleanup_terminated(true);
+                // call back into invoking context
+                if (!cb.empty())
+                    cb();
+
+                // clean up terminated threads
+                scheduler.SchedulingPolicy::cleanup_terminated(true);
             }
         }
 
