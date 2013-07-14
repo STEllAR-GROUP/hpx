@@ -74,7 +74,7 @@ int hpx_main(
     if (num_executors <= 0)
         throw std::invalid_argument("number of executors to use must be larger than 0");
 
-    if (num_executors > num_os_threads)
+    if (std::size_t(num_executors) > num_os_threads)
         throw std::invalid_argument("number of executors to use must be smaller than number of OS threads");
 
     std::size_t num_cores_per_executor = vm["cores"].as<int>();
@@ -93,7 +93,7 @@ int hpx_main(
 
     {
         std::vector<local_priority_queue_executor> executors;
-        for (std::size_t i = 0; i != num_executors; ++i)
+        for (std::size_t i = 0; i != std::size_t(num_executors); ++i)
         {
             // make sure we don't oversubscribe the cores, the last executor will
             // be bound to the remaining number of cores
