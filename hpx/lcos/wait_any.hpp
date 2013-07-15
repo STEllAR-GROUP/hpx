@@ -151,9 +151,6 @@ namespace hpx
                     lcos::detail::future_data_base<T>* current =
                         lcos::detail::get_future_data(f);
 
-                    completed_callback_type cb = boost::move(
-                        current->set_on_completed(completed_callback_type()));
-
                     current->set_on_completed(
                         util::bind(&when_any_tuple::on_future_ready,
                             outer_, i, id_));
