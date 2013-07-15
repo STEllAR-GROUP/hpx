@@ -103,6 +103,8 @@ namespace hpx { namespace util { namespace detail
         }
 
         //
+        typedef typename F::result_type result_type;
+
         template <typename>
         struct result;
 
@@ -115,7 +117,7 @@ namespace hpx { namespace util { namespace detail
         template <typename This>
         struct result<This const ()>
         {
-            typedef typename typename F::result_type type;
+            typedef typename F::result_type type;
         };
 
         BOOST_FORCEINLINE
