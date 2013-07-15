@@ -108,7 +108,7 @@ namespace hpx
                         get_future_data(lazy_values_[i]);
 
                     current->set_on_completed(util::bind(
-                        &when_any::on_future_ready, shared_from_this(), i, id));
+                        &when_any::on_future_ready, this->shared_from_this(), i, id));
                 }
 
                 // If one of the futures is already set, our callback above has
@@ -150,9 +150,6 @@ namespace hpx
                 {
                     lcos::detail::future_data_base<T>* current =
                         lcos::detail::get_future_data(f);
-
-                    completed_callback_type cb = boost::move(
-                        current->set_on_completed(completed_callback_type()));
 
                     current->set_on_completed(
                         util::bind(&when_any_tuple::on_future_ready,
@@ -255,7 +252,7 @@ namespace hpx
 
                 // set callback functions to execute when future is ready
                 boost::fusion::accumulate(lazy_values_, std::size_t(0),
-                    init_when(shared_from_this(), threads::get_self_id()));
+                    init_when(this->shared_from_this(), threads::get_self_id()));
 
                 // If one of the futures is already set then our callback above
                 // has already been called, otherwise we suspend ourselves.
