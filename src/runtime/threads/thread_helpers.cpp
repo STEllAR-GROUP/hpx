@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,8 @@
 #if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
+
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
