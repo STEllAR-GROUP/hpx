@@ -93,7 +93,7 @@ void function_pointers()
         vf.push_back(dataflow(unwrapped(&int_f1), make_ready_future(42)));
     }
     future<int> f4 = dataflow(unwrapped(&int_f_vector), vf);
-    
+
     future<int>
         f5 = dataflow(
             unwrapped(&int_f1)

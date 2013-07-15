@@ -11,6 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/apply.hpp>
+#include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/detail/extract_completed_callback_type.hpp>
 #include <hpx/util/tuple.hpp>
@@ -27,6 +28,7 @@
 #include <boost/mpl/or.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_base_and_derived.hpp>
 
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/enum.hpp>
@@ -39,6 +41,14 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     template <typename T>
     struct is_future_or_future_range
       : boost::mpl::or_<traits::is_future<T>, traits::is_future_range<T> >
+    {};
+
+    template <typename Policy>
+    struct is_launch_policy
+      : boost::mpl::or_<
+            boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
+          , boost::is_base_and_derived<threads::executor, Policy>
+        >
     {};
 }}}}
 
@@ -105,7 +115,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
+        template <typename Policy, typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
         struct BOOST_PP_CAT(dataflow_frame_, N)
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -163,19 +173,19 @@ namespace hpx { namespace lcos { namespace local {
 
             futures_type futures_;
 
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
 
             template <typename FFunc, BOOST_PP_ENUM_PARAMS(N, typename A)>
             BOOST_PP_CAT(dataflow_frame_, N)(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , HPX_ENUM_FWD_ARGS(N, A, f)
             )
               : futures_(
                     BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_CTOR_LIST, _)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
 
@@ -204,18 +214,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &BOOST_PP_CAT(dataflow_frame_, N)::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &BOOST_PP_CAT(dataflow_frame_, N)::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
 
             template <typename Iter>
@@ -306,7 +327,8 @@ namespace hpx { namespace lcos { namespace local {
                 );
 
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -391,7 +413,8 @@ namespace hpx { namespace lcos { namespace local {
                 }
 
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -400,7 +423,7 @@ namespace hpx { namespace lcos { namespace local {
 
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -420,7 +443,8 @@ namespace hpx { namespace lcos { namespace local {
                     begin_type;
 
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -442,6 +466,7 @@ namespace hpx { namespace lcos { namespace local {
         };
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -451,7 +476,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , BOOST_PP_CAT(detail::dataflow_frame_, N)<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , BOOST_PP_ENUM_PARAMS(N, F)
         >
     >::type
@@ -463,7 +489,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             BOOST_PP_CAT(detail::dataflow_frame_, N)<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , BOOST_PP_ENUM_PARAMS(N, F)
             >
             frame_type;
@@ -481,16 +508,52 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , BOOST_PP_CAT(detail::dataflow_frame_, N)<
-            Func
+            threads::executor
+          , Func
+          , BOOST_PP_ENUM_PARAMS(N, F)
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , HPX_ENUM_FWD_ARGS(N, F, f)
+    )
+    {
+        typedef
+            BOOST_PP_CAT(detail::dataflow_frame_, N)<
+                threads::executor
+              , Func
+              , BOOST_PP_ENUM_PARAMS(N, F)
+            >
+            frame_type;
+
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , HPX_ENUM_FORWARD_ARGS(N, F, f)
+            );
+
+        return frame->get_future();
+    }
+
+    template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , BOOST_PP_CAT(detail::dataflow_frame_, N)<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , BOOST_PP_ENUM_PARAMS(N, F)
         >
     >::type
@@ -498,7 +561,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             BOOST_PP_CAT(detail::dataflow_frame_, N)<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , BOOST_PP_ENUM_PARAMS(N, F)
             >
             frame_type;

@@ -10,7 +10,7 @@
 
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0>
+        template <typename Policy, typename Func, typename F0>
         struct dataflow_frame_1
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -51,18 +51,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0>
             dataflow_frame_1(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0
             )
               : futures_(
                     boost::forward<A0>(f0)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -84,18 +84,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_1::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_1::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -174,7 +185,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -249,7 +261,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -257,7 +270,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -273,7 +286,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -292,6 +306,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -301,7 +316,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_1<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0
         >
     >::type
@@ -313,7 +329,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_1<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0
             >
             frame_type;
@@ -328,16 +345,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_1<
-            Func
+            threads::executor
+          , Func
+          , F0
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0
+    )
+    {
+        typedef
+            detail::dataflow_frame_1<
+                threads::executor
+              , Func
+              , F0
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_1<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0
         >
     >::type
@@ -345,7 +395,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_1<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0
             >
             frame_type;
@@ -360,7 +411,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1>
+        template <typename Policy, typename Func, typename F0 , typename F1>
         struct dataflow_frame_2
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -401,18 +452,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1>
             dataflow_frame_2(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -434,18 +485,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_2::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_2::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -524,7 +586,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -599,7 +662,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -607,7 +671,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -623,7 +687,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -642,6 +707,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -651,7 +717,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_2<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1
         >
     >::type
@@ -663,7 +730,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_2<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1
             >
             frame_type;
@@ -678,16 +746,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_2<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1
+    )
+    {
+        typedef
+            detail::dataflow_frame_2<
+                threads::executor
+              , Func
+              , F0 , F1
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_2<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1
         >
     >::type
@@ -695,7 +796,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_2<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1
             >
             frame_type;
@@ -710,7 +812,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2>
         struct dataflow_frame_3
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -751,18 +853,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2>
             dataflow_frame_3(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -784,18 +886,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_3::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_3::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -874,7 +987,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -949,7 +1063,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -957,7 +1072,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -973,7 +1088,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -992,6 +1108,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -1001,7 +1118,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_3<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2
         >
     >::type
@@ -1013,7 +1131,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_3<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2
             >
             frame_type;
@@ -1028,16 +1147,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_3<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2
+    )
+    {
+        typedef
+            detail::dataflow_frame_3<
+                threads::executor
+              , Func
+              , F0 , F1 , F2
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_3<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2
         >
     >::type
@@ -1045,7 +1197,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_3<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2
             >
             frame_type;
@@ -1060,7 +1213,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3>
         struct dataflow_frame_4
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -1101,18 +1254,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3>
             dataflow_frame_4(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -1134,18 +1287,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_4::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_4::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -1224,7 +1388,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -1299,7 +1464,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -1307,7 +1473,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -1323,7 +1489,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -1342,6 +1509,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -1351,7 +1519,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_4<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3
         >
     >::type
@@ -1363,7 +1532,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_4<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3
             >
             frame_type;
@@ -1378,16 +1548,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_4<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3
+    )
+    {
+        typedef
+            detail::dataflow_frame_4<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_4<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3
         >
     >::type
@@ -1395,7 +1598,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_4<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3
             >
             frame_type;
@@ -1410,7 +1614,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
         struct dataflow_frame_5
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -1451,18 +1655,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
             dataflow_frame_5(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -1484,18 +1688,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_5::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_5::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -1574,7 +1789,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -1649,7 +1865,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -1657,7 +1874,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -1673,7 +1890,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -1692,6 +1910,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -1701,7 +1920,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_5<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4
         >
     >::type
@@ -1713,7 +1933,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_5<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4
             >
             frame_type;
@@ -1728,16 +1949,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_5<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4
+    )
+    {
+        typedef
+            detail::dataflow_frame_5<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_5<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4
         >
     >::type
@@ -1745,7 +1999,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_5<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4
             >
             frame_type;
@@ -1760,7 +2015,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
         struct dataflow_frame_6
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -1801,18 +2056,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
             dataflow_frame_6(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -1834,18 +2089,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_6::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_6::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -1924,7 +2190,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -1999,7 +2266,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -2007,7 +2275,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -2023,7 +2291,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -2042,6 +2311,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -2051,7 +2321,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_6<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5
         >
     >::type
@@ -2063,7 +2334,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_6<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5
             >
             frame_type;
@@ -2078,16 +2350,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_6<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5
+    )
+    {
+        typedef
+            detail::dataflow_frame_6<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_6<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5
         >
     >::type
@@ -2095,7 +2400,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_6<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5
             >
             frame_type;
@@ -2110,7 +2416,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
         struct dataflow_frame_7
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -2151,18 +2457,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
             dataflow_frame_7(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5 , BOOST_FWD_REF(A6) f6
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5) , boost::forward<A6>(f6)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -2184,18 +2490,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_7::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_7::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -2274,7 +2591,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -2349,7 +2667,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -2357,7 +2676,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -2373,7 +2692,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -2392,6 +2712,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -2401,7 +2722,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_7<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6
         >
     >::type
@@ -2413,7 +2735,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_7<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6
             >
             frame_type;
@@ -2428,16 +2751,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_7<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6
+    )
+    {
+        typedef
+            detail::dataflow_frame_7<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5 , F6
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_7<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6
         >
     >::type
@@ -2445,7 +2801,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_7<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6
             >
             frame_type;
@@ -2460,7 +2817,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
         struct dataflow_frame_8
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -2501,18 +2858,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
             dataflow_frame_8(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5 , BOOST_FWD_REF(A6) f6 , BOOST_FWD_REF(A7) f7
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5) , boost::forward<A6>(f6) , boost::forward<A7>(f7)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -2534,18 +2891,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_8::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_8::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -2624,7 +2992,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -2699,7 +3068,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -2707,7 +3077,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -2723,7 +3093,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -2742,6 +3113,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -2751,7 +3123,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_8<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7
         >
     >::type
@@ -2763,7 +3136,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_8<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7
             >
             frame_type;
@@ -2778,16 +3152,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_8<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7
+    )
+    {
+        typedef
+            detail::dataflow_frame_8<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_8<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7
         >
     >::type
@@ -2795,7 +3202,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_8<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7
             >
             frame_type;
@@ -2810,7 +3218,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
         struct dataflow_frame_9
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -2851,18 +3259,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
             dataflow_frame_9(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5 , BOOST_FWD_REF(A6) f6 , BOOST_FWD_REF(A7) f7 , BOOST_FWD_REF(A8) f8
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5) , boost::forward<A6>(f6) , boost::forward<A7>(f7) , boost::forward<A8>(f8)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -2884,18 +3292,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_9::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_9::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -2974,7 +3393,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -3049,7 +3469,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -3057,7 +3478,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -3073,7 +3494,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -3092,6 +3514,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -3101,7 +3524,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_9<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8
         >
     >::type
@@ -3113,7 +3537,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_9<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8
             >
             frame_type;
@@ -3128,16 +3553,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_9<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8
+    )
+    {
+        typedef
+            detail::dataflow_frame_9<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_9<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8
         >
     >::type
@@ -3145,7 +3603,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_9<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8
             >
             frame_type;
@@ -3160,7 +3619,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
         struct dataflow_frame_10
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -3201,18 +3660,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
             dataflow_frame_10(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5 , BOOST_FWD_REF(A6) f6 , BOOST_FWD_REF(A7) f7 , BOOST_FWD_REF(A8) f8 , BOOST_FWD_REF(A9) f9
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5) , boost::forward<A6>(f6) , boost::forward<A7>(f7) , boost::forward<A8>(f8) , boost::forward<A9>(f9)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -3234,18 +3693,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_10::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_10::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -3324,7 +3794,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -3399,7 +3870,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -3407,7 +3879,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -3423,7 +3895,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -3442,6 +3915,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -3451,7 +3925,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_10<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9
         >
     >::type
@@ -3463,7 +3938,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_10<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9
             >
             frame_type;
@@ -3478,16 +3954,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_10<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9
+    )
+    {
+        typedef
+            detail::dataflow_frame_10<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_10<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9
         >
     >::type
@@ -3495,7 +4004,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_10<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9
             >
             frame_type;
@@ -3510,7 +4020,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
         struct dataflow_frame_11
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -3551,18 +4061,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
             dataflow_frame_11(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5 , BOOST_FWD_REF(A6) f6 , BOOST_FWD_REF(A7) f7 , BOOST_FWD_REF(A8) f8 , BOOST_FWD_REF(A9) f9 , BOOST_FWD_REF(A10) f10
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5) , boost::forward<A6>(f6) , boost::forward<A7>(f7) , boost::forward<A8>(f8) , boost::forward<A9>(f9) , boost::forward<A10>(f10)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -3584,18 +4094,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_11::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_11::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -3674,7 +4195,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -3749,7 +4271,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -3757,7 +4280,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -3773,7 +4296,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -3792,6 +4316,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -3801,7 +4326,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_11<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10
         >
     >::type
@@ -3813,7 +4339,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_11<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10
             >
             frame_type;
@@ -3828,16 +4355,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_11<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10
+    )
+    {
+        typedef
+            detail::dataflow_frame_11<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_11<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10
         >
     >::type
@@ -3845,7 +4405,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_11<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10
             >
             frame_type;
@@ -3860,7 +4421,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
         struct dataflow_frame_12
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -3901,18 +4462,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
             dataflow_frame_12(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5 , BOOST_FWD_REF(A6) f6 , BOOST_FWD_REF(A7) f7 , BOOST_FWD_REF(A8) f8 , BOOST_FWD_REF(A9) f9 , BOOST_FWD_REF(A10) f10 , BOOST_FWD_REF(A11) f11
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5) , boost::forward<A6>(f6) , boost::forward<A7>(f7) , boost::forward<A8>(f8) , boost::forward<A9>(f9) , boost::forward<A10>(f10) , boost::forward<A11>(f11)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -3934,18 +4495,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_12::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_12::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -4024,7 +4596,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -4099,7 +4672,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -4107,7 +4681,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -4123,7 +4697,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -4142,6 +4717,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -4151,7 +4727,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_12<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11
         >
     >::type
@@ -4163,7 +4740,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_12<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11
             >
             frame_type;
@@ -4178,16 +4756,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_12<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11
+    )
+    {
+        typedef
+            detail::dataflow_frame_12<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_12<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11
         >
     >::type
@@ -4195,7 +4806,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_12<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11
             >
             frame_type;
@@ -4210,7 +4822,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
         struct dataflow_frame_13
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -4251,18 +4863,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
             dataflow_frame_13(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5 , BOOST_FWD_REF(A6) f6 , BOOST_FWD_REF(A7) f7 , BOOST_FWD_REF(A8) f8 , BOOST_FWD_REF(A9) f9 , BOOST_FWD_REF(A10) f10 , BOOST_FWD_REF(A11) f11 , BOOST_FWD_REF(A12) f12
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5) , boost::forward<A6>(f6) , boost::forward<A7>(f7) , boost::forward<A8>(f8) , boost::forward<A9>(f9) , boost::forward<A10>(f10) , boost::forward<A11>(f11) , boost::forward<A12>(f12)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -4284,18 +4896,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_13::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_13::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -4374,7 +4997,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -4449,7 +5073,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -4457,7 +5082,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -4473,7 +5098,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -4492,6 +5118,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -4501,7 +5128,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_13<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12
         >
     >::type
@@ -4513,7 +5141,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_13<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12
             >
             frame_type;
@@ -4528,16 +5157,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_13<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12
+    )
+    {
+        typedef
+            detail::dataflow_frame_13<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_13<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12
         >
     >::type
@@ -4545,7 +5207,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_13<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12
             >
             frame_type;
@@ -4560,7 +5223,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
         struct dataflow_frame_14
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -4601,18 +5264,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
             dataflow_frame_14(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5 , BOOST_FWD_REF(A6) f6 , BOOST_FWD_REF(A7) f7 , BOOST_FWD_REF(A8) f8 , BOOST_FWD_REF(A9) f9 , BOOST_FWD_REF(A10) f10 , BOOST_FWD_REF(A11) f11 , BOOST_FWD_REF(A12) f12 , BOOST_FWD_REF(A13) f13
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5) , boost::forward<A6>(f6) , boost::forward<A7>(f7) , boost::forward<A8>(f8) , boost::forward<A9>(f9) , boost::forward<A10>(f10) , boost::forward<A11>(f11) , boost::forward<A12>(f12) , boost::forward<A13>(f13)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -4634,18 +5297,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_14::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_14::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -4724,7 +5398,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -4799,7 +5474,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -4807,7 +5483,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -4823,7 +5499,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -4842,6 +5519,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -4851,7 +5529,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_14<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13
         >
     >::type
@@ -4863,7 +5542,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_14<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13
             >
             frame_type;
@@ -4878,16 +5558,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_14<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13
+    )
+    {
+        typedef
+            detail::dataflow_frame_14<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_14<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13
         >
     >::type
@@ -4895,7 +5608,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_14<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13
             >
             frame_type;
@@ -4910,7 +5624,7 @@ namespace hpx { namespace lcos { namespace local {
 }}}
 namespace hpx { namespace lcos { namespace local {
     namespace detail {
-        template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
+        template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
         struct dataflow_frame_15
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
@@ -4951,18 +5665,18 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
                 execute_function_type;
             futures_type futures_;
-            BOOST_SCOPED_ENUM(launch) policy_;
+            Policy policy_;
             func_type func_;
             template <typename FFunc, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14>
             dataflow_frame_15(
-                BOOST_SCOPED_ENUM(launch) policy
+                Policy policy
               , BOOST_FWD_REF(FFunc) func
               , BOOST_FWD_REF(A0) f0 , BOOST_FWD_REF(A1) f1 , BOOST_FWD_REF(A2) f2 , BOOST_FWD_REF(A3) f3 , BOOST_FWD_REF(A4) f4 , BOOST_FWD_REF(A5) f5 , BOOST_FWD_REF(A6) f6 , BOOST_FWD_REF(A7) f7 , BOOST_FWD_REF(A8) f8 , BOOST_FWD_REF(A9) f9 , BOOST_FWD_REF(A10) f10 , BOOST_FWD_REF(A11) f11 , BOOST_FWD_REF(A12) f12 , BOOST_FWD_REF(A13) f13 , BOOST_FWD_REF(A14) f14
             )
               : futures_(
                     boost::forward<A0>(f0) , boost::forward<A1>(f1) , boost::forward<A2>(f2) , boost::forward<A3>(f3) , boost::forward<A4>(f4) , boost::forward<A5>(f5) , boost::forward<A6>(f6) , boost::forward<A7>(f7) , boost::forward<A8>(f8) , boost::forward<A9>(f9) , boost::forward<A10>(f10) , boost::forward<A11>(f11) , boost::forward<A12>(f12) , boost::forward<A13>(f13) , boost::forward<A14>(f14)
                 )
-              , policy_(policy)
+              , policy_(boost::move(policy))
               , func_(boost::forward<FFunc>(func))
             {}
             BOOST_FORCEINLINE
@@ -4984,18 +5698,29 @@ namespace hpx { namespace lcos { namespace local {
             template <typename Iter>
             BOOST_FORCEINLINE
             void await(
-                BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+                BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
             {
                 typedef
                     boost::mpl::bool_<boost::is_void<result_type>::value>
                     is_void;
-                if(policy_ == hpx::launch::sync)
+                if(policy == hpx::launch::sync)
                 {
                     execute(is_void());
                     return;
                 }
                 execute_function_type f = &dataflow_frame_15::execute;
                 hpx::apply(hpx::util::bind(f, future_base_type(this), is_void()));
+            }
+            template <typename Iter>
+            BOOST_FORCEINLINE
+            void await(
+                threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            {
+                typedef
+                    boost::mpl::bool_<boost::is_void<result_type>::value>
+                    is_void;
+                execute_function_type f = &dataflow_frame_15::execute;
+                hpx::apply(sched, hpx::util::bind(f, future_base_type(this), is_void()));
             }
             template <typename Iter>
             void await_range(Iter next, Iter end)
@@ -5074,7 +5799,8 @@ namespace hpx { namespace lcos { namespace local {
                   , boost::move(boost::end(boost::fusion::deref(iter)))
                 );
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -5149,7 +5875,8 @@ namespace hpx { namespace lcos { namespace local {
                     return;
                 }
                 await(
-                    boost::move(boost::fusion::next(iter))
+                    policy_
+                  , boost::move(boost::fusion::next(iter))
                   , boost::mpl::bool_<
                         boost::is_same<next_type, end_type>::value
                     >()
@@ -5157,7 +5884,7 @@ namespace hpx { namespace lcos { namespace local {
             }
             template <typename Iter>
             BOOST_FORCEINLINE
-            void await(Iter iter, boost::mpl::false_)
+            void await(Policy&, Iter iter, boost::mpl::false_)
             {
                 typedef
                     typename boost::fusion::result_of::deref<Iter>::type
@@ -5173,7 +5900,8 @@ namespace hpx { namespace lcos { namespace local {
                     typename boost::fusion::result_of::begin<futures_type>::type
                     begin_type;
                 await(
-                    boost::move(boost::fusion::begin(futures_))
+                    policy_
+                  , boost::move(boost::fusion::begin(futures_))
                   , boost::mpl::bool_<
                         boost::is_same<begin_type, end_type>::value
                     >()
@@ -5192,6 +5920,7 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }
+    
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
@@ -5201,7 +5930,8 @@ namespace hpx { namespace lcos { namespace local {
             >::type
         >
       , detail::dataflow_frame_15<
-            Func
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13 , F14
         >
     >::type
@@ -5213,7 +5943,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_15<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13 , F14
             >
             frame_type;
@@ -5228,16 +5959,49 @@ namespace hpx { namespace lcos { namespace local {
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
-        boost::is_same<
-            BOOST_SCOPED_ENUM(launch)
-          , typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Func
-                >::type
+        detail::is_future_or_future_range<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
             >::type
         >
       , detail::dataflow_frame_15<
-            Func
+            threads::executor
+          , Func
+          , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13 , F14
+        >
+    >::type
+    dataflow(
+        threads::executor& sched
+      , BOOST_FWD_REF(Func) func
+      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14
+    )
+    {
+        typedef
+            detail::dataflow_frame_15<
+                threads::executor
+              , Func
+              , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13 , F14
+            >
+            frame_type;
+        boost::intrusive_ptr<frame_type> frame =
+            new frame_type(
+                sched
+              , boost::forward<Func>(func)
+              , boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 )
+            );
+        return frame->get_future();
+    }
+    template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        detail::is_launch_policy<
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<Func>::type
+            >::type
+        >
+      , detail::dataflow_frame_15<
+            BOOST_SCOPED_ENUM(launch)
+          , Func
           , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13 , F14
         >
     >::type
@@ -5245,7 +6009,8 @@ namespace hpx { namespace lcos { namespace local {
     {
         typedef
             detail::dataflow_frame_15<
-                Func
+                BOOST_SCOPED_ENUM(launch)
+              , Func
               , F0 , F1 , F2 , F3 , F4 , F5 , F6 , F7 , F8 , F9 , F10 , F11 , F12 , F13 , F14
             >
             frame_type;
