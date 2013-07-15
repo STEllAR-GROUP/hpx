@@ -123,7 +123,7 @@ namespace hpx
                         get_future_data(lazy_values_[i]);
 
                     current->set_on_completed(util::bind(
-                        &when_n::on_future_ready, shared_from_this(), i, id));
+                        &when_n::on_future_ready, this->shared_from_this(), i, id));
                 }
 
                 // if all of the requested futures are already set, our
