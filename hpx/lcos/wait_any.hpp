@@ -14,7 +14,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
-#include <hpx/lcos/detail/extract_completed_callback_type.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -33,6 +32,8 @@
 #include <boost/fusion/include/tuple.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -41,7 +42,7 @@ namespace hpx
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
-        struct when_any
+        struct when_any : boost::enable_shared_from_this<when_any<T> >
         {
         private:
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_any)
@@ -50,9 +51,9 @@ namespace hpx
 
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
-                std::size_t index_not_initialized = 
+                std::size_t index_not_initialized =
                     static_cast<std::size_t>(index_error);
-                if (index_.compare_exchange_strong(index_not_initialized, idx)) 
+                if (index_.compare_exchange_strong(index_not_initialized, idx))
                 {
                     // reactivate waiting thread only if it's not us
                     if (id != threads::get_self_id())
@@ -65,12 +66,12 @@ namespace hpx
             typedef std::vector<lcos::future<T> > argument_type;
 
             when_any(argument_type const& lazy_values)
-              : lazy_values_(lazy_values), 
+              : lazy_values_(lazy_values),
                 index_(static_cast<std::size_t>(index_error))
             {}
 
             when_any(BOOST_RV_REF(argument_type) lazy_values)
-              : lazy_values_(boost::move(lazy_values)), 
+              : lazy_values_(boost::move(lazy_values)),
                 index_(static_cast<std::size_t>(index_error))
             {}
 
@@ -94,16 +95,10 @@ namespace hpx
             result_type operator()()
             {
                 using lcos::detail::get_future_data;
-                using lcos::local::detail::extract_completed_callback_type;
-
-                typedef typename extract_completed_callback_type<
-                    lcos::future<T>
-                >::type completed_callback_type;
 
                 index_.store(static_cast<std::size_t>(index_error));
 
                 std::size_t size = lazy_values_.size();
-                std::vector<completed_callback_type> callbacks(size);
 
                 // set callback functions to execute when future is ready
                 threads::thread_id_type id = threads::get_self_id();
@@ -112,21 +107,8 @@ namespace hpx
                     lcos::detail::future_data_base<T>* current =
                         get_future_data(lazy_values_[i]);
 
-                    completed_callback_type cb = boost::move(
-                        current->reset_on_completed());
-
-                    if (cb) {
-                        callbacks[i] = cb;
-                        current->set_on_completed(boost::move(
-                            lcos::local::detail::compose_cb(
-                                boost::move(cb)
-                              , util::bind(&when_any::on_future_ready, this, i, id)
-                            )));
-                    }
-                    else {
-                        current->set_on_completed(
-                            util::bind(&when_any::on_future_ready, this, i, id));
-                    }
+                    current->set_on_completed(util::bind(
+                        &when_any::on_future_ready, shared_from_this(), i, id));
                 }
 
                 // If one of the futures is already set, our callback above has
@@ -140,19 +122,6 @@ namespace hpx
                 // that should not happen
                 BOOST_ASSERT(index_.load() != static_cast<std::size_t>(index_error));
 
-                // reset all pending callback functions
-                for (std::size_t i = 0; i < size; ++i)
-                {
-                    lcos::detail::future_data_base<T>* current =
-                        get_future_data(lazy_values_[i]);
-
-                    completed_callback_type cb = boost::move(
-                        current->reset_on_completed());
-
-                    if (cb && callbacks[i])
-                        current->set_on_completed(boost::move(callbacks[i]));
-                }
-
                 return result_type(static_cast<int>(index_), lazy_values_[index_]);
             }
 
@@ -163,19 +132,16 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         template <typename Tuple, typename T>
         struct when_any_tuple
+          : boost::enable_shared_from_this<when_any_tuple<Tuple, T> >
         {
         private:
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_any_tuple)
 
-            typedef typename lcos::local::detail::extract_completed_callback_type<
-                lcos::future<T>
-            >::type completed_callback_type;
-
             struct init_when
             {
-                init_when(when_any_tuple& outer, threads::thread_id_type id,
-                        std::vector<completed_callback_type>& callbacks)
-                  : outer_(&outer), id_(id), callbacks_(callbacks)
+                init_when(boost::shared_ptr<when_any_tuple>& outer,
+                        threads::thread_id_type id)
+                  : outer_(outer), id_(id)
                 {}
 
                 typedef std::size_t result_type;
@@ -188,62 +154,25 @@ namespace hpx
                     completed_callback_type cb = boost::move(
                         current->set_on_completed(completed_callback_type()));
 
-                    if (cb) {
-                        callbacks_[i] = cb;
-                        current->set_on_completed(boost::move(
-                            lcos::local::detail::compose_cb(
-                                boost::move(cb)
-                              , util::bind(&when_any_tuple::on_future_ready,
-                                    outer_, i, id_)
-                            )));
-                    }
-                    else {
-                        current->set_on_completed(
-                            util::bind(&when_any_tuple::on_future_ready,
-                                outer_, i, id_));
-                    }
+                    current->set_on_completed(
+                        util::bind(&when_any_tuple::on_future_ready,
+                            outer_, i, id_));
 
                     return ++i;
                 }
 
-                when_any_tuple* outer_;
+                boost::shared_ptr<when_any_tuple> outer_;
                 threads::thread_id_type id_;
-                std::vector<completed_callback_type>& callbacks_;
             };
             friend struct init_when;
-
-            struct reset_when
-            {
-                reset_when(std::vector<completed_callback_type>& callbacks)
-                  : callbacks_(callbacks)
-                {}
-
-                typedef std::size_t result_type;
-
-                result_type operator()(std::size_t i, lcos::future<T> f) const
-                {
-                    lcos::detail::future_data_base<T>* current =
-                        lcos::detail::get_future_data(f);
-
-                    completed_callback_type cb = boost::move(
-                        current->reset_on_completed());
-
-                    if (cb && callbacks_[i])
-                        current->set_on_completed(boost::move(callbacks_[i]));
-
-                    return ++i;
-                }
-
-                std::vector<completed_callback_type>& callbacks_;
-            };
 
             enum { index_error = -1 };
 
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
-                std::size_t index_not_initialized = 
+                std::size_t index_not_initialized =
                     static_cast<std::size_t>(index_error);
-                if (index_.compare_exchange_strong(index_not_initialized, idx)) 
+                if (index_.compare_exchange_strong(index_not_initialized, idx))
                 {
                     // reactivate waiting thread only if it's not us
                     if (id != threads::get_self_id())
@@ -293,12 +222,12 @@ namespace hpx
             typedef Tuple argument_type;
 
             when_any_tuple(argument_type const& lazy_values)
-              : lazy_values_(lazy_values), 
+              : lazy_values_(lazy_values),
                 index_(static_cast<std::size_t>(index_error))
             {}
 
             when_any_tuple(BOOST_RV_REF(argument_type) lazy_values)
-              : lazy_values_(boost::move(lazy_values)), 
+              : lazy_values_(boost::move(lazy_values)),
                 index_(static_cast<std::size_t>(index_error))
             {}
 
@@ -324,14 +253,11 @@ namespace hpx
             {
                 index_.store(static_cast<std::size_t>(index_error));
 
-                std::vector<completed_callback_type> callbacks(
-                    boost::fusion::size(lazy_values_));
-
                 // set callback functions to execute when future is ready
                 boost::fusion::accumulate(lazy_values_, std::size_t(0),
-                    init_when(*this, threads::get_self_id(), boost::ref(callbacks)));
+                    init_when(shared_from_this(), threads::get_self_id()));
 
-                // If one of the futures is already set then our callback above 
+                // If one of the futures is already set then our callback above
                 // has already been called, otherwise we suspend ourselves.
                 if (index_.load() == static_cast<std::size_t>(index_error))
                 {
@@ -341,10 +267,6 @@ namespace hpx
 
                 // that should not happen
                 BOOST_ASSERT(index_.load() != static_cast<std::size_t>(index_error));
-
-                // reset all pending callback functions
-                boost::fusion::accumulate(lazy_values_, std::size_t(0),
-                    reset_when(boost::ref(callbacks)));
 
                 return result_type(static_cast<int>(index_),
                     get_element(lazy_values_, index_));
@@ -384,8 +306,12 @@ namespace hpx
             return lcos::make_ready_future(return_type());
         }
 
+        boost::shared_ptr<detail::when_any<value_type> > f =
+            boost::make_shared<detail::when_any<value_type> >(
+                boost::move(lazy_values));
+
         lcos::local::futures_factory<return_type()> p(
-            detail::when_any<value_type>(boost::move(lazy_values)));
+            util::bind(&detail::when_any<value_type>::operator(), f));
 
         p.apply();
         return p.get_future();
@@ -405,8 +331,13 @@ namespace hpx
             return lcos::make_ready_future(return_type());
         }
 
-        lcos::local::futures_factory<return_type()> p(
-            detail::when_any<T>(boost::move(lazy_values)));
+        boost::shared_ptr<detail::when_any<T> > f =
+            boost::make_shared<detail::when_any<T> >(
+                boost::move(lazy_values));
+
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any<T>::operator(), f));
 
         p.apply();
         return p.get_future();
@@ -425,9 +356,12 @@ namespace hpx
             return lcos::make_ready_future(return_type());
         }
 
+        boost::shared_ptr<detail::when_any<T> > f =
+            boost::make_shared<detail::when_any<T> >(lazy_values);
+
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::when_any<T>(lazy_values));
+                util::bind(&detail::when_any<T>::operator(), f));
 
         p.apply();
         return p.get_future();
@@ -454,7 +388,7 @@ namespace hpx
 
         lcos::future<result_type> f = when_any(begin, end);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -472,7 +406,7 @@ namespace hpx
 
         lcos::future<result_type> f = when_any(lazy_values);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -489,7 +423,7 @@ namespace hpx
 
         lcos::future<result_type> f = when_any(lazy_values);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -545,9 +479,13 @@ namespace hpx
             BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_TYPE, _)
         > argument_type;
 
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _)))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _)));
+
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
 
         p.apply();
         return p.get_future();
@@ -563,7 +501,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _));
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }

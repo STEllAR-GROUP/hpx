@@ -14,7 +14,6 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
-#include <hpx/lcos/detail/extract_completed_callback_type.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -126,11 +125,6 @@ namespace hpx
             result_type operator()()
             {
                 using lcos::detail::get_future_data;
-                using lcos::local::detail::extract_completed_callback_type;
-
-                typedef typename extract_completed_callback_type<
-                    lcos::future<T>
-                >::type completed_callback_type;
 
                 this->base_type::ready_count_.store(0);
 
@@ -142,20 +136,8 @@ namespace hpx
                     lcos::detail::future_data_base<T>* current =
                         get_future_data(this->base_type::lazy_values_[i]);
 
-                    completed_callback_type cb = boost::move(
-                        current->reset_on_completed());
-
-                    if (cb) {
-                        current->set_on_completed(boost::move(
-                            lcos::local::detail::compose_cb(
-                                boost::move(cb)
-                              , util::bind(&when_all::on_future_ready, this, i, id)
-                            )));
-                    }
-                    else {
-                        current->set_on_completed(
-                            util::bind(&when_all::on_future_ready, this, i, id));
-                    }
+                    current->set_on_completed(
+                        util::bind(&when_all::on_future_ready, this, i, id));
                 }
 
                 // If all of the requested futures are already set then our
@@ -170,15 +152,6 @@ namespace hpx
                 // all futures should be ready
                 BOOST_ASSERT(this->base_type::ready_count_ == size);
 
-#if defined(HPX_DEBUG)
-                // make sure no callback functions are registered anymore (all
-                // should have been called by no)
-                for (std::size_t i = 0; i < size; ++i)
-                {
-                    BOOST_ASSERT(!get_future_data(
-                        this->base_type::lazy_values_[i])->reset_on_completed());
-                }
-#endif
                 return this->base_type::lazy_values_;
             }
 
@@ -241,11 +214,6 @@ namespace hpx
             result_type operator()()
             {
                 using lcos::detail::get_future_data;
-                using lcos::local::detail::extract_completed_callback_type;
-
-                typedef typename extract_completed_callback_type<
-                    lcos::future<T>
-                >::type completed_callback_type;
 
                 ready_count_.store(0);
 
@@ -257,20 +225,8 @@ namespace hpx
                     lcos::detail::future_data_base<T>* current =
                         get_future_data(lazy_values_[i]);
 
-                    completed_callback_type cb = boost::move(
-                        current->reset_on_completed());
-
-                    if (cb) {
-                        current->set_on_completed(boost::move(
-                            lcos::local::detail::compose_cb(
-                                boost::move(cb)
-                              , util::bind(&when_all::on_future_ready, this, id)
-                            )));
-                    }
-                    else {
-                        current->set_on_completed(
-                            util::bind(&when_all::on_future_ready, this, id));
-                    }
+                    current->set_on_completed(
+                        util::bind(&when_all::on_future_ready, this, id));
                 }
 
                 // If all of the requested futures are already set then our
@@ -285,15 +241,6 @@ namespace hpx
                 // all futures should be ready
                 BOOST_ASSERT(ready_count_ == size);
 
-#if defined(HPX_DEBUG)
-                // make sure no callback functions are registered anymore (all
-                // should have been called by no)
-                for (std::size_t i = 0; i < size; ++i)
-                {
-                    BOOST_ASSERT(!get_future_data(lazy_values_[i])->
-                        reset_on_completed());
-                }
-#endif
                 return lazy_values_;
             }
 

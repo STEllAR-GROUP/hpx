@@ -13,7 +13,6 @@
 #include <hpx/apply.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/detail/extract_completed_callback_type.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
@@ -38,6 +37,7 @@
 
 namespace hpx { namespace lcos { namespace local { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct is_future_or_future_range
       : boost::mpl::or_<traits::is_future<T>, traits::is_future_range<T> >
@@ -50,6 +50,45 @@ namespace hpx { namespace lcos { namespace local { namespace detail
           , boost::is_base_and_derived<threads::executor, Policy>
         >
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Future
+      , typename IsFutureRange = typename traits::is_future_range<Future>::type
+    >
+    struct extract_completed_callback_type;
+
+    template <typename Future>
+    struct extract_completed_callback_type<Future, boost::mpl::true_>
+    {
+        typedef
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<
+                    Future
+                >::type
+            >::type::value_type::future_data_type
+            future_data_type;
+
+        typedef
+            typename future_data_type::completed_callback_type
+            type;
+    };
+
+    template <typename Future>
+    struct extract_completed_callback_type<Future, boost::mpl::false_>
+    {
+        typedef
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<
+                    Future
+                >::type
+            >::type::future_data_type
+            future_data_type;
+
+        typedef
+            typename future_data_type::completed_callback_type
+            type;
+    };
 }}}}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -113,8 +152,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
 #define N BOOST_PP_ITERATION()
 
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
         struct BOOST_PP_CAT(dataflow_frame_, N)
           : hpx::lcos::detail::future_data<
@@ -129,7 +170,6 @@ namespace hpx { namespace lcos { namespace local {
                 >::type
             >
         {
-
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
@@ -273,40 +313,17 @@ namespace hpx { namespace lcos { namespace local {
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
 
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
+                            )
+                        )
+                    );
 
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
                     return;
                 }
 
@@ -374,40 +391,16 @@ namespace hpx { namespace lcos { namespace local {
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
 
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
 
                     return;
                 }
@@ -576,7 +569,6 @@ namespace hpx { namespace lcos { namespace local {
 
         return frame->get_future();
     }
-
 }}}
 
 #endif
