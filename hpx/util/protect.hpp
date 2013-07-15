@@ -121,13 +121,13 @@ namespace hpx { namespace util { namespace detail
         };
 
         BOOST_FORCEINLINE
-        typename typename F::result_type operator()()
+        typename F::result_type operator()()
         {
             return f_();
         }
 
         BOOST_FORCEINLINE
-        typename typename F::result_type operator()() const
+        typename F::result_type operator()() const
         {
             return f_();
         }
