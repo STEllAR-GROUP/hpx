@@ -111,8 +111,7 @@ namespace hpx {
         timer_pool_(rtcfg.get_thread_pool_size("timer_pool"),
             boost::bind(&runtime_impl::init_tss, This(), "timer-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        parcel_port_(parcelset::parcelport::create(
-            parcelset::connection_tcpip, ini_,
+        parcel_port_(parcelset::parcelport::create_bootstrap(ini_,
             boost::bind(&runtime_impl::init_tss, This(), "parcel-thread", ::_1, ::_2, true),
             boost::bind(&runtime_impl::deinit_tss, This()))),
         scheduler_(init),

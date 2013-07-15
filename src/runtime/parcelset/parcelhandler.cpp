@@ -55,10 +55,33 @@ namespace hpx { namespace parcelset
         case connection_portals4:
             return "portals4";
 
+        case connection_mpi:
+            return "mpi";
+
         default:
             break;
         }
         return "<unknown>";
+    }
+
+    connection_type get_connection_type_from_name(std::string const& t)
+    {
+        if (!std::strcmp(t.c_str(), "tcpip"))
+            return connection_tcpip;
+
+        if (!std::strcmp(t.c_str(), "shmem"))
+            return connection_shmem;
+
+        if (!std::strcmp(t.c_str(), "ibverbs"))
+            return connection_ibverbs;
+
+        if (!std::strcmp(t.c_str(), "portals4"))
+            return connection_portals4;
+
+        if (!std::strcmp(t.c_str(), "mpi"))
+            return connection_mpi;
+
+        return connection_unknown;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -276,10 +299,10 @@ namespace hpx { namespace parcelset
         if (dest.get_type() == connection_tcpip) {
             std::string enable_shmem =
                 get_config_entry("hpx.parcel.use_shmem_parcelport", "0");
+
             // if destination is on the same network node, use shared memory
             // otherwise fall back to tcp
-            if (
-                use_alternative_parcelports_ &&
+            if (use_alternative_parcelports_ &&
                 dest.get_address() == here().get_address() &&
                 boost::lexical_cast<int>(enable_shmem))
             {
@@ -294,10 +317,27 @@ namespace hpx { namespace parcelset
         if (dest.get_type() == connection_tcpip) {
             std::string enable_ibverbs =
                 get_config_entry("hpx.parcel.ibverbs.enable", "0");
-            if (use_alternative_parcelports_ && boost::lexical_cast<int>(enable_ibverbs))
+            if (use_alternative_parcelports_ && 
+                boost::lexical_cast<int>(enable_ibverbs))
             {
                 if (pports_[connection_ibverbs])
                     return connection_ibverbs;
+            }
+        }
+#endif
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        // FIXME: add check if MPI are really available for this connection.
+
+        if (dest.get_type() == connection_tcpip) {
+            std::string enable_mpi =
+                get_config_entry("hpx.parcel.mpi.enable", "0");
+
+            if ((use_alternative_parcelports_ ||
+                 cfg.get_entry("hpx.parcel.bootstrap", "tcpip") == "mpi") &&
+                 boost::lexical_cast<int>(enable_mpi))
+            {
+                if (pports_[connection_mpi])
+                    return connection_mpi;
             }
         }
 #endif

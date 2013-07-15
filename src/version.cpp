@@ -198,13 +198,13 @@ namespace hpx
         strm << "  HPX_WAIT_ARGUMENT_LIMIT="
              << HPX_WAIT_ARGUMENT_LIMIT << "\n";
 #endif
-#if defined(HPX_MAX_PARCEL_CONNECTIONS)
-        strm << "  HPX_MAX_PARCEL_CONNECTIONS="
-             << HPX_MAX_PARCEL_CONNECTIONS << "\n";
+#if defined(HPX_PARCEL_MAX_CONNECTIONS)
+        strm << "  HPX_PARCEL_MAX_CONNECTIONS="
+             << HPX_PARCEL_MAX_CONNECTIONS << "\n";
 #endif
-#if defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY)
-        strm << "  HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY="
-             << HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY << "\n";
+#if defined(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY)
+        strm << "  HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY="
+             << HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY << "\n";
 #endif
 #if defined(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE)
         strm << "  HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE="

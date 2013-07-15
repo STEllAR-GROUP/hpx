@@ -301,6 +301,11 @@ namespace hpx { namespace parcelset
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
+        static boost::shared_ptr<parcelport> create_bootstrap(
+            util::runtime_configuration const& cfg,
+            HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+            HPX_STD_FUNCTION<void()> const& on_stop_thread);
+
         /// Return the configured maximal allowed message data size
         boost::uint64_t get_max_message_size() const
         {

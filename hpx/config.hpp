@@ -174,6 +174,18 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines the type of the parcelport to be used during application
+/// bootstrap. This value can be changed at runtime by the configuration
+/// parameter:
+///
+///   hpx.parcel.bootstrap = ...
+///
+/// (or by setting the corresponding environment variable HPX_PARCEL_BOOTSTRAP).
+#if !defined(HPX_PARCEL_BOOTSTRAP)
+#  define HPX_PARCEL_BOOTSTRAP "tcpip"
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive (to
 /// all other localities). This value can be changed at runtime by setting
 /// the configuration parameter:
@@ -181,9 +193,9 @@
 ///   hpx.parcel.max_connections = ...
 ///
 /// (or by setting the corresponding environment variable
-/// HPX_MAX_PARCEL_CONNECTIONS).
-#if !defined(HPX_MAX_PARCEL_CONNECTIONS)
-#  define HPX_MAX_PARCEL_CONNECTIONS 512
+/// HPX_PARCEL_MAX_CONNECTIONS).
+#if !defined(HPX_PARCEL_MAX_CONNECTIONS)
+#  define HPX_PARCEL_MAX_CONNECTIONS 512
 #endif
 
 /// This defines the number of outgoing shmem (parcel-) connections kept alive
@@ -206,9 +218,9 @@
 ///   hpx.parcel.max_connections_per_locality = ...
 ///
 /// (or by setting the corresponding environment variable
-/// HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY).
-#if !defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY)
-#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 4
+/// HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY).
+#if !defined(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY)
+#  define HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,9 +231,9 @@
 ///   hpx.parcel.max_message_size = ...
 ///
 /// (or by setting the corresponding environment variable
-/// HPX_MAX_MESSAGE_SIZE).
-#if !defined(HPX_MAX_MESSAGE_SIZE)
-#  define HPX_MAX_MESSAGE_SIZE 1000000000
+/// HPX_PARCEL_MAX_MESSAGE_SIZE).
+#if !defined(HPX_PARCEL_MAX_MESSAGE_SIZE)
+#  define HPX_PARCEL_MAX_MESSAGE_SIZE 1000000000
 #endif
 
 /// This defines the number of AGAS address translations kept in the local

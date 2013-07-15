@@ -106,6 +106,7 @@ namespace hpx
             connection_shmem = 1,
             connection_portals4 = 2,
             connection_ibverbs = 3,
+            connection_mpi = 4,
             connection_last
         };
 
@@ -129,6 +130,8 @@ namespace hpx
         }
 
         HPX_API_EXPORT std::string get_connection_type_name(connection_type);
+        HPX_API_EXPORT connection_type get_connection_type_from_name(std::string const&);
+
         HPX_API_EXPORT policies::message_handler* get_message_handler(
             parcelhandler* ph, char const* name, char const* type, std::size_t num,
             std::size_t interval, naming::locality const& l, connection_type t,

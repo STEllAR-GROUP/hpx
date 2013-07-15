@@ -21,6 +21,20 @@
 
 namespace hpx { namespace parcelset
 {
+    boost::shared_ptr<parcelport> parcelport::create_bootstrap(
+        util::runtime_configuration const& cfg,
+        HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
+        HPX_STD_FUNCTION<void()> const& on_stop_thread)
+    {
+        std::string pptype = cfg.get_entry("hpx.parcel.bootstrap", "tcpip");
+
+        connection_type type = get_connection_type_from_name(pptype);
+        if (type == connection_unknown)
+            type = connection_tcpip;
+
+        return create(type, cfg, on_start_thread, on_stop_thread);
+    }
+
     boost::shared_ptr<parcelport> parcelport::create(connection_type type,
         util::runtime_configuration const& cfg,
         HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
@@ -49,6 +63,7 @@ namespace hpx { namespace parcelset
                     "unsupported connection type 'connection_shmem'");
             }
             break;
+
         case connection_ibverbs:
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
             {
@@ -57,7 +72,7 @@ namespace hpx { namespace parcelset
                 std::string enable_ibverbs =
                     cfg.get_entry("hpx.parcel.ibverbs.enable", "0");
 
-                if(boost::lexical_cast<int>(enable_ibverbs))
+                if (boost::lexical_cast<int>(enable_ibverbs))
                 {
                     return boost::make_shared<parcelset::ibverbs::parcelport>(
                         cfg, on_start_thread, on_stop_thread);
@@ -67,9 +82,29 @@ namespace hpx { namespace parcelset
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                 "unsupported connection type 'connection_ibverbs'");
             break;
+
         case connection_portals4:
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                 "unsupported connection type 'connection_portals4'");
+            break;
+
+        case connection_mpi:
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            {
+                // Create MPI based parcelport only if allowed by the
+                // configuration info.
+                std::string enable_mpi =
+                    cfg.get_entry("hpx.parcel.mpi.enable", "0");
+
+                if (boost::lexical_cast<int>(enable_mpi))
+                {
+                    return boost::make_shared<parcelset::mpi::parcelport>(
+                        cfg, on_start_thread, on_stop_thread);
+                }
+            }
+#endif
+            HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
+                "unsupported connection type 'connection_mpi'");
             break;
 
         default:
@@ -83,7 +118,7 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini)
-        : parcels_(),
+      : parcels_(),
         here_(ini.get_parcelport_address()),
         max_message_size_(ini.get_max_message_size())
     {

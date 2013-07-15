@@ -100,12 +100,13 @@ namespace hpx { namespace util
             "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_PARCEL_SERVER_PORT:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
-            "max_connections = ${HPX_MAX_PARCEL_CONNECTIONS:"
-                BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS) "}",
-            "max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:"
-                BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY) "}",
-            "max_message_size = ${HPX_MAX_MESSAGE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_MAX_MESSAGE_SIZE) "}",
+            "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}",
+            "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:"
+                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
+            "max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
+                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
+            "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
 #ifdef BOOST_BIG_ENDIAN
             "endian_out=${HPX_ENDIAN_OUT:big}",
 #else
@@ -114,13 +115,17 @@ namespace hpx { namespace util
 
             // shmem related settings
             "[hpx.parcel.shmem]",
-            "enable=${HPX_USE_SHMEM_PARCELPORT:0}",
+            "enable=${HPX_PARCELPORT_USE_SHMEM:0}",
             "data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
 
             // ibverbs related settings
             "[hpx.parcel.ibverbs]",
-            "enable=${HPX_USE_IBVERBS_PARCELPORT:0}",
+            "enable=${HPX_PARCELPORT_USE_IBVERBS:0}",
             "buffer_size=${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
+
+            // MPI related settings
+            "[hpx.parcel.mpi]",
+            "enable=${HPX_PARCELPORT_USE_MPI:0}",
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -399,12 +404,12 @@ namespace hpx { namespace util
             {
                 std::string cfg_max_connections_per_loc(
                     sec->get_entry("max_connections_per_locality",
-                        HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY));
+                        HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY));
 
                 return boost::lexical_cast<std::size_t>(cfg_max_connections_per_loc);
             }
         }
-        return HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY;
+        return HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY;
     }
 
     std::size_t runtime_configuration::get_max_connections() const
@@ -416,12 +421,12 @@ namespace hpx { namespace util
             {
                 std::string cfg_max_connections(
                     sec->get_entry("max_connections",
-                        HPX_MAX_PARCEL_CONNECTIONS));
+                        HPX_PARCEL_MAX_CONNECTIONS));
 
                 return boost::lexical_cast<std::size_t>(cfg_max_connections);
             }
         }
-        return HPX_MAX_PARCEL_CONNECTIONS;
+        return HPX_PARCEL_MAX_CONNECTIONS;
     }
 
     std::size_t runtime_configuration::get_shmem_data_buffer_cache_size() const
@@ -719,10 +724,10 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.parcel");
             if (NULL != sec) {
                 return boost::lexical_cast<boost::uint64_t>(
-                    sec->get_entry("max_message_size", HPX_MAX_MESSAGE_SIZE));
+                    sec->get_entry("max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE));
             }
         }
-        return HPX_MAX_MESSAGE_SIZE;    // default is 1GByte
+        return HPX_PARCEL_MAX_MESSAGE_SIZE;    // default is 1GByte
     }
 
     ///////////////////////////////////////////////////////////////////////////
