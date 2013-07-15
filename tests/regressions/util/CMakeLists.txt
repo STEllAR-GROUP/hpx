@@ -8,6 +8,7 @@ set(tests
     command_line_arguments
     function_argument
     function_serialization
+    protect_with_nullary_pfo
    )
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
