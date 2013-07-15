@@ -19,9 +19,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -34,7 +37,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -52,9 +55,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -67,7 +73,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -85,9 +91,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -100,7 +109,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -118,9 +127,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -133,7 +145,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -151,9 +163,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -166,7 +181,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -184,9 +199,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -199,7 +217,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -217,9 +235,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -232,7 +253,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5 , f6);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -250,9 +271,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -265,7 +289,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -283,9 +307,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -298,7 +325,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -316,9 +343,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -331,7 +361,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -349,9 +379,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -364,7 +397,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -382,9 +415,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -397,7 +433,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -415,9 +451,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -430,7 +469,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -448,9 +487,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -463,7 +505,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }
@@ -481,9 +523,12 @@ namespace hpx
         typedef boost::fusion::tuple<
             lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T> , lcos::future<T>
         > argument_type;
-        lcos::local::futures_factory<return_type()> p((
-            detail::when_any_tuple<argument_type, T>(
-                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14))));
+        boost::shared_ptr<detail::when_any_tuple<argument_type, T> > f =
+            boost::make_shared<detail::when_any_tuple<argument_type, T> >(
+                argument_type(f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14));
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                util::bind(&detail::when_any_tuple<argument_type, T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -496,7 +541,7 @@ namespace hpx
         lcos::future<result_type> f = when_any(
             f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12 , f13 , f14);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
             return result_type();
         }

@@ -137,7 +137,7 @@ void LU( int numBlocks)
             dfArray[0][i][j] = dataflow( unwrapped( &ProcessInnerBlock ), hpx::make_ready_future( blockList[i][j]), dfArray[0][0][j], *first_col );
         }
     }
-    //all calcultion after initialization. Each iteration, the number of tasks/blocks spawned is decreased.
+    //all calculation after initialization. Each iteration, the number of tasks/blocks spawned is decreased.
     for(int i = 1; i < numBlocks; i++) {
         dfArray[i][i][i] = dataflow( unwrapped( &ProcessDiagonalBlock ), dfArray[i-1][i][i]);
         diag_block = &dfArray[i][i][i];
@@ -253,8 +253,8 @@ void checkResult( vector<double> &originalA )
                 errors++;
             }
         }
-        HPX_TEST_EQ(errors, 0);
     }
+    HPX_TEST_EQ(errors, 0);
 }
 
 void Print_Matrix(vector<double> &v)

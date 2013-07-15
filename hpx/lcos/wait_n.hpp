@@ -28,6 +28,10 @@
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/iterate.hpp>
 
+#include <boost/atomic.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -49,7 +53,7 @@ namespace hpx
         }
 
         template <typename T>
-        struct when_n
+        struct when_n : boost::enable_shared_from_this<when_n<T> >
         {
         private:
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_n)
@@ -109,37 +113,17 @@ namespace hpx
             result_type operator()()
             {
                 using lcos::detail::get_future_data;
-                using lcos::local::detail::extract_completed_callback_type;
-
-                typedef typename extract_completed_callback_type<
-                    lcos::future<T>
-                >::type completed_callback_type;
 
                 // set callback functions to executed when future is ready
                 std::size_t size = lazy_values_.size();
-                std::vector<completed_callback_type> callbacks(size);
-
                 threads::thread_id_type id = threads::get_self_id();
                 for (std::size_t i = 0; i != size; ++i)
                 {
                     lcos::detail::future_data_base<T>* current =
                         get_future_data(lazy_values_[i]);
 
-                    completed_callback_type cb = boost::move(
-                        current->reset_on_completed());
-
-                    if (cb) {
-                        callbacks[i] = cb;
-                        current->set_on_completed(boost::move(
-                            lcos::local::detail::compose_cb(
-                                boost::move(cb)
-                              , util::bind(&when_n::on_future_ready, this, i, id)
-                            )));
-                    }
-                    else {
-                        current->set_on_completed(
-                            util::bind(&when_n::on_future_ready, this, i, id));
-                    }
+                    current->set_on_completed(util::bind(
+                        &when_n::on_future_ready, shared_from_this(), i, id));
                 }
 
                 // if all of the requested futures are already set, our
@@ -151,7 +135,7 @@ namespace hpx
                     this_thread::suspend(threads::suspended);
                 }
 
-                // all futures should be ready
+                // at least N futures should be ready
                 BOOST_ASSERT(count_.load() >= needed_count_);
 
                 result_type result;
@@ -161,19 +145,6 @@ namespace hpx
                 while (ready_.dequeue(idx)) {
                     result.push_back(HPX_STD_MAKE_TUPLE(
                         static_cast<int>(idx), lazy_values_[idx]));
-                }
-
-                // reset all pending callback functions
-                for (std::size_t i = 0; i < size; ++i)
-                {
-                    lcos::detail::future_data_base<T>* current =
-                        get_future_data(lazy_values_[i]);
-
-                    completed_callback_type cb = boost::move(
-                        current->reset_on_completed());
-
-                    if (cb && callbacks[i])
-                        current->set_on_completed(boost::move(callbacks[i]));
                 }
 
                 return result;
@@ -222,8 +193,12 @@ namespace hpx
             return lcos::make_ready_future(return_type());
         }
 
+        boost::shared_ptr<detail::when_n<value_type> > f =
+            boost::make_shared<detail::when_n<value_type> >(
+                boost::move(lazy_values), n);
+
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<value_type>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<value_type>::operator(), f));
 
         p.apply();
         return p.get_future();
@@ -251,8 +226,12 @@ namespace hpx
             return lcos::make_ready_future(return_type());
         }
 
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
+
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
 
         p.apply();
         return p.get_future();
@@ -279,9 +258,11 @@ namespace hpx
             return lcos::make_ready_future(return_type());
         }
 
-        lcos::local::futures_factory<return_type()> p =
-            lcos::local::futures_factory<return_type()>(
-                detail::when_n<T>(lazy_values, n));
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(lazy_values, n);
+
+        lcos::local::futures_factory<return_type()> p(
+            util::bind(&detail::when_n<T>::operator(), f));
 
         p.apply();
         return p.get_future();
@@ -399,8 +380,14 @@ namespace hpx
 
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
+
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
+
         p.apply();
         return p.get_future();
     }

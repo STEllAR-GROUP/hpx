@@ -8,8 +8,10 @@
 // Do not edit manually.
 
 
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0>
         struct dataflow_frame_1
           : hpx::lcos::detail::future_data<
@@ -136,39 +138,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -225,39 +204,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -409,8 +365,10 @@ namespace hpx { namespace lcos { namespace local {
         return frame->get_future();
     }
 }}}
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0 , typename F1>
         struct dataflow_frame_2
           : hpx::lcos::detail::future_data<
@@ -537,39 +495,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -626,39 +561,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -810,8 +722,10 @@ namespace hpx { namespace lcos { namespace local {
         return frame->get_future();
     }
 }}}
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0 , typename F1 , typename F2>
         struct dataflow_frame_3
           : hpx::lcos::detail::future_data<
@@ -938,39 +852,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -1027,39 +918,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -1211,8 +1079,10 @@ namespace hpx { namespace lcos { namespace local {
         return frame->get_future();
     }
 }}}
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3>
         struct dataflow_frame_4
           : hpx::lcos::detail::future_data<
@@ -1339,39 +1209,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -1428,39 +1275,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -1612,8 +1436,10 @@ namespace hpx { namespace lcos { namespace local {
         return frame->get_future();
     }
 }}}
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
         struct dataflow_frame_5
           : hpx::lcos::detail::future_data<
@@ -1740,39 +1566,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -1829,39 +1632,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -2013,8 +1793,10 @@ namespace hpx { namespace lcos { namespace local {
         return frame->get_future();
     }
 }}}
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
         struct dataflow_frame_6
           : hpx::lcos::detail::future_data<
@@ -2141,39 +1923,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -2230,39 +1989,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -2414,8 +2150,10 @@ namespace hpx { namespace lcos { namespace local {
         return frame->get_future();
     }
 }}}
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
         struct dataflow_frame_7
           : hpx::lcos::detail::future_data<
@@ -2542,39 +2280,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -2631,39 +2346,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -2815,8 +2507,10 @@ namespace hpx { namespace lcos { namespace local {
         return frame->get_future();
     }
 }}}
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
         struct dataflow_frame_8
           : hpx::lcos::detail::future_data<
@@ -2943,39 +2637,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -3032,39 +2703,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -3216,8 +2864,10 @@ namespace hpx { namespace lcos { namespace local {
         return frame->get_future();
     }
 }}}
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
         struct dataflow_frame_9
           : hpx::lcos::detail::future_data<
@@ -3344,39 +2994,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -3433,39 +3060,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(
@@ -3617,8 +3221,10 @@ namespace hpx { namespace lcos { namespace local {
         return frame->get_future();
     }
 }}}
-namespace hpx { namespace lcos { namespace local {
-    namespace detail {
+namespace hpx { namespace lcos { namespace local
+{
+    namespace detail
+    {
         template <typename Policy, typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
         struct dataflow_frame_10
           : hpx::lcos::detail::future_data<
@@ -3745,39 +3351,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , boost::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(next)
-                                      , boost::move(end)
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            boost::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(next)
+                              , boost::move(end)
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                boost::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(next)
-                                  , boost::move(end)
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await_range(boost::move(++next), boost::move(end));
@@ -3834,39 +3417,16 @@ namespace hpx { namespace lcos { namespace local {
                         lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
-                    completed_callback_type cb
-                        = boost::move(
-                            next_future_data->reset_on_completed()
-                        );
-                    if(cb)
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                compose_cb(
-                                    boost::move(cb)
-                                  , hpx::util::bind(
-                                        f
-                                      , future_base_type(this)
-                                      , boost::move(iter)
-                                      , boost::mpl::false_()
-                                    )
-                                )
+                    next_future_data->set_on_completed(
+                        boost::move(
+                            hpx::util::bind(
+                                f
+                              , future_base_type(this)
+                              , boost::move(iter)
+                              , boost::mpl::false_()
                             )
-                        );
-                    }
-                    else
-                    {
-                        next_future_data->set_on_completed(
-                            boost::move(
-                                hpx::util::bind(
-                                    f
-                                  , future_base_type(this)
-                                  , boost::move(iter)
-                                  , boost::mpl::false_()
-                                )
-                            )
-                        );
-                    }
+                        )
+                    );
                     return;
                 }
                 await(

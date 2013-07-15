@@ -138,7 +138,8 @@ namespace detail
         virtual completed_callback_type
             set_on_completed(BOOST_RV_REF(completed_callback_type)) = 0;
         virtual completed_callback_type
-            set_on_completed_locked(BOOST_RV_REF(completed_callback_type)) = 0;
+            set_on_completed_locked(BOOST_RV_REF(completed_callback_type),
+            typename mutex_type::scoped_lock& l) = 0;
         virtual completed_callback_type reset_on_completed() = 0;
 
         // wait support
@@ -150,16 +151,19 @@ namespace detail
         struct reset_cb
         {
             template <typename F>
-            reset_cb(future_data_base& fb, BOOST_FWD_REF(F) f)
+            reset_cb(future_data_base& fb, BOOST_FWD_REF(F) f,
+                    typename mutex_type::scoped_lock& l)
               : target_(fb),
-                oldcb_(fb.set_on_completed_locked(boost::forward<F>(f)))
+                l_(l),
+                oldcb_(fb.set_on_completed_locked(boost::forward<F>(f), l))
             {}
             ~reset_cb()
             {
-                target_.set_on_completed_locked(boost::move(oldcb_));
+                target_.set_on_completed_locked(boost::move(oldcb_), l_);
             }
 
             future_data_base& target_;
+            typename mutex_type::scoped_lock& l_;
             completed_callback_type oldcb_;
         };
 
@@ -169,7 +173,8 @@ namespace detail
             if (!ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 reset_cb r(*this, util::bind(
-                    &future_data_base::wake_me_up, this_, threads::get_self_id()));
+                    &future_data_base::wake_me_up, this_, threads::get_self_id()),
+                    l);
 
                 util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                 this_thread::suspend(threads::suspended);
@@ -183,7 +188,8 @@ namespace detail
             if (!ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 reset_cb r(*this, util::bind(
-                    &future_data_base::wake_me_up, this_, threads::get_self_id()));
+                    &future_data_base::wake_me_up, this_, threads::get_self_id()),
+                    l);
 
                 util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(p) == threads::wait_signaled) ?
@@ -199,7 +205,8 @@ namespace detail
             if (!ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 reset_cb r(*this, util::bind(
-                    &future_data_base::wake_me_up, this_, threads::get_self_id()));
+                    &future_data_base::wake_me_up, this_, threads::get_self_id()),
+                    l);
 
                 util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(at) == threads::wait_signaled) ?
@@ -213,6 +220,29 @@ namespace detail
 
     protected:
         future_data_base() {}
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F1, typename F2>
+    struct compose_cb_impl
+    {
+        template <typename A1, typename A2>
+        compose_cb_impl(BOOST_FWD_REF(A1) f1, BOOST_FWD_REF(A2) f2)
+          : f1_(boost::forward<A1>(f1))
+          , f2_(boost::forward<A2>(f2))
+        {}
+
+        typedef void result_type;
+
+        template <typename Future>
+        void operator()(Future & f) const
+        {
+            if (!f1_.empty()) f1_(f);
+            if (!f2_.empty()) f2_(f);
+        }
+
+        typename util::detail::remove_reference<F1>::type f1_;
+        typename util::detail::remove_reference<F2>::type f2_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -436,23 +466,52 @@ namespace detail
         set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
-            return boost::move(set_on_completed_locked(boost::move(data_sink)));
+            return boost::move(set_on_completed_locked(boost::move(data_sink), l));
         }
 
-        completed_callback_type
-        set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
+    private:
+        template <typename F1, typename F2>
+        static BOOST_FORCEINLINE completed_callback_type
+        compose_cb(BOOST_FWD_REF(F1) f1, BOOST_FWD_REF(F2) f2)
         {
-            // this future instance coincidentally keeps us alive
-            lcos::future<Result> f =
-                lcos::detail::make_future_from_data<Result>(this);
+            // otherwise create a combined callback
+            return completed_callback_type(boost::move(
+                    compose_cb_impl<F1, F2>(
+                        boost::forward<F1>(f1),
+                        boost::forward<F2>(f2))
+                ));
+        }
 
+    public:
+        completed_callback_type set_on_completed_locked(
+            BOOST_RV_REF(completed_callback_type) data_sink,
+            typename mutex_type::scoped_lock& l)
+        {
             completed_callback_type retval = boost::move(on_completed_);
 
             if (!data_sink.empty() && !data_.is_empty()) {
-                // invoke the callback (continuation) function right away
-                data_sink(f);
+                // this future instance coincidentally keeps us alive
+                lcos::future<Result> f =
+                    lcos::detail::make_future_from_data<Result>(this);
+
+                {
+                    // invoke the callback (continuation) function right away
+                    util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
+
+                    if (!retval.empty())
+                        retval(f);
+                    data_sink(f);
+                }
+
+                return boost::move(retval);
+            }
+            else if (!retval.empty()) {
+                // store a combined callback wrapping the old and the new one
+                on_completed_ = boost::move(
+                    compose_cb(boost::move(data_sink), retval));
             }
             else {
+                // store the new callback
                 on_completed_ = boost::move(data_sink);
             }
 

@@ -20,8 +20,11 @@ namespace hpx
         lazy_values.push_back(f0);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -53,8 +56,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -86,8 +92,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -119,8 +128,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -152,8 +164,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -185,8 +200,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -218,8 +236,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -251,8 +272,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -284,8 +308,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -317,8 +344,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -350,8 +380,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -383,8 +416,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -416,8 +452,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11); lazy_values.push_back(f12);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -449,8 +488,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11); lazy_values.push_back(f12); lazy_values.push_back(f13);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -482,8 +524,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11); lazy_values.push_back(f12); lazy_values.push_back(f13); lazy_values.push_back(f14);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -515,8 +560,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11); lazy_values.push_back(f12); lazy_values.push_back(f13); lazy_values.push_back(f14); lazy_values.push_back(f15);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -548,8 +596,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11); lazy_values.push_back(f12); lazy_values.push_back(f13); lazy_values.push_back(f14); lazy_values.push_back(f15); lazy_values.push_back(f16);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -581,8 +632,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11); lazy_values.push_back(f12); lazy_values.push_back(f13); lazy_values.push_back(f14); lazy_values.push_back(f15); lazy_values.push_back(f16); lazy_values.push_back(f17);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -614,8 +668,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11); lazy_values.push_back(f12); lazy_values.push_back(f13); lazy_values.push_back(f14); lazy_values.push_back(f15); lazy_values.push_back(f16); lazy_values.push_back(f17); lazy_values.push_back(f18);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
@@ -647,8 +704,11 @@ namespace hpx
         lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11); lazy_values.push_back(f12); lazy_values.push_back(f13); lazy_values.push_back(f14); lazy_values.push_back(f15); lazy_values.push_back(f16); lazy_values.push_back(f17); lazy_values.push_back(f18); lazy_values.push_back(f19);
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T> > >
             return_type;
+        boost::shared_ptr<detail::when_n<T> > f =
+            boost::make_shared<detail::when_n<T> >(
+                boost::move(lazy_values), n);
         lcos::local::futures_factory<return_type()> p(
-            detail::when_n<T>(boost::move(lazy_values), n));
+            util::bind(&detail::when_n<T>::operator(), f));
         p.apply();
         return p.get_future();
     }
