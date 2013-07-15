@@ -1,5 +1,5 @@
 //  Copyright (c) 2007 Robert Perricone
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0.
@@ -12,7 +12,7 @@
 #if defined(BOOST_WINDOWS)
 #  define HPX_COROUTINE_SYMBOL_EXPORT      __declspec(dllexport)
 #  define HPX_COROUTINE_SYMBOL_IMPORT      __declspec(dllimport)
-#elif defined(HPX_COROUTINE_GCC_HAVE_VISIBILITY)
+#elif defined(HPX_COROUTINE_GCC_HAVE_VISIBILITY) || defined(HPX_ELF_HIDDEN_VISIBILITY)
 #  define HPX_COROUTINE_SYMBOL_EXPORT      __attribute__((visibility("default")))
 #  define HPX_COROUTINE_SYMBOL_IMPORT      __attribute__((visibility("default")))
 #else

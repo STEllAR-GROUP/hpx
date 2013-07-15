@@ -10,11 +10,12 @@
 #include <boost/assert.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
     template<typename CoroutineType, typename ContextImpl,
         template <typename> class Heap>
-    void coroutine_impl<CoroutineType, ContextImpl, Heap>::set_self(self_type* self)
+    HPX_COROUTINE_EXPORT void
+    coroutine_impl<CoroutineType, ContextImpl, Heap>::set_self(self_type* self)
     {
         BOOST_ASSERT(NULL != self_.get());
         *self_ = self;
@@ -22,6 +23,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     template<typename CoroutineType, typename ContextImpl,
         template <typename> class Heap>
+    HPX_COROUTINE_EXPORT
     typename coroutine_impl<CoroutineType, ContextImpl, Heap>::self_type*
     coroutine_impl<CoroutineType, ContextImpl, Heap>::get_self()
     {
@@ -30,7 +32,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     template<typename CoroutineType, typename ContextImpl,
         template <typename> class Heap>
-    void coroutine_impl<CoroutineType, ContextImpl, Heap>::init_self()
+    HPX_COROUTINE_EXPORT void
+    coroutine_impl<CoroutineType, ContextImpl, Heap>::init_self()
     {
         BOOST_ASSERT(NULL == self_.get());
         self_.reset(new self_type* (NULL));
@@ -38,7 +41,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     template<typename CoroutineType, typename ContextImpl,
         template <typename> class Heap>
-    void coroutine_impl<CoroutineType, ContextImpl, Heap>::reset_self()
+    HPX_COROUTINE_EXPORT void
+    coroutine_impl<CoroutineType, ContextImpl, Heap>::reset_self()
     {
         self_.reset(NULL);
     }
