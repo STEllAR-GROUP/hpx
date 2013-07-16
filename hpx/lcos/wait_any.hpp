@@ -139,7 +139,7 @@ namespace hpx
 
             struct init_when
             {
-                init_when(boost::shared_ptr<when_any_tuple>& outer,
+                init_when(boost::shared_ptr<when_any_tuple> outer,
                         threads::thread_id_type id)
                   : outer_(outer), id_(id)
                 {}

@@ -140,7 +140,7 @@ namespace detail
         virtual completed_callback_type
             set_on_completed_locked(BOOST_RV_REF(completed_callback_type),
             typename mutex_type::scoped_lock& l) = 0;
-        virtual completed_callback_type reset_on_completed() = 0;
+        virtual completed_callback_type reset_on_completed_locked() = 0;
 
         // wait support
         void wake_me_up(threads::thread_id_type id)
@@ -155,8 +155,10 @@ namespace detail
                     typename mutex_type::scoped_lock& l)
               : target_(fb),
                 l_(l),
-                oldcb_(fb.set_on_completed_locked(boost::forward<F>(f), l))
-            {}
+                oldcb_(fb.reset_on_completed_locked())
+            {
+                fb.set_on_completed_locked(boost::forward<F>(f), l);
+            }
             ~reset_cb()
             {
                 target_.set_on_completed_locked(boost::move(oldcb_), l_);
@@ -518,14 +520,9 @@ namespace detail
             return boost::move(retval);
         }
 
-        completed_callback_type reset_on_completed()
+        completed_callback_type reset_on_completed_locked()
         {
-            completed_callback_type cb;
-            {
-                typename mutex_type::scoped_lock l(this->mtx_);
-                cb = boost::move(on_completed_);
-            }
-            return boost::move(cb);
+            return boost::move(on_completed_);
         }
 
     private:

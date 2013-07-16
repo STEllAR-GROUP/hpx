@@ -15,7 +15,6 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
-#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
 
