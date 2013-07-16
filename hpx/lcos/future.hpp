@@ -246,12 +246,6 @@ namespace hpx { namespace lcos
         future<typename boost::result_of<F(future)>::type>
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
-        // reset any pending continuation function
-        void then()
-        {
-            future_data_->reset_on_completed();
-        }
-
         // wait support
         void wait() const
         {
@@ -475,12 +469,6 @@ namespace hpx { namespace lcos
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
-
-        // reset any pending continuation function
-        void then()
-        {
-            future_data_->reset_on_completed();
-        }
 
         // wait support
         void wait() const
