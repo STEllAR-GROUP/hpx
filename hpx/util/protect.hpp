@@ -166,13 +166,13 @@ namespace hpx { namespace util { namespace detail
 
         protected_bind& operator=(BOOST_COPY_ASSIGN_REF(protected_bind) rhs)
         {
-            nullary_protected_bind<T>::operator=(rhs);
+            nullary_protected_bind<F>::operator=(rhs);
             return *this;
         }
 
         protected_bind& operator=(BOOST_RV_REF(protected_bind) rhs)
         {
-            nullary_protected_bind<T>::operator=(boost::move(rhs));
+            nullary_protected_bind<F>::operator=(boost::move(rhs));
             return *this;
         }
 
