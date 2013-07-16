@@ -164,6 +164,16 @@ namespace hpx { namespace util { namespace detail
           : nullary_protected_bind<F>(boost::move(f))
         {}
 
+        protected_bind& operator=(BOOST_COPY_ASSIGN_REF(protected_bind) rhs)
+        {
+            return nullary_protected_bind<T>::operator=(rhs);
+        }
+
+        protected_bind& operator=(BOOST_RV_REF(protected_bind) rhs)
+        {
+            return nullary_protected_bind<T>::operator=(boost::move(rhs));
+        }
+
         template <typename>
         struct result;
 
