@@ -24,11 +24,12 @@ struct print_obj
 {
 public:
     typedef void result_type;
+
     template <typename F>
     struct result;
 
-    template <typename F, typename T>
-    struct result<F(T)>
+    template <typename F, typename A1>
+    struct result<F(A1)>
     {
         typedef void type;
     };
