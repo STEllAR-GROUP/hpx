@@ -1,5 +1,0 @@
-[dataflow]
-nx0  = 3
-nt0  = 10
-grain_size = 5
-loglevel     = 2
