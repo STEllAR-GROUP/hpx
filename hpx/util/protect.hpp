@@ -181,7 +181,7 @@ namespace hpx { namespace util { namespace detail
         typename boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type          \
         operator()(HPX_ENUM_FWD_ARGS(N, A, a))                                  \
         {                                                                       \
-            return f_(HPX_ENUM_FORWARD_ARGS(N, A, a));                          \
+            return this->f_(HPX_ENUM_FORWARD_ARGS(N, A, a));                    \
         }                                                                       \
                                                                                 \
         template <typename This, BOOST_PP_ENUM_PARAMS(N, typename A)>           \
