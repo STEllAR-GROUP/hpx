@@ -179,10 +179,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     static hpx::util::thread_specific_ptr<self_type*, tls_tag> self_;
 
   public:
-    HPX_COROUTINE_EXPORT static void set_self(self_type* self);
-    HPX_COROUTINE_EXPORT static self_type* get_self();
-    HPX_COROUTINE_EXPORT static void init_self();
-    HPX_COROUTINE_EXPORT static void reset_self();
+    static void set_self(self_type* self);
+    static self_type* get_self();
+    static void init_self();
+    static void reset_self();
 
 #if defined(HPX_GENERIC_COROUTINES)
   protected:
@@ -574,6 +574,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       p->reset();
   }
 }}}}
+
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
