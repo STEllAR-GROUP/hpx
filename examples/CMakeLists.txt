@@ -6,61 +6,26 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    1d_hydro
     accumulator
-    adaptive1d
-    adaptive_dataflow
     allgather
     async_io
     balancing
-    bcast
-    bfs
     cancelable_action
-    dataflow
-    distributed_test
-    embarrassingly_parallel
-    fortran_threadsafe
-    gtcx
-    gravity
     heartbeat
-    hplpx
     interpolate1d
     interpolate3d
     jacobi
-    nbody
     nqueen
-    object_semaphore
-    oclm_integration
     performance_counters
-    queue
     quickstart
     qt
     random_mem_access
-    sendrecv
     sheneos
     spell_check
     startup_shutdown
     thread_aware_timer
     throttle
    )
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  if(${GCC_VERSION} GREATER 040500)
-    set(subdirs ${subdirs}
-        hpxla
-       )
-  endif()
-  if(${GCC_VERSION} GREATER 040699 AND ${BOOST_MINOR_VERSION} GREATER 46)
-    set(subdirs ${subdirs}
-        geometry
-        )
-  endif()
-else()
-  set(subdirs ${subdirs}
-      hpxla
-      geometry
-      )
-endif()
 
 if(HPX_HAVE_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
