@@ -177,7 +177,7 @@ int main(
         header = false;
 
     // Setup the TBB environment.
-    tbb::task_scheduler_init init(vm["threads"].as<int>());
+    tbb::task_scheduler_init init(vm["threads"].as<boost::uint64_t>());
 
     return tbb_main(vm);
 }
