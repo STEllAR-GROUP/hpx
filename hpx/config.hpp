@@ -17,9 +17,11 @@
 #include <hpx/config/preprocessor/add3.hpp>
 #include <hpx/config/preprocessor/round_up.hpp>
 #include <hpx/config/preprocessor/round_up_add3.hpp>
+
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/arithmetic/add.hpp>
-#include <boost/preprocessor/selection/min.hpp> 
+#include <boost/preprocessor/selection/min.hpp>
+#include <boost/preprocessor/facilities/expand.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure DEBUG macro is defined consistently across platforms
@@ -67,7 +69,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // We currently do not support more than 20 arguments (ask if you need more)
-#define HPX_MAX_LIMIT 20
+#if !defined(HPX_MAX_LIMIT)
+#  define HPX_MAX_LIMIT 20
+#endif
 
 // We need the same value as a string for partial preprocessing the files.
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
@@ -81,7 +85,7 @@
 #    define HPX_ACTION_ARGUMENT_LIMIT HPX_LIMIT
 #  else
 #    define HPX_ACTION_ARGUMENT_LIMIT \
-        BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_LIMIT), HPX_MAX_LIMIT)
+        BOOST_PP_EXPAND(BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_LIMIT), HPX_MAX_LIMIT))
 #  endif
 #elif (HPX_ACTION_ARGUMENT_LIMIT < 4)
 #  error "HPX_ACTION_ARGUMENT_LIMIT is too low, it must be higher than 4"
@@ -97,7 +101,7 @@
 #    define HPX_WAIT_ARGUMENT_LIMIT HPX_LIMIT
 #  else
 #    define HPX_WAIT_ARGUMENT_LIMIT \
-        BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_LIMIT), HPX_MAX_LIMIT)
+        BOOST_PP_EXPAND(BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_LIMIT), HPX_MAX_LIMIT))
 #  endif
 #elif (HPX_WAIT_ARGUMENT_LIMIT < 4)
 #  error "HPX_WAIT_ARGUMENT_LIMIT is too low, it must be higher than 4"
@@ -114,7 +118,7 @@
 #    define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT HPX_LIMIT
 #  else
 #    define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT \
-        BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_LIMIT), HPX_MAX_LIMIT)
+        BOOST_PP_EXPAND(BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_LIMIT), HPX_MAX_LIMIT))
 #  endif
 #elif (HPX_COMPONENT_CREATE_ARGUMENT_LIMIT < 4)
 #  error "HPX_COMPONENT_CREATE_ARGUMENT_LIMIT is too low, it must be higher than 4"
@@ -130,10 +134,10 @@
 #if !defined(HPX_FUNCTION_ARGUMENT_LIMIT)
 #  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #    define HPX_FUNCTION_ARGUMENT_LIMIT \
-        BOOST_PP_MIN(HPX_PP_ADD3(HPX_LIMIT), HPX_MAX_LIMIT)
+        BOOST_PP_EXPAND(BOOST_PP_MIN(HPX_PP_ADD3(HPX_LIMIT), HPX_MAX_LIMIT))
 #  else
 #    define HPX_FUNCTION_ARGUMENT_LIMIT \
-        BOOST_PP_MIN(HPX_PP_ROUND_UP_ADD3(HPX_ACTION_ARGUMENT_LIMIT), HPX_MAX_LIMIT)
+        BOOST_PP_EXPAND(BOOST_PP_MIN(HPX_PP_ROUND_UP_ADD3(HPX_ACTION_ARGUMENT_LIMIT), HPX_MAX_LIMIT))
 #  endif
 #elif (HPX_FUNCTION_ARGUMENT_LIMIT < 7)
 #  error "HPX_FUNCTION_ARGUMENT_LIMIT is too low, it must be higher than 7"
@@ -153,7 +157,7 @@
 #    define HPX_TUPLE_LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
 #  else
 #    define HPX_TUPLE_LIMIT \
-        BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_FUNCTION_ARGUMENT_LIMIT), HPX_MAX_LIMIT)
+        BOOST_PP_EXPAND(BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_FUNCTION_ARGUMENT_LIMIT), HPX_MAX_LIMIT))
 #  endif
 #elif (HPX_TUPLE_LIMIT < 7)
 #  error "HPX_TUPLE_LIMIT is too low, it must be higher than 7"
@@ -170,7 +174,7 @@
 #    define HPX_LOCK_LIMIT HPX_LIMIT
 #  else
 #    define HPX_LOCK_LIMIT \
-        BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_LIMIT), HPX_MAX_LIMIT)
+        BOOST_PP_EXPAND(BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_LIMIT), HPX_MAX_LIMIT))
 #  endif
 #elif (HPX_LOCK_LIMIT > HPX_MAX_LIMIT) && \
       !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
