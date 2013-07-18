@@ -292,10 +292,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
           typedef typename coroutine_type::self self_type;
           {
-              self_type* old_self = super_type::get_self();
-              self_type self(this, old_self);
-              reset_self_on_exit on_exit(&self, old_self);
-
+              self_type self(this);
+              reset_self_on_exit on_exit(&self);
               this->m_result_last = m_fun(*this->args());
 
               // if this thread returned 'terminated' we need to reset the functor
@@ -352,10 +350,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         }
         ~reset_self_on_exit()
         {
-            super_type::set_self(old_self);
+            super_type::set_self(NULL);
         }
-
-        self_type* old_self;
     };
 
   public:
@@ -382,9 +378,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       typedef typename coroutine_type::result_slot_type result_slot_type;
 
       {
-          self_type* old_self = super_type::get_self();
-          self_type self(this, old_self);
-          reset_self_on_exit on_exit(&self, old_self);
+          self_type self(this);
+          reset_self_on_exit on_exit(&self);
           detail::unpack(m_fun, *this->args(),
               detail::trait_tag<typename coroutine_type::arg_slot_traits>());
       }

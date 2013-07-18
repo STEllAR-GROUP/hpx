@@ -12,8 +12,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
-#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
-
 #include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

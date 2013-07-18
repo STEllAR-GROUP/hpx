@@ -48,7 +48,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         reset_self_on_exit(coroutine_self* self)
           : self_(self)
         {
+<<<<<<< HEAD
             impl_type::set_self(self->next_self_);
+=======
+            impl_type::set_self(NULL);
+>>>>>>> Revert some of the recent changes to fix segfault in release mode. However, this will break executors.
         }
         ~reset_self_on_exit()
         {
