@@ -48,7 +48,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         reset_self_on_exit(coroutine_self* self)
           : self_(self)
         {
-            impl_type::set_self(NULL);
+            impl_type::set_self(self->next_self_);
         }
         ~reset_self_on_exit()
         {
@@ -191,8 +191,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #endif
     }
 
-    explicit coroutine_self(impl_type * pimpl)
-      : m_pimpl(pimpl)
+    explicit coroutine_self(impl_type * pimpl, coroutine_self* next_self = 0)
+      : m_pimpl(pimpl), next_self_(next_self)
     {}
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
@@ -211,7 +211,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if defined(HPX_GENERIC_COROUTINES)
   private:
     coroutine_self(impl_type * pimpl, detail::init_from_impl_tag) 
-      : m_pimpl(pimpl) 
+      : m_pimpl(pimpl), next_self_(0)
     {}
 
     yield_result_type yield_impl(
@@ -259,6 +259,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       return m_pimpl;
     }
     impl_ptr m_pimpl;
+    coroutine_self* next_self_;
   };
 
 }}}}
