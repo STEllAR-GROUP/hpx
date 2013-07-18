@@ -30,7 +30,6 @@
 #include <hpx/runtime/threads/threadmanager_impl.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
