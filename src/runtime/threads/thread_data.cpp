@@ -228,4 +228,3 @@ hpx::threads::thread_self::impl_type::init_self();
 
 template HPX_EXPORT void
 hpx::threads::thread_self::impl_type::reset_self();
-
