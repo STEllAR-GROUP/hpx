@@ -441,7 +441,7 @@ namespace hpx { namespace util
                 ("hpx:high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
-                  "--hpx:queuing=priority_local only")
+                  "--hpx:queuing=priority_local and --hpx:queuing=priority_abp only")
                 ("hpx:numa-sensitive",
                   "makes the priority_local scheduler NUMA sensitive, valid for "
                   "--hpx:queuing=local and priority_local only")

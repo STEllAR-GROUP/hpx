@@ -65,6 +65,7 @@ Here is a list of the tickets we closed for this release.
 * [issue 774] - Using local dataflow without explicit namespace
 * [issue 773] - Local dataflow with unwrap: functor operators need to be const
 * [issue 772] - Allow (remote) actions to return a future
+* [issue 771] - Setting HPX_LIMIT gives huge boost MPL errors
 * [issue 770] - Add launch policy to (local) dataflow
 * [issue 769] - Make compile time configuration information available
 * [issue 768] - Const correctness problem in local dataflow
@@ -169,6 +170,8 @@ Here is a list of the tickets we closed for this release.
 * [issue 664] - Adapt new meanings of 'const' and 'mutable'
 * [issue 661] - Implement BTL Parcel port
 * [issue 655] - Make HPX work with the "decltype" result_of
+* [issue 647] - documentation for specifying the number of high priority threads
+                `--hpx:high-priority-threads`
 * [issue 643] - Error parsing host file
 * [issue 642] - HWLoc issue with TAU
 * [issue 639] - Logging potentially suspends a running thread
