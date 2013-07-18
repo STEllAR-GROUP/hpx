@@ -11,6 +11,7 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>
+#include <boost/mpl/bool.hpp>
 
 #include <algorithm>
 
@@ -85,6 +86,17 @@ namespace hpx { namespace util
         boost::shared_ptr<T> data_;
         std::size_t size_;
     };
+}}
+
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // Customization point for streaming with util::any, we don't want 
+    // util::serialize_buffer to be streamable
+    template <typename T>
+    struct supports_streaming_with_any<util::serialize_buffer<T> >
+      : boost::mpl::false_
+    {};
 }}
 
 #endif
