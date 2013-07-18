@@ -111,10 +111,6 @@ is available.
     then an additional number of high-priority-threads queues plus an additional 
     low priority queue.
 
-    Documentation claims –hpx:high-priority-threads option only available for 
-    local priority but is accepted on command line for both periodic priority 
-    and abd priority (same for error messages)
-
     Is numa-sensitive only for local priority??? I know it says that in the 
     documentation and error messages but seems to be available for abp 
     priority and periodic priority

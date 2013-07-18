@@ -429,7 +429,8 @@ namespace hpx
             if (vm.count("hpx:high-priority-threads")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:high-priority-threads, valid for "
-                    "--hpx:queuing=priority_local only");
+                    "--hpx:queuing=priority_local and --hpx:queuing=priority_abp "
+                    "only");
             }
         }
 
@@ -439,7 +440,8 @@ namespace hpx
             if (vm.count("hpx:numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--hpx:numa-sensitive, valid for "
-                    "--hpx:queuing=local, priority_local, or priority_abp only");
+                    "--hpx:queuing=local, --hpx:queuing=priority_local, or "
+                    "--hpx:queuing=priority_abp only");
             }
         }
 
