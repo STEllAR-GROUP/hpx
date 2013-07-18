@@ -130,8 +130,11 @@ int main(
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
+       
+        ( "no-header"
+        , "do not print out the csv header row")
         ;
-    ;
+     ;
 
     store(command_line_parser(argc, argv).options(cmdline).run(), vm);
 
