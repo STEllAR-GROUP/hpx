@@ -379,9 +379,14 @@ of Clang, libc++, and Boost).
 * Create a build folder. __hpx__ requires an out-of-tree-build. This means that you
   will be unable to run CMake in the __hpx__ source folder.
 * Open up the CMake GUI. In the input box labelled "Where is the source code:",
-  enter the full path to the source folder. In the input box labelled
-  "Where to build the binaries:", enter the full path to the build folder you
-  created before.
+  enter the full path to the source folder. The source directory is one where the 
+  sources were checked out. CMakeLists.txt files in the source directory as well as the 
+  subdirectories describe the build to CMake. In addition to this, there are CMake 
+  scripts (usually ending in .cmake) stored in a special CMake directory. CMake does not 
+  alter any file in the source directory and   doesn't add new ones either. In the input 
+  box labelled "Where to build the binaries:", enter the full path to the build folder you 
+  created before. The build directory is one where all compiler outputs are stored, which 
+  includes object files and final executables.
 * Add CMake variable definitions (if any) by clicking the "Add Entry" button.
   There are two required variables you need to define: `BOOST_ROOT` and
   `HWLOC_ROOT`. These (PATH) variable needs to be set to point to the root
@@ -398,7 +403,9 @@ of Clang, libc++, and Boost).
   Windows system limitation affecting the number of HPX threads you can create.
 * Make sure that that the `CMAKE_BUILD_TYPE` build type (under the `CMAKE` tree)
   is set to `Debug` or `Release`, according to what you plain to do (alternatively,
-  this variable can be set to `RelWithDebInfo` or `MinSizeRel`).
+  this variable can be set to `RelWithDebInfo` or `MinSizeRel`). The text area at 
+  the bottom of CMake GUI displays the output of CMake. CMake prompts an error message 
+  in a separate dialog box if a required dependency is not found.
 * Press "Configure" again. Repeat this step until the "Generate" button becomes
   clickable (and until no variable definitions are marked red anymore).
 * Press "Generate".
