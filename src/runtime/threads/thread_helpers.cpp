@@ -16,6 +16,7 @@
 #if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
