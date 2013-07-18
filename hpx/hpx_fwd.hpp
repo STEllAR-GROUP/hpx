@@ -605,8 +605,9 @@ namespace hpx
         class future;
 
         template <typename Result>
-        future<typename util::detail::remove_reference<Result>::type>
-        make_ready_future(BOOST_FWD_REF(Result));
+        future<typename boost::remove_const<
+            typename util::detail::remove_reference<Result>::type
+        >::type> make_ready_future(BOOST_FWD_REF(Result));
 
         future<void> make_ready_future();
 

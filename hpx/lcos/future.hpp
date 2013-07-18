@@ -299,11 +299,14 @@ namespace hpx { namespace lcos
 
     // extension: create a pre-initialized future object
     template <typename Result>
-    future<typename util::detail::remove_reference<Result>::type>
+    future<typename boost::remove_const<
+        typename util::detail::remove_reference<Result>::type
+    >::type>
     make_ready_future(BOOST_FWD_REF(Result) init)
     {
-        return future<typename util::detail::remove_reference<Result>::type>(
-            boost::forward<Result>(init));
+        return future<typename boost::remove_const<
+            typename util::detail::remove_reference<Result>::type
+        >::type>(boost::forward<Result>(init));
     }
 
     ///////////////////////////////////////////////////////////////////////////
