@@ -96,6 +96,11 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Plugin, typename Enable = void>
     struct plugin_config_data;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Customization point for streaming with util::any
+    template <typename T, typename Enable = void>
+    struct supports_streaming_with_any;
 }}
 
 #endif
