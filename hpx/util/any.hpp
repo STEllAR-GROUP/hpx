@@ -45,7 +45,9 @@
 #include <stdexcept>
 #include <typeinfo>
 #include <algorithm>
-#include <iosfwd>
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
+#  include <iosfwd>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
@@ -89,9 +91,10 @@ namespace hpx { namespace util
             void (*clone)(void* const*, void**);
             void (*copy)(void* const*, void**);
             bool (*equal_to)(void* const*, void* const*);
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
             std::basic_istream<Char>& (*stream_in)(std::basic_istream<Char>&, void**);
             std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&, void* const*);
-
+#endif
             virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
             virtual void load_object(void **, IArchive & ar, unsigned) = 0;
 
@@ -112,8 +115,10 @@ namespace hpx { namespace util
             void (*clone)(void* const*, void**);
             void (*copy)(void* const*, void**);
             bool (*equal_to)(void* const*, void* const*);
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
             std::basic_istream<Char>& (*stream_in)(std::basic_istream<Char>&, void**);
             std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&, void* const*);
+#endif
         };
 
         // static functions for small value-types
@@ -172,6 +177,7 @@ namespace hpx { namespace util
                 {
                     return (get(x) == get(y));
                 }
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
                 static std::basic_istream<Char>&
                 stream_in (std::basic_istream<Char>& i, void** obj)
                 {
@@ -184,6 +190,7 @@ namespace hpx { namespace util
                     o << *reinterpret_cast<T const*>(obj);
                     return o;
                 }
+#endif
             };
         };
 
@@ -239,6 +246,7 @@ namespace hpx { namespace util
                 {
                     return (get(x) == get(y));
                 }
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
                 static std::basic_istream<Char>&
                 stream_in(std::basic_istream<Char>& i, void** obj)
                 {
@@ -251,6 +259,7 @@ namespace hpx { namespace util
                     o << **reinterpret_cast<T* const*>(obj);
                     return o;
                 }
+#endif
             };
         };
 
@@ -269,9 +278,10 @@ namespace hpx { namespace util
                 base_type::clone = Vtable::clone;
                 base_type::copy = Vtable::copy;
                 base_type::equal_to = Vtable::equal_to;
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
                 base_type::stream_in = Vtable::stream_in;
                 base_type::stream_out = Vtable::stream_out;
-
+#endif
                 // make sure the global gets instantiated;
                 hpx::actions::detail::guid_initialization<fxn_ptr>();
             }
@@ -316,8 +326,10 @@ namespace hpx { namespace util
                 base_type::clone = Vtable::clone;
                 base_type::copy = Vtable::copy;
                 base_type::equal_to = Vtable::equal_to;
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
                 base_type::stream_in = Vtable::stream_in;
                 base_type::stream_out = Vtable::stream_out;
+#endif
             }
 
             virtual base_type * get_ptr()
@@ -366,6 +378,7 @@ namespace hpx { namespace util
             }
         };
 
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
         template <typename Char>
         inline std::basic_istream<Char>&
         operator>> (std::basic_istream<Char>& i, empty&)
@@ -390,6 +403,7 @@ namespace hpx { namespace util
         {
             return o;
         }
+#endif
     }} // namespace hpx::util::detail::any
 }}  // namespace hpx::util
 
@@ -665,6 +679,7 @@ namespace hpx { namespace util
         // type has a corresponding operator defined, which is completely safe
         // because hpx::uti::any is used only in contexts where these operators
         // do exist
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
         template <typename IArchive_, typename OArchive_, typename Char_>
         friend std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
@@ -674,6 +689,7 @@ namespace hpx { namespace util
         friend std::basic_ostream<Char_>&
         operator<< (std::basic_ostream<Char_>& o,
             basic_any<IArchive_, OArchive_, Char_> const& obj);
+#endif
 
     private:
 
@@ -724,6 +740,7 @@ namespace hpx { namespace util
     };
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
     template <typename IArchive_, typename OArchive_, typename Char_>
     std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
@@ -739,6 +756,7 @@ namespace hpx { namespace util
     {
         return obj.table->stream_out(o, &obj.object);
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Char> // default is char
@@ -982,6 +1000,7 @@ namespace hpx { namespace util
         // type has a corresponding operator defined, which is completely safe
         // because hpx::util::any is used only in contexts where these operators
         // do exist
+#if defined(HPX_ANY_SUPPORTS_STREAMING)
         template <typename IArchive_, typename OArchive_, typename Char_>
         friend std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
@@ -991,6 +1010,7 @@ namespace hpx { namespace util
         friend std::basic_ostream<Char_>&
         operator<< (std::basic_ostream<Char_>& o,
             basic_any<IArchive_, OArchive_, Char_> const& obj);
+#endif
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     private: // types
@@ -1065,7 +1085,6 @@ namespace hpx { namespace util
         return any_cast<nonref const&>(const_cast<basic_any<IArchive, OArchive, Char> &>(operand));
     }
 
-
     ///////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
     typedef basic_any<portable_binary_iarchive, portable_binary_oarchive, char> any;
@@ -1074,9 +1093,7 @@ namespace hpx { namespace util
     typedef basic_any<void, void, char> any_nonser;
     typedef basic_any<void, void, wchar_t> wany_nonser;
 
-
     ///////////////////////////////////////////////////////////////////////////
-
     struct hash_any
     {
         size_t operator()(const any &elem ) const
@@ -1094,7 +1111,6 @@ namespace hpx { namespace util
             return boost::hash_range(data.begin(), data.end());
         }
     };
-
 }}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
