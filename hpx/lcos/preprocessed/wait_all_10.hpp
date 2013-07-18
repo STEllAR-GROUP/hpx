@@ -328,3 +328,99 @@ namespace hpx
         return f.get(ec);
     }
 }
+namespace hpx
+{
+    
+    template <typename T>
+    lcos::future<std::vector<lcos::future<T> > >
+    when_all (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10)
+    {
+        typedef std::vector<lcos::future<T> > return_type;
+        return_type lazy_values;
+        lazy_values.reserve(11);
+        lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10);
+        lcos::local::futures_factory<return_type()> p(
+            detail::when_all<T>(boost::move(lazy_values)));
+        p.apply();
+        return p.get_future();
+    }
+    template <typename T>
+    std::vector<lcos::future<T> >
+    wait_all(lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10,
+        error_code& ec = throws)
+    {
+        typedef std::vector<lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_all(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10);
+        if (!f.valid()) {
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all", 
+                "lcos::when_all didn't return a valid future");
+            return result_type();
+        }
+        return f.get(ec);
+    }
+}
+namespace hpx
+{
+    
+    template <typename T>
+    lcos::future<std::vector<lcos::future<T> > >
+    when_all (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10 , lcos::future<T> f11)
+    {
+        typedef std::vector<lcos::future<T> > return_type;
+        return_type lazy_values;
+        lazy_values.reserve(12);
+        lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11);
+        lcos::local::futures_factory<return_type()> p(
+            detail::when_all<T>(boost::move(lazy_values)));
+        p.apply();
+        return p.get_future();
+    }
+    template <typename T>
+    std::vector<lcos::future<T> >
+    wait_all(lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10 , lcos::future<T> f11,
+        error_code& ec = throws)
+    {
+        typedef std::vector<lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_all(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11);
+        if (!f.valid()) {
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all", 
+                "lcos::when_all didn't return a valid future");
+            return result_type();
+        }
+        return f.get(ec);
+    }
+}
+namespace hpx
+{
+    
+    template <typename T>
+    lcos::future<std::vector<lcos::future<T> > >
+    when_all (lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10 , lcos::future<T> f11 , lcos::future<T> f12)
+    {
+        typedef std::vector<lcos::future<T> > return_type;
+        return_type lazy_values;
+        lazy_values.reserve(13);
+        lazy_values.push_back(f0); lazy_values.push_back(f1); lazy_values.push_back(f2); lazy_values.push_back(f3); lazy_values.push_back(f4); lazy_values.push_back(f5); lazy_values.push_back(f6); lazy_values.push_back(f7); lazy_values.push_back(f8); lazy_values.push_back(f9); lazy_values.push_back(f10); lazy_values.push_back(f11); lazy_values.push_back(f12);
+        lcos::local::futures_factory<return_type()> p(
+            detail::when_all<T>(boost::move(lazy_values)));
+        p.apply();
+        return p.get_future();
+    }
+    template <typename T>
+    std::vector<lcos::future<T> >
+    wait_all(lcos::future<T> f0 , lcos::future<T> f1 , lcos::future<T> f2 , lcos::future<T> f3 , lcos::future<T> f4 , lcos::future<T> f5 , lcos::future<T> f6 , lcos::future<T> f7 , lcos::future<T> f8 , lcos::future<T> f9 , lcos::future<T> f10 , lcos::future<T> f11 , lcos::future<T> f12,
+        error_code& ec = throws)
+    {
+        typedef std::vector<lcos::future<T> > result_type;
+        lcos::future<result_type> f = when_all(
+            f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7 , f8 , f9 , f10 , f11 , f12);
+        if (!f.valid()) {
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all", 
+                "lcos::when_all didn't return a valid future");
+            return result_type();
+        }
+        return f.get(ec);
+    }
+}

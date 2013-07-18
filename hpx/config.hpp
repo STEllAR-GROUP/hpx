@@ -98,7 +98,8 @@
 /// This defines the maximum number of arguments \a hpx#lcos#wait can take
 #if !defined(HPX_WAIT_ARGUMENT_LIMIT)
 #  if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#    define HPX_WAIT_ARGUMENT_LIMIT HPX_LIMIT
+#    define HPX_WAIT_ARGUMENT_LIMIT \
+        BOOST_PP_EXPAND(BOOST_PP_MIN(HPX_PP_ADD3(HPX_LIMIT), HPX_MAX_LIMIT))
 #  else
 #    define HPX_WAIT_ARGUMENT_LIMIT \
         BOOST_PP_EXPAND(BOOST_PP_MIN(HPX_PP_ROUND_UP(HPX_LIMIT), HPX_MAX_LIMIT))
