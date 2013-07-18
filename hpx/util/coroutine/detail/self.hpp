@@ -45,10 +45,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // store the current this and write it to the TSS on exit
     struct reset_self_on_exit
     {
-        reset_self_on_exit(coroutine_self* self, coroutine_self* old_self = 0)
+        reset_self_on_exit(coroutine_self* self)
           : self_(self)
         {
-            impl_type::set_self(old_self);
+            impl_type::set_self(NULL);
         }
         ~reset_self_on_exit()
         {
@@ -122,7 +122,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
       this->m_pimpl->bind_result(&arg0);
       {
-        reset_self_on_exit on_exit(this, old_self_);
+        reset_self_on_exit on_exit(this);
         this->m_pimpl->yield();
       }
 
@@ -191,8 +191,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #endif
     }
 
-    explicit coroutine_self(impl_type * pimpl, coroutine_self* old_self = NULL)
-      : m_pimpl(pimpl), old_self_(old_self)
+    explicit coroutine_self(impl_type * pimpl)
+      : m_pimpl(pimpl)
     {}
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
@@ -211,7 +211,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if defined(HPX_GENERIC_COROUTINES)
   private:
     coroutine_self(impl_type * pimpl, detail::init_from_impl_tag) 
-      : m_pimpl(pimpl), old_self_(0)
+      : m_pimpl(pimpl) 
     {}
 
     yield_result_type yield_impl(
@@ -221,7 +221,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
       this->m_pimpl->bind_result(&result_);
       {
-        reset_self_on_exit on_exit(this, old_self_);
+        reset_self_on_exit on_exit(this);
         this->m_pimpl->yield();
       }
 
@@ -239,7 +239,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       coroutine_accessor::get_impl(target)->bind_result_pointer(m_pimpl->result_pointer());
 
       {
-        reset_self_on_exit on_exit(this, old_self_);
+        reset_self_on_exit on_exit(this);
         this->m_pimpl->yield_to(*coroutine_accessor::get_impl(target));
       }
 
@@ -259,7 +259,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       return m_pimpl;
     }
     impl_ptr m_pimpl;
-    coroutine_self* old_self_;
   };
 
 }}}}
