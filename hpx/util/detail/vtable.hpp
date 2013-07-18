@@ -56,6 +56,15 @@ namespace hpx { namespace util { namespace detail {
     {
         template <typename Functor, typename Sig, typename IArchive, typename OArchive>
         struct type;
+
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+#  include <hpx/util/detail/preprocessed/vtable2.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/vtable2_" HPX_LIMIT_STR ".hpp")
+#endif
+
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
         4                                                                       \
@@ -68,6 +77,12 @@ namespace hpx { namespace util { namespace detail {
     )                                                                           \
 /**/
 #include BOOST_PP_ITERATE()
+
+#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(output: null)
+#endif
+
+#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
     };
 }}}
