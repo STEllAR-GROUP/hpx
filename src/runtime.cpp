@@ -17,7 +17,6 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
-#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/parcel_suffix.hpp>
