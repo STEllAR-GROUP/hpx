@@ -218,3 +218,5 @@ namespace hpx { namespace threads
 template HPX_EXPORT void
 hpx::threads::thread_self::impl_type::set_self(hpx::threads::thread_self*);
 
+template HPX_EXPORT hpx::threads::thread_self*
+hpx::threads::thread_self::impl_type::get_self();
