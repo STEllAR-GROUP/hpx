@@ -74,6 +74,13 @@ namespace hpx { namespace util
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
+        // this is needed for util::any
+        friend bool
+        operator==(serialize_buffer const& rhs, serialize_buffer const& lhs)
+        {
+            return rhs.data_.get() == lhs.data_.get() && rhs.size_ == lhs.size_;
+        }
+
     private:
         boost::shared_ptr<T> data_;
         std::size_t size_;
