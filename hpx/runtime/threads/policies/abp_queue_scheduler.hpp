@@ -30,6 +30,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+///////////////////////////////////////////////////////////////////////////
+// We globally control whether to do minimal deadlock detection using this
+// global bool variable. It will be set once by the runtime configuration
+// startup code
+extern bool minimal_deadlock_detection;
+#endif
 
 struct abp_queue_scheduler : public scheduler_base
 {
@@ -333,7 +340,7 @@ struct abp_queue_scheduler : public scheduler_base
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         // no new work is available, are we deadlocked?
-        if (/*0 == num_thread &&*/ LHPX_ENABLED(error)) {
+        if (minimal_deadlock_detection && LHPX_ENABLED(error)) {
             bool suspended_only = true;
 
             for (std::size_t i = 0; suspended_only && i < queue_size; ++i) {

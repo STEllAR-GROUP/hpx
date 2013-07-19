@@ -36,6 +36,13 @@ namespace hpx { namespace threads { namespace policies
 // stays set, thus no race conditions will occur.
 extern bool maintain_queue_wait_times;
 #endif
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+///////////////////////////////////////////////////////////////////////////
+// We globally control whether to do minimal deadlock detection using this
+// global bool variable. It will be set once by the runtime configuration
+// startup code
+extern bool minimal_deadlock_detection;
+#endif
 
 typedef boost::lockfree::deque<thread_data*> work_item_deque_type;
 
@@ -555,9 +562,12 @@ struct thread_deque
 #if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         return false;
 #else
-        mutex_type::scoped_lock lk(mtx_);
-        return detail::dump_suspended_threads(num_thread, thread_map_
-          , idle_loop_count, running);
+        if (minimal_deadlock_detection) {
+            mutex_type::scoped_lock lk(mtx_);
+            return detail::dump_suspended_threads(num_thread, thread_map_
+              , idle_loop_count, running);
+        }
+        return false;
 #endif
     }
 

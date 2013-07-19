@@ -33,6 +33,13 @@ namespace hpx { namespace threads { namespace policies
     // stays set, thus no race conditions will occur.
     extern bool maintain_queue_wait_times;
 #endif
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+    ///////////////////////////////////////////////////////////////////////////
+    // We globally control whether to do minimal deadlock detection using this
+    // global bool variable. It will be set once by the runtime configuration
+    // startup code
+    extern bool minimal_deadlock_detection;
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     class global_thread_queue
@@ -630,7 +637,10 @@ namespace hpx { namespace threads { namespace policies
                 if (added_new) {
     #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
                     // dump list of suspended threads once a second
-                    if (HPX_UNLIKELY(LHPX_ENABLED(error) && addfrom->new_tasks_.empty())) {
+                    if (minimal_deadlock_detection &&
+                        HPX_UNLIKELY(LHPX_ENABLED(error) &&
+                        addfrom->new_tasks_.empty()))
+                    {
                         detail::dump_suspended_threads(num_thread, thread_map_,
                             idle_loop_count, running);
                     }
@@ -648,7 +658,10 @@ namespace hpx { namespace threads { namespace policies
 
     #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
                     // dump list of suspended threads once a second
-                    if (HPX_UNLIKELY(LHPX_ENABLED(error) && addfrom->new_tasks_.empty())) {
+                    if (minimal_deadlock_detection &&
+                        HPX_UNLIKELY(LHPX_ENABLED(error) &&
+                        addfrom->new_tasks_.empty()))
+                    {
                         detail::dump_suspended_threads(num_thread, thread_map_,
                             idle_loop_count, running);
                     }
@@ -687,9 +700,12 @@ namespace hpx { namespace threads { namespace policies
 #if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             return false;
 #else
-            mutex_type::scoped_lock lk(mtx_);
-            return detail::dump_suspended_threads(num_thread, thread_map_
-              , idle_loop_count, running);
+            if (minimal_deadlock_detection) {
+                mutex_type::scoped_lock lk(mtx_);
+                return detail::dump_suspended_threads(num_thread, thread_map_
+                  , idle_loop_count, running);
+            }
+            return false;
 #endif
         }
 

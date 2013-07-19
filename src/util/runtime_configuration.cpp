@@ -25,13 +25,25 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
-namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix 
+namespace hpx { namespace util { namespace coroutines { namespace detail { namespace posix
 {
-    // this global (urghhh) variable is used to control whether guard pages 
+    ///////////////////////////////////////////////////////////////////////////
+    // this global (urghhh) variable is used to control whether guard pages
     // will be used or not
     HPX_EXPORT bool use_guard_pages = true;
 }}}}}
 #endif
+
+namespace hpx { namespace threads { namespace policies
+{
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+    ///////////////////////////////////////////////////////////////////////////
+    // We globally control whether to do minimal deadlock detection using this
+    // global bool variable. It will be set once by the runtime configuration
+    // startup code
+    bool minimal_deadlock_detection = true;
+#endif
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -68,6 +80,13 @@ namespace hpx { namespace util
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
 #if HPX_HAVE_VERIFY_LOCKS
             "lock_detection = ${HPX_LOCK_DETECTION:0}",
+#endif
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+#if HPX_DEBUG
+            "minimal_deadlock_detection = ${MINIMAL_DEADLOCK_DETECTION:1}",
+#else
+            "minimal_deadlock_detection = ${MINIMAL_DEADLOCK_DETECTION:0}",
+#endif
 #endif
 
             // add placeholders for keys to be added by command line handling
@@ -302,6 +321,10 @@ namespace hpx { namespace util
         if (enable_lock_detection())
             util::enable_lock_detection();
 #endif
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+        threads::policies::minimal_deadlock_detection =
+            enable_minimal_deadlock_detection();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -347,6 +370,10 @@ namespace hpx { namespace util
 #if HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
+#endif
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+        threads::policies::minimal_deadlock_detection =
+            enable_minimal_deadlock_detection();
 #endif
     }
 
@@ -616,6 +643,34 @@ namespace hpx { namespace util
         }
 #endif
         return false;
+    }
+
+    // Enable minimal deadlock detection for HPX threads
+    bool runtime_configuration::enable_minimal_deadlock_detection() const
+    {
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+#if HPX_DEBUG
+                return boost::lexical_cast<int>(
+                    sec->get_entry("minimal_deadlock_detection", "1")) ? true : false;
+#else
+                return boost::lexical_cast<int>(
+                    sec->get_entry("minimal_deadlock_detection", "0")) ? true : false;
+#endif
+            }
+        }
+
+#if HPX_DEBUG
+        return true;
+#else
+        return false;
+#endif
+
+#else
+        return false;
+#endif
     }
 
     std::size_t runtime_configuration::get_os_thread_count() const

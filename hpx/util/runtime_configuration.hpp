@@ -89,6 +89,9 @@ namespace hpx { namespace util
         // Enable lock detection during suspension
         bool enable_lock_detection() const;
 
+        // Enable minimal deadlock detection for HPX threads
+        bool enable_minimal_deadlock_detection() const;
+
         // Returns the number of OS threads this locality is running.
         std::size_t get_os_thread_count() const;
 

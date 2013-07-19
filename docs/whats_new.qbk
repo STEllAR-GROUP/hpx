@@ -414,6 +414,8 @@ HPX' releases so far.
 * [issue 317] - Implement network performance counters
 * [issue 310] - Duplicate logging entries
 * [issue 230] - Add compile time option to disable thread debugging info
+* [issue 171] - Add an INI option to turn off deadlock detection independently of
+                logging
 * [issue 170] - OSHL internal counters are incorrect
 * [issue 103] - Better diagnostics for multiple component/action registerations
                 under the same name
