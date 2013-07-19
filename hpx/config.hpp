@@ -67,8 +67,8 @@
 #endif
 
 // make sure Fusion sizes are adjusted appropriately as well
-#if HPX_LIMIT > 10 && !defined(FUSION_MAX_VECTOR_SIZE)
-#  define FUSION_MAX_VECTOR_SIZE HPX_PP_ROUND_UP(HPX_LIMIT)
+#if HPX_LIMIT > 5 && !defined(FUSION_MAX_VECTOR_SIZE)
+#  define FUSION_MAX_VECTOR_SIZE 20
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
