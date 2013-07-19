@@ -44,6 +44,10 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/foreach.hpp>
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/util/mpi_environment.hpp>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -1064,6 +1068,27 @@ namespace hpx
                     result = 0;     // --hpx:help
                 return result;
             }
+
+#if defined(_POSIX_VERSION)
+            if(!cfg.vm_["hpx:attach-gdb"].empty())
+            {
+                int i = 0;
+                char hostname[256];
+                gethostname(hostname, sizeof(hostname));
+                std::cerr
+                    << "PID: " << getpid() << " on " << hostname
+                    << " ready for attach. Once attached set i = 1 and continue"
+                    << std::endl;
+                while(i == 0)
+                {
+                    sleep(1);
+                }
+            }
+#endif
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            util::mpi_environment::init(&argc, &argv, cfg);
+#endif
 
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(cfg.queuing_)) {
