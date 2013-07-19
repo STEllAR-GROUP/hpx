@@ -17,7 +17,15 @@
 namespace hpx { namespace threads { namespace policies
 {
 
-struct add_new_tag {};
+    struct add_new_tag {};
+
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+    ///////////////////////////////////////////////////////////////////////////
+    // We globally control whether to do minimal deadlock detection using this
+    // global bool variable. It will be set once by the runtime configuration
+    // startup code
+    extern bool minimal_deadlock_detection;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace detail
