@@ -165,15 +165,29 @@ namespace hpx { namespace parcelset
         parcels_->set_parcelhandler(this);
 
         attach_parcelport(pp, false);
+
+        util::io_service_pool *pool = 0;
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        bool tcpip_bootstrap = (get_config_entry("hpx.parcel.bootstrap", "tcpip") == "tcpip");
+        if(tcpip_bootstrap)
+        {
+            pool = pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
+        }
+        else
+        {
+            pool = pports_[connection_mpi]->get_thread_pool("parcel_pool_mpi");
+        }
+#else
+        pool = pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
+#endif
+        BOOST_ASSERT(0 != pool);
+
+
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
         std::string enable_shmem =
             get_config_entry("hpx.parcel.shmem.enable", "0");
 
         if (boost::lexical_cast<int>(enable_shmem)) {
-            util::io_service_pool* pool =
-                pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
-            BOOST_ASSERT(0 != pool);
-
             attach_parcelport(parcelport::create(
                 connection_shmem, hpx::get_config(),
                 pool->get_on_start_thread(), pool->get_on_stop_thread()));
@@ -184,14 +198,29 @@ namespace hpx { namespace parcelset
             get_config_entry("hpx.parcel.ibverbs.enable", "0");
 
         if (boost::lexical_cast<int>(enable_ibverbs)) {
-                
-            util::io_service_pool* pool =
-                pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
-            BOOST_ASSERT(0 != pool);
-
             attach_parcelport(parcelport::create(
                 connection_ibverbs, hpx::get_config(),
                 pool->get_on_start_thread(), pool->get_on_stop_thread()));
+        }
+#endif
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        if(tcpip_bootstrap)
+        {
+            if (util::mpi_environment::enabled()) {
+                attach_parcelport(parcelport::create(
+                    connection_mpi, hpx::get_config(),
+                    pool->get_on_start_thread(), pool->get_on_stop_thread()));
+            }
+        }
+        else
+        {
+            std::string enable_tcpip =
+                get_config_entry("hpx.parcel.tcpip.enable", "1");
+            if (boost::lexical_cast<int>(enable_tcpip)) {
+                attach_parcelport(parcelport::create(
+                    connection_tcpip, hpx::get_config(),
+                    pool->get_on_start_thread(), pool->get_on_stop_thread()));
+            }
         }
 #endif
     }
@@ -312,7 +341,7 @@ namespace hpx { namespace parcelset
         }
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
-        // FIXME: add check if ibverbs are really available for this connection.
+        // FIXME: add check if ibverbs are really available for this destination.
 
         if (dest.get_type() == connection_tcpip) {
             std::string enable_ibverbs =
@@ -326,15 +355,12 @@ namespace hpx { namespace parcelset
         }
 #endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-        // FIXME: add check if MPI are really available for this connection.
+        // FIXME: add check if MPI are really available for this destination.
 
         if (dest.get_type() == connection_tcpip) {
-            std::string enable_mpi =
-                get_config_entry("hpx.parcel.mpi.enable", "0");
-
             if ((use_alternative_parcelports_ ||
-                 cfg.get_entry("hpx.parcel.bootstrap", "tcpip") == "mpi") &&
-                 boost::lexical_cast<int>(enable_mpi))
+                 get_config_entry("hpx.parcel.bootstrap", "tcpip") == "mpi") &&
+                 util::mpi_environment::enabled())
             {
                 if (pports_[connection_mpi])
                     return connection_mpi;

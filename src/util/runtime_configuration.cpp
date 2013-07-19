@@ -113,6 +113,10 @@ namespace hpx { namespace util
             "endian_out=${HPX_ENDIAN_OUT:little}",
 #endif
 
+            // TCPIP related settings
+            "[hpx.parcel.tcpip]",
+            "enable=${HPX_PARCELPORT_USE_TCPIP:1}",
+
             // shmem related settings
             "[hpx.parcel.shmem]",
             "enable=${HPX_PARCELPORT_USE_SHMEM:0}",
@@ -363,12 +367,24 @@ namespace hpx { namespace util
                 std::string cfg_port(
                     sec->get_entry("port", HPX_INITIAL_IP_PORT));
 
-                return naming::locality(
-                    sec->get_entry("address", HPX_INITIAL_IP_ADDRESS),
-                    boost::lexical_cast<boost::uint16_t>(cfg_port));
+                return
+                    naming::locality(
+                        sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
+                      , boost::lexical_cast<boost::uint16_t>(cfg_port)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+                      , mpi_environment::enabled() ? 0 : -1
+#endif
+                    );
             }
         }
-        return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
+        return
+            naming::locality(
+                HPX_INITIAL_IP_ADDRESS
+              , HPX_INITIAL_IP_PORT
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+              , mpi_environment::enabled() ? 0 : -1
+#endif
+            );
     }
 
     // HPX network address configuration information has to be stored in the

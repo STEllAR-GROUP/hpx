@@ -210,6 +210,10 @@ macro(add_hpx_library name)
     hpx_append_property(${name}_lib LINK_FLAGS ${${name}_LINK_FLAGS})
   endif()
 
+  if(HPX_USE_PARCELPORT_MPI AND MPI_FOUND)
+    hpx_append_property(${name}_lib LINK_FLAGS ${MPI_${${name}_LANGUAGE}_LINK_FLAGS})
+  endif()
+
   if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
     hpx_append_property(${name}_lib COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     if(NOT MSVC)

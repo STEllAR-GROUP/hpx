@@ -12,6 +12,9 @@
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 #  include <hpx/runtime/parcelset/ibverbs/parcelport.hpp>
 #endif
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#  include <hpx/runtime/parcelset/mpi/parcelport.hpp>
+#endif
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/exception.hpp>
@@ -28,22 +31,33 @@ namespace hpx { namespace parcelset
     {
         std::string pptype = cfg.get_entry("hpx.parcel.bootstrap", "tcpip");
 
-        connection_type type = get_connection_type_from_name(pptype);
+        int type = get_connection_type_from_name(pptype);
         if (type == connection_unknown)
             type = connection_tcpip;
 
         return create(type, cfg, on_start_thread, on_stop_thread);
     }
 
-    boost::shared_ptr<parcelport> parcelport::create(connection_type type,
+    boost::shared_ptr<parcelport> parcelport::create(int type,
         util::runtime_configuration const& cfg,
         HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
         HPX_STD_FUNCTION<void()> const& on_stop_thread)
     {
         switch(type) {
         case connection_tcpip:
-            return boost::make_shared<parcelset::tcp::parcelport>(
-                cfg, on_start_thread, on_stop_thread);
+            {
+                std::string enable_tcpip = 
+                    cfg.get_entry("hpx.parcel.tcpip.enable", "1");
+
+                if (boost::lexical_cast<int>(enable_tcpip)) 
+                {
+                    return boost::make_shared<parcelset::tcp::parcelport>(
+                        cfg, on_start_thread, on_stop_thread);
+                }
+
+                HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
+                    "unsupported connection type 'connection_tcpip'");
+            }
 
         case connection_shmem:
             {
@@ -103,6 +117,7 @@ namespace hpx { namespace parcelset
                 }
             }
 #endif
+
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                 "unsupported connection type 'connection_mpi'");
             break;
@@ -129,6 +144,7 @@ namespace hpx { namespace parcelset
     void parcelport::put_parcels(std::vector<parcel> const & parcels,
             std::vector<write_handler_type> const& handlers)
     {
+        BOOST_ASSERT(false);
         if (parcels.size() != handlers.size())
         {
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::put_parcels",

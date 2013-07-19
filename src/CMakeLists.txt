@@ -228,6 +228,7 @@ else()
     ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
 endif()
 
+set(hpx_serialization_link_flag_properties)
 if(NOT MSVC)
   set_target_properties(hpx_serialization
                         PROPERTIES SKIP_BUILD_RPATH TRUE
@@ -236,9 +237,13 @@ if(NOT MSVC)
                                    INSTALL_RPATH ${HPX_RPATH})
 else()
   if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
-    set_target_properties(hpx_serialization PROPERTIES LINK_FLAGS "/include:__tcmalloc")
+    set(hpx_serialization_link_flag_properties "${hpx_serialization_link_flag_properties} /include:__tcmalloc")
     hpx_debug("malloc" "hpx_serialization: forcing linking to __tcmalloc")
   endif()
+endif()
+
+if(HPX_USE_PARCELPORT_MPI AND MPI_FOUND)
+  set(hpx_serialization_link_flag_properties "${hpx_serialization_link_flag_properties} ${MPI_CXX_LINK_FLAGS}")
 endif()
 
 set_target_properties(hpx_serialization PROPERTIES
@@ -246,6 +251,7 @@ set_target_properties(hpx_serialization PROPERTIES
   SOVERSION ${HPX_SOVERSION}
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx_serialization
+  LINK_FLAGS "${hpx_serialization_link_flag_properties}"
   FOLDER "Core")
 
 if(MSVC)
@@ -312,6 +318,7 @@ set_target_properties(hpx PROPERTIES
   OUTPUT_NAME hpx
   FOLDER "Core")
 
+set(hpx_link_flag_properties)
 if(MSVC)
   set_target_properties(hpx PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
@@ -327,7 +334,6 @@ if(MSVC)
     LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${HPX_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
     LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${HPX_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
-  set(hpx_link_flag_properties)
   if(TCMALLOC_FOUND AND "${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
     set(hpx_link_flag_properties "${hpx_link_flag_properties} /include:__tcmalloc")
     hpx_debug("malloc" "hpx: forcing linking to __tcmalloc")
@@ -336,6 +342,10 @@ else()
   set_target_properties(hpx PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${HPX_RUNTIME_OUTPUT_DIRECTORY}
     LIBRARY_OUTPUT_DIRECTORY ${HPX_LIBRARY_OUTPUT_DIRECTORY})
+endif()
+
+if(HPX_USE_PARCELPORT_MPI AND MPI_FOUND)
+  set(hpx_link_flag_properties "${hpx_link_flag_properties} ${MPI_CXX_LINK_FLAGS}")
 endif()
 
 if(NOT MSVC)
@@ -348,9 +358,10 @@ else()
   if(HPX_HAVE_SWAP_CONTEXT_EMULATION)
     set(hpx_link_flag_properties "${hpx_link_flag_properties} /EXPORT:switch_to_fiber")
   endif()
-  set_target_properties(hpx PROPERTIES LINK_FLAGS "${hpx_link_flag_properties}")
   hpx_debug("hpx_link_flag_properties" "hpx: ${hpx_link_flag_properties}")
 endif()
+
+set_property(TARGET hpx APPEND PROPERTY LINK_FLAGS ${hpx_link_flag_properties})
 
 target_link_libraries(hpx
   hpx_serialization

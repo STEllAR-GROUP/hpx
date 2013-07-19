@@ -11,6 +11,9 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/util/mpi_environment.hpp>
+#endif
 
 #include <boost/config.hpp>
 #include <boost/io/ios_state.hpp>
@@ -28,7 +31,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Version of locality class.
-#define HPX_LOCALITY_VERSION   0x10
+#define HPX_LOCALITY_VERSION   0x11
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
@@ -64,25 +67,38 @@ namespace hpx { namespace naming
     {
     public:
         locality()
-          : address_(), port_(boost::uint16_t(-1))
+          : address_(), port_(boost::uint16_t(-1)), rank_(-1)
         {}
 
         locality(std::string const& addr, boost::uint16_t port)
-          : address_(addr), port_(port)
+          : address_(addr), port_(port), rank_(util::mpi_environment::rank())
         {}
 
         locality(boost::asio::ip::address addr, boost::uint16_t port)
-          : address_(addr.to_string()), port_(port)
+          : address_(addr.to_string()), port_(port), rank_(util::mpi_environment::rank())
         {}
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        locality(std::string const& addr, boost::uint16_t port, int rank)
+          : address_(addr), port_(port), rank_(rank)
+        {}
+
+        locality(boost::asio::ip::address addr, boost::uint16_t port, int rank)
+          : address_(addr.to_string()), port_(port), rank_(rank)
+        {}
+#endif
+
         explicit locality(boost::asio::ip::tcp::endpoint ep)
-          : address_(ep.address().to_string()), port_(ep.port())
+          : address_(ep.address().to_string()), port_(ep.port()), rank_(util::mpi_environment::rank())
         {}
 
         locality& operator= (boost::asio::ip::tcp::endpoint ep)
         {
             address_ = ep.address().to_string();
             port_ = ep.port();
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            rank_ = hpx::util::mpi_environment::rank();
+#endif
             return *this;
         }
 
@@ -92,7 +108,12 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         friend bool operator==(locality const& lhs, locality const& rhs)
         {
-            return lhs.port_ == rhs.port_ && lhs.address_ == rhs.address_;
+            return
+                lhs.port_ == rhs.port_ && lhs.address_ == rhs.address_
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+                && lhs.rank_ == rhs.rank_
+#endif
+                ;
         }
 
         friend bool operator!=(locality const& lhs, locality const& rhs)
@@ -103,7 +124,11 @@ namespace hpx { namespace naming
         friend bool operator< (locality const& lhs, locality const& rhs)
         {
             return lhs.address_ < rhs.address_ ||
-                   (lhs.address_ == rhs.address_ && lhs.port_ < rhs.port_);
+                   (lhs.address_ == rhs.address_ && lhs.port_ < rhs.port_)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+                   || (lhs.address_ == rhs.address_ && lhs.port_ == rhs.port_ && lhs.rank_ < rhs.rank_)
+#endif
+                   ;
         }
 
         friend bool operator> (locality const& lhs, locality const& rhs)
@@ -119,8 +144,16 @@ namespace hpx { namespace naming
 
         std::string const& get_address() const { return address_; }
         boost::uint16_t get_port() const { return port_; }
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        int get_rank() const { return rank_; }
+#endif
+
         parcelset::connection_type get_type() const
         {
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            if(rank_ != -1)
+                return parcelset::connection_mpi;
+#endif
             return parcelset::connection_tcpip;
         }
 
@@ -135,6 +168,9 @@ namespace hpx { namespace naming
         {
             ar << address_;
             ar << port_;
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            ar << rank_;
+#endif
         }
 
         template<class Archive>
@@ -149,18 +185,27 @@ namespace hpx { namespace naming
 
             ar >> address_;
             ar >> port_;
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            ar >> rank_;
+#endif
         }
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
         std::string address_;
         boost::uint16_t port_;
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        int rank_;
+#endif
     };
 
     inline std::ostream& operator<< (std::ostream& os, locality const& l)
     {
         boost::io::ios_flags_saver ifs(os);
         os << l.address_ << ":" << l.port_;
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        os << " (MPI Rank: " << l.rank_ << ")";
+#endif
         return os;
     }
 

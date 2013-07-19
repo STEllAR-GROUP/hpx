@@ -296,7 +296,7 @@ namespace hpx { namespace parcelset
         }
 
         /// Create a new instance of a parcelport
-        static boost::shared_ptr<parcelport> create(connection_type type,
+        static boost::shared_ptr<parcelport> create(int type,
             util::runtime_configuration const& cfg,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread);

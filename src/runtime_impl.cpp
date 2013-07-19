@@ -35,6 +35,10 @@
 #include <io.h>
 #endif
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/util/mpi_environment.hpp>
+#endif
+
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -172,12 +176,17 @@ namespace hpx {
         LRT_(debug) << "~runtime_impl(entering)";
 
         // stop all services
+        std::cout << util::mpi_environment::rank() << "runtime_impl::~runtime_impl()\n";
         parcel_handler_.stop();     // stops parcel pools as well
         thread_manager_->stop();    // stops timer_pool_ as well
         io_pool_.stop();
 
         // unload libraries
         //runtime_support_.tidy();
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        util::mpi_environment::finalize();
+#endif
 
         LRT_(debug) << "~runtime_impl(finished)";
     }
@@ -348,6 +357,7 @@ namespace hpx {
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::stop(bool blocking)
     {
         LRT_(warning) << "runtime_impl: about to stop services";
+        std::cout << util::mpi_environment::rank() << "runtime_impl::stop() start\n";
 
         // flush all parcel buffers, stop buffering parcels at this point
         parcel_handler_.flush_buffers(true);
@@ -368,12 +378,16 @@ namespace hpx {
 
         boost::thread t(boost::bind(&runtime_impl::stopped, this, blocking,
             boost::ref(cond), boost::ref(mtx)));
+        std::cout << util::mpi_environment::rank() << "runtime_impl::stop() waiting for stopped ...\n";
         cond.wait(l);
+        std::cout << util::mpi_environment::rank() << "runtime_impl::stop() stopped ...\n";
 
         t.join();
 
         // stop the rest of the system
+        std::cout << util::mpi_environment::rank() << "runtime_impl::stop() stopping parcel handler\n";
         parcel_handler_.stop(blocking);     // stops parcel pools as well
+        std::cout << util::mpi_environment::rank() << "runtime_impl::stop() stopping parcel handler done\n";
         io_pool_.stop();                    // stops io_pool_ as well
 
         deinit_tss();

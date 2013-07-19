@@ -336,6 +336,31 @@ if(HPX_USE_PARCELPORT_IBVERBS)
 endif()
 
 ################################################################################
+# Decide whether to use MPI based parcelport
+################################################################################
+hpx_option(HPX_USE_PARCELPORT_MPI BOOL "Enable parcelport based on MPI (default: OFF)." OFF ADVANCED)
+if(HPX_USE_PARCELPORT_MPI)
+  find_package(HPX_MPI)
+  if(MPI_FOUND)
+    foreach(language CXX C Fortran)
+      set(CMAKE_${language}_FLAGS_DEBUG
+          "${CMAKE_${language}_FLAGS_DEBUG} ${MPI_${language}_COMPILE_FLAGS}")
+      set(CMAKE_${language}_FLAGS_RELWITHDEBINFO
+          "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} ${MPI_${language}_COMPILE_FLAGS}")
+      set(CMAKE_${language}_FLAGS_MINSIZEREL
+          "${CMAKE_${language}_FLAGS_MINSIZEREL} ${MPI_${language}_COMPILE_FLAGS}")
+      set(CMAKE_${language}_FLAGS_RELEASE
+          "${CMAKE_${language}_FLAGS_RELEASE} ${MPI_${language}_COMPILE_FLAGS}")
+    endforeach()
+    hpx_include_sys_directories(${MPI_CXX_INCLUDE_PATH})
+    hpx_add_definitions(-DHPX_HAVE_PARCELPORT_MPI)
+    hpx_add_definitions(${MPI_CXX_COMPILE_FLAGS})
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_CXX_LIBRARIES})
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_EXTRA_LIBRARIES})
+  endif()
+endif()
+
+################################################################################
 # Logging configuration
 ################################################################################
 hpx_option(HPX_NO_LOGGING BOOL "Build hpx with logging completely disabled (default: OFF)." OFF ADVANCED)
@@ -635,6 +660,7 @@ if(HPX_NATIVE_MIC)
     set(CMAKE_${language}_FLAGS_RELEASE
         "${CMAKE_${language}_FLAGS_RELEASE} -mmic")
   endforeach()
+  hpx_add_definitions(-mmic)
 endif()
 
 if(MSVC)
@@ -1109,10 +1135,13 @@ else()
     # #858: type qualifier on return type is meaningless
     # #1098: the qualifier on this friend declaration is ignored
     # #488: template parameter not used in declaring the parameter type
+    # #2203: cast discards qualifiers from target type (needed for mvapich2
+    # mpi header)
     hpx_use_flag_if_available(-wd1170)
     hpx_use_flag_if_available(-wd858)
     hpx_use_flag_if_available(-wd1098)
     hpx_use_flag_if_available(-wd488)
+    hpx_use_flag_if_available(-wd2203)
     if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
