@@ -49,12 +49,6 @@
 #define HPX_INITIAL_IP_ADDRESS      "127.0.0.1"
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines if the Intel Thread Building Blocks library will be used
-#if !defined(HPX_USE_TBB)
-#  define HPX_USE_TBB 0
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of possible runtime instances in one
 /// executable
 #if !defined(HPX_RUNTIME_INSTANCE_LIMIT)
@@ -67,15 +61,20 @@
 #  define HPX_LIMIT 5
 #endif
 
+// We need the same value as a string while partially preprocessing the files.
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  define HPX_LIMIT_STR BOOST_PP_STRINGIZE(HPX_LIMIT)
+#endif
+
+// make sure Fusion sizes are adjusted appropriately as well
+#if HPX_LIMIT > 10 && !defined(FUSION_MAX_VECTOR_SIZE)
+#  define FUSION_MAX_VECTOR_SIZE HPX_PP_ROUND_UP(HPX_LIMIT)
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // We currently do not support more than 20 arguments (ask if you need more)
 #if !defined(HPX_MAX_LIMIT)
 #  define HPX_MAX_LIMIT 20
-#endif
-
-// We need the same value as a string for partial preprocessing the files.
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  define HPX_LIMIT_STR BOOST_PP_STRINGIZE(HPX_LIMIT)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
