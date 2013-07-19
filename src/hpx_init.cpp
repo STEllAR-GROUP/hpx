@@ -1056,20 +1056,22 @@ namespace hpx
                 return result;
             }
 
-#if defined(_POSIX_VERSION)
-            if(!cfg.vm_["hpx:attach-gdb"].empty())
+#if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
+            if(cfg.vm_.count("hpx:attach-debugger"))
             {
+#if defined(_POSIX_VERSION)
                 int i = 0;
-                char hostname[256];
-                gethostname(hostname, sizeof(hostname));
                 std::cerr
-                    << "PID: " << getpid() << " on " << hostname
-                    << " ready for attach. Once attached set i = 1 and continue"
+                    << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
+                    << " ready for attaching debugger. Once attached set i = 1 and continue"
                     << std::endl;
                 while(i == 0)
                 {
                     sleep(1);
                 }
+#elif defined(BOOST_MSVC)
+                DebugBreak();
+#endif
             }
 #endif
 
