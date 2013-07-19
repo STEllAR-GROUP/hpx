@@ -152,6 +152,9 @@ bool pre_main(runtime_mode mode)
             }
 
             std::size_t const num_localities = cfg.get_num_localities();
+
+            std::cout << util::mpi_environment::rank() << " pre_main: " << num_localities << "\n";
+
             second_stage = create_barrier(num_localities, second_barrier);
             third_stage = create_barrier(num_localities, third_barrier);
             fourth_stage = create_barrier(num_localities, fourth_barrier);

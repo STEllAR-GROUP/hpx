@@ -10,6 +10,9 @@
 #include <hpx/util/mpi_environment.hpp>
 
 #include <boost/format.hpp>
+#include <boost/assign.hpp>
+
+#include <iostream>
 
 #include <iostream>
 
@@ -19,12 +22,13 @@ namespace hpx { namespace util
 
     void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
+        using namespace boost::assign;
         std::string bootstrap_parcelport = cfg.rtcfg_.get_entry("hpx.parcel.bootstrap", "tcpip");
 
         bool enable_mpi = false;
         if(bootstrap_parcelport == "mpi")
         {
-            cfg.rtcfg_.parse("mpi enable", "hpx.parcel.mpi.enable!=1");
+            cfg.ini_config_ += "hpx.parcel.mpi.enable!=1";
             enable_mpi = true;
         }
         else
@@ -33,7 +37,7 @@ namespace hpx { namespace util
             enable_mpi = boost::lexical_cast<int>(enable_mpi_str);
             if(enable_mpi)
             {
-                cfg.rtcfg_.parse("mpi enable", "hpx.parcel.bootstrap!=mpi");
+                cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
             }
         }
 
@@ -41,28 +45,38 @@ namespace hpx { namespace util
         {
             MPI_Init(argc, argv);
             MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
+
+            char name[MPI_MAX_PROCESSOR_NAME];
+            int len;
+            MPI_Get_processor_name(name, &len);
+
+            std::cout << rank() << ": " << name << "\n";
+
             int this_rank = rank();
-            cfg.rtcfg_.parse("mpi rank",
-                boost::str(boost::format("hpx.locality!=%1%")
-                          % this_rank));
-            cfg.rtcfg_.parse("mpi size",
-                boost::str(boost::format("hpx.localities!=%1%")
-                          % size()));
+            cfg.ini_config_ += "hpx.locality!=" + boost::lexical_cast<std::string>(this_rank);
+            cfg.ini_config_ += "hpx.localities!=" + boost::lexical_cast<std::string>(size());
+            cfg.num_localities_ = size();
+
+            std::cout << rank() << " mpi_environment::init(): " << size() << "\n";
 
             if(this_rank == 0)
             {
                 cfg.mode_ = hpx::runtime_mode_console;
-                cfg.rtcfg_.parse("mpi service mode", "hpx.agas.service_mode!=bootstrap");
+                cfg.ini_config_ += "hpx.agas.service_mode!=bootstrap";
             }
             else
             {
                 cfg.mode_ = hpx::runtime_mode_worker;
-                cfg.rtcfg_.parse("mpi service mode", "hpx.agas.service_mode!=hosted");
+                cfg.ini_config_ += "hpx.agas.service_mode!=hosted";
             }
-            cfg.rtcfg_.parse("mpi runtime mode",
-                boost::str(boost::format("hpx.runtime_mode!=%1%")
-                          % get_runtime_mode_name(cfg.mode_)));
+            cfg.ini_config_ += std::string("hpx.runtime_mode!=") + get_runtime_mode_name(cfg.mode_);
             std::cout << communicator_ << "\n";
+
+            cfg.rtcfg_.reconfigure(cfg.ini_config_);
+            if(rank() == 0)
+            {
+                std::cout << rank() << " mpi_environment::init(): " << cfg.rtcfg_.get_num_localities() << "\n";
+            }
         }
     }
 
