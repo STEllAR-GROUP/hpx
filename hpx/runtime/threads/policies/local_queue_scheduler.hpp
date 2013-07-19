@@ -356,7 +356,7 @@ namespace hpx { namespace threads { namespace policies
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
                 // no new work is available, are we deadlocked?
-                if (HPX_UNLIKELY(0 == added /*&& 0 == num_thread*/ && LHPX_ENABLED(error))) {
+                if (HPX_UNLIKELY(0 == added && minimal_deadlock_detection && LHPX_ENABLED(error))) {
                     bool suspended_only = true;
 
                     for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {

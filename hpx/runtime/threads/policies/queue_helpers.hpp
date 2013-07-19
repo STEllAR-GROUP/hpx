@@ -45,6 +45,8 @@ namespace detail
         (void)running;
         return false;
 #else
+        if (!minimal_deadlock_detection)
+            return false;
         if (HPX_LIKELY(idle_loop_count++ < HPX_IDLE_LOOP_COUNT_MAX))
             return false;
 

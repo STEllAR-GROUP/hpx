@@ -30,6 +30,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+    ///////////////////////////////////////////////////////////////////////////
+    // We globally control whether to do minimal deadlock detection using this
+    // global bool variable. It will be set once by the runtime configuration
+    // startup code
+    extern bool minimal_deadlock_detection;
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     /// The local_priority_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
@@ -662,7 +670,7 @@ namespace hpx { namespace threads { namespace policies
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
-            if (HPX_UNLIKELY(/*0 == num_thread &&*/ LHPX_ENABLED(error))) {
+            if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error))) {
                 bool suspended_only = true;
 
                 for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
