@@ -67,15 +67,24 @@ namespace hpx { namespace naming
     {
     public:
         locality()
-          : address_(), port_(boost::uint16_t(-1)), rank_(-1)
+          : address_(), port_(boost::uint16_t(-1))
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+          , rank_(-1)
+#endif
         {}
 
         locality(std::string const& addr, boost::uint16_t port)
-          : address_(addr), port_(port), rank_(util::mpi_environment::rank())
+          : address_(addr), port_(port)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+          , rank_(util::mpi_environment::rank())
+#endif
         {}
 
         locality(boost::asio::ip::address addr, boost::uint16_t port)
-          : address_(addr.to_string()), port_(port), rank_(util::mpi_environment::rank())
+          : address_(addr.to_string()), port_(port)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+          , rank_(util::mpi_environment::rank())
+#endif
         {}
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
@@ -126,7 +135,7 @@ namespace hpx { namespace naming
             return lhs.address_ < rhs.address_ ||
                    (lhs.address_ == rhs.address_ && lhs.port_ < rhs.port_)
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-                   || (lhs.address_ == rhs.address_ && lhs.port_ == rhs.port_ && lhs.rank_ < rhs.rank_)
+                || (lhs.address_ == rhs.address_ && lhs.port_ == rhs.port_ && lhs.rank_ < rhs.rank_)
 #endif
                    ;
         }
@@ -144,6 +153,7 @@ namespace hpx { namespace naming
 
         std::string const& get_address() const { return address_; }
         boost::uint16_t get_port() const { return port_; }
+
 #if defined(HPX_HAVE_PARCELPORT_MPI)
         int get_rank() const { return rank_; }
 #endif

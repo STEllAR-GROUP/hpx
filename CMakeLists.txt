@@ -352,11 +352,15 @@ if(HPX_USE_PARCELPORT_MPI)
       set(CMAKE_${language}_FLAGS_RELEASE
           "${CMAKE_${language}_FLAGS_RELEASE} ${MPI_${language}_COMPILE_FLAGS}")
     endforeach()
-    hpx_include_sys_directories(${MPI_CXX_INCLUDE_PATH})
+    hpx_include_sys_directories(${MPI_C_INCLUDE_PATH})
     hpx_add_definitions(-DHPX_HAVE_PARCELPORT_MPI)
-    hpx_add_definitions(${MPI_CXX_COMPILE_FLAGS})
-    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_CXX_LIBRARIES})
-    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_EXTRA_LIBRARIES})
+    foreach(language CXX C)
+      if(MPI_${language}_COMPILE_FLAGS)
+        hpx_add_definitions(${MPI_${language}_COMPILE_FLAGS})
+      endif()
+    endforeach()
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_C_LIBRARIES})
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_EXTRA_LIBRARY})
   endif()
 endif()
 
@@ -906,6 +910,11 @@ if(MSVC)
     if(MSVC11)
       # MSVC2012 is overeager to report 'qualifier applied to function type has no meaning; ignored'
       hpx_append_flag(-wd4180)
+    endif()
+
+    # OpenMPI triggers a lot of forcing value to bool 'true' or 'false' (performance warning)
+    if(MPI_FOUND)
+      hpx_append_flag(-wd4800)
     endif()
 
     # According to the ifort Windows manual, W3 isn't supported

@@ -171,7 +171,7 @@ namespace hpx { namespace parcelset { namespace mpi
                 std::cout << "Tag: " << recv_header[0] << " Number of parcels: " << recv_header[1] << " Size of message : " << recv_header[2] << "\n";
                 */
 
-                std::pair<int, int> recv_key(status.MPI_SOURCE, recv_header[0]);
+                std::pair<int, int> recv_key(status.MPI_SOURCE, static_cast<int>(recv_header[0]));
                 recv_buffers_type::iterator it = recv_buffers.find(recv_key);
                 if(it == recv_buffers.end())
                 {
@@ -196,10 +196,10 @@ namespace hpx { namespace parcelset { namespace mpi
                 recv_requests.push_back(MPI_Request());
                 MPI_Irecv(
                     &it->second.second[0],
-                    recv_header[2],
+                    static_cast<int>(recv_header[2]),
                     MPI_CHAR,
                     status.MPI_SOURCE,
-                    recv_header[0],
+                    static_cast<int>(recv_header[0]),
                     communicator,
                     &recv_requests.back()
                 );
@@ -209,7 +209,7 @@ namespace hpx { namespace parcelset { namespace mpi
             if(!recv_requests.empty())
             {
                 int index;
-                MPI_Testany(recv_requests.size(), &recv_requests[0], &index, &completed, &status);
+                MPI_Testany(static_cast<int>(recv_requests.size()), &recv_requests[0], &index, &completed, &status);
                 if(completed)
                 {
                     //BOOST_ASSERT(status.MPI_SOURCE == requests.first);
@@ -270,7 +270,7 @@ namespace hpx { namespace parcelset { namespace mpi
             if(!send_header_requests.empty())
             {
                 int index;
-                MPI_Testany(send_header_requests.size(), &send_header_requests[0], &index, &completed, &status);
+                MPI_Testany(static_cast<int>(send_header_requests.size()), &send_header_requests[0], &index, &completed, &status);
                 if(completed)
                 {
                     //std::cout << util::mpi_environment::rank() <<  " sent header with tag " << send_header_tags[index] << "!\n";
@@ -279,7 +279,7 @@ namespace hpx { namespace parcelset { namespace mpi
                     BOOST_ASSERT(it != send_buffers.end());
                     MPI_Isend(
                         &it->second.get<2>()[0]
-                      , it->second.get<2>().size()
+                      , static_cast<int>(it->second.get<2>().size())
                       , MPI_CHAR
                       , it->second.get<0>()
                       , send_header_tags[index]
@@ -294,7 +294,7 @@ namespace hpx { namespace parcelset { namespace mpi
             if(!send_data_requests.empty())
             {
                 int index;
-                MPI_Testany(send_data_requests.size(), &send_data_requests[0], &index, &completed, &status);
+                MPI_Testany(static_cast<int>(send_data_requests.size()), &send_data_requests[0], &index, &completed, &status);
                 if(completed)
                 {
                     //std::cout << util::mpi_environment::rank() <<  " sent data with tag " << send_header_tags[index] << "!\n";

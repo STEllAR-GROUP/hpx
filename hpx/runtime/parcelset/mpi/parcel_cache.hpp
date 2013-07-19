@@ -16,6 +16,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/format.hpp>
 
 #include <set>
 

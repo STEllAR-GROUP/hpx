@@ -5,16 +5,17 @@
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
-
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/mpi_environment.hpp>
 
+#include <boost/format.hpp>
+
 #include <iostream>
 
-namespace hpx { namespace util {
-    MPI_Comm mpi_environment::communicator_ = -1;
-
+namespace hpx { namespace util
+{
+    MPI_Comm mpi_environment::communicator_ = reinterpret_cast<MPI_Comm>(-1);
 
     void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
@@ -82,7 +83,7 @@ namespace hpx { namespace util {
 
     bool mpi_environment::enabled()
     {
-        return communicator_ != -1;
+        return communicator_ != reinterpret_cast<MPI_Comm>(-1);
     }
 
     int mpi_environment::size()
