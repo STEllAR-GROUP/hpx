@@ -18,12 +18,13 @@
 
 namespace hpx { namespace util
 {
-    MPI_Comm mpi_environment::communicator_ = reinterpret_cast<MPI_Comm>(-1);
+    MPI_Comm mpi_environment::communicator_ = 0;
 
     void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
         using namespace boost::assign;
-        std::string bootstrap_parcelport = cfg.rtcfg_.get_entry("hpx.parcel.bootstrap", "tcpip");
+        std::string bootstrap_parcelport =
+            cfg.rtcfg_.get_entry("hpx.parcel.bootstrap", "tcpip");
 
         bool enable_mpi = false;
         if(bootstrap_parcelport == "mpi")
@@ -33,7 +34,8 @@ namespace hpx { namespace util
         }
         else
         {
-            std::string enable_mpi_str = cfg.rtcfg_.get_entry("hpx.parcel.mpi.enable", "0");
+            std::string enable_mpi_str =
+                cfg.rtcfg_.get_entry("hpx.parcel.mpi.enable", "0");
             enable_mpi = boost::lexical_cast<int>(enable_mpi_str);
             if(enable_mpi)
             {
@@ -46,11 +48,12 @@ namespace hpx { namespace util
             MPI_Init(argc, argv);
             MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
 
-            char name[MPI_MAX_PROCESSOR_NAME];
-            int len;
+            char name[MPI_MAX_PROCESSOR_NAME] = { '\0' };
+            int len = 0;
             MPI_Get_processor_name(name, &len);
 
             std::cout << rank() << ": " << name << "\n";
+            std::cout << communicator_ << "\n";
 
             int this_rank = rank();
             cfg.ini_config_ += "hpx.locality!=" + boost::lexical_cast<std::string>(this_rank);
@@ -69,13 +72,14 @@ namespace hpx { namespace util
                 cfg.mode_ = hpx::runtime_mode_worker;
                 cfg.ini_config_ += "hpx.agas.service_mode!=hosted";
             }
-            cfg.ini_config_ += std::string("hpx.runtime_mode!=") + get_runtime_mode_name(cfg.mode_);
-            std::cout << communicator_ << "\n";
+            cfg.ini_config_ += std::string("hpx.runtime_mode!=") +
+                get_runtime_mode_name(cfg.mode_);
 
             cfg.rtcfg_.reconfigure(cfg.ini_config_);
             if(rank() == 0)
             {
-                std::cout << rank() << " mpi_environment::init(): " << cfg.rtcfg_.get_num_localities() << "\n";
+                std::cout << rank() << " mpi_environment::init(): "
+                          << cfg.rtcfg_.get_num_localities() << "\n";
             }
         }
     }
@@ -85,7 +89,11 @@ namespace hpx { namespace util
         if(enabled())
         {
             std::cout << "Rank " << rank() << " finalizing\n";
-            MPI_Comm_free(&communicator_);
+
+            MPI_Comm communicator = communicator_;
+            communicator_ = 0;
+            MPI_Comm_free(&communicator);
+
             MPI_Finalize();
         }
     }
@@ -97,7 +105,7 @@ namespace hpx { namespace util
 
     bool mpi_environment::enabled()
     {
-        return communicator_ != reinterpret_cast<MPI_Comm>(-1);
+        return communicator_ != 0;
     }
 
     int mpi_environment::size()

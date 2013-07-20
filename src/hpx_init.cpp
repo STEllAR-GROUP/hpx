@@ -1057,8 +1057,7 @@ namespace hpx
             }
 
 #if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
-            if(cfg.vm_.count("hpx:attach-debugger"))
-            {
+            if(cfg.vm_.count("hpx:attach-debugger")) {
 #if defined(_POSIX_VERSION)
                 int i = 0;
                 std::cerr
