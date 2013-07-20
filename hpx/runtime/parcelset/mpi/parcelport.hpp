@@ -161,7 +161,7 @@ namespace hpx { namespace parcelset { namespace mpi
         void send_parcels_or_reclaim_connection(naming::locality const& locality_id,
             parcelport_connection_ptr const& client_connection);
         void retry_sending_parcels(naming::locality const& locality_id);
-        void get_connection_and_send_parcels(naming::locality const& locality_id, 
+        void get_connection_and_send_parcels(naming::locality const& locality_id,
             naming::gid_type const& parcel_id);
         */
     private:
@@ -186,6 +186,7 @@ namespace hpx { namespace parcelset { namespace mpi
                 tag = free_tags.front();
                 free_tags.pop_front();
             }
+            BOOST_ASSERT(tag != 0);
 
             return tag;
         }

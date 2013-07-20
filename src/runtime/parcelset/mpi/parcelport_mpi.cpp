@@ -48,7 +48,6 @@ namespace hpx
 namespace hpx { namespace parcelset { namespace mpi
 {
     void decode_message(
-        std::size_t num_parcel_chunks,
         std::vector<char> const & parcel_data,
         parcelport& pp);
 
@@ -121,38 +120,22 @@ namespace hpx { namespace parcelset { namespace mpi
     void parcelport::handle_messages()
     {
         MPI_Comm communicator = util::mpi_environment::communicator();
-        acceptor accept(communicator);
-        typedef std::list<receiver> receivers_type;
-        typedef std::list<sender> senders_type;
+        acceptor ack(communicator);
+        typedef std::list<boost::shared_ptr<receiver> > receivers_type;
+        typedef std::list<boost::shared_ptr<sender> > senders_type;
         receivers_type receivers;
         senders_type senders;
+
         while(!stopped)
         {
-            std::pair<bool, header> next(accept.next_header());
+            std::pair<bool, header> next(ack.next_header());
             if(next.first)
             {
-                receivers.push_back(receiver(next.second, communicator));
-            }
-            detail::parcel_cache::parcels_map parcels(boost::move(parcel_cache_.get_parcels()));
-            BOOST_FOREACH(detail::parcel_cache::parcels_map::value_type & p, parcels)
-            {
-                senders.push_back(
-                    sender(
-                        header(
-                            p.first, // destination rank
-                            get_next_tag(),
-                            p.second.num_chunks,
-                            p.second.buffer.size()
-                        )
-                      , boost::move(p.second.buffer)
-                      , boost::move(p.second.handlers)
-                      , communicator
-                    )
-                );
+                receivers.push_back(boost::make_shared<receiver>(next.second, communicator));
             }
             for(receivers_type::iterator it = receivers.begin(); it != receivers.end();)
             {
-                if(it->done(*this))
+                if((*it)->done(*this))
                 {
                     it = receivers.erase(it);
                 }
@@ -163,17 +146,18 @@ namespace hpx { namespace parcelset { namespace mpi
             }
             for(senders_type::iterator it = senders.begin(); it != senders.end();)
             {
-                if(it->done())
+                if((*it)->done())
                 {
+                    free_tags.push_back((*it)->tag());
                     it = senders.erase(it);
-                    free_tags.push_back(it->tag());
                 }
                 else
                 {
                     ++it;
                 }
             }
-
+            senders_type const & tmp = parcel_cache_.get_senders(HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this()), communicator);
+            senders.insert(senders.end(), tmp.begin(), tmp.end());
         }
         // cancel all remaining requests
         std::cout << util::mpi_environment::rank() << " handle_messages stopped\n";
@@ -229,23 +213,7 @@ namespace hpx { namespace parcelset { namespace mpi
         parcel_cache_.set_parcel(p, write_handler_type(), 0);
     }
 
-    struct mpi_parcel_data
-    {
-        const char * data_ptr;
-        std::size_t size_;
-
-        std::size_t size() const
-        {
-            return size_;
-        }
-        const char * data() const
-        {
-            return data_ptr;
-        }
-    };
-
     void decode_message(
-        std::size_t num_parcel_chunks,
         std::vector<char> const & parcel_data,
         parcelport& pp
         //performance_counters::parcels::data_point receive_data,
@@ -258,42 +226,34 @@ namespace hpx { namespace parcelset { namespace mpi
                 util::high_resolution_timer timer;
                 boost::int64_t overall_add_parcel_time = 0;
 
-                mpi_parcel_data data = {&parcel_data[0], parcel_data.size()};
-                std::size_t bytes_decoded = 0;
-                for(std::size_t chunk = 0; chunk < num_parcel_chunks; ++chunk)
+                // De-serialize the parcel data
+                util::portable_binary_iarchive archive(parcel_data,
+                    parcel_data.size(), boost::archive::no_header);
+
+                std::size_t parcel_count = 0;
+                archive >> parcel_count;
+                BOOST_ASSERT(parcel_count > 0);
+                for(std::size_t i = 0; i != parcel_count; ++i)
                 {
-                    // De-serialize the parcel data
-                    util::portable_binary_iarchive archive(data,
-                        parcel_data.size(), boost::archive::no_header);
+                    // de-serialize parcel and add it to incoming parcel queue
+                    parcel p;
+                    archive >> p;
+                    // make sure this parcel ended up on the right locality
+                    BOOST_ASSERT(p.get_destination_locality() == pp.here());
 
-                    std::size_t parcel_count = 0;
-                    archive >> parcel_count;
-                    for(std::size_t i = 0; i != parcel_count; ++i)
-                    {
-                        // de-serialize parcel and add it to incoming parcel queue
-                        parcel p;
-                        archive >> p;
-                        // make sure this parcel ended up on the right locality
-                        BOOST_ASSERT(p.get_destination_locality() == pp.here());
+                    // be sure not to measure add_parcel as serialization time
+                    boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
 
-                        // be sure not to measure add_parcel as serialization time
-                        boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
-
-                        pp.add_received_parcel(p);
-                        overall_add_parcel_time += timer.elapsed_nanoseconds() -
-                            add_parcel_time;
-                    }
-
-                    // complete received data with parcel count
-                    /*
-                    receive_data.num_parcels_ = parcel_count;
-                    receive_data.raw_bytes_ = archive.bytes_read();
-                    */
-                    std::size_t bytes_read = archive.bytes_read();
-                    data.data_ptr += bytes_read;
-                    data.size_ -= bytes_read;
-                    bytes_decoded += bytes_read;
+                    pp.add_received_parcel(p);
+                    overall_add_parcel_time += timer.elapsed_nanoseconds() -
+                        add_parcel_time;
                 }
+
+                // complete received data with parcel count
+                /*
+                receive_data.num_parcels_ = parcel_count;
+                receive_data.raw_bytes_ = archive.bytes_read();
+                */
 
                 // store the time required for serialization
                 /*

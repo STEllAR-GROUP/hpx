@@ -19,6 +19,7 @@
 namespace hpx { namespace parcelset { namespace mpi {
 
     struct sender
+      : boost::noncopyable
     {
         typedef HPX_STD_FUNCTION<
             void(boost::system::error_code const&, std::size_t)
@@ -41,21 +42,21 @@ namespace hpx { namespace parcelset { namespace mpi {
             MPI_Comm communicator)
           : communicator_(communicator)
           , header_(h)
-          , buffer_(buffer)
-          , handlers_(handlers)
+          , buffer_(boost::move(buffer))
+          , handlers_(boost::move(handlers))
           , state_(invalid)
         {
             header_.assert_valid();
             BOOST_ASSERT(header_.rank() != util::mpi_environment::rank());
 
-            MPI_Isend(
+            MPI_Irsend(
                 header_.data(), // Data pointer
-                3,              // Size
+                2,              // Size
                 header_.type(), // MPI Datatype
                 header_.rank(), // Destination
                 0,              // Tag
                 communicator_,  // Communicator
-                &request_       // Request
+                &header_request_       // Request
                 );
             state_ = sending_header;
         }
@@ -66,9 +67,8 @@ namespace hpx { namespace parcelset { namespace mpi {
             {
                 case sending_header:
                     {
-                        MPI_Status status;
                         int completed = 0;
-                        MPI_Test(&request_, &completed, &status);
+                        MPI_Test(&header_request_, &completed, MPI_STATUS_IGNORE);
                         if(completed)
                         {
                             state_ = sent_header;
@@ -79,23 +79,22 @@ namespace hpx { namespace parcelset { namespace mpi {
                 case sent_header:
                     {
                         BOOST_ASSERT(static_cast<std::size_t>(header_.size()) == buffer_.size());
-                        MPI_Isend(
+                        MPI_Irsend(
                             buffer_.data(), // Data pointer
                             static_cast<int>(buffer_.size()), // Size
                             MPI_CHAR,       // MPI Datatype
                             header_.rank(), // Destination
                             header_.tag(),  // Tag
                             communicator_,  // Communicator
-                            &request_       // Request
+                            &data_request_       // Request
                             );
                         state_ = sending_data;
                         return done();
                     }
                 case sending_data:
                     {
-                        MPI_Status status;
                         int completed = 0;
-                        MPI_Test(&request_, &completed, &status);
+                        MPI_Test(&data_request_, &completed, MPI_STATUS_IGNORE);
                         if(completed)
                         {
                             state_ = sent_data;
@@ -139,7 +138,8 @@ namespace hpx { namespace parcelset { namespace mpi {
             std::vector<write_handler_type> handlers_;
             sender_state state_;
 
-            MPI_Request request_;
+            MPI_Request header_request_;
+            MPI_Request data_request_;
     };
 
 }}}

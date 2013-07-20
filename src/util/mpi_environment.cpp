@@ -76,11 +76,6 @@ namespace hpx { namespace util
                 get_runtime_mode_name(cfg.mode_);
 
             cfg.rtcfg_.reconfigure(cfg.ini_config_);
-            if(rank() == 0)
-            {
-                std::cout << rank() << " mpi_environment::init(): "
-                          << cfg.rtcfg_.get_num_localities() << "\n";
-            }
         }
     }
 

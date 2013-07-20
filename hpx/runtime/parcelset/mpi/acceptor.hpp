@@ -20,7 +20,7 @@ namespace hpx { namespace parcelset { namespace mpi {
       : boost::noncopyable
     {
         acceptor(MPI_Comm communicator)
-            : communicator_(communicator)
+          : communicator_(communicator)
         {
             irecv_header();
         }
@@ -49,14 +49,18 @@ namespace hpx { namespace parcelset { namespace mpi {
 
             void irecv_header()
             {
+                /*
+                BOOST_ASSERT(source_ != -1);
+                BOOST_ASSERT(source_ != util::mpi_environment::rank());
+                */
                 MPI_Irecv(
                     header_.data(), // data pointer
-                    3,              // number of elements
+                    2,              // number of elements
                     header_.type(), // MPI Datatype
-                    MPI_ANY_SOURCE, // Source
+                    MPI_ANY_SOURCE,        // Source
                     0,              // Tag
                     communicator_,  // Communicator
-                    &request_);      // Request
+                    &request_);     // Request
             }
     };
 }}}

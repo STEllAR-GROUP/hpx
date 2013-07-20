@@ -12,27 +12,26 @@ namespace hpx { namespace parcelset { namespace mpi {
     {
         typedef int value_type;
 
-        header(int rank, value_type tag_, value_type num_chunks_, value_type size_)
+        header(int rank, value_type tag_, value_type size_)
           : rank_(rank)
         {
-          data_[0] = tag_;
-          data_[1] = num_chunks_;
-          data_[2] = size_;
+            BOOST_ASSERT(rank_ != util::mpi_environment::rank());
+            data_[0] = tag_;
+            data_[1] = size_;
         }
 
         header()
           : rank_(-1)
         {
-          data_[0] = -1;
-          data_[1] = -1;
-          data_[2] = -1;
+            data_[0] = -1;
+            data_[1] = -1;
         }
 
         void assert_valid() const
         {
+            BOOST_ASSERT(rank_ != util::mpi_environment::rank());
             BOOST_ASSERT(rank() != -1);
             BOOST_ASSERT(tag() != -1);
-            BOOST_ASSERT(num_chunks() != -1);
             BOOST_ASSERT(size() != -1);
         }
 
@@ -51,14 +50,9 @@ namespace hpx { namespace parcelset { namespace mpi {
             return data_[0];
         }
 
-        value_type const & num_chunks() const
-        {
-            return data_[1];
-        }
-
         value_type const & size() const
         {
-            return data_[2];
+            return data_[1];
         }
 
         value_type & rank()
@@ -71,14 +65,9 @@ namespace hpx { namespace parcelset { namespace mpi {
             return data_[0];
         }
 
-        value_type & num_chunks()
-        {
-            return data_[1];
-        }
-
         value_type & size()
         {
-            return data_[2];
+            return data_[1];
         }
 
         MPI_Datatype type()
@@ -90,7 +79,7 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         private:
             int rank_;
-            boost::array<value_type, 3> data_;
+            boost::array<value_type, 2> data_;
     };
 }}}
 

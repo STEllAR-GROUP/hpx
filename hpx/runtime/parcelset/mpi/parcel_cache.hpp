@@ -11,6 +11,7 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/io_service_pool.hpp>
 */
+#include <hpx/runtime/parcelset/mpi/sender.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -30,26 +31,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         typedef HPX_STD_FUNCTION<
             void(boost::system::error_code const&, std::size_t)
         > write_handler_type;
-
-        void append(std::vector<char> const & b, std::vector<write_handler_type> const & h)
-        {
-            append_buffer(b);
-            append_handlers(h);
-            ++num_chunks;
-        }
-
-        void append_buffer(std::vector<char> const & b)
-        {
-            buffer.resize(buffer.size() + b.size());
-            buffer.insert(buffer.end(), b.begin(), b.end());
-        }
-        void append_handlers(std::vector<write_handler_type> const & h)
-        {
-            handlers.resize(handlers.size() + h.size());
-            handlers.insert(handlers.end(), h.begin(), h.end());
-        }
-
-        std::size_t num_chunks;
+        int rank;
         std::vector<char> buffer;
         std::vector<write_handler_type> handlers;
     };
@@ -60,7 +42,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             void(boost::system::error_code const&, std::size_t)
         > write_handler_type;
 
-        typedef std::map<int, parcel_buffer> parcels_map;
+        typedef std::vector<parcel_buffer> parcel_buffers;
         typedef hpx::lcos::local::spinlock mutex_type;
 
         parcel_cache(std::size_t num_threads)
@@ -134,7 +116,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     }
 
                     util::portable_binary_oarchive archive(
-                        buffer, filter.get(), archive_flags);
+                        buffer, filter.get(), boost::archive::no_header);
 
                     std::size_t count = pv.size();
                     archive << count;
@@ -197,47 +179,34 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             std::size_t i = (idx == std::size_t(-1)) ? hpx::get_worker_thread_num() : idx;
             {
                 mutex_type::scoped_lock lk(*parcel_maps_mtx[i]);
-                parcels_map::iterator it = parcel_buffers_[i].find(dest_rank);
-                if(it == parcel_buffers_[i].end())
-                {
-                    parcel_buffer b = {1, boost::move(buffer), boost::move(handlers)};
-                    parcel_buffers_[i].insert(
-                        std::make_pair(
-                            dest_rank,
-                            boost::move(b)
-                        )
-                    );
-                }
-                else
-                {
-                    it->second.append(buffer, handlers);
-                }
+                parcel_buffer b = {dest_rank, buffer, handlers};
+                parcel_buffers_[i].push_back(b);
             }
         }
 
-        parcels_map get_parcels()
+        std::list<boost::shared_ptr<sender> > get_senders(HPX_STD_FUNCTION<int()> tag_generator, MPI_Comm communicator)
         {
-            parcels_map res;
+            std::list<boost::shared_ptr<sender> > res;
             for(std::size_t i = 0; i < parcel_buffers_.size(); ++i)
             {
                 mutex_type::scoped_lock lk(*parcel_maps_mtx[i]);
-                BOOST_FOREACH(parcels_map::value_type & parcels, parcel_buffers_[i])
+                BOOST_FOREACH(parcel_buffer & b, parcel_buffers_[i])
                 {
-                    parcel_buffer & p = parcels.second;
-                    if(p.buffer.size() == 0) continue;
-
-                    int rank = parcels.first;
-                    parcels_map::iterator it = res.find(rank);
-                    if(it == res.end())
-                    {
-                        res.insert(std::make_pair(rank, boost::move(p)));
-                    }
-                    else
-                    {
-                        it->second.append_buffer(p.buffer);
-                        it->second.append_handlers(p.handlers);
-                        it->second.num_chunks += p.num_chunks;
-                    }
+                    int size = b.buffer.size();
+                    boost::shared_ptr<sender> s(new sender(
+                        header(
+                            b.rank
+                          , tag_generator()
+                          , size
+                        )
+                      , boost::move(b.buffer)
+                      , boost::move(b.handlers)
+                      , communicator
+                    ));
+                    if(s->done()) continue;
+                    res.push_back(
+                        s
+                    );
                 }
                 parcel_buffers_[i].clear();
             }
@@ -249,7 +218,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         performance_counters::parcels::data_point send_data_;
 
         std::vector<mutex_type*> parcel_maps_mtx;
-        std::vector<parcels_map> parcel_buffers_;
+        std::vector<parcel_buffers> parcel_buffers_;
 
         // archive flags
         int archive_flags_;

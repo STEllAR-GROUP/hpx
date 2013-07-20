@@ -21,11 +21,11 @@ namespace hpx { namespace parcelset { namespace mpi {
     struct parcelport;
 
     void decode_message(
-        std::size_t num_chunks,
         std::vector<char> const & parcel_data,
         parcelport& pp);
 
     struct receiver
+      : boost::noncopyable
     {
         receiver(header const & h, MPI_Comm communicator)
           : header_(h)
@@ -51,13 +51,15 @@ namespace hpx { namespace parcelset { namespace mpi {
             if(completed)
             {
                 BOOST_ASSERT(status.MPI_SOURCE == header_.rank());
+                BOOST_ASSERT(status.MPI_SOURCE != util::mpi_environment::rank());
                 BOOST_ASSERT(status.MPI_TAG == header_.tag());
 #ifdef HPX_DEBUG
                 int count;
                 MPI_Get_count(&status, MPI_CHAR, &count);
                 BOOST_ASSERT(count == header_.size());
+                BOOST_ASSERT(static_cast<std::size_t>(count) == buffer_.size());
 #endif
-                decode_message(header_.num_chunks(), buffer_, pp);
+                decode_message(buffer_, pp);
                 return true;
             }
             return false;
