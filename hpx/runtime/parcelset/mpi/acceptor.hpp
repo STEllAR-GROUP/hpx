@@ -11,6 +11,7 @@
 #include <hpx/runtime/parcelset/mpi/header.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <vector>
 #include <utility>

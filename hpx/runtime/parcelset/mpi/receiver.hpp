@@ -9,6 +9,7 @@
 
 #include <boost/assert.hpp>
 #include <boost/move/move.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <vector>
 #include <utility>
@@ -29,7 +30,7 @@ namespace hpx { namespace parcelset { namespace mpi {
     {
         receiver(header const & h, MPI_Comm communicator)
           : header_(h)
-          , buffer_(h.size(), 0xcd)
+          , buffer_(h.size())
         {
             header_.assert_valid();
             BOOST_ASSERT(header_.rank() != util::mpi_environment::rank());

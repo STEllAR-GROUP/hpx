@@ -12,6 +12,7 @@
 
 #include <boost/assert.hpp>
 #include <boost/move/move.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <vector>
 #include <utility>
