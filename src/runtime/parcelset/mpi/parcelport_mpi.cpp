@@ -308,7 +308,7 @@ namespace hpx { namespace parcelset { namespace mpi
                             f(ec, it->second.get<2>().size());
                         }
                     }
-                    free_tags.push_back(send_header_tags[index]);
+                    free_tags.push_back(send_data_tags[index]);
                     send_data_requests.erase(send_data_requests.begin() + index);
                     send_data_tags.erase(send_data_tags.begin() + index);
                 }
