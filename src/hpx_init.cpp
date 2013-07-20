@@ -33,6 +33,7 @@
 #include <vector>
 #include <new>
 
+#include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>

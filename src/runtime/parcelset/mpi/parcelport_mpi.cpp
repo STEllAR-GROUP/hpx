@@ -10,6 +10,9 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/parcelset/mpi/parcelport.hpp>
+#include <hpx/runtime/parcelset/mpi/acceptor.hpp>
+#include <hpx/runtime/parcelset/mpi/sender.hpp>
+#include <hpx/runtime/parcelset/mpi/receiver.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -90,7 +93,7 @@ namespace hpx { namespace parcelset { namespace mpi
         boost::asio::io_service& io_service = io_service_pool_.get_io_service();
 
         io_service.post(HPX_STD_BIND(&parcelport::handle_messages, this->shared_from_this()));
-        
+
         if (blocking)
         {
             std::cout << util::mpi_environment::rank() <<  " running MPI parcelport blocked\n";
@@ -118,216 +121,61 @@ namespace hpx { namespace parcelset { namespace mpi
     void parcelport::handle_messages()
     {
         MPI_Comm communicator = util::mpi_environment::communicator();
-        MPI_Request recv_header_request;
-        boost::int64_t recv_header[] = {0, 0, 0};
-        boost::int64_t send_header[] = {0, 0, 0};
-
-        std::vector<MPI_Request> recv_requests;
-
-        typedef 
-            std::map<
-                std::pair<
-                    int // Source
-                  , int // Tag
-                >
-              , std::pair<
-                    std::size_t // Number of parcels
-                  , std::vector<char> // Data
-                >
-            >
-            recv_buffers_type;
-        recv_buffers_type recv_buffers;
-
-
-        std::vector<MPI_Request> send_header_requests;
-        std::vector<int> send_header_tags;
-        std::vector<MPI_Request> send_data_requests;
-        std::vector<int> send_data_tags;
-        typedef 
-            std::map<
-                int // Tag
-              , HPX_STD_TUPLE<
-                    int // Destination
-                  , std::size_t // Number of parcels
-                  , std::vector<char> // Data
-                  , std::vector<write_handler_type> // Write Handlers
-                >
-            >
-            send_buffers_type;
-        send_buffers_type send_buffers;
-
-        MPI_Irecv(recv_header, 3, MPI_INT64_T, MPI_ANY_SOURCE, 0, communicator, &recv_header_request);
-        //std::cout << util::mpi_environment::rank() <<  " handle messages!\n";
-        bool run = !stopped;
-        while(run)
+        acceptor accept(communicator);
+        typedef std::list<receiver> receivers_type;
+        typedef std::list<sender> senders_type;
+        receivers_type receivers;
+        senders_type senders;
+        while(!stopped)
         {
-            MPI_Status status;
-            int completed;
-            MPI_Test(&recv_header_request, &completed, &status);
-            if(completed)
+            std::pair<bool, header> next(accept.next_header());
+            if(next.first)
             {
-                /*
-                std::cout << util::mpi_environment::rank() <<  " received a message from " << recv_header_status.MPI_SOURCE << "!\n";
-                std::cout << "Tag: " << recv_header[0] << " Number of parcels: " << recv_header[1] << " Size of message : " << recv_header[2] << "\n";
-                */
-
-                std::pair<int, int> recv_key(status.MPI_SOURCE, static_cast<int>(recv_header[0]));
-                recv_buffers_type::iterator it = recv_buffers.find(recv_key);
-                if(it == recv_buffers.end())
+                receivers.push_back(receiver(next.second, communicator));
+            }
+            detail::parcel_cache::parcels_map parcels(boost::move(parcel_cache_.get_parcels()));
+            BOOST_FOREACH(detail::parcel_cache::parcels_map::value_type & p, parcels)
+            {
+                senders.push_back(
+                    sender(
+                        header(
+                            p.first, // destination rank
+                            get_next_tag(),
+                            p.second.num_chunks,
+                            p.second.buffer.size()
+                        )
+                      , boost::move(p.second.buffer)
+                      , boost::move(p.second.handlers)
+                      , communicator
+                    )
+                );
+            }
+            for(receivers_type::iterator it = receivers.begin(); it != receivers.end();)
+            {
+                if(it->done(*this))
                 {
-                    it =
-                        recv_buffers.insert(
-                            it
-                          , std::make_pair(
-                                recv_key
-                              , std::make_pair(
-                                    recv_header[1]
-                                  , std::vector<char>(recv_header[2])
-                                )
-                            )
-                        );
+                    it = receivers.erase(it);
                 }
                 else
                 {
-                    it->second.first = recv_header[1];
-                    it->second.second.resize(recv_header[2]);
+                    ++it;
                 }
-
-                recv_requests.push_back(MPI_Request());
-                MPI_Irecv(
-                    &it->second.second[0],
-                    static_cast<int>(recv_header[2]),
-                    MPI_CHAR,
-                    status.MPI_SOURCE,
-                    static_cast<int>(recv_header[0]),
-                    communicator,
-                    &recv_requests.back()
-                );
-                MPI_Irecv(recv_header, 3, MPI_INT64_T, MPI_ANY_SOURCE, 0, communicator, &recv_header_request);
             }
-            
-            if(!recv_requests.empty())
+            for(senders_type::iterator it = senders.begin(); it != senders.end();)
             {
-                int index;
-                MPI_Testany(static_cast<int>(recv_requests.size()), &recv_requests[0], &index, &completed, &status);
-                if(completed)
+                if(it->done())
                 {
-                    //BOOST_ASSERT(status.MPI_SOURCE == requests.first);
-                    //std::cout << "received full message from " << status.MPI_SOURCE << "\n";
-                    std::pair<int, int> recv_key(status.MPI_SOURCE, status.MPI_TAG);
-                    recv_buffers_type::iterator it = recv_buffers.find(recv_key);
-                    BOOST_ASSERT(it != recv_buffers.end());
-                    decode_message(it->second.first, it->second.second, *this);
-                    it->second.first = 0;
-                    it->second.second.clear();
-                    recv_requests.erase(recv_requests.begin() + index);
+                    it = senders.erase(it);
+                    free_tags.push_back(it->tag());
+                }
+                else
+                {
+                    ++it;
                 }
             }
 
-            detail::parcel_cache::parcels_map parcels_map = parcel_cache_.get_parcels();
-            if(!parcels_map.empty())
-            {
-                //std::cout << util::mpi_environment::rank() <<  " got " << parcels_map.size() << " parcel data to send!\n";
-                BOOST_FOREACH(detail::parcel_cache::parcels_map::value_type const & parcels, parcels_map)
-                {
-                    //std::cout << util::mpi_environment::rank() <<  " sending header to " << parcels.first << "!\n";
-                    int tag = get_next_tag();
-                    send_header[0] = tag;
-                    send_header[1] = parcels.second.get<0>();
-                    send_header[2] = parcels.second.get<1>().size();
-                    
-                    send_header_requests.push_back(MPI_Request());
-                    MPI_Isend(send_header, 3, MPI_INT64_T, parcels.first, 0, communicator, &send_header_requests.back());
-                    
-                    send_header_tags.push_back(tag);
-                    send_buffers_type::iterator it = send_buffers.find(tag);
-                    if(it == send_buffers.end())
-                    {
-                        it
-                          = send_buffers.insert(
-                                it
-                              , std::make_pair(
-                                    tag
-                                  , hpx::util::make_tuple(
-                                        parcels.first
-                                      , parcels.second.get<0>()
-                                      , boost::move(parcels.second.get<1>())
-                                      , boost::move(parcels.second.get<2>())
-                                    )
-                                )
-                            );
-                    }
-                    else
-                    {
-                        it->second.get<0>() = parcels.first;
-                        it->second.get<1>() = parcels.second.get<0>();
-                        it->second.get<2>() = boost::move(parcels.second.get<1>());
-                        it->second.get<3>() = boost::move(parcels.second.get<2>());
-                    }
-                }
-            }
-            
-            if(!send_header_requests.empty())
-            {
-                int index;
-                MPI_Testany(static_cast<int>(send_header_requests.size()), &send_header_requests[0], &index, &completed, &status);
-                if(completed)
-                {
-                    //std::cout << util::mpi_environment::rank() <<  " sent header with tag " << send_header_tags[index] << "!\n";
-                    send_data_requests.push_back(MPI_Request());
-                    send_buffers_type::iterator it = send_buffers.find(send_header_tags[index]);
-                    BOOST_ASSERT(it != send_buffers.end());
-                    MPI_Isend(
-                        &it->second.get<2>()[0]
-                      , static_cast<int>(it->second.get<2>().size())
-                      , MPI_CHAR
-                      , it->second.get<0>()
-                      , send_header_tags[index]
-                      , communicator
-                      , &send_data_requests.back()
-                    );
-                    send_data_tags.push_back(send_header_tags[index]);
-                    send_header_requests.erase(send_header_requests.begin() + index);
-                    send_header_tags.erase(send_header_tags.begin() + index);
-                }
-            }
-            if(!send_data_requests.empty())
-            {
-                int index;
-                MPI_Testany(static_cast<int>(send_data_requests.size()), &send_data_requests[0], &index, &completed, &status);
-                if(completed)
-                {
-                    //std::cout << util::mpi_environment::rank() <<  " sent data with tag " << send_header_tags[index] << "!\n";
-                    send_buffers_type::iterator it = send_buffers.find(send_data_tags[index]);
-                    BOOST_ASSERT(it != send_buffers.end());
-                    error_code ec;
-                    BOOST_FOREACH(write_handler_type & f, it->second.get<3>())
-                    {
-                        if(f)
-                        {
-                            f(ec, it->second.get<2>().size());
-                        }
-                    }
-                    free_tags.push_back(send_data_tags[index]);
-                    send_data_requests.erase(send_data_requests.begin() + index);
-                    send_data_tags.erase(send_data_tags.begin() + index);
-                }
-            }
-
-            if(stopped)
-            {
-                run = !(recv_requests.empty() && send_data_requests.empty() && send_header_requests.empty());
-            }
-            else
-            {
-                run = true;
-            }
         }
         // cancel all remaining requests
-        MPI_Cancel(&recv_header_request);
-        BOOST_ASSERT(recv_requests.empty());
-        BOOST_ASSERT(send_header_requests.empty());
-        BOOST_ASSERT(send_data_requests.empty());
         std::cout << util::mpi_environment::rank() << " handle_messages stopped\n";
     }
 

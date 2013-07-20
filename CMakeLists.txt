@@ -341,7 +341,7 @@ endif()
 hpx_option(HPX_USE_PARCELPORT_MPI BOOL "Enable parcelport based on MPI (default: OFF)." OFF ADVANCED)
 if(HPX_USE_PARCELPORT_MPI)
   find_package(HPX_MPI)
-  if(MPI_FOUND)
+  if(MPI_FOUND OR MPI_CXX_FOUND)
     foreach(language CXX C Fortran)
       set(CMAKE_${language}_FLAGS_DEBUG
           "${CMAKE_${language}_FLAGS_DEBUG} ${MPI_${language}_COMPILE_FLAGS}")
@@ -352,14 +352,18 @@ if(HPX_USE_PARCELPORT_MPI)
       set(CMAKE_${language}_FLAGS_RELEASE
           "${CMAKE_${language}_FLAGS_RELEASE} ${MPI_${language}_COMPILE_FLAGS}")
     endforeach()
-    hpx_include_sys_directories(${MPI_C_INCLUDE_PATH})
     hpx_add_definitions(-DHPX_HAVE_PARCELPORT_MPI)
     foreach(language CXX C)
       if(MPI_${language}_COMPILE_FLAGS)
         hpx_add_definitions(${MPI_${language}_COMPILE_FLAGS})
       endif()
+      if(MPI_${language}_INCLUDE_PATH)
+        hpx_include_sys_directories(${MPI_${language}_INCLUDE_PATH})
+      endif()
+      if(MPI_${language}_LIBRARIES)
+        set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_${language}_LIBRARIES})
+      endif()
     endforeach()
-    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_C_LIBRARIES})
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_EXTRA_LIBRARY})
   endif()
 endif()
@@ -447,8 +451,8 @@ if(NOT MSVC)
     hpx_add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
   endif()
 endif()
-  
-if(NOT MSVC) 
+
+if(NOT MSVC)
   hpx_option(HPX_USE_MMAP BOOL "Use mmap for stack allocation (default: ON)" ON ADVANCED)
   if(HPX_USE_MMAP)
     hpx_add_definitions(-DHPX_USE_MMAP)
@@ -771,7 +775,7 @@ hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=pe
 if(HPX_PERIODIC_PRIORITY_SCHEDULER)
   hpx_add_definitions(-DHPX_PERIODIC_PRIORITY_SCHEDULER)
 endif()
-  
+
 hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
            "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
 
@@ -1277,11 +1281,11 @@ else()
   hpx_use_flag_if_available(-pthread LANGUAGES CXX C)
 
 endif()
-  
+
 if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
-  
+
 if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()

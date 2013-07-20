@@ -25,21 +25,42 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace mpi { namespace detail
 {
+    struct parcel_buffer
+    {
+        typedef HPX_STD_FUNCTION<
+            void(boost::system::error_code const&, std::size_t)
+        > write_handler_type;
+
+        void append(std::vector<char> const & b, std::vector<write_handler_type> const & h)
+        {
+            append_buffer(b);
+            append_handlers(h);
+            ++num_chunks;
+        }
+
+        void append_buffer(std::vector<char> const & b)
+        {
+            buffer.resize(buffer.size() + b.size());
+            buffer.insert(buffer.end(), b.begin(), b.end());
+        }
+        void append_handlers(std::vector<write_handler_type> const & h)
+        {
+            handlers.resize(handlers.size() + h.size());
+            handlers.insert(handlers.end(), h.begin(), h.end());
+        }
+
+        std::size_t num_chunks;
+        std::vector<char> buffer;
+        std::vector<write_handler_type> handlers;
+    };
+
     struct parcel_cache
     {
         typedef HPX_STD_FUNCTION<
             void(boost::system::error_code const&, std::size_t)
         > write_handler_type;
 
-        typedef
-            HPX_STD_TUPLE<
-                std::size_t
-              , std::vector<char>
-              , std::vector<write_handler_type>
-            >
-            parcels_type;
-
-        typedef std::map<int, parcels_type> parcels_map;
+        typedef std::map<int, parcel_buffer> parcels_map;
         typedef hpx::lcos::local::spinlock mutex_type;
 
         parcel_cache(std::size_t num_threads)
@@ -78,12 +99,12 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         {
             set_parcel(std::vector<parcel>(1, p), std::vector<write_handler_type>(1, f), idx);
         }
-        
+
         void set_parcel(std::vector<parcel> const& pv, std::vector<write_handler_type> const & handlers, std::size_t idx = -1)
         {
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
-            
+
             // we choose the highest priority of all parcels for this message
             threads::thread_priority priority = threads::thread_priority_default;
 
@@ -172,37 +193,24 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 return;
             }
             */
+            int dest_rank = pv[0].get_destination_locality().get_rank();
             std::size_t i = (idx == std::size_t(-1)) ? hpx::get_worker_thread_num() : idx;
             {
                 mutex_type::scoped_lock lk(*parcel_maps_mtx[i]);
-                int dest_rank = pv[0].get_destination_locality().get_rank();
                 parcels_map::iterator it = parcel_buffers_[i].find(dest_rank);
                 if(it == parcel_buffers_[i].end())
                 {
+                    parcel_buffer b = {1, boost::move(buffer), boost::move(handlers)};
                     parcel_buffers_[i].insert(
                         std::make_pair(
                             dest_rank,
-                            parcels_type(
-                                1
-                              , buffer
-                              , handlers
-                            )
+                            boost::move(b)
                         )
                     );
                 }
                 else
                 {
-                    std::size_t tt = it->second.get<0>();
-                    ++it->second.get<0>();
-                    BOOST_ASSERT(it->second.get<0>() == tt + 1);
-
-                    std::vector<char>& buf = it->second.get<1>();
-                    buf.reserve(buf.size() + buffer.size());
-                    buf.insert(buf.end(), buffer.begin(), buffer.end());
-
-                    std::vector<write_handler_type>& handler = it->second.get<2>();
-                    handler.reserve(handler.size() + handlers.size());
-                    handler.insert(handler.end(), handlers.begin(), handlers.end());
+                    it->second.append(buffer, handlers);
                 }
             }
         }
@@ -213,31 +221,22 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             for(std::size_t i = 0; i < parcel_buffers_.size(); ++i)
             {
                 mutex_type::scoped_lock lk(*parcel_maps_mtx[i]);
-                BOOST_FOREACH(parcels_map::value_type const & parcels, parcel_buffers_[i])
+                BOOST_FOREACH(parcels_map::value_type & parcels, parcel_buffers_[i])
                 {
-                    parcels_type const & p = parcels.second;
-                    if(p.get<1>().size() == 0) continue;
+                    parcel_buffer & p = parcels.second;
+                    if(p.buffer.size() == 0) continue;
 
                     int rank = parcels.first;
                     parcels_map::iterator it = res.find(rank);
                     if(it == res.end())
                     {
-                        res.insert(std::make_pair(rank, parcels.second));
-                        continue;
+                        res.insert(std::make_pair(rank, boost::move(p)));
                     }
                     else
                     {
-                        it->second.get<0>() += parcels.second.get<0>();
-
-                        std::vector<char>& buf = it->second.get<1>();
-                        std::vector<char> const & new_buf = parcels.second.get<1>();
-                        buf.reserve(buf.size() + new_buf.size());
-                        buf.insert(buf.end(), new_buf.begin(), new_buf.end());
-
-                        std::vector<write_handler_type>& handler = it->second.get<2>();
-                        std::vector<write_handler_type> const & new_handler = parcels.second.get<2>();
-                        handler.reserve(handler.size() + new_handler.size());
-                        handler.insert(handler.end(), new_handler.begin(), new_handler.end());
+                        it->second.append_buffer(p.buffer);
+                        it->second.append_handlers(p.handlers);
+                        it->second.num_chunks += p.num_chunks;
                     }
                 }
                 parcel_buffers_[i].clear();
