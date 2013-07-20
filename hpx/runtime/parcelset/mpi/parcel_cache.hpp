@@ -192,7 +192,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 mutex_type::scoped_lock lk(*parcel_maps_mtx[i]);
                 BOOST_FOREACH(parcel_buffer & b, parcel_buffers_[i])
                 {
-                    int size = b.buffer.size();
+                    int size = static_cast<int>(b.buffer.size());
                     boost::shared_ptr<sender> s(new sender(
                         header(
                             b.rank
