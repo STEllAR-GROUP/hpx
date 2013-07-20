@@ -18,7 +18,7 @@
 
 namespace hpx { namespace parcelset { namespace mpi {
 
-    struct parcelport;
+    class parcelport;
 
     void decode_message(
         std::vector<char> const & parcel_data,
@@ -29,7 +29,7 @@ namespace hpx { namespace parcelset { namespace mpi {
     {
         receiver(header const & h, MPI_Comm communicator)
           : header_(h)
-          , buffer_(h.size())
+          , buffer_(h.size(), 0xcd)
         {
             header_.assert_valid();
             BOOST_ASSERT(header_.rank() != util::mpi_environment::rank());
@@ -40,21 +40,21 @@ namespace hpx { namespace parcelset { namespace mpi {
                 header_.rank(), // Source
                 header_.tag(),  // Tag
                 communicator, // Communicator
-                &request);    // Request
+                &request_);    // Request
         }
 
         bool done(parcelport & pp)
         {
-            MPI_Status status;
+            MPI_Status status = { 0 };
             int completed = 0;
-            MPI_Test(&request, &completed, &status);
+            MPI_Test(&request_, &completed, &status);
             if(completed)
             {
                 BOOST_ASSERT(status.MPI_SOURCE == header_.rank());
                 BOOST_ASSERT(status.MPI_SOURCE != util::mpi_environment::rank());
                 BOOST_ASSERT(status.MPI_TAG == header_.tag());
 #ifdef HPX_DEBUG
-                int count;
+                int count = 0;
                 MPI_Get_count(&status, MPI_CHAR, &count);
                 BOOST_ASSERT(count == header_.size());
                 BOOST_ASSERT(static_cast<std::size_t>(count) == buffer_.size());
@@ -69,7 +69,7 @@ namespace hpx { namespace parcelset { namespace mpi {
             header header_;
             std::vector<char> buffer_;
 
-            MPI_Request request;
+            MPI_Request request_;
     };
 }}}
 

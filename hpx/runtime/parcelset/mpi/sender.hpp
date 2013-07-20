@@ -117,12 +117,13 @@ namespace hpx { namespace parcelset { namespace mpi {
                     }
                 case sender_done:
                     return true;
+                default:
                 case invalid:
                     {
                         BOOST_ASSERT(false);
                     }
+                    return false;
             }
-
             return false;
         }
 

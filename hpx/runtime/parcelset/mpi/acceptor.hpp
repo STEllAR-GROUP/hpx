@@ -27,7 +27,7 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         std::pair<bool, header> next_header()
         {
-            MPI_Status status;
+            MPI_Status status = { 0 };
             int completed = 0;
             MPI_Test(&request_, &completed, &status);
             if(completed)
@@ -42,10 +42,10 @@ namespace hpx { namespace parcelset { namespace mpi {
             return std::make_pair(false, header());
         }
 
-        private:
-            MPI_Comm communicator_;
-            MPI_Request request_;
-            header header_;
+    private:
+        MPI_Comm communicator_;
+        MPI_Request request_;
+        header header_;
 
             void irecv_header()
             {
