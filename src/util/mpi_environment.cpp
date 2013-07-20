@@ -71,6 +71,7 @@ namespace hpx { namespace util
             {
                 cfg.mode_ = hpx::runtime_mode_worker;
                 cfg.ini_config_ += "hpx.agas.service_mode!=hosted";
+                cfg.hpx_main_f_ = 0;
             }
             cfg.ini_config_ += std::string("hpx.runtime_mode!=") +
                 get_runtime_mode_name(cfg.mode_);
