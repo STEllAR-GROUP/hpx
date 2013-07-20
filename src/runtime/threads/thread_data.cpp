@@ -11,6 +11,8 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
+
 #include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -213,7 +215,16 @@ namespace hpx { namespace threads
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-// explicit instantiation of the function thread_self::set_self
+// explicit instantiation of the thread_self functions
 template HPX_EXPORT void
 hpx::threads::thread_self::impl_type::set_self(hpx::threads::thread_self*);
+
+template HPX_EXPORT hpx::threads::thread_self*
+hpx::threads::thread_self::impl_type::get_self();
+
+template HPX_EXPORT void
+hpx::threads::thread_self::impl_type::init_self();
+
+template HPX_EXPORT void
+hpx::threads::thread_self::impl_type::reset_self();
 

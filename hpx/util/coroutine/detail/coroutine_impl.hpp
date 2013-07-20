@@ -575,8 +575,6 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   }
 }}}}
 
-#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
-
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
