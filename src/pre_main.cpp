@@ -153,14 +153,12 @@ bool pre_main(runtime_mode mode)
 
             std::size_t const num_localities = cfg.get_num_localities();
 
-            std::cout << util::mpi_environment::rank() << " pre_main: " << num_localities << "\n";
-
             second_stage = create_barrier(num_localities, second_barrier);
             third_stage = create_barrier(num_localities, third_barrier);
             fourth_stage = create_barrier(num_localities, fourth_barrier);
 
             if (num_localities > 1) {
-                // retrieve list of resolved localities 
+                // retrieve list of resolved localities
                 rt.get_parcel_handler().set_resolved_localities(
                     agas_client.get_resolved_localities());
             }
@@ -175,7 +173,7 @@ bool pre_main(runtime_mode mode)
             third_stage = find_barrier(third_barrier);
             fourth_stage = find_barrier(fourth_barrier);
 
-            // retrieve list of resolved localities 
+            // retrieve list of resolved localities
             rt.get_parcel_handler().set_resolved_localities(
                 agas_client.get_resolved_localities());
 
@@ -246,7 +244,7 @@ bool pre_main(runtime_mode mode)
         return false;
     }
 
-    // now adjust the number of local AGAS cache entries for the number of 
+    // now adjust the number of local AGAS cache entries for the number of
     // connected localities
     agas_client.adjust_local_cache_size();
 

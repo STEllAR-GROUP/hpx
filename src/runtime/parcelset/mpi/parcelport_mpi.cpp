@@ -74,7 +74,6 @@ namespace hpx { namespace parcelset { namespace mpi
 
     parcelport::~parcelport()
     {
-        std::cout << util::mpi_environment::rank() << " parcelport::~parcelport()\n";
     }
 
     util::io_service_pool* parcelport::get_thread_pool(char const* name)
@@ -95,7 +94,6 @@ namespace hpx { namespace parcelset { namespace mpi
 
         if (blocking)
         {
-            std::cout << util::mpi_environment::rank() <<  " running MPI parcelport blocked\n";
             io_service_pool_.join();
         }
 
@@ -105,7 +103,6 @@ namespace hpx { namespace parcelset { namespace mpi
     void parcelport::stop(bool blocking)
     {
         // make sure no more work is pending, wait for service pool to get empty
-        std::cout << util::mpi_environment::rank() << " parcelport::stop() start\n";
         io_service_pool_.stop();
         stopped = true;
         if (blocking) {
@@ -113,8 +110,6 @@ namespace hpx { namespace parcelset { namespace mpi
 
             io_service_pool_.clear();
         }
-        //MPI_Barrier(util::mpi_environment::communicator());
-        std::cout << util::mpi_environment::rank() << " parcelport::stop() finished\n";
     }
 
     void parcelport::handle_messages()
@@ -160,7 +155,6 @@ namespace hpx { namespace parcelset { namespace mpi
             senders.insert(senders.end(), tmp.begin(), tmp.end());
         }
         // cancel all remaining requests
-        std::cout << util::mpi_environment::rank() << " handle_messages stopped\n";
     }
 
     ///////////////////////////////////////////////////////////////////////////

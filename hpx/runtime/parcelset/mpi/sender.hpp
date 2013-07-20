@@ -50,7 +50,7 @@ namespace hpx { namespace parcelset { namespace mpi {
             header_.assert_valid();
             BOOST_ASSERT(header_.rank() != util::mpi_environment::rank());
 
-            MPI_Irsend(
+            MPI_Isend(
                 header_.data(), // Data pointer
                 2,              // Size
                 header_.type(), // MPI Datatype
@@ -80,7 +80,7 @@ namespace hpx { namespace parcelset { namespace mpi {
                 case sent_header:
                     {
                         BOOST_ASSERT(static_cast<std::size_t>(header_.size()) == buffer_.size());
-                        MPI_Irsend(
+                        MPI_Isend(
                             buffer_.data(), // Data pointer
                             static_cast<int>(buffer_.size()), // Size
                             MPI_CHAR,       // MPI Datatype

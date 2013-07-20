@@ -28,7 +28,7 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         std::pair<bool, header> next_header()
         {
-            MPI_Status status = { 0 };
+            MPI_Status status;// = { 0 };
             int completed = 0;
             MPI_Test(&request_, &completed, &status);
             if(completed)

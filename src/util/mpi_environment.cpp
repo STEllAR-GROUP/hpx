@@ -52,15 +52,17 @@ namespace hpx { namespace util
             int len = 0;
             MPI_Get_processor_name(name, &len);
 
+            /*
             std::cout << rank() << ": " << name << "\n";
             std::cout << communicator_ << "\n";
+            */
 
             int this_rank = rank();
             cfg.ini_config_ += "hpx.locality!=" + boost::lexical_cast<std::string>(this_rank);
             cfg.ini_config_ += "hpx.localities!=" + boost::lexical_cast<std::string>(size());
             cfg.num_localities_ = size();
 
-            std::cout << rank() << " mpi_environment::init(): " << size() << "\n";
+            //std::cout << rank() << " mpi_environment::init(): " << size() << "\n";
 
             if(this_rank == 0)
             {

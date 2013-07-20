@@ -46,7 +46,7 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         bool done(parcelport & pp)
         {
-            MPI_Status status = { 0 };
+            MPI_Status status;// = { 0 };
             int completed = 0;
             MPI_Test(&request_, &completed, &status);
             if(completed)
