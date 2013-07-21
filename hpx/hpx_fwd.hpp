@@ -137,7 +137,7 @@ namespace hpx
             std::size_t interval, naming::locality const& l, connection_type t,
             error_code& ec = throws);
 
-        HPX_API_EXPORT void flush_buffers();
+        HPX_API_EXPORT void do_background_work();
     }
 
     /// \namespace threads

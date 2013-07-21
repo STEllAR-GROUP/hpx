@@ -1014,9 +1014,9 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    void flush_buffers()
+    void do_background_work()
     {
-        get_runtime().get_parcel_handler().flush_buffers();
+        get_runtime().get_parcel_handler().do_background_work();
     }
 }}
 

@@ -215,7 +215,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 }
                 parcel_buffers_[i].clear();
             }
-            return res;
+            return boost::move(res);
         }
 
         std::vector<mutex_type*> parcel_maps_mtx_;

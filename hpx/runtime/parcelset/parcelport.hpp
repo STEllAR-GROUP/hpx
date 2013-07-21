@@ -146,11 +146,22 @@ namespace hpx { namespace parcelset
             connection_cache_reclaims = 4
         };
 
+        // invoke pending background work
+        virtual void do_background_work()
+        {
+            // by default no work has to be done
+        }
+
+        // by default this parcelport does not expose any conenction cache
+        // statistics
+        virtual bool supports_connection_cache_statistics() const
+        {
+            return false;
+        }
+
         virtual boost::int64_t
         get_connection_cache_statistics(connection_cache_statistics_type, bool reset)
         {
-            // by default this parcelport does not expose any conenction cache
-            // statistics
             return 0;
         }
 

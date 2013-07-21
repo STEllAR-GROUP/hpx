@@ -20,9 +20,14 @@ namespace hpx { namespace parcelset { namespace mpi {
     struct acceptor
       : boost::noncopyable
     {
-        acceptor(MPI_Comm communicator)
-          : communicator_(communicator)
+        acceptor()
+          : communicator_(0)
         {
+        }
+
+        void run(MPI_Comm communicator)
+        {
+            communicator_ = communicator;
             irecv_header();
         }
 

@@ -10,6 +10,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/mpi/parcel_cache.hpp>
+#include <hpx/runtime/parcelset/mpi/acceptor.hpp>
+#include <hpx/runtime/parcelset/mpi/receiver.hpp>
+#include <hpx/runtime/parcelset/mpi/sender.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
@@ -18,6 +21,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <set>
+#include <list>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -108,6 +112,10 @@ namespace hpx { namespace parcelset { namespace mpi
         /// Return the thread pool if the name matches
         util::io_service_pool* get_thread_pool(char const* name);
 
+        /// Make sure all pending requests are handled
+        void do_background_work();
+
+    private:
         /// support enable_shared_from_this
         boost::shared_ptr<parcelport> shared_from_this()
         {
@@ -126,27 +134,37 @@ namespace hpx { namespace parcelset { namespace mpi
         util::io_service_pool io_service_pool_;
 
         detail::parcel_cache parcel_cache_;
-        boost::atomic<bool> stopped;
+        boost::atomic<bool> stopped_;
+        boost::atomic<bool> handling_messages_;
 
-        int next_tag;
-        std::deque<int> free_tags;
+        int next_tag_;
+        std::deque<int> free_tags_;
 
         int get_next_tag()
         {
             int tag = 0;
-            if(free_tags.empty())
+            if(free_tags_.empty())
             {
-                tag = next_tag++;
+                tag = next_tag_++;
             }
             else
             {
-                tag = free_tags.front();
-                free_tags.pop_front();
+                tag = free_tags_.front();
+                free_tags_.pop_front();
             }
             BOOST_ASSERT(tag != 0);
 
             return tag;
         }
+
+        // handle messages
+        acceptor acceptor_;
+
+        typedef std::list<boost::shared_ptr<receiver> > receivers_type;
+        receivers_type receivers_;
+
+        typedef std::list<boost::shared_ptr<sender> > senders_type;
+        senders_type senders_;
 
         void handle_messages();
     };

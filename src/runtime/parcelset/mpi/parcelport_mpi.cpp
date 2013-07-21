@@ -10,9 +10,6 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/parcelset/mpi/parcelport.hpp>
-#include <hpx/runtime/parcelset/mpi/acceptor.hpp>
-#include <hpx/runtime/parcelset/mpi/sender.hpp>
-#include <hpx/runtime/parcelset/mpi/receiver.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -47,6 +44,11 @@ namespace hpx
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    bool is_starting();
+}
+
 namespace hpx { namespace parcelset { namespace mpi
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -56,8 +58,9 @@ namespace hpx { namespace parcelset { namespace mpi
       : parcelset::parcelport(ini),
         io_service_pool_(1, on_start_thread, on_stop_thread, "parcel_pool_mpi", "-mpi"),
         parcel_cache_(ini.get_os_thread_count(), this->get_max_message_size()),
-        stopped(false),
-        next_tag(2)
+        stopped_(false),
+        handling_messages_(false),
+        next_tag_(2)
     {
         if (here_.get_type() != connection_mpi) {
             HPX_THROW_EXCEPTION(network_error, "mpi::parcelport::parcelport",
@@ -82,9 +85,8 @@ namespace hpx { namespace parcelset { namespace mpi
         //std::cout << util::mpi_environment::rank() <<  " running MPI parcelport\n";
         io_service_pool_.run(false);    // start pool
 
-        boost::asio::io_service& io_service = io_service_pool_.get_io_service();
-
-        io_service.post(HPX_STD_BIND(&parcelport::handle_messages, this->shared_from_this()));
+        acceptor_.run(util::mpi_environment::communicator());
+        do_background_work();      // schedule message handler
 
         if (blocking)
         {
@@ -98,46 +100,88 @@ namespace hpx { namespace parcelset { namespace mpi
     {
         // make sure no more work is pending, wait for service pool to get empty
         io_service_pool_.stop();
-        stopped = true;
+        stopped_ = true;
         if (blocking) {
             io_service_pool_.join();
             io_service_pool_.clear();
         }
     }
 
+    // Make sure all pending requests are handled
+    void parcelport::do_background_work()
+    {
+        if (stopped_)
+            return;
+
+        bool false_ = false;
+        if (!handling_messages_.compare_exchange_strong(false_, true))
+            return;
+
+        boost::asio::io_service& io_service = io_service_pool_.get_io_service();
+        io_service.post(HPX_STD_BIND(&parcelport::handle_messages, this->shared_from_this()));
+    }
+
+    namespace detail
+    {
+        struct handling_messages
+        {
+            handling_messages(boost::atomic<bool>& handling_messages_flag)
+              : handling_messages_(handling_messages_flag)
+            {}
+
+            ~handling_messages()
+            {
+                handling_messages_.store(false);
+            }
+
+            boost::atomic<bool>& handling_messages_;
+        };
+    }
+
     void parcelport::handle_messages()
     {
-        MPI_Comm communicator = util::mpi_environment::communicator();
-        acceptor ack(communicator);
-        typedef std::list<boost::shared_ptr<receiver> > receivers_type;
-        typedef std::list<boost::shared_ptr<sender> > senders_type;
-        receivers_type receivers;
-        senders_type senders;
+        detail::handling_messages hm(handling_messages_);       // reset on exit
 
-        while(!stopped)
+        MPI_Comm communicator = util::mpi_environment::communicator();
+
+        bool bootstrapping = hpx::is_starting();
+        bool has_work = true;
+
+        while(bootstrapping || (!stopped_ && has_work))
         {
-            std::pair<bool, header> next(ack.next_header());
+            // add new receive requests
+            std::pair<bool, header> next(acceptor_.next_header());
             if(next.first)
             {
-                receivers.push_back(boost::make_shared<receiver>(next.second, communicator));
+                receivers_.push_back(boost::make_shared<receiver>(next.second, communicator));
             }
-            for(receivers_type::iterator it = receivers.begin(); it != receivers.end();)
+
+            // handle all receive requests
+            for(receivers_type::iterator it = receivers_.begin(); it != receivers_.end(); /**/)
             {
                 if((*it)->done(*this))
                 {
-                    it = receivers.erase(it);
+                    it = receivers_.erase(it);
                 }
                 else
                 {
                     ++it;
                 }
             }
-            for(senders_type::iterator it = senders.begin(); it != senders.end();)
+            has_work = !receivers_.empty();
+
+            // add new send requests
+            senders_.splice(senders_.end(), parcel_cache_.get_senders(
+                HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this()),
+                communicator, *this));
+
+            // handle all send requests
+            for(senders_type::iterator it = senders_.begin(); it != senders_.end(); /**/)
             {
                 if((*it)->done(*this))
                 {
-                    free_tags.push_back((*it)->tag());
-                    it = senders.erase(it);
+                    free_tags_.push_back((*it)->tag());
+                    it = senders_.erase(it);
                 }
                 else
                 {
@@ -145,12 +189,13 @@ namespace hpx { namespace parcelset { namespace mpi
                 }
             }
 
-            senders_type const & tmp = parcel_cache_.get_senders(
-                HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this()),
-                communicator, *this);
-            senders.insert(senders.end(), tmp.begin(), tmp.end());
+            if (!has_work)
+                has_work = !senders_.empty();
+
+            if (bootstrapping)
+                bootstrapping = hpx::is_starting();
         }
-        // cancel all remaining requests
+        // cancel all remaining requests if has been stopped
     }
 
     ///////////////////////////////////////////////////////////////////////////
