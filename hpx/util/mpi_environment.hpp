@@ -16,7 +16,7 @@ namespace hpx { namespace util {
 
     struct mpi_environment
     {
-        static void init(int *argc, char ***argv, command_line_handling& cfg);
+        static int init(int *argc, char ***argv, command_line_handling& cfg);
         static void finalize();
         static MPI_Comm &communicator();
         static bool enabled();

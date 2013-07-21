@@ -5,22 +5,18 @@
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/mpi_environment.hpp>
 
-#include <boost/format.hpp>
-#include <boost/assign.hpp>
-
-#include <iostream>
-
-#include <iostream>
+#include <boost/assign/std/vector.hpp>
 
 namespace hpx { namespace util
 {
     MPI_Comm mpi_environment::communicator_ = 0;
 
-    void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
+    int mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
         using namespace boost::assign;
         std::string bootstrap_parcelport =
@@ -36,58 +32,47 @@ namespace hpx { namespace util
         {
             std::string enable_mpi_str =
                 cfg.rtcfg_.get_entry("hpx.parcel.mpi.enable", "0");
-            enable_mpi = boost::lexical_cast<int>(enable_mpi_str);
+            enable_mpi = boost::lexical_cast<int>(enable_mpi_str) ? true : false;
             if(enable_mpi)
             {
                 cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
             }
         }
 
+        int this_rank = -1;
         if (enable_mpi)
         {
             MPI_Init(argc, argv);
             MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
 
-            char name[MPI_MAX_PROCESSOR_NAME] = { '\0' };
+            char name[MPI_MAX_PROCESSOR_NAME+1] = { '\0' };
             int len = 0;
             MPI_Get_processor_name(name, &len);
 
-            /*
-            std::cout << rank() << ": " << name << "\n";
-            std::cout << communicator_ << "\n";
-            */
-
-            int this_rank = rank();
-            cfg.ini_config_ += "hpx.locality!=" + boost::lexical_cast<std::string>(this_rank);
-            cfg.ini_config_ += "hpx.localities!=" + boost::lexical_cast<std::string>(size());
+            this_rank = rank();
             cfg.num_localities_ = size();
-
-            //std::cout << rank() << " mpi_environment::init(): " << size() << "\n";
 
             if(this_rank == 0)
             {
                 cfg.mode_ = hpx::runtime_mode_console;
-                cfg.ini_config_ += "hpx.agas.service_mode!=bootstrap";
             }
             else
             {
                 cfg.mode_ = hpx::runtime_mode_worker;
-                cfg.ini_config_ += "hpx.agas.service_mode!=hosted";
-                cfg.hpx_main_f_ = 0;
             }
-            cfg.ini_config_ += std::string("hpx.runtime_mode!=") +
-                get_runtime_mode_name(cfg.mode_);
 
-            cfg.rtcfg_.reconfigure(cfg.ini_config_);
+            cfg.ini_config_ += std::string("hpx.hpx.parcel.mpi.rank!=") +
+                boost::lexical_cast<std::string>(this_rank);
+            cfg.ini_config_ += std::string("hpx.hpx.parcel.mpi.processorname!=") +
+                name;
         }
+        return this_rank;
     }
 
     void mpi_environment::finalize()
     {
         if(enabled())
         {
-            std::cout << "Rank " << rank() << " finalizing\n";
-
             MPI_Comm communicator = communicator_;
             communicator_ = 0;
             MPI_Comm_free(&communicator);
@@ -109,16 +94,16 @@ namespace hpx { namespace util
     int mpi_environment::size()
     {
         int res(-1);
-        if(!enabled()) return res;
-        MPI_Comm_size(communicator_, &res);
+        if(enabled())
+            MPI_Comm_size(communicator_, &res);
         return res;
     }
 
     int mpi_environment::rank()
     {
         int res(-1);
-        if(!enabled()) return res;
-        MPI_Comm_rank(communicator_, &res);
+        if(enabled())
+            MPI_Comm_rank(communicator_, &res);
         return res;
     }
 }}
