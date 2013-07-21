@@ -12,6 +12,8 @@ namespace hpx { namespace parcelset { namespace mpi {
     {
         typedef int value_type;
 
+        static int const data_size_ = 2;
+
         header(int rank, value_type tag_, value_type size_)
           : rank_(rank)
         {
@@ -75,11 +77,9 @@ namespace hpx { namespace parcelset { namespace mpi {
             return MPI_INT;
         }
 
-
-
-        private:
-            int rank_;
-            boost::array<value_type, 2> data_;
+    private:
+        int rank_;
+        boost::array<value_type, data_size_> data_;
     };
 }}}
 

@@ -46,7 +46,7 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         bool done(parcelport & pp)
         {
-            MPI_Status status;// = { 0 };
+            MPI_Status status;
             int completed = 0;
             MPI_Test(&request_, &completed, &status);
             if(completed)
@@ -66,11 +66,11 @@ namespace hpx { namespace parcelset { namespace mpi {
             return false;
         }
 
-        private:
-            header header_;
-            std::vector<char> buffer_;
+    private:
+        header header_;
+        std::vector<char> buffer_;
 
-            MPI_Request request_;
+        MPI_Request request_;
     };
 }}}
 

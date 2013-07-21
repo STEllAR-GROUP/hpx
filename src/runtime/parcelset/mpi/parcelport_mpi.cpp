@@ -151,7 +151,8 @@ namespace hpx { namespace parcelset { namespace mpi
                     ++it;
                 }
             }
-            senders_type const & tmp = parcel_cache_.get_senders(HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this()), communicator);
+            senders_type const & tmp = parcel_cache_.get_senders(
+                HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this()), communicator);
             senders.insert(senders.end(), tmp.begin(), tmp.end());
         }
         // cancel all remaining requests

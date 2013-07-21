@@ -52,12 +52,12 @@ namespace hpx { namespace parcelset { namespace mpi {
 
             MPI_Isend(
                 header_.data(), // Data pointer
-                2,              // Size
+                header_.data_size_,     // Size
                 header_.type(), // MPI Datatype
                 header_.rank(), // Destination
                 0,              // Tag
                 communicator_,  // Communicator
-                &header_request_       // Request
+                &header_request_        // Request
                 );
             state_ = sending_header;
         }

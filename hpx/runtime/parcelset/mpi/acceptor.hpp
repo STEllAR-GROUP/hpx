@@ -28,7 +28,7 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         std::pair<bool, header> next_header()
         {
-            MPI_Status status;// = { 0 };
+            MPI_Status status;
             int completed = 0;
             MPI_Test(&request_, &completed, &status);
             if(completed)
@@ -48,21 +48,21 @@ namespace hpx { namespace parcelset { namespace mpi {
         MPI_Request request_;
         header header_;
 
-            void irecv_header()
-            {
-                /*
-                BOOST_ASSERT(source_ != -1);
-                BOOST_ASSERT(source_ != util::mpi_environment::rank());
-                */
-                MPI_Irecv(
-                    header_.data(), // data pointer
-                    2,              // number of elements
-                    header_.type(), // MPI Datatype
-                    MPI_ANY_SOURCE,        // Source
-                    0,              // Tag
-                    communicator_,  // Communicator
-                    &request_);     // Request
-            }
+        void irecv_header()
+        {
+            /*
+            BOOST_ASSERT(source_ != -1);
+            BOOST_ASSERT(source_ != util::mpi_environment::rank());
+            */
+            MPI_Irecv(
+                header_.data(), // data pointer
+                header_.data_size_,     // number of elements
+                header_.type(), // MPI Datatype
+                MPI_ANY_SOURCE,         // Source
+                0,              // Tag
+                communicator_,  // Communicator
+                &request_);     // Request
+        }
     };
 }}}
 
