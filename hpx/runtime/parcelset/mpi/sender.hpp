@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/parcelset/mpi/header.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/move/move.hpp>
@@ -17,10 +18,22 @@
 #include <vector>
 #include <utility>
 
-namespace hpx { namespace parcelset { namespace mpi {
+namespace hpx { namespace parcelset { namespace mpi
+{
+    struct parcel_buffer
+    {
+        typedef HPX_STD_FUNCTION<
+            void(boost::system::error_code const&, std::size_t)
+        > write_handler_type;
 
-    struct sender
-      : boost::noncopyable
+        int rank_;
+        std::vector<char> buffer_;
+        std::vector<write_handler_type> handlers_;
+        performance_counters::parcels::data_point send_data_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct sender : boost::noncopyable
     {
         typedef HPX_STD_FUNCTION<
             void(boost::system::error_code const&, std::size_t)
@@ -38,15 +51,15 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         sender(
             header const & h,
-            BOOST_RV_REF(std::vector<char>) buffer,
-            BOOST_RV_REF(std::vector<write_handler_type>) handlers,
+            boost::shared_ptr<parcel_buffer> buffer,
             MPI_Comm communicator)
           : communicator_(communicator)
           , header_(h)
-          , buffer_(boost::move(buffer))
-          , handlers_(boost::move(handlers))
+          , buffer_(buffer)
           , state_(invalid)
         {
+            buffer_->send_data_.time_ = util::high_resolution_clock::now();
+
             header_.assert_valid();
             BOOST_ASSERT(header_.rank() != util::mpi_environment::rank());
 
@@ -62,68 +75,73 @@ namespace hpx { namespace parcelset { namespace mpi {
             state_ = sending_header;
         }
 
-        bool done()
+        bool done(parcelport & pp)
         {
             switch (state_)
             {
-                case sending_header:
+            case sending_header:
+                {
+                    int completed = 0;
+                    MPI_Test(&header_request_, &completed, MPI_STATUS_IGNORE);
+                    if(completed)
                     {
-                        int completed = 0;
-                        MPI_Test(&header_request_, &completed, MPI_STATUS_IGNORE);
-                        if(completed)
+                        state_ = sent_header;
+                        return done(pp);
+                    }
+                    break;
+                }
+            case sent_header:
+                {
+                    BOOST_ASSERT(static_cast<std::size_t>(header_.size()) ==
+                        buffer_->buffer_.size());
+
+                    MPI_Isend(
+                        buffer_->buffer_.data(), // Data pointer
+                        static_cast<int>(buffer_->buffer_.size()), // Size
+                        MPI_CHAR,           // MPI Datatype
+                        header_.rank(),     // Destination
+                        header_.tag(),      // Tag
+                        communicator_,      // Communicator
+                        &data_request_      // Request
+                        );
+                    state_ = sending_data;
+                    return done(pp);
+                }
+            case sending_data:
+                {
+                    int completed = 0;
+                    MPI_Test(&data_request_, &completed, MPI_STATUS_IGNORE);
+                    if(completed)
+                    {
+                        state_ = sent_data;
+                        return done(pp);
+                    }
+                    break;
+                }
+            case sent_data:
+                {
+                    error_code ec;
+                    BOOST_FOREACH(write_handler_type & f, buffer_->handlers_)
+                    {
+                        if(!f.empty())
                         {
-                            state_ = sent_header;
-                            return done();
+                            f(ec, header_.size());
                         }
-                        break;
                     }
-                case sent_header:
-                    {
-                        BOOST_ASSERT(static_cast<std::size_t>(header_.size()) == buffer_.size());
-                        MPI_Isend(
-                            buffer_.data(), // Data pointer
-                            static_cast<int>(buffer_.size()), // Size
-                            MPI_CHAR,       // MPI Datatype
-                            header_.rank(), // Destination
-                            header_.tag(),  // Tag
-                            communicator_,  // Communicator
-                            &data_request_       // Request
-                            );
-                        state_ = sending_data;
-                        return done();
-                    }
-                case sending_data:
-                    {
-                        int completed = 0;
-                        MPI_Test(&data_request_, &completed, MPI_STATUS_IGNORE);
-                        if(completed)
-                        {
-                            state_ = sent_data;
-                            return done();
-                        }
-                        break;
-                    }
-                case sent_data:
-                    {
-                        error_code ec;
-                        BOOST_FOREACH(write_handler_type & f, handlers_)
-                        {
-                            if(!f.empty())
-                            {
-                                f(ec, header_.size());
-                            }
-                        }
-                        state_ = sender_done;
-                        return done();
-                    }
-                case sender_done:
-                    return true;
-                default:
-                case invalid:
-                    {
-                        BOOST_ASSERT(false);
-                    }
-                    return false;
+                    state_ = sender_done;
+                    return done(pp);
+                }
+            case sender_done:
+                buffer_->send_data_.time_ = util::high_resolution_clock::now() -
+                        buffer_->send_data_.time_;
+                pp.add_sent_data(buffer_->send_data_);
+                return true;
+            default:
+            case invalid:
+                {
+                    BOOST_ASSERT(false);
+                }
+                return false;
             }
             return false;
         }
@@ -133,17 +151,15 @@ namespace hpx { namespace parcelset { namespace mpi {
             return header_.tag();
         }
 
-        private:
-            MPI_Comm communicator_;
-            header header_;
-            std::vector<char> buffer_;
-            std::vector<write_handler_type> handlers_;
-            sender_state state_;
+    private:
+        MPI_Comm communicator_;
+        header header_;
+        boost::shared_ptr<parcel_buffer> buffer_;
+        sender_state state_;
 
-            MPI_Request header_request_;
-            MPI_Request data_request_;
+        MPI_Request header_request_;
+        MPI_Request data_request_;
     };
-
 }}}
 
 #endif

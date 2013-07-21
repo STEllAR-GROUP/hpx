@@ -24,24 +24,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace mpi { namespace detail
 {
-    struct parcel_buffer
-    {
-        typedef HPX_STD_FUNCTION<
-            void(boost::system::error_code const&, std::size_t)
-        > write_handler_type;
-
-        int rank_;
-        std::vector<char> buffer_;
-        std::vector<write_handler_type> handlers_;
-    };
-
+    ///////////////////////////////////////////////////////////////////////////
     struct parcel_cache
     {
         typedef HPX_STD_FUNCTION<
             void(boost::system::error_code const&, std::size_t)
         > write_handler_type;
 
-        typedef std::vector<parcel_buffer> parcel_buffers;
+        typedef std::vector<boost::shared_ptr<parcel_buffer> > parcel_buffers;
         typedef hpx::lcos::local::spinlock mutex_type;
 
         parcel_cache(std::size_t num_threads, boost::uint64_t max_outbound_size)
@@ -83,7 +73,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         }
 
         void set_parcel(std::vector<parcel> const& pv,
-            std::vector<write_handler_type> const & handlers, std::size_t idx = -1)
+            std::vector<write_handler_type> handlers, std::size_t idx = -1)
         {
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
@@ -91,8 +81,11 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             // we choose the highest priority of all parcels for this message
             threads::thread_priority priority = threads::thread_priority_default;
 
+            // collect outgoing data
+            boost::shared_ptr<parcel_buffer> buffer(boost::make_shared<parcel_buffer>());
+            buffer->handlers_ = boost::move(handlers);
+
             // guard against serialization errors
-            std::vector<char> buffer;
             try {
                 BOOST_FOREACH(parcel const & p, pv)
                 {
@@ -100,7 +93,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     priority = (std::max)(p.get_thread_priority(), priority);
                 }
 
-                buffer.reserve(arg_size*2);
+                buffer->buffer_.reserve(arg_size*2);
 
                 // mark start of serialization
                 util::high_resolution_timer timer;
@@ -112,12 +105,12 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
 
                     int archive_flags = archive_flags_;
                     if (filter.get() != 0) {
-                        filter->set_max_length(buffer.capacity());
+                        filter->set_max_length(buffer->buffer_.capacity());
                         archive_flags |= util::enable_compression;
                     }
 
                     util::portable_binary_oarchive archive(
-                        buffer, filter.get(), boost::archive::no_header);
+                        buffer->buffer_, filter.get(), boost::archive::no_header);
 
                     std::size_t count = pv.size();
                     archive << count;
@@ -130,7 +123,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     arg_size = archive.bytes_written();
 
                     // store the time required for serialization
-                    send_data_.serialization_time_ = timer.elapsed_nanoseconds();
+                    buffer->send_data_.serialization_time_ = timer.elapsed_nanoseconds();
                 }
             }
             catch (boost::archive::archive_exception const& e) {
@@ -163,7 +156,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
 
             // make sure outgoing message is not larger than allowed
-            if (buffer.size() > max_outbound_size_)
+            if (buffer->buffer_.size() > max_outbound_size_)
             {
                 HPX_THROW_EXCEPTION(serialization_error,
                     "mpi::detail::parcel_cache::set_parcel",
@@ -171,12 +164,16 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                         "parcelport: parcel serialization created message larger "
                         "than allowed (created: %ld, allowed: %ld), consider"
                         "configuring larger hpx.parcel.max_message_size") %
-                            buffer.size() % max_outbound_size_));
+                            buffer->buffer_.size() % max_outbound_size_));
                 return;
             }
 
-            int dest_rank = pv[0].get_destination_locality().get_rank();
-            if (dest_rank == -1)
+            buffer->send_data_.num_parcels_ = pv.size();
+            buffer->send_data_.bytes_ = arg_size;
+            buffer->send_data_.raw_bytes_ = buffer->buffer_.size();
+
+            buffer->rank_ = pv[0].get_destination_locality().get_rank();
+            if (buffer->rank_ == -1)
             {
                 HPX_THROW_EXCEPTION(serialization_error,
                     "mpi::detail::parcel_cache::set_parcel",
@@ -188,31 +185,30 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
 
             {
                 mutex_type::scoped_lock lk(*parcel_maps_mtx_[i]);
-                parcel_buffer b = { dest_rank, buffer, handlers };
-                parcel_buffers_[i].push_back(b);
+                parcel_buffers_[i].push_back(buffer);
             }
         }
 
         std::list<boost::shared_ptr<sender> > get_senders(
-            HPX_STD_FUNCTION<int()> const& tag_generator, MPI_Comm communicator)
+            HPX_STD_FUNCTION<int()> const& tag_generator, MPI_Comm communicator,
+            parcelport& pp)
         {
             std::list<boost::shared_ptr<sender> > res;
             for(std::size_t i = 0; i < parcel_buffers_.size(); ++i)
             {
                 mutex_type::scoped_lock lk(*parcel_maps_mtx_[i]);
-                BOOST_FOREACH(parcel_buffer & b, parcel_buffers_[i])
+                BOOST_FOREACH(boost::shared_ptr<parcel_buffer> b, parcel_buffers_[i])
                 {
                     boost::shared_ptr<sender> s(boost::make_shared<sender>(
                         header(
-                            b.rank_
+                            b->rank_
                           , tag_generator()
-                          , static_cast<int>(b.buffer_.size())
+                          , static_cast<int>(b->buffer_.size())
                         )
-                      , boost::move(b.buffer_)
-                      , boost::move(b.handlers_)
+                      , b
                       , communicator
                     ));
-                    if(s->done()) continue;
+                    if(s->done(pp)) continue;
                     res.push_back(
                         s
                     );
@@ -221,10 +217,6 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
             return res;
         }
-
-        /// Counters and their data containers.
-        util::high_resolution_timer timer_;
-        performance_counters::parcels::data_point send_data_;
 
         std::vector<mutex_type*> parcel_maps_mtx_;
         std::vector<parcel_buffers> parcel_buffers_;

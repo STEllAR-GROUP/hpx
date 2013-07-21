@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/parcelset/mpi/header.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/move/move.hpp>
@@ -35,7 +35,7 @@ namespace hpx { namespace parcelset { namespace mpi {
           , buffer_(boost::make_shared<std::vector<char> >(h.size()))
         {
             // start collecting statistics for this receive operation
-            receive_data_.time_ = timer_.elapsed_nanoseconds();
+            receive_data_.time_ = util::high_resolution_clock::now();
             receive_data_.serialization_time_ = 0;
             receive_data_.bytes_ = 0;
             receive_data_.num_parcels_ = 0;
@@ -69,7 +69,7 @@ namespace hpx { namespace parcelset { namespace mpi {
                 BOOST_ASSERT(static_cast<std::size_t>(count) == buffer_->size());
 #endif
                 // take measurement of overall receive time
-                receive_data_.time_ = timer_.elapsed_nanoseconds() -
+                receive_data_.time_ = util::high_resolution_clock::now() -
                     receive_data_.time_;
 
                 decode_message(*buffer_, pp, receive_data_);
@@ -84,7 +84,6 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         MPI_Request request_;
 
-        util::high_resolution_timer timer_;
         performance_counters::parcels::data_point receive_data_;
     };
 }}}

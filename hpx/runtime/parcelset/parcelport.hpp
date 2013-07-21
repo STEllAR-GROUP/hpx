@@ -298,6 +298,11 @@ namespace hpx { namespace parcelset
             parcels_received_.add_data(data);
         }
 
+        void add_sent_data(performance_counters::parcels::data_point const& data)
+        {
+            parcels_sent_.add_data(data);
+        }
+
         /// Create a new instance of a parcelport
         static boost::shared_ptr<parcelport> create(int type,
             util::runtime_configuration const& cfg,

@@ -101,7 +101,6 @@ namespace hpx { namespace parcelset { namespace mpi
         stopped = true;
         if (blocking) {
             io_service_pool_.join();
-
             io_service_pool_.clear();
         }
     }
@@ -135,7 +134,7 @@ namespace hpx { namespace parcelset { namespace mpi
             }
             for(senders_type::iterator it = senders.begin(); it != senders.end();)
             {
-                if((*it)->done())
+                if((*it)->done(*this))
                 {
                     free_tags.push_back((*it)->tag());
                     it = senders.erase(it);
@@ -145,8 +144,10 @@ namespace hpx { namespace parcelset { namespace mpi
                     ++it;
                 }
             }
+
             senders_type const & tmp = parcel_cache_.get_senders(
-                HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this()), communicator);
+                HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this()),
+                communicator, *this);
             senders.insert(senders.end(), tmp.begin(), tmp.end());
         }
         // cancel all remaining requests
@@ -177,8 +178,8 @@ namespace hpx { namespace parcelset { namespace mpi
             BOOST_ASSERT(locality_id == parcels[i].get_destination_locality());
         }
 #endif
-        parcel_cache_.set_parcel(parcels, handlers);
 
+        parcel_cache_.set_parcel(parcels, handlers);
     }
 
     void parcelport::put_parcel(parcel const& p, write_handler_type f)
