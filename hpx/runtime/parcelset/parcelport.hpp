@@ -122,7 +122,10 @@ namespace hpx { namespace parcelset
         }
 
         /// Cache specific functionality
-        virtual void remove_from_connection_cache(naming::locality const& loc) = 0;
+        virtual void remove_from_connection_cache(naming::locality const& loc)
+        {
+            // by default, no connection cache is used
+        }
 
         /// Retrieve the type of the locality represented by this parcelport
         virtual connection_type get_type() const = 0;

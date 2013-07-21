@@ -105,20 +105,8 @@ namespace hpx { namespace parcelset { namespace mpi
             return connection_mpi;
         }
 
-        /// Cache specific functionality
-        void remove_from_connection_cache(naming::locality const& loc)
-        {
-            //connection_cache_.clear(loc);
-        }
-
         /// Return the thread pool if the name matches
         util::io_service_pool* get_thread_pool(char const* name);
-
-        /// Return the given connection cache statistic
-        /*
-        boost::int64_t get_connection_cache_statistics(
-            connection_cache_statistics_type t, bool reset);
-        */
 
         /// support enable_shared_from_this
         boost::shared_ptr<parcelport> shared_from_this()
@@ -133,37 +121,6 @@ namespace hpx { namespace parcelset { namespace mpi
                 parcelset::parcelport::shared_from_this());
         }
 
-    protected:
-        /*
-        // helper functions for receiving parcels
-        void handle_accept(boost::system::error_code const& e,
-            server::tcp::parcelport_connection_ptr);
-        void handle_read_completion(boost::system::error_code const& e,
-            server::tcp::parcelport_connection_ptr);
-
-        /// helper function to send remaining pending parcels
-        void send_pending_parcels_trampoline(
-            boost::system::error_code const& ec,
-            naming::locality const& prefix,
-            parcelport_connection_ptr client_connection);
-        void send_pending_parcels(parcelport_connection_ptr client_connection,
-            std::vector<parcel> const&, std::vector<write_handler_type> const&);
-
-        /// \brief Retrieve a new connection
-        parcelport_connection_ptr get_connection(naming::locality const& l,
-            error_code& ec = throws);
-        parcelport_connection_ptr get_connection_wait(naming::locality const& l,
-            error_code& ec = throws);
-
-        parcelport_connection_ptr create_connection(naming::locality const& l,
-            error_code& ec = throws);
-
-        void send_parcels_or_reclaim_connection(naming::locality const& locality_id,
-            parcelport_connection_ptr const& client_connection);
-        void retry_sending_parcels(naming::locality const& locality_id);
-        void get_connection_and_send_parcels(naming::locality const& locality_id,
-            naming::gid_type const& parcel_id);
-        */
     private:
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool io_service_pool_;
@@ -192,25 +149,6 @@ namespace hpx { namespace parcelset { namespace mpi
         }
 
         void handle_messages();
-
-        /*
-        /// Acceptor used to listen for incoming connections.
-        boost::asio::ip::tcp::acceptor* acceptor_;
-
-        /// The connection cache for sending connections
-        util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
-
-        /// The list of accepted connections
-        mutable lcos::local::spinlock connections_mtx_;
-
-        typedef std::set<server::tcp::parcelport_connection_ptr> accepted_connections_set;
-        accepted_connections_set accepted_connections_;
-
-#if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
-        typedef std::set<tcp::parcelport_connection_weak_ptr> write_connections_set;
-        write_connections_set write_connections_;
-#endif
-        */
     };
 }}}
 

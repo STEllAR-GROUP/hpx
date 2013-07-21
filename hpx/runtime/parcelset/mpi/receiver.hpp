@@ -5,7 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/parcelset/mpi/header.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/move/move.hpp>
@@ -22,26 +24,32 @@ namespace hpx { namespace parcelset { namespace mpi {
     class parcelport;
 
     void decode_message(
-        std::vector<char> const & parcel_data,
-        parcelport& pp);
+        std::vector<char> const & parcel_data, parcelport& pp,
+        performance_counters::parcels::data_point& receive_data);
 
     struct receiver
       : boost::noncopyable
     {
         receiver(header const & h, MPI_Comm communicator)
           : header_(h)
-          , buffer_(h.size())
+          , buffer_(boost::make_shared<std::vector<char> >(h.size()))
         {
+            // start collecting statistics for this receive operation
+            receive_data_.time_ = timer_.elapsed_nanoseconds();
+            receive_data_.serialization_time_ = 0;
+            receive_data_.bytes_ = 0;
+            receive_data_.num_parcels_ = 0;
+
             header_.assert_valid();
             BOOST_ASSERT(header_.rank() != util::mpi_environment::rank());
             MPI_Irecv(
-                buffer_.data(), // data pointer
-                static_cast<int>(buffer_.size()), // number of elements
-                MPI_CHAR,     // MPI Datatype
-                header_.rank(), // Source
-                header_.tag(),  // Tag
-                communicator, // Communicator
-                &request_);    // Request
+                buffer_->data(),    // data pointer
+                static_cast<int>(buffer_->size()), // number of elements
+                MPI_CHAR,           // MPI Datatype
+                header_.rank(),     // Source
+                header_.tag(),      // Tag
+                communicator,       // Communicator
+                &request_);         // Request
         }
 
         bool done(parcelport & pp)
@@ -58,9 +66,13 @@ namespace hpx { namespace parcelset { namespace mpi {
                 int count = 0;
                 MPI_Get_count(&status, MPI_CHAR, &count);
                 BOOST_ASSERT(count == header_.size());
-                BOOST_ASSERT(static_cast<std::size_t>(count) == buffer_.size());
+                BOOST_ASSERT(static_cast<std::size_t>(count) == buffer_->size());
 #endif
-                decode_message(buffer_, pp);
+                // take measurement of overall receive time
+                receive_data_.time_ = timer_.elapsed_nanoseconds() -
+                    receive_data_.time_;
+
+                decode_message(*buffer_, pp, receive_data_);
                 return true;
             }
             return false;
@@ -68,9 +80,12 @@ namespace hpx { namespace parcelset { namespace mpi {
 
     private:
         header header_;
-        std::vector<char> buffer_;
+        boost::shared_ptr<std::vector<char> > buffer_;
 
         MPI_Request request_;
+
+        util::high_resolution_timer timer_;
+        performance_counters::parcels::data_point receive_data_;
     };
 }}}
 

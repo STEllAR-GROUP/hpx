@@ -19,6 +19,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/hash.hpp>
@@ -31,6 +32,7 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 
+#if defined(HPX_HAVE_SECURITY)
 namespace hpx
 {
     /// \brief Verify the certificate in the given byte sequence
@@ -41,29 +43,21 @@ namespace hpx
     ///
     HPX_API_EXPORT bool verify_parcel_suffix(std::vector<char> const& data,
         naming::gid_type& parcel_id, error_code& ec = throws);
-
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace mpi
 {
-    void decode_message(
-        std::vector<char> const & parcel_data,
-        parcelport& pp);
-
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : parcelset::parcelport(ini),
         io_service_pool_(1, on_start_thread, on_stop_thread, "parcel_pool_mpi", "-mpi"),
-        parcel_cache_(ini.get_os_thread_count()),
+        parcel_cache_(ini.get_os_thread_count(), this->get_max_message_size()),
         stopped(false),
         next_tag(2)
-        /*
-        acceptor_(NULL),
-        connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
-        */
     {
         if (here_.get_type() != connection_mpi) {
             HPX_THROW_EXCEPTION(network_error, "mpi::parcelport::parcelport",
@@ -210,8 +204,8 @@ namespace hpx { namespace parcelset { namespace mpi
 
     void decode_message(
         std::vector<char> const & parcel_data,
-        parcelport& pp
-        //performance_counters::parcels::data_point receive_data,
+        parcelport& pp,
+        performance_counters::parcels::data_point& receive_data
     )
     {
         // protect from un-handled exceptions bubbling up
@@ -245,18 +239,14 @@ namespace hpx { namespace parcelset { namespace mpi
                 }
 
                 // complete received data with parcel count
-                /*
                 receive_data.num_parcels_ = parcel_count;
                 receive_data.raw_bytes_ = archive.bytes_read();
-                */
 
                 // store the time required for serialization
-                /*
                 receive_data.serialization_time_ = timer.elapsed_nanoseconds() -
                     overall_add_parcel_time;
-                */
 
-                //pp.add_received_data(receive_data);
+                pp.add_received_data(receive_data);
             }
             catch (hpx::exception const& e) {
                 LPT_(error)
