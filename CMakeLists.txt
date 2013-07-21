@@ -317,8 +317,8 @@ endif()
 # Decide whether to use shared memory based parcelport (starting with Boost V1.52)
 ################################################################################
 if(${BOOST_MINOR_VERSION} GREATER 51)
-  hpx_option(HPX_USE_PARCELPORT_SHMEM BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
-  if(HPX_USE_PARCELPORT_SHMEM)
+  hpx_option(HPX_HAVE_PARCELPORT_SHMEM BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
+  if(HPX_HAVE_PARCELPORT_SHMEM)
     hpx_add_definitions(-DHPX_HAVE_PARCELPORT_SHMEM)
   endif()
 endif()
@@ -326,8 +326,8 @@ endif()
 ################################################################################
 # Decide whether to use rdma based ibverbs parcelport
 ################################################################################
-hpx_option(HPX_USE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
-if(HPX_USE_PARCELPORT_IBVERBS)
+hpx_option(HPX_HAVE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
+if(HPX_HAVE_PARCELPORT_IBVERBS)
   find_package(HPX_Ibverbs)
   find_package(HPX_Rdmacm)
   if(IBVERBS_FOUND AND RDMACM_FOUND)
@@ -338,8 +338,8 @@ endif()
 ################################################################################
 # Decide whether to use MPI based parcelport
 ################################################################################
-hpx_option(HPX_USE_PARCELPORT_MPI BOOL "Enable parcelport based on MPI (default: OFF)." OFF ADVANCED)
-if(HPX_USE_PARCELPORT_MPI)
+hpx_option(HPX_HAVE_PARCELPORT_MPI BOOL "Enable parcelport based on MPI (default: OFF)." OFF ADVANCED)
+if(HPX_HAVE_PARCELPORT_MPI)
   find_package(HPX_MPI)
   if(MPI_FOUND OR MPI_CXX_FOUND)
     foreach(language CXX C Fortran)

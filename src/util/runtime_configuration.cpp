@@ -108,28 +108,28 @@ namespace hpx { namespace util
             "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
 #ifdef BOOST_BIG_ENDIAN
-            "endian_out=${HPX_ENDIAN_OUT:big}",
+            "endian_out = ${HPX_ENDIAN_OUT:big}",
 #else
-            "endian_out=${HPX_ENDIAN_OUT:little}",
+            "endian_out = ${HPX_ENDIAN_OUT:little}",
 #endif
 
             // TCPIP related settings
             "[hpx.parcel.tcpip]",
-            "enable=${HPX_PARCELPORT_USE_TCPIP:1}",
+            "enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}",
 
             // shmem related settings
             "[hpx.parcel.shmem]",
-            "enable=${HPX_PARCELPORT_USE_SHMEM:0}",
-            "data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
+            "enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}",
+            "data_buffer_cache_size = ${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
 
             // ibverbs related settings
             "[hpx.parcel.ibverbs]",
-            "enable=${HPX_PARCELPORT_USE_IBVERBS:0}",
-            "buffer_size=${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
+            "enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}",
+            "buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
 
             // MPI related settings
             "[hpx.parcel.mpi]",
-            "enable=${HPX_PARCELPORT_USE_MPI:0}",
+            "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
 
             // predefine command line aliases
             "[hpx.commandline]",

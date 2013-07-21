@@ -278,7 +278,7 @@ sections, one for each component.
 [teletype]
 ``
     [hpx.parcel.tcpip]
-    enable = ${HPX_PARCELPORT_USE_TCPIP:1}
+    enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}
 ``
 [c++]
 
@@ -295,12 +295,12 @@ sections, one for each component.
 The following settings relate to the shared memory parcelport (which is usable
 for communication between two localities on the same node). These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` is set
-(the equivalent cmake variable is `HPX_PARCELPORT_USE_SHMEM`, and has to be set to `ON`).
+(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_SHMEM`, and has to be set to `ON`).
 
 [teletype]
 ``
     [hpx.parcel.shmem]
-    enable = ${HPX_PARCELPORT_USE_SHMEM:0}
+    enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}
     data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}
 ``
 [c++]
@@ -322,13 +322,13 @@ effect only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` is set
 
 The following settings relate to the Infiniband parcelport. These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` is set
-(the equivalent cmake variable is `HPX_PARCELPORT_USE_IBVERBS`, and has to be 
+(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_IBVERBS`, and has to be 
 set to `ON`).
 
 [teletype]
 ``
     [hpx.parcel.ibverbs]
-    enable = ${HPX_PARCELPORT_USE_IBVERBS:0}
+    enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}
     buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
 ``
 [c++]
@@ -351,13 +351,13 @@ set to `ON`).
 
 The following settings relate to the MPI parcelport. These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` is set
-(the equivalent cmake variable is `HPX_PARCELPORT_USE_MPI`, and has to be set 
+(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_MPI`, and has to be set 
 to `ON`).
 
 [teletype]
 ``
     [hpx.parcel.mpi]
-    enable = ${HPX_PARCELPORT_USE_MPI:0}
+    enable = ${HPX_HAVE_PARCELPORT_MPI:0}
     rank = <MPI_rank>
     processor_name = <MPI_processor_name>
 ``

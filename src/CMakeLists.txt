@@ -242,7 +242,7 @@ else()
   endif()
 endif()
 
-if(HPX_USE_PARCELPORT_MPI AND MPI_FOUND)
+if(HPX_HAVE_PARCELPORT_MPI AND MPI_FOUND)
   set(hpx_serialization_link_flag_properties "${hpx_serialization_link_flag_properties} ${MPI_CXX_LINK_FLAGS}")
 endif()
 
@@ -344,7 +344,7 @@ else()
     LIBRARY_OUTPUT_DIRECTORY ${HPX_LIBRARY_OUTPUT_DIRECTORY})
 endif()
 
-if(HPX_USE_PARCELPORT_MPI AND MPI_FOUND)
+if(HPX_HAVE_PARCELPORT_MPI AND MPI_FOUND)
   set(hpx_link_flag_properties "${hpx_link_flag_properties} ${MPI_CXX_LINK_FLAGS}")
 endif()
 
