@@ -120,7 +120,7 @@ public:
     friend class boost::archive::load_access;
 protected:
 #endif
-    unsigned int m_flags;
+    boost::uint32_t m_flags;
     HPX_ALWAYS_EXPORT void
     load_impl(boost::int64_t& l, char maxsize);
 
@@ -266,7 +266,7 @@ public:
         init(flags);
     }
 
-    unsigned int flags() const
+    boost::uint32_t flags() const
     {
         return m_flags;
     }

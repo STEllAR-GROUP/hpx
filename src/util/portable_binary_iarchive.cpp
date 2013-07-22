@@ -142,9 +142,9 @@ void portable_binary_iarchive::init(unsigned int flags)
 #endif
     }
 
-    unsigned char x;
+    boost::uint16_t x;
     load(x);
-    m_flags = static_cast<unsigned int>(x << CHAR_BIT);
+    m_flags = static_cast<boost::uint32_t>(x << CHAR_BIT);
 
     // handle filter and compression in the archive separately
     bool has_filter = false;
