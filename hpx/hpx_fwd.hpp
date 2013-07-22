@@ -9,6 +9,10 @@
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <mpi.h>
+#endif
+
 #include <cstdlib>
 #include <vector>
 

@@ -7,13 +7,14 @@
 #if !defined(HPX_NAMING_LOCALITY_MAR_24_2008_0942AM)
 #define HPX_NAMING_LOCALITY_MAR_24_2008_0942AM
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/util/mpi_environment.hpp>
+#endif
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-#include <hpx/util/mpi_environment.hpp>
-#endif
 
 #include <boost/config.hpp>
 #include <boost/io/ios_state.hpp>

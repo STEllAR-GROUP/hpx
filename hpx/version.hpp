@@ -7,6 +7,10 @@
 #if !defined(HPX_VERSION_AUG_18_2011_0854PM)
 #define HPX_VERSION_AUG_18_2011_0854PM
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <mpi.h>
+#endif
+
 #include <string>
 
 #include <boost/version.hpp>

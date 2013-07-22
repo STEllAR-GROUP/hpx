@@ -4,9 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <vector>
-#include <iostream>
-
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/util/ini.hpp>
@@ -30,6 +27,9 @@
 
 #include <hpx/util/logging/format/named_write_fwd.hpp>
 #include <hpx/util/logging/format_fwd.hpp>
+
+#include <vector>
+#include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////
 // definitions related to console logging
