@@ -342,8 +342,13 @@ response symbol_namespace::resolve(
         if (0 == naming::detail::get_credit_from_gid(gid))
         {
             BOOST_ASSERT(1 == naming::detail::get_credit_from_gid(it->second));
-            naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT);
+            {
+                hpx::util::unlock_the_lock<mutex_type::scoped_lock> ull(l);
+                naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT);
+            }
 
+            // FIXME: can there be a race condition betwen this and another
+            // call to remove the gid from the map?
             naming::detail::add_credit_to_gid(gid, HPX_INITIAL_GLOBALCREDIT);
             naming::detail::add_credit_to_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
 
