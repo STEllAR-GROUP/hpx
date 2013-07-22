@@ -127,9 +127,9 @@ namespace hpx { namespace util
             "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
 #ifdef BOOST_BIG_ENDIAN
-            "endian_out = ${HPX_ENDIAN_OUT:big}",
+            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
 #else
-            "endian_out = ${HPX_ENDIAN_OUT:little}",
+            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
 #endif
             "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
 
