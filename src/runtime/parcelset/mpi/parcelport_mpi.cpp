@@ -6,6 +6,8 @@
 
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -309,3 +311,5 @@ namespace hpx { namespace parcelset { namespace mpi
         }
     }
 }}}
+
+#endif

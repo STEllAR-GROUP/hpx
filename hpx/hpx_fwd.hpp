@@ -10,6 +10,7 @@
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
+// Intel MPI requires this to be included before anything else
 #include <mpi.h>
 #endif
 

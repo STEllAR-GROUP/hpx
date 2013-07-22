@@ -5,10 +5,10 @@
 
 #ifndef HPX_UTIL_MPI_ENV_HPP
 #define HPX_UTIL_MPI_ENV_HPP
+
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
-#include <mpi.h>
-
+#include <hpx/hpx_fwd.hpp>
 #include <cstdlib>
 
 namespace hpx { namespace util {
@@ -26,7 +26,6 @@ namespace hpx { namespace util {
     private:
         static MPI_Comm communicator_;
     };
-
 }}
 
 #endif

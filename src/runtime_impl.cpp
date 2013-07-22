@@ -4,10 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-#include <hpx/util/mpi_environment.hpp>
-#endif
-
 #include <hpx/hpx_fwd.hpp>
 
 #include <iostream>
