@@ -105,7 +105,10 @@ namespace hpx { namespace naming
 #endif
 
         explicit locality(boost::asio::ip::tcp::endpoint ep)
-          : address_(ep.address().to_string()), port_(ep.port()), rank_(util::mpi_environment::rank())
+          : address_(ep.address().to_string()), port_(ep.port())
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+          , rank_(util::mpi_environment::rank())
+#endif
         {}
 
         locality& operator= (boost::asio::ip::tcp::endpoint ep)

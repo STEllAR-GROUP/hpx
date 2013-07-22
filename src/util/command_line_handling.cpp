@@ -16,6 +16,7 @@
 #include <hpx/util/mpi_environment.hpp>
 #endif
 
+#include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -338,7 +339,7 @@ namespace hpx { namespace util
         }
 
         if (vm.count("hpx:hpx")) {
-            if (!util::split_ip_address(vm["hpx:hpx"].as<std::string>(), 
+            if (!util::split_ip_address(vm["hpx:hpx"].as<std::string>(),
                     hpx_host, hpx_port))
             {
                 std::cerr

@@ -65,7 +65,6 @@ namespace hpx { namespace parcelset { namespace tcp
                 "locality type: " + get_connection_type_name(here_.get_type()));
         }
         */
-        BOOST_ASSERT(false);
     }
 
     parcelport::~parcelport()

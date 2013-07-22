@@ -110,7 +110,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     }
 
                     util::portable_binary_oarchive archive(
-                        buffer->buffer_, filter.get(), boost::archive::no_header);
+                        buffer->buffer_, filter.get(), archive_flags);
 
                     std::size_t count = pv.size();
                     archive << count;
@@ -221,10 +221,10 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         std::vector<mutex_type*> parcel_maps_mtx_;
         std::vector<parcel_buffers> parcel_buffers_;
 
-        boost::uint64_t max_outbound_size_;
-
         // archive flags
         int archive_flags_;
+
+        boost::uint64_t max_outbound_size_;
     };
 }}}}
 

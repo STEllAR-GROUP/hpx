@@ -82,7 +82,6 @@ namespace hpx { namespace parcelset { namespace mpi
 
     bool parcelport::run(bool blocking)
     {
-        //std::cout << util::mpi_environment::rank() <<  " running MPI parcelport\n";
         io_service_pool_.run(false);    // start pool
 
         acceptor_.run(util::mpi_environment::communicator());
@@ -202,11 +201,6 @@ namespace hpx { namespace parcelset { namespace mpi
     void parcelport::put_parcels(std::vector<parcel> const & parcels,
         std::vector<write_handler_type> const& handlers)
     {
-        /*
-        std::cout << util::mpi_environment::rank() <<  " MPI parcelport: put parcels\n";
-        std::cout << util::mpi_environment::rank() << " destination: " << parcels[0].get_destination_locality() << "\n";
-        */
-
         if (parcels.size() != handlers.size())
         {
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::put_parcels",
@@ -220,7 +214,7 @@ namespace hpx { namespace parcelset { namespace mpi
         // make sure all parcels go to the same locality
         for (std::size_t i = 1; i != parcels.size(); ++i)
         {
-            BOOST_ASSERT(locality_id == parcels[i].get_destination_locality());
+            BOOST_ASSERT(locality_id.get_rank() == parcels[i].get_destination_locality().get_rank());
         }
 #endif
 
@@ -229,22 +223,11 @@ namespace hpx { namespace parcelset { namespace mpi
 
     void parcelport::put_parcel(parcel const& p, write_handler_type f)
     {
-        /*
-        std::cout << util::mpi_environment::rank() <<  " MPI parcelport: put parcel\n";
-        std::cout << util::mpi_environment::rank() << " destination: " << p.get_destination_locality() << "\n";
-        */
         parcel_cache_.set_parcel(p, f);
     }
 
     void parcelport::send_early_parcel(parcel& p)
     {
-        /*
-        std::cout << util::mpi_environment::rank() << " MPI parcelport: send early parcel\n";
-        std::cout << util::mpi_environment::rank() << " destination: " << p.get_destination_locality() << "\n";
-        */
-        naming::locality const& l = p.get_destination_locality();
-        error_code ec;
-
         parcel_cache_.set_parcel(p, write_handler_type(), 0);
     }
 
@@ -274,7 +257,7 @@ namespace hpx { namespace parcelset { namespace mpi
                     parcel p;
                     archive >> p;
                     // make sure this parcel ended up on the right locality
-                    BOOST_ASSERT(p.get_destination_locality() == pp.here());
+                    BOOST_ASSERT(p.get_destination_locality().get_rank() == pp.here().get_rank());
 
                     // be sure not to measure add_parcel as serialization time
                     boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();

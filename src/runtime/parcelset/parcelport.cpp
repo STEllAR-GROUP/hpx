@@ -46,10 +46,10 @@ namespace hpx { namespace parcelset
         switch(type) {
         case connection_tcpip:
             {
-                std::string enable_tcpip = 
+                std::string enable_tcpip =
                     cfg.get_entry("hpx.parcel.tcpip.enable", "1");
 
-                if (boost::lexical_cast<int>(enable_tcpip)) 
+                if (boost::lexical_cast<int>(enable_tcpip))
                 {
                     return boost::make_shared<parcelset::tcp::parcelport>(
                         cfg, on_start_thread, on_stop_thread);
@@ -62,12 +62,12 @@ namespace hpx { namespace parcelset
         case connection_shmem:
             {
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
-                // Create shmem based parcelport only if allowed by the 
+                // Create shmem based parcelport only if allowed by the
                 // configuration info.
-                std::string enable_shmem = 
+                std::string enable_shmem =
                     cfg.get_entry("hpx.parcel.shmem.enable", "0");
 
-                if (boost::lexical_cast<int>(enable_shmem)) 
+                if (boost::lexical_cast<int>(enable_shmem))
                 {
                     return boost::make_shared<parcelset::shmem::parcelport>(
                         cfg, on_start_thread, on_stop_thread);
@@ -144,7 +144,6 @@ namespace hpx { namespace parcelset
     void parcelport::put_parcels(std::vector<parcel> const & parcels,
             std::vector<write_handler_type> const& handlers)
     {
-        BOOST_ASSERT(false);
         if (parcels.size() != handlers.size())
         {
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::put_parcels",
