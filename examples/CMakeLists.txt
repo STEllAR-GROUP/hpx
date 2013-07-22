@@ -6,6 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
+    1d_hydro
     accumulator
     allgather
     async_io
@@ -13,7 +14,6 @@ set(subdirs
     cancelable_action
     heartbeat
     interpolate1d
-    interpolate3d
     jacobi
     nqueen
     performance_counters
