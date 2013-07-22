@@ -336,6 +336,23 @@ namespace hpx { namespace naming
             return static_cast<boost::uint16_t>(c);
         }
 
+        inline boost::uint16_t remove_credit_from_gid(gid_type& id, boost::uint16_t debit)
+        {
+            boost::uint64_t msb = id.get_msb();
+            BOOST_ASSERT(((msb & gid_type::credit_mask) >> 16) > debit);
+
+            boost::int32_t c = static_cast<boost::int32_t>(
+                boost::uint16_t((msb & gid_type::credit_mask) >> 16) - debit);
+
+            BOOST_ASSERT(0 == (c & ~gid_type::credit_base_mask));
+
+            id.set_msb((msb & ~gid_type::credit_mask) |
+                ((c & gid_type::credit_base_mask) << 16));
+
+            BOOST_ASSERT(c < (std::numeric_limits<boost::uint16_t>::max)());
+            return static_cast<boost::uint16_t>(c);
+        }
+
         inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb)
         {
             return msb & ~(gid_type::credit_mask | gid_type::was_split_mask);

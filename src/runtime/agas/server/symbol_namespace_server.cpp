@@ -334,7 +334,7 @@ response symbol_namespace::resolve(
         gid = naming::detail::split_credits_for_gid(it->second);
 
         LAGAS_(debug) << (boost::format(
-            "symbol_namespace::resolve, split credits for entry, "
+            "symbol_namespace::resolve, split credits for entry: "
             "key(%1%), entry(%2%), gid(%3%)")
             % key % it->second % gid);
 
@@ -342,18 +342,68 @@ response symbol_namespace::resolve(
         if (0 == naming::detail::get_credit_from_gid(gid))
         {
             BOOST_ASSERT(1 == naming::detail::get_credit_from_gid(it->second));
-            {
-                hpx::util::unlock_the_lock<mutex_type::scoped_lock> ull(l);
-                naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT);
-            }
 
-            // FIXME: can there be a race condition betwen this and another
-            // call to remove the gid from the map?
-            naming::detail::add_credit_to_gid(gid, HPX_INITIAL_GLOBALCREDIT);
+            // Since we have to give up the lock for the actual incref, we add
+            // the credit tentatively to the map entry to avoid that it is deleted
+            // while the lock is relinquished. If the incref fails we try to recover
+            // afterwards.
             naming::detail::add_credit_to_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
 
+            {
+                hpx::util::unlock_the_lock<mutex_type::scoped_lock> ull(l);
+                naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT, ec);
+            }
+
+            if (ec)
+            {
+                // the incref call failed, remove the tentatively added credit from
+                // the map entry
+                it = gids_.find(key);       // relocate the entry
+                if (it == end)
+                {
+                    LAGAS_(debug) << (boost::format(
+                        "symbol_namespace::resolve, can't re-locate map entry, "
+                        "giving up: key(%1%), gid(%2%)")
+                        % key % gid);
+
+                    // the map  entry is gone, giving up
+                    return response(symbol_ns_resolve
+                                  , naming::invalid_gid
+                                  , invalid_status);
+                }
+
+                // remove the tentativley added credit, if its still in place
+                if (naming::detail::get_credit_from_gid(it->second) < HPX_INITIAL_GLOBALCREDIT)
+                {
+                    LAGAS_(debug) << (boost::format(
+                        "symbol_namespace::resolve, can't remove credit from map entry, "
+                        "giving up: key(%1%), entry(%2%), gid(%3%)")
+                        % key % it->second % gid);
+
+                    // giving up as the credit has already been (partially) used
+                    return response(symbol_ns_resolve
+                                  , naming::invalid_gid
+                                  , invalid_status);
+                }
+
+                naming::detail::remove_credit_from_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
+
+                LAGAS_(debug) << (boost::format(
+                    "symbol_namespace::resolve, could not accquire additional credits for "
+                    "credit splitting: key(%1%), entry(%2%), gid(%3%)")
+                    % key % it->second % gid);
+
+                // return error to caller
+                return response(symbol_ns_resolve
+                              , naming::invalid_gid
+                              , invalid_status);
+            }
+
+            // since all went well we add the credit to the gid to return as well
+            naming::detail::add_credit_to_gid(gid, HPX_INITIAL_GLOBALCREDIT);
+
             LAGAS_(debug) << (boost::format(
-                "symbol_namespace::resolve, incremented entry credits, "
+                "symbol_namespace::resolve, incremented entry credits: "
                 "key(%1%), entry(%2%), gid(%3%)")
                 % key % it->second % gid);
         }
