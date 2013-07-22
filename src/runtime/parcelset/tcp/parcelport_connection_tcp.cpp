@@ -70,6 +70,11 @@ namespace hpx { namespace parcelset { namespace tcp
         else {
             BOOST_ASSERT(endian_out =="little" || endian_out == "big");
         }
+
+        std::string array_optimization =
+            get_config_entry("hpx.parcel.array_optimization", "1");
+        if (boost::lexical_cast<int>(array_optimization) == 0)
+            archive_flags_ |= util::disable_array_optimization;
     }
 
     ///////////////////////////////////////////////////////////////////////////

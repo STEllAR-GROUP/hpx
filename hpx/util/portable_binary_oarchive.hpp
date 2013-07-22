@@ -246,12 +246,12 @@ public:
         // If we need to potentially flip bytes we serialize each element
         // separately.
 #ifdef BOOST_BIG_ENDIAN
-        if (m_flags & endian_little) {
+        if (m_flags & (endian_little | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 save(a.address()[i]);
         }
 #else
-        if (m_flags & endian_big) {
+        if (m_flags & (endian_big | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 save(a.address()[i]);
         }

@@ -312,6 +312,12 @@ namespace hpx { namespace parcelset
             return max_message_size_;
         }
 
+        /// Return whether it is allowed to apply array optimizations
+        bool allow_array_optimizations() const
+        {
+            return allow_array_optimizations_;
+        }
+
     protected:
         void report_potential_connection_error(naming::locality const& locality_id,
             naming::gid_type const& parcel_id, error_code const& ec);
@@ -338,6 +344,9 @@ namespace hpx { namespace parcelset
         /// Parcel timers and their data containers.
         performance_counters::parcels::gatherer parcels_sent_;
         performance_counters::parcels::gatherer parcels_received_;
+
+        /// serialization is allowed to use array optimization
+        bool allow_array_optimizations_;
     };
 }}
 
