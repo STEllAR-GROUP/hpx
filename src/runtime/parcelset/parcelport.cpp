@@ -135,8 +135,13 @@ namespace hpx { namespace parcelset
     parcelport::parcelport(util::runtime_configuration const& ini)
       : parcels_(),
         here_(ini.get_parcelport_address()),
-        max_message_size_(ini.get_max_message_size())
+        max_message_size_(ini.get_max_message_size()),
+        allow_array_optimizations_(true)
     {
+        std::string array_optimization =
+            get_config_entry("hpx.parcel.array_optimization", "1");
+        if (boost::lexical_cast<int>(array_optimization) == 0)
+            allow_array_optimizations_ = false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
