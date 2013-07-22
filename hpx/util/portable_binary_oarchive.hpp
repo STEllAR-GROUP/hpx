@@ -118,7 +118,7 @@ public:
     friend class boost::archive::save_access;
 protected:
 #endif
-    unsigned int m_flags;
+    boost::uint32_t m_flags;
     HPX_ALWAYS_EXPORT void
     save_impl(const boost::int64_t l, const char maxsize);
 
@@ -227,12 +227,12 @@ public:
     portable_binary_oarchive(Container& buffer, binary_filter* filter = 0, unsigned flags = 0)
       : primitive_base_t(buffer, flags),
         archive_base_t(flags),
-        m_flags(flags & (enable_compression | endian_big | endian_little))
+        m_flags(flags & (enable_compression | endian_big | endian_little | disable_array_optimization))
     {
         init(filter, flags);
     }
 
-    unsigned int flags() const
+    boost::uint32_t flags() const
     {
         return m_flags;
     }

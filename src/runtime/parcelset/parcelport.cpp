@@ -124,7 +124,7 @@ namespace hpx { namespace parcelset
         allow_array_optimizations_(true)
     {
         std::string array_optimization =
-            get_config_entry("hpx.parcel.array_optimization", "1");
+            ini.get_entry("hpx.parcel.array_optimization", "1");
         if (boost::lexical_cast<int>(array_optimization) == 0)
             allow_array_optimizations_ = false;
     }

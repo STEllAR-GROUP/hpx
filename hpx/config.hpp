@@ -71,6 +71,11 @@
 #  define FUSION_MAX_VECTOR_SIZE 20
 #endif
 
+// make sure boost::result_of is adjusted appropriately as well
+#if HPX_LIMIT > 5 && !defined(BOOST_RESULT_OF_NUM_ARGS)
+#  define BOOST_RESULT_OF_NUM_ARGS 20
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // We currently do not support more than 20 arguments (ask if you need more)
 #if !defined(HPX_MAX_LIMIT)
@@ -645,10 +650,10 @@
 #define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
 
 #if defined(HPX_HAVE_SODIUM)
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB           0x0000000100000001ULL
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB           0x0000000000000005ULL
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB    0x0000000000000001ULL      // this is made locality specific
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB    0x0000000000000006ULL
+#  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB         0x0000000100000001ULL
+#  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB         0x0000000000000005ULL
+#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB  0x0000000000000001ULL      // this is made locality specific
+#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB  0x0000000000000006ULL
 #endif
 
 #if !defined(HPX_NO_DEPRECATED)
