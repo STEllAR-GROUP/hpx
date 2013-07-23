@@ -10,6 +10,7 @@ set(tests
     dataflow_launch
     regression_future_790
     regression_set_hpx_limit_771
+    regression_set_hpx_limit_798
    )
 
 # MSVC 2010 is not able to cope with this test

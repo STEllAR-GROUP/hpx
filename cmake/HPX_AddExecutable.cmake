@@ -86,6 +86,10 @@ macro(add_hpx_executable name)
     hpx_append_property(${name}_exe LINK_FLAGS ${${name}_LINK_FLAGS})
   endif()
 
+  if(HPX_HAVE_PARCELPORT_MPI AND MPI_FOUND)
+    hpx_append_property(${name}_exe LINK_FLAGS ${MPI_${${name}_LANGUAGE}_LINK_FLAGS})
+  endif()
+
   if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
     hpx_append_property(${name}_exe COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     if(NOT MSVC)

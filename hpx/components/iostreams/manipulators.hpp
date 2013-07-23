@@ -8,10 +8,10 @@
 #if !defined(HPX_9CF0FD9D_039C_4046_B244_C7FCC97D9945)
 #define HPX_9CF0FD9D_039C_4046_B244_C7FCC97D9945
 
-#include <ostream>
-
 #include <hpx/config.hpp>
 #include <hpx/components/iostreams/export_definitions.hpp>
+
+#include <ostream>
 
 namespace hpx { namespace iostreams
 {

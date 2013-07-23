@@ -35,6 +35,10 @@
 #include <io.h>
 #endif
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/util/mpi_environment.hpp>
+#endif
+
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -178,6 +182,10 @@ namespace hpx {
 
         // unload libraries
         //runtime_support_.tidy();
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        util::mpi_environment::finalize();
+#endif
 
         LRT_(debug) << "~runtime_impl(finished)";
     }
@@ -350,7 +358,7 @@ namespace hpx {
         LRT_(warning) << "runtime_impl: about to stop services";
 
         // flush all parcel buffers, stop buffering parcels at this point
-        parcel_handler_.flush_buffers(true);
+        parcel_handler_.do_background_work(true);
 
         // execute all on_exit functions whenever the first thread calls this
         this->runtime::stopping();

@@ -31,9 +31,33 @@ namespace hpx { namespace util
         struct serialize_sequence_loop
         {
             template <typename Archive, typename Element>
-            static void serialize(Archive& ar, Element& e, boost::mpl::false_)
+            static void serialize_element(Archive & ar, Element & e, boost::mpl::false_)
             {
                 ar & e;
+            }
+            
+            template <typename Archive, typename Element>
+            static void serialize_element(Archive & ar, Element & e, boost::mpl::true_)
+            {
+                ar & boost::serialization::make_array(&e, 1);;
+            }
+
+            template <typename Archive, typename Element>
+            static void serialize(Archive& ar, Element& e, boost::mpl::false_)
+            {
+                typedef typename boost::remove_const<Element>::type element_type;
+                typedef typename
+                    boost::serialization::is_bitwise_serializable<element_type>::type
+                predicate;
+                
+                if(ar.flags() & disable_array_optimization)
+                {
+                    serialize_element(ar, e, boost::mpl::false_());
+                }
+                else
+                {
+                    serialize_element(ar, e, predicate());
+                }
             }
 
             template <typename Archive>
@@ -110,8 +134,15 @@ namespace hpx { namespace util
         typedef typename
             boost::serialization::is_bitwise_serializable<sequence_type>::type
         predicate;
-
-        detail::serialize_sequence(ar, seq, predicate());
+        
+        if(ar.flags() & disable_array_optimization)
+        {
+            detail::serialize_sequence(ar, seq, boost::mpl::false_());
+        }
+        else
+        {
+            detail::serialize_sequence(ar, seq, predicate());
+        }
     }
 }}
 

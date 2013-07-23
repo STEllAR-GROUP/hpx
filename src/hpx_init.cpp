@@ -29,15 +29,24 @@
 #  include <signal.h>
 #endif
 
+#if defined(HPX_NATIVE_MIC)
+#   include <cstdlib>
+#endif
+
 #include <iostream>
 #include <vector>
 #include <new>
 
+#include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/foreach.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/util/mpi_environment.hpp>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -1041,6 +1050,11 @@ namespace hpx
         int result = 0;
         set_error_handlers();
 
+#ifdef HPX_NATIVE_MIC
+        unsetenv("LC_ALL");
+        unsetenv("LANG");
+#endif
+
         try {
             // handle all common command line switches
             util::command_line_handling cfg(mode, f, ini_config);
@@ -1135,11 +1149,13 @@ namespace hpx
             }
         }
         catch (std::exception& e) {
+            std::cerr << "{env}: " << hpx::detail::get_execution_environment();
             std::cerr << "hpx::init: std::exception caught: " << e.what()
                       << "\n";
             return -1;
         }
         catch (...) {
+            std::cerr << "{env}: " << hpx::detail::get_execution_environment();
             std::cerr << "hpx::init: unexpected exception caught\n";
             return -1;
         }

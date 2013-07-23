@@ -100,8 +100,8 @@ namespace hpx { namespace parcelset
         /// \brief Stop all parcelports associated with this parcelhandler
         void stop(bool blocking = true);
 
-        /// \ brief flush all parcel buffers
-        void flush_buffers(bool stop_buffering = false);
+        /// \ brief do background work in the parcel layer
+        void do_background_work(bool stop_buffering = false);
 
         /// \brief Allow access to AGAS resolver instance.
         ///
@@ -432,6 +432,7 @@ namespace hpx { namespace parcelset
 
         boost::int64_t get_connection_cache_statistics(connection_type pp_type,
             parcelport::connection_cache_statistics_type stat_type, bool) const;
+        bool supports_connection_cache_statistics(connection_type pp_type) const;
 
     protected:
         std::size_t get_incoming_queue_length(bool /*reset*/) const

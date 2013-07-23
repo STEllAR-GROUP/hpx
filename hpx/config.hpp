@@ -7,6 +7,11 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+// Intel MPI requires this to be included before anything else
+#include <mpi.h>
+#endif
+
 #include <hpx/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
@@ -69,6 +74,23 @@
 // make sure Fusion sizes are adjusted appropriately as well
 #if HPX_LIMIT > 5 && !defined(FUSION_MAX_VECTOR_SIZE)
 #  define FUSION_MAX_VECTOR_SIZE 20
+#endif
+
+#if HPX_LIMIT > 6 && !defined(BOOST_FUSION_INVOKE_MAX_ARITY)
+#  define BOOST_FUSION_INVOKE_MAX_ARITY HPX_LIMIT
+#endif
+
+#if HPX_LIMIT > 6 && !defined(BOOST_FUSION_INVOKE_PROCEDURE_MAX_ARITY)
+#  define BOOST_FUSION_INVOKE_PROCEDURE_MAX_ARITY HPX_LIMIT
+#endif
+
+#if HPX_LIMIT > 6 && !defined(BOOST_FUSION_INVOKE_FUNCTION_OBJECT_MAX_ARITY)
+#  define BOOST_FUSION_INVOKE_FUNCTION_OBJECT_MAX_ARITY HPX_LIMIT
+#endif
+
+// make sure boost::result_of is adjusted appropriately as well
+#if HPX_LIMIT > 5 && !defined(BOOST_RESULT_OF_NUM_ARGS)
+#  define BOOST_RESULT_OF_NUM_ARGS 20
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -645,10 +667,10 @@
 #define HPX_AGAS_LOCALITY_NS_LSB                     0x0000000000000004ULL
 
 #if defined(HPX_HAVE_SODIUM)
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB           0x0000000100000001ULL
-#  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB           0x0000000000000005ULL
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB    0x0000000000000001ULL      // this is made locality specific
-#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB    0x0000000000000006ULL
+#  define HPX_ROOT_CERTIFICATE_AUTHORITY_MSB         0x0000000100000001ULL
+#  define HPX_ROOT_CERTIFICATE_AUTHORITY_LSB         0x0000000000000005ULL
+#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_MSB  0x0000000000000001ULL      // this is made locality specific
+#  define HPX_SUBORDINATE_CERTIFICATE_AUTHORITY_LSB  0x0000000000000006ULL
 #endif
 
 #if !defined(HPX_NO_DEPRECATED)

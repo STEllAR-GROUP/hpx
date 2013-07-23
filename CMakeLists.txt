@@ -193,6 +193,7 @@ if(HPX_NATIVE_MIC)
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
+  hpx_add_definitions(-DHPX_NATIVE_MIC)
   set(HPX_MALLOC "tbbmalloc")
 endif()
 
@@ -317,8 +318,8 @@ endif()
 # Decide whether to use shared memory based parcelport (starting with Boost V1.52)
 ################################################################################
 if(${BOOST_MINOR_VERSION} GREATER 51)
-  hpx_option(HPX_USE_PARCELPORT_SHMEM BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
-  if(HPX_USE_PARCELPORT_SHMEM)
+  hpx_option(HPX_HAVE_PARCELPORT_SHMEM BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
+  if(HPX_HAVE_PARCELPORT_SHMEM)
     hpx_add_definitions(-DHPX_HAVE_PARCELPORT_SHMEM)
   endif()
 endif()
@@ -326,12 +327,45 @@ endif()
 ################################################################################
 # Decide whether to use rdma based ibverbs parcelport
 ################################################################################
-hpx_option(HPX_USE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
-if(HPX_USE_PARCELPORT_IBVERBS)
+hpx_option(HPX_HAVE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
+if(HPX_HAVE_PARCELPORT_IBVERBS)
   find_package(HPX_Ibverbs)
   find_package(HPX_Rdmacm)
   if(IBVERBS_FOUND AND RDMACM_FOUND)
     hpx_add_definitions(-DHPX_HAVE_PARCELPORT_IBVERBS)
+  endif()
+endif()
+
+################################################################################
+# Decide whether to use MPI based parcelport
+################################################################################
+hpx_option(HPX_HAVE_PARCELPORT_MPI BOOL "Enable parcelport based on MPI (default: OFF)." OFF ADVANCED)
+if(HPX_HAVE_PARCELPORT_MPI)
+  find_package(HPX_MPI)
+  if(MPI_FOUND OR MPI_CXX_FOUND)
+    foreach(language CXX C Fortran)
+      set(CMAKE_${language}_FLAGS_DEBUG
+          "${CMAKE_${language}_FLAGS_DEBUG} ${MPI_${language}_COMPILE_FLAGS}")
+      set(CMAKE_${language}_FLAGS_RELWITHDEBINFO
+          "${CMAKE_${language}_FLAGS_RELWITHDEBINFO} ${MPI_${language}_COMPILE_FLAGS}")
+      set(CMAKE_${language}_FLAGS_MINSIZEREL
+          "${CMAKE_${language}_FLAGS_MINSIZEREL} ${MPI_${language}_COMPILE_FLAGS}")
+      set(CMAKE_${language}_FLAGS_RELEASE
+          "${CMAKE_${language}_FLAGS_RELEASE} ${MPI_${language}_COMPILE_FLAGS}")
+    endforeach()
+    hpx_add_definitions(-DHPX_HAVE_PARCELPORT_MPI)
+    foreach(language CXX C)
+      if(MPI_${language}_COMPILE_FLAGS)
+        hpx_add_definitions(${MPI_${language}_COMPILE_FLAGS})
+      endif()
+      if(MPI_${language}_INCLUDE_PATH)
+        hpx_include_sys_directories(${MPI_${language}_INCLUDE_PATH})
+      endif()
+      if(MPI_${language}_LIBRARIES)
+        set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_${language}_LIBRARIES})
+      endif()
+    endforeach()
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_EXTRA_LIBRARY})
   endif()
 endif()
 
@@ -418,8 +452,8 @@ if(NOT MSVC)
     hpx_add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
   endif()
 endif()
-  
-if(NOT MSVC) 
+
+if(NOT MSVC)
   hpx_option(HPX_USE_MMAP BOOL "Use mmap for stack allocation (default: ON)" ON ADVANCED)
   if(HPX_USE_MMAP)
     hpx_add_definitions(-DHPX_USE_MMAP)
@@ -635,6 +669,7 @@ if(HPX_NATIVE_MIC)
     set(CMAKE_${language}_FLAGS_RELEASE
         "${CMAKE_${language}_FLAGS_RELEASE} -mmic")
   endforeach()
+  hpx_add_definitions(-mmic)
 endif()
 
 if(MSVC)
@@ -741,7 +776,7 @@ hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=pe
 if(HPX_PERIODIC_PRIORITY_SCHEDULER)
   hpx_add_definitions(-DHPX_PERIODIC_PRIORITY_SCHEDULER)
 endif()
-  
+
 hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
            "Compile HPX with google perftools (Default: ON)" ON ADVANCED)
 
@@ -880,6 +915,11 @@ if(MSVC)
     if(MSVC11)
       # MSVC2012 is overeager to report 'qualifier applied to function type has no meaning; ignored'
       hpx_append_flag(-wd4180)
+    endif()
+
+    # OpenMPI triggers a lot of forcing value to bool 'true' or 'false' (performance warning)
+    if(MPI_FOUND)
+      hpx_append_flag(-wd4800)
     endif()
 
     # According to the ifort Windows manual, W3 isn't supported
@@ -1109,10 +1149,13 @@ else()
     # #858: type qualifier on return type is meaningless
     # #1098: the qualifier on this friend declaration is ignored
     # #488: template parameter not used in declaring the parameter type
+    # #2203: cast discards qualifiers from target type (needed for mvapich2
+    # mpi header)
     hpx_use_flag_if_available(-wd1170)
     hpx_use_flag_if_available(-wd858)
     hpx_use_flag_if_available(-wd1098)
     hpx_use_flag_if_available(-wd488)
+    hpx_use_flag_if_available(-wd2203)
     if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
@@ -1239,11 +1282,11 @@ else()
   hpx_use_flag_if_available(-pthread LANGUAGES CXX C)
 
 endif()
-  
+
 if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
-  
+
 if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()

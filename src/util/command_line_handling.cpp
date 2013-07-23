@@ -12,6 +12,11 @@
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/command_line_handling.hpp>
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/util/mpi_environment.hpp>
+#endif
+
+#include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -225,10 +230,14 @@ namespace hpx { namespace util
             num_threads_ = threads;
         }
 
-        // handling number of localities
+        // handling number of localities, might have already been initialized
+        // from MPI environment
         std::size_t batch_localities = env.retrieve_number_of_localities();
-        num_localities_ = cfgmap.get_value<std::size_t>(
-            "hpx.localities", batch_localities);
+        if (num_localities_ == 1)
+        {
+            num_localities_ = cfgmap.get_value<std::size_t>(
+                "hpx.localities", batch_localities);
+        }
 
         if ((env.run_with_pbs() || env.run_with_slurm()) &&
             using_nodelist && (batch_localities != num_localities_))
@@ -330,7 +339,7 @@ namespace hpx { namespace util
         }
 
         if (vm.count("hpx:hpx")) {
-            if (!util::split_ip_address(vm["hpx:hpx"].as<std::string>(), 
+            if (!util::split_ip_address(vm["hpx:hpx"].as<std::string>(),
                     hpx_host, hpx_port))
             {
                 std::cerr
@@ -542,6 +551,27 @@ namespace hpx { namespace util
         return false;
     }
 
+    void command_line_handling::handle_attach_debugger()
+    {
+#if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
+        if(vm_.count("hpx:attach-debugger")) {
+#if defined(_POSIX_VERSION)
+            int i = 0;
+            std::cerr
+                << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
+                << " ready for attaching debugger. Once attached set i = 1 and continue"
+                << std::endl;
+            while(i == 0)
+            {
+                sleep(1);
+            }
+#elif defined(BOOST_MSVC)
+            DebugBreak();
+#endif
+        }
+#endif
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(
         boost::program_options::options_description const& desc_cmdline,
@@ -595,6 +625,10 @@ namespace hpx { namespace util
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        node = util::mpi_environment::init(&argc, &argv, *this);
+#endif
+
         // minimally assume one locality and this is the console
         if (node == std::size_t(-1))
             node = 0;
@@ -610,6 +644,9 @@ namespace hpx { namespace util
         {
             return -1;
         }
+
+        // break into debugger, if requested
+        handle_attach_debugger();
 
         // handle all --hpx:foo and --hpx:*:foo options
         if (!handle_arguments(cfgmap, vm_, ini_config_, node))

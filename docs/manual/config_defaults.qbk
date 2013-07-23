@@ -241,6 +241,7 @@ sections, one for each component.
     max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:<hpx_parcel_max_connections>}
     max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:<hpx_parcel_max_connections_per_locality>}
     max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:<hpx_parcel_max_message_size>}
+    array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}
 ``
 [c++]
 
@@ -281,17 +282,38 @@ sections, one for each component.
       transferrable through the parcel layer.]
      [static information, the default depends on the compile time preprocessor
       constant `HPX_PARCEL_MAX_MESSAGE_SIZE` (`1000000000`) bytes.]]
+    [[`hpx.parcel.array_optimization`]
+     [This property defines whether this locality is allowed to utilize array
+      optimizations during serialization of parcel data.]
+     [static information, the default is `1` (on).]]
 ]
 
-The following setting relate to the shared memory parcelport (which is usable
+[teletype]
+``
+    [hpx.parcel.tcpip]
+    enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}
+``
+[c++]
+
+[table:ini_hpx_parcel_tcpip
+    [[Property]                 [Description]                         [Remark]]
+    [[`hpx.parcel.tcpip.enable`]
+     [Enable the use of the default TCPIP parcelport. Note that the initial
+      bootstrap of the overall __hpx__ application will be performed using the
+      default TCPIP connections.]
+     [static information, the connections are enabled by default. This will
+      be disabled only if MPI is enabled (see below)]]
+]
+
+The following settings relate to the shared memory parcelport (which is usable
 for communication between two localities on the same node). These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` is set
-(the equivalent cmake variable has the same name, and has to be set to `ON`).
+(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_SHMEM`, and has to be set to `ON`).
 
 [teletype]
 ``
     [hpx.parcel.shmem]
-    enable = ${HPX_PARCELPORT_USE_SHMEM:0}
+    enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}
     data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}
 ``
 [c++]
@@ -311,15 +333,15 @@ effect only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` is set
       constant `HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE` (`512`)]]
 ]
 
-The following setting relate to the Infiniband parcelport (which is usable
-for cmmunication between two localities on the same node). These settings take
+The following settings relate to the Infiniband parcelport. These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` is set
-(the equivalent cmake variable has the same name, and has to be set to `ON`).
+(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_IBVERBS`, and has to be 
+set to `ON`).
 
 [teletype]
 ``
     [hpx.parcel.ibverbs]
-    enable = ${HPX_PARCELPORT_USE_IBVERBS:0}
+    enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}
     buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
 ``
 [c++]
@@ -338,6 +360,36 @@ effect only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` is set
       serialized and sent over the network in a zero-copy fashion. Parcels
       bigger than this will be transparently copied to a big enough temporary
       buffer.]]
+]
+
+The following settings relate to the MPI parcelport. These settings take
+effect only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` is set
+(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_MPI`, and has to be set 
+to `ON`).
+
+[teletype]
+``
+    [hpx.parcel.mpi]
+    enable = ${HPX_HAVE_PARCELPORT_MPI:0}
+    rank = <MPI_rank>
+    processor_name = <MPI_processor_name>
+``
+[c++]
+
+[table:ini_hpx_parcel_mpi
+    [[Property]                 [Description]                         [Remark]]
+    [[`hpx.parcel.mpi.enable`]
+     [Enable the use of the MPI parcelport for connections between
+      localities running on a node with MPI support. Note
+      that the initial bootstrap of the overall __hpx__ application will
+      still be performed using MPI as well.]
+     [static information, the connections are disabled by default.]]
+    [[`hpx.parcel.mpi.rank`]
+     [This property will be initialized to the MPI rank of the locality.]
+     [dynamic information set by __hpx__]]
+    [[`hpx.parcel.mpi.processor_name`]
+     [This property will be initialized to the MPI processor name of the locality.]
+     [dynamic information set by __hpx__]]
 ]
 
 

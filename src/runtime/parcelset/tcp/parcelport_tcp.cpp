@@ -58,11 +58,13 @@ namespace hpx { namespace parcelset { namespace tcp
         acceptor_(NULL),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
+        /*
         if (here_.get_type() != connection_tcpip) {
             HPX_THROW_EXCEPTION(network_error, "tcp::parcelport::parcelport",
                 "this parcelport was instantiated to represent an unexpected "
                 "locality type: " + get_connection_type_name(here_.get_type()));
         }
+        */
     }
 
     parcelport::~parcelport()
@@ -638,6 +640,10 @@ namespace hpx { namespace parcelset { namespace tcp
         performance_counters::parcels::data_point receive_data,
         bool first_message)
     {
+        unsigned archive_flags = boost::archive::no_header;
+        if (!pp.allow_array_optimizations())
+            archive_flags |= util::disable_array_optimization;
+
         // protect from un-handled exceptions bubbling up
         try {
             try {
@@ -648,7 +654,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 {
                     // De-serialize the parcel data
                     util::portable_binary_iarchive archive(*parcel_data,
-                        inbound_data_size, boost::archive::no_header);
+                        inbound_data_size, archive_flags);
 
                     std::size_t parcel_count = 0;
                     archive >> parcel_count;

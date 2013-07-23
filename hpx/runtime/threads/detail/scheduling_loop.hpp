@@ -305,7 +305,7 @@ namespace hpx { namespace threads { namespace detail
 
                 if (0 == num_thread) {
                     // do background work in parcel layer
-                    hpx::parcelset::flush_buffers();
+                    hpx::parcelset::do_background_work();
                 }
             }
 

@@ -12,6 +12,9 @@
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 #  include <hpx/runtime/parcelset/ibverbs/parcelport.hpp>
 #endif
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#  include <hpx/runtime/parcelset/mpi/parcelport.hpp>
+#endif
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/exception.hpp>
@@ -28,32 +31,43 @@ namespace hpx { namespace parcelset
     {
         std::string pptype = cfg.get_entry("hpx.parcel.bootstrap", "tcpip");
 
-        connection_type type = get_connection_type_from_name(pptype);
+        int type = get_connection_type_from_name(pptype);
         if (type == connection_unknown)
             type = connection_tcpip;
 
         return create(type, cfg, on_start_thread, on_stop_thread);
     }
 
-    boost::shared_ptr<parcelport> parcelport::create(connection_type type,
+    boost::shared_ptr<parcelport> parcelport::create(int type,
         util::runtime_configuration const& cfg,
         HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
         HPX_STD_FUNCTION<void()> const& on_stop_thread)
     {
         switch(type) {
         case connection_tcpip:
-            return boost::make_shared<parcelset::tcp::parcelport>(
-                cfg, on_start_thread, on_stop_thread);
+            {
+                std::string enable_tcpip =
+                    cfg.get_entry("hpx.parcel.tcpip.enable", "1");
+
+                if (boost::lexical_cast<int>(enable_tcpip))
+                {
+                    return boost::make_shared<parcelset::tcp::parcelport>(
+                        cfg, on_start_thread, on_stop_thread);
+                }
+
+                HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
+                    "unsupported connection type 'connection_tcpip'");
+            }
 
         case connection_shmem:
             {
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
-                // Create shmem based parcelport only if allowed by the 
+                // Create shmem based parcelport only if allowed by the
                 // configuration info.
-                std::string enable_shmem = 
+                std::string enable_shmem =
                     cfg.get_entry("hpx.parcel.shmem.enable", "0");
 
-                if (boost::lexical_cast<int>(enable_shmem)) 
+                if (boost::lexical_cast<int>(enable_shmem))
                 {
                     return boost::make_shared<parcelset::shmem::parcelport>(
                         cfg, on_start_thread, on_stop_thread);
@@ -103,6 +117,7 @@ namespace hpx { namespace parcelset
                 }
             }
 #endif
+
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                 "unsupported connection type 'connection_mpi'");
             break;
@@ -120,8 +135,13 @@ namespace hpx { namespace parcelset
     parcelport::parcelport(util::runtime_configuration const& ini)
       : parcels_(),
         here_(ini.get_parcelport_address()),
-        max_message_size_(ini.get_max_message_size())
+        max_message_size_(ini.get_max_message_size()),
+        allow_array_optimizations_(true)
     {
+        std::string array_optimization =
+            ini.get_entry("hpx.parcel.array_optimization", "1");
+        if (boost::lexical_cast<int>(array_optimization) == 0)
+            allow_array_optimizations_ = false;
     }
 
     ///////////////////////////////////////////////////////////////////////////

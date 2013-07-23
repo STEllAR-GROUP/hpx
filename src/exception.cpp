@@ -56,7 +56,7 @@ namespace hpx { namespace detail
         return count;
     }
 
-    inline std::string get_execution_environment()
+    std::string get_execution_environment()
     {
         std::vector<std::string> env;
 
@@ -372,10 +372,25 @@ namespace hpx
         if (line)
             strm << "{line}: " << *line << "\n";
 
+        bool thread_info = false;
+        char const* const thread_prefix = "{os-thread}: ";
         std::size_t const* shepherd =
             boost::get_error_info<hpx::detail::throw_shepherd>(e);
-        if (shepherd && std::size_t(-1) != *shepherd)
-            strm << "{os-thread}: " << *shepherd << "\n";
+        if (shepherd && std::size_t(-1) != *shepherd) {
+            strm << thread_prefix << *shepherd;
+            thread_info = true;
+        }
+        std::string const* thread_name = runtime::get_thread_name();
+        if (thread_name) {
+            if (!thread_info)
+                strm << thread_prefix;
+            else 
+                strm << ", ";
+            strm << *thread_name;
+            thread_info = true;
+        }
+        if (thread_info)
+            strm << "\n";
 
         std::size_t const* thread_id =
             boost::get_error_info<hpx::detail::throw_thread_id>(e);

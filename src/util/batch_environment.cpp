@@ -186,7 +186,7 @@ namespace hpx { namespace util
                     if (!line.empty()) {
                         if (debug_)
                             std::cerr << "read: '" << line << "'" << std::endl;
-            
+
                         boost::asio::ip::tcp::endpoint ep =
                             util::resolve_hostname(line, 0, io_service);
 
@@ -271,7 +271,7 @@ namespace hpx { namespace util
             if (!s.empty()) {
                 if (debug_)
                     std::cerr << "extracted: '" << s << "'" << std::endl;
-        
+
                 boost::asio::ip::tcp::endpoint ep =
                     util::resolve_hostname(s, 0, io_service);
 

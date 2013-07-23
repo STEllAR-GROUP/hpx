@@ -22,7 +22,7 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/int.hpp>
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500 || defined(BOOST_INTEL)
 #include <boost/mpl/fold.hpp>
 #include <boost/mpl/and.hpp>
 #endif
@@ -104,7 +104,7 @@ namespace hpx { namespace util
 #endif
 
 // gcc 4.4.x is not able to cope with this, thus we disable the optimization
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500 || defined(BOOST_INTEL)
         ///////////////////////////////////////////////////////////////////////
         struct compute_sequence_is_bitwise_serializable
         {

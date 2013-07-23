@@ -9,6 +9,8 @@
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
+#include <hpx/config.hpp>
+
 #include <cstdlib>
 #include <vector>
 
@@ -31,7 +33,6 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 
-#include <hpx/config.hpp>
 #include <hpx/config/function.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
@@ -137,7 +138,7 @@ namespace hpx
             std::size_t interval, naming::locality const& l, connection_type t,
             error_code& ec = throws);
 
-        HPX_API_EXPORT void flush_buffers();
+        HPX_API_EXPORT void do_background_work();
     }
 
     /// \namespace threads

@@ -122,7 +122,10 @@ namespace hpx { namespace parcelset
         }
 
         /// Cache specific functionality
-        virtual void remove_from_connection_cache(naming::locality const& loc) = 0;
+        virtual void remove_from_connection_cache(naming::locality const& loc)
+        {
+            // by default, no connection cache is used
+        }
 
         /// Retrieve the type of the locality represented by this parcelport
         virtual connection_type get_type() const = 0;
@@ -143,11 +146,22 @@ namespace hpx { namespace parcelset
             connection_cache_reclaims = 4
         };
 
+        // invoke pending background work
+        virtual void do_background_work()
+        {
+            // by default no work has to be done
+        }
+
+        // by default this parcelport does not expose any conenction cache
+        // statistics
+        virtual bool supports_connection_cache_statistics() const
+        {
+            return false;
+        }
+
         virtual boost::int64_t
         get_connection_cache_statistics(connection_cache_statistics_type, bool reset)
         {
-            // by default this parcelport does not expose any conenction cache
-            // statistics
             return 0;
         }
 
@@ -295,8 +309,13 @@ namespace hpx { namespace parcelset
             parcels_received_.add_data(data);
         }
 
+        void add_sent_data(performance_counters::parcels::data_point const& data)
+        {
+            parcels_sent_.add_data(data);
+        }
+
         /// Create a new instance of a parcelport
-        static boost::shared_ptr<parcelport> create(connection_type type,
+        static boost::shared_ptr<parcelport> create(int type,
             util::runtime_configuration const& cfg,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread);
@@ -310,6 +329,12 @@ namespace hpx { namespace parcelset
         boost::uint64_t get_max_message_size() const
         {
             return max_message_size_;
+        }
+
+        /// Return whether it is allowed to apply array optimizations
+        bool allow_array_optimizations() const
+        {
+            return allow_array_optimizations_;
         }
 
     protected:
@@ -338,6 +363,9 @@ namespace hpx { namespace parcelset
         /// Parcel timers and their data containers.
         performance_counters::parcels::gatherer parcels_sent_;
         performance_counters::parcels::gatherer parcels_received_;
+
+        /// serialization is allowed to use array optimization
+        bool allow_array_optimizations_;
     };
 }}
 

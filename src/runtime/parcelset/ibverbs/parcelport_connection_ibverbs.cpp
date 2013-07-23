@@ -49,15 +49,20 @@ namespace hpx { namespace parcelset { namespace ibverbs
             BOOST_ASSERT(endian_out =="little" || endian_out == "big");
         }
 
+        std::string array_optimization =
+            get_config_entry("hpx.parcel.array_optimization", "1");
+        if (boost::lexical_cast<int>(array_optimization) == 0)
+            archive_flags_ |= util::disable_array_optimization;
+
         boost::system::error_code ec;
         std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");
-        
+
         std::size_t buffer_size = boost::lexical_cast<std::size_t>(buffer_size_str);
         char * mr_buffer = context_.set_buffer_size(buffer_size, ec);
 
         out_buffer_.set_mr_buffer(mr_buffer, buffer_size);
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {

@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
 #include <hpx/version.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -127,24 +128,29 @@ namespace hpx { namespace util
             "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
 #ifdef BOOST_BIG_ENDIAN
-            "endian_out=${HPX_ENDIAN_OUT:big}",
+            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
 #else
-            "endian_out=${HPX_ENDIAN_OUT:little}",
+            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
 #endif
+            "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
+
+            // TCPIP related settings
+            "[hpx.parcel.tcpip]",
+            "enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}",
 
             // shmem related settings
             "[hpx.parcel.shmem]",
-            "enable=${HPX_PARCELPORT_USE_SHMEM:0}",
-            "data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
+            "enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}",
+            "data_buffer_cache_size = ${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
 
             // ibverbs related settings
             "[hpx.parcel.ibverbs]",
-            "enable=${HPX_PARCELPORT_USE_IBVERBS:0}",
-            "buffer_size=${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
+            "enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}",
+            "buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
 
             // MPI related settings
             "[hpx.parcel.mpi]",
-            "enable=${HPX_PARCELPORT_USE_MPI:0}",
+            "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -390,12 +396,24 @@ namespace hpx { namespace util
                 std::string cfg_port(
                     sec->get_entry("port", HPX_INITIAL_IP_PORT));
 
-                return naming::locality(
-                    sec->get_entry("address", HPX_INITIAL_IP_ADDRESS),
-                    boost::lexical_cast<boost::uint16_t>(cfg_port));
+                return
+                    naming::locality(
+                        sec->get_entry("address", HPX_INITIAL_IP_ADDRESS)
+                      , boost::lexical_cast<boost::uint16_t>(cfg_port)
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+                      , mpi_environment::enabled() ? 0 : -1
+#endif
+                    );
             }
         }
-        return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
+        return
+            naming::locality(
+                HPX_INITIAL_IP_ADDRESS
+              , HPX_INITIAL_IP_PORT
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+              , mpi_environment::enabled() ? 0 : -1
+#endif
+            );
     }
 
     // HPX network address configuration information has to be stored in the

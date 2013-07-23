@@ -103,7 +103,7 @@ system and application performance.
          `<connection_type>`.
 
          The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -133,7 +133,7 @@ system and application performance.
          (see `<operation>`, e.g. `sent` or `received`).
 
          The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -162,7 +162,7 @@ system and application performance.
          `<connection_type>` by the given locality.
 
          The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -191,7 +191,7 @@ system and application performance.
          `<operation>`, e.g. `sent` or `received`).
 
          The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -220,7 +220,7 @@ system and application performance.
          `<operation>`, e.g. `sent` or `received`).
 
          The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -272,7 +272,7 @@ system and application performance.
          `sent` or `received`).
 
          The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -302,7 +302,7 @@ system and application performance.
          `<operation>`, e.g. `sent` or `received`).
 
          The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -333,7 +333,7 @@ system and application performance.
          `cache-evictions`, `cache-hits`, `cache-misses`, or `cache-reclaims`).
 
          The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_USE_PARCELPORT_SHMEM` was
+         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 

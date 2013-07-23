@@ -123,6 +123,11 @@ namespace hpx { namespace parcelset { namespace tcp
         util::io_service_pool* get_thread_pool(char const* name);
 
         /// Return the given connection cache statistic
+        bool supports_connection_cache_statistics() const
+        {
+            return true;
+        }
+
         boost::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type t, bool reset);
 

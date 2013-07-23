@@ -120,7 +120,7 @@ public:
     friend class boost::archive::load_access;
 protected:
 #endif
-    unsigned int m_flags;
+    boost::uint32_t m_flags;
     HPX_ALWAYS_EXPORT void
     load_impl(boost::int64_t& l, char maxsize);
 
@@ -266,7 +266,7 @@ public:
         init(flags);
     }
 
-    unsigned int flags() const
+    boost::uint32_t flags() const
     {
         return m_flags;
     }
@@ -278,12 +278,12 @@ public:
         // If we need to potentially flip bytes we serialize each element
         // separately.
 #ifdef BOOST_BIG_ENDIAN
-        if (m_flags & endian_little) {
+        if (m_flags & (endian_little | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 load(a.address()[i]);
         }
 #else
-        if (m_flags & endian_big) {
+        if (m_flags & (endian_big | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 load(a.address()[i]);
         }

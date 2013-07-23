@@ -56,14 +56,16 @@ our tables below.
 [table:contributors Contributors
   [[Name]                    [Institution]        [email]]
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
-  [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
+  [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
   [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
-  [[Matthew Anderson]        [__crest__, __iu__]  [[$./images/emails/manderson.png]]]
+  [[Shuangyang Yang]         [__cct__, __lsu__]   [[$./images/emails/syang16.png]]]
+  [[Jeroen Habraken]         [__tue__]            [[$./images/emails/vexocide.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
   [[Andrew Kemp]             [__cct__, __lsu__]   [[$./images/emails/akemp.png]]]
-  [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
   [[Adrian Serio]            [__cct__, __lsu__]   [[$./images/emails/aserio.png]]]
+  [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
+  [[Matthew Anderson]        [__crest__, __iu__]  [[$./images/emails/manderson.png]]]
   [[Alex Nagelberg]          [__cct__, __lsu__]   [[$./images/emails/anagelberg.png]]]
   [[Dylan Stark]             [__sandia__]         [[$./images/emails/dstark.png]]]
 ]
@@ -83,17 +85,24 @@ our tables below.
 
 [heading Acknowledgements]
 
-Thanks also to the following people who contributed directly or indirectly to 
+Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
 * Pyry Jahkola, who contributed the Mac OS build system and build documentation
   on how to build HPX using Clang and libc++.
-* Patricia Grubel (New Mexico State University), who contributed the desciption 
+* Patricia Grubel (New Mexico State University), who contributed the desciption
   of the different __hpx__ thread scheduler policies.
+* Lars Viklund, who contributed platform specific patches for FreeBSD and MSVC12.
+* Agustin Berge, who contributed patches fixing some very nasty hidden template
+  meta-programming issues.
+* Mario Mulansky, who created an __hpx__ backend for his Boost.Odeint library, and
+  who submitted several test cases allowing us to reproduce and fix problems
+  in __hpx__.
+* Rekha Raj, who contributed changes to the description of the Windows build
+  instructions.
 
 In addition to the people who worked directly with __hpx__ development we would
-like to acknowledge Thomas Sterling, who was instrumental in the creation
-of ParalleX as well as the NSF, DOE, DARPA, and __cct__ who fund and support our
+like to acknowledge the NSF, DoE, DARPA, and __cct__ who fund and support our
 work.
 
 [endsect] [/ People]

@@ -1,35 +1,36 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_SHMEM_PARCELPORT_NOV_25_2012_0425PM)
-#define HPX_PARCELSET_SHMEM_PARCELPORT_NOV_25_2012_0425PM
+#if !defined(HPX_PARCELSET_MPI_PARCELPORT_HPP)
+#define HPX_PARCELSET_MPI_PARCELPORT_HPP
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
-#include <hpx/runtime/parcelset/shmem/data_buffer_cache.hpp>
-#include <hpx/runtime/parcelset/shmem/data_window.hpp>
-#include <hpx/runtime/parcelset/shmem/acceptor.hpp>
-#include <hpx/runtime/parcelset/shmem/parcelport_connection.hpp>
-#include <hpx/runtime/parcelset/server/shmem/parcelport_server_connection.hpp>
+#include <hpx/runtime/parcelset/mpi/parcel_cache.hpp>
+#include <hpx/runtime/parcelset/mpi/acceptor.hpp>
+#include <hpx/runtime/parcelset/mpi/receiver.hpp>
+#include <hpx/runtime/parcelset/mpi/sender.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
 
 #include <boost/cstdint.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <set>
+#include <list>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace shmem
+namespace hpx { namespace parcelset { namespace mpi
 {
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
-    /// to receive parcels. This parcelport manages connections over shared
-    /// memory.
+    /// to receive parcels.
     class HPX_EXPORT parcelport : public parcelset::parcelport
     {
     public:
@@ -65,10 +66,7 @@ namespace hpx { namespace parcelset { namespace shmem
         /// function or function object gets invoked on completion of the send
         /// operation or on any error.
         ///
-        /// \param p        [in, out] A reference to the parcel to send. The
-        ///                 parcel \a p will be modified in place, as it will
-        ///                 get set the resolved destination address and parcel
-        ///                 id (if not already set).
+        /// \param p        [in] A reference to the parcel to send.
         /// \param f        [in] A function object to be invoked on successful
         ///                 completion or on errors. The signature of this
         ///                 function object is expected to be:
@@ -97,30 +95,27 @@ namespace hpx { namespace parcelset { namespace shmem
         void put_parcels(std::vector<parcel> const & parcels,
             std::vector<write_handler_type> const& handlers);
 
-        /// Cache specific functionality
-        void remove_from_connection_cache(naming::locality const& loc)
-        {
-            connection_cache_.clear(loc);
-        }
+        /// Send an early parcel through the TCP parcelport
+        ///
+        /// \param p        [in, out] A reference to the parcel to send. The
+        ///                 parcel \a p will be modified in place, as it will
+        ///                 get set the resolved destination address and parcel
+        ///                 id (if not already set).
+        void send_early_parcel(parcel& p);
 
         /// Retrieve the type of the locality represented by this parcelport
         connection_type get_type() const
         {
-            return connection_shmem;
+            return connection_mpi;
         }
 
         /// Return the thread pool if the name matches
         util::io_service_pool* get_thread_pool(char const* name);
 
-        /// Return the given connection cache statistic
-        bool supports_connection_cache_statistics() const
-        {
-            return true;
-        }
+        /// Make sure all pending requests are handled
+        void do_background_work();
 
-        boost::int64_t get_connection_cache_statistics(
-            connection_cache_statistics_type t, bool reset);
-
+    private:
         /// support enable_shared_from_this
         boost::shared_ptr<parcelport> shared_from_this()
         {
@@ -134,51 +129,44 @@ namespace hpx { namespace parcelset { namespace shmem
                 parcelset::parcelport::shared_from_this());
         }
 
-    protected:
-        // helper functions for receiving parcels
-        void handle_accept(boost::system::error_code const& e,
-            server::shmem::parcelport_connection_ptr);
-        void handle_read_completion(boost::system::error_code const& e,
-            server::shmem::parcelport_connection_ptr);
-
-        /// helper function to send remaining pending parcels
-        void send_pending_parcels_trampoline(
-            boost::system::error_code const& ec,
-            naming::locality const& prefix,
-            parcelport_connection_ptr client_connection);
-        void send_pending_parcels(parcelport_connection_ptr client_connection,
-            std::vector<parcel> const&, std::vector<write_handler_type> const&);
-
-        /// \brief Retrieve a new connection
-        parcelport_connection_ptr get_connection(naming::locality const& l, 
-            error_code& ec = throws);
-
-        parcelport_connection_ptr create_connection(naming::locality const& l,
-            error_code& ec = throws);
-
-        void send_parcels_or_reclaim_connection(naming::locality const& locality_id,
-            parcelport_connection_ptr const& client_connection);
-        void retry_sending_parcels(naming::locality const& locality_id);
-        void get_connection_and_send_parcels(naming::locality const& locality_id, 
-            naming::gid_type const& parcel_id);
-
     private:
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool io_service_pool_;
 
-        /// Acceptor used to listen for incoming connections.
-        acceptor* acceptor_;
-        std::size_t connection_count_;
+        detail::parcel_cache parcel_cache_;
+        boost::atomic<bool> stopped_;
+        boost::atomic<bool> handling_messages_;
 
-        /// The connection cache for sending connections
-        util::connection_cache<parcelport_connection, naming::locality> connection_cache_;
+        int next_tag_;
+        std::deque<int> free_tags_;
 
-        /// The cache holding data_buffers
-        data_buffer_cache data_buffer_cache_;
+        int get_next_tag()
+        {
+            int tag = 0;
+            if(free_tags_.empty())
+            {
+                tag = next_tag_++;
+            }
+            else
+            {
+                tag = free_tags_.front();
+                free_tags_.pop_front();
+            }
+            BOOST_ASSERT(tag != 0);
 
-        /// The list of accepted connections
-        typedef std::set<server::shmem::parcelport_connection_ptr> accepted_connections_set;
-        accepted_connections_set accepted_connections_;
+            return tag;
+        }
+
+        // handle messages
+        acceptor acceptor_;
+
+        typedef std::list<boost::shared_ptr<receiver> > receivers_type;
+        receivers_type receivers_;
+
+        typedef std::list<boost::shared_ptr<sender> > senders_type;
+        senders_type senders_;
+
+        void handle_messages();
     };
 }}}
 
