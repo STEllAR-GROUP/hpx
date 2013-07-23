@@ -350,8 +350,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         }
         ~reset_self_on_exit()
         {
-            super_type::set_self(NULL);
+            super_type::set_self(old_self);
         }
+
+        self_type *old_self;
     };
 
   public:
