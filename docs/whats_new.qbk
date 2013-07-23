@@ -14,15 +14,21 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_6 __hpx__ V0.9.6]
 
+We have had over 1200 commits since the last release and we have closed
+roughly 135 tickets (bugs, feature requests, etc.).
+
 [heading General Changes]
 
 The major new fetures in this release are:
 
+* We further consolidated the API exposed by __hpx__. We aligned our APIs as much as
+  possible with the existing C++11 Standard and related proposals to the 
+  C++ standardization committee (such as __cpp11_n3632__ and __cpp11_n3634__).
 * We implemented a first version of a distributed AGAS service which essentially
   eliminates all explicit AGAS network traffic.
 * We created a native ibverbs parcelport allowing to take advantage of the
   superior latency and bandwidth characteristics of Infiniband networks.
-* We successfully ported HPX to the Xeon Phi platform.
+* We successfully ported __hpx__ to the Xeon Phi platform.
 * Support for the SLURM scheduling system was implemented.
 * Major efforts have been dedicated to improving the performance counter
   framework, numerous new counters were implemented and new APIs were added.
@@ -33,16 +39,27 @@ The major new fetures in this release are:
   communication layer.
 * Added an experimental executors API allowing to use different scheduling
   policies for different parts of the code. This API has been modelled after
-  the Standards proposal N3562. This API is bound to change in the future,
-  though.
+  the Standards proposal __cpp11_n3562__. This API is bound to change in
+  the future, though.
 * Added minimal security support for localities which is enforced on the 
   parcelport level. This support is preliminary and experimental and might
   change in the future.
+* We created a parcelport using low level MPI functions. This is in support
+  of legacy applications which are to be gradually ported and to support
+  platforms where MPI is the only available portable networking layer.
+* We added a preliminary and experimental implementation of a tuple-space
+  object which exposes an interface similar to such systems described in the
+  literature (see for instance __linda__).
 
 [heading Bug Fixes (Closed Tickets)]
 
-Here is a list of the tickets we closed for this release.
+Here is a list of the important tickets we closed for this release. This is again
+a very long list of newly implemented features and fixed issues for any HPX' 
+releases so far.
 
+* [issue 800] - Add possibility to disable array optimizations during serialization
+* [issue 798] - HPX_LIMIT does not work for local dataflow
+* [issue 796] - Problem with Large Numbers of Threads
 * [issue 793] - Changing dataflow test case to hang consistently
 * [issue 792] - CMake Error
 * [issue 791] - Problems with local::dataflow
