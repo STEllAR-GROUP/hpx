@@ -29,15 +29,24 @@
 #  include <signal.h>
 #endif
 
+#if defined(HPX_NATIVE_MIC)
+#   include <cstdlib>
+#endif
+
 #include <iostream>
 #include <vector>
 #include <new>
 
+#include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/foreach.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/util/mpi_environment.hpp>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -1041,6 +1050,12 @@ namespace hpx
         int result = 0;
         set_error_handlers();
 
+#ifdef HPX_NATIVE_MIC
+        unsetenv("LC_ALL");
+        unsetenv("LANG");
+#endif
+
+
         try {
             // handle all common command line switches
             util::command_line_handling cfg(mode, f, ini_config);
@@ -1053,6 +1068,27 @@ namespace hpx
                     result = 0;     // --hpx:help
                 return result;
             }
+
+#if defined(_POSIX_VERSION)
+            if(!cfg.vm_["hpx:attach-gdb"].empty())
+            {
+                int i = 0;
+                char hostname[256];
+                gethostname(hostname, sizeof(hostname));
+                std::cerr
+                    << "PID: " << getpid() << " on " << hostname
+                    << " ready for attach. Once attached set i = 1 and continue"
+                    << std::endl;
+                while(i == 0)
+                {
+                    sleep(1);
+                }
+            }
+#endif
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            util::mpi_environment::init(&argc, &argv, cfg);
+#endif
 
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(cfg.queuing_)) {
@@ -1135,11 +1171,23 @@ namespace hpx
             }
         }
         catch (std::exception& e) {
+            char **env = environ;
+            while(*env != NULL)
+            {
+                std::cerr << "{env}: " << *env << "\n";
+                ++env;
+            }
             std::cerr << "hpx::init: std::exception caught: " << e.what()
                       << "\n";
             return -1;
         }
         catch (...) {
+            char **env = environ;
+            while(*env != NULL)
+            {
+                std::cerr << "{env}: " << *env << "\n";
+                ++env;
+            }
             std::cerr << "hpx::init: unexpected exception caught\n";
             return -1;
         }

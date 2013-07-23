@@ -41,9 +41,6 @@ addressing_service::addressing_service(
   , state_(starting)
   , locality_()
 { // {{{
-    // boot the parcel port
-    pp.run(false);
-
     create_big_boot_barrier(pp, ini_, runtime_type_);
 
     if (caching_)
@@ -51,6 +48,9 @@ addressing_service::addressing_service(
 
     if (service_type == service_mode_bootstrap)
         launch_bootstrap(ini_);
+
+    // now, boot the parcel port
+    pp.run(false);
 }
 
 void addressing_service::initialize()

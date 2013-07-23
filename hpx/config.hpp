@@ -7,6 +7,11 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+// Intel MPI requires this to be included before anything else
+#include <mpi.h>
+#endif
+
 #include <hpx/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>

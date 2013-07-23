@@ -58,11 +58,13 @@ namespace hpx { namespace parcelset { namespace tcp
         acceptor_(NULL),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
+        /*
         if (here_.get_type() != connection_tcpip) {
             HPX_THROW_EXCEPTION(network_error, "tcp::parcelport::parcelport",
                 "this parcelport was instantiated to represent an unexpected "
                 "locality type: " + get_connection_type_name(here_.get_type()));
         }
+        */
     }
 
     parcelport::~parcelport()

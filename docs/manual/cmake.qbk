@@ -292,12 +292,12 @@ variables are used more seldom and are mainly useful for debugging purposes.
       for this option is `OFF`. This option can be enabled only if the
       __boost_wave__ tool is available (see CMake variable `BOOSTWAVE` below).]
     ]
-    [[`HPX_USE_PARCELPORT_SHMEM:BOOL`]
+    [[`HPX_HAVE_PARCELPORT_SHMEM:BOOL`]
      [Sets whether the experimental implementation of a parcelport communicating
       over shared memory will be enabled or not. This variable is set to `OFF`
       by default.]
     ]
-    [[`HPX_USE_PARCELPORT_IBVERBS:BOOL`]
+    [[`HPX_HAVE_PARCELPORT_IBVERBS:BOOL`]
      [Sets whether the experimental implementation of a parcelport communicating
       over Infiniband will be enabled or not. This variable is set to `OFF`
       by default. In order to use this option the IBVERBS and RDMACM libraries 

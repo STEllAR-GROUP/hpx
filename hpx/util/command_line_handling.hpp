@@ -51,6 +51,8 @@ namespace hpx { namespace util
             std::vector<std::string> const& unregistered_options);
         bool handle_help_options(
             boost::program_options::options_description const& help);
+
+        void handle_attach_debugger();
     };
 }}
 

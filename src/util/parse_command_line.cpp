@@ -367,6 +367,10 @@ namespace hpx { namespace util
 
             // general options definitions
             hpx_options.add_options()
+#if defined(_POSIX_VERSION)
+                ("hpx:attach-gdb",
+                  "wait for gdb to be attached")
+#endif
                 ("hpx:run-agas-server",
                   "run AGAS server as part of this runtime instance")
                 ("hpx:run-hpx-main",
@@ -475,6 +479,9 @@ namespace hpx { namespace util
                   "AGAS logs to the target destination")
                 // enable debug output from command line handling
                 ("hpx:debug-clp", "debug command line processing")
+#if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
+                ("hpx:attach-debugger", "wait for a debugger to be attached")
+#endif
             ;
 
             options_description counter_options(
