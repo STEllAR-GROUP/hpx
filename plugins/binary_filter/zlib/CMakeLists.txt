@@ -5,8 +5,8 @@
 
 include(HPX_AddLibrary)
 
-hpx_option(HPX_USE_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
-if(HPX_USE_COMPRESSION_ZLIB)
+hpx_option(HPX_HAVE_COMPRESSION_ZLIB BOOL "Enable zlib compression for parcel data (default: OFF)." OFF ADVANCED)
+if(HPX_HAVE_COMPRESSION_ZLIB)
   if(MSVC)
     set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams zlib)
     set(ZLIB_FOUND ON CACHE INTERNAL "ZLIB_FOUND")
@@ -20,7 +20,7 @@ endif()
 
 macro(add_zlib_module)
   hpx_debug("add_zlib_module" "ZLIB_FOUND: ${ZLIB_FOUND}")
-  if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
+  if(HPX_HAVE_COMPRESSION_ZLIB AND ZLIB_FOUND)
     hpx_include_sys_directories(${ZLIB_INCLUDE_DIR})
     hpx_link_sys_directories(${ZLIB_LIBRARY_DIR})
 

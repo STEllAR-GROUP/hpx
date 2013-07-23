@@ -5,8 +5,8 @@
 
 include(HPX_AddLibrary)
 
-hpx_option(HPX_USE_COMPRESSION_BZIP2 BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
-if(HPX_USE_COMPRESSION_BZIP2)
+hpx_option(HPX_HAVE_COMPRESSION_BZIP2 BOOL "Enable bzip2 compression for parcel data (default: OFF)." OFF ADVANCED)
+if(HPX_HAVE_COMPRESSION_BZIP2)
   if(MSVC)
     set(BOOST_LIBRARIES ${BOOST_LIBRARIES} iostreams bzip2)
     set(BZIP2_FOUND ON CACHE INTERNAL "BZIP2_FOUND")
@@ -20,7 +20,7 @@ endif()
 
 macro(add_bzip2_module)
   hpx_debug("add_bzip2_module" "BZIP2_FOUND: ${BZIP2_FOUND}")
-  if(HPX_USE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
+  if(HPX_HAVE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
     hpx_include_sys_directories(${BZIP2_INCLUDE_DIR})
     hpx_link_sys_directories(${BZIP2_LIBRARY_DIR})
 

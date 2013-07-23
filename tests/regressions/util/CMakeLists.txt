@@ -16,7 +16,7 @@ set(function_argument_FLAGS DEPENDENCIES iostreams_component)
 set(function_serialization_dependencies
   iostreams_component)
 
-if(HPX_USE_COMPRESSION_ZLIB AND ZLIB_FOUND)
+if(HPX_HAVE_COMPRESSION_ZLIB AND ZLIB_FOUND)
   set(function_serialization_dependencies
     ${function_serialization_dependencies}
     compress_zlib_lib)

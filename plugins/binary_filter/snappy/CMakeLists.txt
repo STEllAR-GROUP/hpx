@@ -5,14 +5,14 @@
 
 include(HPX_AddLibrary)
 
-hpx_option(HPX_USE_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
-if(HPX_USE_COMPRESSION_SNAPPY)
+hpx_option(HPX_HAVE_COMPRESSION_SNAPPY BOOL "Enable snappy compression for parcel data (default: OFF)." OFF ADVANCED)
+if(HPX_HAVE_COMPRESSION_SNAPPY)
   find_package(HPX_Snappy)
 endif()
 
 macro(add_snappy_module)
   hpx_debug("add_snappy_module" "SNAPPY_FOUND: ${SNAPPY_FOUND}")
-  if(HPX_USE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
+  if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
     hpx_include_sys_directories(${SNAPPY_INCLUDE_DIR})
     hpx_link_sys_directories(${SNAPPY_LIBRARY_DIR})
 

@@ -303,19 +303,19 @@ variables are used more seldom and are mainly useful for debugging purposes.
       by default. In order to use this option the IBVERBS and RDMACM libraries 
       must be found and configured by cmake.]
     ]
-    [[`HPX_USE_COMPRESSION_ZLIB:BOOL`]
+    [[`HPX_HAVE_COMPRESSION_ZLIB:BOOL`]
      [Sets whether support for compressing parcels using the __zlib__ library will
       be enabled or not. This variable is set to `OFF` by default. If you enable
       this option CMake will try to find the __zlib__ library, which might require
       setting the CMake variable `ZLIB_ROOT`.]
     ]
-    [[`HPX_USE_COMPRESSION_BZIP2:BOOL`]
+    [[`HPX_HAVE_COMPRESSION_BZIP2:BOOL`]
      [Sets whether support for compressing parcels using the __bzip2__ library will
       be enabled or not. This variable is set to `OFF` by default. If you enable
       this option CMake will try to find the __bzip2__ library, which might require
       setting the CMake variable `BZIP_ROOT`.]
     ]
-    [[`HPX_USE_COMPRESSION_SNAPPY:BOOL`]
+    [[`HPX_HAVE_COMPRESSION_SNAPPY:BOOL`]
      [Sets whether support for compressing parcels using the __snappy__ library will
       be enabled or not. This variable is set to `OFF` by default. If you enable
       this option CMake will try to find the __snappy__ library, which might require
