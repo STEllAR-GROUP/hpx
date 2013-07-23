@@ -193,6 +193,7 @@ if(HPX_NATIVE_MIC)
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
+  hpx_add_definitions(-DHPX_NATIVE_MIC)
   set(HPX_MALLOC "tbbmalloc")
 endif()
 
