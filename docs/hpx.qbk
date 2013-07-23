@@ -49,6 +49,7 @@
 [def __fau__                    [@http://www.fau.de Friedrich-Alexander University Erlangen-Nuremberg (FAU)]]
 [def __inf3__                   [@http://www3.cs.fau.de Chair of Computer Science 3 - Computer Architecture]]
 [def __sandia__                 [@http://www.sandia.gov Sandia National Labs (Albuquerque)]]
+[def __tue__                    [@http://www.tui.nl Technische Universiteit Eindhoven]]
 
 [def __boost__                  [@http://www.boost.org/ Boost]]
 [def __boost_libraries__        [@http://www.boost.org/ Boost C++ Libraries]]
@@ -98,6 +99,13 @@
 [def __slurm__                  [@http://slurm.net/ SLURM]]
 [def __srun__                   [@http://slurm.schedmd.com/srun.html srun]]
 [def __sbatch__                 [@http://slurm.schedmd.com/sbatch.html sbatch]]
+[def __linda__                  [@http://en.wikipedia.org/wiki/Linda_(coordination_language) The Linda Coordination Language]]
+
+[def __cpp11__                  [@http://www.open-std.org/jtc1/sc22/wg21 C++11 Standard]]
+[def __cpp11_n3632__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html N3632]]
+[def __cpp11_n3634__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3634.pdf N3634]]
+[def __cpp11_n3562__            [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf N3562]]
+
 
 [def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]
 
