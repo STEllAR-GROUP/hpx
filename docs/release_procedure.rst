@@ -26,8 +26,8 @@ the lines as they are completed to avoid confusion.
         usage documentation, either in the form of comments or a readme. 
 
 #.  Send the list of examples and benchmarks that will be included in the
-    release to gopx@cct.lsu.edu and stellar@cct.lsu.edu, and ask for feedback.
-    Update the list as necessary.
+    release to hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu, and ask 
+    for feedback. Update the list as necessary.
 
 #.  Write release notes for the blog to summarize the major changes listed in
     the log. The blog article should go in the "downloads" section. The url of
@@ -62,9 +62,9 @@ the lines as they are completed to avoid confusion.
 
 #.  Tag a release candidate from the release branch.
 
-#.  Notify gopx@cct.lsu.edu and stellar@cct.lsu.edu of the availability of the
-    release candidate. Ask users to test the candidate by checking out the
-    release candidate tag.
+#.  Notify hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu of the
+    availability of the release candidate. Ask users to test the candidate by 
+    checking out the release candidate tag.
 
 #.  Allow at least a week for testing of the release candidate. Pull in changes
     as needed from master to resolve bug fixes, etc.
@@ -85,7 +85,8 @@ the lines as they are completed to avoid confusion.
 .. URL/title format needed.
 #.  Write a new blog post announcing the release.
 
-#.  Announce the release on gopx@cct.lsu.edu and stellar@cct.lsu.edu.
+#.  Announce the release on hpx-users@stellar.cct.lsu.edu and 
+    stellar@cct.lsu.edu.
 
 #.  Beer and pizza.
 
