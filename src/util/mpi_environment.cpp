@@ -76,6 +76,7 @@ namespace hpx { namespace util
             MPI_Comm communicator = communicator_;
             communicator_ = 0;
             MPI_Comm_free(&communicator);
+            MPI_Finalize();
         }
     }
 
