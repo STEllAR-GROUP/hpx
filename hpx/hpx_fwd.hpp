@@ -9,10 +9,7 @@
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-// Intel MPI requires this to be included before anything else
-#include <mpi.h>
-#endif
+#include <hpx/config.hpp>
 
 #include <cstdlib>
 #include <vector>
@@ -36,7 +33,6 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 
-#include <hpx/config.hpp>
 #include <hpx/config/function.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
