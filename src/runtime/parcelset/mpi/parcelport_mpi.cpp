@@ -221,16 +221,19 @@ namespace hpx { namespace parcelset { namespace mpi
 #endif
 
         parcel_cache_.set_parcel(parcels, handlers);
+        do_background_work();      // schedule message handler
     }
 
     void parcelport::put_parcel(parcel const& p, write_handler_type f)
     {
         parcel_cache_.set_parcel(p, f);
+        do_background_work();      // schedule message handler
     }
 
     void parcelport::send_early_parcel(parcel& p)
     {
         parcel_cache_.set_parcel(p, write_handler_type(), 0);
+        do_background_work();      // schedule message handler
     }
 
     void decode_message(
