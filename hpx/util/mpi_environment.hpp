@@ -14,7 +14,7 @@
 namespace hpx { namespace util {
     struct command_line_handling;
 
-    struct mpi_environment
+    struct HPX_EXPORT mpi_environment
     {
         static int init(int *argc, char ***argv, command_line_handling& cfg);
         static void finalize();

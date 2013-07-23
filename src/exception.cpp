@@ -56,7 +56,7 @@ namespace hpx { namespace detail
         return count;
     }
 
-    inline std::string get_execution_environment()
+    std::string get_execution_environment()
     {
         std::vector<std::string> env;
 

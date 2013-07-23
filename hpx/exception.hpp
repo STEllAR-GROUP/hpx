@@ -837,6 +837,9 @@ namespace hpx
         // stack backtrace, otherwise it will return an empty string.
         HPX_EXPORT std::string backtrace();
 
+        // Portably extract the current execution environment
+        HPX_EXPORT std::string get_execution_environment();
+
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
         HPX_EXPORT void report_exception_and_terminate(boost::exception_ptr const&);
