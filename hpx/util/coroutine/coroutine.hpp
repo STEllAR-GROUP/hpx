@@ -271,7 +271,7 @@ namespace hpx { namespace util { namespace coroutines
       return good()? &coroutine::bool_type_f: 0;
     }
 
-    bool operator==(const coroutine& rhs) {
+    bool operator==(const coroutine& rhs) const {
       return m_pimpl == rhs.m_pimpl;
     }
 

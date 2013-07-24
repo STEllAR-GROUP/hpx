@@ -58,7 +58,7 @@ namespace hpx { namespace threads { namespace policies
 
         // this is the type of the queues of new or pending threads
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
-        typedef HPX_STD_TUPLE<thread_data*, boost::uint64_t> thread_description;
+        typedef HPX_STD_TUPLE<thread_data_base*, boost::uint64_t> thread_description;
 #else
         typedef thread_data thread_description;
 #endif
@@ -459,7 +459,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if non is
         /// available
-        bool get_next_thread(threads::thread_data*& thrd, std::size_t num_thread)
+        bool get_next_thread(threads::thread_data_base*& thrd, std::size_t num_thread)
         {
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             thread_description* tdesc;
@@ -490,7 +490,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data* thrd, std::size_t num_thread)
+        void schedule_thread(threads::thread_data_base* thrd, std::size_t num_thread)
         {
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             work_items_.enqueue(
@@ -503,7 +503,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
+        bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
         {
             if (thrd->is_created_from(&memory_pool_))
             {

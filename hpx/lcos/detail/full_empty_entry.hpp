@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -115,7 +115,8 @@ namespace hpx { namespace lcos { namespace detail
                 queue.pop_front();
 
                 // we know that the id is actually the pointer to the thread
-                threads::thread_data* thrd = reinterpret_cast<threads::thread_data*>(id);
+                threads::thread_data_base* thrd =
+                    reinterpret_cast<threads::thread_data_base*>(id);
                 LERR_(info) << "~full_empty_entry: aborting pending thread in "
                         << desc << ": "
                         << get_thread_state_name(thrd->get_state())

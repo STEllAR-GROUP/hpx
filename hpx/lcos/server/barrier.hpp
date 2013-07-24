@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -109,7 +109,8 @@ namespace hpx { namespace lcos { namespace server
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread_data* thrd = static_cast<threads::thread_data*>(id);
+                    threads::thread_data_base* thrd =
+                        static_cast<threads::thread_data_base*>(id);
                     LERR_(fatal) << "~barrier: pending thread: "
                             << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();

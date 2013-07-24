@@ -49,7 +49,7 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
 #ifdef HPX_ACCEL_QUEUING
     // hardware accelerated queuing
-    typedef accel::fifo<thread_data *> work_item_queue_type;
+    typedef accel::fifo<thread_data_base *> work_item_queue_type;
 
     template <typename ThreadData>
     inline void
@@ -77,9 +77,9 @@ namespace hpx { namespace threads { namespace policies
 #else
     // software queuing
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
-    typedef HPX_STD_TUPLE<thread_data*, boost::uint64_t> thread_description;
+    typedef HPX_STD_TUPLE<thread_data_base*, boost::uint64_t> thread_description;
 #else
-    typedef thread_data thread_description;
+    typedef thread_data_base thread_description;
 #endif
 
     typedef boost::lockfree::fifo<thread_description*> work_item_queue_type;
@@ -129,7 +129,7 @@ namespace hpx { namespace threads { namespace policies
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef boost::ptr_map<
-            thread_id_type, thread_data, std::less<thread_id_type>
+            thread_id_type, thread_data_base, std::less<thread_id_type>
         > thread_map_type;
 
         // this is the type of the queue of new tasks not yet converted to
@@ -177,10 +177,18 @@ namespace hpx { namespace threads { namespace policies
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
                 // create the new thread
+                threads::thread_init_data& data = HPX_STD_GET(0, *task);
                 thread_state_enum state = HPX_STD_GET(1, *task);
-                HPX_STD_UNIQUE_PTR<threads::thread_data> thrd (
-                    new (memory_pool_) threads::thread_data(
-                        HPX_STD_GET(0, *task), memory_pool_, state));
+                HPX_STD_UNIQUE_PTR<threads::thread_data_base> thrd;
+
+                if (data.stacksize != 0) {
+                    thrd.reset(new (memory_pool_) threads::thread_data(
+                        data, memory_pool_, state));
+                }
+                else {
+                    thrd.reset(new threads::stackless_thread_data(
+                        data, &memory_pool_, state));
+                }
 
                 delete task;
 
@@ -458,9 +466,16 @@ namespace hpx { namespace threads { namespace policies
             if (run_now) {
                 typename mutex_type::scoped_lock lk(mtx_);
 
-                HPX_STD_UNIQUE_PTR<threads::thread_data> thrd (
-                    new (memory_pool_) threads::thread_data(
+                HPX_STD_UNIQUE_PTR<threads::thread_data_base> thrd;
+
+                if (data.stacksize != 0) {
+                    thrd.reset(new (memory_pool_) threads::thread_data(
                         data, memory_pool_, initial_state));
+                }
+                else {
+                    thrd.reset(new threads::stackless_thread_data(
+                        data, &memory_pool_, initial_state));
+                }
 
                 // add a new entry in the map for this thread
                 thread_id_type id = thrd->get_thread_id();
@@ -567,7 +582,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if non is
         /// available
-        bool get_next_thread(threads::thread_data*& thrd, std::size_t num_thread)
+        bool get_next_thread(threads::thread_data_base*& thrd, std::size_t num_thread)
         {
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             thread_description* tdesc;
@@ -599,7 +614,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data* thrd, std::size_t num_thread)
+        void schedule_thread(threads::thread_data_base* thrd, std::size_t num_thread)
         {
             ++work_items_count_;
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
@@ -613,7 +628,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
+        bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
         {
             if (thrd->is_created_from(&memory_pool_))
             {

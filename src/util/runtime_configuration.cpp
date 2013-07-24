@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2012 Hartmut Kaiser
+//  Copyright (c) 2005-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -836,6 +836,9 @@ namespace hpx { namespace util
 
         case threads::thread_stacksize_huge:
             return huge_stacksize;
+
+        case threads::thread_stacksize_nostack:
+            return 0;       // stackless thread
 
         default:
         case threads::thread_stacksize_small:
