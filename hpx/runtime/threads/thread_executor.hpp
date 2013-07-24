@@ -60,7 +60,7 @@ namespace hpx { namespace threads
                 std::size_t thread_num, error_code& ec) = 0;
 
             // Remove the given processing unit from the scheduler.
-            virtual void remove_processing_unit(std::size_t thread_num, 
+            virtual void remove_processing_unit(std::size_t thread_num,
                 error_code& ec) = 0;
         };
 
@@ -84,7 +84,7 @@ namespace hpx { namespace threads
             // situations.
             virtual void add(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc,
                 threads::thread_state_enum initial_state, bool run_now,
-                error_code& ec) = 0;
+                threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             // Return an estimate of the number of waiting closures.
             virtual std::size_t num_pending_closures(error_code& ec) const = 0;
@@ -117,7 +117,7 @@ namespace hpx { namespace threads
             // bounds on the executor's queue size.
             virtual void add_at(boost::posix_time::ptime const& abs_time,
                 BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc,
-                error_code& ec) = 0;
+                threads::thread_stacksize stacksize, error_code& ec) = 0;
 
             // Schedule given function for execution in this executor no sooner
             // than time rel_time from now. This call never blocks, and may
@@ -125,7 +125,7 @@ namespace hpx { namespace threads
             virtual void add_after(
                 boost::posix_time::time_duration const& rel_time,
                 BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc,
-                error_code& ec) = 0;
+                threads::thread_stacksize stacksize, error_code& ec) = 0;
         };
     }
 
@@ -157,9 +157,11 @@ namespace hpx { namespace threads
         /// situations.
         void add(HPX_STD_FUNCTION<void()> f, char const* desc = "",
             threads::thread_state_enum initial_state = threads::pending,
-            bool run_now = true, error_code& ec = throws)
+            bool run_now = true,
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            error_code& ec = throws)
         {
-            executor_data_->add(boost::move(f), desc, initial_state, run_now, ec);
+            executor_data_->add(boost::move(f), desc, initial_state, run_now, stacksize, ec);
         }
 
         /// Return an estimate of the number of waiting closures.
@@ -205,57 +207,61 @@ namespace hpx { namespace threads
         // default constructor creates invalid (non-usable) executor
         scheduled_executor() {}
 
-        /// Effects: The specified function object shall be scheduled for 
-        /// execution by the executor at some point in the future no sooner 
+        /// Effects: The specified function object shall be scheduled for
+        /// execution by the executor at some point in the future no sooner
         /// than the time represented by abs_time.
-        /// Synchronization: completion of closure on a particular thread 
+        /// Synchronization: completion of closure on a particular thread
         /// happens before destruction of that thread’s thread-duration
         /// variables.
-        /// Error conditions: If invoking closure throws an exception, the 
+        /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
         void add_at(boost::posix_time::ptime const& abs_time,
             HPX_STD_FUNCTION<void()> f, char const* desc = "",
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_at(abs_time, boost::move(f), desc, ec);
+                executor_data_)->add_at(abs_time, boost::move(f), desc, stacksize, ec);
         }
 
         template <typename Clock, typename Duration>
         void add_at(boost::chrono::time_point<Clock, Duration> const& abs_time,
             HPX_STD_FUNCTION<void()> f, char const* desc = "",
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_at(util::to_ptime(abs_time), 
-                boost::move(f), desc, ec);
+                executor_data_)->add_at(util::to_ptime(abs_time),
+                    boost::move(f), desc, stacksizeec);
         }
 
-        /// Effects: The specified function object shall be scheduled for 
-        /// execution by the executor at some point in the future no sooner 
+        /// Effects: The specified function object shall be scheduled for
+        /// execution by the executor at some point in the future no sooner
         /// than time rel_time from now.
-        /// Synchronization: completion of closure on a particular thread 
+        /// Synchronization: completion of closure on a particular thread
         /// happens before destruction of that thread’s thread-duration
         /// variables.
-        /// Error conditions: If invoking closure throws an exception, the 
+        /// Error conditions: If invoking closure throws an exception, the
         /// executor shall call terminate.
         void add_after(
             boost::posix_time::time_duration const& rel_time,
             HPX_STD_FUNCTION<void()> f, char const* desc = "",
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_after(rel_time, boost::move(f), desc, ec);
+                executor_data_)->add_after(rel_time, boost::move(f), desc, stacksize, ec);
         }
 
         template <typename Rep, typename Period>
         void add_after(boost::chrono::duration<Rep, Period> const& rel_time,
             HPX_STD_FUNCTION<void()> f, char const* desc = "",
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
             error_code& ec = throws)
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
-                executor_data_)->add_after(util::to_time_duration(rel_time), 
-                boost::move(f), desc, ec);
+                executor_data_)->add_after(util::to_time_duration(rel_time),
+                    boost::move(f), desc, stacksize, ec);
         }
 
         /// Return a reference to the default executor for this process.
@@ -263,15 +269,15 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Returns: the default executor defined by the 
-    /// active process. If set_default_executor hasn’t been called then the 
+    /// Returns: the default executor defined by the
+    /// active process. If set_default_executor hasn’t been called then the
     /// return value is a pointer to an executor of unspecified type.
     HPX_EXPORT scheduled_executor default_executor();
 
-    /// Effect: the default executor of the active process is set to the given 
-    /// executor instance. 
+    /// Effect: the default executor of the active process is set to the given
+    /// executor instance.
     /// Requires: executor shall not be null.
-    /// Synchronization: Changing and using the default executor is sequentially 
+    /// Synchronization: Changing and using the default executor is sequentially
     /// consistent.
     HPX_EXPORT void set_default_executor(scheduled_executor executor);
 }}
