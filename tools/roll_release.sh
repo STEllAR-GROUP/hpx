@@ -72,7 +72,7 @@ TARBZ2_SIZE=`ls -s -h packages/$TARBZ2 | awk {'print $1'}`
 SEVENZ_SIZE=`ls -s -h packages/$SEVENZ | awk {'print $1'}`
 
 echo "<ul>"
-echo "  <li>HPX V$DOT_VERSION: <a title=\"HPX V$DOT_VERSION Release Notes\" href=\"$WEBSITE/downloads/hpx-v$DASH_VERSION-release-notes/\">release notes</a>"
+echo "  <li>HPX V$DOT_VERSION: <a title=\"HPX V$DOT_VERSION Release Notes\" href=\"$WEBSITE/downloads/hpx-v$DASH_VERSION-release-notes/\">release notes</a>"
 echo "  <table>"
 echo "    <tr><th>File</th><th>MD5 Hash</th></tr>"
 echo "    <tr><td><a title=\"HPX V$DOT_VERSION (zip)\" href=\"$WEBSITE/files/$ZIP\">zip ($ZIP_SIZE)</a></td><td><code>$ZIP_MD5</code></td></tr>"
