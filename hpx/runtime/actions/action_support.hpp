@@ -34,6 +34,7 @@
 #include <hpx/util/void_cast.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
@@ -53,7 +54,6 @@
 #include <boost/serialization/extended_type_info.hpp>
 #include <boost/serialization/extended_type_info_typeid.hpp>
 #include <boost/type_traits/remove_const.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/if.hpp>
@@ -337,7 +337,10 @@ namespace hpx { namespace actions
 
         template <typename Arg0>
         explicit transfer_action(BOOST_FWD_REF(Arg0) arg0)
-          : arguments_(boost::forward<Arg0>(arg0)),
+          : arguments_(boost::forward<Arg0>(arg0),
+                typename util::tuple1<typename boost::remove_const<
+                        typename util::detail::remove_reference<Arg0>::type
+                    >::type>::forwarding_tag()),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
@@ -355,7 +358,10 @@ namespace hpx { namespace actions
 
         template <typename Arg0>
         transfer_action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
-          : arguments_(boost::forward<Arg0>(arg0)),
+          : arguments_(boost::forward<Arg0>(arg0),
+                typename util::tuple1<typename boost::remove_const<
+                        typename util::detail::remove_reference<Arg0>::type
+                    >::type>::forwarding_tag()),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
@@ -1107,6 +1113,9 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
 /**/
 #define HPX_ACTION_USES_HUGE_STACK(action)                                    \
     HPX_ACTION_USES_STACK(action, threads::thread_stacksize_huge)             \
+/**/
+#define HPX_ACTION_DOES_NOT_SUSPEND(action)                                   \
+    HPX_ACTION_USES_STACK(action, threads::thread_stacksize_nostack)          \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
