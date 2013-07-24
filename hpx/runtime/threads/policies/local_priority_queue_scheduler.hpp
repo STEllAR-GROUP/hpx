@@ -115,8 +115,10 @@ namespace hpx { namespace threads { namespace policies
                 init.affinity_domain_, init.affinity_desc_),
             numa_sensitive_(init.numa_sensitive_),
             topology_(get_topology()),
+#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
             steals_in_numa_domain_(init.num_queues_),
             steals_outside_numa_domain_(init.num_queues_),
+#endif
 #if !defined(HPX_HAVE_MORE_THAN_64_THREADS)
             numa_domain_masks_(init.num_queues_),
             outside_numa_domain_masks_(init.num_queues_)
@@ -206,6 +208,8 @@ namespace hpx { namespace threads { namespace policies
             bool empty = true;
             for (std::size_t i = 0; i < queues_.size(); ++i)
                 empty = queues_[i]->cleanup_terminated(delete_all) && empty;
+            if (!delete_all)
+                return empty;
 
             for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                 empty = high_priority_queues_[i]->cleanup_terminated(delete_all) && empty;
@@ -234,7 +238,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queues_.size();
+                num_thread = ++curr_queue_ % queue_size;
 
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
@@ -248,7 +252,7 @@ namespace hpx { namespace threads { namespace policies
             }
             else if (data.priority == thread_priority_low) {
                 return low_priority_queue_.create_thread(data, initial_state,
-                    run_now, queues_.size() + high_priority_queues_.size(), ec);
+                    run_now, queue_size + high_priority_queues_.size(), ec);
             }
 
             BOOST_ASSERT(num_thread < queue_size);
@@ -633,7 +637,10 @@ namespace hpx { namespace threads { namespace policies
 
             // steal work items: first try to steal from other cores in
             // the same NUMA node
-            if (test(steals_in_numa_domain_, num_thread)) {
+#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
+            if (test(steals_in_numa_domain_, num_thread))
+#endif
+            {
                 mask_cref_type numa_domain = numa_domain_masks_[num_thread];
                 for (std::size_t i = 0; i < queues_size; ++i)
                 {
@@ -650,6 +657,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
+#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
             // if nothing found, ask everybody else
             if (test(steals_outside_numa_domain_, num_thread)) {
                 mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
@@ -667,6 +675,7 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
             }
+#endif
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
@@ -725,7 +734,9 @@ namespace hpx { namespace threads { namespace policies
                 topology_.get_numa_node_affinity_mask(num_pu, numa_sensitive_);
 
             if (any(core_mask) && any(node_mask)) {
+#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 set(steals_in_numa_domain_, num_thread);
+#endif
                 numa_domain_masks_[num_thread] = node_mask;
             }
 
@@ -740,7 +751,9 @@ namespace hpx { namespace threads { namespace policies
                 first_mask = core_mask;
 
             if (any(first_mask & core_mask)) {
+#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 set(steals_outside_numa_domain_, num_thread);
+#endif
                 outside_numa_domain_masks_[num_thread] = not_(node_mask) & machine_mask;
             }
         }
@@ -773,8 +786,10 @@ namespace hpx { namespace threads { namespace policies
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;
         topology const& topology_;
+#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
         mask_type steals_in_numa_domain_;
         mask_type steals_outside_numa_domain_;
+#endif
         std::vector<mask_type> numa_domain_masks_;
         std::vector<mask_type> outside_numa_domain_masks_;
     };

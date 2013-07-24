@@ -173,6 +173,9 @@ namespace hpx { namespace threads { namespace policies
             for (std::size_t i = 0; i < queues_.size(); ++i)
                 empty = queues_[i]->cleanup_terminated(delete_all) && empty;
 
+            if (!delete_all)
+                return empty;
+
             for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                 empty = high_priority_queues_[i]->cleanup_terminated(delete_all) && empty;
 
@@ -197,9 +200,13 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 #endif
+            std::size_t queue_size = queues_.size();
 
             if (std::size_t(-1) == num_thread)
-                num_thread = ++curr_queue_ % queues_.size();
+                num_thread = ++curr_queue_ % queue_size;
+
+            if (num_thread >= queue_size)
+                num_thread %= queue_size;
 
             // now create the thread
             if (data.priority == thread_priority_critical) {
@@ -210,10 +217,10 @@ namespace hpx { namespace threads { namespace policies
             }
             else if (data.priority == thread_priority_low) {
                 return low_priority_queue_.create_thread(data, initial_state,
-                    run_now, queues_.size()+high_priority_queues_.size(), ec);
+                    run_now, queue_size + high_priority_queues_.size(), ec);
             }
 
-            BOOST_ASSERT(num_thread < queues_.size());
+            BOOST_ASSERT(num_thread < queue_size);
             return queues_[num_thread]->create_thread(data, initial_state,
                 run_now, num_thread, ec);
         }

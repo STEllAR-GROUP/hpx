@@ -411,17 +411,17 @@ namespace hpx { namespace util
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0), valid for "
-                  "--hpx:queuing=local and priority_local only")
+                  "--hpx:queuing=local, static and priority_local only")
                 ("hpx:pu-step", value<std::size_t>(),
                   "the step between used processing unit numbers for this "
                   "instance of HPX (default: 1), valid for "
-                  "--hpx:queuing=local and priority_local only")
+                  "--hpx:queuing=local, static and priority_local only")
 #endif
 #if defined(HPX_HAVE_HWLOC)
                 ("hpx:affinity", value<std::string>(),
                   "the affinity domain the OS threads will be confined to, "
                   "possible values: pu, core, numa, machine (default: pu), valid for "
-                  "--hpx:queuing=local and priority_local only")
+                  "--hpx:queuing=local, static and priority_local only")
                 ("hpx:bind", value<std::vector<std::string> >()->composing(),
                   "the detailed affinity description for the OS threads, see "
                   "the documentation for a detailed description of possible "
@@ -438,7 +438,8 @@ namespace hpx { namespace util
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global/g', "
                   "'local/l', 'priority_local/pr', 'abp/a', 'priority_abp', "
-                  "'hierarchy/h', and 'periodic/pe' (default: priority_local/p)")
+                  "'hierarchy/h', static/s and 'periodic/pe' "
+                  "(default: priority_local/p)")
                 ("hpx:hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
                    "--hpx:queuing=hierarchy only (default: 2)")

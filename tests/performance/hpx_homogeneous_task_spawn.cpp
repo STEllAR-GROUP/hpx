@@ -37,6 +37,8 @@ using hpx::flush;
 // Command-line variables.
 boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
+boost::uint64_t feeders = 1;
+
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,6 +61,12 @@ void print_results(
             % walltime % (walltime / tasks)) << flush;
 }
 
+void create_tasks(boost::uint64_t tasks)
+{
+    for (boost::uint64_t i = 0; i < tasks; ++i)
+        register_work(HPX_STD_BIND(&invoke_worker, delay));
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
@@ -74,11 +82,11 @@ int hpx_main(
         // Start the clock.
         high_resolution_timer t;
 
-        for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(HPX_STD_BIND(&invoke_worker, delay));
+        for (boost::uint64_t i = 0; i < feeders; ++i)
+            register_work(HPX_STD_BIND(&create_tasks, tasks/feeders));
 
         // Reschedule hpx_main until all other hpx-threads have finished. We
-        // should be resumed after most of the null px-threads have been
+        // should be resumed after most of the null HPX-threads have been
         // executed. If we haven't, we just reschedule ourselves again.
         do {
             suspend();
@@ -103,6 +111,10 @@ int main(
         ( "tasks"
         , value<boost::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks to invoke")
+
+        ( "feeders"
+        , value<boost::uint64_t>(&feeders)->default_value(1)
+        , "number of feeders (threads creating new tasks)")
 
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)

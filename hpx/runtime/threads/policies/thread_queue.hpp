@@ -121,7 +121,7 @@ namespace hpx { namespace threads { namespace policies
         enum {
             min_add_new_count = 100,
             max_add_new_count = 100,
-            max_delete_count = 100
+            max_delete_count = 5000
         };
 
         // this is the type of the queues of new or pending threads
@@ -287,12 +287,16 @@ namespace hpx { namespace threads { namespace policies
             return addednew != 0;
         }
 
+    public:
         /// This function makes sure all threads which are marked for deletion
         /// (state is terminated) are properly destroyed
-        bool cleanup_terminated_locked(bool delete_all = false)
+        bool cleanup_terminated_locked_helper(bool delete_all = false)
         {
             if (thread_map_.empty())
-                return true;
+                return false;
+
+            if (terminated_items_count_ == 0)
+                return false;
 
             if (delete_all) {
                 // delete all threads
@@ -307,6 +311,7 @@ namespace hpx { namespace threads { namespace policies
                     (void)deleted;
                     BOOST_ASSERT(deleted);
                 }
+                return false;
             }
             else {
                 // delete only this many threads
@@ -327,15 +332,38 @@ namespace hpx { namespace threads { namespace policies
                     if (deleted)
                         --delete_count;
                 }
+                return terminated_items_count_ != 0;
             }
+        }
+
+        bool cleanup_terminated_locked(bool delete_all = false)
+        {
+            cleanup_terminated_locked_helper(delete_all);
             return thread_map_.empty();
         }
 
     public:
         bool cleanup_terminated(bool delete_all = false)
         {
-            typename mutex_type::scoped_lock lk(mtx_);
-            return cleanup_terminated_locked(delete_all);
+            if (delete_all) {
+                bool thread_map_is_empty = false;
+                while (true)
+                {
+                    typename mutex_type::scoped_try_lock lk(mtx_);
+                    if (!lk || !cleanup_terminated_locked_helper(false))
+                    {
+                        thread_map_is_empty = thread_map_.empty();
+                        break;
+                    }
+                }
+                return thread_map_is_empty;
+            }
+
+            typename mutex_type::scoped_try_lock lk(mtx_);
+            if (!lk) return false;
+
+            cleanup_terminated_locked_helper(false);
+            return thread_map_.empty();
         }
 
         // The maximum number of active threads this thread manager should
@@ -609,17 +637,15 @@ namespace hpx { namespace threads { namespace policies
             if (terminated == state)
                 return terminated_items_count_;
 
+            if (staged == state)
+                return static_cast<boost::int64_t>(new_tasks_count_);
+
             typename mutex_type::scoped_lock lk(mtx_);
             if (unknown == state)
             {
                 BOOST_ASSERT((thread_map_.size() + new_tasks_count_) <
                     static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
                 return static_cast<boost::int64_t>(thread_map_.size() + new_tasks_count_);
-            }
-
-            if (staged == state)
-            {
-                return static_cast<boost::int64_t>(new_tasks_count_);
             }
 
             boost::int64_t num_threads = 0;
@@ -657,12 +683,11 @@ namespace hpx { namespace threads { namespace policies
             boost::int64_t& idle_loop_count, std::size_t& added,
             thread_queue* addfrom_ = 0) HPX_HOT
         {
-            // this thread acquired the lock, do maintenance, if needed
+            // try to generate new threads from task lists, but only if our
+            // own list of threads is empty
             if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
 
-                // No obvious work has to be done, so a lock won't hurt too much
-                // but we lock only one of the threads, assuming this thread
-                // will do the maintenance
+                // No obvious work has to be done, so a lock won't hurt too much.
                 //
                 // We prefer to exit this function (some kind of very short
                 // busy waiting) to blocking on this lock. Locking fails either
@@ -671,14 +696,11 @@ namespace hpx { namespace threads { namespace policies
                 // just falls through to the cleanup work below (no work is available)
                 // in which case the current thread (which failed to acquire
                 // the lock) will just retry to enter this loop.
-                util::try_lock_wrapper<mutex_type> lk(mtx_);
+                typename mutex_type::scoped_try_lock lk(mtx_);
                 if (!lk)
                     return false;            // avoid long wait on lock
 
-    //            LTM_(debug) << "tfunc(" << num_thread << "): queues empty"
-    //                        << ", threads left: " << thread_map_.size();
-
-                // stop running after all PX threads have been terminated
+                // stop running after all HPX threads have been terminated
                 thread_queue* addfrom = addfrom_ ? addfrom_ : this;
                 bool added_new = add_new_always(added, addfrom, num_thread);
                 if (!added_new) {

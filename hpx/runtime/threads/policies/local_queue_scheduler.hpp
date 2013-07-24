@@ -320,12 +320,15 @@ namespace hpx { namespace threads { namespace policies
             if (0 == added) {
                 // steal work items: first try to steal from other cores in the
                 // same NUMA node
-                mask_cref_type core_mask = topology_.get_thread_affinity_mask(
-                    num_thread, numa_sensitive_);
                 mask_cref_type node_mask = topology_.get_numa_node_affinity_mask(
                     num_thread, numa_sensitive_);
 
-                if (any(core_mask) && any(node_mask)) {
+#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
+                mask_cref_type core_mask = topology_.get_thread_affinity_mask(
+                    num_thread, numa_sensitive_);
+                if (any(core_mask) && any(node_mask))
+#endif
+                {
                     for (std::size_t i = 0; (0 == added) && i < queues_.size();
                          ++i)
                     {
@@ -342,6 +345,7 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
 
+#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 // if nothing found ask everybody else
                 for (std::size_t i = 1; 0 == added && i < queues_.size(); ++i) {
                     std::size_t idx = (i + num_thread) % queues_.size();
@@ -353,6 +357,7 @@ namespace hpx { namespace threads { namespace policies
                         return result;
                     }
                 }
+#endif
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
                 // no new work is available, are we deadlocked?

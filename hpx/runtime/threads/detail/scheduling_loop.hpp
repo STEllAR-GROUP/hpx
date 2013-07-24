@@ -189,9 +189,9 @@ namespace hpx { namespace threads { namespace detail
                 idle_loop_count = 0;
                 ++busy_loop_count;
 
-                // Only pending PX threads will be executed.
-                // Any non-pending PX threads are leftovers from a set_state()
-                // call for a previously pending PX thread (see comments above).
+                // Only pending HPX threads will be executed.
+                // Any non-pending HPX threads are leftovers from a set_state()
+                // call for a previously pending HPX thread (see comments above).
                 thread_state state = thrd->get_state();
                 thread_state_enum state_val = state;
 
@@ -253,7 +253,7 @@ namespace hpx { namespace threads { namespace detail
                         state_val, "normal");
 
                     // Re-add this work item to our list of work items if the PX
-                    // thread should be re-scheduled. If the PX thread is suspended
+                    // thread should be re-scheduled. If the HPX thread is suspended
                     // now we just keep it in the map of threads.
                     if (state_val == pending) {
                         // schedule other work
@@ -283,10 +283,10 @@ namespace hpx { namespace threads { namespace detail
                     scheduler.SchedulingPolicy::schedule_thread(thrd, num_thread);
                 }
 
-                // Remove the mapping from thread_map_ if PX thread is depleted
-                // or terminated, this will delete the PX thread as all
+                // Remove the mapping from thread_map_ if HPX thread is depleted
+                // or terminated, this will delete the HPX thread as all
                 // references go out of scope.
-                // REVIEW: what has to be done with depleted PX threads?
+                // REVIEW: what has to be done with depleted HPX threads?
                 if (state_val == depleted || state_val == terminated)
                     scheduler.SchedulingPolicy::destroy_thread(thrd, busy_loop_count);
 
@@ -311,19 +311,19 @@ namespace hpx { namespace threads { namespace detail
 
             // Clean up all terminated threads for all thread queues once in a
             // while.
-            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
+            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX*10)
             {
                 busy_loop_count = 0;
                 scheduler.SchedulingPolicy::cleanup_terminated(true);
             }
-            else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+            else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX*10)
             {
                 // call back into invoking context
                 if (!cb.empty())
                     cb();
 
                 // clean up terminated threads
-                scheduler.SchedulingPolicy::cleanup_terminated(true);
+                scheduler.SchedulingPolicy::cleanup_terminated();
             }
         }
 
