@@ -25,9 +25,9 @@
 //
 #define HPX_VERSION_FULL         0x000906
 
-#define HPX_VERSION_MAJOR        0
-#define HPX_VERSION_MINOR        9
-#define HPX_VERSION_SUBMINOR     6
+#define HPX_VERSION_MAJOR        1
+#define HPX_VERSION_MINOR        0
+#define HPX_VERSION_SUBMINOR     0
 
 #define HPX_VERSION_DATE         20130407
 

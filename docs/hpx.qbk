@@ -10,7 +10,7 @@
     [quickbook 1.6]
     [id hpx]
     [authors [STE||AR Group, The]]
-    [version 0.9.6]
+    [version 1.0.0]
     [copyright 2011 2012 2013 The STE||AR Group, Louisiana State University]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
@@ -33,7 +33,7 @@
 [def __0_9_6__                  [link hpx.whats_new.hpx_0_9_6 V0.9.6]]
 [def __1_0_0__                  [link hpx.whats_new.hpx_1_0_0 V1.0.0]]
 
-[def __version__                __0_9_6__]
+[def __version__                __1_0_0__]
 
 [def __hpx__                    /HPX/]
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
