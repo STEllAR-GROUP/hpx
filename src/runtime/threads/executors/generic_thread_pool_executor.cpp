@@ -41,12 +41,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void generic_thread_pool_executor::add(
         BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f,
         char const* desc, threads::thread_state_enum initial_state,
-        bool run_now, error_code& ec)
+        bool run_now, threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new thread
         thread_init_data data(util::bind(
             &generic_thread_pool_executor::thread_function_nullary,
             boost::move(f)), desc);
+        data.stacksize = stacksize;
 
         threads::detail::create_thread(scheduler_base_, data,
             initial_state, run_now, ec);

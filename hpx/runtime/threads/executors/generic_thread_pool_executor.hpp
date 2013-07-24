@@ -33,7 +33,7 @@ namespace hpx { namespace threads { namespace executors
             // situations.
             void add(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* description,
                 threads::thread_state_enum initial_state, bool run_now,
-                error_code& ec);
+                threads::thread_stacksize stacksize, error_code& ec);
 
             // Return an estimate of the number of waiting tasks.
             std::size_t num_pending_closures(error_code& ec) const;
