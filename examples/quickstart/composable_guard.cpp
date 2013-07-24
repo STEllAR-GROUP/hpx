@@ -6,6 +6,25 @@
 #include <hpx/lcos/local/composable_guard.hpp>
 #include <hpx/hpx_init.hpp>
 
+// This program illustrates the use of composable guards to perform
+// a computation that might otherwise rely on mutexes. In fact, guards
+// are like mutexes, but with the distinction that they are locked for
+// you (at the start of a task), and unlocked for you.
+//
+// In the example below, we use guards to manage incrementing the variables
+// i1 and i2. We don't need to use atomics for this, but it makes the
+// load, increment, and store steps more explicit. At the end, in order to
+// pass the test and get the correct total, every compare_exchange must
+// succeed.
+//
+// Because guards don't add locking structures to the current environment
+// during a calculation, they can never deadlock. Guards use only a
+// few atomic operations to perform their operaions, and never cause a
+// task to block, so they should be quite fast.
+//
+// To use guards, call the run_guarded() method, supplying it with
+// a guard or guard set, and a task to be performed.
+
 typedef boost::atomic<int> int_atomic;
 int_atomic i1(0), i2(0);
 hpx::lcos::local::guard_set guards;
@@ -15,21 +34,21 @@ boost::shared_ptr<hpx::lcos::local::guard> l2(new hpx::lcos::local::guard());
 void incr1() {
     // implicitly lock l1
     int tmp = i1.load();
-    BOOST_ASSERT(i1.compare_exchange_strong(tmp,tmp+1));
+    i1.compare_exchange_strong(tmp,tmp+1);
     // implicitly unlock l1
 }
 void incr2() {
     // implicitly lock l2
     int tmp = i2.load();
-    BOOST_ASSERT(i2.compare_exchange_strong(tmp,tmp+1));
+    i2.compare_exchange_strong(tmp,tmp+1);
     // implicitly unlock l2
 }
 void both() {
     // implicitly lock l1 and l2
     int tmp = i1.load();
-    BOOST_ASSERT(i1.compare_exchange_strong(tmp,tmp+1));
+    i1.compare_exchange_strong(tmp,tmp+1);
     tmp = i2.load();
-    BOOST_ASSERT(i2.compare_exchange_strong(tmp,tmp+1));
+    i2.compare_exchange_strong(tmp,tmp+1);
     // implicitly unlock l1 and l2
 }
 

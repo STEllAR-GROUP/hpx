@@ -240,7 +240,7 @@ detail in the sections __unix_installation__ and __windows_installation__.
 [c++]
 
 For more detailed information about using __cmake__ please refer its documentation
-and to the section __cmake_hpx__.
+and also the section __cmake_hpx__.
 
 [endsect] [/ How to Install __hpx__ on Unix Variants]
 
@@ -389,7 +389,7 @@ of Clang, libc++, and Boost).
   includes object files and final executables.
 * Add CMake variable definitions (if any) by clicking the "Add Entry" button.
   There are two required variables you need to define: `BOOST_ROOT` and
-  `HWLOC_ROOT`. These (PATH) variable needs to be set to point to the root
+  `HWLOC_ROOT`. These (PATH) variables need to be set to point to the root
   folder of your __boost__ and __hwloc__ installations.
   It is recommended to set the variable `CMAKE_INSTALL_PREFIX` as
   well. This allows to control where the built HPX libraries will be installed.
@@ -398,11 +398,11 @@ of Clang, libc++, and Boost).
 * Press the "Configure" button. A window will pop up asking you which compilers
   to use. Select the Visual Studio 10 (64Bit) compiler (it usually is
   the default if available). The Visual Studio 2012 (64Bit) compiler is
-  supported as well. Note that while it is possible to build HPX for x86
+  supported as well. Note that while it is possible to build HPX for x86,
   we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit
   Windows system limitation affecting the number of HPX threads you can create.
-* Make sure that that the `CMAKE_BUILD_TYPE` build type (under the `CMAKE` tree)
-  is set to `Debug` or `Release`, according to what you plain to do (alternatively,
+* Make sure that that the `CMAKE_BUILD_TYPE` (under the `CMAKE` tree)
+  is set to `Debug` or `Release`, according to what you plan to do (alternatively,
   this variable can be set to `RelWithDebInfo` or `MinSizeRel`). The text area at 
   the bottom of CMake GUI displays the output of CMake. CMake prompts an error message 
   in a separate dialog box if a required dependency is not found.
@@ -413,7 +413,7 @@ of Clang, libc++, and Boost).
 * Build the INSTALL target.
 
 For more detailed information about using __cmake__ please refer its documentation
-and to the section __cmake_hpx__.
+and also the section __cmake_hpx__.
 
 [endsect] [/ How to Install __hpx__ on Windows]
 
@@ -463,7 +463,7 @@ in the section __hello_world_example__.
          ]
 
 The [^#PBS -l nodes=2:ppn=4] directive will cause two compute nodes to be
-allocated for the application, as specified int the option [^nodes]. Each of the
+allocated for the application, as specified in the option [^nodes]. Each of the
 nodes will dedicate four cores to the program, as per the option [^ppn], short
 for "processors per node" (PBS does not distinguish between processors and
 cores). Note that requesting more cores per node than physically available is
