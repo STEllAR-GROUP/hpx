@@ -12,7 +12,9 @@
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
+
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -232,7 +234,7 @@ namespace hpx { namespace util
 
     template <int N, typename Tuple>
     BOOST_FORCEINLINE BOOST_CONSTEXPR
-    typename detail::tuple_element<N, Tuple>::crtype
+    typename detail::tuple_element<N, Tuple const>::crtype
     get(Tuple const& t) BOOST_NOEXCEPT
     {
         return t.template get<N>();
@@ -366,6 +368,18 @@ namespace boost
                                                                               \
         static BOOST_CONSTEXPR rtype get(Tuple& t) BOOST_NOEXCEPT             \
             { return t.BOOST_PP_CAT(a, N); }                                  \
+    };                                                                        \
+/**/
+
+#define HPX_TUPLE_INDEX_CONST(Z, N, D)                                        \
+    template <typename Tuple>                                                 \
+    struct tuple_element<N, Tuple const>                                      \
+    {                                                                         \
+        typedef typename boost::add_const<                                    \
+            typename Tuple::BOOST_PP_CAT(member_type, N)>::type type;         \
+        typedef typename detail::tuple_element_access<type>::type rtype;      \
+        typedef typename detail::tuple_element_access<type>::ctype crtype;    \
+                                                                              \
         static BOOST_CONSTEXPR crtype get(Tuple const& t) BOOST_NOEXCEPT      \
             { return t.BOOST_PP_CAT(a, N); }                                  \
     };                                                                        \
@@ -374,8 +388,10 @@ namespace boost
 namespace hpx { namespace util { namespace detail
 {
     BOOST_PP_REPEAT(HPX_TUPLE_LIMIT, HPX_TUPLE_INDEX, _)
+    BOOST_PP_REPEAT(HPX_TUPLE_LIMIT, HPX_TUPLE_INDEX_CONST, _)
 }}}
 
+#undef HPX_TUPLE_INDEX_CONST
 #undef HPX_TUPLE_INDEX
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -445,10 +461,10 @@ namespace hpx { namespace util
 
         template <int E>
         BOOST_CONSTEXPR
-        typename detail::tuple_element<E, HPX_UTIL_TUPLE_NAME>::crtype
+        typename detail::tuple_element<E, HPX_UTIL_TUPLE_NAME const>::crtype
         get() const BOOST_NOEXCEPT
         {
-            return detail::tuple_element<E, HPX_UTIL_TUPLE_NAME>::get(*this);
+            return detail::tuple_element<E, HPX_UTIL_TUPLE_NAME const>::get(*this);
         }
 
         HPX_UTIL_TUPLE_NAME() {}
@@ -489,9 +505,31 @@ namespace hpx { namespace util
           : a0(boost::forward<Arg0>(arg0))
         {}
 
+        struct forwarding_tag {};
+
+        template <typename Arg0>
+        explicit tuple1(BOOST_FWD_REF(Arg0) arg0, forwarding_tag)
+          : a0(boost::forward<Arg0>(arg0))
+        {}
+
+        template <typename Arg0>
+        explicit tuple1(BOOST_RV_REF(tuple<Arg0>) arg0)
+          : a0(detail::move_if_no_ref<Arg0>::call(arg0.a0))
+        {}
+
         template <typename Arg0>
         explicit tuple1(BOOST_RV_REF(tuple1<Arg0>) arg0)
           : a0(detail::move_if_no_ref<Arg0>::call(arg0.a0))
+        {}
+
+        template <typename Arg0>
+        explicit tuple1(tuple<Arg0> const& arg0)
+          : a0(arg0.a0)
+        {}
+
+        template <typename Arg0>
+        explicit tuple1(tuple1<Arg0> const& arg0)
+          : a0(arg0.a0)
         {}
 #else
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -502,6 +540,13 @@ namespace hpx { namespace util
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
         HPX_UTIL_TUPLE_NAME(BOOST_RV_REF(HPX_UTIL_STRIP((
                     HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>
+                ))) other)
+          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MOVE_MEMBER, T)
+        {}
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+        HPX_UTIL_TUPLE_NAME(BOOST_RV_REF(HPX_UTIL_STRIP((
+                    tuple<BOOST_PP_ENUM_PARAMS(N, T)>
                 ))) other)
           : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MOVE_MEMBER, T)
         {}
@@ -529,6 +574,18 @@ namespace hpx { namespace util
 /**/
 #endif
 
+#if N == 1
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Arg0>
+    BOOST_FORCEINLINE
+    tuple1<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)> 
+    forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
+    {
+        typedef tuple1<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)> result_type;
+        return result_type(boost::forward<Arg0>(arg0),
+            typename result_type::forwarding_tag());
+    }
+#else
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     BOOST_FORCEINLINE
@@ -539,6 +596,7 @@ namespace hpx { namespace util
                 BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>(
             HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
     }
+#endif
 
 #undef HPX_UTIL_MAKE_ARGUMENT_PACK
 
@@ -604,6 +662,40 @@ namespace hpx { namespace util
             return *this;
         }
 
+#if N == 1
+        template <typename Arg0>
+        explicit tuple(BOOST_FWD_REF(Arg0) arg0,
+                typename boost::disable_if<is_tuple<Arg0> >::type* = 0)
+          : base_tuple(boost::forward<Arg0>(arg0))
+        {}
+
+        struct forwarding_tag {};
+
+        template <typename Arg0>
+        explicit tuple(BOOST_FWD_REF(Arg0) arg0, forwarding_tag t)
+          : base_tuple(boost::forward<Arg0>(arg0), typename base_tuple::forwarding_tag())
+        {}
+
+        template <typename Arg0>
+        explicit tuple(BOOST_RV_REF(tuple<Arg0>) arg0)
+          : base_tuple(boost::move(arg0))
+        {}
+
+        template <typename Arg0>
+        explicit tuple(BOOST_RV_REF(tuple1<Arg0>) arg0)
+          : base_tuple(boost::move(arg0))
+        {}
+
+        template <typename Arg0>
+        explicit tuple(tuple<Arg0> const& arg0)
+          : base_tuple(arg0)
+        {}
+
+        template <typename Arg0>
+        explicit tuple(tuple1<Arg0> const& arg0)
+          : base_tuple(arg0)
+        {}
+#else
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg))
           : base_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
@@ -621,6 +713,7 @@ namespace hpx { namespace util
                 ))) other)
           : base_tuple(other)
         {}
+#endif
     };
 
 #define HPX_UTIL_MAKE_TUPLE_ARG(Z, N, D)                                      \
@@ -629,14 +722,28 @@ namespace hpx { namespace util
     >::type                                                                   \
 /**/
 
+#if N == 1
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    BOOST_FORCEINLINE tuple<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_TUPLE_ARG, Arg)>
+    BOOST_FORCEINLINE
+    tuple<HPX_UTIL_MAKE_TUPLE_ARG(_, 0, Arg)>
+    make_tuple(BOOST_FWD_REF(Arg0) arg0)
+    {
+        typedef tuple<HPX_UTIL_MAKE_TUPLE_ARG(_, 0, Arg)> result_type;
+        return result_type(boost::forward<Arg0>(arg0),
+            typename result_type::forwarding_tag());
+    }
+#else
+    ///////////////////////////////////////////////////////////////////////////
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE
+    tuple<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_TUPLE_ARG, Arg)>
     make_tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return tuple<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_TUPLE_ARG, Arg)>(
             HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
     }
+#endif
 
 #undef HPX_UTIL_MAKE_TUPLE_ARG
 }}
@@ -655,6 +762,7 @@ BOOST_FUSION_ADAPT_TPL_STRUCT(
 
 namespace boost { namespace serialization
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     struct is_bitwise_serializable<
             hpx::util::HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)> >
@@ -668,6 +776,23 @@ namespace boost { namespace serialization
       : hpx::util::detail::sequence_is_bitwise_serializable<
             hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)> >
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Archive, BOOST_PP_ENUM_PARAMS(N, typename T)>
+    BOOST_FORCEINLINE void serialize(Archive& ar,
+        hpx::util::HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>& t,
+        unsigned int const version)
+    {
+        hpx::util::serialize_sequence(ar, t);
+    }
+
+    template <typename Archive, BOOST_PP_ENUM_PARAMS(N, typename T)>
+    BOOST_FORCEINLINE void serialize(Archive& ar,
+        hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, T)>& t,
+        unsigned int const version)
+    {
+        hpx::util::serialize_sequence(ar, t);
+    }
 }}
 
 #undef N

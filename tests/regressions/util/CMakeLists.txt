@@ -9,6 +9,7 @@ set(tests
     function_argument
     function_serialization
     protect_with_nullary_pfo
+    regression_tuple_serialization_803
    )
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
