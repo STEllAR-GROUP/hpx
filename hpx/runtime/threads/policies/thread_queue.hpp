@@ -121,7 +121,7 @@ namespace hpx { namespace threads { namespace policies
         enum {
             min_add_new_count = 100,
             max_add_new_count = 100,
-            max_delete_count = 5000
+            max_delete_count = 1000
         };
 
         // this is the type of the queues of new or pending threads
@@ -349,8 +349,8 @@ namespace hpx { namespace threads { namespace policies
                 bool thread_map_is_empty = false;
                 while (true)
                 {
-                    typename mutex_type::scoped_try_lock lk(mtx_);
-                    if (!lk || !cleanup_terminated_locked_helper(false))
+                    typename mutex_type::scoped_lock lk(mtx_);
+                    if (/*!lk || */!cleanup_terminated_locked_helper(false))
                     {
                         thread_map_is_empty = thread_map_.empty();
                         break;
@@ -359,8 +359,8 @@ namespace hpx { namespace threads { namespace policies
                 return thread_map_is_empty;
             }
 
-            typename mutex_type::scoped_try_lock lk(mtx_);
-            if (!lk) return false;
+            typename mutex_type::scoped_lock lk(mtx_);
+//            if (!lk) return false;
 
             cleanup_terminated_locked_helper(false);
             return thread_map_.empty();
