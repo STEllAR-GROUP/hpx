@@ -197,7 +197,7 @@ namespace hpx { namespace util { namespace coroutines
 
             stackless_coroutine& this_;
         };
-        friend reset_on_exit;
+        friend struct reset_on_exit;
 
     public:
         BOOST_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
