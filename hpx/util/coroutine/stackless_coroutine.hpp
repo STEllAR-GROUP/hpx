@@ -159,7 +159,7 @@ namespace hpx { namespace util { namespace coroutines
         {
             BOOST_ASSERT(exited());
 
-            f_ = boost::forward<F>(f);
+            f_ = boost::forward<Functor>(f);
             id_ = id;
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
             phase_ = 0;
@@ -213,7 +213,7 @@ namespace hpx { namespace util { namespace coroutines
 
         operator bool_type() const
         {
-            return good() ? &coroutine::bool_type_f : 0;
+            return good() ? &stackless_coroutine::bool_type_f : 0;
         }
 
         bool operator==(const stackless_coroutine& rhs) const
