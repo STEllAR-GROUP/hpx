@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -68,7 +68,7 @@ namespace detail
         typename Map::const_iterator end = tm.end();
         for (typename Map::const_iterator it = tm.begin(); it != end; ++it)
         {
-            threads::thread_data const* thrd = (*it).second;
+            threads::thread_data_base const* thrd = (*it).second;
             threads::thread_state state = thrd->get_state();
             threads::thread_state marked_state = thrd->get_marked_state();
 

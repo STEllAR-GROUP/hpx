@@ -223,7 +223,7 @@ namespace hpx { namespace threads
         get_state(thread_id_type id)
     {
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_state() : thread_state(terminated);
     }
 
@@ -234,7 +234,7 @@ namespace hpx { namespace threads
         get_phase(thread_id_type id)
     {
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_thread_phase() : std::size_t(~0);
     }
 
@@ -245,7 +245,7 @@ namespace hpx { namespace threads
         get_priority(thread_id_type id)
     {
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_priority() : thread_priority_unknown;
     }
 
@@ -257,7 +257,7 @@ namespace hpx { namespace threads
         get_description(thread_id_type id) const
     {
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_description() : "<unknown>";
     }
 
@@ -273,7 +273,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             return thrd->set_description(desc);
         return NULL;
@@ -291,7 +291,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_lco_description() : "<unknown>";
     }
 
@@ -307,7 +307,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             return thrd->set_lco_description(desc);
         return NULL;
@@ -326,7 +326,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_backtrace() : 0;
     }
 
@@ -342,7 +342,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->set_backtrace(bt) : 0;
     }
 
@@ -362,7 +362,7 @@ namespace hpx { namespace threads
             ec = make_success_code();
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->interruption_enabled() : false;
     }
 
@@ -380,7 +380,7 @@ namespace hpx { namespace threads
             ec = make_success_code();
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             return thrd->set_interruption_enabled(enable);
         return false;
@@ -401,7 +401,7 @@ namespace hpx { namespace threads
             ec = make_success_code();
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->interruption_requested() : false;
     }
 
@@ -420,7 +420,7 @@ namespace hpx { namespace threads
             ec = make_success_code();
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd) {
             thrd->interrupt(flag);      // notify thread
 
@@ -446,7 +446,7 @@ namespace hpx { namespace threads
             ec = make_success_code();
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             thrd->interruption_point();      // notify thread
     }
@@ -465,7 +465,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_thread_data() : 0;
     }
 
@@ -482,7 +482,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->set_thread_data(data) : 0;
     }
 #endif
@@ -502,7 +502,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             thrd->run_thread_exit_callbacks();
     }
@@ -522,7 +522,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return (0 != thrd) ? thrd->add_thread_exit_callback(f) : false;
     }
 
@@ -540,7 +540,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (0 != thrd)
             thrd->free_thread_exit_callbacks();
     }
@@ -560,7 +560,7 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (0 == thrd)
             return default_executor();
 

@@ -44,16 +44,16 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread) = 0;
 
         virtual bool get_next_thread(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd) = 0;
+            boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd) = 0;
 
-        virtual void schedule_thread(threads::thread_data* thrd,
+        virtual void schedule_thread(threads::thread_data_base* thrd,
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal) = 0;
-        virtual void schedule_thread_last(threads::thread_data* thrd,
+        virtual void schedule_thread_last(threads::thread_data_base* thrd,
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal) = 0;
 
-        virtual bool destroy_thread(threads::thread_data* thrd,
+        virtual bool destroy_thread(threads::thread_data_base* thrd,
             boost::int64_t& busy_count) = 0;
 
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,

@@ -40,7 +40,7 @@ namespace hpx { namespace threads { namespace detail
 
         // make sure that the thread has not been suspended and set active again
         // in the mean time
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         thread_state current_state = thrd->get_state();
 
         if (thread_state_enum(current_state) == thread_state_enum(previous_state) &&
@@ -84,7 +84,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         // we know that the id is actually the pointer to the thread
-        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (!thrd) {
             if (&ec != &throws)
                 ec = make_success_code();

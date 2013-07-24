@@ -387,7 +387,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd)
+            boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
         {
             BOOST_ASSERT(tree.size());
             BOOST_ASSERT(num_thread < tree[0].size());
@@ -407,7 +407,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
+        void schedule_thread(threads::thread_data_base* thrd, std::size_t num_thread,
             thread_priority /*priority*/ = thread_priority_normal)
         {
             BOOST_ASSERT(tree.size());
@@ -415,14 +415,14 @@ namespace hpx { namespace threads { namespace policies
             tree.back()[0]->schedule_thread(thrd, 0);
         }
 
-        void schedule_thread_last(threads::thread_data* thrd, std::size_t num_thread,
+        void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             hierarchy_scheduler::schedule_thread(thrd, num_thread, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
+        bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
         {
             for(size_type i = 0; i < tree.size(); ++i)
             {

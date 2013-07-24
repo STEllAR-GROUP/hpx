@@ -44,7 +44,7 @@ extern bool maintain_queue_wait_times;
 extern bool minimal_deadlock_detection;
 #endif
 
-typedef boost::lockfree::deque<thread_data*> work_item_deque_type;
+typedef boost::lockfree::deque<thread_data_base*> work_item_deque_type;
 
 template <typename Queue, typename Value>
 inline void enqueue(Queue& workqueue, Value val)
@@ -396,7 +396,7 @@ struct thread_deque
         return invalid_thread_id; // thread has not been created yet
     }
 
-    bool get_next_thread(threads::thread_data*& thrd)
+    bool get_next_thread(threads::thread_data_base*& thrd)
     {
         if (dequeue(work_items_, thrd)) {
             --work_items_count_;
@@ -405,7 +405,7 @@ struct thread_deque
         return false;
     }
 
-    bool steal_next_thread(threads::thread_data*& thrd)
+    bool steal_next_thread(threads::thread_data_base*& thrd)
     {
         if (steal(work_items_, thrd)) {
             --work_items_count_;
@@ -415,20 +415,20 @@ struct thread_deque
     }
 
     // Schedule the passed thread
-    void schedule_thread(threads::thread_data* thrd)
+    void schedule_thread(threads::thread_data_base* thrd)
     {
         enqueue(work_items_, thrd);
         ++work_items_count_;
     }
 
-    void schedule_thread_last(threads::thread_data* thrd)
+    void schedule_thread_last(threads::thread_data_base* thrd)
     {
         enqueue_last(work_items_, thrd);
         ++work_items_count_;
     }
 
     // Destroy the passed thread as it has been terminated
-    bool destroy_thread(threads::thread_data* thrd, boost::int64_t& busy_count)
+    bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
     {
         if (thrd->is_created_from(&memory_pool_)) {
             thread_id_type id = thrd->get_thread_id();

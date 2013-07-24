@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,6 +24,7 @@ using hpx::finalize;
 using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
+using hpx::applier::register_non_suspendable_work;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
@@ -67,6 +68,12 @@ void create_tasks(boost::uint64_t tasks)
         register_work(HPX_STD_BIND(&invoke_worker, delay));
 }
 
+void create_stackless_tasks(boost::uint64_t tasks)
+{
+    for (boost::uint64_t i = 0; i < tasks; ++i)
+        register_non_suspendable_work(HPX_STD_BIND(&invoke_worker, delay));
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
@@ -82,8 +89,14 @@ int hpx_main(
         // Start the clock.
         high_resolution_timer t;
 
-        for (boost::uint64_t i = 0; i < feeders; ++i)
-            register_work(HPX_STD_BIND(&create_tasks, tasks/feeders));
+        if (0 == vm.count("no-stack")) {
+            for (boost::uint64_t i = 0; i < feeders; ++i)
+                register_work(HPX_STD_BIND(&create_tasks, tasks/feeders));
+        }
+        else {
+            for (boost::uint64_t i = 0; i < feeders; ++i)
+                register_work(HPX_STD_BIND(&create_stackless_tasks, tasks/feeders));
+        }
 
         // Reschedule hpx_main until all other hpx-threads have finished. We
         // should be resumed after most of the null HPX-threads have been
@@ -115,6 +128,9 @@ int main(
         ( "feeders"
         , value<boost::uint64_t>(&feeders)->default_value(1)
         , "number of feeders (threads creating new tasks)")
+
+        ( "no-stack"
+        , "use stackless threads")
 
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)

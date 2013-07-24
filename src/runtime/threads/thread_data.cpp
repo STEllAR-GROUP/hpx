@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -36,7 +36,7 @@ namespace hpx { namespace threads
 
         if (0 != p)
         {
-            thread_data* pt = reinterpret_cast<thread_data*>(p);
+            thread_data* pt = static_cast<thread_data*>(p);
             BOOST_ASSERT(pt->pool_);
             pt->pool_->deallocate(pt);
         }
@@ -45,10 +45,10 @@ namespace hpx { namespace threads
     void thread_data::operator delete(void *p, thread_pool& pool)
     {
         if (0 != p)
-            pool.deallocate(reinterpret_cast<thread_data*>(p));
+            pool.deallocate(static_cast<thread_data*>(p));
     }
 
-    void thread_data::run_thread_exit_callbacks()
+    void thread_data_base::run_thread_exit_callbacks()
     {
         mutex_type::scoped_lock l(this);
         while (exit_funcs_)
@@ -64,7 +64,7 @@ namespace hpx { namespace threads
         ran_exit_funcs_ = true;
     }
 
-    bool thread_data::add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f)
+    bool thread_data_base::add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f)
     {
         mutex_type::scoped_lock l(this);
         if (ran_exit_funcs_ || get_state() == terminated)
@@ -76,7 +76,7 @@ namespace hpx { namespace threads
         return true;
     }
 
-    void thread_data::free_thread_exit_callbacks()
+    void thread_data_base::free_thread_exit_callbacks()
     {
         mutex_type::scoped_lock l(this);
 
@@ -91,7 +91,7 @@ namespace hpx { namespace threads
         }
     }
 
-    bool thread_data::interruption_point(bool throw_on_interrupt)
+    bool thread_data_base::interruption_point(bool throw_on_interrupt)
     {
         mutex_type::scoped_lock l(this);
         if (enabled_interrupt_ && requested_interrupt_)
@@ -180,7 +180,7 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_id() :
+            static_cast<thread_data_base*>(self->get_thread_id())->get_parent_thread_id() :
             threads::invalid_thread_id;
     }
 
@@ -188,7 +188,7 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_thread_phase() :
+            static_cast<thread_data_base*>(self->get_thread_id())->get_parent_thread_phase() :
             0;
     }
 
@@ -196,7 +196,7 @@ namespace hpx { namespace threads
     {
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread_data*>(self->get_thread_id())->get_parent_locality_id() :
+            static_cast<thread_data_base*>(self->get_thread_id())->get_parent_locality_id() :
             naming::invalid_locality_id;
     }
 #endif
@@ -208,7 +208,7 @@ namespace hpx { namespace threads
 #else
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread_data*>(self->get_thread_id())->get_component_id() : 0;
+            static_cast<thread_data_base*>(self->get_thread_id())->get_component_id() : 0;
 #endif
     }
 }}

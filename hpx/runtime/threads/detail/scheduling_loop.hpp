@@ -76,7 +76,7 @@ namespace hpx { namespace threads { namespace detail
 
     ///////////////////////////////////////////////////////////////////////
     inline void write_new_state_log_debug(std::size_t num_thread,
-        thread_data* thrd, thread_state_enum state, char const* info)
+        thread_data_base* thrd, thread_state_enum state, char const* info)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "
             << "thread(" << thrd->get_thread_id() << "), "
@@ -85,7 +85,7 @@ namespace hpx { namespace threads { namespace detail
             << info;
     }
     inline void write_new_state_log_warning(std::size_t num_thread,
-        thread_data* thrd, thread_state_enum state, char const* info)
+        thread_data_base* thrd, thread_state_enum state, char const* info)
     {
         // log this in any case
         LTM_(warning) << "tfunc(" << num_thread << "): "
@@ -95,7 +95,7 @@ namespace hpx { namespace threads { namespace detail
             << info;
     }
     inline void write_old_state_log(std::size_t num_thread,
-        thread_data* thrd, thread_state_enum state)
+        thread_data_base* thrd, thread_state_enum state)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "
                     << "thread(" << thrd->get_thread_id() << "), "
@@ -108,7 +108,7 @@ namespace hpx { namespace threads { namespace detail
     class switch_status
     {
     public:
-        switch_status (thread_data* t, thread_state prev_state)
+        switch_status (thread_data_base* t, thread_state prev_state)
           : thread_(t), prev_state_(prev_state),
             need_restore_state_(t->set_state_tagged(active, prev_state_, orig_state_))
         {}
@@ -154,7 +154,7 @@ namespace hpx { namespace threads { namespace detail
         void disable_restore() { need_restore_state_ = false; }
 
     private:
-        thread_data* thread_;
+        thread_data_base* thread_;
         thread_state prev_state_;
         thread_state orig_state_;
         bool need_restore_state_;
@@ -182,7 +182,7 @@ namespace hpx { namespace threads { namespace detail
 
         while (true) {
             // Get the next HPX thread from the queue
-            thread_data* thrd = NULL;
+            thread_data_base* thrd = NULL;
             if (scheduler.SchedulingPolicy::get_next_thread(num_thread,
                     global_state == running, idle_loop_count, thrd))
             {
