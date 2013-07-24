@@ -25,6 +25,7 @@ using hpx::finalize;
 using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
+using hpx::applier::register_non_suspendable_work;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
@@ -107,8 +108,17 @@ int hpx_main(
 
         t.restart();
 
-        for (boost::uint64_t i = 0; i < tasks; ++i)
-            executors[i % num_executors].add(HPX_STD_BIND(&invoke_worker, delay));
+        if (0 == vm.count("no-stack")) {
+            // schedule normal threads
+            for (boost::uint64_t i = 0; i < tasks; ++i)
+                executors[i % num_executors].add(HPX_STD_BIND(&invoke_worker, delay));
+        }
+        else {
+            // schedule stackless threads
+            for (boost::uint64_t i = 0; i < tasks; ++i)
+                executors[i % num_executors].add(HPX_STD_BIND(&invoke_worker, delay),
+                    "", hpx::threads::pending, true, hpx::threads::thread_stacksize_nostack);
+        }
 
     // destructors of executors will wait for all tasks to finish executing
     }
@@ -139,6 +149,9 @@ int main(
         ( "executors,e"
         , value<int>()->default_value(1)
         , "number of executor instances to use")
+
+        ( "no-stack"
+        , "use stackless threads")
 
         ( "cores"
         , value<int>()->default_value(1)
