@@ -66,7 +66,7 @@ namespace hpx { namespace util { namespace coroutines
         typedef typename traits_type::arg_slot_type arg_slot_type;
         typedef typename traits_type::arg_slot_traits arg_slot_traits;
 
-        typedef typename void* thread_id_type;
+        typedef void* thread_id_type;
 
         stackless_coroutine() {}
 
