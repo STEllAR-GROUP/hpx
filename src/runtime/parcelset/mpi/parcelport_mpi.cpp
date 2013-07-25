@@ -114,8 +114,11 @@ namespace hpx { namespace parcelset { namespace mpi
         if (stopped_)
             return;
 
-        // See if we really need to post another work item to the io service
-        if(handling_messages_) return;
+        // Atomically set handling_messages_ to true, if another work item hasn't
+        // started executing before us.
+        bool false_ = false;
+        if (!handling_messages_.compare_exchange_strong(false_, true))
+            return;
 
         boost::asio::io_service& io_service = io_service_pool_.get_io_service();
         io_service.post(HPX_STD_BIND(&parcelport::handle_messages, this->shared_from_this()));
@@ -140,12 +143,6 @@ namespace hpx { namespace parcelset { namespace mpi
 
     void parcelport::handle_messages()
     {
-        // Atomically set handling_messages_ to true, if another work item hasn't
-        // started executing before us.
-        bool false_ = false;
-        if (!handling_messages_.compare_exchange_strong(false_, true))
-            return;
-
         detail::handling_messages hm(handling_messages_);       // reset on exit
 
         MPI_Comm communicator = util::mpi_environment::communicator();
