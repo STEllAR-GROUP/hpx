@@ -79,7 +79,7 @@ int hpx_main()
                 float x0 = (float)i * 3.5f / (float)sizeX - 2.5f;
                 float y0 = (float)j * 2.0f / (float)sizeY - 1.0f;
 
-                iteration.push_back(async(fractal_pixel, here, x0, y0, max_iteration));
+                iteration.push_back(async(&fractal_pixel, here, x0, y0, max_iteration));
             }
         }
         wait_all(iteration);
