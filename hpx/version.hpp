@@ -35,7 +35,7 @@
     #define HPX_AGAS_VERSION 0x30
 #endif
 
-#define HPX_VERSION_TAG          "-trunk"
+#define HPX_VERSION_TAG          ""
 
 #if !defined(HPX_GIT_COMMIT)
     #define HPX_GIT_COMMIT       "unknown"
