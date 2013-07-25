@@ -119,7 +119,8 @@ namespace hpx { namespace applier
 
         threads::thread_init_data data(
             HPX_STD_BIND(&thread_function, boost::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread, 0);
+            desc ? desc : "<unknown>", 0, priority, os_thread, 
+            threads::get_stack_size(threads::thread_stacksize_nostack));
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
@@ -225,7 +226,8 @@ namespace hpx { namespace applier
 
         threads::thread_init_data data(
             HPX_STD_BIND(&thread_function, boost::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread, 0);
+            desc ? desc : "<unknown>", 0, priority, os_thread,
+            threads::get_stack_size(threads::thread_stacksize_nostack));
         app->get_thread_manager().register_work(data, state, ec);
     }
 

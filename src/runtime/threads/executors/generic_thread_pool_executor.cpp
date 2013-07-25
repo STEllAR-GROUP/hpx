@@ -47,7 +47,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_init_data data(util::bind(
             &generic_thread_pool_executor::thread_function_nullary,
             boost::move(f)), desc);
-        data.stacksize = stacksize;
+        data.stacksize = threads::get_stack_size(stacksize);
 
         threads::detail::create_thread(scheduler_base_, data,
             initial_state, run_now, ec);

@@ -167,7 +167,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_init_data data(util::bind(
             &thread_pool_executor::thread_function_nullary, this,
             boost::move(f)), desc);
-        data.stacksize = stacksize;
+        data.stacksize = threads::get_stack_size(stacksize);
 
         // update statistics
         ++tasks_scheduled_;
@@ -195,7 +195,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_init_data data(util::bind(
             &thread_pool_executor::thread_function_nullary, this,
             boost::move(f)), desc);
-        data.stacksize = stacksize;
+        data.stacksize = threads::get_stack_size(stacksize);
 
         thread_id_type id = threads::detail::create_thread(
             &scheduler_, data, suspended, true, ec);
@@ -229,7 +229,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_init_data data(util::bind(
             &thread_pool_executor::thread_function_nullary, this,
             boost::move(f)), desc);
-        data.stacksize = stacksize;
+        data.stacksize = threads::get_stack_size(stacksize);
 
         thread_id_type id = threads::detail::create_thread(
             &scheduler_, data, suspended, true, ec);
