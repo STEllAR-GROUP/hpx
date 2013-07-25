@@ -323,6 +323,7 @@ namespace hpx { namespace threads { namespace detail
                     cb();
 
                 // clean up terminated threads
+                idle_loop_count = 0;
                 scheduler.SchedulingPolicy::cleanup_terminated();
             }
         }
