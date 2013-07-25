@@ -29,9 +29,9 @@ double func(double x1 , double x2 , double x3 , double x4 , double x5 , double x
 int main()
 {
     future< double > f = make_ready_future( 1.0 );
-    f = hpx::lcos::local::dataflow( hpx::launch::sync , 
-                                    unwrapped( [](double x1 , double x2 , double x3 , double x4 ,
-                                                  double x5 , double x6 , double x7 ) -> double 
-                                               { return x1; } ) , f , f , f , f , f , f , f );
+    f = hpx::lcos::local::dataflow(
+            hpx::launch::sync,
+            unwrapped( &func ), 
+            f, f, f, f, f, f, f);
     return hpx::util::report_errors();
 }
