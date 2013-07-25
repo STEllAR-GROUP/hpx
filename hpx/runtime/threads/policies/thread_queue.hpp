@@ -203,6 +203,7 @@ namespace hpx { namespace threads { namespace policies
                         "Couldn't add new thread to the thread map");
                     return 0;
                 }
+                ++thread_map_count_;
 
                 // only insert the thread into the work-items queue if it is in
                 // pending state
@@ -316,8 +317,9 @@ namespace hpx { namespace threads { namespace policies
 
                     --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) ? true : false;
-                    (void)deleted;
                     BOOST_ASSERT(deleted);
+                    if (deleted)
+                        --thread_map_count_;
                 }
                 return false;
             }
@@ -337,8 +339,10 @@ namespace hpx { namespace threads { namespace policies
                     --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) ? true : false;
                     BOOST_ASSERT(deleted);
-                    if (deleted)
+                    if (deleted) {
+                        --thread_map_count_;
                         --delete_count;
+                    }
                 }
                 return terminated_items_count_ != 0;
             }
@@ -353,6 +357,9 @@ namespace hpx { namespace threads { namespace policies
     public:
         bool cleanup_terminated(bool delete_all = false)
         {
+            if (terminated_items_count_ == 0)
+                return (thread_map_count_ == 0) ? true : false;
+
             if (delete_all) {
                 bool thread_map_is_empty = false;
                 while (true)
@@ -382,7 +389,8 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
         thread_queue(std::size_t max_count = max_thread_count)
-          : work_items_(128),
+          : thread_map_count_(0),
+            work_items_(128),
             work_items_count_(0),
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             work_items_wait_(0),
@@ -488,6 +496,7 @@ namespace hpx { namespace threads { namespace policies
                         "Couldn't add new thread to the map of threads");
                     return invalid_thread_id;
                 }
+                ++thread_map_count_;
 
                 // push the new thread in the pending queue thread
                 if (initial_state == pending)
@@ -653,15 +662,17 @@ namespace hpx { namespace threads { namespace policies
                 return terminated_items_count_;
 
             if (staged == state)
-                return static_cast<boost::int64_t>(new_tasks_count_);
+                return new_tasks_count_;
 
-            typename mutex_type::scoped_lock lk(mtx_);
             if (unknown == state)
             {
-                BOOST_ASSERT((thread_map_.size() + new_tasks_count_) <
+                BOOST_ASSERT((thread_map_count_ + new_tasks_count_) <
                     static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
-                return static_cast<boost::int64_t>(thread_map_.size() + new_tasks_count_);
+                return thread_map_count_ + new_tasks_count_;
             }
+
+            // acquire lock only if absolutely necessary
+            typename mutex_type::scoped_lock lk(mtx_);
 
             boost::int64_t num_threads = 0;
             thread_map_type::const_iterator end = thread_map_.end();
@@ -772,9 +783,11 @@ namespace hpx { namespace threads { namespace policies
         mutable mutex_type mtx_;                    ///< mutex protecting the members
 
         thread_map_type thread_map_;                ///< mapping of thread id's to HPX-threads
-        work_items_type work_items_;                ///< list of active work items
+        boost::atomic<boost::int64_t> thread_map_count_;       ///< overall count of work items
 
+        work_items_type work_items_;                ///< list of active work items
         boost::atomic<boost::int64_t> work_items_count_;       ///< count of active work items
+
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         boost::atomic<boost::int64_t> work_items_wait_;        ///< overall wait time of work items
         boost::atomic<boost::int64_t> work_items_wait_count_;  ///< overall number of work items in queue

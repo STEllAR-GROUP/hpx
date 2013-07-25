@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/thread_aware_timer.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <stdexcept>
@@ -29,7 +29,7 @@ using hpx::applier::register_non_suspendable_work;
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
 
-using hpx::util::high_resolution_timer;
+using hpx::util::thread_aware_timer;
 
 using hpx::cout;
 using hpx::flush;
@@ -62,16 +62,23 @@ void print_results(
             % walltime % (walltime / tasks)) << flush;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+void invoke_worker_helper(hpx::threads::thread_state_ex_enum)
+{
+    invoke_worker(delay);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void create_tasks(boost::uint64_t tasks)
 {
-    for (boost::uint64_t i = 0; i < tasks; ++i)
-        register_work(HPX_STD_BIND(&invoke_worker, delay));
+    for (boost::uint64_t i = 0; i != tasks; ++i)
+        register_work(&invoke_worker_helper);
 }
 
 void create_stackless_tasks(boost::uint64_t tasks)
 {
-    for (boost::uint64_t i = 0; i < tasks; ++i)
-        register_non_suspendable_work(HPX_STD_BIND(&invoke_worker, delay));
+    for (boost::uint64_t i = 0; i != tasks; ++i)
+        register_non_suspendable_work(&invoke_worker_helper);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,15 +93,18 @@ int hpx_main(
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
 
+        if (0 == feeders || feeders > get_os_thread_count())
+            throw std::invalid_argument("number of feeders must be between 1 and OS-thread-count\n");
+
         // Start the clock.
-        high_resolution_timer t;
+        thread_aware_timer t;
 
         if (0 == vm.count("no-stack")) {
-            for (boost::uint64_t i = 0; i < feeders; ++i)
+            for (boost::uint64_t i = 0; i != feeders; ++i)
                 register_work(HPX_STD_BIND(&create_tasks, tasks/feeders));
         }
         else {
-            for (boost::uint64_t i = 0; i < feeders; ++i)
+            for (boost::uint64_t i = 0; i != feeders; ++i)
                 register_work(HPX_STD_BIND(&create_stackless_tasks, tasks/feeders));
         }
 
