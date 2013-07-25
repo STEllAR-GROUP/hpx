@@ -114,9 +114,8 @@ namespace hpx { namespace parcelset { namespace mpi
         if (stopped_)
             return;
 
-        bool false_ = false;
-        if (!handling_messages_.compare_exchange_strong(false_, true))
-            return;
+        // See if we really need to post another work item to the io service
+        if(handling_messages_) return;
 
         boost::asio::io_service& io_service = io_service_pool_.get_io_service();
         io_service.post(HPX_STD_BIND(&parcelport::handle_messages, this->shared_from_this()));
@@ -141,6 +140,12 @@ namespace hpx { namespace parcelset { namespace mpi
 
     void parcelport::handle_messages()
     {
+        // Atomically set handling_messages_ to true, if another work item hasn't
+        // started executing before us.
+        bool false_ = false;
+        if (!handling_messages_.compare_exchange_strong(false_, true))
+            return;
+
         detail::handling_messages hm(handling_messages_);       // reset on exit
 
         MPI_Comm communicator = util::mpi_environment::communicator();
@@ -148,7 +153,11 @@ namespace hpx { namespace parcelset { namespace mpi
         bool bootstrapping = hpx::is_starting();
         bool has_work = true;
 
-        while(bootstrapping || (!stopped_ && has_work))
+        hpx::util::high_resolution_timer t;
+
+        // We let the message handling loop spin for another 2 seconds to avoid the
+        // costs involved with posting it to asio
+        while(bootstrapping || (!stopped_ && has_work) || (t.elapsed() < 10.0))
         {
             // add new receive requests
             std::pair<bool, header> next(acceptor_.next_header());
@@ -195,14 +204,17 @@ namespace hpx { namespace parcelset { namespace mpi
 
             if (bootstrapping)
                 bootstrapping = hpx::is_starting();
+
+            if(has_work)
+                t.restart();
         }
-        // cancel all remaining requests if has been stopped
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void parcelport::put_parcels(std::vector<parcel> const & parcels,
         std::vector<write_handler_type> const& handlers)
     {
+        do_background_work();      // schedule message handler
         if (parcels.size() != handlers.size())
         {
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::put_parcels",
@@ -221,23 +233,22 @@ namespace hpx { namespace parcelset { namespace mpi
 #endif
 
         parcel_cache_.set_parcel(parcels, handlers);
-        do_background_work();      // schedule message handler
     }
 
     void parcelport::put_parcel(parcel const& p, write_handler_type f)
     {
-        parcel_cache_.set_parcel(p, f);
         do_background_work();      // schedule message handler
+        parcel_cache_.set_parcel(p, f);
     }
 
     void parcelport::send_early_parcel(parcel& p)
     {
-        parcel_cache_.set_parcel(p, write_handler_type(), 0);
         do_background_work();      // schedule message handler
+        parcel_cache_.set_parcel(p, write_handler_type(), 0);
     }
 
     void decode_message(
-        std::vector<char> const & parcel_data,
+        std::vector<char, allocator<char> > const & parcel_data,
         parcelport& pp,
         performance_counters::parcels::data_point& receive_data
     )
