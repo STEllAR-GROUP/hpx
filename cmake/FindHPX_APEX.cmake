@@ -27,7 +27,6 @@ hpx_find_package(APEX
   HEADER_PATHS include)
 
 if(APEX_FOUND)
-  #set(hpx_LIBRARIES ${hpx_LIBRARIES} ${APEX_LIBRARY})
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${APEX_LIBRARY})
   hpx_include_sys_directories(${APEX_INCLUDE_DIR})
   hpx_link_sys_directories(${APEX_LIBRARY_DIR})
