@@ -665,11 +665,7 @@ namespace hpx { namespace threads { namespace policies
                 return new_tasks_count_;
 
             if (unknown == state)
-            {
-                BOOST_ASSERT((thread_map_count_ + new_tasks_count_) <
-                    static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
                 return thread_map_count_ + new_tasks_count_;
-            }
 
             // acquire lock only if absolutely necessary
             typename mutex_type::scoped_lock lk(mtx_);
