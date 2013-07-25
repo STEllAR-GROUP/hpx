@@ -232,7 +232,7 @@ namespace hpx { namespace threads
         {
             boost::static_pointer_cast<detail::scheduled_executor_base>(
                 executor_data_)->add_at(util::to_ptime(abs_time),
-                    boost::move(f), desc, stacksizeec);
+                    boost::move(f), desc, stacksizee);
         }
 
         /// Effects: The specified function object shall be scheduled for
