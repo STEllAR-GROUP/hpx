@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/parcelset/mpi/header.hpp>
+#include <hpx/runtime/parcelset/mpi/allocator.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
 #include <boost/assert.hpp>
@@ -27,7 +28,7 @@ namespace hpx { namespace parcelset { namespace mpi
         > write_handler_type;
 
         int rank_;
-        std::vector<char> buffer_;
+        std::vector<char, allocator<char> > buffer_;
         std::vector<write_handler_type> handlers_;
         performance_counters::parcels::data_point send_data_;
     };
@@ -72,6 +73,16 @@ namespace hpx { namespace parcelset { namespace mpi
                 communicator_,  // Communicator
                 &header_request_        // Request
                 );
+
+            MPI_Isend(
+                buffer_->buffer_.data(), // Data pointer
+                static_cast<int>(buffer_->buffer_.size()), // Size
+                MPI_CHAR,           // MPI Datatype
+                header_.rank(),     // Destination
+                header_.tag(),      // Tag
+                communicator_,      // Communicator
+                &data_request_      // Request
+                );
             state_ = sending_header;
         }
 
@@ -94,16 +105,6 @@ namespace hpx { namespace parcelset { namespace mpi
                 {
                     BOOST_ASSERT(static_cast<std::size_t>(header_.size()) ==
                         buffer_->buffer_.size());
-
-                    MPI_Isend(
-                        buffer_->buffer_.data(), // Data pointer
-                        static_cast<int>(buffer_->buffer_.size()), // Size
-                        MPI_CHAR,           // MPI Datatype
-                        header_.rank(),     // Destination
-                        header_.tag(),      // Tag
-                        communicator_,      // Communicator
-                        &data_request_      // Request
-                        );
                     state_ = sending_data;
                     return done(pp);
                 }

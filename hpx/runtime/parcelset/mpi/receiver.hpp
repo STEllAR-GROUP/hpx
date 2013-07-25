@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/parcelset/mpi/header.hpp>
+#include <hpx/runtime/parcelset/mpi/allocator.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
 #include <boost/assert.hpp>
@@ -24,7 +25,7 @@ namespace hpx { namespace parcelset { namespace mpi {
     class parcelport;
 
     void decode_message(
-        std::vector<char> const & parcel_data, parcelport& pp,
+        std::vector<char, allocator<char> > const & parcel_data, parcelport& pp,
         performance_counters::parcels::data_point& receive_data);
 
     struct receiver
@@ -32,7 +33,7 @@ namespace hpx { namespace parcelset { namespace mpi {
     {
         receiver(header const & h, MPI_Comm communicator)
           : header_(h)
-          , buffer_(boost::make_shared<std::vector<char> >(h.size()))
+          , buffer_(boost::make_shared<std::vector<char, allocator<char> > >(h.size()))
         {
             // start collecting statistics for this receive operation
             receive_data_.time_ = util::high_resolution_clock::now();
@@ -54,9 +55,13 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         bool done(parcelport & pp)
         {
-            MPI_Status status;
             int completed = 0;
+#ifdef HPX_DEBUG
+            MPI_Status status;
             MPI_Test(&request_, &completed, &status);
+#else
+            MPI_Test(&request_, &completed, MPI_STATUS_IGNORE);
+#endif
             if(completed)
             {
                 BOOST_ASSERT(status.MPI_SOURCE == header_.rank());
@@ -80,7 +85,7 @@ namespace hpx { namespace parcelset { namespace mpi {
 
     private:
         header header_;
-        boost::shared_ptr<std::vector<char> > buffer_;
+        boost::shared_ptr<std::vector<char, allocator<char> > > buffer_;
 
         MPI_Request request_;
 

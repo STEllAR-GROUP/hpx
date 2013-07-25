@@ -7,6 +7,7 @@
 #define HPX_PARCELSET_MPI_PARCELCACHE_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/parcelset/mpi/allocator.hpp>
 #include <hpx/runtime/parcelset/mpi/sender.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -204,18 +205,16 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 mutex_type::scoped_lock lk(*parcel_maps_mtx_[i]);
                 BOOST_FOREACH(boost::shared_ptr<parcel_buffer> b, parcel_buffers_[i])
                 {
-                    boost::shared_ptr<sender> s(boost::make_shared<sender>(
-                        header(
-                            b->rank_
-                          , tag_generator()
-                          , static_cast<int>(b->buffer_.size())
-                        )
-                      , b
-                      , communicator
-                    ));
-                    if(s->done(pp)) continue;
                     res.push_back(
-                        s
+                        boost::make_shared<sender>(
+                            header(
+                                b->rank_
+                              , tag_generator()
+                              , static_cast<int>(b->buffer_.size())
+                            )
+                          , b
+                          , communicator
+                        )
                     );
                 }
                 parcel_buffers_[i].clear();
