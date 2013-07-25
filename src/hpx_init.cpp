@@ -1059,7 +1059,7 @@ namespace hpx
             // handle all common command line switches
             util::command_line_handling cfg(mode, f, ini_config);
 
-            util::apex_wrapper_init(argc, argv);
+            util::apex_wrapper_init apex(argc, argv);
 
             result = cfg.call(desc_cmdline, argc, argv);
             if (result != 0) {
