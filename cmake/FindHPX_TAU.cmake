@@ -24,7 +24,6 @@ hpx_find_package(TAU
   HEADER_PATHS include)
 
 if(TAU_FOUND)
-  #set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TAU_LIBRARY})
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${TAU_LIBRARY})
   hpx_include_sys_directories(${TAU_INCLUDE_DIR})
   hpx_link_sys_directories(${TAU_LIBRARY_DIR})
