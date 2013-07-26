@@ -447,6 +447,7 @@ and also the section __cmake_hpx__.
               <linkflags>"-std=c++0x -mmic"
             ;
 ```
+[teletype]
 * Change to the directory you unpacked boost in (from now on referred to as $BOOST_ROOT)
   and execute the following commands:
 ```
@@ -482,7 +483,7 @@ This is achieved by invoking CMake in the following way:
             -DHWLOC_ROOT=$HWLOC_ROOT  \
             /path/to/hpx
 ```
-
+[c++]
 For more detailed information about using __cmake__ please refer its documentation
 and to the section __cmake_hpx__. Please pay special attention to the section about
 HPX_MALLOC as this is crucial for getting decent performance on the Xeon Phi.
