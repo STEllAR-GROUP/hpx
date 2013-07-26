@@ -44,7 +44,7 @@ namespace hpx { namespace util
                 std::copy(data, data + size, data_.get());
             }
             else {
-                data_ = boost::shared_ptr<T>(data, &serialize_buffer::no_deleter);
+                data_ = boost::shared_array<T>(data, &serialize_buffer::no_deleter);
             }
         }
 
@@ -126,7 +126,7 @@ namespace hpx { namespace util
         }
 
     private:
-        boost::shared_ptr<T> data_;
+        boost::shared_array<T> data_;
         std::size_t size_;
     };
 }}
