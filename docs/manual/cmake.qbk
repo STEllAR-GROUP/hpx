@@ -238,6 +238,9 @@ along with a brief explanation.
       and the LCO description (while the thread is suspended). The default value
       for this variable is `OFF` if `CMAKE_BUILD_TYPE=Release` and `ON` otherwise.]
     ]
+    [[`HPX_NO_INSTALL:BOOL`]
+     [Sets whether __hpx__ can be used directly from the build directory. (default: OFF)]
+    ]
     [[`HPX_NATIVE_MIC:BOOL`]
      [Build __hpx__ to run natively on the Xeon Phi Coprocessor (default: OFF)]
     ]
