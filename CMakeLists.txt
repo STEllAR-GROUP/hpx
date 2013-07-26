@@ -1590,13 +1590,7 @@ hpx_info("external_link_directories" "hpx_LIBRARIES: ${hpx_LIBRARIES}")
 foreach(lib ${hpx_LIBRARIES})
   get_filename_component(lib_dir ${lib} PATH)
   if(lib_dir)
-    string(FIND ${external_link_directories} ${lib_dir} lib_dir_found)
-    if(${lib_dir_found} EQUAL "-1")
-      set(external_link_directories "${external_link_directories} ${lib_dir}")
-      hpx_info("external_link_directories" "added: ${lib_dir}.")
-    else()
-      hpx_info("external_link_directories" "not added: ${lib_dir}.")
-    endif()
+    set(external_link_directories "${external_link_directories} ${lib_dir}")
   endif()
   get_filename_component(lib ${lib} NAME_WE)
 
@@ -1605,18 +1599,24 @@ foreach(lib ${hpx_LIBRARIES})
     string(REGEX REPLACE "^lib" "" lib ${lib})
   endif()
 
-  string(FIND "${external_libraries}" ${lib} lib_found)
-  if(${lib_found} EQUAL "-1")
-    set(external_libraries "${external_libraries} ${lib}")
-    set(external_libraries_name "${external_libraries_name} -l${lib}")
-  endif()
+  set(external_libraries "${external_libraries} ${lib}")
+  set(external_libraries_name "${external_libraries_name} -l${lib}")
 endforeach()
+
+# make lists unique
+list(REMOVE_DUPLICATES external_link_directories)
+list(REMOVE_DUPLICATES external_libraries)
+list(REMOVE_DUPLICATES external_libraries_name)
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
   string(REGEX REPLACE "([ ()])" "\\\\\\1" directory "${directory}")
   set(external_include_directories "${external_include_directories} ${directory}")
   set(external_include_flags "${external_include_flags} -I${directory}")
 endforeach()
+
+# make lists unique
+list(REMOVE_DUPLICATES external_include_directories)
+list(REMOVE_DUPLICATES external_include_flags)
 
 set(boost_library_info "")
 
@@ -1637,6 +1637,9 @@ foreach(definition ${definitions})
     string(REGEX REPLACE "\"" "\\\\\\\\\\\\\\\\\"" definition ${definition})
     set(external_definitions "${external_definitions} ${definition}")
 endforeach()
+
+# make list unique
+list(REMOVE_DUPLICATES external_definitions)
 
 set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 
