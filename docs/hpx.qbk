@@ -14,7 +14,7 @@
     [copyright 2011 2012 2013 The STE||AR Group, Louisiana State University]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
-        accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt] 
+        accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt]
         or copy at [@http://www.boost.org/LICENSE_1_0.txt])
     ]
 ]
@@ -37,10 +37,11 @@
 
 [def __hpx__                    /HPX/]
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
-[def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
-[def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #ste||ar at Freenet]]
+[def __stellar_list__           [@email:hpx-users@stellar.cct.lsu.edu hpx-users@stellar.cct.lsu.edu]]
+[def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #ste||ar at Freenode]]
 [def __stellar_hpx_download__   [@http://stellar.cct.lsu.edu/downloads/ __hpx__ Downloads]]
 [def __stellar_hpx_github__     [@http://github.com/STEllAR-GROUP/hpx/ Github]]
+[def __stellar_hpx_buildbot__     [@http://hermione.cct.lsu.edu/ HPX Buildbot Website]]
 
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
 [def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]
@@ -66,12 +67,14 @@
 [def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
 [def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
 
+[def __hwloc_downloads__        [@http://http://www.open-mpi.org/software/hwloc/v1.7/ hwloc Downloads]]
 [def __doxygen__                [@http://www.doxygen.org Doxygen]]
 
 [/ External dependencies]
 [def __cmake__                  [@http://www.cmake.org CMake]]
 [def __cmake_download__         [@http://www.cmake.org/cmake/resources/software.html CMake Downloads]]
 [def __gcc__                    [@http://gcc.gnu.org GNU Compiler Collection (g++)]]
+[def __icpc__                   [@http://software.intel.com/en-us/intel-composer-xe/ Intel Composer XE Suites]]
 [def __gmake__                  [@http://www.gnu.org/software/make GNU Make (gmake)]]
 [def __eglibc__                 [@http://eglibc.org/home Embedded GLIBC (EGLIBC)]]
 [def __glibc__                  [@http://gnu.org/s/libc GNU C Library (GLIBC)]]
@@ -243,8 +246,8 @@ a list of people working in this group and participating in writing this
 documentation see __people__.
 
 This documentation is automatically generated for __hpx__ __version__ (from Git
-commit: [git_commit_link __hpx_git_commit__]) by the Boost __boost_quickbook__ 
-and __boost_auto_index__ documentation tools. __boost_quickbook__ and 
+commit: [git_commit_link __hpx_git_commit__]) by the Boost __boost_quickbook__
+and __boost_auto_index__ documentation tools. __boost_quickbook__ and
 __boost_auto_index__ can be found in the collection of __boost_tools__.
 
 [include preface.qbk]

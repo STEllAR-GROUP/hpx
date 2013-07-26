@@ -1,5 +1,6 @@
 [/=============================================================================
     Copyright (C) 2007-2013 Hartmut Kaiser
+    Copyright (C)      2013 Thomas Heller
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -237,6 +238,52 @@ along with a brief explanation.
       and the LCO description (while the thread is suspended). The default value
       for this variable is `OFF` if `CMAKE_BUILD_TYPE=Release` and `ON` otherwise.]
     ]
+    [[`HPX_NATIVE_MIC:BOOL`]
+     [Build __hpx__ to run natively on the Xeon Phi Coprocessor (default: OFF)]
+    ]
+]
+
+The following list is about the default memory allocator used by __hpx__. We currently
+support the regular system allocator, tcmalloc, jemalloc and tbbmalloc. The allocator is
+crucial in getting an application to scale with __hpx__. The default system allocator
+is usually a point of heavy contention due to syscalls and locks in the operating system.
+This can be avoided by using the above custom allocators. For using __hpx__ on the Xeon
+Phi we only support system and tbbmalloc. tbbmalloc is part of the Intel Thread Building
+Blocks.
+
+[variablelist Affecting the default memory allocator
+    [[`HPX_MALLOC:STRING`]
+     [Set the memory allocator to use. Defaults to tcmalloc on regular systems and to
+      tbbmalloc if HPX_NATIVE_MIC is set to On. If the specific memory allocator isn't
+      found we silently fall back to the system allocator.]]
+]
+
+[variablelist Locations for memory allocators
+    [[`TCMALLOC_ROOT:PATH`]
+     [Specifies where to look at for tcmalloc]]
+    [[`JEMALLOC_ROOT:PATH`]
+     [Specifies where to look at for jemalloc]]
+    [[`TBB_ROOT:PATH`]
+     [Specifies where to look at for tbb. tbbmalloc is part of tbb]]
+]
+
+Here is a list of options controlling the parcelports available for all applications built
+with __hpx__.
+
+[variablelist Enable HPX Parcelports
+    [[`HPX_HAVE_PARCELPORT_SHMEM:BOOL`]
+     [Enable parcelport based on shared memory. This is only available if you use a boost
+     version greater than 1.51 (default: OFF)]
+    ]
+    [[`HPX_HAVE_PARCELPORT_IBVERBS:BOOL`]
+     [Enable parcelport based on rdma ibverbs operations. We use rdmacm to establish our
+     connections. In order use the parcelport, please set `IBVERBS_ROOT` and `RDMACM_ROOT`
+     to point to the appropriate locations of your ofed stack. (default: OFF)]
+    ]
+    [[`HPX_HAVE_PARCELPORT_MPI:BOOL`]
+     [Enable parcelport based on MPI. Please set `MPI_CXX_COMPILER` and `MPI_C_COMPILER`
+      to point to the correct location of your MPI compiler wrappers (default: OFF)]
+    ]
 ]
 
 Here is a list of options controlling the scheduling policies available for
@@ -300,7 +347,7 @@ variables are used more seldom and are mainly useful for debugging purposes.
     [[`HPX_HAVE_PARCELPORT_IBVERBS:BOOL`]
      [Sets whether the experimental implementation of a parcelport communicating
       over Infiniband will be enabled or not. This variable is set to `OFF`
-      by default. In order to use this option the IBVERBS and RDMACM libraries 
+      by default. In order to use this option the IBVERBS and RDMACM libraries
       must be found and configured by cmake.]
     ]
     [[`HPX_HAVE_COMPRESSION_ZLIB:BOOL`]
@@ -384,7 +431,7 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
     ]
     [[`SODIUM_ROOT:PATH`]
      [Specifies where to look for the __sodium__ library. The Sodium library
-      is necessary to enable the security related functionality (see 
+      is necessary to enable the security related functionality (see
       `HPX_HAVE_SECURITY`).]
     ]
 ]

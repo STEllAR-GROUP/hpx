@@ -2,6 +2,7 @@
     Copyright (C) 2007-2013 Hartmut Kaiser
     Copyright (C) 2011 Bryce Lelbach
     Copyright (C) 2013 Pyry Jahkola
+    Copyright (C) 2013 Thomas Heller
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -59,25 +60,28 @@ The installation of Boost is described in detail in Boost's own
 __boost_getting_started__ document. However, if you've never used the Boost
 libraries (or even if you have), here's a quick primer: __boost_installation__.
 
-Currently, __hpx__ only supports two compilers: GCC and MSVC. __hpx__ uses CMake as
-a build system.
+In addition, we urge every user to have a recent version of hwloc installed on
+the target system in order to have proper support for thread pinning and NUMA
+awareness.
+
+__hpx__ is written in 99% Standard C++. As such __hpx__ is compilable with
+almost any standards compliant C++ compiler. A compiler supporting the C++11
+Standard is highly recommended. We are currently support GCC, MSVC, ICPC and
+clang. For the status of your favorite compiler with hpx visit __stellar_hpx_buildbot__.
 
 [table Software Prerequisites for __hpx__ on Linux systems
     [[Name                       ][Recommended Version][Minimum Version ]]
 
     [[[*Compilers]]]
     [[__gcc__                    ][4.6.3              ][4.4.5           ]]
+    [[__icpc__                   ][2013               ][2013            ]]
 
     [[[*Build System]]]
     [[__cmake__                  ][2.8.4              ][2.8.4           ]]
-    [[__gmake__                  ][3.81               ][3.80            ]]
 
     [[[*Required Libraries]]]
     [[__boost_libraries__        ][1.48.0 or newer    ][1.47.0          ]]
-    [[__eglibc__ (Debian, Ubuntu)][2.11               ][2.7             ]]
-    [[__glibc__ (Redhat)         ][2.11               ][2.7             ]]
-    [[__libstdcxx__              ][4.6.3              ][4.4.5           ]]
-    [[__hwloc__                  ][1.4                ][1.2             ]
+    [[__hwloc__                  ][1.7                ][1.2             ]
         [Used for OS-thread pinning and NUMA awareness.]]
 ]
 
@@ -92,7 +96,7 @@ a build system.
 
     [[[*Required Libraries]]]
     [[__boost__                  ][1.48.0 or newer    ][1.43.0          ]]
-    [[__hwloc__                  ][1.5                ][1.5             ]
+    [[__hwloc__                  ][1.7                ][1.5             ]
         [Used for OS-thread pinning and NUMA awareness.]]
 ]
 
@@ -108,14 +112,14 @@ listed below.
 [table Highly Recommended Optional Software Prerequisites for __hpx__ on Linux systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
-    [[__hdf5__                   ][1.8.7              ][1.6.7           ]
-        [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
-         and interpolate3d applications. See important note below.]]
     [[__google_perftools__       ][1.7.1              ][1.7.1           ]
         [Used as a replacement for the system allocator, and for allocation
          diagnostics.]]
     [[__libunwind__              ][0.99               ][0.97            ]
         [Dependency of google-perftools on x86-64, used for stack unwinding.]]
+    [[__hdf5__                   ][1.8.7              ][1.6.7           ]
+        [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
+         and interpolate3d applications. See important note below.]]
 ]
 
 [table Optional Software Prerequisites for __hpx__ on Linux systems
@@ -140,8 +144,6 @@ listed below.
 [table Highly Recommended Optional Software Prerequisites for __hpx__ on Windows systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
-    [[__hwloc__                  ][1.4.2              ][1.4.2           ]
-        [Used for OS-thread pinning and NUMA awareness.]]
     [[__hdf5__                   ][1.8.7              ][1.6.7           ]
         [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
          and interpolate3d applications. See important note below.]]
@@ -240,7 +242,8 @@ detail in the sections __unix_installation__ and __windows_installation__.
 [c++]
 
 For more detailed information about using __cmake__ please refer its documentation
-and also the section __cmake_hpx__.
+and also the section __cmake_hpx__. Please pay special attention to the section about
+HPX_MALLOC as this is crucial for getting decent performance.
 
 [endsect] [/ How to Install __hpx__ on Unix Variants]
 
@@ -359,6 +362,10 @@ of Clang, libc++, and Boost).
         make
 ``
 
+For more detailed information about using __cmake__ please refer its documentation
+and to the section __cmake_hpx__ for. Please pay special attention to the section about
+HPX_MALLOC as this is crucial for getting decent performance.
+
 [c++]
 [endsect]
 
@@ -379,13 +386,13 @@ of Clang, libc++, and Boost).
 * Create a build folder. __hpx__ requires an out-of-tree-build. This means that you
   will be unable to run CMake in the __hpx__ source folder.
 * Open up the CMake GUI. In the input box labelled "Where is the source code:",
-  enter the full path to the source folder. The source directory is one where the 
-  sources were checked out. CMakeLists.txt files in the source directory as well as the 
-  subdirectories describe the build to CMake. In addition to this, there are CMake 
-  scripts (usually ending in .cmake) stored in a special CMake directory. CMake does not 
-  alter any file in the source directory and   doesn't add new ones either. In the input 
-  box labelled "Where to build the binaries:", enter the full path to the build folder you 
-  created before. The build directory is one where all compiler outputs are stored, which 
+  enter the full path to the source folder. The source directory is one where the
+  sources were checked out. CMakeLists.txt files in the source directory as well as the
+  subdirectories describe the build to CMake. In addition to this, there are CMake
+  scripts (usually ending in .cmake) stored in a special CMake directory. CMake does not
+  alter any file in the source directory and   doesn't add new ones either. In the input
+  box labelled "Where to build the binaries:", enter the full path to the build folder you
+  created before. The build directory is one where all compiler outputs are stored, which
   includes object files and final executables.
 * Add CMake variable definitions (if any) by clicking the "Add Entry" button.
   There are two required variables you need to define: `BOOST_ROOT` and
@@ -403,8 +410,8 @@ of Clang, libc++, and Boost).
   Windows system limitation affecting the number of HPX threads you can create.
 * Make sure that that the `CMAKE_BUILD_TYPE` (under the `CMAKE` tree)
   is set to `Debug` or `Release`, according to what you plan to do (alternatively,
-  this variable can be set to `RelWithDebInfo` or `MinSizeRel`). The text area at 
-  the bottom of CMake GUI displays the output of CMake. CMake prompts an error message 
+  this variable can be set to `RelWithDebInfo` or `MinSizeRel`). The text area at
+  the bottom of CMake GUI displays the output of CMake. CMake prompts an error message
   in a separate dialog box if a required dependency is not found.
 * Press "Configure" again. Repeat this step until the "Generate" button becomes
   clickable (and until no variable definitions are marked red anymore).
@@ -416,6 +423,71 @@ For more detailed information about using __cmake__ please refer its documentati
 and also the section __cmake_hpx__.
 
 [endsect] [/ How to Install __hpx__ on Windows]
+
+[section:intel_mic_installation How to Install __hpx__ on the Xeon Phi]
+
+[heading Installation of the Boost Libraries]
+
+* Download __boost_downloads__ for Linux and unpack the retreived tarball.
+
+* Adapt your ~/user-config.jam to contain the following lines:
+```
+        ## Toolset to be used for compiling for the host
+        using intel
+            : host
+            :
+            : <cxxflags>"-std=c++0x"
+            ;
+
+        ## Toolset to be used for compiling for the Xeon Phi
+        using intel
+            : mic
+            :
+            : <cxxflags>"-std=c++0x -mmic"
+              <linkflags>"-std=c++0x -mmic"
+            ;
+```
+* Change to the directory you unpacked boost in (from now on referred to as $BOOST_ROOT)
+  and execute the following commands:
+```
+        $ ./bootstrap.sh
+        $ ./b2 toolset=intel-mic -j<N>
+```
+  You should now have all the required boost libraries.
+
+[heading Installation of the hwloc Library]
+
+* Download __hwloc_downloads__, unpack the retreived tarball and change to the newly
+  created directory
+* Run the configure-make-install procedure as follows:
+```
+        $ CC=icc CFLAGS=-mmic CXX=icpc CXXFLAGS=-mmic LDFLAGS=-mmic ./configure --host=k1om --prefix=$HWLOC_ROOT
+        $ make
+        $ make install
+```
+You now have a working hwloc installation in $HWLOC_ROOT.
+
+[heading Building __hpx__]
+
+After all the prerequistes have been succesfully installed, we can now start building and
+installing __hpx__. The build procedure is almost the same as for __unix_installation__
+with the sole difference that you have to enable the Xeon Phi in the CMake Build system.
+This is achieved by invoking CMake in the following way:
+```
+        cmake                         \
+            -DCMAKE_CXX_COMPILER=icpc \
+            -DCMAKE_C_COMPILER=icc    \
+            -DHPX_NATIVE_MIC=On       \
+            -DBOOST_ROOT=$BOOST_ROOT  \
+            -DHWLOC_ROOT=$HWLOC_ROOT  \
+            /path/to/hpx
+```
+
+For more detailed information about using __cmake__ please refer its documentation
+and to the section __cmake_hpx__. Please pay special attention to the section about
+HPX_MALLOC as this is crucial for getting decent performance on the Xeon Phi.
+
+[endsect] [/ How to Install __hpx__ on the Xeon Phi]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:unix_pbs How to Use __hpx__ Applications with PBS]
@@ -589,10 +661,10 @@ command line tool __srun__ which interacts with the SLURM batch scheduling
 system.
 
 ```
-    srun -p <node-type> -N <number-of-nodes> hpx-application <application-arguments>
+    srun -p <partition> -N <number-of-nodes> hpx-application <application-arguments>
 ```
 
-Here, `<node-type>` is one of the node partitions existing on the target machine
+Here, `<partition>` is one of the node partitions existing on the target machine
 (consult the machines documentation to get a list of existing partitions) and
 `<number-of-nodes>` is the number of compute nodes you want to use. By default,
 the HPX application is started with one locality per node and uses all available
@@ -607,13 +679,13 @@ application.
       ports. All of this information is automatically extracted from the SLURM
       environment by the __hpx__ startup code.]
 
-[important The __srun__ documentation explicitly states: "If `-c` is specified 
-      without `-n`, as many tasks will be allocated per node as possible while 
-      satisfying the `-c` restriction. For instance on a cluster with 8 CPUs per 
-      node, a job request for 4 nodes and 3 CPUs per task may be allocated 3 or 
-      6 CPUs per node (1 or 2 tasks per node) depending upon resource consumption 
+[important The __srun__ documentation explicitly states: "If `-c` is specified
+      without `-n`, as many tasks will be allocated per node as possible while
+      satisfying the `-c` restriction. For instance on a cluster with 8 CPUs per
+      node, a job request for 4 nodes and 3 CPUs per task may be allocated 3 or
+      6 CPUs per node (1 or 2 tasks per node) depending upon resource consumption
       by other jobs."
-      For this reason, we suggest to always specify `-n <number-of-instances>`, 
+      For this reason, we suggest to always specify `-n <number-of-instances>`,
       even if `<number-of-instances>` is equal to one (`1`).]
 
 [heading Interactive Shells]
@@ -657,5 +729,6 @@ were in an interactive shell.
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
+[/Thomas Heller 07-26-13]
 
 
