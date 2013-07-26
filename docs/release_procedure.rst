@@ -55,7 +55,8 @@ the lines as they are completed to avoid confusion.
         *   ``CMakeLists.txt``
 
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
-    ``hpx/version.hpp`` (replace it with an empty string).
+    ``hpx/version.hpp`` (replace it with ``-rc1`` for the release candidate
+    and later with an empty string for the actual release).
 
 #.  Remove the examples and benchmarks that will not go into the release from
     the release branch.

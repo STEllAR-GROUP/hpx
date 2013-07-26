@@ -8,14 +8,22 @@
 [section:whats_new What's New]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[/ section:hpx_1_0_0 __hpx__ V1.0.0]
-[/ endsect]
+[section:hpx_1_0_0 __hpx__ V1.0.0]
+
+[heading General Changes]
+
+[heading Bug Fixes (Closed Tickets)]
+
+[endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_previous Previous __hpx__ Releases]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_6 __hpx__ V0.9.6]
 
 We have had over 1200 commits since the last release and we have closed
-roughly 135 tickets (bugs, feature requests, etc.).
+roughly 140 tickets (bugs, feature requests, etc.).
 
 [heading General Changes]
 
@@ -216,9 +224,6 @@ a very long list of newly implemented features and fixed issues.
 * [issue 43]  - Support for Darwin (Xcode + Clang)
 
 [endsect]
-
-[/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_previous Previous __hpx__ Releases]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_5 __hpx__ V0.9.5]
