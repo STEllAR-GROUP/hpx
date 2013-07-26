@@ -22,7 +22,7 @@ roughly 135 tickets (bugs, feature requests, etc.).
 The major new fetures in this release are:
 
 * We further consolidated the API exposed by __hpx__. We aligned our APIs as much as
-  possible with the existing C++11 Standard and related proposals to the 
+  possible with the existing C++11 Standard and related proposals to the
   C++ standardization committee (such as __cpp11_n3632__ and __cpp11_n3634__).
 * We implemented a first version of a distributed AGAS service which essentially
   eliminates all explicit AGAS network traffic.
@@ -41,7 +41,7 @@ The major new fetures in this release are:
   policies for different parts of the code. This API has been modelled after
   the Standards proposal __cpp11_n3562__. This API is bound to change in
   the future, though.
-* Added minimal security support for localities which is enforced on the 
+* Added minimal security support for localities which is enforced on the
   parcelport level. This support is preliminary and experimental and might
   change in the future.
 * We created a parcelport using low level MPI functions. This is in support
@@ -54,11 +54,15 @@ The major new fetures in this release are:
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release. This is again
-a very long list of newly implemented features and fixed issues for any HPX' 
+a very long list of newly implemented features and fixed issues for any HPX'
 releases so far.
 
+* [issue 805] - Adding the introduction and fixing DOCBOOK dependencies for widows use
+* [issue 804] - Add stackless (non-suspendable) thread type
+* [issue 803] - Create proper serialization support functions for util::tuple
 * [issue 800] - Add possibility to disable array optimizations during serialization
 * [issue 798] - HPX_LIMIT does not work for local dataflow
+* [issue 797] - Create a parcelport which uses MPI
 * [issue 796] - Problem with Large Numbers of Threads
 * [issue 793] - Changing dataflow test case to hang consistently
 * [issue 792] - CMake Error
