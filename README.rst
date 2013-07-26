@@ -109,6 +109,17 @@ Linux
 
     $ gmake install
 
+   This will build and install the essential core components of HPX only. Use
+
+    $ gmake tests
+
+   to build and run the tests and 
+
+    $ gmake examples
+    $ gmake install
+
+   to build and install the examples.
+
 Mac OSX
 -------
 
@@ -175,6 +186,17 @@ Mac OSX
 6) To complete the build and install HPX::
 
     $ make install
+
+   This will build and install the essential core components of HPX only. Use
+
+    $ make tests
+
+   to build and run the tests and 
+
+    $ make examples
+    $ make install
+
+   to build and install the examples.
 
 Windows
 -------
