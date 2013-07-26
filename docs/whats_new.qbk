@@ -54,8 +54,7 @@ The major new fetures in this release are:
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release. This is again
-a very long list of newly implemented features and fixed issues for any HPX'
-releases so far.
+a very long list of newly implemented features and fixed issues.
 
 * [issue 805] - Adding the introduction and fixing DOCBOOK dependencies for widows use
 * [issue 804] - Add stackless (non-suspendable) thread type

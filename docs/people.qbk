@@ -75,8 +75,8 @@ our tables below.
 [table:authors Documentation Authors
   [[Name]                    [Institution]        [email]]
   [[Hartmut Kaiser]          [__cct__, __lsu__]   [[$./images/emails/hkaiser.png]]]
-  [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
   [[Thomas Heller]           [__inf3__, __fau__]  [[$./images/emails/theller.png]]]
+  [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]   [[$./images/emails/blelbach.png]]]
   [[Vinay C Amatya]          [__cct__, __lsu__]   [[$./images/emails/vamatya.png]]]
   [[Steven Brandt]           [__cct__, __lsu__]   [[$./images/emails/sbrandt.png]]]
   [[Maciej Brodowicz]        [__crest__, __iu__]  [[$./images/emails/mbrodowicz.png]]]
@@ -102,7 +102,7 @@ the project through discussions, pull requests, documentation patches, etc.
   instructions.
 
 In addition to the people who worked directly with __hpx__ development we would
-like to acknowledge the NSF, DoE, DARPA, __cct__ and __inf3__ who fund and support our
+like to acknowledge the NSF, DoE, DARPA, __cct__, and __inf3__ who fund and support our
 work.
 
 [endsect] [/ People]
