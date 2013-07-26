@@ -11,6 +11,7 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>
+#include <boost/shared_array.hpp>
 #include <boost/mpl/bool.hpp>
 
 #include <algorithm>
