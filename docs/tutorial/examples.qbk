@@ -21,6 +21,32 @@ complex, yet powerful, __hpx__ concepts.
 [/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
+[section:firstprogram A First Program]
+
+[import ../../examples/quickstart/hpx_tutorial.cpp]
+
+This is a basic HPX asynchronous "hello world" program.
+
+In our minimalist implementation we have one function for registering the asynchroneous callback (SECTION 1, below),
+
+[SECTION_1]
+
+the int_main entry point which we use to start up the asynchroneous section of our program (SECTION 2, below),
+
+[SECTION_2]
+
+and the hpx_main entry point where we run the asynchroneous section of our program (SECTION 3, below).
+
+[SECTION_3]
+
+From the hpx_main section of the program, we can do various asynchroneous tasks and perhaps even tailor the
+execution of our application based on the resources avaliable to us. However, all we will do in this simple
+program is determine and output the number of cores avaliable to the program (3.a), declare a single future
+which will return a single integer and register the future with our function declared in SECTION I (3.b),
+and finally wait for the function to complete and, upon completion, retrieve its returned value (3.c).
+
+[endsect]
+
 [section:fibonacci Fibonacci]
 
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
