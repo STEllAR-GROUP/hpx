@@ -56,6 +56,7 @@ The major new fetures in this release are:
 Here is a list of the important tickets we closed for this release. This is again
 a very long list of newly implemented features and fixed issues.
 
+* [issue 806] - make (all) in examples folder does nothing
 * [issue 805] - Adding the introduction and fixing DOCBOOK dependencies for widows use
 * [issue 804] - Add stackless (non-suspendable) thread type
 * [issue 803] - Create proper serialization support functions for util::tuple
