@@ -233,12 +233,25 @@ detail in the sections __unix_installation__ and __windows_installation__.
 [caution Compiling and linking __hpx__ needs a considerable amount of memory. It is advisable that
     approximately 2 GB of memory per parallel process is available.]
 
+[note Many Linux distributions use `make` as an alias for `gmake`]
+
 * To complete the build and install __hpx__:
 
 ``
     $ gmake install
 ``
 
+[important These commands will build and install the essential core components of
+           __hpx__ only. In order to build and run the tests, please invoke:
+           ``
+               $ gmake tests
+           ``
+           and in order to build (and install) all examples invoke:
+           ``
+               $ gmake examples
+               $ gmake install
+           ``
+           ]
 [c++]
 
 For more detailed information about using __cmake__ please refer its documentation
