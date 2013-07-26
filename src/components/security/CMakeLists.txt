@@ -9,7 +9,8 @@ set(root "${hpx_SOURCE_DIR}/hpx/components/security")
 add_hpx_component(security
   FOLDER "Core/Components"
   HEADER_ROOT ${root}
-  AUTOGLOB)
+  AUTOGLOB
+  ESSENTIAL)
 
 add_hpx_pseudo_dependencies(components.security
                             security_component)
