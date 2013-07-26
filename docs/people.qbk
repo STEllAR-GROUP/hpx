@@ -100,6 +100,7 @@ the project through discussions, pull requests, documentation patches, etc.
   in __hpx__.
 * Rekha Raj, who contributed changes to the description of the Windows build
   instructions.
+* Alex Nagelberg for his work on implementing a C wrapper API for HPX.
 
 In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge the NSF, DoE, DARPA, __cct__, and __inf3__ who fund and support our
