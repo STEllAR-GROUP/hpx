@@ -27,10 +27,12 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy>
     class HPX_EXPORT runtime_impl;
 
+#if defined(HPX_HAVE_SECURITY)
     namespace detail
     {
         struct manage_security_data;
     }
+#endif
 
     class HPX_EXPORT runtime
     {
@@ -254,14 +256,6 @@ namespace hpx
         ///          succeeded or not.
         ///
         virtual bool unregister_thread() = 0;
-
-#if defined(HPX_HAVE_SECURITY)
-        // Initialize the subordinate CA for this locality
-        virtual void initialize_locality_certificate_authority(
-            components::security::server::signed_type<
-                components::security::server::certificate
-            > const & root_certificate) = 0;
-#endif
 
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters

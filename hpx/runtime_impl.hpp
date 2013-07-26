@@ -343,14 +343,6 @@ namespace hpx {
         /// Unregister an external OS-thread with HPX
         bool unregister_thread();
 
-#if defined(HPX_HAVE_SECURITY)
-        // Initialize the subordinate CA for this locality
-        void initialize_locality_certificate_authority(
-            components::security::server::signed_type<
-                components::security::server::certificate
-            > const & root_certificate);
-#endif
-
     private:
         void init_tss(char const* context, std::size_t num, char const* postfix,
             bool service_thread);
