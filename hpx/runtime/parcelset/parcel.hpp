@@ -449,7 +449,7 @@ namespace hpx { namespace traits
     template<>
     struct type_size<hpx::parcelset::parcel>
     {
-        static std::size_t call(hpx::parcelset::parcel const& parcel_);
+        HPX_EXPORT static std::size_t call(hpx::parcelset::parcel const& parcel_);
     };
 }}
 #endif

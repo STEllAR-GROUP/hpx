@@ -28,7 +28,7 @@ namespace hpx { namespace util
         enum init_mode
         {
             copy = 0,       // constructor copies data
-            reference = 1   // constructor does not copy data and does not 
+            reference = 1   // constructor does not copy data and does not
                             // manage the lifetime of it
         };
 
@@ -55,22 +55,65 @@ namespace hpx { namespace util
         // serialization support
         friend class boost::serialization::access;
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
         void save(Archive& ar, const unsigned int version) const
         {
             ar << size_;
-            boost::serialization::array<T> arr(data_.get(), size_);
-            ar << arr;
+
+            typedef typename
+                boost::serialization::use_array_optimization<Archive>::template apply<
+                    typename boost::remove_const<T>::type
+                >::type use_optimized;
+
+            save_optimized(ar, version, use_optimized());
         }
 
+        template <typename Archive>
+        void save_optimized(Archive& ar, const unsigned int version, boost::mpl::false_) const
+        {
+            std::size_t c = size_;
+            T* t = data_.get();
+            while(c-- > 0)
+                ar << *t++;
+        }
+
+        template <typename Archive>
+        void save_optimized(Archive& ar, const unsigned int version, boost::mpl::true_) const
+        {
+            boost::serialization::array<T> arr(data_.get(), size_);
+            ar.save_array(arr, version);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
         void load(Archive& ar, const unsigned int version)
         {
             ar >> size_;
             data_.reset(new T[size_]);
 
+            typedef typename
+                boost::serialization::use_array_optimization<Archive>::template apply<
+                    typename boost::remove_const<T>::type
+                >::type use_optimized;
+
+            load_optimized(ar, version, use_optimized());
+        }
+
+        template <typename Archive>
+        void load_optimized(Archive& ar, const unsigned int version, boost::mpl::false_)
+        {
+            std::size_t c = size_;
+            T* t = data_.get();
+            while(c-- > 0)
+                ar >> *t++;
+        }
+
+        template <typename Archive>
+        void load_optimized(Archive& ar, const unsigned int version, boost::mpl::true_)
+        {
             boost::serialization::array<T> arr(data_.get(), size_);
-            ar >> arr;
+            ar.load_array(arr, version);
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -91,7 +134,7 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    // Customization point for streaming with util::any, we don't want 
+    // Customization point for streaming with util::any, we don't want
     // util::serialize_buffer to be streamable
     template <typename T>
     struct supports_streaming_with_any<util::serialize_buffer<T> >
