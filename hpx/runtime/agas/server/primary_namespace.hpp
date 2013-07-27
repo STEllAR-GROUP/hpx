@@ -39,7 +39,7 @@ namespace server
 {
 
 // Base name used to register the component
-char const* const primary_namespace_service_name = "primary_namespace/";
+char const* const primary_namespace_service_name = "primary/";
 
 /// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
 /// resolved addresses.
@@ -154,6 +154,7 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_unbind_gid_count(bool);
         boost::int64_t get_change_credit_count(bool);
         boost::int64_t get_allocate_count(bool);
+        boost::int64_t get_overall_count(bool);
 
         boost::int64_t get_route_time(bool);
         boost::int64_t get_bind_gid_time(bool);
@@ -161,6 +162,7 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_unbind_gid_time(bool);
         boost::int64_t get_change_credit_time(bool);
         boost::int64_t get_allocate_time(bool);
+        boost::int64_t get_overall_time(bool);
 
         // increment counter values
         void increment_route_count();

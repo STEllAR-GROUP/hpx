@@ -35,7 +35,7 @@ namespace server
 {
 
 // Base name used to register the component
-char const* const symbol_namespace_service_name = "symbol_namespace/";
+char const* const symbol_namespace_service_name = "symbol/";
 
 struct HPX_EXPORT symbol_namespace 
   : components::fixed_component_base<symbol_namespace>
@@ -84,11 +84,13 @@ struct HPX_EXPORT symbol_namespace
         boost::int64_t get_resolve_count(bool);
         boost::int64_t get_unbind_count(bool);
         boost::int64_t get_iterate_names_count(bool);
+        boost::int64_t get_overall_count(bool);
 
         boost::int64_t get_bind_time(bool);
         boost::int64_t get_resolve_time(bool);
         boost::int64_t get_unbind_time(bool);
         boost::int64_t get_iterate_names_time(bool);
+        boost::int64_t get_overall_time(bool);
 
         // increment counter values
         void increment_bind_count();

@@ -206,10 +206,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     { // {{{
         void register_counter_types()
         {
-            server::locality_namespace::register_counter_types();
             server::primary_namespace::register_counter_types();
-            server::component_namespace::register_counter_types();
-            server::symbol_namespace::register_counter_types();
         }
 
         void register_server_instance(char const* servicename

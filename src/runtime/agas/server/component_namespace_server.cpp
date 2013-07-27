@@ -184,10 +184,22 @@ void component_namespace::register_counter_types(
     {
         std::string name(detail::component_namespace_services[i].name_);
         std::string help;
-        if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
-            help = boost::str(help_count % name.substr(name.find_last_of('/')+1));
-        else
-            help = boost::str(help_time % name.substr(name.find_last_of('/')+1));
+        std::string::size_type p = name.find_last_of('/');
+        if (p != std::string::npos) {
+            if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
+                help = boost::str(help_count % name.substr(p+1));
+            else
+                help = boost::str(help_time % name.substr(p+1));
+        }
+        else {
+            BOOST_ASSERT(detail::component_namespace_services[i].code_ ==
+                component_ns_statistics_counter);
+            name = component_namespace_service_name + name;
+            if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
+                help = "returns the overall number of invocations of all component AGAS services";
+            else
+                help = "returns the overall execution time of all component AGAS services";
+        }
 
         performance_counters::install_counter_type(
             "/agas/" + name
@@ -631,13 +643,18 @@ response component_namespace::statistics_counter(
         return response();
     }
 
+    // be prepared for aggregating counter (named 'component/<...>')
+    std::string countername = p.countername_;
+    if (countername.find(component_namespace_service_name) == 0)
+        countername = countername.substr(10);    // sizeof(component_namespace_service_name) == 10
+
     namespace_action_code code = invalid_request;
     detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
           i != detail::num_component_namespace_services;
           ++i)
     {
-        if (p.countername_ == detail::component_namespace_services[i].name_)
+        if (countername == detail::component_namespace_services[i].name_)
         {
             code = detail::component_namespace_services[i].code_;
             target = detail::component_namespace_services[i].target_;
@@ -680,6 +697,9 @@ response component_namespace::statistics_counter(
         case component_ns_num_localities:
             get_data_func = boost::bind(&cd::get_num_localities_count, &counter_data_, ::_1);
             break;
+        case component_ns_statistics_counter:
+            get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
+            break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
               , "component_namespace::statistics"
@@ -710,6 +730,9 @@ response component_namespace::statistics_counter(
             break;
         case component_ns_num_localities:
             get_data_func = boost::bind(&cd::get_num_localities_time, &counter_data_, ::_1);
+            break;
+        case component_ns_statistics_counter:
+            get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -779,6 +802,18 @@ boost::int64_t component_namespace::counter_data::get_num_localities_count(bool 
     return util::get_and_reset_value(num_localities_.count_, reset);
 }
 
+boost::int64_t component_namespace::counter_data::get_overall_count(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(bind_prefix_.count_, reset) +
+        util::get_and_reset_value(bind_name_.count_, reset) +
+        util::get_and_reset_value(resolve_id_.count_, reset) +
+        util::get_and_reset_value(unbind_name_.count_, reset) +
+        util::get_and_reset_value(iterate_types_.count_, reset) +
+        util::get_and_reset_value(get_component_type_name_.count_, reset) +
+        util::get_and_reset_value(num_localities_.count_, reset);
+}
+
 // access execution time counters
 boost::int64_t component_namespace::counter_data::get_bind_prefix_time(bool reset)
 {
@@ -820,6 +855,18 @@ boost::int64_t component_namespace::counter_data::get_num_localities_time(bool r
 {
     mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(num_localities_.time_, reset);
+}
+
+boost::int64_t component_namespace::counter_data::get_overall_time(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(bind_prefix_.time_, reset) +
+        util::get_and_reset_value(bind_name_.time_, reset) +
+        util::get_and_reset_value(resolve_id_.time_, reset) +
+        util::get_and_reset_value(unbind_name_.time_, reset) +
+        util::get_and_reset_value(iterate_types_.time_, reset) +
+        util::get_and_reset_value(get_component_type_name_.time_, reset) +
+        util::get_and_reset_value(num_localities_.time_, reset);
 }
 
 // increment counter values

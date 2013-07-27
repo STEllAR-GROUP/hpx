@@ -187,10 +187,22 @@ void primary_namespace::register_counter_types(
     {
         std::string name(detail::primary_namespace_services[i].name_);
         std::string help;
-        if (detail::primary_namespace_services[i].target_ == detail::counter_target_count)
-            help = boost::str(help_count % name.substr(name.find_last_of('/')+1));
-        else
-            help = boost::str(help_time % name.substr(name.find_last_of('/')+1));
+        std::string::size_type p = name.find_last_of('/');
+        if (p != std::string::npos) {
+            if (detail::primary_namespace_services[i].target_ == detail::counter_target_count)
+                help = boost::str(help_count % name.substr(p+1));
+            else
+                help = boost::str(help_time % name.substr(p+1));
+        }
+        else {
+            BOOST_ASSERT(detail::primary_namespace_services[i].code_ ==
+                primary_ns_statistics_counter);
+            name = primary_namespace_service_name + name;
+            if (detail::primary_namespace_services[i].target_ == detail::counter_target_count)
+                help = "returns the overall number of invocations of all primary AGAS services";
+            else
+                help = "returns the overall execution time of all primary AGAS services";
+        }
 
         performance_counters::install_counter_type(
             "/agas/" + name
@@ -1185,13 +1197,18 @@ response primary_namespace::statistics_counter(
         return response();
     }
 
+    // be prepared for aggregating counter (named 'primary/<...>')
+    std::string countername = p.countername_;
+    if (countername.find(primary_namespace_service_name) == 0)
+        countername = countername.substr(8);    // sizeof(primary_namespace_service_name) == 8
+
     namespace_action_code code = invalid_request;
     detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
           i != detail::num_primary_namespace_services;
           ++i)
     {
-        if (p.countername_ == detail::primary_namespace_services[i].name_)
+        if (countername == detail::primary_namespace_services[i].name_)
         {
             code = detail::primary_namespace_services[i].code_;
             target = detail::primary_namespace_services[i].target_;
@@ -1203,7 +1220,7 @@ response primary_namespace::statistics_counter(
     {
         HPX_THROWS_IF(ec, bad_parameter,
             "primary_namespace::statistics_counter",
-            "unknown performance counter (unrelated to AGAS)");
+            "unknown performance counter (unrelated to AGAS?)");
         return response();
     }
 
@@ -1231,6 +1248,9 @@ response primary_namespace::statistics_counter(
             break;
         case primary_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
+            break;
+        case primary_ns_statistics_counter:
+            get_data_func = boost::bind(&cd::get_overall_count, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1260,6 +1280,9 @@ response primary_namespace::statistics_counter(
             break;
         case primary_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
+            break;
+        case primary_ns_statistics_counter:
+            get_data_func = boost::bind(&cd::get_overall_time, &counter_data_, ::_1);
             break;
         default:
             HPX_THROWS_IF(ec, bad_parameter
@@ -1323,6 +1346,17 @@ boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
     return util::get_and_reset_value(allocate_.count_, reset);
 }
 
+boost::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(route_.count_, reset) +
+        util::get_and_reset_value(bind_gid_.count_, reset) +
+        util::get_and_reset_value(resolve_gid_.count_, reset) +
+        util::get_and_reset_value(unbind_gid_.count_, reset) +
+        util::get_and_reset_value(change_credit_.count_, reset) +
+        util::get_and_reset_value(allocate_.count_, reset);
+}
+
 // access execution time counters
 boost::int64_t primary_namespace::counter_data::get_route_time(bool reset)
 {
@@ -1358,6 +1392,17 @@ boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
     return util::get_and_reset_value(allocate_.time_, reset);
+}
+
+boost::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(route_.time_, reset) +
+        util::get_and_reset_value(bind_gid_.time_, reset) +
+        util::get_and_reset_value(resolve_gid_.time_, reset) +
+        util::get_and_reset_value(unbind_gid_.time_, reset) +
+        util::get_and_reset_value(change_credit_.time_, reset) +
+        util::get_and_reset_value(allocate_.time_, reset);
 }
 
 // increment counter values

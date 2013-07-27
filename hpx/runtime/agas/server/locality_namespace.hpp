@@ -39,7 +39,7 @@ namespace server
 {
 
 // Base name used to register the component
-char const* const locality_namespace_service_name = "locality_namespace/";
+char const* const locality_namespace_service_name = "locality/";
 
 struct HPX_EXPORT locality_namespace
   : components::fixed_component_base<locality_namespace>
@@ -99,6 +99,7 @@ struct HPX_EXPORT locality_namespace
         boost::int64_t get_num_localities_count(bool);
         boost::int64_t get_num_threads_count(bool);
         boost::int64_t get_resolved_localities_count(bool);
+        boost::int64_t get_overall_count(bool);
 
         boost::int64_t get_allocate_time(bool);
         boost::int64_t get_resolve_locality_time(bool);
@@ -107,6 +108,7 @@ struct HPX_EXPORT locality_namespace
         boost::int64_t get_num_localities_time(bool);
         boost::int64_t get_num_threads_time(bool);
         boost::int64_t get_resolved_localities_time(bool);
+        boost::int64_t get_overall_time(bool);
 
         // increment counter values
         void increment_allocate_count();

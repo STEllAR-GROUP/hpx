@@ -84,8 +84,19 @@ namespace detail
     // counter description data for component namespace components
     static counter_service_data const component_namespace_services[] =
     {
+        // counters exposing overall API invocation count and timings
+        {   "count"
+          , ""
+          , counter_target_count
+          , component_ns_statistics_counter
+          , component_ns_statistics_counter }
+      , {   "time"
+          , "ns"
+          , counter_target_time
+          , component_ns_statistics_counter
+          , component_ns_statistics_counter }
         // counters exposing API invocation counts
-        {   "count/bind_prefix"
+      , {   "count/bind_prefix"
           , ""
           , counter_target_count
           , component_ns_bind_prefix
@@ -163,8 +174,19 @@ namespace detail
     // counter description data for localities namespace components
     static counter_service_data const locality_namespace_services[] =
     {
+        // counters exposing overall API invocation count and timings
+        {   "count"
+          , ""
+          , counter_target_count
+          , locality_ns_statistics_counter
+          , locality_ns_statistics_counter }
+      , {   "time"
+          , "ns"
+          , counter_target_time
+          , locality_ns_statistics_counter
+          , locality_ns_statistics_counter }
         // counters exposing API invocation counts
-        {   "count/free"
+      , {   "count/free"
           , ""
           , counter_target_count
           , locality_ns_free
@@ -205,7 +227,7 @@ namespace detail
           , counter_target_time
           , locality_ns_localities
           , locality_ns_statistics_counter }
-      , {   "time/lnum_ocalities"
+      , {   "time/num_localities"
           , "ns"
           , counter_target_time
           , locality_ns_num_localities
@@ -232,8 +254,19 @@ namespace detail
     // counter description data for primary namespace components
     static counter_service_data const primary_namespace_services[] =
     {
+        // counters exposing overall API invocation count and timings
+        {   "count"
+          , ""
+          , counter_target_count
+          , primary_ns_statistics_counter
+          , primary_ns_statistics_counter }
+      , {   "time"
+          , "ns"
+          , counter_target_time
+          , primary_ns_statistics_counter
+          , primary_ns_statistics_counter }
         // counters exposing API invocation counts
-        {   "count/route"
+      , {   "count/route"
           , ""
           , counter_target_count
           , primary_ns_route
@@ -301,8 +334,19 @@ namespace detail
     // counter description data for symbol namespace components
     static counter_service_data const symbol_namespace_services[] =
     {
+        // counters exposing overall API invocation count and timings
+        {   "count"
+          , ""
+          , counter_target_count
+          , symbol_ns_statistics_counter
+          , symbol_ns_statistics_counter }
+      , {   "time"
+          , "ns"
+          , counter_target_time
+          , symbol_ns_statistics_counter
+          , symbol_ns_statistics_counter }
         // counters exposing API invocation counts
-        {   "count/bind"
+      , {   "count/bind"
           , ""
           , counter_target_count
           , symbol_ns_bind
