@@ -71,7 +71,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations)
         std::size_t arg_size = hpx::traits::get_type_size(outp);
         std::vector<char> out_buffer;
 
-        out_buffer.reserve(arg_size*2);
+        out_buffer.resize(arg_size*2);
 
         {
             // create an output archive and serialize the parcel

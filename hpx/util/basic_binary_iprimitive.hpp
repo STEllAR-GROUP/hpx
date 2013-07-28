@@ -86,17 +86,12 @@ namespace hpx { namespace util
                                 "archive data bstream is too short"));
                         return;
                     }
-                    std::memcpy(address, &buffer_[current_], count);
-                    current_ += count;
 
-                    if (size_ < current_)
-                    {
-                        BOOST_THROW_EXCEPTION(
-                            boost::archive::archive_exception(
-                                boost::archive::archive_exception::input_stream_error,
-                                "archive data bstream is too short"));
-                        return;
-                    }
+                    if (count == 1)
+                        *static_cast<unsigned char*>(address) = buffer_[current_];
+                    else
+                        std::memcpy(address, &buffer_[current_], count);
+                    current_ += count;
                 }
             }
         }

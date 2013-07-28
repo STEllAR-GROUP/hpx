@@ -79,6 +79,11 @@ namespace hpx { namespace util
             {
                 if (filter_) {
                     std::size_t written = 0;
+
+                    if (cont_.size() < current_)
+                        cont_.resize(current_);
+                    current_ = 0;
+
                     do {
                         bool flushed = filter_->flush(&cont_[current_],
                             cont_.size()-current_, written);
@@ -104,25 +109,21 @@ namespace hpx { namespace util
 
             void save_binary(void const* address, std::size_t count)
             {
-                if (count != 0)
+                BOOST_ASSERT(count != 0);
                 {
-                    cont_.resize(cont_.size() + count);
                     if (filter_) {
                         filter_->save(address, count);
                     }
                     else {
-                        std::memcpy(&cont_[current_], address, count);
-                        current_ += count;
-                    }
+                        if (cont_.size() < current_ + count)
+                            cont_.resize(cont_.size() + count);
 
-                    if (cont_.size() < current_)
-                    {
-                        BOOST_THROW_EXCEPTION(
-                            boost::archive::archive_exception(
-                                boost::archive::archive_exception::output_stream_error,
-                                "archive data bstream is too short"));
-                        return;
+                        if (count == 1)
+                            cont_[current_] = *static_cast<unsigned char const*>(address);
+                        else
+                            std::memcpy(&cont_[current_], address, count);
                     }
+                    current_ += count;
                 }
             }
 
