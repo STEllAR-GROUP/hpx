@@ -982,8 +982,9 @@ public:
 
     // same, but bulk operation
     bool is_local_address(
-        std::vector<naming::gid_type>& gids
-      , std::vector<naming::address>& addrs
+        naming::gid_type const* gids
+      , naming::address* addrs
+      , std::size_t size
       , boost::dynamic_bitset<>& locals
       , error_code& ec = throws
         );
@@ -1119,8 +1120,9 @@ public:
     // Bulk version.
     // TODO: Add versions that take std::vector<id_type> for convenience.
     bool resolve(
-        std::vector<naming::gid_type> const& gids
-      , std::vector<naming::address>& addrs
+        naming::gid_type const* gids
+      , naming::address* addrs
+      , std::size_t size
       , boost::dynamic_bitset<>& locals
       , error_code& ec = throws
         )
@@ -1128,26 +1130,28 @@ public:
         // Try the cache.
         if (caching_)
         {
-            bool all_resolved = resolve_cached(gids, addrs, locals, ec);
+            bool all_resolved = resolve_cached(gids, addrs, size, locals, ec);
             if (ec)
                 return false;
             if (all_resolved)
                 return true; // Nothing more to do.
         }
 
-        return resolve_full(gids, addrs, locals, ec);
+        return resolve_full(gids, addrs, size, locals, ec);
     }
 
     bool resolve_full(
-        std::vector<naming::gid_type> const& gids
-      , std::vector<naming::address>& addrs
+        naming::gid_type const* gids
+      , naming::address* addrs
+      , std::size_t size
       , boost::dynamic_bitset<>& locals
       , error_code& ec = throws
         );
 
     bool resolve_cached(
-        std::vector<naming::gid_type> const& gids
-      , std::vector<naming::address>& addrs
+        naming::gid_type const* gids
+      , naming::address* addrs
+      , std::size_t size
       , boost::dynamic_bitset<>& locals
       , error_code& ec = throws
         );

@@ -22,8 +22,9 @@ namespace hpx { namespace agas { namespace server
     { // {{{ route implementation
         parcelset::parcel p = req.get_parcel();
 
-        std::vector<naming::gid_type> const& gids = p.get_destinations();
-        std::vector<naming::address>& addrs = p.get_destination_addrs();
+        std::size_t size = p.size();
+        naming::gid_type const* gids = p.get_destinations();
+        naming::address* addrs = p.get_destination_addrs();
         std::vector<boost::fusion::vector2<naming::gid_type, gva> > cache_addresses;
 
         // resolve destination addresses, we should be able to resolve all of
@@ -34,8 +35,8 @@ namespace hpx { namespace agas { namespace server
             if (!locality_)
                 locality_ = get_runtime().here();
 
-            cache_addresses.reserve(gids.size());
-            for (std::size_t i = 0; i != gids.size(); ++i)
+            cache_addresses.reserve(size);
+            for (std::size_t i = 0; i != size; ++i)
             {
                 if (!addrs[i])
                 {
@@ -83,7 +84,7 @@ namespace hpx { namespace agas { namespace server
 
         // asynchronously update cache on source locality
         naming::id_type source = get_colocation_id(p.get_source());
-        for (std::size_t i = 0; i != gids.size(); ++i)
+        for (std::size_t i = 0; i != size; ++i)
         {
             boost::fusion::vector2<naming::gid_type, gva> const& r =
                 cache_addresses[i];

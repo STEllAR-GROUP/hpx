@@ -409,19 +409,18 @@ namespace hpx { namespace applier
         naming::locality dest = p.get_destination_locality();
 
         // fetch the set of destinations
-        std::vector<naming::address> const& addrs = p.get_destination_addrs();
+        std::size_t size = p.size();
+        naming::address const* addrs = p.get_destination_addrs();
 
         // if the parcel carries a continuation it should be directed to a
         // single destination
-        BOOST_ASSERT(!cont || addrs.size() == 1);
+        BOOST_ASSERT(!cont || size == 1);
 
         // schedule a thread for each of the destinations
         threads::threadmanager_base& tm = get_thread_manager();
-        std::vector<naming::address>::const_iterator end = addrs.end();
-        for (std::vector<naming::address>::const_iterator it = addrs.begin();
-             it != end; ++it)
+        for (std::size_t i = 0; i != size; ++i)
         {
-            naming::address const& addr = *it;
+            naming::address const& addr = addrs[i];
 
             // make sure this parcel destination matches the proper locality
             BOOST_ASSERT(dest == addr.locality_);

@@ -420,29 +420,25 @@ namespace hpx { namespace parcelset
         // properly initialize parcel
         init_parcel(p);
 
-        std::vector<naming::gid_type> const& gids = p.get_destinations();
-        std::vector<naming::address>& addrs = p.get_destination_addrs();
+        std::size_t size = p.size();
 
-        if (gids.empty()) {
+        if (0 == size) {
             HPX_THROW_EXCEPTION(network_error, "parcelhandler::put_parcel",
                 "no destination address given");
             return;
         }
 
-        if (gids.size() != addrs.size()) {
-            HPX_THROW_EXCEPTION(network_error, "parcelhandler::put_parcel",
-                "inconsistent number of destination addresses");
-            return;
-        }
+        naming::gid_type const* gids = p.get_destinations();
+        naming::address* addrs = p.get_destination_addrs();
 
         bool resolved_locally = true;
-        if (1 == gids.size()) {
+        if (1 == size) {
             if (!addrs[0])
                 resolved_locally = resolver_.resolve(gids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_.resolve(gids, addrs, locals);
+            resolved_locally = resolver_.resolve(gids, addrs, size, locals);
         }
 
         if (!p.get_parcel_id())

@@ -144,7 +144,8 @@ namespace hpx
         boost::dynamic_bitset<> locals;
         std::size_t count = ids.size();
         gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
+        addrs.resize(count);
+        if (agas::is_local_address(ids.data(), addrs.data(), count, locals)) {
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
@@ -492,7 +493,8 @@ namespace hpx
         boost::dynamic_bitset<> locals;
         std::size_t count = ids.size();
         gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
+        addrs.resize(count);
+        if (agas::is_local_address(ids.data(), addrs.data(), count, locals)) {
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
@@ -840,7 +842,8 @@ namespace hpx
         boost::dynamic_bitset<> locals;
         std::size_t count = ids.size();
         gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
+        addrs.resize(count);
+        if (agas::is_local_address(ids.data(), addrs.data(), count, locals)) {
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
@@ -1188,7 +1191,8 @@ namespace hpx
         boost::dynamic_bitset<> locals;
         std::size_t count = ids.size();
         gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
+        addrs.resize(count);
+        if (agas::is_local_address(ids.data(), addrs.data(), count, locals)) {
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
@@ -1536,7 +1540,8 @@ namespace hpx
         boost::dynamic_bitset<> locals;
         std::size_t count = ids.size();
         gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
+        addrs.resize(count);
+        if (agas::is_local_address(ids.data(), addrs.data(), count, locals)) {
             
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {

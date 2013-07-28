@@ -870,8 +870,9 @@ bool addressing_service::is_local_address_cached(
 
 // Return true if at least one address is local.
 bool addressing_service::is_local_address(
-    std::vector<naming::gid_type>& gids
-  , std::vector<naming::address>& addrs
+    naming::gid_type const* gids
+  , naming::address* addrs
+  , std::size_t size
   , boost::dynamic_bitset<>& locals
   , error_code& ec
     )
@@ -879,14 +880,14 @@ bool addressing_service::is_local_address(
     // Try the cache
     if (caching_)
     {
-        bool all_resolved = resolve_cached(gids, addrs, locals, ec);
+        bool all_resolved = resolve_cached(gids, addrs, size, locals, ec);
         if (ec)
             return false;
         if (all_resolved)
             return locals.any();      // all destinations resolved
     }
 
-    if (!resolve_full(gids, addrs, locals, ec) || ec)
+    if (!resolve_full(gids, addrs, size, locals, ec) || ec)
         return false;
 
     return locals.any();
@@ -1086,15 +1087,13 @@ bool addressing_service::resolve_cached(
 } // }}}
 
 bool addressing_service::resolve_full(
-    std::vector<naming::gid_type> const& gids
-  , std::vector<naming::address>& addrs
+    naming::gid_type const* gids
+  , naming::address* addrs
+  , std::size_t count
   , boost::dynamic_bitset<>& locals
   , error_code& ec
     )
 {
-    std::size_t count = gids.size();
-
-    addrs.resize(count);
     locals.resize(count);
 
     try {
@@ -1102,7 +1101,7 @@ bool addressing_service::resolve_full(
         reqs.reserve(count);
 
         // special cases
-        for (std::size_t i = 0; i < count; ++i)
+        for (std::size_t i = 0; i != count; ++i)
         {
             if (!addrs[i])
             {
@@ -1185,15 +1184,13 @@ bool addressing_service::resolve_full(
 }
 
 bool addressing_service::resolve_cached(
-    std::vector<naming::gid_type> const& gids
-  , std::vector<naming::address>& addrs
+    naming::gid_type const* gids
+  , naming::address* addrs
+  , std::size_t count
   , boost::dynamic_bitset<>& locals
   , error_code& ec
     )
 {
-    std::size_t count = gids.size();
-
-    addrs.resize(count);
     locals.resize(count);
 
     std::size_t resolved = 0;
@@ -1229,7 +1226,7 @@ void addressing_service::route(
 {
     // compose request
     request req(primary_ns_route, p);
-    std::vector<naming::gid_type> const& gids = p.get_destinations();
+    naming::gid_type const* gids = p.get_destinations();
 
     naming::id_type const target(
         stubs::primary_namespace::get_service_instance(gids[0])

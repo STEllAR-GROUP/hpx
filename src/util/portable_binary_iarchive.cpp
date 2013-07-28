@@ -52,7 +52,7 @@
 namespace hpx { namespace util
 {
 
-void portable_binary_iarchive::load_impl(boost::int64_t& l, char maxsize)
+void portable_binary_iarchive::load_impl(boost::int64_t& l, char const maxsize)
 {
     l = 0;
 
@@ -84,6 +84,34 @@ void portable_binary_iarchive::load_impl(boost::int64_t& l, char maxsize)
 
     if(negative)
         l = -l;
+}
+
+void portable_binary_iarchive::load_impl(boost::uint64_t& ul, char const maxsize)
+{
+    ul = 0;
+
+    char size;
+    this->primitive_base_t::load(size);
+    if (0 == size)
+        return;
+
+    if (size > maxsize) {
+        BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
+    }
+
+    char* cptr = reinterpret_cast<char *>(&ul);
+#ifdef BOOST_BIG_ENDIAN
+    cptr += (sizeof(boost::uint64_t) - size);
+#endif
+    this->primitive_base_t::load_binary(cptr, static_cast<std::size_t>(size));
+
+#ifdef BOOST_BIG_ENDIAN
+    if(m_flags & endian_little)
+          reverse_bytes(size, cptr);
+#else
+    if(m_flags & endian_big)
+          reverse_bytes(size, cptr);
+#endif
 }
 
 void portable_binary_iarchive::load_override(
@@ -150,11 +178,10 @@ void portable_binary_iarchive::init(unsigned int flags)
     bool has_filter = false;
     *this >> has_filter;
 
-    if (has_filter) {
+    if (has_filter && (m_flags & enable_compression)) {
         util::binary_filter* filter = 0;
         *this >> filter;
-        if (m_flags & enable_compression)
-            this->set_filter(filter);
+        this->set_filter(filter);
     }
 }
 

@@ -4,6 +4,10 @@
 #include <boost/version.hpp>
 #include <hpx/config.hpp>
 
+#include <boost/mpl/bool.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
+#include <boost/type_traits/is_integral.hpp>
+
 #if !defined(HPX_USE_PORTABLE_ARCHIVES) || HPX_USE_PORTABLE_ARCHIVES == 0
 #include <boost/archive/binary_iarchive.hpp>
 
@@ -121,8 +125,9 @@ public:
 protected:
 #endif
     boost::uint32_t m_flags;
-    HPX_ALWAYS_EXPORT void
-    load_impl(boost::int64_t& l, char maxsize);
+
+    HPX_ALWAYS_EXPORT void load_impl(boost::int64_t& l, char const maxsize);
+    HPX_ALWAYS_EXPORT void load_impl(boost::uint64_t& l, char const maxsize);
 
     // default fall through for any types not specified here
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
@@ -132,18 +137,31 @@ protected:
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif
     template <typename T>
-    void load(T& t, typename boost::enable_if<boost::is_integral<T> >::type* = 0)
+    void load_integral(T& t, boost::mpl::false_)
     {
         boost::int64_t l = 0;
         load_impl(l, sizeof(T));
-        // use cast to avoid compile time warning
-        t = static_cast<T>(l);
+        t = static_cast<T>(l);      // use cast to avoid compile time warning
+    }
+
+    template <typename T>
+    void load_integral(T& t, boost::mpl::true_)
+    {
+        boost::uint64_t l = 0;
+        load_impl(l, sizeof(T));
+        t = static_cast<T>(l);      // use cast to avoid compile time warning
     }
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
 #endif
+
+    template <typename T>
+    void load(T& t, typename boost::enable_if<boost::is_integral<T> >::type* = 0)
+    {
+        load_integral(t, typename boost::is_unsigned<T>::type());
+    }
 
     template <typename T>
     void load(T& t, typename boost::disable_if<boost::is_integral<T> >::type* = 0)

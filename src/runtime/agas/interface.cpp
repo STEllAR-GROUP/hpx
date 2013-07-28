@@ -234,11 +234,15 @@ bool is_local_address(
   , error_code& ec
     )
 {
+    std::size_t count = ids.size();
+
     std::vector<naming::gid_type> gids;
-    gids.reserve(ids.size());
+    gids.reserve(count);
 
     std::transform(ids.begin(), ids.end(), std::back_inserter(gids), convert_to_gid);
-    return naming::get_agas_client().is_local_address(gids, addrs, locals, ec);
+
+    addrs.resize(count);
+    return naming::get_agas_client().is_local_address(gids.data(), addrs.data(), count, locals, ec);
 }
 
 bool is_local_address_cached(

@@ -35,7 +35,7 @@ namespace hpx { namespace util
             {
                 ar & e;
             }
-            
+
             template <typename Archive, typename Element>
             static void serialize_element(Archive & ar, Element & e, boost::mpl::true_)
             {
@@ -49,7 +49,7 @@ namespace hpx { namespace util
                 typedef typename
                     boost::serialization::is_bitwise_serializable<element_type>::type
                 predicate;
-                
+
                 if(ar.flags() & disable_array_optimization)
                 {
                     serialize_element(ar, e, boost::mpl::false_());
@@ -134,7 +134,7 @@ namespace hpx { namespace util
         typedef typename
             boost::serialization::is_bitwise_serializable<sequence_type>::type
         predicate;
-        
+
         if(ar.flags() & disable_array_optimization)
         {
             detail::serialize_sequence(ar, seq, boost::mpl::false_());

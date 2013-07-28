@@ -22,7 +22,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -39,7 +39,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -62,7 +62,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -79,7 +79,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -102,7 +102,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -119,7 +119,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -142,7 +142,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -159,7 +159,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -182,7 +182,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -199,7 +199,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -222,7 +222,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -239,7 +239,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -262,7 +262,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -279,7 +279,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -302,7 +302,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -319,7 +319,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -342,7 +342,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -359,7 +359,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -382,7 +382,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -399,7 +399,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -422,7 +422,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -439,7 +439,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -462,7 +462,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -479,7 +479,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -502,7 +502,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -519,7 +519,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -542,7 +542,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -559,7 +559,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -582,7 +582,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -599,7 +599,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -622,7 +622,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<
@@ -639,7 +639,7 @@ namespace hpx { namespace traits
         static components::security::capability call(
             naming::address::address_type lva)
         {
-            components::server::runtime_support* rts = 
+            components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
             components::component_type const type =
                 components::get_component_type<

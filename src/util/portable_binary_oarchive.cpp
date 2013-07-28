@@ -47,7 +47,7 @@ namespace hpx { namespace util
 {
 
 void portable_binary_oarchive::save_impl(
-    const boost::int64_t l, const char maxsize)
+    boost::int64_t const l, char const maxsize)
 {
     char size = 0;
     if (l == 0) {
@@ -65,7 +65,7 @@ void portable_binary_oarchive::save_impl(
     do {
         ll >>= CHAR_BIT;
         ++size;
-    } while(ll != 0);
+    } while (ll != 0);
 
     this->primitive_base_t::save(size);
     this->primitive_base_t::save(negative);
@@ -84,6 +84,39 @@ void portable_binary_oarchive::save_impl(
     if(m_flags & endian_big)
         reverse_bytes(size, cptr);
 #endif
+
+    this->primitive_base_t::save_binary(cptr, static_cast<std::size_t>(size));
+}
+
+void portable_binary_oarchive::save_impl(
+    boost::uint64_t const ul, char const maxsize)
+{
+    char size = 0;
+    if (ul == 0) {
+        this->primitive_base_t::save(size);
+        return;
+    }
+
+    boost::uint64_t ll = ul;
+    do {
+        ll >>= CHAR_BIT;
+        ++size;
+    } while (ll != 0);
+
+    this->primitive_base_t::save(size);
+
+    ll = ul;
+    char* cptr = reinterpret_cast<char*>(&ll);
+
+#ifdef BOOST_BIG_ENDIAN
+    cptr += (sizeof(boost::uint64_t) - size);
+    if(m_flags & endian_little)
+        reverse_bytes(size, cptr);
+#else
+    if(m_flags & endian_big)
+        reverse_bytes(size, cptr);
+#endif
+
     this->primitive_base_t::save_binary(cptr, static_cast<std::size_t>(size));
 }
 
@@ -120,10 +153,9 @@ void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int fl
     bool has_filter = filter ? true : false;
     *this << has_filter;
 
-    if (has_filter) {
+    if (has_filter && (m_flags & enable_compression)) {
         *this << filter;
-        if (m_flags & enable_compression)
-            this->set_filter(filter);
+        this->set_filter(filter);
     }
 }
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)

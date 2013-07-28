@@ -4,6 +4,10 @@
 #include <boost/version.hpp>
 #include <hpx/config.hpp>
 
+#include <boost/mpl/bool.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
+#include <boost/type_traits/is_integral.hpp>
+
 #if !defined(HPX_USE_PORTABLE_ARCHIVES) || HPX_USE_PORTABLE_ARCHIVES == 0
 #include <boost/archive/binary_oarchive.hpp>
 
@@ -119,15 +123,27 @@ public:
 protected:
 #endif
     boost::uint32_t m_flags;
-    HPX_ALWAYS_EXPORT void
-    save_impl(const boost::int64_t l, const char maxsize);
+
+    HPX_ALWAYS_EXPORT void save_impl(boost::int64_t const l, char const maxsize);
+    HPX_ALWAYS_EXPORT void save_impl(boost::uint64_t const l, char const maxsize);
 
     // default fall through for any types not specified here
     template <typename T>
-    void save(T const& val, typename boost::enable_if<boost::is_integral<T> >::type* = 0)
+    void save_integral(T const& val, boost::mpl::false_)
     {
-        boost::int64_t t = static_cast<boost::int64_t>(val);
-        save_impl(t, sizeof(T));
+        save_impl(static_cast<boost::int64_t>(val), sizeof(T));
+    }
+
+    template <typename T>
+    void save_integral(T const& val, boost::mpl::true_)
+    {
+        save_impl(static_cast<boost::uint64_t>(val), sizeof(T));
+    }
+
+    template <typename T>
+    void save(T const& t, typename boost::enable_if<boost::is_integral<T> >::type* = 0)
+    {
+        save_integral(t, typename boost::is_unsigned<T>::type());
     }
 
     template <typename T>
@@ -136,9 +152,11 @@ protected:
         this->primitive_base_t::save(t);
     }
 
-    void save(const std::string& t) {
+    void save(std::string const &t)
+    {
         this->primitive_base_t::save(t);
     }
+
 #if BOOST_VERSION >= 104400
     void save(const boost::archive::class_id_reference_type& t) {
         boost::int64_t l = t;
