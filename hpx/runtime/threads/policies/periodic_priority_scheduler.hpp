@@ -153,7 +153,7 @@ namespace hpx { namespace threads { namespace policies
             return num_thread;
         }
 
-        std::size_t get_num_stolen_threads(std::size_t num_thread, bool reset) const
+        std::size_t get_num_stolen_threads(std::size_t num_thread, bool reset)
         {
             return 0;
         }

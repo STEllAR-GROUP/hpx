@@ -180,6 +180,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 #endif
+            std::size_t queue_size = queues_.size();
             if (std::size_t(-1) == num_thread)
                 num_thread = ++curr_queue_ % queue_size;
 
