@@ -6,5 +6,46 @@
 =============================================================================/]
 
 [section:lcos Using LCOs]
+Lightweight Control Objects provide synchrhonization for HPX applications. Most
+of them are familiar from other frameworks, but a few of them work in slightly
+special different ways adapted to HPX.
+
+future
+
+queue
+
+object_semaphore
+
+barrier
+
+[/== Local ==/]
+and_gate 
+
+barrier
+
+channel
+
+composable_guard
+
+conditional_trigger
+
+counting_semaphore
+
+dataflow
+
+event
+
+mutex
+
+once
+
+recursive_mutex
+
+spinlock
+
+spinlock_no_backoff
+
+trigger
+
 [endsect]
 
