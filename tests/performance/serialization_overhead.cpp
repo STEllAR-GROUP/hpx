@@ -23,7 +23,8 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations)
 {
     hpx::naming::gid_type here = hpx::find_here().get_gid();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid, reinterpret_cast<boost::uint64_t>(&test_function));
+        hpx::components::component_invalid,
+        reinterpret_cast<boost::uint64_t>(&test_function));
 
     // compose archive flags
 #ifdef BOOST_BIG_ENDIAN
@@ -97,7 +98,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-std::size_t data_size = 1000000;
+std::size_t data_size = 1;
 std::size_t iterations = 1000;
 std::size_t concurrency = 1;
 

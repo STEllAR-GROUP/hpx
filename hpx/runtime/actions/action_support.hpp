@@ -621,7 +621,7 @@ namespace hpx { namespace actions
         static automatic_action_registration<transfer_action> const register_action;
 
         // serialization support
-        BOOST_FORCEINLINE void load(hpx::util::portable_binary_iarchive & ar)
+        void load(hpx::util::portable_binary_iarchive & ar)
         {
             util::serialize_sequence(ar, arguments_);
 
@@ -654,7 +654,7 @@ namespace hpx { namespace actions
             }
         }
 
-        BOOST_FORCEINLINE void save(hpx::util::portable_binary_oarchive & ar) const
+        void save(hpx::util::portable_binary_oarchive & ar) const
         {
             util::serialize_sequence(ar, arguments_);
 
@@ -1103,8 +1103,8 @@ namespace hpx { namespace actions
         hpx::actions::transfer_action<action>)                                \
 /**/
 
-namespace hpx { namespace actions {
-
+namespace hpx { namespace actions
+{
     template <typename Action>
     struct init_registration<transfer_action<Action> >
     {
