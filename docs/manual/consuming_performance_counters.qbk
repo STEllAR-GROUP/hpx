@@ -20,7 +20,7 @@ abstraction for querying and logging performance counter data for a set of perfo
 __hpx__ provides a set of predefined command line options for every application
 which uses `hpx::init` for its initialization. While there are much more command
 line options available (see __commandline__), the set of options related to
-Performance Counters allow to list existing counters, query existing counters
+Performance Counters allow one to list existing counters, query existing counters
 once at application termination or repeatedly after a constant time interval.
 
 The following table summarizes the available command line options:

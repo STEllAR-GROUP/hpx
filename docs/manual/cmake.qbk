@@ -337,7 +337,7 @@ variables are used more seldom and are mainly useful for debugging purposes.
       below).]
     ]
     [[`HPX_AUTOMATIC_PREPROCESSING:BOOL`]
-     [Sets whether the generated makefiles should allow to regenerate the
+     [Sets whether the generated makefiles should regenerate the
       partially preprocessed files that are part of __hpx__. The default value
       for this option is `OFF`. This option can be enabled only if the
       __boost_wave__ tool is available (see CMake variable `BOOSTWAVE` below).]
