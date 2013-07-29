@@ -22,19 +22,18 @@
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/traits/is_future.hpp>
-#include <hpx/traits/needs_guid_initialization.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/action_factory.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/base_object.hpp>
-#include <hpx/util/void_cast.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/static.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
@@ -50,9 +49,6 @@
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
 #include <boost/serialization/access.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/extended_type_info.hpp>
-#include <boost/serialization/extended_type_info_typeid.hpp>
 #include <boost/serialization/is_bitwise_serializable.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/type_traits/remove_const.hpp>
@@ -227,6 +223,9 @@ namespace hpx { namespace actions
 
         /// Return the size of action arguments in bytes
         virtual std::size_t get_type_size() const = 0;
+
+        virtual void load(hpx::util::portable_binary_iarchive & ar) = 0;
+        virtual void save(hpx::util::portable_binary_oarchive & ar) const = 0;
 
         /// Return all data needed for thread initialization
         virtual threads::thread_init_data&
@@ -409,7 +408,7 @@ namespace hpx { namespace actions
         //
         ~transfer_action()
         {
-            detail::guid_initialization<transfer_action>();
+            //detail::guid_initialization<transfer_action>();
         }
 
     public:
@@ -433,7 +432,7 @@ namespace hpx { namespace actions
         {
             return detail::get_action_name<derived_type>();
         }
-
+        
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
         action_type get_action_type() const
@@ -615,18 +614,11 @@ namespace hpx { namespace actions
             return boost::fusion::at_c<N>(arguments_);
         }
 
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<transfer_action, base_action>();
-        }
+        /// action factory support
+        static automatic_action_registration<transfer_action> const register_action;
 
-    private:
         // serialization support
-        friend class boost::serialization::access;
-
-        template <typename Archive>
-        BOOST_FORCEINLINE void load(Archive& ar, const unsigned int /*version*/)
+        BOOST_FORCEINLINE void load(hpx::util::portable_binary_iarchive & ar)
         {
             util::serialize_sequence(ar, arguments_);
 
@@ -659,8 +651,7 @@ namespace hpx { namespace actions
             }
         }
 
-        template <typename Archive>
-        BOOST_FORCEINLINE void save(Archive& ar, const unsigned int /*version*/) const
+        BOOST_FORCEINLINE void save(hpx::util::portable_binary_oarchive & ar) const
         {
             util::serialize_sequence(ar, arguments_);
 
@@ -691,8 +682,6 @@ namespace hpx { namespace actions
             }
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
-
     private:
         static boost::uint32_t get_locality_id()
         {
@@ -711,6 +700,10 @@ namespace hpx { namespace actions
         threads::thread_priority priority_;
         threads::thread_stacksize stacksize_;
     };
+
+    template <typename Action>
+    automatic_action_registration<transfer_action<Action> > const
+        transfer_action<Action>::register_action = automatic_action_registration<transfer_action<Action> >().register_action();
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N, typename Action>
@@ -1040,11 +1033,11 @@ namespace hpx { namespace actions
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
-        hpx::actions::detail::register_base_helper<action>                    \
+    hpx::actions::detail::register_base_helper<action>                        \
             BOOST_PP_CAT(                                                     \
                 BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
                 _##actionname);                                               \
-    /**/
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper macro for action serialization, each of the defined actions needs to
@@ -1071,8 +1064,7 @@ namespace hpx { namespace actions
     HPX_REGISTER_ACTION_2(action, action)                                     \
 /**/
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
-    BOOST_CLASS_EXPORT_IMPLEMENT(hpx::actions::transfer_action<action>)       \
-    HPX_REGISTER_BASE_HELPER(hpx::actions::transfer_action<action>, actionname) \
+    HPX_ACTION_REGISTER_ACTION_FACTORY(hpx::actions::transfer_action<action>, actionname)                    \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
 /**/
 
@@ -1086,18 +1078,10 @@ namespace hpx { namespace actions
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2(action)              \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
-        struct needs_guid_initialization<action>                              \
+        struct needs_automatic_registration<action>                           \
           : boost::mpl::false_                                                \
         {};                                                                   \
     }}                                                                        \
-/**/
-#define HPX_REGISTER_ACTION_DECLARATION_GUID(action)                          \
-    namespace boost { namespace archive { namespace detail {                  \
-        namespace extra_detail {                                              \
-            template <>                                                       \
-            struct init_guid<action>;                                         \
-        }                                                                     \
-    }}}                                                                       \
 /**/
 
 #define HPX_REGISTER_ACTION_DECLARATION_(...)                                 \
@@ -1112,16 +1096,25 @@ namespace hpx { namespace actions
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1(action)                  \
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2(                         \
         hpx::actions::transfer_action<action>)                                \
-    BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<action>,            \
-        BOOST_PP_STRINGIZE(actionname))                                       \
-    HPX_REGISTER_ACTION_DECLARATION_GUID(hpx::actions::transfer_action<action>) \
 /**/
 
-///////////////////////////////////////////////////////////////////////////////
-// Register the action templates with serialization.
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Action>), (hpx::actions::transfer_action<Action>)
-)
+namespace hpx { namespace actions {
+    template <typename Action>
+    struct init_registration;
+
+    template <typename Action>
+    struct init_registration<transfer_action<Action> >
+    {
+        static automatic_action_registration<transfer_action<Action> > const & g;
+    };
+
+
+    template <typename Action>
+    automatic_action_registration<transfer_action<Action> > const & init_registration<transfer_action<Action> >::g
+    = ::boost::serialization::singleton<
+        automatic_action_registration<transfer_action<Action> >
+    >::get_mutable_instance().register_action();
+}}
 
 #if 0 //WIP
 ///////////////////////////////////////////////////////////////////////////////

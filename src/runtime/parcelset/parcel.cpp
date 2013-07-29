@@ -45,8 +45,13 @@ namespace hpx { namespace parcelset
             // If we have a source id, serialize it.
             if (has_source_id)
                 ar << source_id_;
+            
+            std::string name = action_->get_action_name();
+            ar << name;
+            //std::cout << "saving " << hash << "\n";
 
-            ar << action_;
+            //ar << action_;
+            action_->save(ar);
 
             // If we have a continuation, serialize it.
             if (has_continuation) {
@@ -108,8 +113,15 @@ namespace hpx { namespace parcelset
             // Check for a source id.
             if (has_source_id)
                 ar >> source_id_;
-
+            
+            std::string name;
+            ar >> name;
+            action_ = actions::action_factory::create(name);
+            action_->load(ar);
+            /*
             ar >> action_;
+            std::cout << "loading " << hash << " " << action_->get_action_hash() << "\n";
+            */
 
             // handle continuation.
             if (has_continuation) {

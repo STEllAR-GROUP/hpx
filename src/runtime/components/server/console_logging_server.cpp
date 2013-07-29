@@ -34,21 +34,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // definitions related to console logging
 
-namespace boost { namespace serialization
-{
-    HPX_EXPORT void serialize(hpx::util::portable_binary_oarchive& ar,
-        hpx::components::message_type& r, unsigned int version)
-    {
-        hpx::util::serialize_sequence(ar, r);
-    }
-
-    HPX_EXPORT void serialize(hpx::util::portable_binary_iarchive& ar,
-        hpx::components::message_type& r, unsigned int version)
-    {
-        hpx::util::serialize_sequence(ar, r);
-    }
-}}
-
 ///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
 HPX_REGISTER_PLAIN_ACTION(
