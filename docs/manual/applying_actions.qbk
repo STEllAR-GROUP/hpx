@@ -139,8 +139,8 @@ several ways to apply an action, all of which are described in the following sec
 [def __async_continue__ [link hpx.manual.applying_actions.action_invocation.apply_continue Applying an Action with a Continuation and with Synchronization]]
 [def __sync__           [link hpx.manual.applying_actions.action_invocation.sync Applying an Action Synchronously]]
 
-__hpx__ allows to apply any action with a syntax which is very close to the
-standard C++ way of invoking functions. In fact, all action types have an
+__hpx__ allows the user to apply actions with a syntax similar to the
+C++ standard. In fact, all action types have an
 overloaded function operator allowing to synchronously apply the action. Further,
 __hpx__ implements `hpx::async`, which semantically works similar to the
 way `std::async` works for plain C++ function.
@@ -209,7 +209,7 @@ the local locality:
 (as before, the function `hpx::find_here()` returns the id of the local
 locality (the locality this code is executed on).
 
-[note The use of a `hpx::future<void>` allows to synchronize with any remote
+[note The use of a `hpx::future<void>` allows the current thread to synchronize with any remote
       operation not returning any value.]
 
 [note Any `std::future<>` returned from `std::async()` is required to block in its
@@ -296,12 +296,12 @@ communication latencies.
 [//////////////////////////////////////////////////////////////////////////////]
 [section:async_continue Applying an Action with a Continuation but without any Synchronization]
 
-This method is very similar to the method described in section __apply__. The main
-difference is that it allows to chain a sequence of asynchronous operations, while
+This method is very similar to the method described in section __apply__. The 
+difference is that it allows the user to chain a sequence of asynchronous operations, while
 handing the (intermediate) results from one step to the next step in the chain.
 Where `hpx::apply` invokes a single function using 'fire and forget' semantics,
-`hpx::apply_continue` allows to asynchronously trigger a chain of functions 
-asynchronously, without the need for the execution flow 'to come back' to the 
+`hpx::apply_continue` asynchronously triggers a chain of functions 
+without the need for the execution flow 'to come back' to the 
 invocation site. Each of the asynchronous functions can be executed on a different 
 locality.
 
@@ -316,7 +316,7 @@ addition to what `hpx::async` can do, the functions `hpx::async_continue` takes
 an additional function argument. This function will be called as the continuation
 of the executed action. It is expected to perform additional operations and to
 make sure that a result is returned to the original invocation site. This method
-allows to chain operations asynchronously by providing a continuation operation
+chains operations asynchronously by providing a continuation operation
 which is automatically executed once the first action has finished executing.
 
 As an example we chain two actions, where the result of the first action is
