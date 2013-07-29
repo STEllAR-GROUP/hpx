@@ -141,6 +141,15 @@ namespace hpx { namespace traits
     struct supports_streaming_with_any<util::serialize_buffer<T> >
       : boost::mpl::false_
     {};
+   
+    template <typename T>
+    struct type_size<util::serialize_buffer<T> >
+    {
+        static std::size_t call(util::serialize_buffer<T> const& buffer_)
+        {
+            return buffer_.size() * sizeof(T);
+        }
+    };
 }}
 
 #endif
