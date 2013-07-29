@@ -38,10 +38,10 @@ run_guarded() with a function (task).
 
 If a single method needs to run with multiple guards, use a guard set.
 
-     hpx::lcos::local::guard gu1,gu2;
-     hpx::lcos::local::guard_set gs;
-     gs.add(&gu1);
-     gs.add(&gu2);
+     boost::shared<hpx::lcos::local::guard> gu1(new hpx::lcos::local::guard());
+     boost::shared<hpx::lcos::local::guard> gu2(new hpx::lcos::local::guard());
+     gs.add(*gu1);
+     gs.add(*gu2);
      run_guarded(gs,task);
 
 Guards use two atomic operations (which are not called repeatedly)
