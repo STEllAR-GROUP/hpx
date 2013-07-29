@@ -97,7 +97,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-std::size_t data_size = 1;
+std::size_t data_size = 1000000;
 std::size_t iterations = 1000;
 std::size_t concurrency = 1;
 
