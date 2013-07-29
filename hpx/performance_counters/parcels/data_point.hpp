@@ -27,6 +27,7 @@ namespace hpx { namespace performance_counters { namespace parcels
 #endif
           , num_parcels_(0)
           , raw_bytes_(0)
+          , buffer_allocate_time_(0)
         {}
 
         std::size_t bytes_;           ///< number of bytes on tyhe wire for this parcel
@@ -44,6 +45,9 @@ namespace hpx { namespace performance_counters { namespace parcels
         std::size_t num_parcels_;     ///< The number of parcels processed by this message
         std::size_t raw_bytes_;       ///< number of bytes processed for the action in
                                       ///< this parcel (uncompressed)
+
+        boost::int64_t buffer_allocate_time_; ///< The time spent for allocating buffers
+
     };
 }}}
 

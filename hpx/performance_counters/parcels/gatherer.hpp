@@ -47,6 +47,7 @@ namespace hpx { namespace performance_counters { namespace parcels
 #if defined(HPX_HAVE_SECURITY)
         boost::int64_t total_security_time(bool reset);
 #endif
+        boost::int64_t total_buffer_allocate_time(bool reset);
 
     private:
         boost::int64_t overall_bytes_;
@@ -58,6 +59,8 @@ namespace hpx { namespace performance_counters { namespace parcels
         boost::int64_t num_parcels_;
         boost::int64_t num_messages_;
         boost::int64_t overall_raw_bytes_;
+
+        boost::int64_t buffer_allocate_time_;
 
         // Create mutex for accumulator functions.
         mutable mutex_type acc_mtx;
@@ -76,6 +79,7 @@ namespace hpx { namespace performance_counters { namespace parcels
         num_parcels_ += x.num_parcels_;
         overall_raw_bytes_ += x.raw_bytes_;
         ++num_messages_;
+        buffer_allocate_time_ += x.buffer_allocate_time_;
     }
 
     inline boost::int64_t gatherer::num_parcels(bool reset)
@@ -120,6 +124,12 @@ namespace hpx { namespace performance_counters { namespace parcels
     {
         mutex_type::scoped_lock mtx(acc_mtx);
         return util::get_and_reset_value(overall_raw_bytes_, reset);
+    }
+
+    inline boost::int64_t gatherer::total_buffer_allocate_time(bool reset)
+    {
+        mutex_type::scoped_lock mtx(acc_mtx);
+        return util::get_and_reset_value(buffer_allocate_time_, reset);
     }
 }}}
 

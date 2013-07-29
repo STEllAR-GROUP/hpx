@@ -671,6 +671,21 @@ namespace hpx { namespace parcelset
         return pp ? pp->get_raw_data_received(reset) : 0;
     }
 
+    boost::int64_t parcelhandler::get_buffer_allocate_time_sent(
+        connection_type pp_type, bool reset) const
+    {
+        error_code ec(lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_buffer_allocate_time_sent(reset) : 0;
+    }
+    boost::int64_t parcelhandler::get_buffer_allocate_time_received(
+        connection_type pp_type, bool reset) const
+    {
+        error_code ec(lightweight);
+        parcelport* pp = find_parcelport(pp_type, ec);
+        return pp ? pp->get_buffer_allocate_time_sent(reset) : 0;
+    }
+
     // connection stack statistics
     boost::int64_t parcelhandler::get_connection_cache_statistics(
         connection_type pp_type,
@@ -784,6 +799,11 @@ namespace hpx { namespace parcelset
             boost::bind(&parcelhandler::get_raw_data_sent, this, pp_type, ::_1));
         HPX_STD_FUNCTION<boost::int64_t(bool)> data_raw_received(
             boost::bind(&parcelhandler::get_raw_data_received, this, pp_type, ::_1));
+
+        HPX_STD_FUNCTION<boost::int64_t(bool)> buffer_allocate_time_sent(
+            boost::bind(&parcelhandler::get_buffer_allocate_time_sent, this, pp_type, ::_1));
+        HPX_STD_FUNCTION<boost::int64_t(bool)> buffer_allocate_time_received(
+            boost::bind(&parcelhandler::get_buffer_allocate_time_received, this, pp_type, ::_1));
 
         std::string connection_type_name(get_connection_type_name(pp_type));
         performance_counters::generic_counter_type_data const counter_types[] =
@@ -945,6 +965,24 @@ namespace hpx { namespace parcelset
                   _1, data_received, _2),
               &performance_counters::locality_counter_discoverer,
               "bytes"
+            },
+            { boost::str(boost::format("/parcels/time/%s/buffer_allocate/received") % connection_type_name),
+              performance_counters::counter_raw,
+              boost::str(boost::format("returns the time needed to allocate the buffers for serializing using the %s connection type") % connection_type_name),
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, buffer_allocate_time_received, _2),
+              &performance_counters::locality_counter_discoverer,
+              "ns"
+            },
+            { boost::str(boost::format("/parcels/time/%s/buffer_allocate/sent") % connection_type_name),
+              performance_counters::counter_raw,
+              boost::str(boost::format("returns the time needed to allocate the buffers for serializing using the %s connection type") % connection_type_name),
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, buffer_allocate_time_sent, _2),
+              &performance_counters::locality_counter_discoverer,
+              "ns"
             },
         };
         performance_counters::install_counter_types(

@@ -62,7 +62,7 @@ namespace hpx { namespace parcelset { namespace mpi
         parcel_cache_(ini.get_os_thread_count(), this->get_max_message_size()),
         stopped_(false),
         handling_messages_(false),
-        next_tag_(2)
+        next_tag_(1)
     {
         if (here_.get_type() != connection_mpi) {
             HPX_THROW_EXCEPTION(network_error, "mpi::parcelport::parcelport",
@@ -154,7 +154,7 @@ namespace hpx { namespace parcelset { namespace mpi
 
         // We let the message handling loop spin for another 2 seconds to avoid the
         // costs involved with posting it to asio
-        while(bootstrapping || (!stopped_ && has_work) || (t.elapsed() < 10.0))
+        while(bootstrapping || (!stopped_ && has_work) || (t.elapsed() < 2.0))
         {
             // add new receive requests
             std::pair<bool, header> next(acceptor_.next_header());
@@ -179,7 +179,7 @@ namespace hpx { namespace parcelset { namespace mpi
 
             // add new send requests
             senders_.splice(senders_.end(), parcel_cache_.get_senders(
-                HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this()),
+                HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this(), HPX_STD_PLACEHOLDERS::_1),
                 communicator, *this));
 
             // handle all send requests
@@ -267,6 +267,7 @@ namespace hpx { namespace parcelset { namespace mpi
 
                 std::size_t parcel_count = 0;
                 archive >> parcel_count;
+
                 BOOST_ASSERT(parcel_count > 0);
                 for(std::size_t i = 0; i != parcel_count; ++i)
                 {

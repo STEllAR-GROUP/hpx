@@ -266,6 +266,13 @@
 #  define HPX_PARCEL_MAX_MESSAGE_SIZE 1000000000
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+// This defines the number of bytes of overhead it takes to serialize a
+// parcel.
+#if !defined(HPX_PARCEL_SERIALIZATION_OVERHEAD)
+#   define HPX_PARCEL_SERIALIZATION_OVERHEAD 512
+#endif
+
 /// This defines the number of AGAS address translations kept in the local
 /// cache on a per OS-thread basis (system wide used OS threads).
 #if !defined(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD)

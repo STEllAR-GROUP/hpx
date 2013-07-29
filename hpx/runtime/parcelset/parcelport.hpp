@@ -285,6 +285,16 @@ namespace hpx { namespace parcelset
             return parcels_received_.total_bytes(reset);
         }
 
+        boost::int64_t get_buffer_allocate_time_sent(bool reset)
+        {
+            return parcels_sent_.total_buffer_allocate_time(reset);
+        }
+
+        boost::int64_t get_buffer_allocate_time_received(bool reset)
+        {
+            return parcels_received_.total_buffer_allocate_time(reset);
+        }
+
         /// total data (uncompressed) received (bytes)
         std::size_t get_raw_data_received(bool reset)
         {

@@ -430,6 +430,9 @@ namespace hpx { namespace parcelset
         // total data (uncompressed) received (bytes)
         std::size_t get_raw_data_received(connection_type, bool) const;
 
+        boost::int64_t get_buffer_allocate_time_sent(connection_type, bool) const;
+        boost::int64_t get_buffer_allocate_time_received(connection_type, bool) const;
+
         boost::int64_t get_connection_cache_statistics(connection_type pp_type,
             parcelport::connection_cache_statistics_type stat_type, bool) const;
         bool supports_connection_cache_statistics(connection_type pp_type) const;

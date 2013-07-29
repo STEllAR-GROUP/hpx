@@ -33,10 +33,12 @@ namespace hpx { namespace parcelset { namespace mpi {
     {
         receiver(header const & h, MPI_Comm communicator)
           : header_(h)
-          , buffer_(boost::make_shared<std::vector<char, allocator<char> > >(h.size()))
+          , buffer_(boost::make_shared<std::vector<char, allocator<char> > >())//h.size()))
         {
             // start collecting statistics for this receive operation
             receive_data_.time_ = util::high_resolution_clock::now();
+            buffer_->resize(h.size());
+            receive_data_.buffer_allocate_time_ = util::high_resolution_clock::now() - receive_data_.time_;
             receive_data_.serialization_time_ = 0;
             receive_data_.bytes_ = 0;
             receive_data_.num_parcels_ = 0;
