@@ -135,7 +135,7 @@ component for you. The remainder of this section will explain the process
 of creating a full Performance Counter based on the Sine example which you
 can find in the directory `examples/performance_counters/sine/`.
 
-This base class is defined in the header file
+The base class is defined in the header file
 [hpx_link hpx/performance_counters/base_performance_counter.hpp..hpx/performance_counters/base_performance_counter.hpp]
 as:
 
@@ -149,8 +149,8 @@ this looks like:
 [import ../../examples/performance_counters/sine/server/sine.hpp]
 [sine_counter_definition]
 
-i.e. the type `sine_counter` is derived from the mentioned base class passing
-the type itself as a template argument (please see
+i.e. the type `sine_counter` is derived from the base class passing
+the type as a template argument (please see
 [hpx_link examples/performance_counters/sine/server/sine.hpp..sine.hpp]
 for the full source code of the counter definition). For more information
 about this technique (called Curiously Recurring Template Pattern - CRTP),
@@ -160,8 +160,8 @@ This base class itself is derived from the `performance_counter` interface
 described above.
 
 
-Additionally, full Performance Counters not only expose the actual value but
-also provide information about
+Additionally, full Performance Counter implementation not only exposes the actual value but
+also provides information about
 
 * The point in time a particular value was retrieved
 * A (sequential) invocation count
