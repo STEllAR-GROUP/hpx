@@ -252,7 +252,7 @@ system and application performance.
          address. In this case a parcel is sent to the AGAS service component
          which is responsible for creating the destination GID (and is
          responsible for resolving the destination address). This AGAS service
-         component will deiver the parcel to its final target.]
+         component will deliver the parcel to its final target.]
     ]
     [   [`/parcels/count/<connection_type>/<operation>`
 
@@ -328,7 +328,7 @@ system and application performance.
         ]
         [None]
         [Returns the overall number cache events (evictions, hits, inserts,
-         misses, andreclaims) for the connection cache of the given connection
+         misses, and reclaims) for the connection cache of the given connection
          type on the given locality (see `<cache_statistics>`, e.g. `cache-insertions`,
          `cache-evictions`, `cache-hits`, `cache-misses`, or `cache-reclaims`).
 
