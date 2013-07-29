@@ -194,7 +194,7 @@ information needs to be added to one of the `ini` configuration files:
 
 [heading Specifying Options for Single Localities Only]
 
-For runs involving more than one locality it is sometimes desireable to supply
+For runs involving more than one locality it is sometimes desirable to supply
 specific command line options to single localities only. When the
 __hpx__ application is launched using a scheduler (like PBS, for more details
 see section __using_pbs__), specifying dedicated command line options for single
@@ -265,13 +265,13 @@ and `pu` (processing unit). Indexes are non-negative integers that specify a
 unique physical object in a topology tree using its logical sequence number.
 
 Chaining multiple tuples together in the more general form
-`object1:index1[.object2:index2[...]]` is permissable. While the first tuple's
+`object1:index1[.object2:index2[...]]` is permissible. While the first tuple's
 object may appear anywhere in the topology, the Nth tuple's object must have
 a shallower topology depth than the (N+1)th tuple's object. Put simply: as
 you  move right in a tuple chain, objects must go deeper in the topology tree.
 Indexes specified in chained tuples are relative to the scope of the parent
 object. For example, `socket:0.core:1` refers to the second core in the first
-socket (all indicies are zero based).
+socket (all indices are zero based).
 
 Multiple affinities can be specified using several `--hpx:bind` command line
 options or by appending several affinities separated by a `';'`. By default,
