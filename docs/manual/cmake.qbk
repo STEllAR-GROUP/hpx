@@ -217,7 +217,7 @@ along with a brief explanation.
      [Sets whether __hpx__ should not support generating detailed logging output
       (default: `OFF`). Even if this is set to `OFF` (i.e. logging is supported)
       you need to enable logging when running any __hpx__ application. Logging
-      support introducied a minimal runtime overhead which usually can be ignored.
+      support introduces a minimal runtime overhead which usually can be ignored.
       This option allows to remove this runtime overhead but by doing so disables
       the capability to extract detailed runtime information in case of errors.]
     ]
@@ -333,7 +333,7 @@ variables are used more seldom and are mainly useful for debugging purposes.
       value for this variable is `OFF`. Even if the variable is set to `ON`
       you must separately enable integration with the Intel tools at runtime.
       This option is available only if the include files and libraries for
-      one of the Intel tools canbe located (see CMake variable `AMPLIFIER`
+      one of the Intel tools can be located (see CMake variable `AMPLIFIER`
       below).]
     ]
     [[`HPX_AUTOMATIC_PREPROCESSING:BOOL`]
@@ -623,7 +623,7 @@ we do:
 
 ``
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -lhello_world
+    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -L${HOME}/my_hpx_libs -lhello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
@@ -706,7 +706,7 @@ The basic structure to include __hpx__ into your CMakeLists.txt is shown here:
 
     # This adds the HPX cmake configuration directory to the search path.
     set(CMAKE_MODULE_PATH
-        ${HPX_ROOT}/share/cmake-${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}/Modules)
+        ${HPX_ROOT}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules)
 
     # Instruct cmake to find the HPX settings
     find_package(HPX)
