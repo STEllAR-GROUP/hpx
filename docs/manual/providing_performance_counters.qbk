@@ -83,7 +83,7 @@ enables to instantiate exactly one counter instance for each locality. Repeated
 requests to instantiate such a counter will return the same instance, e.g. the
 instance created for the first request.
 
-If this counter should be accessible using the standard __hpx__ command line
+If this counter needs to be accessed using the standard __hpx__ command line
 options, the registration has to be performed during application startup,
 before `hpx_main` is executed. The best way to achieve this is to register
 an __hpx__ startup function using the API function
@@ -93,11 +93,11 @@ calling `hpx::init` to initialize the runtime system:
     int main(int argc, char* argv[])
     {
         // By registering the counter type we make it available to any consumer
-        // creating and querying an instance of the type "/test/data".
+        // who creates and queries an instance of the type "/test/data".
         //
-        // This registration should be performed during startup. We register the
-        // function 'register_counter_type' to be executed as an HPX thread right
-        // before hpx_main will be executed.
+        // This registration should be performed during startup. The
+        // function 'register_counter_type' should be executed as an HPX thread right
+        // before hpx_main is executed.
         ``[funcref hpx::register_startup_function `hpx::register_startup_function`]``(&register_counter_type);
 
         // Initialize and run HPX.
