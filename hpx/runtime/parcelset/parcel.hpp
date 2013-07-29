@@ -772,6 +772,11 @@ namespace boost { namespace serialization
 BOOST_CLASS_TRACKING(hpx::parcelset::parcel, boost::serialization::track_never)
 BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
 
+BOOST_CLASS_TRACKING(hpx::parcelset::detail::single_destination_parcel_data,
+    boost::serialization::track_never)
+BOOST_CLASS_TRACKING(hpx::parcelset::detail::multi_destination_parcel_data,
+    boost::serialization::track_never)
+
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
