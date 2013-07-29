@@ -110,13 +110,13 @@ by section basis below.
       application instance.]
      [dynamic information, initialized from command line (argc/argv)]]
     [[`hpx.lock_detection`]
-     [This setting allows to enable to verify that no locks are being held 
+     [This setting verifies that no locks are being held 
       while a __hpx__ thread is suspended.]
      [dynamic information, by default this is set to '0', this setting is
       effective only if `HPX_VERIFY_LOCKS` is set during configuration in 
       cmake.]]
     [[`hpx.minimal_deadlock_detection`]
-     [This setting allows to enable support for minimal deadlock detection 
+     [This setting enables support for minimal deadlock detection 
       for __hpx__-threads..]
      [dynamic information, by default this is set to '1' (for Debug builds) 
       or to '0' (for Release, RelWithDebInfo, RelMinSize builds), this setting is
@@ -219,7 +219,7 @@ of the components will contain at least the following properties:
       `hpx.components.<component_instance_name>.name`]
      [dynamic information, filled by the component]]
     [[`hpx.components.<component_instance_name>.enabled`]
-     [This setting allows to explicitly enable or disable the component.]
+     [This setting explicitly enables or disables the component.]
      [This is an optional property, __hpx__ assumed that the component is
       enabled if it is not defined.]]
 ]
