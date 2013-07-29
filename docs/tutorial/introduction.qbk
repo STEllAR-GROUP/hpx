@@ -265,9 +265,8 @@ behind what they did is based on ideas around static and dynamic dataflow.
 There are certain attempts today to get back to those ideas and to incorporate
 them with modern architectures. For instance, a lot of work is being done in
 the area of constructing dataflow oriented execution trees. Our results show
-that employing dataflow techniques in combination with the other ideas as
-outlined here allows to improve overall scalability for certain problems
-considerably.
+that employing dataflow techniques in combination with the other ideas, as
+outlined herein, considerabley improves scalability for many problems.
 
 [heading:locality_control Adaptive Locality Control instead of Static Data Distribution]
 
