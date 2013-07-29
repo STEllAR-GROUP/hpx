@@ -21,10 +21,6 @@ namespace hpx { namespace actions {
         ctor_map::const_iterator it = factory.ctor_map_.find(name);
         if(it == factory.ctor_map_.end())
         {
-            BOOST_FOREACH(ctor_map::value_type const & v, factory.ctor_map_)
-            {
-                std::cout << v.first << "\n";
-            }
             std::string error = "Can not find action ";
             error += name;
             error += " in map";
@@ -39,12 +35,9 @@ namespace hpx { namespace actions {
     void action_factory::add_action(std::string const & name, ctor_type ctor)
     {
         ctor_map::iterator it = ctor_map_.find(name);
-        std::cout << "adding " << name << "\n";
         if(it != ctor_map_.end())
         {
-            HPX_THROW_EXCEPTION(bad_action_code,
-                "action_factory::add_action"
-              , "Action already registered");
+            return;
         }
 
         ctor_map_.insert(std::make_pair(name, ctor));

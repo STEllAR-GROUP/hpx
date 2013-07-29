@@ -69,24 +69,16 @@ namespace hpx { namespace actions {
         }
     };
 
-    template <typename Action>
-    void automatic_factory_registration()
-    {
-        action_registration<Action>();
-    }
-
     template <typename Action, typename Enable = typename traits::needs_automatic_registration<Action>::type>
     struct automatic_action_registration
     {
         automatic_action_registration()
         {
-            std::cout << "auto registering ...\n";
-            automatic_factory_registration<Action> act;
+            action_registration<Action> auto_register;
         }
 
         automatic_action_registration & register_action()
         {
-            automatic_factory_registration<Action> act;
             return *this;
         }
     };
@@ -96,7 +88,6 @@ namespace hpx { namespace actions {
     {
         automatic_action_registration()
         {
-            std::cout << "not auto registering ...\n";
         }
 
         automatic_action_registration & register_action()
