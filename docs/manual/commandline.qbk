@@ -121,9 +121,8 @@ described in the table below:
 
 [heading Command Line Argument Shortcuts]
 
-Additionally, every __hpx__ application defines certain shortcuts allowing to
-significantly shorten the command line options. The follwoing table lists all
-predefined command line option shortcuts:
+Additionally, the following shortcuts are available from
+every __hpx__ application.
 
 [teletype]
 
@@ -158,17 +157,17 @@ predefined command line option shortcuts:
 [c++]
 
 It is possible to define your own shortcut options. In fact, all of the shortcuts
-listed above are pre-defined using the technique described here. This implies,
-that it is possible to redefine any of the pre-defined shortcuts to expand
+listed above are pre-defined using the technique described here. 
+In fact, it is possible to redefine any of the pre-defined shortcuts to expand
 differently as well.
 
-Shortcut options are looked up in the internal configuration database. They are
+Shortcut options are obtained from the internal configuration database. They are
 stored as key-value properties in a special properties section named
 `hpx.commandline`. You can define your own shortcuts by adding the corresponding
 definitions to one of the `ini` configuration files as described in the section
 __configuration__. For instance, in order to define a command line shortcut
 `--pc` which should expand to `--hpx:print-counter`, the following configuration
-information needs to be stored in one of the `ini` configuration files:
+information needs to be added to one of the `ini` configuration files:
 ``
     [hpx.commandline]
     --pc = --hpx:print-counter
@@ -185,21 +184,21 @@ information needs to be stored in one of the `ini` configuration files:
           `--hpx:print-counter=/threads{locality#0/total}/count/cumulative`
       ]
 
-[important Any shortcut option defined as described should either start with
+[important Any shortcut option should either start with
       a single `'-'` or with two `'--'` characters. Shortcuts starting with a
       single `'-'` are interpreted as short options (i.e. everything after the
       first character following the `'-'` is treated as the argument). Shortcuts
-      starting with `'--'` are interpreted as long options. Any other shortcut
-      formats are not supported.]
+      starting with `'--'` are interpreted as long options. No other shortcut
+      formats are supported.]
 [c++]
 
 [heading Specifying Options for Single Localities Only]
 
 For runs involving more than one locality it is sometimes desireable to supply
-specific command line options to single localities only. Especially when the
+specific command line options to single localities only. When the
 __hpx__ application is launched using a scheduler (like PBS, for more details
 see section __using_pbs__), specifying dedicated command line options for single
-localities could prove to be tricky. For this reason all of the command line
+localities may be desirable. For this reason all of the command line
 options which have the general format `--hpx:<some_key>` can be used in a more
 general form: `--hpx:<N>:<some_key>`, where <N> is the number of the locality
 this command line options will be applied to, all other localities will simply
@@ -219,9 +218,9 @@ ignore the option. For instance, the following PBS script passes the option
 ```
 
 [caution If the first application specific argument (inside `$APP_OPTIONS`)
-         is a non-option (i.e. does not start with a '`-`' or a '`--`', then those
-         have to be placed before the option [hpx_cmdline --hpx:nodes], which
-         in this case should be the last option on the command line.
+         is a non-option (i.e. does not start with a '`-`' or a '`--`', then it
+         must be placed before the option [hpx_cmdline --hpx:nodes], which,
+         in this case, should be the last option on the command line.
 
          Alternatively, use the option [hpx_cmdline --hpx:endnodes] to explicitly 
          mark the end of the list of node names:
@@ -242,7 +241,7 @@ detail:
 
 [heading:bind The Command Line Option `--hpx:bind`]
 
-This command line option allows to specify the required affinity of the __hpx__
+This command line option allows one to specify the required affinity of the __hpx__
 worker threads to the underlying processing units. As a result the worker
 threads will run only on the processing units identified by the corresponding
 bind specification.

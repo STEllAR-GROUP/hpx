@@ -10,36 +10,35 @@
 Performance Counters in __hpx__ are used to provide information as to how well
 the runtime system or an application is performing. The counter data can help
 determine system bottlenecks and fine-tune system and application performance.
-The __hpx__ runtime system, its networking and other layers provide counter
+The __hpx__ runtime system, its networking, and other layers provide counter
 data that an application can consume to provide users with information of how
 well the application is performing.
 
 Applications can also use counter data to determine how much system resources
 to consume. For example, an application that transfers data over the network
-could consume counter data from an  network switch to determine how much data
+could consume counter data from a network switch to determine how much data
 to transfer without competing for network bandwidth with other network traffic.
 The application could use the counter data to adjust its transfer rate as the
 bandwidth usage from other network traffic increases or decreases.
 
 Performance Counters are __hpx__ parallel processes which expose a predefined
-interface. __hpx__ exposes special API functions allowing to create, manage,
-access the data from, and release instances of Performance Counters. The main
-means to identify a Performance Counter instance is the counter instance name.
-Performance Counter instance names have a predefined structure which is
-described in the section __counter_names__. The main advantages of this is that
+interface. __hpx__ exposes special API functions that allow one to create, manage,
+read the counter data, and release instances of Performance Counters. 
+Performance Counter instances are accesssed by name,
+and these names have a predefined structure which is
+described in the section __counter_names__. The advantage of this is that
 any Performance Counter can be accessed remotely (from a different locality)
 or locally (from the same locality). Moreover, since all counters expose their
 data using the same API, any code consuming counter data can be utilized to
 access arbitrary system information with minimal effort.
 
-Consumers of counter data can consume counter data in real time. Real time data
-describes the current activity of the computer. More information about how
+Counter data may be accesssed in real time. More information about how
 to consume counter data can be found in the section __consuming_counters__.
 
 All __hpx__ applications provide command line options related to performance
-counters, such as the possibility to list available counter types, or
-periodically query the counter data of specific counters to be printed to the
-screen or to be written to a file. For more information about these, please
+counters, such as the ability to list available counter types, or
+periodically query specific counters to be printed to the
+screen or save them in a file. For more information, please
 refer to the section __commandline__.
 
 [include performance_counter_names.qbk]

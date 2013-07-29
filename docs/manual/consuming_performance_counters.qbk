@@ -7,12 +7,12 @@
 
 [section:consuming Consuming Performance Counter Data]
 
-You can consume performance data using either the command line interface of
-your __hpx__ application or the __hpx__ API. The command line interface is
-easier to use than the API, but it is less flexible and does not allow to adjust
+You can consume performance data using either the command line interface or
+via the __hpx__ application or the __hpx__ API. The command line interface is
+easier to use, but it is less flexible and does not allow one to adjust
 the behaviour of your application at runtime.
-The command line interface is essentially a convenience abstraction for
-querying and logging performance counter data for a set of performance counters.
+The command line interface provides a convenience abstraction but simplified
+abstraction for querying and logging performance counter data for a set of performance counters.
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:commandline Consuming Performance Counter Data from the Command Line]
