@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -132,4 +132,79 @@ namespace hpx { namespace naming
 
         return locality::iterator_type();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Archive>
+    void locality::save(Archive& ar, const unsigned int version) const
+    {
+        if(ar.flags() & util::disable_array_optimization) {
+            ar << address_;
+            ar << port_;
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            BOOST_ASSERT(HPX_LOCALITY_VERSION_MPI == version);
+            ar << rank_;
+#endif
+        }
+        else {
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            BOOST_ASSERT(HPX_LOCALITY_VERSION_MPI == version);
+#endif
+            detail::locality_serialization_data data;
+            fill_serialization_data(*this, data);
+            ar << boost::serialization::make_array(&data, 1);
+        }
+    }
+
+    template <typename Archive>
+    void locality::load(Archive& ar, const unsigned int version)
+    {
+        if (version > HPX_LOCALITY_VERSION_MPI)
+        {
+            HPX_THROW_EXCEPTION(version_too_new,
+                "locality::load",
+                "trying to load locality with unknown version");
+            return;
+        }
+
+        if(ar.flags() & util::disable_array_optimization) {
+            ar >> address_;
+            ar >> port_;
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            // try to read rank only if the sender knows about MPI
+            if (version > HPX_LOCALITY_VERSION_NO_MPI)
+                ar >> rank_;
+#else
+            // account for the additional rank
+            if (version > HPX_LOCALITY_VERSION_NO_MPI)
+            {
+                int rank = -1;
+                ar >> rank;
+
+                if (rank != -1) {
+                // FIXME: we might have received a locality which is of
+                // no use to us as our locality is not configured to
+                // support MPI.
+                    HPX_THROW_EXCEPTION(version_unknown,
+                        "locality::load",
+                        "load locality with valid rank while MPI was "
+                            "not configured");
+                }
+                return;
+            }
+#endif
+        }
+        else {
+            detail::locality_serialization_data data;
+            ar >> boost::serialization::make_array(&data, 1);
+            fill_from_serialization_data(data, *this);
+        }
+    }
+
+    template HPX_EXPORT
+    void locality::save(util::portable_binary_oarchive&, const unsigned int) const;
+
+    template HPX_EXPORT
+    void locality::load(util::portable_binary_iarchive&, const unsigned int);
 }}

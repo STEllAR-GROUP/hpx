@@ -9,10 +9,6 @@
 #if !defined(HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM)
 #define HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM
 
-#include <boost/serialization/split_member.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/version.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -21,6 +17,11 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
 #include <hpx/util/binary_filter.hpp>
+
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/is_bitwise_serializable.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/assert.hpp>

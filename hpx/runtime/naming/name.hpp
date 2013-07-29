@@ -1,5 +1,5 @@
-//  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -235,7 +235,10 @@ namespace hpx { namespace naming
         template <typename Archive>
         void serialize(Archive & ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::make_array(this, 1);
+            if(ar.flags() & util::disable_array_optimization)
+                ar & id_msb_ & id_lsb_;
+            else
+                ar & boost::serialization::make_array(this, 1);
         }
 
         // actual gid

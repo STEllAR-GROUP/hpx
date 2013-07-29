@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,24 @@
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
+#include <boost/serialization/is_bitwise_serializable.hpp>
+#include <boost/serialization/array.hpp>
+
+#include <boost/mpl/bool.hpp>
+
+namespace hpx { namespace naming { namespace detail
+{
+    struct gid_serialization_data;
+}}}
+
+namespace boost { namespace serialization
+{
+    template <>
+    struct is_bitwise_serializable<
+            hpx::naming::detail::gid_serialization_data>
+       : boost::mpl::true_
+    {};
+}}
 
 namespace hpx { namespace naming
 {
@@ -160,8 +178,7 @@ namespace hpx { namespace naming
                     // the split gid. In the worst case this will cause a
                     // memory leak. I'm not sure if it is possible to reliably
                     // handle this problem.
-                    naming::resolver_client& resolver =
-                        naming::get_agas_client();
+                    naming::resolver_client& resolver = naming::get_agas_client();
                     resolver.incref_apply(*this, *this, HPX_INITIAL_GLOBALCREDIT * 2);
                 }
                 return newid;
@@ -171,30 +188,47 @@ namespace hpx { namespace naming
             return *this;
         }
 
+        struct gid_serialization_data
+        {
+            gid_type gid_;
+            boost::uint16_t type_;
+        };
+
         // serialization
         template <typename Archive>
         void id_type_impl::save(Archive& ar, const unsigned int version) const
         {
-            naming::gid_type split_id(prepare_gid());
-            ar << split_id << type_;
+            if(ar.flags() & util::disable_array_optimization) {
+                naming::gid_type split_id(prepare_gid());
+                ar << split_id << type_;
+            }
+            else {
+                gid_serialization_data data;
+                data.gid_ = prepare_gid();
+                data.type_ = type_;
+                ar << boost::serialization::make_array(&data, 1);
+            }
         }
 
         template <typename Archive>
         void id_type_impl::load(Archive& ar, const unsigned int version)
         {
-            // serialize base class
-            ar >> static_cast<gid_type&>(*this);
+            if(ar.flags() & util::disable_array_optimization) {
+                // serialize base class and management type
+                ar >> static_cast<gid_type&>(*this);
+                ar >> type_;
+            }
+            else {
+                gid_serialization_data data;
+                ar >> boost::serialization::make_array(&data, 1);
+                static_cast<gid_type&>(*this) = data.gid_;
+                type_ = static_cast<id_type_management>(data.type_);
+            }
 
-            // serialize management type
-            id_type_management m;
-            ar >> m;
-
-            if (detail::unmanaged != m && detail::managed != m) {
+            if (detail::unmanaged != type_ && detail::managed != type_) {
                 HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
                     "trying to load id_type with unknown deleter");
             }
-
-            type_ = m;
         }
 
         // explicit instantiation for the correct archive types

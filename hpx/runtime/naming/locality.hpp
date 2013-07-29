@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,6 +28,9 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
+#include <boost/serialization/is_bitwise_serializable.hpp>
+#include <boost/serialization/array.hpp>
+#include <boost/mpl/bool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -133,8 +136,7 @@ namespace hpx { namespace naming
             if(util::mpi_environment::enabled())
                 return lhs.rank_ == rhs.rank_;
 #endif
-            return
-                lhs.port_ == rhs.port_ && lhs.address_ == rhs.address_;
+            return lhs.port_ == rhs.port_ && lhs.address_ == rhs.address_;
         }
 
         friend bool operator!=(locality const& lhs, locality const& rhs)
@@ -160,16 +162,26 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         operator util::safe_bool<locality>::result_type() const
         {
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            return util::safe_bool<locality>()(
+                port_ != boost::uint16_t(-1) || rank_ != -1);
+#else
             return util::safe_bool<locality>()(port_ != boost::uint16_t(-1));
+#endif
         }
 
         std::string const& get_address() const { return address_; }
+        void set_address(char const* address) { address_ = address; }
+
         boost::uint16_t get_port() const { return port_; }
+        void set_port(boost::uint16_t port) { port_ = port; }
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-        int get_rank() const { return rank_; }
+        boost::int16_t get_rank() const { return rank_; }
+        void set_rank(boost::int16_t rank) { rank_ = rank; }
 #else
-        int get_rank() const { return -1; }
+        boost::int16_t get_rank() const { return -1; }
+        void set_rank(boost::int16_t rank) {}
 #endif
 
         parcelset::connection_type get_type() const
@@ -187,63 +199,19 @@ namespace hpx { namespace naming
         // serialization support
         friend class boost::serialization::access;
 
-        template<class Archive>
-        void save(Archive & ar, const unsigned int version) const
-        {
-            ar << address_;
-            ar << port_;
+        template <typename Archive>
+        void save(Archive& ar, const unsigned int version) const;
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-            BOOST_ASSERT(HPX_LOCALITY_VERSION_MPI == version);
-            ar << rank_;
-#endif
-        }
+        template <typename Archive>
+        void load(Archive& ar, const unsigned int version);
 
-        template<class Archive>
-        void load(Archive & ar, const unsigned int version)
-        {
-            if (version > HPX_LOCALITY_VERSION_MPI)
-            {
-                HPX_THROW_EXCEPTION(version_too_new,
-                    "locality::load",
-                    "trying to load locality with unknown version");
-                return;
-            }
-
-            ar >> address_;
-            ar >> port_;
-
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-            // try to read rank only if the sender knows about MPI
-            if (version > HPX_LOCALITY_VERSION_NO_MPI)
-                ar >> rank_;
-#else
-            // account for the additional rank
-            if (version > HPX_LOCALITY_VERSION_NO_MPI)
-            {
-                int rank = -1;
-                ar >> rank;
-
-                if (rank != -1) {
-                // FIXME: we might have received a locality which is of
-                // no use to us as this locality is not configured to
-                // support MPI.
-                    HPX_THROW_EXCEPTION(version_unknown,
-                        "locality::load",
-                        "load locality with valid rank while MPI was "
-                            "not configured");
-                }
-                return;
-            }
-#endif
-        }
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
         std::string address_;
         boost::uint16_t port_;
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-        int rank_;
+        boost::int16_t rank_;
 #endif
     };
 
@@ -279,6 +247,47 @@ namespace hpx { namespace naming
     {
         return locality::iterator_type();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        struct locality_serialization_data
+        {
+            char name_[64];         // we assume 64 bytes as an arbitrary maximum
+            boost::uint16_t port_;
+            boost::int16_t rank_;
+        };
+
+        inline void fill_serialization_data(locality const& l,
+            detail::locality_serialization_data& data)
+        {
+            std::string const& address = l.get_address();
+            BOOST_ASSERT(address.size() < sizeof(data.name_));
+            std::size_t len = (std::min)(address.size(), sizeof(data.name_)-1);
+            std::strncpy(data.name_, address.c_str(), len);
+            data.name_[len] = '\0';
+            data.port_ = l.get_port();
+            data.rank_ = l.get_rank();
+        }
+
+        inline void fill_from_serialization_data(
+            detail::locality_serialization_data const& data,
+            locality& l)
+        {
+            l.set_address(data.name_);
+            l.set_port(data.port_);
+            l.set_rank(data.rank_);
+        }
+    }
+}}
+
+namespace boost { namespace serialization
+{
+    template <>
+    struct is_bitwise_serializable<
+            hpx::naming::detail::locality_serialization_data>
+       : boost::mpl::true_
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

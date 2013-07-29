@@ -53,6 +53,8 @@
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/extended_type_info.hpp>
 #include <boost/serialization/extended_type_info_typeid.hpp>
+#include <boost/serialization/is_bitwise_serializable.hpp>
+#include <boost/serialization/array.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_convertible.hpp>
@@ -68,6 +70,30 @@
 #include <boost/preprocessor/cat.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+/// \cond NOINTERNAL
+namespace hpx { namespace actions { namespace detail
+{
+    struct action_serialization_data
+    {
+        boost::uint64_t parent_id_;
+        boost::uint64_t parent_phase_;
+        boost::uint32_t parent_locality_;
+        boost::uint16_t priority_;
+        boost::uint16_t stacksize_;
+    };
+}}}
+
+namespace boost { namespace serialization
+{
+    template <>
+    struct is_bitwise_serializable<
+            hpx::actions::detail::action_serialization_data>
+       : boost::mpl::true_
+    {};
+}}
+
+/// \endcond
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -599,25 +625,73 @@ namespace hpx { namespace actions
         // serialization support
         friend class boost::serialization::access;
 
-        template <class Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int /*version*/)
+        template <typename Archive>
+        BOOST_FORCEINLINE void load(Archive& ar, const unsigned int /*version*/)
         {
             util::serialize_sequence(ar, arguments_);
 
             // Always serialize the parent information to maintain binary 
             // compatibility on the wire.
+
+            if (ar.flags() & util::disable_array_optimization) {
+#if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+                boost::uint32_t parent_locality_ = naming::invalid_locality_id;
+                boost::uint64_t parent_id_ = boost::uint64_t(-1);
+                boost::uint64_t parent_phase_ = 0;
+#endif
+                ar >> parent_locality_;
+                ar >> parent_id_;
+                ar >> parent_phase_;
+
+                ar >> priority_;
+                ar >> stacksize_;
+            }
+            else {
+                detail::action_serialization_data data;
+                ar >> boost::serialization::make_array(&data, 1);
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+                parent_id_ = data.parent_id_;
+                parent_phase_ = data.parent_phase_;
+                parent_locality_ = data.parent_locality_;
+#endif
+                priority_ = static_cast<threads::thread_priority>(data.priority_);
+                stacksize_ = static_cast<threads::thread_stacksize>(data.stacksize_);
+            }
+        }
+
+        template <typename Archive>
+        BOOST_FORCEINLINE void save(Archive& ar, const unsigned int /*version*/) const
+        {
+            util::serialize_sequence(ar, arguments_);
+
+            // Always serialize the parent information to maintain binary 
+            // compatibility on the wire.
+
 #if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             boost::uint32_t parent_locality_ = naming::invalid_locality_id;
             boost::uint64_t parent_id_ = boost::uint64_t(-1);
             boost::uint64_t parent_phase_ = 0;
 #endif
-            ar & parent_locality_;
-            ar & parent_id_;
-            ar & parent_phase_;
+            if (ar.flags() & util::disable_array_optimization) {
+                ar << parent_locality_;
+                ar << parent_id_;
+                ar << parent_phase_;
 
-            ar & priority_;
-            ar & stacksize_;
+                ar << priority_;
+                ar << stacksize_;
+            }
+            else {
+                detail::action_serialization_data data;
+                data.parent_id_ = parent_id_;
+                data.parent_phase_ = parent_phase_;
+                data.parent_locality_ = parent_locality_;
+                data.priority_ = priority_;
+                data.stacksize_ = stacksize_;
+                ar << boost::serialization::make_array(&data, 1);
+            }
         }
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     private:
         static boost::uint32_t get_locality_id()
@@ -628,6 +702,7 @@ namespace hpx { namespace actions
 
     protected:
         arguments_type arguments_;
+
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         boost::uint32_t parent_locality_;
         boost::uint64_t parent_id_;
