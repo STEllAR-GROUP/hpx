@@ -218,8 +218,8 @@ along with a brief explanation.
       (default: `OFF`). Even if this is set to `OFF` (i.e. logging is supported)
       you need to enable logging when running any __hpx__ application. Logging
       support introducied a minimal runtime overhead which usually can be ignored.
-      This option allows to remove this runtime overhead but by doing so disables
-      the capability to extract detailed runtime information in case of errors.]
+      This option removes runtime overhead but also disables
+      the capability to extract detailed runtime error information.]
     ]
     [[`HPX_HAVE_CXX11:BOOL`]
      [Sets whether __hpx__ should use C++11 support, if available (default: `ON`).]
