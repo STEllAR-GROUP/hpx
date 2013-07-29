@@ -8,10 +8,13 @@
 #if !defined(HPX_RUNTIME_ACTIONS_ACTION_FACTORY_HPP)
 #define HPX_RUNTIME_ACTIONS_ACTION_FACTORY_HPP
 
+#include <hpx/hpx_fwd.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/cstdint.hpp>
 #include <map>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace traits {
     // This trait is used to decide whether a class (or specialization) is
@@ -42,7 +45,7 @@ namespace hpx { namespace actions {
 
         private:
             void add_action(std::string const & name, ctor_type ctor);
-            static HPX_ALWAYS_EXPORT action_factory & get_instance();
+            static action_factory& get_instance();
 
             ctor_map ctor_map_;
 
@@ -102,6 +105,8 @@ namespace hpx { namespace actions {
         }
     };
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #define HPX_ACTION_REGISTER_ACTION_FACTORY(Action, Name)                        \
     static ::hpx::actions::action_registration<Action>                          \

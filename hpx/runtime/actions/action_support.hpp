@@ -237,7 +237,7 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             threads::thread_init_data& data) = 0;
 
-        /// Return a pointer to the filter to be used while serializing an 
+        /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
         virtual util::binary_filter* get_serialization_filter(
             parcelset::parcel const& p) const = 0;
@@ -432,7 +432,7 @@ namespace hpx { namespace actions
         {
             return detail::get_action_name<derived_type>();
         }
-        
+
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
         action_type get_action_type() const
@@ -580,7 +580,7 @@ namespace hpx { namespace actions
             return data;
         }
 
-        /// Return a pointer to the filter to be used while serializing an 
+        /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
         util::binary_filter* get_serialization_filter(
             parcelset::parcel const& p) const
@@ -622,7 +622,7 @@ namespace hpx { namespace actions
         {
             util::serialize_sequence(ar, arguments_);
 
-            // Always serialize the parent information to maintain binary 
+            // Always serialize the parent information to maintain binary
             // compatibility on the wire.
 
             if (ar.flags() & util::disable_array_optimization) {
@@ -655,7 +655,7 @@ namespace hpx { namespace actions
         {
             util::serialize_sequence(ar, arguments_);
 
-            // Always serialize the parent information to maintain binary 
+            // Always serialize the parent information to maintain binary
             // compatibility on the wire.
 
 #if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
@@ -703,7 +703,8 @@ namespace hpx { namespace actions
 
     template <typename Action>
     automatic_action_registration<transfer_action<Action> > const
-        transfer_action<Action>::register_action = automatic_action_registration<transfer_action<Action> >().register_action();
+        transfer_action<Action>::register_action =
+            automatic_action_registration<transfer_action<Action> >().register_action();
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N, typename Action>
@@ -861,12 +862,12 @@ namespace hpx { namespace actions
             return base_action::plain_action;
         }
 
-        /// Enable hooking into the execution of all actions. This function is 
+        /// Enable hooking into the execution of all actions. This function is
         /// called for each thread function which is to be returned to the applier.
         ///
         /// This allows to hook into the execution of all actions for a particular
         /// component type.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         decorate_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type lva)
         {
@@ -1064,7 +1065,8 @@ namespace hpx { namespace actions
     HPX_REGISTER_ACTION_2(action, action)                                     \
 /**/
 #define HPX_REGISTER_ACTION_2(action, actionname)                             \
-    HPX_ACTION_REGISTER_ACTION_FACTORY(hpx::actions::transfer_action<action>, actionname)                    \
+    HPX_ACTION_REGISTER_ACTION_FACTORY(hpx::actions::transfer_action<action>, \
+        actionname)                                                           \
     HPX_DEFINE_GET_ACTION_NAME_(action, actionname)                           \
 /**/
 
@@ -1098,7 +1100,8 @@ namespace hpx { namespace actions
         hpx::actions::transfer_action<action>)                                \
 /**/
 
-namespace hpx { namespace actions {
+namespace hpx { namespace actions
+{
     template <typename Action>
     struct init_registration;
 
@@ -1108,12 +1111,12 @@ namespace hpx { namespace actions {
         static automatic_action_registration<transfer_action<Action> > const & g;
     };
 
-
     template <typename Action>
-    automatic_action_registration<transfer_action<Action> > const & init_registration<transfer_action<Action> >::g
-    = ::boost::serialization::singleton<
-        automatic_action_registration<transfer_action<Action> >
-    >::get_mutable_instance().register_action();
+    automatic_action_registration<transfer_action<Action> > const&
+        init_registration<transfer_action<Action> >::g =
+            ::boost::serialization::singleton<
+                automatic_action_registration<transfer_action<Action> >
+            >::get_mutable_instance().register_action();
 }}
 
 #if 0 //WIP
@@ -1216,13 +1219,13 @@ namespace hpx { namespace actions {
 ///
 /// The parameter \a action is the type of the action to declare the
 /// boilerplate for.
-/// 
+///
 /// This macro can be invoked with an optional second parameter. This parameter
-/// specifies a unique name of the action to be used for serialization purposes. 
-/// The second parameter has to be specified if the first parameter is not 
+/// specifies a unique name of the action to be used for serialization purposes.
+/// The second parameter has to be specified if the first parameter is not
 /// usable as a plain (non-qualified) C++ identifier, i.e. the first parameter
-/// contains special characters which cannot be part of a C++ identifier, such 
-/// as '<', '>', or ':'. 
+/// contains special characters which cannot be part of a C++ identifier, such
+/// as '<', '>', or ':'.
 ///
 /// \par Example:
 ///
@@ -1327,13 +1330,13 @@ namespace hpx { namespace actions {
 ///
 /// The parameter \a action is the type of the action to define the
 /// boilerplate for.
-/// 
+///
 /// This macro can be invoked with an optional second parameter. This parameter
-/// specifies a unique name of the action to be used for serialization purposes. 
-/// The second parameter has to be specified if the first parameter is not 
+/// specifies a unique name of the action to be used for serialization purposes.
+/// The second parameter has to be specified if the first parameter is not
 /// usable as a plain (non-qualified) C++ identifier, i.e. the first parameter
-/// contains special characters which cannot be part of a C++ identifier, such 
-/// as '<', '>', or ':'. 
+/// contains special characters which cannot be part of a C++ identifier, such
+/// as '<', '>', or ':'.
 ///
 /// \note This macro has to be used once for each of the component actions
 /// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION macros. It has to
