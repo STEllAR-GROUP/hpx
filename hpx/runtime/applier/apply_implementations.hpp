@@ -205,8 +205,7 @@ namespace hpx
 
         std::size_t count = ids.size();
         gids.reserve(count);
-        addrs.resize(count);
-        if (agas::is_local_address(ids.data(), addrs.data(), count, locals)) {
+        if (agas::is_local_address(ids, addrs, locals)) {
             // at least one destination is local
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i)) {
