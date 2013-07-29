@@ -1103,14 +1103,7 @@ namespace hpx { namespace actions
         hpx::actions::transfer_action<action>)                                \
 /**/
 
-<<<<<<< Updated upstream
-namespace hpx { namespace actions
-{
-    template <typename Action>
-    struct init_registration;
-=======
 namespace hpx { namespace actions {
->>>>>>> Stashed changes
 
     template <typename Action>
     struct init_registration<transfer_action<Action> >
@@ -1119,17 +1112,9 @@ namespace hpx { namespace actions {
     };
 
     template <typename Action>
-<<<<<<< Updated upstream
-    automatic_action_registration<transfer_action<Action> > const&
-        init_registration<transfer_action<Action> >::g =
-            ::boost::serialization::singleton<
-                automatic_action_registration<transfer_action<Action> >
-            >::get_mutable_instance().register_action();
-=======
     automatic_action_registration<transfer_action<Action> >
         init_registration<transfer_action<Action> >::g
             = automatic_action_registration<transfer_action<Action> >();
->>>>>>> Stashed changes
 }}
 
 #if 0 //WIP
