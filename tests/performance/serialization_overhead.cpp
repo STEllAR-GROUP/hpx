@@ -23,9 +23,9 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations)
 {
     hpx::naming::gid_type here = hpx::find_here().get_gid();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid, &test_function);
+        hpx::components::component_invalid, reinterpret_cast<boost::uint64_t>(&test_function));
 
-    // copose archive flags
+    // compose archive flags
 #ifdef BOOST_BIG_ENDIAN
     std::string endian_out =
         hpx::get_config_entry("hpx.parcel.endian_out", "big");
