@@ -6,6 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/runtime/actions/polymorphic_factory.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/serialize_intrusive_ptr.hpp>
@@ -53,15 +54,41 @@ namespace hpx { namespace parcelset
 
             // If we have a continuation, serialize it.
             if (has_continuation) {
-                actions::continuation const* c = continuation_.get();
-                ar << c;
+                std::string continuation_name = continuation_->get_continuation_name();
+                ar << continuation_name;
+
+                continuation_->save(ar);
+            }
+        }
+
+        template <typename Archive>
+        void parcel_data::load(Archive& ar, bool has_source_id, bool has_continuation)
+        {
+            // Check for a source id.
+            if (has_source_id)
+                ar >> source_id_;
+
+            std::string action_name;
+            ar >> action_name;
+
+            action_ = actions::polymorphic_factory<
+                actions::base_action>::create(action_name);
+            action_->load(ar);
+
+            // handle continuation.
+            if (has_continuation) {
+                std::string continuation_name;
+                ar >> continuation_name;
+
+                continuation_ = actions::polymorphic_factory<
+                    actions::continuation>::create(continuation_name);
+                continuation_->load(ar);
             }
         }
 
         ///////////////////////////////////////////////////////////////////////////
         template <typename Archive>
-        void single_destination_parcel_data::save_optimized(Archive& ar,
-            const unsigned int version, boost::mpl::true_) const
+        void single_destination_parcel_data::save_optimized(Archive& ar) const
         {
             data_.has_source_id_ = source_id_ ? true : false;
 
@@ -73,8 +100,7 @@ namespace hpx { namespace parcelset
         }
 
         template <typename Archive>
-        void single_destination_parcel_data::save_optimized(Archive& ar,
-            const unsigned int version, boost::mpl::false_) const
+        void single_destination_parcel_data::save_normal(Archive& ar) const
         {
             data_.has_source_id_ = source_id_ ? true : false;
 
@@ -94,41 +120,15 @@ namespace hpx { namespace parcelset
         void single_destination_parcel_data::save(Archive& ar,
             const unsigned int version) const
         {
-            if(ar.flags() & util::disable_array_optimization)
-            {
-                save_optimized(ar, version, boost::mpl::false_());
-            }
+            if (ar.flags() & util::disable_array_optimization)
+                save_normal(ar);
             else
-            {
-                save_optimized(ar, version, boost::mpl::true_());
-            }
+                save_optimized(ar);
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
-        void parcel_data::load(Archive& ar, bool has_source_id, bool has_continuation)
-        {
-            // Check for a source id.
-            if (has_source_id)
-                ar >> source_id_;
-
-            std::string action_name;
-            ar >> action_name;
-
-            action_ = actions::action_factory::create(action_name);
-            action_->load(ar);
-
-            // handle continuation.
-            if (has_continuation) {
-                actions::continuation* c = 0;
-                ar >> c;
-                continuation_.reset(c);
-            }
-        }
-
-        template <typename Archive>
-        void single_destination_parcel_data::load_optimized(Archive & ar,
-            const unsigned int version, boost::mpl::true_)
+        void single_destination_parcel_data::load_optimized(Archive & ar)
         {
             ar >> boost::serialization::make_array(&data_, 1);
             ar >> addr_;
@@ -138,8 +138,7 @@ namespace hpx { namespace parcelset
         }
 
         template <typename Archive>
-        void single_destination_parcel_data::load_optimized(Archive & ar,
-            const unsigned int version, boost::mpl::false_)
+        void single_destination_parcel_data::load_normal(Archive & ar)
         {
             ar >> data_.parcel_id_;
             ar >> data_.start_time_ >> data_.creation_time_;
@@ -164,20 +163,15 @@ namespace hpx { namespace parcelset
                     "trying to load parcel with unknown version");
             }
 
-            if(ar.flags() & util::disable_array_optimization)
-            {
-                load_optimized(ar, version, boost::mpl::false_());
-            }
+            if (ar.flags() & util::disable_array_optimization)
+                load_normal(ar);
             else
-            {
-                load_optimized(ar, version, boost::mpl::true_());
-            }
+                load_optimized(ar);
         }
 
         ///////////////////////////////////////////////////////////////////////////
         template <typename Archive>
-        void multi_destination_parcel_data::save_optimized(Archive& ar,
-            const unsigned int version, boost::mpl::true_) const
+        void multi_destination_parcel_data::save_optimized(Archive& ar) const
         {
             data_.has_source_id_ = source_id_ ? true : false;
 
@@ -189,8 +183,7 @@ namespace hpx { namespace parcelset
         }
 
         template <typename Archive>
-        void multi_destination_parcel_data::save_optimized(Archive& ar,
-            const unsigned int version, boost::mpl::false_) const
+        void multi_destination_parcel_data::save_normal(Archive& ar) const
         {
             data_.has_source_id_ = source_id_ ? true : false;
 
@@ -208,20 +201,15 @@ namespace hpx { namespace parcelset
         void multi_destination_parcel_data::save(Archive& ar,
             const unsigned int version) const
         {
-            if(ar.flags() & util::disable_array_optimization)
-            {
-                save_optimized(ar, version, boost::mpl::false_());
-            }
+            if (ar.flags() & util::disable_array_optimization)
+                save_normal(ar);
             else
-            {
-                save_optimized(ar, version, boost::mpl::true_());
-            }
+                save_optimized(ar);
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Archive>
-        void multi_destination_parcel_data::load_optimized(Archive & ar,
-            const unsigned int version, boost::mpl::true_)
+        void multi_destination_parcel_data::load_optimized(Archive& ar)
         {
             ar >> boost::serialization::make_array(&data_, 1);
             ar >> dests_ >> addrs_;
@@ -231,8 +219,7 @@ namespace hpx { namespace parcelset
         }
 
         template <typename Archive>
-        void multi_destination_parcel_data::load_optimized(Archive & ar,
-            const unsigned int version, boost::mpl::false_)
+        void multi_destination_parcel_data::load_normal(Archive& ar)
         {
             ar >> data_.parcel_id_;
             ar >> data_.start_time_ >> data_.creation_time_;
@@ -245,7 +232,7 @@ namespace hpx { namespace parcelset
         }
 
         template <typename Archive>
-        void multi_destination_parcel_data::load(Archive & ar,
+        void multi_destination_parcel_data::load(Archive& ar,
             const unsigned int version)
         {
             if (version > HPX_PARCEL_VERSION)
@@ -255,14 +242,10 @@ namespace hpx { namespace parcelset
                     "trying to load parcel with unknown version");
             }
 
-            if(ar.flags() & util::disable_array_optimization)
-            {
-                load_optimized(ar, version, boost::mpl::false_());
-            }
+            if (ar.flags() & util::disable_array_optimization)
+                load_normal(ar);
             else
-            {
-                load_optimized(ar, version, boost::mpl::true_());
-            }
+                load_optimized(ar);
         }
 
         ///////////////////////////////////////////////////////////////////////

@@ -323,21 +323,17 @@ namespace hpx { namespace parcelset
             friend class boost::serialization::access;
 
             template <typename Archive>
-            void save_optimized(Archive& ar, const unsigned int version,
-                boost::mpl::false_) const;
+            void save_optimized(Archive& ar) const;
             template <typename Archive>
-            void save_optimized(Archive& ar, const unsigned int version,
-                boost::mpl::true_) const;
+            void save_normal(Archive& ar) const;
 
             template <typename Archive>
             void save(Archive& ar, const unsigned int version) const;
 
             template <typename Archive>
-            void load_optimized(Archive& ar, const unsigned int version,
-                boost::mpl::false_);
+            void load_optimized(Archive& ar);
             template <typename Archive>
-            void load_optimized(Archive& ar, const unsigned int version,
-                boost::mpl::true_);
+            void load_normal(Archive& ar);
 
             template <typename Archive>
             void load(Archive& ar, const unsigned int version);
@@ -503,18 +499,14 @@ namespace hpx { namespace parcelset
             friend class boost::serialization::access;
 
             template <typename Archive>
-            void save_optimized(Archive& ar, const unsigned int version,
-                boost::mpl::false_) const;
+            void save_optimized(Archive& ar) const;
             template <typename Archive>
-            void save_optimized(Archive& ar, const unsigned int version,
-                boost::mpl::true_) const;
+            void save_normal(Archive& ar) const;
 
             template <typename Archive>
-            void load_optimized(Archive& ar, const unsigned int version,
-                boost::mpl::false_);
+            void load_optimized(Archive& ar);
             template <typename Archive>
-            void load_optimized(Archive& ar, const unsigned int version,
-                boost::mpl::true_);
+            void load_normal(Archive& ar);
 
             template <typename Archive>
             void save(Archive& ar, const unsigned int version) const;

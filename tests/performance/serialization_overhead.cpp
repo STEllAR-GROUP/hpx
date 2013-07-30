@@ -13,15 +13,18 @@
 #include <boost/format.hpp>
 
 // This function will never be called
-void test_function(hpx::util::serialize_buffer<double> const& b)
+int test_function(hpx::util::serialize_buffer<double> const& b)
 {
+    return 42;
 }
 HPX_PLAIN_ACTION(test_function, test_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-double benchmark_serialization(std::size_t data_size, std::size_t iterations)
+double benchmark_serialization(std::size_t data_size, std::size_t iterations,
+    bool continuation)
 {
-    hpx::naming::gid_type here = hpx::find_here().get_gid();
+    hpx::naming::id_type const here_id = hpx::find_here();
+    hpx::naming::gid_type here = here_id.get_gid();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
         reinterpret_cast<boost::uint64_t>(&test_function));
@@ -60,10 +63,19 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations)
     hpx::util::serialize_buffer<double> buffer(data.data(), data.size(),
         hpx::util::serialize_buffer<double>::reference);
 
-    // create a parcel without continuation
-    hpx::parcelset::parcel outp (here, addr,
-        new hpx::actions::transfer_action<test_action>(
-            hpx::threads::thread_priority_normal, buffer));
+    // create a parcel with/without continuation
+    hpx::parcelset::parcel outp;
+    if (continuation) {
+        outp = hpx::parcelset::parcel(here, addr,
+            new hpx::actions::transfer_action<test_action>(
+                hpx::threads::thread_priority_normal, buffer),
+            new hpx::actions::typed_continuation<int>(here_id));
+    }
+    else {
+        outp = hpx::parcelset::parcel(here, addr,
+            new hpx::actions::transfer_action<test_action>(
+                hpx::threads::thread_priority_normal, buffer));
+    }
 
     hpx::util::high_resolution_timer t;
 
@@ -105,12 +117,13 @@ std::size_t concurrency = 1;
 int hpx_main(boost::program_options::variables_map& vm)
 {
     bool print_header = (vm.count("no-header") == 0) ? true : false;
+    bool continuation = (vm.count("continuation") != 0) ? true : false;
 
     std::vector<hpx::future<double> > timings;
     for (int i = 0; i != concurrency; ++i)
     {
-        timings.push_back(hpx::async(
-            hpx::util::bind(&benchmark_serialization, data_size, iterations)));
+        timings.push_back(hpx::async(hpx::util::bind(
+            &benchmark_serialization, data_size, iterations, continuation)));
     }
 
     double overall_time = 0;
@@ -144,6 +157,9 @@ int main(int argc, char* argv[])
         ( "iterations"
         , boost::program_options::value<std::size_t>(&iterations)->default_value(1000)
         , "number of iterations while measuring serialization overhead (default: 1000)")
+
+        ( "continuation"
+        , "add a continuation to each created parcel")
 
         ( "no-header"
         , "do not print out the csv header row")

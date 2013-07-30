@@ -116,14 +116,6 @@ namespace hpx { namespace components { namespace server
     {};
 }}}
 
-///////////////////////////////////////////////////////////////////////////////
-// Declaration of serialization support for the runtime_support actions
-HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
-    (template <typename Component
-        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)>)
-  , (hpx::components::server::BOOST_PP_CAT(create_component_action, N)<
-        Component BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)>))
-
 #undef N
 
 #endif  // !BOOST_PP_IS_ITERATING

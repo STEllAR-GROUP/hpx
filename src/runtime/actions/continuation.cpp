@@ -9,8 +9,6 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
-BOOST_CLASS_EXPORT(hpx::actions::continuation)
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {

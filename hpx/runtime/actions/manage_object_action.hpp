@@ -17,6 +17,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/util/void_cast.hpp>
+#include <hpx/util/base_object.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

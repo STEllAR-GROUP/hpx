@@ -26,7 +26,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/runtime/actions/action_factory.hpp>
+#include <hpx/runtime/actions/polymorphic_factory.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/demangle_helper.hpp>
@@ -96,6 +96,8 @@ namespace hpx { namespace actions
 {
     /// \cond NOINTERNAL
 
+    struct base_action;
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -119,7 +121,7 @@ namespace hpx { namespace actions
             /// but the header in which the action is defined misses a
             /// HPX_REGISTER_ACTION_DECLARATION
             BOOST_MPL_ASSERT_MSG(
-                traits::needs_guid_initialization<Action>::value
+                traits::needs_automatic_registration<Action>::value
               , HPX_REGISTER_ACTION_DECLARATION_MISSING
               , (Action)
             );
@@ -139,6 +141,53 @@ namespace hpx { namespace actions
         struct remote_action_result<lcos::future<Result> >
         {
             typedef Result type;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Action>
+        struct action_registration
+        {
+            static boost::shared_ptr<base_action> create()
+            {
+                return boost::shared_ptr<base_action>(new Action());
+            }
+
+            action_registration()
+            {
+                polymorphic_factory<base_action>::get_instance().
+                    add_factory_function(
+                        detail::get_action_name<typename Action::derived_type>()
+                      , &action_registration::create
+                    );
+            }
+        };
+
+        template <typename Action, typename Enable =
+            typename traits::needs_automatic_registration<Action>::type>
+        struct automatic_action_registration
+        {
+            automatic_action_registration()
+            {
+                action_registration<Action> auto_register;
+            }
+
+            automatic_action_registration & register_action()
+            {
+                return *this;
+            }
+        };
+
+        template <typename Action>
+        struct automatic_action_registration<Action, boost::mpl::false_>
+        {
+            automatic_action_registration()
+            {
+            }
+
+            automatic_action_registration & register_action()
+            {
+                return *this;
+            }
         };
     }
 
@@ -618,7 +667,7 @@ namespace hpx { namespace actions
         }
 
         /// action factory support
-        static automatic_action_registration<transfer_action> const register_action;
+        static detail::automatic_action_registration<transfer_action> const register_action;
 
         // serialization support
         void load(hpx::util::portable_binary_iarchive & ar)
@@ -705,9 +754,10 @@ namespace hpx { namespace actions
     };
 
     template <typename Action>
-    automatic_action_registration<transfer_action<Action> > const
+    detail::automatic_action_registration<transfer_action<Action> > const
         transfer_action<Action>::register_action =
-            automatic_action_registration<transfer_action<Action> >().register_action();
+            detail::automatic_action_registration<transfer_action<Action> >().
+                register_action();
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N, typename Action>
@@ -1059,6 +1109,12 @@ namespace hpx { namespace actions
     }}}                                                                       \
 /**/
 
+#define HPX_ACTION_REGISTER_ACTION_FACTORY(Action, Name)                      \
+    static ::hpx::actions::detail::action_registration<Action>                \
+        const BOOST_PP_CAT(Name, _action_factory_registration) =              \
+        ::hpx::actions::detail::action_registration<Action>();                \
+/**/
+
 #define HPX_REGISTER_ACTION_(...)                                             \
     HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
         HPX_REGISTER_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)                   \
@@ -1108,13 +1164,13 @@ namespace hpx { namespace actions
     template <typename Action>
     struct init_registration<transfer_action<Action> >
     {
-        static automatic_action_registration<transfer_action<Action> > g;
+        static detail::automatic_action_registration<transfer_action<Action> > g;
     };
 
     template <typename Action>
-    automatic_action_registration<transfer_action<Action> >
-        init_registration<transfer_action<Action> >::g
-            = automatic_action_registration<transfer_action<Action> >();
+    detail::automatic_action_registration<transfer_action<Action> >
+        init_registration<transfer_action<Action> >::g = 
+            detail::automatic_action_registration<transfer_action<Action> >();
 }}
 
 #if 0 //WIP
