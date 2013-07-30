@@ -569,6 +569,10 @@ namespace hpx { namespace actions
           : continuation(gid)
         {}
 
+        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid)
+          : continuation(boost::move(gid))
+        {}
+
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
                 BOOST_FWD_REF(F) f)
@@ -576,13 +580,19 @@ namespace hpx { namespace actions
         {}
 
         template <typename F>
+        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid,
+                BOOST_FWD_REF(F) f)
+          : continuation(boost::move(gid)), f_(boost::forward<F>(f))
+        {}
+
+        template <typename F>
         explicit typed_continuation(BOOST_FWD_REF(F) f)
           : f_(boost::forward<F>(f))
         {}
 
-        virtual ~typed_continuation()
+        ~typed_continuation()
         {
-            detail::guid_initialization<typed_continuation>();
+            init_registration<typed_continuation>::g.register_continuation();
         }
 
         void deferred_trigger(lcos::future<Result> result) const
@@ -615,27 +625,36 @@ namespace hpx { namespace actions
                     util::placeholders::_1));
         }
 
-        static void register_base()
+    private:
+        char const* get_continuation_name() const
         {
-            util::void_cast_register_nonvirt<typed_continuation, continuation>();
+            return detail::get_continuation_name<typed_continuation>();
         }
 
-    private:
         /// serialization support
-        friend class boost::serialization::access;
-        typedef continuation base_type;
-
-        template <class Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int /*version*/)
+        void load(hpx::util::portable_binary_iarchive& ar)
         {
+            // serialize base class
+            typedef continuation base_type;
+            this->base_type::load(ar);
+
+            // serialize function
+            bool have_function = false;
+            ar.load(have_function);
+            if (have_function)
+                ar >> f_;
+        }
+        void save(hpx::util::portable_binary_oarchive& ar) const
+        {
+            // serialize base class
+            typedef continuation base_type;
+            this->base_type::save(ar);
+
             // serialize function
             bool have_function = !f_.empty();
-            ar & have_function;
+            ar.save(have_function);
             if (have_function)
-                ar & f_;
-
-            // serialize base class
-            ar & util::base_object_nonvirt<base_type>(*this);
+                ar << f_;
         }
 
         util::function<void(naming::id_type, Result)> f_;
