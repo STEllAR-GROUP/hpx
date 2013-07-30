@@ -182,7 +182,7 @@
 [def __cmake_doc_tools__        [link hpx.manual.cmake.doc_tools Setting up the HPX Documentation Tool Chain]]
 [def __pkg_config__             [link hpx.manual.cmake.unix_comps_pkg_config How to Build __hpx__ Components with pkg-config]]
 
-[/ Do not add any whitespace between [str]and the template body, it ends upin the
+[/ Do not add any whitespace between [str]and the template body, it ends up in the
    generated docs, which may cause unwanted effects.]
 [template hpx_cmdline[str][link hpx.manual.init.commandline [str]]]
 

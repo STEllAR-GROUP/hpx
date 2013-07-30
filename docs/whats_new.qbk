@@ -482,15 +482,15 @@ approximately 80 tickets (bugs, feature requests, etc.).
   (possibly remote) action into a future.
 * [classref hpx::thread] and [classref hpx::lcos::future]`<>` are now cancelable.
 * Added support for sequential and logic composition of [classref hpx::lcos::future]`<>`'s.
-  The member function [memberref hpx::lcos::future::when]`()` allows to sequentially
-  compose futures, while the helper functions [funcref hpx::wait_all], [funcref hpx::wait_any],
+  The member function [memberref hpx::lcos::future::when]`()` permits futures to
+  be sequentially composed. The helper functions [funcref hpx::wait_all], [funcref hpx::wait_any],
   and [funcref hpx::wait_n] can be used to wait for more than one future at a time.
 * __hpx__ now exposes [funcref hpx::apply]`()` and [funcref hpx::async]`()` as the preferred way of
   creating (or invoking) any deferred work. These functions are usable with
   various types of functions, function objects, and actions and provide a
   uniform way to spawn deferred tasks.
-* __hpx__ now allows to utilize [funcref hpx::util::bind] to (partially) bind no only
-  local functions and function objects, but also actions. Remote bound actions
+* __hpx__ now utilizes [funcref hpx::util::bind] to (partially) bind 
+  local functions and function objects, and also actions. Remote bound actions
   can have placeholders as well.
 * __hpx__ continuations are now fully polymorphic. The class
   [classref hpx::actions::forwarding_continuation] is an example of how the user can

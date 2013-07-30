@@ -89,7 +89,7 @@ counter instance name.
 
 [heading:instances Performance Counter Instances]
 
-The `full_instancename` allows to distinguish different counter instances of
+The `full_instancename` distinguishes different counter instances of
 the same counter type. The formatting of the `full_instancename` depends on
 the counter type. There are two types of counters: simple counters which
 usually generate the counter values based on direct measurements, and

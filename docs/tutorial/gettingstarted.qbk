@@ -412,7 +412,7 @@ HPX_MALLOC as this is crucial for getting decent performance.
   `HWLOC_ROOT`. These (PATH) variables need to be set to point to the root
   folder of your __boost__ and __hwloc__ installations.
   It is recommended to set the variable `CMAKE_INSTALL_PREFIX` as
-  well. This allows to control where the built HPX libraries will be installed.
+  well. This determines where the HPX libraries will be built and installed.
   If this (PATH) variable is set, it has to refer to the directory where the
   built __hpx__ files should be installed to.
 * Press the "Configure" button. A window will pop up asking you which compilers

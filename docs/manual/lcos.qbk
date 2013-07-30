@@ -6,5 +6,66 @@
 =============================================================================/]
 
 [section:lcos Using LCOs]
+Lightweight Control Objects provide synchrhonization for HPX applications. Most
+of them are familiar from other frameworks, but a few of them work in slightly
+special different ways adapted to HPX.
+
+# future
+
+# queue
+
+# object_semaphore
+
+# barrier
+
+# and_gate 
+
+# barrier
+
+# channel
+
+# composable_guard - Composable guards operate in a manner similar to locks, but
+are applied only to asynchronous functions. The guard (or guards) is automatically
+locked at the beginning of a specified task and automatically unlocked at the end.
+Because guards are never added to an existing task's execution context, the calling
+of guards is freely composable and can never deadlock.
+
+To call an application with a single guard, simply declare the guard and call
+run_guarded() with a function (task).
+
+     hpx::lcos::local::guard gu;
+     run_guarded(gu,task);
+
+If a single method needs to run with multiple guards, use a guard set.
+
+     boost::shared<hpx::lcos::local::guard> gu1(new hpx::lcos::local::guard());
+     boost::shared<hpx::lcos::local::guard> gu2(new hpx::lcos::local::guard());
+     gs.add(*gu1);
+     gs.add(*gu2);
+     run_guarded(gs,task);
+
+Guards use two atomic operations (which are not called repeatedly)
+to manage what they do, so overhead should be extremely low.
+
+# conditional_trigger
+
+# counting_semaphore
+
+# dataflow
+
+# event
+
+# mutex
+
+# once
+
+# recursive_mutex
+
+# spinlock
+
+# spinlock_no_backoff
+
+trigger
+
 [endsect]
 

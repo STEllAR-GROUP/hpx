@@ -166,9 +166,8 @@ should be the same as used for the second argument to the macro
 above.
 
 Additionally a file `.hpx.ini` which could be located in the current working
-directory (see step 3 as described in the section __loading_ini__) allows to
-add the directory to the ini search path where the above ini file specific to
-the component is located:
+directory (see step 3 as described in the section __loading_ini__) can
+be used to add to the ini search path for components:
 
 [teletype]
 ``

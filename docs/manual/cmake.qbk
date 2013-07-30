@@ -218,8 +218,8 @@ along with a brief explanation.
       (default: `OFF`). Even if this is set to `OFF` (i.e. logging is supported)
       you need to enable logging when running any __hpx__ application. Logging
       support introduces a minimal runtime overhead which usually can be ignored.
-      This option allows to remove this runtime overhead but by doing so disables
-      the capability to extract detailed runtime information in case of errors.]
+      This option removes runtime overhead but also disables
+      the capability to extract detailed runtime error information.]
     ]
     [[`HPX_HAVE_CXX11:BOOL`]
      [Sets whether __hpx__ should use C++11 support, if available (default: `ON`).]
@@ -337,7 +337,7 @@ variables are used more seldom and are mainly useful for debugging purposes.
       below).]
     ]
     [[`HPX_AUTOMATIC_PREPROCESSING:BOOL`]
-     [Sets whether the generated makefiles should allow to regenerate the
+     [Sets whether the generated makefiles should regenerate the
       partially preprocessed files that are part of __hpx__. The default value
       for this option is `OFF`. This option can be enabled only if the
       __boost_wave__ tool is available (see CMake variable `BOOSTWAVE` below).]

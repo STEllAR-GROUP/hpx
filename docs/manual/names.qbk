@@ -31,7 +31,7 @@ data type. This data type is conceptually very similar to `void*` pointers as
 it does not expose any type information of the object it is referring to.
 
 The only predefined global addresses are assigned to all localities. The
-following __hpx__ API functions allow to retrieve the global addresses of
+following __hpx__ API functions allow one to retrieve the global addresses of
 localities:
 
 * [funcref hpx::find_here() `hpx::find_here()`]: retrieve the global address
