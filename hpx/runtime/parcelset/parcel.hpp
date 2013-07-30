@@ -315,30 +315,26 @@ namespace hpx { namespace parcelset
                 return sizeof(parcel_buffer) + this->get_action()->get_type_size();
             }
 
+            template <typename Archive>
+            void save(Archive& ar) const;
+
+            template <typename Archive>
+            void load(Archive& ar);
+
         private:
             friend std::ostream& operator<< (std::ostream& os,
                 single_destination_parcel_data const& req);
 
             // serialization support
-            friend class boost::serialization::access;
-
             template <typename Archive>
             void save_optimized(Archive& ar) const;
             template <typename Archive>
             void save_normal(Archive& ar) const;
 
             template <typename Archive>
-            void save(Archive& ar, const unsigned int version) const;
-
-            template <typename Archive>
             void load_optimized(Archive& ar);
             template <typename Archive>
             void load_normal(Archive& ar);
-
-            template <typename Archive>
-            void load(Archive& ar, const unsigned int version);
-
-            BOOST_SERIALIZATION_SPLIT_MEMBER()
 
         private:
             // the parcel data is wrapped into a separate struct to simplify
@@ -491,13 +487,17 @@ namespace hpx { namespace parcelset
                     this->get_action()->get_type_size();      // action
             }
 
+            template <typename Archive>
+            void save(Archive& ar) const;
+
+            template <typename Archive>
+            void load(Archive& ar);
+
         private:
             friend std::ostream& operator<< (std::ostream& os,
                 multi_destination_parcel_data const& req);
 
             // serialization support
-            friend class boost::serialization::access;
-
             template <typename Archive>
             void save_optimized(Archive& ar) const;
             template <typename Archive>
@@ -507,14 +507,6 @@ namespace hpx { namespace parcelset
             void load_optimized(Archive& ar);
             template <typename Archive>
             void load_normal(Archive& ar);
-
-            template <typename Archive>
-            void save(Archive& ar, const unsigned int version) const;
-
-            template <typename Archive>
-            void load(Archive& ar, const unsigned int version);
-
-            BOOST_SERIALIZATION_SPLIT_MEMBER()
 
         private:
             // the parcel data is wrapped into a separate struct to simplify

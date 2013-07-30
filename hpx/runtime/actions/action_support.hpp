@@ -689,7 +689,8 @@ namespace hpx { namespace actions
             }
             else {
                 detail::action_serialization_data data;
-                ar >> boost::serialization::make_array(&data, 1);
+                ar.load(data);
+
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
                 parent_id_ = data.parent_id_;
                 parent_phase_ = data.parent_phase_;
@@ -727,7 +728,8 @@ namespace hpx { namespace actions
                 data.parent_locality_ = parent_locality_;
                 data.priority_ = priority_;
                 data.stacksize_ = stacksize_;
-                ar << boost::serialization::make_array(&data, 1);
+
+                ar.save(data);
             }
         }
 

@@ -195,6 +195,7 @@ namespace hpx { namespace naming
 
     private:
         friend std::ostream& operator<< (std::ostream& os, locality const& l);
+        friend struct address;
 
         // serialization support
         friend class boost::serialization::access;
@@ -247,47 +248,6 @@ namespace hpx { namespace naming
     {
         return locality::iterator_type();
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
-        struct locality_serialization_data
-        {
-            char name_[64];         // we assume 64 bytes as an arbitrary maximum
-            boost::uint16_t port_;
-            boost::int16_t rank_;
-        };
-
-        inline void fill_serialization_data(locality const& l,
-            detail::locality_serialization_data& data)
-        {
-            std::string const& address = l.get_address();
-            BOOST_ASSERT(address.size() < sizeof(data.name_));
-            std::size_t len = (std::min)(address.size(), sizeof(data.name_)-1);
-            std::strncpy(data.name_, address.c_str(), len);
-            data.name_[len] = '\0';
-            data.port_ = l.get_port();
-            data.rank_ = l.get_rank();
-        }
-
-        inline void fill_from_serialization_data(
-            detail::locality_serialization_data const& data,
-            locality& l)
-        {
-            l.set_address(data.name_);
-            l.set_port(data.port_);
-            l.set_rank(data.rank_);
-        }
-    }
-}}
-
-namespace boost { namespace serialization
-{
-    template <>
-    struct is_bitwise_serializable<
-            hpx::naming::detail::locality_serialization_data>
-       : boost::mpl::true_
-    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

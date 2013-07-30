@@ -48,14 +48,14 @@ namespace hpx { namespace parcelset
                 ar << source_id_;
 
             std::string action_name = action_->get_action_name();
-            ar << action_name;
+            ar.save(action_name);
 
             action_->save(ar);
 
             // If we have a continuation, serialize it.
             if (has_continuation) {
                 std::string continuation_name = continuation_->get_continuation_name();
-                ar << continuation_name;
+                ar.save(continuation_name);
 
                 continuation_->save(ar);
             }
@@ -69,7 +69,7 @@ namespace hpx { namespace parcelset
                 ar >> source_id_;
 
             std::string action_name;
-            ar >> action_name;
+            ar.load(action_name);
 
             action_ = actions::polymorphic_factory<
                 actions::base_action>::create(action_name);
@@ -78,7 +78,7 @@ namespace hpx { namespace parcelset
             // handle continuation.
             if (has_continuation) {
                 std::string continuation_name;
-                ar >> continuation_name;
+                ar.load(continuation_name);
 
                 continuation_ = actions::polymorphic_factory<
                     actions::continuation>::create(continuation_name);
@@ -92,8 +92,8 @@ namespace hpx { namespace parcelset
         {
             data_.has_source_id_ = source_id_ ? true : false;
 
-            ar << boost::serialization::make_array(&data_, 1);
-            ar << addr_;
+            ar.save(data_);
+            ar.save(addr_);
 
             this->parcel_data::save(ar, data_.has_source_id_ ? true : false,
                 data_.has_continuation_ ? true : false);
@@ -117,8 +117,7 @@ namespace hpx { namespace parcelset
         }
 
         template <typename Archive>
-        void single_destination_parcel_data::save(Archive& ar,
-            const unsigned int version) const
+        void single_destination_parcel_data::save(Archive& ar) const
         {
             if (ar.flags() & util::disable_array_optimization)
                 save_normal(ar);
@@ -130,8 +129,8 @@ namespace hpx { namespace parcelset
         template <typename Archive>
         void single_destination_parcel_data::load_optimized(Archive & ar)
         {
-            ar >> boost::serialization::make_array(&data_, 1);
-            ar >> addr_;
+            ar.load(data_);
+            ar.load(addr_);
 
             this->parcel_data::load(ar, data_.has_source_id_ ? true : false,
                 data_.has_continuation_ ? true : false);
@@ -153,16 +152,8 @@ namespace hpx { namespace parcelset
         }
 
         template <typename Archive>
-        void single_destination_parcel_data::load(Archive & ar,
-            const unsigned int version)
+        void single_destination_parcel_data::load(Archive& ar)
         {
-            if (version > HPX_PARCEL_VERSION)
-            {
-                HPX_THROW_EXCEPTION(version_too_new,
-                    "parcel::load",
-                    "trying to load parcel with unknown version");
-            }
-
             if (ar.flags() & util::disable_array_optimization)
                 load_normal(ar);
             else
@@ -175,7 +166,7 @@ namespace hpx { namespace parcelset
         {
             data_.has_source_id_ = source_id_ ? true : false;
 
-            ar << boost::serialization::make_array(&data_, 1);
+            ar.save(data_);
             ar << dests_ << addrs_;
 
             this->parcel_data::save(ar, data_.has_source_id_ ? true : false,
@@ -198,8 +189,7 @@ namespace hpx { namespace parcelset
         }
 
         template <typename Archive>
-        void multi_destination_parcel_data::save(Archive& ar,
-            const unsigned int version) const
+        void multi_destination_parcel_data::save(Archive& ar) const
         {
             if (ar.flags() & util::disable_array_optimization)
                 save_normal(ar);
@@ -211,7 +201,7 @@ namespace hpx { namespace parcelset
         template <typename Archive>
         void multi_destination_parcel_data::load_optimized(Archive& ar)
         {
-            ar >> boost::serialization::make_array(&data_, 1);
+            ar.load(data_);
             ar >> dests_ >> addrs_;
 
             this->parcel_data::load(ar, data_.has_source_id_ ? true : false,
@@ -232,16 +222,8 @@ namespace hpx { namespace parcelset
         }
 
         template <typename Archive>
-        void multi_destination_parcel_data::load(Archive& ar,
-            const unsigned int version)
+        void multi_destination_parcel_data::load(Archive& ar)
         {
-            if (version > HPX_PARCEL_VERSION)
-            {
-                HPX_THROW_EXCEPTION(version_too_new,
-                    "parcel::load",
-                    "trying to load parcel with unknown version");
-            }
-
             if (ar.flags() & util::disable_array_optimization)
                 load_normal(ar);
             else
@@ -251,20 +233,16 @@ namespace hpx { namespace parcelset
         ///////////////////////////////////////////////////////////////////////
         // explicit instantiation for the correct archive types
         template HPX_EXPORT void
-        single_destination_parcel_data::save(util::portable_binary_oarchive&,
-            const unsigned int) const;
+        single_destination_parcel_data::save(util::portable_binary_oarchive&) const;
 
         template HPX_EXPORT void
-        single_destination_parcel_data::load(util::portable_binary_iarchive&,
-            const unsigned int);
+        single_destination_parcel_data::load(util::portable_binary_iarchive&);
 
         template HPX_EXPORT void
-        multi_destination_parcel_data::save(util::portable_binary_oarchive&,
-            const unsigned int) const;
+        multi_destination_parcel_data::save(util::portable_binary_oarchive&) const;
 
         template HPX_EXPORT void
-        multi_destination_parcel_data::load(util::portable_binary_iarchive&,
-            const unsigned int);
+        multi_destination_parcel_data::load(util::portable_binary_iarchive&);
 
         ///////////////////////////////////////////////////////////////////////////
         std::ostream& operator<< (std::ostream& os, single_destination_parcel_data const& p)
@@ -291,30 +269,49 @@ namespace hpx { namespace parcelset
         BOOST_ASSERT(data_.get() != 0);
 
         bool is_multi_destination = data_->is_multi_destination();
-        ar << is_multi_destination;
+        ar.save(is_multi_destination);
 
-        if (is_multi_destination)
-            ar << *static_cast<detail::multi_destination_parcel_data const*>(data_.get());
-        else
-            ar << *static_cast<detail::single_destination_parcel_data const*>(data_.get());
+        if (is_multi_destination) {
+            boost::static_pointer_cast<
+                detail::multi_destination_parcel_data
+            >(data_)->save(ar);
+        }
+        else {
+            boost::static_pointer_cast<
+                detail::single_destination_parcel_data
+            >(data_)->save(ar);
+        }
     }
 
     template <typename Archive>
     void parcel::load(Archive& ar, const unsigned int version)
     {
+        if (version > HPX_PARCEL_VERSION)
+        {
+            HPX_THROW_EXCEPTION(version_too_new,
+                "parcel::load",
+                "trying to load parcel with unknown version");
+        }
+
         bool is_multi_destination;
-        ar >> is_multi_destination;
+        ar.load(is_multi_destination);
 
         if (is_multi_destination) {
             boost::intrusive_ptr<detail::parcel_data> data(
                 new detail::multi_destination_parcel_data);
-            ar >> *static_cast<detail::multi_destination_parcel_data*>(data.get());
+
+            boost::static_pointer_cast<
+                detail::multi_destination_parcel_data
+            >(data)->load(ar);
             std::swap(data_, data);
         }
         else {
             boost::intrusive_ptr<detail::parcel_data> data(
                 new detail::single_destination_parcel_data);
-            ar >> *static_cast<detail::single_destination_parcel_data*>(data.get());
+
+            boost::static_pointer_cast<
+                detail::single_destination_parcel_data
+            >(data)->load(ar);
             std::swap(data_, data);
         }
     }

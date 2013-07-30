@@ -137,23 +137,13 @@ namespace hpx { namespace naming
     template <typename Archive>
     void locality::save(Archive& ar, const unsigned int version) const
     {
-        if(ar.flags() & util::disable_array_optimization) {
-            ar << address_;
-            ar << port_;
+        ar.save(address_);
+        ar.save(port_);
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-            BOOST_ASSERT(HPX_LOCALITY_VERSION_MPI == version);
-            ar << rank_;
+        BOOST_ASSERT(HPX_LOCALITY_VERSION_MPI == version);
+        ar.save(rank_);
 #endif
-        }
-        else {
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-            BOOST_ASSERT(HPX_LOCALITY_VERSION_MPI == version);
-#endif
-            detail::locality_serialization_data data;
-            fill_serialization_data(*this, data);
-            ar << boost::serialization::make_array(&data, 1);
-        }
     }
 
     template <typename Archive>
@@ -167,39 +157,32 @@ namespace hpx { namespace naming
             return;
         }
 
-        if(ar.flags() & util::disable_array_optimization) {
-            ar >> address_;
-            ar >> port_;
+        ar.load(address_);
+        ar.load(port_);
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-            // try to read rank only if the sender knows about MPI
-            if (version > HPX_LOCALITY_VERSION_NO_MPI)
-                ar >> rank_;
+        // try to read rank only if the sender knows about MPI
+        if (version > HPX_LOCALITY_VERSION_NO_MPI)
+            ar.load(rank_);
 #else
-            // account for the additional rank
-            if (version > HPX_LOCALITY_VERSION_NO_MPI)
-            {
-                int rank = -1;
-                ar >> rank;
+        // account for the additional rank
+        if (version > HPX_LOCALITY_VERSION_NO_MPI)
+        {
+            int rank = -1;
+            ar.load(rank);
 
-                if (rank != -1) {
-                // FIXME: we might have received a locality which is of
-                // no use to us as our locality is not configured to
-                // support MPI.
-                    HPX_THROW_EXCEPTION(version_unknown,
-                        "locality::load",
-                        "load locality with valid rank while MPI was "
-                            "not configured");
-                }
-                return;
+            if (rank != -1) {
+            // FIXME: we might have received a locality which is of
+            // no use to us as our locality is not configured to
+            // support MPI.
+                HPX_THROW_EXCEPTION(version_unknown,
+                    "locality::load",
+                    "load locality with valid rank while MPI was "
+                        "not configured");
             }
+            return;
+        }
 #endif
-        }
-        else {
-            detail::locality_serialization_data data;
-            ar >> boost::serialization::make_array(&data, 1);
-            fill_from_serialization_data(data, *this);
-        }
     }
 
     template HPX_EXPORT

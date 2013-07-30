@@ -20,7 +20,6 @@ namespace hpx { namespace naming { namespace detail
 {
     struct name_serialization_data
     {
-        locality_serialization_data locality_;
         address::address_type address_;
         address::component_type type_;
     };
@@ -45,11 +44,12 @@ namespace hpx { namespace naming
             ar << locality_ << type_ << address_;
         }
         else {
+            locality_.save(ar, HPX_LOCALITY_VERSION);
+
             detail::name_serialization_data data;
-            fill_serialization_data(locality_, data.locality_);
             data.type_ = type_;
             data.address_ = address_;
-            ar << boost::serialization::make_array(&data, 1);
+            ar.save(data);
         }
     }
 
@@ -67,9 +67,10 @@ namespace hpx { namespace naming
             ar >> locality_ >> type_ >> address_;
         }
         else {
+            locality_.load(ar, HPX_LOCALITY_VERSION);
+
             detail::name_serialization_data data;
-            ar >> boost::serialization::make_array(&data, 1);
-            fill_from_serialization_data(data.locality_, locality_);
+            ar.load(data);
             type_ = data.type_;
             address_ = data.address_;
         }

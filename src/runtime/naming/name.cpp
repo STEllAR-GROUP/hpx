@@ -196,7 +196,7 @@ namespace hpx { namespace naming
 
         // serialization
         template <typename Archive>
-        void id_type_impl::save(Archive& ar, const unsigned int version) const
+        void id_type_impl::save(Archive& ar) const
         {
             if(ar.flags() & util::disable_array_optimization) {
                 naming::gid_type split_id(prepare_gid());
@@ -206,12 +206,13 @@ namespace hpx { namespace naming
                 gid_serialization_data data;
                 data.gid_ = prepare_gid();
                 data.type_ = type_;
-                ar << boost::serialization::make_array(&data, 1);
+
+                ar.save(data);
             }
         }
 
         template <typename Archive>
-        void id_type_impl::load(Archive& ar, const unsigned int version)
+        void id_type_impl::load(Archive& ar)
         {
             if(ar.flags() & util::disable_array_optimization) {
                 // serialize base class and management type
@@ -220,7 +221,8 @@ namespace hpx { namespace naming
             }
             else {
                 gid_serialization_data data;
-                ar >> boost::serialization::make_array(&data, 1);
+                ar.load(data);
+
                 static_cast<gid_type&>(*this) = data.gid_;
                 type_ = static_cast<id_type_management>(data.type_);
             }
@@ -233,10 +235,10 @@ namespace hpx { namespace naming
 
         // explicit instantiation for the correct archive types
         template HPX_EXPORT void id_type_impl::save(
-            util::portable_binary_oarchive&, const unsigned int version) const;
+            util::portable_binary_oarchive&) const;
 
         template HPX_EXPORT void id_type_impl::load(
-            util::portable_binary_iarchive&, const unsigned int version);
+            util::portable_binary_iarchive&);
     }   // detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -244,9 +246,9 @@ namespace hpx { namespace naming
     void id_type::save(Archive& ar, const unsigned int version) const
     {
         bool isvalid = gid_ ? true : false;
-        ar << isvalid;
+        ar.save(isvalid);
         if (isvalid)
-            ar << gid_;
+            gid_->save(ar);
     }
 
     template <class Archive>
@@ -258,9 +260,13 @@ namespace hpx { namespace naming
         }
 
         bool isvalid;
-        ar >> isvalid;
-        if (isvalid)
-            ar >> gid_;
+        ar.load(isvalid);
+        if (isvalid) {
+            boost::intrusive_ptr<detail::id_type_impl> gid(
+                new detail::id_type_impl);
+            gid->load(ar);
+            std::swap(gid_, gid);
+        }
     }
 
     // explicit instantiation for the correct archive types

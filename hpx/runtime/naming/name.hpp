@@ -233,7 +233,7 @@ namespace hpx { namespace naming
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int /*version*/)
+        void serialize(Archive& ar, const unsigned int /*version*/)
         {
             if(ar.flags() & util::disable_array_optimization)
                 ar & id_msb_ & id_lsb_;
@@ -453,18 +453,14 @@ namespace hpx { namespace naming
                 return type_;
             }
 
-        private:
             // serialization
-            friend class boost::serialization::access;
+            template <typename Archive>
+            void save(Archive& ar) const;
 
             template <typename Archive>
-            void save(Archive& ar, const unsigned int version) const;
+            void load(Archive& ar);
 
-            template <typename Archive>
-            void load(Archive& ar, const unsigned int version);
-
-            BOOST_SERIALIZATION_SPLIT_MEMBER()
-
+        private:
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
             naming::gid_type prepare_gid() const;

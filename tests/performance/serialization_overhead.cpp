@@ -77,6 +77,9 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
                 hpx::threads::thread_priority_normal, buffer));
     }
 
+    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
+    outp.set_source(here_id);
+
     hpx::util::high_resolution_timer t;
 
     for (std::size_t i = 0; i != iterations; ++i)
