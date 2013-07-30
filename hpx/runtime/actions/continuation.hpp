@@ -344,10 +344,6 @@ namespace hpx { namespace actions
         }
 
     private:
-        /// continuation factory support
-        static detail::automatic_continuation_registration<typed_continuation> const
-            register_continuation;
-
         char const* get_continuation_name() const
         {
             return detail::get_continuation_name<typed_continuation>();
@@ -464,13 +460,9 @@ namespace hpx { namespace actions
         }
 
     private:
-        /// continuation factory support
-        static detail::automatic_continuation_registration<typed_continuation> const
-            register_continuation;
-
         char const* get_continuation_name() const
         {
-            return detail::get_continuation_name<typed_continuation>();
+            return "hpx_unused_typed_continuation";
         }
 
         /// serialization support
@@ -513,12 +505,6 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
-    detail::automatic_continuation_registration<typed_continuation<Result> > const
-        typed_continuation<Result>::register_continuation =
-            detail::automatic_continuation_registration<typed_continuation<Result> >().
-                register_continuation();
-
     template <typename Result>
     detail::automatic_continuation_registration<typed_continuation<Result> >
         init_registration<typed_continuation<Result> >::g =
@@ -609,7 +595,19 @@ namespace hpx
     }}                                                                        \
 /**/
 
+#define HPX_DEFINE_GET_CONTINUATION_NAME_(continuation, name)                 \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template<> HPX_ALWAYS_EXPORT                                          \
+        char const* get_continuation_name<continuation>()                     \
+        {                                                                     \
+            return BOOST_PP_STRINGIZE(name);                                  \
+        }                                                                     \
+    }}}                                                                       \
+/**/
+
 #define HPX_REGISTER_TYPED_CONTINUATION(Result, Name)                         \
+    HPX_DEFINE_GET_CONTINUATION_NAME_(                                        \
+        hpx::actions::typed_continuation<Result>, Name)                       \
     HPX_CONTINUATION_REGISTER_CONTINUATION_FACTORY(                           \
         hpx::actions::typed_continuation<Result>, Name)                       \
 /**/

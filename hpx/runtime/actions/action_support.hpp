@@ -666,9 +666,6 @@ namespace hpx { namespace actions
             return boost::fusion::at_c<N>(arguments_);
         }
 
-        /// action factory support
-        static detail::automatic_action_registration<transfer_action> const register_action;
-
         // serialization support
         void load(hpx::util::portable_binary_iarchive & ar)
         {
@@ -752,12 +749,6 @@ namespace hpx { namespace actions
         threads::thread_priority priority_;
         threads::thread_stacksize stacksize_;
     };
-
-    template <typename Action>
-    detail::automatic_action_registration<transfer_action<Action> > const
-        transfer_action<Action>::register_action =
-            detail::automatic_action_registration<transfer_action<Action> >().
-                register_action();
 
     ///////////////////////////////////////////////////////////////////////////
     template <int N, typename Action>
