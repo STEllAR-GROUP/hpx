@@ -93,7 +93,7 @@ namespace hpx { namespace parcelset
             data_.has_source_id_ = source_id_ ? true : false;
 
             ar.save(data_);
-            ar.save(addr_);
+            ar << addr_;
 
             this->parcel_data::save(ar, data_.has_source_id_ ? true : false,
                 data_.has_continuation_ ? true : false);
@@ -130,7 +130,7 @@ namespace hpx { namespace parcelset
         void single_destination_parcel_data::load_optimized(Archive & ar)
         {
             ar.load(data_);
-            ar.load(addr_);
+            ar >> addr_;
 
             this->parcel_data::load(ar, data_.has_source_id_ ? true : false,
                 data_.has_continuation_ ? true : false);
