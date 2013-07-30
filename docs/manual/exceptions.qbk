@@ -84,10 +84,11 @@ instance can be used in a very similar way as the
 retrieves all available diagnostic information from the error code instance as
 a formatted string.
 
-Under certain circumstances it is desireable to output only some of the
+As for handling exceptions, when working with error codes, under certain 
+circumstances it is desireable to output only some of the
 diagnostics, or to output those using different formatting. For this case, __hpx__
-exposes a set of lower level functions as demonstrated in the following code
-snippet:
+exposes a set of lower level functions usable with error codes as demonstrated 
+in the following code snippet:
 
 [error_handling_diagnostic_elements]
 
