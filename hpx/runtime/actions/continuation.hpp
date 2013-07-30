@@ -86,7 +86,7 @@ namespace hpx { namespace actions
     namespace detail
     {
         template <typename Continuation>
-        char const* get_continuation_name()
+        inline char const* get_continuation_name()
         {
             return util::type_id<Continuation>::typeid_.type_id();
         }
@@ -358,7 +358,7 @@ namespace hpx { namespace actions
 
             // serialize function
             bool have_function = false;
-            ar >> have_function;
+            ar.load(have_function);
             if (have_function)
                 ar >> f_;
         }
@@ -370,7 +370,7 @@ namespace hpx { namespace actions
 
             // serialize function
             bool have_function = !f_.empty();
-            ar << have_function;
+            ar.save(have_function);
             if (have_function)
                 ar << f_;
         }
@@ -474,7 +474,7 @@ namespace hpx { namespace actions
 
             // serialize function
             bool have_function = false;
-            ar >> have_function;
+            ar.load(have_function);
             if (have_function)
                 ar >> f_;
         }
@@ -486,7 +486,7 @@ namespace hpx { namespace actions
 
             // serialize function
             bool have_function = !f_.empty();
-            ar << have_function;
+            ar.save(have_function);
             if (have_function)
                 ar << f_;
         }
@@ -585,7 +585,16 @@ namespace hpx
         ::hpx::actions::detail::continuation_registration<Continuation>();    \
 /**/
 
+#define HPX_DECLARE_GET_CONTINUATION_NAME_(continuation, name)                \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template<> HPX_ALWAYS_EXPORT                                          \
+        char const* get_continuation_name<continuation>();                    \
+    }}}                                                                       \
+/**/
+
 #define HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(Result, Name)             \
+    HPX_DECLARE_GET_CONTINUATION_NAME_(                                       \
+        hpx::actions::typed_continuation<Result>, Name)                       \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
         struct needs_automatic_registration<                                  \

@@ -87,6 +87,6 @@ namespace hpx { namespace actions
         return factory.get();
     }
 
-    template struct HPX_EXPORT polymorphic_factory<base_action>;
-    template struct HPX_EXPORT polymorphic_factory<continuation>;
+    template class HPX_EXPORT polymorphic_factory<base_action>;
+    template class HPX_EXPORT polymorphic_factory<continuation>;
 }}
