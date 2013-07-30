@@ -118,11 +118,20 @@ int hpx_main()
             .push_back(small_object(20)) // second elem: small_object
             .push_back(big_object(30, 40)); // third elem: big_object
 
+        hpx::cout << "locality " << hpx::get_locality_id() << ": " << "created tuple1: ";
+        print_tuple(tuple1);
+        hpx::cout<< hpx::endl;
+
+
         tuple_type tuple2;
         tuple2.push_back(std::string("second"))
             .push_back(std::string("string")) // first elem: string
             .push_back(small_object(50)) // second elem: small_object
             .push_back(big_object(60, 70)); // third elem: big_object
+
+        hpx::cout << "locality " << hpx::get_locality_id() << ": " << "created tuple2: ";
+        print_tuple(tuple2);
+        hpx::cout<< hpx::endl;
 
         std::vector<hpx::lcos::future<void> > futures;
 

@@ -10,7 +10,7 @@
 
 #include <boost/serialization/access.hpp>
 
-#define ENABLE_DEBUG false
+#define ENABLE_DEBUG true
 
 ///////////////////////////////////////////////////////////////////////////////
 struct small_object
