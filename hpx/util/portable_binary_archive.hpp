@@ -31,7 +31,10 @@ namespace hpx { namespace util
         enable_compression          = 0x00002000,
         endian_big                  = 0x00004000,
         endian_little               = 0x00008000,
-        disable_array_optimization  = 0x00010000
+        disable_array_optimization  = 0x00010000,
+        disable_data_chunking       = 0x00020000,
+
+        all_archive_flags           = 0x0003e000    // all of the above
     };
 
     inline void
