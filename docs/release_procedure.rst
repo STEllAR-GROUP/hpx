@@ -50,9 +50,9 @@ the lines as they are completed to avoid confusion.
 #.  Checkout the main branch, and bump the HPX version to the next release
     target. The following files contain version info:
 
-        *   ``hpx/version.hpp``
-        *   ``docs/hpx.qbk`` (Don't forget to update the logo)
-        *   ``CMakeLists.txt``
+    *   ``hpx/version.hpp``
+    *   ``docs/hpx.qbk`` (Don't forget to update the logo)
+    *   ``CMakeLists.txt``
 
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
     ``hpx/version.hpp`` (replace it with ``-rc1`` for the release candidate
@@ -81,7 +81,7 @@ the lines as they are completed to avoid confusion.
 #.  Post the draft of the release notes.
 
 #.  Upload the packages and generated documentation to the website. Use the following
-    formats::
+    formats:::
 
         http://stellar.cct.lsu.edu/files/hpx_#.#.#.zip
         http://stellar.cct.lsu.edu/files/hpx_#.#.#.tar.gz
