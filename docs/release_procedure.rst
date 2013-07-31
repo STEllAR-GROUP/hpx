@@ -31,7 +31,7 @@ the lines as they are completed to avoid confusion.
 
 #.  Write release notes for the blog to summarize the major changes listed in
     the log. The blog article should go in the "downloads" section. The url of
-    the blog article should follow this format (where # are version numbers):::
+    the blog article should follow this format (where # are version numbers)::
 
         stellar.cct.lsu.edu/downloads/hpx-v#-#-#-release-notes
 
@@ -50,9 +50,11 @@ the lines as they are completed to avoid confusion.
 #.  Checkout the main branch, and bump the HPX version to the next release
     target. The following files contain version info:
 
-    *   ``hpx/version.hpp``
-    *   ``docs/hpx.qbk`` (Don't forget to update the logo)
-    *   ``CMakeLists.txt``
+        *   ``hpx/version.hpp``
+        *   ``docs/hpx.qbk``
+        *   ``CMakeLists.txt``
+
+#.  Update the logo size in ``docs/cmakelist.txt`` lines 115/116
 
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
     ``hpx/version.hpp`` (replace it with ``-rc1`` for the release candidate
