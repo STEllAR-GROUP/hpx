@@ -80,10 +80,17 @@ the lines as they are completed to avoid confusion.
 
 #.  Post the draft of the release notes.
 
-.. URL format needed.
-#.  Upload the packages and generated documentation to the website.
+#.  Upload the packages and generated documentation to the website. Use the following
+    formats::
 
-.. URL/title format needed.
+        http://stellar.cct.lsu.edu/files/hpx_#.#.#.zip
+        http://stellar.cct.lsu.edu/files/hpx_#.#.#.tar.gz
+        http://stellar.cct.lsu.edu/files/hpx_#.#.#.tar.bz2
+        http://stellar.cct.lsu.edu/files/hpx_#.#.#.7z
+        http://stellar.cct.lsu.edu/files/hpx_#.#.#/html
+        http://stellar.cct.lsu.edu/files/hpx_#.#.#/html/code
+        http://stellar.cct.lsu.edu/downloads/hpx-v#-#-#-release-notes
+
 #.  Write a new blog post announcing the release.
 
 #.  Announce the release on hpx-users@stellar.cct.lsu.edu and 
