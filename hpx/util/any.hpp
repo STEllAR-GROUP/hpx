@@ -118,8 +118,12 @@ namespace hpx { namespace util
         };
 
         template <typename T
+          , typename Small
           , typename Enable = typename traits::supports_streaming_with_any<T>::type>
-        struct streaming_base
+        struct streaming_base;
+
+        template <typename T>
+        struct streaming_base<T, boost::mpl::true_, boost::mpl::true_>
         {
             template <typename Char>
             static std::basic_istream<Char>&
@@ -139,7 +143,27 @@ namespace hpx { namespace util
         };
 
         template <typename T>
-        struct streaming_base<T, boost::mpl::false_>
+        struct streaming_base<T, boost::mpl::false_, boost::mpl::true_>
+        {
+            template <typename Char>
+            static std::basic_istream<Char>&
+            stream_in (std::basic_istream<Char>& i, void** obj)
+            {
+                i >> **reinterpret_cast<T**>(obj);
+                return i;
+            }
+
+            template <typename Char>
+            static std::basic_ostream<Char>&
+            stream_out(std::basic_ostream<Char>& o, void* const* obj)
+            {
+                o << **reinterpret_cast<T* const*>(obj);
+                return o;
+            }
+        };
+
+        template <typename T, typename Small>
+        struct streaming_base<T, Small, boost::mpl::false_>
         {
             template <typename Char>
             static std::basic_istream<Char>&
@@ -164,7 +188,7 @@ namespace hpx { namespace util
         struct fxns<boost::mpl::true_>
         {
             template<typename T, typename IArchive, typename OArchive, typename Char>
-            struct type : public streaming_base<T>
+            struct type : public streaming_base<T, boost::mpl::true_>
             {
                 static fxn_ptr_table<IArchive, OArchive, Char> *get_ptr()
                 {
@@ -220,7 +244,7 @@ namespace hpx { namespace util
         struct fxns<boost::mpl::false_>
         {
             template<typename T, typename IArchive, typename OArchive, typename Char>
-            struct type : public streaming_base<T>
+            struct type : public streaming_base<T, boost::mpl::false_>
             {
                 static fxn_ptr_table<IArchive, OArchive, Char> *get_ptr()
                 {

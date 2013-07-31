@@ -32,17 +32,15 @@ int hpx_main(variables_map& vm)
 {
     {
         {
-            any any1(big_object(30,40));
+            any any1(big_object(30, 40));
             std::stringstream buffer;
 
             buffer << any1;
 
             HPX_TEST_EQ(buffer.str(), "3040");
-
         }
 
         {
-
             typedef uint64_t index_type;
             typedef hpx::util::any elem_type;
             typedef hpx::util::hash_any hash_elem_functor;
