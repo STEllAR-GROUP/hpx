@@ -106,6 +106,7 @@ namespace hpx { namespace parcelset { namespace mpi
             io_service_pool_.join();
             io_service_pool_.clear();
         }
+        buffer_pool_.clear();
     }
 
     // Make sure all pending requests are handled
@@ -160,7 +161,7 @@ namespace hpx { namespace parcelset { namespace mpi
             std::pair<bool, header> next(acceptor_.next_header());
             if(next.first)
             {
-                receivers_.push_back(boost::make_shared<receiver>(next.second, communicator));
+                receivers_.push_back(boost::make_shared<receiver>(next.second, communicator, *this));
             }
 
             // handle all receive requests

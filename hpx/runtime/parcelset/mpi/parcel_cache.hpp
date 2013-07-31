@@ -121,7 +121,8 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
         }
 
-        void encode_parcels(boost::shared_ptr<parcel_buffer> & buffer, std::vector<parcel> const & pv)
+        template <typename Parcelport>
+        void encode_parcels(boost::shared_ptr<parcel_buffer> & buffer, std::vector<parcel> const & pv, Parcelport& pp)
         {
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
@@ -141,7 +142,8 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
 
             util::high_resolution_timer timer;
-            buffer->buffer_.reserve(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+            buffer->buffer_ = pp.buffer_pool_.get_buffer(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+            buffer->buffer_->resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
             buffer->send_data_.buffer_allocate_time_ = timer.elapsed_nanoseconds();
 
             // mark start of serialization
@@ -154,12 +156,12 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
 
                 int archive_flags = archive_flags_;
                 if (filter.get() != 0) {
-                    filter->set_max_length(buffer->buffer_.capacity());
+                    filter->set_max_length(buffer->buffer_->capacity());
                     archive_flags |= util::enable_compression;
                 }
 
                 util::portable_binary_oarchive archive(
-                    buffer->buffer_, filter.get(), archive_flags);
+                    *buffer->buffer_, filter.get(), archive_flags);
 
                 std::size_t count = pv.size();
                 archive << count;
@@ -171,7 +173,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
 
                 arg_size = archive.bytes_written();
 
-                BOOST_ASSERT(arg_size == buffer->buffer_.size());
+                BOOST_ASSERT(arg_size == buffer->buffer_->size());
 
                 // store the time required for serialization
                 buffer->send_data_.serialization_time_ = timer.elapsed_nanoseconds() - serialization_start;;
@@ -206,7 +208,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
 
             // make sure outgoing message is not larger than allowed
-            if (buffer->buffer_.size() > max_outbound_size_)
+            if (buffer->buffer_->size() > max_outbound_size_)
             {
                 HPX_THROW_EXCEPTION(serialization_error,
                     "mpi::detail::parcel_cache::set_parcel",
@@ -214,19 +216,20 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                         "parcelport: parcel serialization created message larger "
                         "than allowed (created: %ld, allowed: %ld), consider"
                         "configuring larger hpx.parcel.max_message_size") %
-                            buffer->buffer_.size() % max_outbound_size_));
+                            buffer->buffer_->size() % max_outbound_size_));
                 return;
             }
             
-            buffer->send_data_.raw_bytes_ = buffer->buffer_.size();
+            buffer->send_data_.raw_bytes_ = buffer->buffer_->size();
 
             buffer->send_data_.num_parcels_ = pv.size();
             buffer->send_data_.bytes_ = arg_size;
         }
 
+        template <typename Parcelport>
         std::list<boost::shared_ptr<sender> > get_senders(
             HPX_STD_FUNCTION<bool(int&)> const& tag_generator, MPI_Comm communicator,
-            parcelport& pp)
+            Parcelport& pp)
         {
             std::list<boost::shared_ptr<sender> > res;
             {
@@ -250,13 +253,13 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     ph.second.clear();
                     {
                         util::unlock_the_lock<mutex_type::scoped_try_lock> ull0(lk0);
-                        encode_parcels(buffer, parcels);
+                        encode_parcels(buffer, parcels, pp);
                         res.push_back(
                             boost::make_shared<sender>(
                                 header(
                                     buffer->rank_
                                   , tag
-                                  , static_cast<int>(buffer->buffer_.size())
+                                  , static_cast<int>(buffer->buffer_->size())
                                 )
                               , buffer
                               , communicator

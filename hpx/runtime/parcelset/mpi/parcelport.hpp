@@ -15,7 +15,7 @@
 #include <hpx/runtime/parcelset/mpi/sender.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/connection_cache.hpp>
+#include <hpx/util/buffer_pool.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
@@ -115,6 +115,7 @@ namespace hpx { namespace parcelset { namespace mpi
         /// Make sure all pending requests are handled
         void do_background_work();
 
+        util::buffer_pool<char, allocator<char> > buffer_pool_;
     private:
         /// support enable_shared_from_this
         boost::shared_ptr<parcelport> shared_from_this()

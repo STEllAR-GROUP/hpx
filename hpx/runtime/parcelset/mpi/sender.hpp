@@ -28,7 +28,7 @@ namespace hpx { namespace parcelset { namespace mpi
         > write_handler_type;
 
         int rank_;
-        std::vector<char, allocator<char> > buffer_;
+        boost::shared_ptr<std::vector<char, allocator<char> > > buffer_;
         std::vector<write_handler_type> handlers_;
         performance_counters::parcels::data_point send_data_;
     };
@@ -75,8 +75,8 @@ namespace hpx { namespace parcelset { namespace mpi
                 );
 
             MPI_Isend(
-                buffer_->buffer_.data(), // Data pointer
-                static_cast<int>(buffer_->buffer_.size()), // Size
+                buffer_->buffer_->data(), // Data pointer
+                static_cast<int>(buffer_->buffer_->size()), // Size
                 MPI_CHAR,           // MPI Datatype
                 header_.rank(),     // Destination
                 header_.tag(),      // Tag
@@ -86,7 +86,8 @@ namespace hpx { namespace parcelset { namespace mpi
             state_ = sending_header;
         }
 
-        bool done(parcelport & pp)
+        template <typename Parcelport>
+        bool done(Parcelport & pp)
         {
             switch (state_)
             {
@@ -104,7 +105,7 @@ namespace hpx { namespace parcelset { namespace mpi
             case sent_header:
                 {
                     BOOST_ASSERT(static_cast<std::size_t>(header_.size()) ==
-                        buffer_->buffer_.size());
+                        buffer_->buffer_->size());
                     state_ = sending_data;
                     return done(pp);
                 }
@@ -136,6 +137,7 @@ namespace hpx { namespace parcelset { namespace mpi
                 buffer_->send_data_.time_ = util::high_resolution_clock::now() -
                         buffer_->send_data_.time_;
                 pp.add_sent_data(buffer_->send_data_);
+                pp.buffer_pool_.reclaim_buffer(buffer_->buffer_);
                 return true;
             default:
             case invalid:

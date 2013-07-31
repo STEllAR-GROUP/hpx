@@ -31,12 +31,13 @@ namespace hpx { namespace parcelset { namespace mpi {
     struct receiver
       : boost::noncopyable
     {
-        receiver(header const & h, MPI_Comm communicator)
+        template <typename Parcelport>
+        receiver(header const & h, MPI_Comm communicator, Parcelport& pp)
           : header_(h)
-          , buffer_(boost::make_shared<std::vector<char, allocator<char> > >())//h.size()))
         {
             // start collecting statistics for this receive operation
             receive_data_.time_ = util::high_resolution_clock::now();
+            buffer_ = pp.buffer_pool_.get_buffer(h.size());
             buffer_->resize(h.size());
             receive_data_.buffer_allocate_time_ = util::high_resolution_clock::now() - receive_data_.time_;
             receive_data_.serialization_time_ = 0;
@@ -55,7 +56,8 @@ namespace hpx { namespace parcelset { namespace mpi {
                 &request_);         // Request
         }
 
-        bool done(parcelport & pp)
+        template <typename Parcelport>
+        bool done(Parcelport & pp)
         {
             int completed = 0;
 #ifdef HPX_DEBUG
@@ -80,6 +82,7 @@ namespace hpx { namespace parcelset { namespace mpi {
                     receive_data_.time_;
 
                 decode_message(*buffer_, pp, receive_data_);
+                pp.buffer_pool_.reclaim_buffer(buffer_);
                 return true;
             }
             return false;
