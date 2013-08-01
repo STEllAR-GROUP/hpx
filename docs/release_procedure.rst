@@ -83,7 +83,7 @@ the lines as they are completed to avoid confusion.
 #.  Post the draft of the release notes.
 
 #.  Upload the packages and generated documentation to the website. Use the following
-    formats:::
+    formats::
 
         http://stellar.cct.lsu.edu/files/hpx_#.#.#.zip
         http://stellar.cct.lsu.edu/files/hpx_#.#.#.tar.gz
@@ -95,8 +95,8 @@ the lines as they are completed to avoid confusion.
 
 #.  Write a new blog post announcing the release.
 
-#.  Announce the release on hpx-users@stellar.cct.lsu.edu and 
-    stellar@cct.lsu.edu.
+#.  Announce the release on hpx-users@stellar.cct.lsu.edu, 
+    stellar@cct.lsu.edu, isocpp.org, HPC Wire, and a CCT press release.
 
 #.  Beer and pizza.
 
