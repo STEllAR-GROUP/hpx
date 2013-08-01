@@ -249,7 +249,7 @@ public:
     }
 
     template <typename Container>
-    portable_binary_oarchive(Container& buffer, std::vector<chunk>* chunks,
+    portable_binary_oarchive(Container& buffer, std::vector<serialization_chunk>* chunks,
             binary_filter* filter = 0, unsigned flags = 0)
       : primitive_base_t(buffer, chunks, flags),
         archive_base_t(flags)

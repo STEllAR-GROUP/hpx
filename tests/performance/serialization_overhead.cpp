@@ -80,9 +80,9 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here_id);
 
-    std::vector<hpx::util::chunk>* chunks = 0;
+    std::vector<hpx::util::serialization_chunk>* chunks = 0;
     if (zerocopy)
-        chunks = new std::vector<hpx::util::chunk>();
+        chunks = new std::vector<hpx::util::serialization_chunk>();
 
     hpx::util::high_resolution_timer t;
 

@@ -27,7 +27,7 @@ namespace hpx { namespace util { namespace detail
             chunks_(0), current_chunk_(std::size_t(-1))
         {}
 
-        ocontainer_type(Container& cont, std::vector<chunk>* chunks)
+        ocontainer_type(Container& cont, std::vector<serialization_chunk>* chunks)
           : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
             chunks_(chunks), current_chunk_(std::size_t(-1))
         {
@@ -66,7 +66,7 @@ namespace hpx { namespace util { namespace detail
                 BOOST_ASSERT((*chunks_)[current_chunk_].type_ == chunk_type_index ||
                     (*chunks_)[current_chunk_].size_ != 0);
 
-                // complement current chunk by setting its length
+                // complement current serialization_chunk by setting its length
                 if ((*chunks_)[current_chunk_].type_ == chunk_type_index)
                 {
                     (*chunks_)[current_chunk_].size_ =
@@ -90,10 +90,10 @@ namespace hpx { namespace util { namespace detail
                     filter_->save(address, count);
                 }
                 else {
-                    // make sure there is current chunk descriptor available
+                    // make sure there is current serialization_chunk descriptor available
                     if (chunks_ && (*chunks_)[current_chunk_].size_ != 0)
                     {
-                        // add a new chunk
+                        // add a new serialization_chunk
                         chunks_->push_back(create_index_chunk(current_, 0));
                         ++current_chunk_;
                     }
@@ -113,21 +113,21 @@ namespace hpx { namespace util { namespace detail
         void save_binary_chunk(void const* address, std::size_t count)
         {
             if (filter_ || chunks_ == 0) {
-                // fall back to chunk-less archive
-                save_binary(address, count);
+                // fall back to serialization_chunk-less archive
+                this->ocontainer_type::save_binary(address, count);
             }
             else {
                 BOOST_ASSERT((*chunks_)[current_chunk_].type_ == chunk_type_index ||
                     (*chunks_)[current_chunk_].size_ != 0);
 
-                // complement current chunk by setting its length
+                // complement current serialization_chunk by setting its length
                 if ((*chunks_)[current_chunk_].type_ == chunk_type_index)
                 {
                     (*chunks_)[current_chunk_].size_ =
                         current_ - (*chunks_)[current_chunk_].data_.index_;
                 }
 
-                // add a new chunk referring to the external buffer
+                // add a new serialization_chunk referring to the external buffer
                 chunks_->push_back(create_pointer_chunk(address, count));
                 ++current_chunk_;
             }
@@ -138,7 +138,7 @@ namespace hpx { namespace util { namespace detail
         std::size_t start_compressing_at_;
         binary_filter* filter_;
 
-        std::vector<chunk>* chunks_;
+        std::vector<serialization_chunk>* chunks_;
         std::size_t current_chunk_;
     };
 }}}

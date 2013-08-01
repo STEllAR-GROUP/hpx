@@ -142,7 +142,7 @@ namespace hpx { namespace util
         }
 
         template <typename Container>
-        basic_binary_oprimitive(Container& buffer, std::vector<chunk>* chunks,
+        basic_binary_oprimitive(Container& buffer, std::vector<serialization_chunk>* chunks,
                 unsigned flags = 0)
           : flags_(flags & all_archive_flags),
             size_(0),

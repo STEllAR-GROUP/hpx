@@ -29,7 +29,7 @@ namespace hpx { namespace util { namespace detail
             current_chunk_size_(0)
         {}
 
-        icontainer_type(Container const& cont, std::vector<chunk>* chunks,
+        icontainer_type(Container const& cont, std::vector<serialization_chunk>* chunks,
                 std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
@@ -81,9 +81,9 @@ namespace hpx { namespace util { namespace detail
                 if (chunks_) {
                     current_chunk_size_ += count;
 
-                    // make sure we switch to the next chunk if necessary
+                    // make sure we switch to the next serialization_chunk if necessary
                     if (current_chunk_size_ >= (*chunks_)[current_chunk_].size_) {
-                        // raise an error if we read past the chunk
+                        // raise an error if we read past the serialization_chunk
                         if (current_chunk_size_ > (*chunks_)[current_chunk_].size_)
                         {
                             BOOST_THROW_EXCEPTION(
@@ -102,8 +102,8 @@ namespace hpx { namespace util { namespace detail
         void load_binary_chunk(void*& address, std::size_t count)
         {
             if (filter_.get() || chunks_ == 0) {
-                // fall back to chunk-less archive
-                load_binary(address, count);
+                // fall back to serialization_chunk-less archive
+                this->icontainer_type::load_binary(address, count);
             }
             else {
                 BOOST_ASSERT(current_chunk_ != std::size_t(-1));
@@ -119,7 +119,7 @@ namespace hpx { namespace util { namespace detail
         HPX_STD_UNIQUE_PTR<binary_filter> filter_;
         std::size_t decompressed_size_;
 
-        std::vector<chunk>* chunks_;
+        std::vector<serialization_chunk>* chunks_;
         std::size_t current_chunk_;
         std::size_t current_chunk_size_;
     };
