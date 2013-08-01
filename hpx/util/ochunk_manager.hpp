@@ -69,6 +69,8 @@ namespace hpx { namespace util { namespace detail
                 // complement current serialization_chunk by setting its length
                 if ((*chunks_)[current_chunk_].type_ == chunk_type_index)
                 {
+                    BOOST_ASSERT((*chunks_)[current_chunk_].size_ == 0);
+
                     (*chunks_)[current_chunk_].size_ =
                         current_ - (*chunks_)[current_chunk_].data_.index_;
                 }
@@ -91,7 +93,8 @@ namespace hpx { namespace util { namespace detail
                 }
                 else {
                     // make sure there is current serialization_chunk descriptor available
-                    if (chunks_ && (*chunks_)[current_chunk_].size_ != 0)
+                    if (chunks_ && ((*chunks_)[current_chunk_].type_ == chunk_type_pointer ||
+                        (*chunks_)[current_chunk_].size_ != 0))
                     {
                         // add a new serialization_chunk
                         chunks_->push_back(create_index_chunk(current_, 0));
@@ -112,7 +115,7 @@ namespace hpx { namespace util { namespace detail
 
         void save_binary_chunk(void const* address, std::size_t count)
         {
-            if (filter_ || chunks_ == 0) {
+            if (filter_ || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive
                 this->ocontainer_type::save_binary(address, count);
             }
@@ -123,6 +126,8 @@ namespace hpx { namespace util { namespace detail
                 // complement current serialization_chunk by setting its length
                 if ((*chunks_)[current_chunk_].type_ == chunk_type_index)
                 {
+                    BOOST_ASSERT((*chunks_)[current_chunk_].size_ == 0);
+
                     (*chunks_)[current_chunk_].size_ =
                         current_ - (*chunks_)[current_chunk_].data_.index_;
                 }

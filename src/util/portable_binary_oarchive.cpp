@@ -151,7 +151,7 @@ void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int fl
 
     // handle filter and compression in the archive separately
     bool has_filter = filter ? true : false;
-    *this << has_filter;
+    save(has_filter);
 
     if (has_filter && (this->flags() & enable_compression)) {
         *this << filter;

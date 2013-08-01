@@ -30,7 +30,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/version.hpp>
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
@@ -67,58 +66,6 @@
 
 namespace hpx { namespace util
 {
-//#if BOOST_VERSION < 105500
-    namespace dirty_trick
-    {
-        ///////////////////////////////////////////////////////////////////////
-        // Sorry, we need to play this dirty trick because of a bug in
-        // boost::serialization::array::operator=() which is missing a return
-        // statement prior to Boost V1.55.
-        //
-        // The method of accessing a private member of a class used is
-        // explained here:
-        // http://bloglitb.blogspot.com/2010/07/access-to-private-members-thats-easy.html
-        //
-        template <typename Tag>
-        struct result
-        {
-            typedef typename Tag::type type;
-            static type ptr;
-        };
-
-        template <typename Tag>
-        typename result<Tag>::type result<Tag>::ptr;
-
-        template <typename Tag, typename Tag::type p>
-        struct gain_private_access : result<Tag> 
-        {
-            gain_private_access() { result<Tag>::ptr = p; }
-            static gain_private_access filler_object_;
-        };
-
-        template <typename Tag, typename Tag::type p>
-        typename gain_private_access<Tag, p>
-            gain_private_access<Tag, p>::filler_object_;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T>
-        struct array
-        {
-            typedef T* boost::serialization::array<T>::* type;
-        };
-
-        // Force instantiation of proper template, we instantiate a helper
-        // for accessing boost::serialization::array<int>, assuming that all
-        // boost::serialization::array<T> have the same structure.
-        //
-        // Explicit instantiation; the only place where it is legal to pass
-        // the address of a private member.  Generates the static ::filler_object_
-        // that in turn initializes result<Tag>::type.
-        template gain_private_access<
-            array<int>, &boost::serialization::array<int>::m_t>;
-    }
-//#endif
-
     /////////////////////////////////////////////////////////////////////////--
     // class basic_binary_iprimitive - read serialized objects from a input
     // binary character buffer
@@ -134,7 +81,7 @@ namespace hpx { namespace util
             size_ += count;
         }
 
-        void load_binary_chunk(void*& address, std::size_t count)
+        void load_binary_chunk(void* address, std::size_t count)
         {
             if (0 == count) return;
 
@@ -234,7 +181,7 @@ namespace hpx { namespace util
         // use_array_optimization;
         struct use_array_optimization
         {
-    #if defined(BOOST_NO_DEPENDENT_NESTED_DERIVATIONS)
+#if defined(BOOST_NO_DEPENDENT_NESTED_DERIVATIONS)
             template <typename T>
             struct apply
             {
@@ -242,12 +189,12 @@ namespace hpx { namespace util
                     boost::serialization::is_bitwise_serializable<T>::type
                 type;
             };
-    #else
+#else
             template <typename T>
             struct apply
               : public boost::serialization::is_bitwise_serializable<T>
             {};
-    #endif
+#endif
         };
 
         std::size_t bytes_read() const
@@ -270,20 +217,10 @@ namespace hpx { namespace util
         template <typename T>
         void load_array(boost::serialization::array<T>& a)
         {
-            if (flags() & disable_data_chunking) {
+            if (flags() & disable_data_chunking)
                 load_binary(a.address(), a.count()*sizeof(T));
-            }
-            else {
-                void* address = 0;
-                load_binary_chunk(address, a.count()*sizeof(T));
-//#if BOOST_VERSION < 105500
-                reinterpret_cast<boost::serialization::array<int>&>(a).*
-                    dirty_trick::result<dirty_trick::array<int> >::ptr =
-                        static_cast<int*>(address);
-//#else
-//                a = boost::serialization::array<T>(static_cast<T*>(address), a.count());
-//#endif
-            }
+            else
+                load_binary_chunk(a.address(), a.count()*sizeof(T));
         }
 
         void set_filter(util::binary_filter* filter)

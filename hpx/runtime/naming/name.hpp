@@ -233,13 +233,24 @@ namespace hpx { namespace naming
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
+        void save(Archive& ar, const unsigned int /*version*/) const
         {
             if(ar.flags() & util::disable_array_optimization)
-                ar & id_msb_ & id_lsb_;
+                ar << id_msb_ << id_lsb_;
             else
-                ar & boost::serialization::make_array(this, 1);
+                ar.save(*this);
         }
+
+        template <typename Archive>
+        void load(Archive& ar, const unsigned int /*version*/)
+        {
+            if(ar.flags() & util::disable_array_optimization)
+                ar >> id_msb_ >> id_lsb_;
+            else
+                ar.load(*this);
+        }
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
         // actual gid
         boost::uint64_t id_msb_;
