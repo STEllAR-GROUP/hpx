@@ -98,10 +98,12 @@ namespace hpx { namespace util { namespace coroutines
         __builtin_prefetch (m_sp, 0, 3);
         __builtin_prefetch (static_cast<void**>(m_sp)+64/sizeof(void*), 1, 3);
         __builtin_prefetch (static_cast<void**>(m_sp)+64/sizeof(void*), 0, 3);
+#if !defined(__x86_64__)
         __builtin_prefetch (static_cast<void**>(m_sp)+32/sizeof(void*), 1, 3);
         __builtin_prefetch (static_cast<void**>(m_sp)+32/sizeof(void*), 0, 3);
         __builtin_prefetch (static_cast<void**>(m_sp)-32/sizeof(void*), 1, 3);
         __builtin_prefetch (static_cast<void**>(m_sp)-32/sizeof(void*), 0, 3);
+#endif
         __builtin_prefetch (static_cast<void**>(m_sp)-64/sizeof(void*), 1, 3);
         __builtin_prefetch (static_cast<void**>(m_sp)-64/sizeof(void*), 0, 3);
       }
