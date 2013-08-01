@@ -47,7 +47,8 @@ namespace hpx { namespace util
     union chunk_data
     {
         std::size_t index_;     // position inside the data buffer
-        void const* pos_;       // pointer to external data buffer
+        void const* cpos_;      // const pointer to external data buffer
+        void* pos_;             // pointer to external data buffer
     };
 
     enum chunk_type
@@ -74,7 +75,7 @@ namespace hpx { namespace util
     inline chunk create_pointer_chunk(void const* pos, std::size_t size)
     {
         chunk retval = { chunk_type_pointer, 0, size };
-        retval.data_.pos_ = pos;
+        retval.data_.cpos_ = pos;
         return retval;
     }
 }}

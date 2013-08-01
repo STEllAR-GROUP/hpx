@@ -62,6 +62,17 @@ namespace hpx { namespace util { namespace detail
 
                 cont_.resize(current_);         // truncate container
             }
+            else if (chunks_) {
+                BOOST_ASSERT((*chunks_)[current_chunk_].type_ == chunk_type_index ||
+                    (*chunks_)[current_chunk_].size_ != 0);
+
+                // complement current chunk by setting its length
+                if ((*chunks_)[current_chunk_].type_ == chunk_type_index)
+                {
+                    (*chunks_)[current_chunk_].size_ =
+                        current_ - (*chunks_)[current_chunk_].data_.index_;
+                }
+            }
         }
 
         void set_filter(binary_filter* filter)
@@ -106,12 +117,15 @@ namespace hpx { namespace util { namespace detail
                 save_binary(address, count);
             }
             else {
-                // complement current chunk by setting its length
                 BOOST_ASSERT((*chunks_)[current_chunk_].type_ == chunk_type_index ||
                     (*chunks_)[current_chunk_].size_ != 0);
 
-                (*chunks_)[current_chunk_].size_ =
-                    current_ - (*chunks_)[current_chunk_].data_.index_;
+                // complement current chunk by setting its length
+                if ((*chunks_)[current_chunk_].type_ == chunk_type_index)
+                {
+                    (*chunks_)[current_chunk_].size_ =
+                        current_ - (*chunks_)[current_chunk_].data_.index_;
+                }
 
                 // add a new chunk referring to the external buffer
                 chunks_->push_back(create_pointer_chunk(address, count));

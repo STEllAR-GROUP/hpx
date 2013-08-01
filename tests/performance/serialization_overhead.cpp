@@ -21,7 +21,7 @@ HPX_PLAIN_ACTION(test_function, test_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 double benchmark_serialization(std::size_t data_size, std::size_t iterations,
-    bool continuation)
+    bool continuation, bool zerocopy)
 {
     hpx::naming::id_type const here_id = hpx::find_here();
     hpx::naming::gid_type here = here_id.get_gid();
@@ -80,6 +80,10 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here_id);
 
+    std::vector<hpx::util::chunk>* chunks = 0;
+    if (zerocopy)
+        chunks = new std::vector<hpx::util::chunk>();
+
     hpx::util::high_resolution_timer t;
 
     for (std::size_t i = 0; i != iterations; ++i)
@@ -92,7 +96,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         {
             // create an output archive and serialize the parcel
             hpx::util::portable_binary_oarchive archive(
-                out_buffer, 0, out_archive_flags);
+                out_buffer, chunks, 0, out_archive_flags);
             archive << outp;
 
             arg_size = archive.bytes_written();
@@ -103,7 +107,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         {
             // create an input archive and deserialize the parcel
             hpx::util::portable_binary_iarchive archive(
-                out_buffer, arg_size, in_archive_flags);
+                out_buffer, chunks, arg_size, in_archive_flags);
 
             archive >> inp;
         }
@@ -121,12 +125,14 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     bool print_header = (vm.count("no-header") == 0) ? true : false;
     bool continuation = (vm.count("continuation") != 0) ? true : false;
+    bool zerocopy = (vm.count("zerocopy") != 0) ? true : false;
 
     std::vector<hpx::future<double> > timings;
     for (std::size_t i = 0; i != concurrency; ++i)
     {
         timings.push_back(hpx::async(hpx::util::bind(
-            &benchmark_serialization, data_size, iterations, continuation)));
+            &benchmark_serialization, data_size, iterations,
+            continuation, zerocopy)));
     }
 
     double overall_time = 0;
@@ -163,6 +169,9 @@ int main(int argc, char* argv[])
 
         ( "continuation"
         , "add a continuation to each created parcel")
+
+        ( "zerocopy"
+        , "use zero copy serialization of bitwise copyable arguments")
 
         ( "no-header"
         , "do not print out the csv header row")
