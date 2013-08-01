@@ -137,6 +137,9 @@ endif()
 add_hpx_library_headers(hpx_serialization
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*_binary_*.hpp")
 add_hpx_library_headers(hpx_serialization
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/ichunk_manager.hpp"
+  APPEND)
+add_hpx_library_headers(hpx_serialization
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/ochunk_manager.hpp"
   APPEND)
 
@@ -167,7 +170,7 @@ add_hpx_library_headers(hpx
   APPEND)
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*.h*"
-  EXCLUDE "(.*_binary_.*|ochunk_.*)[.]hpp"
+  EXCLUDE "(.*_binary_.*|[io]chunk_.*)[.]hpp"
   APPEND)
 add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/plugins/*.hpp"

@@ -78,10 +78,10 @@ void portable_binary_oarchive::save_impl(
     char* cptr = reinterpret_cast<char *>(& ll);
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::int64_t) - size);
-    if(flags() & endian_little)
+    if(this->flags() & endian_little)
         reverse_bytes(size, cptr);
 #else
-    if(flags() & endian_big)
+    if(this->flags() & endian_big)
         reverse_bytes(size, cptr);
 #endif
 
@@ -110,10 +110,10 @@ void portable_binary_oarchive::save_impl(
 
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::uint64_t) - size);
-    if(flags() & endian_little)
+    if(this->flags() & endian_little)
         reverse_bytes(size, cptr);
 #else
-    if(flags() & endian_big)
+    if(this->flags() & endian_big)
         reverse_bytes(size, cptr);
 #endif
 
@@ -128,7 +128,7 @@ void portable_binary_oarchive::save_impl(
 #endif
 void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int flags_)
 {
-    if ((flags() & (endian_big | endian_little)) == (endian_big | endian_little))
+    if ((this->flags() & (endian_big | endian_little)) == (endian_big | endian_little))
     {
         // bail out if both flags are specified
         BOOST_THROW_EXCEPTION(
@@ -147,13 +147,13 @@ void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int fl
         *this << v;
     }
 
-    save(static_cast<boost::uint16_t>(flags() >> CHAR_BIT));
+    save(static_cast<boost::uint16_t>(this->flags() >> CHAR_BIT));
 
     // handle filter and compression in the archive separately
     bool has_filter = filter ? true : false;
     *this << has_filter;
 
-    if (has_filter && (flags() & enable_compression)) {
+    if (has_filter && (this->flags() & enable_compression)) {
         *this << filter;
         this->set_filter(filter);
     }

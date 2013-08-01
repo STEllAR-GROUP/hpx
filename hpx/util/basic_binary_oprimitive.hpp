@@ -90,7 +90,7 @@ namespace hpx { namespace util
         // this is the output buffer
         boost::uint32_t flags_;
         std::size_t size_;
-        boost::shared_ptr<detail::erase_container_type> buffer_;
+        boost::shared_ptr<detail::erase_ocontainer_type> buffer_;
 
         // return a pointer to the most derived class
         Archive* This()
@@ -137,6 +137,17 @@ namespace hpx { namespace util
           : flags_(flags & all_archive_flags),
             size_(0),
             buffer_(boost::make_shared<detail::container_type<Container> >(boost::ref(buffer)))
+        {
+            init(flags);
+        }
+
+        template <typename Container>
+        basic_binary_oprimitive(Container& buffer, std::vector<chunk>* chunks,
+                unsigned flags = 0)
+          : flags_(flags & all_archive_flags),
+            size_(0),
+            buffer_(boost::make_shared<detail::ocontainer_type<Container> >(
+                buffer, chunks))
         {
             init(flags);
         }
