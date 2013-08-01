@@ -220,7 +220,7 @@ namespace hpx { namespace util
         {}
 
         template <typename Container>
-        basic_binary_iprimitive(Container const& buffer, std::vector<chunk>* chunks,
+        basic_binary_iprimitive(Container const& buffer, std::vector<serialization_chunk>* chunks,
                 boost::uint64_t inbound_data_size)
           : flags_(0),
             size_(0),

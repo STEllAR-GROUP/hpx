@@ -57,24 +57,24 @@ namespace hpx { namespace util
         chunk_type_pointer = 1
     };
 
-    struct chunk
+    struct serialization_chunk
     {
         chunk_type type_;
         chunk_data data_;       // index or pointer
-        std::size_t size_;      // size of the chunk starting at index_/pos_
+        std::size_t size_;      // size of the serialization_chunk starting at index_/pos_
     };
 
     ///////////////////////////////////////////////////////////////////////
-    inline chunk create_index_chunk(std::size_t index, std::size_t size)
+    inline serialization_chunk create_index_chunk(std::size_t index, std::size_t size)
     {
-        chunk retval = { chunk_type_index, 0, size };
+        serialization_chunk retval = { chunk_type_index, 0, size };
         retval.data_.index_ = index;
         return retval;
     }
 
-    inline chunk create_pointer_chunk(void const* pos, std::size_t size)
+    inline serialization_chunk create_pointer_chunk(void const* pos, std::size_t size)
     {
-        chunk retval = { chunk_type_pointer, 0, size };
+        serialization_chunk retval = { chunk_type_pointer, 0, size };
         retval.data_.cpos_ = pos;
         return retval;
     }

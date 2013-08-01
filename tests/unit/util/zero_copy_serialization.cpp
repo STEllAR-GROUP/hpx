@@ -29,7 +29,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
 {
     std::size_t arg_size = hpx::traits::get_type_size(outp);
     std::vector<char> out_buffer;
-    std::vector<hpx::util::chunk> out_chunks;
+    std::vector<hpx::util::serialization_chunk> out_chunks;
 
     out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
