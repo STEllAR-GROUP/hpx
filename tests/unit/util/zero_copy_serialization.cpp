@@ -29,7 +29,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
 {
     std::size_t arg_size = hpx::traits::get_type_size(outp);
     std::vector<char> out_buffer;
-    std::vector<hpx::util::> out_chunks;
+    std::vector<hpx::util::chunk> out_chunks;
 
     out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
@@ -47,7 +47,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     {
         // create an input archive and deserialize the parcel
         hpx::util::portable_binary_iarchive archive(
-            out_buffer, arg_size, in_archive_flags);
+            out_buffer, &out_chunks, arg_size, in_archive_flags);
 
         archive >> inp;
     }

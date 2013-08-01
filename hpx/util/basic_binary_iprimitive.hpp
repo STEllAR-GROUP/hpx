@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/version.hpp>
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
@@ -137,7 +138,7 @@ namespace hpx { namespace util
         {
             if (0 == count) return;
 
-            buffer_->load_binary_chunk(address);
+            buffer_->load_binary_chunk(address, count);
             size_ += count;
         }
 

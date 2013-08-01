@@ -273,8 +273,8 @@ protected:
     HPX_ALWAYS_EXPORT boost::uint32_t init(boost::uint32_t flags);
 
 public:
-    template <typename Vector>
-    portable_binary_iarchive(Vector const& buffer,
+    template <typename Container>
+    portable_binary_iarchive(Container const& buffer,
             boost::uint64_t inbound_data_size, unsigned flags = 0)
       : primitive_base_t(buffer, inbound_data_size),
         archive_base_t(flags)
@@ -282,8 +282,8 @@ public:
         this->set_flags(init(flags));
     }
 
-    template <typename Vector>
-    portable_binary_iarchive(Vector const& buffer, std::vector<chunk>* chunks,
+    template <typename Container>
+    portable_binary_iarchive(Container const& buffer, std::vector<chunk>* chunks,
             boost::uint64_t inbound_data_size, unsigned flags = 0)
       : primitive_base_t(buffer, chunks, inbound_data_size),
         archive_base_t(flags)

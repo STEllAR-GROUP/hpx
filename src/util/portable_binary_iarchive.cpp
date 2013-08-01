@@ -172,19 +172,19 @@ boost::uint32_t portable_binary_iarchive::init(boost::uint32_t flags)
 
     boost::uint16_t x;
     load(x);
-    flags = static_cast<boost::uint32_t>(x << CHAR_BIT);
+    boost::uint32_t custom_flags = static_cast<boost::uint32_t>(x << CHAR_BIT);
 
     // handle filter and compression in the archive separately
     bool has_filter = false;
     *this >> has_filter;
 
-    if (has_filter && (flags & enable_compression)) {
+    if (has_filter && (custom_flags & enable_compression)) {
         util::binary_filter* filter = 0;
         *this >> filter;
         this->set_filter(filter);
     }
 
-    return flags;
+    return custom_flags | flags;
 }
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
