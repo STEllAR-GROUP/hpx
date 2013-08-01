@@ -16,7 +16,7 @@ namespace hpx { namespace util { namespace detail
         virtual ~erase_icontainer_type() {}
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void load_binary(void* address, std::size_t count) = 0;
-        virtual void load_binary_chunk(void*& address, std::size_t count) = 0;
+        virtual void load_binary_chunk(void* address, std::size_t count) = 0;
     };
 
     template <typename Container>
@@ -99,9 +99,9 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        void load_binary_chunk(void*& address, std::size_t count)
+        void load_binary_chunk(void* address, std::size_t count)
         {
-            if (filter_.get() || chunks_ == 0) {
+            if (filter_.get() || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
                 // fall back to serialization_chunk-less archive
                 this->icontainer_type::load_binary(address, count);
             }
@@ -109,7 +109,18 @@ namespace hpx { namespace util { namespace detail
                 BOOST_ASSERT(current_chunk_ != std::size_t(-1));
                 BOOST_ASSERT((*chunks_)[current_chunk_].type_ == chunk_type_pointer);
 
-                address = (*chunks_)[current_chunk_].data_.pos_;
+                if ((*chunks_)[current_chunk_].size_ != count) 
+                {
+                    BOOST_THROW_EXCEPTION(
+                        boost::archive::archive_exception(
+                            boost::archive::archive_exception::input_stream_error,
+                            "archive data bstream data chunk size mismatch"));
+                    return;
+                }
+
+                // unfortunately we can't implement a zero copy policy on the receiving end
+                // as the memory was already allocated by the serialization code
+                std::memcpy(address, (*chunks_)[current_chunk_].data_.pos_, count);
                 ++current_chunk_;
             }
         }

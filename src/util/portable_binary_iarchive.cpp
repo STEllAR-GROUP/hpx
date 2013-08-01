@@ -176,7 +176,7 @@ boost::uint32_t portable_binary_iarchive::init(boost::uint32_t flags)
 
     // handle filter and compression in the archive separately
     bool has_filter = false;
-    *this >> has_filter;
+    load(has_filter);
 
     if (has_filter && (custom_flags & enable_compression)) {
         util::binary_filter* filter = 0;

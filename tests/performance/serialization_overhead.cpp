@@ -111,6 +111,9 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
             archive >> inp;
         }
+
+        if (chunks)
+            chunks->clear();
     }
 
     return t.elapsed();
