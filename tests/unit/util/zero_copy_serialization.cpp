@@ -9,26 +9,34 @@
 #include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-// This function will never be called
-int test_function(hpx::util::serialize_buffer<double> const& b)
+// These functions will never be called
+int test_function1(hpx::util::serialize_buffer<double> const& b)
 {
     return 42;
 }
-HPX_PLAIN_ACTION(test_function, test_action)
+HPX_PLAIN_ACTION(test_function1, test_action1)
+
+int test_function2(hpx::util::serialize_buffer<double> const& b1,
+    hpx::util::serialize_buffer<double> const& b2)
+{
+    return 42;
+}
+HPX_PLAIN_ACTION(test_function2, test_action2)
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_parcel_serialization(hpx::parcelset::parcel outp)
+void test_parcel_serialization(hpx::parcelset::parcel outp,
+    int in_archive_flags, int out_archive_flags)
 {
     std::size_t arg_size = hpx::traits::get_type_size(outp);
     std::vector<char> out_buffer;
-    std::vector<std::pair<char*, std::size_t> > out_chunks;
+    std::vector<hpx::util::> out_chunks;
 
     out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
     {
         // create an output archive and serialize the parcel
         hpx::util::portable_binary_oarchive archive(
-            out_buffer, 0, out_archive_flags);
+            out_buffer, &out_chunks, 0, out_archive_flags);
         archive << outp;
 
         arg_size = archive.bytes_written();
@@ -78,7 +86,7 @@ void test_normal_serialization(T& arg)
     hpx::naming::gid_type here = here_id.get_gid();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function));
+        reinterpret_cast<boost::uint64_t>(&test_function1));
 
     // compose archive flags
     int in_archive_flags = boost::archive::no_header;
@@ -91,7 +99,7 @@ void test_normal_serialization(T& arg)
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp(here, addr,
-        new hpx::actions::transfer_action<test_action>(
+        new hpx::actions::transfer_action<test_action1>(
             hpx::threads::thread_priority_normal, arg),
         new hpx::actions::typed_continuation<int>(here_id));
 
@@ -101,7 +109,7 @@ void test_normal_serialization(T& arg)
     std::size_t arg_size = hpx::traits::get_type_size(outp);
     std::vector<char> out_buffer;
 
-    out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+    test_parcel_serialization(outp, in_archive_flags, out_archive_flags);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,7 +120,7 @@ void test_zero_copy_serialization(T& arg)
     hpx::naming::gid_type here = here_id.get_gid();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function));
+        reinterpret_cast<boost::uint64_t>(&test_function1));
 
     // compose archive flags
     int in_archive_flags = boost::archive::no_header;
@@ -125,14 +133,14 @@ void test_zero_copy_serialization(T& arg)
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp(here, addr,
-        new hpx::actions::transfer_action<test_action>(
+        new hpx::actions::transfer_action<test_action1>(
             hpx::threads::thread_priority_normal, arg),
         new hpx::actions::typed_continuation<int>(here_id));
 
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here_id);
 
-    test_parcel_serialization(outp);
+    test_parcel_serialization(outp, in_archive_flags, out_archive_flags);
 }
 
 template <typename T1, typename T2>
@@ -142,7 +150,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     hpx::naming::gid_type here = here_id.get_gid();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
-        reinterpret_cast<boost::uint64_t>(&test_function));
+        reinterpret_cast<boost::uint64_t>(&test_function2));
 
     // compose archive flags
     int in_archive_flags = boost::archive::no_header;
@@ -155,14 +163,14 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
 
     // create a parcel with/without continuation
     hpx::parcelset::parcel outp(here, addr,
-        new hpx::actions::transfer_action<test_action>(
-            hpx::threads::thread_priority_normal, arg),
+        new hpx::actions::transfer_action<test_action2>(
+            hpx::threads::thread_priority_normal, arg1, arg2),
         new hpx::actions::typed_continuation<int>(here_id));
 
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here_id);
 
-    test_parcel_serialization(outp);
+    test_parcel_serialization(outp, in_archive_flags, out_archive_flags);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

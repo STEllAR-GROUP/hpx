@@ -42,6 +42,41 @@ namespace hpx { namespace util
     {
         std::reverse(address, address + size);
     }
+
+    ///////////////////////////////////////////////////////////////////////
+    union chunk_data
+    {
+        std::size_t index_;     // position inside the data buffer
+        void const* pos_;       // pointer to external data buffer
+    };
+
+    enum chunk_type
+    {
+        chunk_type_index = 0,
+        chunk_type_pointer = 1
+    };
+
+    struct chunk
+    {
+        chunk_type type_;
+        chunk_data data_;       // index or pointer
+        std::size_t size_;      // size of the chunk starting at index_/pos_
+    };
+
+    ///////////////////////////////////////////////////////////////////////
+    inline chunk create_index_chunk(std::size_t index, std::size_t size)
+    {
+        chunk retval = { chunk_type_index, 0, size };
+        retval.data_.index_ = index;
+        return retval;
+    }
+
+    inline chunk create_pointer_chunk(void const* pos, std::size_t size)
+    {
+        chunk retval = { chunk_type_pointer, 0, size };
+        retval.data_.pos_ = pos;
+        return retval;
+    }
 }}
 
 #endif // PORTABLE_BINARY_ARCHIVE_HPP

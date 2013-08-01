@@ -11,60 +11,34 @@
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
-    union chunk_data
+    struct erase_ocontainer_type
     {
-        std::size_t index_;     // position inside the data buffer
-        void* pos_;             // pointer to external data buffer
-    };
-
-    enum chunk_type
-    {
-        chunk_type_index = 0,
-        chunk_type_pointer = 1
-    };
-
-    struct chunk
-    {
-        chunk_type type_;
-        chunk_data data_;       // index or position
-        std::size_t size_;      // size of the chunk starting at pos_
-    };
-
-    ///////////////////////////////////////////////////////////////////////
-    inline chunk create_index_chunk(std::size_t index, std::size_t size)
-    {
-        chunk retval = { chunk_type_index, 0, size };
-        retval.data_.index_ = index;
-        return retval;
-    }
-
-    inline chunk create_index_chunk(unsigned char* pos, std::size_t size)
-    {
-        chunk retval = { chunk_type_pointer, 0, size };
-        retval.data_.pos_ = pos;
-        return retval;
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    struct erase_container_type
-    {
-        virtual ~erase_container_type() {}
+        virtual ~erase_ocontainer_type() {}
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void save_binary(void const* address, std::size_t count) = 0;
         virtual void save_binary_chunk(void const* address, std::size_t count) = 0;
     };
 
     template <typename Container>
-    struct container_type : erase_container_type
+    struct ocontainer_type : erase_ocontainer_type
     {
-        container_type(Container& cont)
-            : cont_(cont), current_(0), start_compressing_at_(0), filter_(0)
+        ocontainer_type(Container& cont)
+          : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
+            chunks_(0), current_chunk_(std::size_t(-1))
+        {}
+
+        ocontainer_type(Container& cont, std::vector<chunk>* chunks)
+          : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
+            chunks_(chunks), current_chunk_(std::size_t(-1))
         {
-            chunks_.push_back(create_index_chunk(0, 0));
-            current_chunk_ = 0;
+            if (chunks_)
+            {
+                chunks_->push_back(create_index_chunk(0, 0));
+                current_chunk_ = 0;
+            }
         }
 
-        ~container_type()
+        ~ocontainer_type()
         {
             if (filter_) {
                 std::size_t written = 0;
@@ -106,10 +80,10 @@ namespace hpx { namespace util { namespace detail
                 }
                 else {
                     // make sure there is current chunk descriptor available
-                    if (chunks_[current_chunk_].size_ != 0)
+                    if (chunks_ && (*chunks_)[current_chunk_].size_ != 0)
                     {
                         // add a new chunk
-                        chunks_.push_back(create_index_chunk(current_, 0));
+                        chunks_->push_back(create_index_chunk(current_, 0));
                         ++current_chunk_;
                     }
 
@@ -127,19 +101,20 @@ namespace hpx { namespace util { namespace detail
 
         void save_binary_chunk(void const* address, std::size_t count)
         {
-            if (filter_) {
+            if (filter_ || chunks_ == 0) {
                 // fall back to chunk-less archive
                 save_binary(address, count);
             }
             else {
                 // complement current chunk by setting its length
-                BOOST_ASSERT(chunks_[current_chunk_].type_ == chunk_type_index);
-                BOOST_ASSERT(chunks_[current_chunk_].size_ == 0);
+                BOOST_ASSERT((*chunks_)[current_chunk_].type_ == chunk_type_index ||
+                    (*chunks_)[current_chunk_].size_ != 0);
 
-                chunks_[current_chunk_].size_ = current_ - chunks_[current_chunk_].index_;
+                (*chunks_)[current_chunk_].size_ =
+                    current_ - (*chunks_)[current_chunk_].data_.index_;
 
                 // add a new chunk referring to the external buffer
-                chunks_.push_back(create_pointer_chunk(address, count));
+                chunks_->push_back(create_pointer_chunk(address, count));
                 ++current_chunk_;
             }
         }
@@ -149,7 +124,7 @@ namespace hpx { namespace util { namespace detail
         std::size_t start_compressing_at_;
         binary_filter* filter_;
 
-        std::vector<chunk> chunks_;
+        std::vector<chunk>* chunks_;
         std::size_t current_chunk_;
     };
 }}}

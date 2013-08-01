@@ -248,6 +248,15 @@ public:
         init(filter, flags);
     }
 
+    template <typename Container>
+    portable_binary_oarchive(Container& buffer, std::vector<chunk>* chunks,
+            binary_filter* filter = 0, unsigned flags = 0)
+      : primitive_base_t(buffer, chunks, flags),
+        archive_base_t(flags)
+    {
+        init(filter, flags);
+    }
+
     // the optimized save_array dispatches to the base class save_array
     // implementation
 
@@ -258,12 +267,12 @@ public:
         // If we need to potentially flip bytes we serialize each element
         // separately.
 #ifdef BOOST_BIG_ENDIAN
-        if (flags() & (endian_little | disable_array_optimization)) {
+        if (this->flags() & (endian_little | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 save(a.address()[i]);
         }
 #else
-        if (flags() & (endian_big | disable_array_optimization)) {
+        if (this->flags() & (endian_big | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 save(a.address()[i]);
         }

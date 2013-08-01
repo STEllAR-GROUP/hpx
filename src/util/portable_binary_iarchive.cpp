@@ -75,11 +75,11 @@ void portable_binary_iarchive::load_impl(boost::int64_t& l, char const maxsize)
     this->primitive_base_t::load_binary(cptr, static_cast<std::size_t>(size));
 
 #ifdef BOOST_BIG_ENDIAN
-    if(m_flags & endian_little)
-          reverse_bytes(size, cptr);
+    if (this->flags() & endian_little)
+        reverse_bytes(size, cptr);
 #else
-    if(m_flags & endian_big)
-          reverse_bytes(size, cptr);
+    if (this->flags() & endian_big)
+        reverse_bytes(size, cptr);
 #endif
 
     if(negative)
@@ -106,11 +106,11 @@ void portable_binary_iarchive::load_impl(boost::uint64_t& ul, char const maxsize
     this->primitive_base_t::load_binary(cptr, static_cast<std::size_t>(size));
 
 #ifdef BOOST_BIG_ENDIAN
-    if(m_flags & endian_little)
-          reverse_bytes(size, cptr);
+    if (this->flags() & endian_little)
+        reverse_bytes(size, cptr);
 #else
-    if(m_flags & endian_big)
-          reverse_bytes(size, cptr);
+    if (this->flags() & endian_big)
+        reverse_bytes(size, cptr);
 #endif
 }
 
@@ -138,7 +138,7 @@ void portable_binary_iarchive::load_override(
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
-void portable_binary_iarchive::init(unsigned int flags)
+boost::uint32_t portable_binary_iarchive::init(boost::uint32_t flags)
 {
     if (!(flags & boost::archive::no_header))
     {
@@ -172,17 +172,19 @@ void portable_binary_iarchive::init(unsigned int flags)
 
     boost::uint16_t x;
     load(x);
-    m_flags = static_cast<boost::uint32_t>(x << CHAR_BIT);
+    flags = static_cast<boost::uint32_t>(x << CHAR_BIT);
 
     // handle filter and compression in the archive separately
     bool has_filter = false;
     *this >> has_filter;
 
-    if (has_filter && (m_flags & enable_compression)) {
+    if (has_filter && (flags & enable_compression)) {
         util::binary_filter* filter = 0;
         *this >> filter;
         this->set_filter(filter);
     }
+
+    return flags;
 }
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
