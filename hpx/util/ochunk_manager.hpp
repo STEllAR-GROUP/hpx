@@ -33,6 +33,7 @@ namespace hpx { namespace util { namespace detail
         {
             if (chunks_)
             {
+                chunks_->clear();
                 chunks_->push_back(create_index_chunk(0, 0));
                 current_chunk_ = 0;
             }
