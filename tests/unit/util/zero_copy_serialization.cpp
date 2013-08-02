@@ -9,7 +9,6 @@
 #include <hpx/util/serialize_buffer.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-// These functions will never be called
 int test_function1(hpx::util::serialize_buffer<double> const& b)
 {
     return 42;
@@ -76,6 +75,12 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
 
     HPX_TEST_EQ(outcont->get_continuation_name(), incont->get_continuation_name());
     HPX_TEST_EQ(outcont->get_gid(), incont->get_gid());
+
+    //// invoke action encapsulated in inp
+    //naming::address const* inaddrs = pin.get_destination_addrs();
+    //hpx::threads::thread_init_data data;
+    //inact->get_thread_init_data(inaddrs[0].address_, data);
+    //data.func(hpx::threads::wait_signaled);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

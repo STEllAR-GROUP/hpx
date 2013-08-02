@@ -29,6 +29,8 @@ namespace hpx { namespace parcelset { namespace mpi
 
         int rank_;
         boost::shared_ptr<std::vector<char, allocator<char> > > buffer_;
+        std::vector<util::serialization_chunk> chunks_;
+        std::vector<parcel> parcels_;
         std::vector<write_handler_type> handlers_;
         performance_counters::parcels::data_point send_data_;
     };
@@ -63,6 +65,27 @@ namespace hpx { namespace parcelset { namespace mpi
 
             header_.assert_valid();
             BOOST_ASSERT(header_.rank() != util::mpi_environment::rank());
+
+            MPI_Isend(
+                header_.data(),         // Data pointer
+                header_.data_size_,     // Size
+                header_.type(),         // MPI Datatype
+                header_.rank(),         // Destination
+                0,                      // Tag
+                communicator_,          // Communicator
+                &header_request_        // Request
+                );
+
+            MPI_Isend(
+                buffer_->buffer_->data(), // Data pointer
+                static_cast<int>(buffer_->buffer_->size()), // Size
+                MPI_CHAR,               // MPI Datatype
+                header_.rank(),         // Destination
+                header_.tag(),          // Tag
+                communicator_,          // Communicator
+                &data_request_          // Request
+                );
+            state_ = sending_header;
         }
 
         template <typename Parcelport>
@@ -70,30 +93,6 @@ namespace hpx { namespace parcelset { namespace mpi
         {
             switch (state_)
             {
-            case invalid:
-                {
-                    MPI_Isend(
-                        header_.data(), // Data pointer
-                        header_.data_size_,     // Size
-                        header_.type(), // MPI Datatype
-                        header_.rank(), // Destination
-                        0,              // Tag
-                        communicator_,  // Communicator
-                        &header_request_        // Request
-                        );
-
-                    MPI_Isend(
-                        buffer_->buffer_->data(), // Data pointer
-                        static_cast<int>(buffer_->buffer_->size()), // Size
-                        MPI_CHAR,           // MPI Datatype
-                        header_.rank(),     // Destination
-                        header_.tag(),      // Tag
-                        communicator_,      // Communicator
-                        &data_request_      // Request
-                        );
-                    state_ = sending_header;
-                }
-                break;
             case sending_header:
                 {
                     int completed = 0;
@@ -101,6 +100,7 @@ namespace hpx { namespace parcelset { namespace mpi
                     if(completed)
                     {
                         state_ = sent_header;
+                        return done(pp);
                     }
                     break;
                 }
@@ -109,7 +109,7 @@ namespace hpx { namespace parcelset { namespace mpi
                     BOOST_ASSERT(static_cast<std::size_t>(header_.size()) ==
                         buffer_->buffer_->size());
                     state_ = sending_data;
-                    break;
+                    return done(pp);
                 }
             case sending_data:
                 {
@@ -118,6 +118,7 @@ namespace hpx { namespace parcelset { namespace mpi
                     if(completed)
                     {
                         state_ = sent_data;
+                        return done(pp);
                     }
                     break;
                 }
@@ -132,16 +133,20 @@ namespace hpx { namespace parcelset { namespace mpi
                         }
                     }
                     state_ = sender_done;
-                    break;
+                    return done(pp);
                 }
             case sender_done:
                 buffer_->send_data_.time_ = util::high_resolution_clock::now() -
-                        buffer_->send_data_.time_;
+                    buffer_->send_data_.time_;
                 pp.add_sent_data(buffer_->send_data_);
-                pp.buffer_pool_.reclaim_buffer(buffer_->buffer_);
+                pp.reclaim_buffer(buffer_->buffer_);
                 return true;
             default:
-                BOOST_ASSERT(false);
+            case invalid:
+                {
+                    BOOST_ASSERT(false);
+                }
+                return false;
             }
             return false;
         }

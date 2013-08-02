@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset { namespace mpi {
         {
             // start collecting statistics for this receive operation
             receive_data_.time_ = util::high_resolution_clock::now();
-            buffer_ = pp.buffer_pool_.get_buffer(h.size());
+            buffer_ = pp.get_buffer(h.size());
             buffer_->resize(h.size());
             receive_data_.buffer_allocate_time_ =
                 util::high_resolution_clock::now() - receive_data_.time_;
@@ -84,7 +84,7 @@ namespace hpx { namespace parcelset { namespace mpi {
                     receive_data_.time_;
 
                 decode_message(*buffer_, header_.numbytes(), pp, receive_data_);
-                pp.buffer_pool_.reclaim_buffer(buffer_);
+                pp.reclaim_buffer(buffer_);
                 return true;
             }
             return false;
