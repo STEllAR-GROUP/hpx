@@ -9,7 +9,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <vector>
-#include <deque>
+#include <list>
 #include <map>
 
 #include <boost/shared_ptr.hpp>
@@ -17,14 +17,13 @@
 namespace hpx { namespace util {
 
     // This class holds shared_ptr of vector<T, Allocator> with a power of two
-    template <typename T, typename Allocator>
+    template <typename T, typename Allocator = std::allocator<T> >
     struct buffer_pool
     {
         typedef std::vector<T, Allocator> buffer_type;
         typedef boost::shared_ptr<buffer_type> shared_buffer_type;
         typedef typename buffer_type::size_type size_type;
-        typedef std::map<size_type, std::deque<shared_buffer_type> > buffer_map;
-        typedef hpx::lcos::local::spinlock mutex_type;
+        typedef std::map<size_type, std::list<shared_buffer_type> > buffer_map;
 
         shared_buffer_type get_buffer(size_type size)
         {
@@ -47,13 +46,16 @@ namespace hpx { namespace util {
         void reclaim_buffer(shared_buffer_type buffer)
         {
             size_type capacity = next_power_of_two(buffer->capacity());
-            buffer->reserve(capacity);
             buffer->clear();
+            if(capacity != buffer->capacity())
+            {
+                buffer->reserve(capacity);
+            }
 
             typename buffer_map::iterator it = buffers_.find(capacity);
             if(it == buffers_.end())
             {
-                it = buffers_.insert(it, std::make_pair(capacity, std::deque<shared_buffer_type>()));
+                it = buffers_.insert(it, std::make_pair(capacity, std::list<shared_buffer_type>()));
             }
             it->second.push_back(buffer);
         }
