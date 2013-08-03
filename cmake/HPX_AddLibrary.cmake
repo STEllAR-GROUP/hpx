@@ -108,7 +108,7 @@ macro(add_hpx_library name)
     set(exclude_from_all EXCLUDE_FROM_ALL)
   endif()
 
-  if(${${name}_ESSENTIAL})
+  if(${name}_ESSENTIAL)
     add_library(${name}_lib ${${name}_lib_linktype}
       ${${name}_SOURCES} ${${name}_HEADERS})
   else()
