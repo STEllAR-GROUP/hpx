@@ -86,10 +86,23 @@ namespace hpx { namespace actions
     namespace detail
     {
         template <typename Continuation>
-        inline char const* get_continuation_name()
+        char const* get_continuation_name()
+#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+        ;
+#else
         {
+            // If you encounter this assert while compiling code, that means that
+            // you have a HPX_REGISTER_TYPED_CONTINUATION macro somewhere in a
+            // source file, but the header in which the continuation is defined
+            // misses a HPX_REGISTER_TYPED_CONTINUATION_DECLARATION
+            BOOST_MPL_ASSERT_MSG(
+                traits::needs_automatic_registration<Continuation>::value
+              , HPX_REGISTER_TYPED_CONTINUATION_DECLARATION_MISSING
+              , (Continuation)
+            );
             return util::type_id<Continuation>::typeid_.type_id();
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Continuation>
@@ -615,9 +628,9 @@ namespace hpx
 /**/
 
 #define HPX_REGISTER_TYPED_CONTINUATION(Result, Name)                         \
-    HPX_DEFINE_GET_CONTINUATION_NAME_(                                        \
-        hpx::actions::typed_continuation<Result>, Name)                       \
     HPX_CONTINUATION_REGISTER_CONTINUATION_FACTORY(                           \
+        hpx::actions::typed_continuation<Result>, Name)                       \
+    HPX_DEFINE_GET_CONTINUATION_NAME_(                                        \
         hpx::actions::typed_continuation<Result>, Name)                       \
 /**/
 
