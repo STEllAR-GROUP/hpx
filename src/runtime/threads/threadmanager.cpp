@@ -1419,7 +1419,7 @@ namespace hpx { namespace threads
                     LTM_(info) << "stop(" << i << "): join";
 
                     // unlock the lock while joining
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     threads_[i].join();
                 }
                 threads_.clear();

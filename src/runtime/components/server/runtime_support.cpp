@@ -548,7 +548,7 @@ namespace hpx { namespace components { namespace server
 
         // give the scheduler some time to work on remaining tasks
         {
-            util::unlock_the_lock<Lock> ul(l);
+            util::scoped_unlock<Lock> ul(l);
             self->yield(threads::pending);
         }
 
@@ -1395,7 +1395,7 @@ namespace hpx { namespace components { namespace server
 
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             caps = factory->get_required_capabilities();
         }
         return caps;

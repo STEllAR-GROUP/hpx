@@ -74,7 +74,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             id = factory->create_with_args(
                 component_constructor_functor1<
                     typename Component::wrapping_type,
@@ -149,7 +149,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             id = factory->create_with_args(
                 component_constructor_functor2<
                     typename Component::wrapping_type,
@@ -224,7 +224,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             id = factory->create_with_args(
                 component_constructor_functor3<
                     typename Component::wrapping_type,
@@ -299,7 +299,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             id = factory->create_with_args(
                 component_constructor_functor4<
                     typename Component::wrapping_type,
@@ -374,7 +374,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             id = factory->create_with_args(
                 component_constructor_functor5<
                     typename Component::wrapping_type,

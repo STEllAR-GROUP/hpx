@@ -214,7 +214,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -252,7 +252,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full", ec);
                     if (ec) return;
@@ -287,7 +287,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty", ec);
                     if (ec) return;
@@ -327,7 +327,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty", ec);
                     if (ec) return;
@@ -364,7 +364,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full", ec);
                     if (ec) return;
@@ -402,7 +402,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full", ec);
                     if (ec) return;

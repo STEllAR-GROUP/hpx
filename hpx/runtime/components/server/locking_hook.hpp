@@ -111,7 +111,7 @@ namespace hpx { namespace components
             threads::thread_state_ex_enum result = threads::wait_unknown;
 
             {
-                util::unlock_the_lock<mutex_type> ul(mtx_);
+                util::scoped_unlock<mutex_type> ul(mtx_);
                 result = threads::get_self().yield_impl(state);
             }
 

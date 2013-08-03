@@ -48,7 +48,7 @@ namespace hpx { namespace util
             if (first_start_) {
                 first_start_ = false;
 
-                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                 if (pre_shutdown_)
                     register_pre_shutdown_function(boost::bind(&interval_timer::terminate, this));
                 else
@@ -158,7 +158,7 @@ namespace hpx { namespace util
             bool result = false;
 
             {
-                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                 result = f_();            // invoke the supplied function
             }
 

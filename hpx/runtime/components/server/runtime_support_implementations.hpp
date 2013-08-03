@@ -77,7 +77,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
-            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
             id = factory->create_with_args(
                 BOOST_PP_CAT(component_constructor_functor, N)<
                     typename Component::wrapping_type,

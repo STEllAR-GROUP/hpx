@@ -13,13 +13,13 @@ namespace hpx { namespace util
     // This is a helper structure to make sure a lock gets unlocked and locked
     // again in a scope.
     template <typename Lock>
-    struct unlock_the_lock
+    struct scoped_unlock
     {
-        unlock_the_lock(Lock& l) : l_(l)
+        scoped_unlock(Lock& l) : l_(l)
         {
             l_.unlock();
         }
-        ~unlock_the_lock()
+        ~scoped_unlock()
         {
             l_.lock();
         }

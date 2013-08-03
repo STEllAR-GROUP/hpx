@@ -109,7 +109,7 @@ struct object_semaphore
             thread_queue_.pop_front();
 
             {
-                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
 
                 // set the LCO's result
                 applier::trigger(id, boost::move(value));

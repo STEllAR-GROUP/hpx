@@ -211,7 +211,7 @@ namespace hpx { namespace lcos { namespace local
                     reset_queue_entry r(e, queue_);
 
                     {
-                        util::unlock_the_lock<Lock> ul(l);
+                        util::scoped_unlock<Lock> ul(l);
                         this_thread::suspend(threads::suspended,
                             "lcos::counting_semaphore::wait");
                     }
