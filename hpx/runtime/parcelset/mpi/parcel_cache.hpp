@@ -126,6 +126,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         {
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
+            std::vector<parcel>& pv = buffer->parcels_;
 
             buffer->rank_ = pv[0].get_destination_locality().get_rank();
             if (buffer->rank_ == -1)

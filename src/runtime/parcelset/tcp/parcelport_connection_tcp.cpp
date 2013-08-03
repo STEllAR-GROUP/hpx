@@ -48,6 +48,7 @@ namespace hpx { namespace parcelset { namespace tcp
             performance_counters::parcels::gatherer& parcels_sent,
             boost::uint64_t max_outbound_size)
       : socket_(io_service), out_priority_(0), out_size_(0), out_data_size_(0)
+      , num_zero_copy_chunks_(0), num_non_zero_copy_chunks_(0)
       , max_outbound_size_(max_outbound_size)
 #if defined(HPX_HAVE_SECURITY)
       , first_message_(true)
@@ -180,6 +181,7 @@ namespace hpx { namespace parcelset { namespace tcp
         try {
             // clear and preallocate out_buffer_
             out_buffer_.clear();
+            out_chunks_.clear();
 
             BOOST_FOREACH(parcel const & p, pv)
             {
@@ -204,7 +206,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 }
 
                 util::portable_binary_oarchive archive(
-                    out_buffer_, filter.get(), archive_flags);
+                    out_buffer_, &out_chunks_, filter.get(), archive_flags);
 
 #if defined(HPX_HAVE_SECURITY)
                 std::set<boost::uint32_t> localities;
