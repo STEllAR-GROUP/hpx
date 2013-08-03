@@ -95,13 +95,58 @@ namespace hpx { namespace parcelset { namespace tcp
             /// Increment sends and begin timer.
             send_data_.time_ = timer_.elapsed_nanoseconds();
 
+            // prepare chunk data for transmission, the transmission_chunks data
+            // first holds all zero-copy, then all non-zero-copy chunk infos
+            out_transmission_chunks_.clear();
+            out_transmission_chunks_.reserve(out_chunks_.size());
+
+            std::size_t index = 0;
+            BOOST_FOREACH(util::serialization_chunk& c, out_chunks_)
+            {
+                if (c.type_ == util::chunk_type_pointer) {
+                    out_transmission_chunks_.push_back(
+                        transmission_chunk_type(index, c.size_));
+                }
+                ++index;
+            }
+
+            num_zero_copy_chunks_ = out_transmission_chunks_.size();
+            num_non_zero_copy_chunks_ = out_chunks_.size() -
+                out_transmission_chunks_.size();
+
+            BOOST_FOREACH(util::serialization_chunk& c, out_chunks_)
+            {
+                if (c.type_ == util::chunk_type_index) {
+                    out_transmission_chunks_.push_back(
+                        transmission_chunk_type(c.data_.index_, c.size_));
+                }
+            }
+
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&out_priority_, sizeof(out_priority_)));
             buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
             buffers.push_back(boost::asio::buffer(&out_data_size_, sizeof(out_data_size_)));
+
+            // add chunk description
+            buffers.push_back(boost::asio::buffer(&num_zero_copy_chunks_,
+                sizeof(num_zero_copy_chunks_)));
+            buffers.push_back(boost::asio::buffer(&num_non_zero_copy_chunks_,
+                sizeof(num_non_zero_copy_chunks_)));
+
+            buffers.push_back(boost::asio::buffer(out_transmission_chunks_.data(),
+                out_transmission_chunks_.size()*sizeof(transmission_chunk_type)));
+
+            // add main buffer holding data which was serialized normally
             buffers.push_back(boost::asio::buffer(out_buffer_));
+
+            // now add chunks themselves, those hold zero-copy serialized chunks
+            BOOST_FOREACH(util::serialization_chunk& c, out_chunks_)
+            {
+                if (c.type_ == util::chunk_type_pointer)
+                    buffers.push_back(boost::asio::buffer(c.data_.cpos_, c.size_));
+            }
 
             // this additional wrapping of the handler into a bind object is
             // needed to keep  this parcelport_connection object alive for the whole
@@ -142,6 +187,11 @@ namespace hpx { namespace parcelset { namespace tcp
             out_priority_ = 0;
             out_size_ = 0;
             out_data_size_ = 0;
+
+            out_chunks_.clear();
+            out_transmission_chunks_.clear();
+            num_non_zero_copy_chunks_ = 0;
+            num_zero_copy_chunks_ = 0;
 
             send_data_.bytes_ = 0;
             send_data_.time_ = 0;
@@ -202,8 +252,17 @@ namespace hpx { namespace parcelset { namespace tcp
         boost::integer::ulittle8_t out_priority_;
         boost::integer::ulittle64_t out_size_;
         boost::integer::ulittle64_t out_data_size_;
+
         std::vector<char> out_buffer_;
 
+        typedef std::pair<boost::integer::ulittle64_t, boost::integer::ulittle64_t>
+            transmission_chunk_type;
+        std::vector<transmission_chunk_type> out_transmission_chunks_;
+
+        boost::integer::ulittle64_t num_zero_copy_chunks_;
+        boost::integer::ulittle64_t num_non_zero_copy_chunks_;
+
+        std::vector<util::serialization_chunk> out_chunks_;
         boost::uint64_t max_outbound_size_;
 
         bool ack_;

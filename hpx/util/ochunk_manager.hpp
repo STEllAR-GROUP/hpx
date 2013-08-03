@@ -83,6 +83,11 @@ namespace hpx { namespace util { namespace detail
             BOOST_ASSERT(0 == filter_);
             filter_ = filter;
             start_compressing_at_ = current_;
+
+            if (chunks_) {
+                BOOST_ASSERT(chunks_->size() == 1 && (*chunks_)[0].size_ == 0);
+                chunks_->clear();
+            }
         }
 
         void save_binary(void const* address, std::size_t count)

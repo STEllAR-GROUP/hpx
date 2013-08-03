@@ -25,17 +25,21 @@ namespace hpx { namespace util { namespace detail
         icontainer_type(Container const& cont, std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
-            chunks_(0), current_chunk_(std::size_t(-1)),
-            current_chunk_size_(0)
+            chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
         {}
 
         icontainer_type(Container const& cont, std::vector<serialization_chunk>* chunks,
                 std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
-            chunks_(chunks), current_chunk_(chunks ? 0 : std::size_t(-1)),
-            current_chunk_size_(0)
-        {}
+            chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
+        {
+            if (chunks && chunks->size() != 0)
+            {
+                chunks_ = chunks;
+                current_chunk_ = 0;
+            }
+        }
 
         ~icontainer_type() {}
 
@@ -82,9 +86,11 @@ namespace hpx { namespace util { namespace detail
                     current_chunk_size_ += count;
 
                     // make sure we switch to the next serialization_chunk if necessary
-                    if (current_chunk_size_ >= (*chunks_)[current_chunk_].size_) {
+                    std::size_t current_chunk_size = (*chunks_)[current_chunk_].size_;
+                    if (current_chunk_size != 0 && current_chunk_size_ >= current_chunk_size)
+                    {
                         // raise an error if we read past the serialization_chunk
-                        if (current_chunk_size_ > (*chunks_)[current_chunk_].size_)
+                        if (current_chunk_size_ > current_chunk_size)
                         {
                             BOOST_THROW_EXCEPTION(
                                 boost::archive::archive_exception(
