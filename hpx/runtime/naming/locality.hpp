@@ -163,11 +163,10 @@ namespace hpx { namespace naming
         operator util::safe_bool<locality>::result_type() const
         {
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-            return util::safe_bool<locality>()(
-                port_ != boost::uint16_t(-1) || rank_ != -1);
-#else
-            return util::safe_bool<locality>()(port_ != boost::uint16_t(-1));
+            if(util::mpi_environment::enabled())
+                return util::safe_bool<locality>()(rank_ != -1);
 #endif
+            return util::safe_bool<locality>()(port_ != boost::uint16_t(-1));
         }
 
         std::string const& get_address() const { return address_; }
