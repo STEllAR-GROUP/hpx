@@ -48,6 +48,7 @@ namespace hpx { namespace util
             naming::gid_type const& lower
           , naming::gid_type const& upper)
         {
+            mutex_type::scoped_lock l(mtx_);
             lower_ = lower;
             upper_ = upper;
         }

@@ -25,11 +25,11 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(mtx_);
 
         // ensure next_id doesn't overflow
-        if ((lower_ + count) > upper_)
+        if (!lower_ || (lower_ + count) > upper_)
         {
-            naming::gid_type lower;
-            naming::gid_type upper;
+            lower_ = naming::invalid_gid;
 
+            naming::gid_type lower;
             std::size_t count_ = (std::max)(std::size_t(range_delta), count);
 
             {
@@ -37,8 +37,11 @@ namespace hpx { namespace util
                 lower = hpx::agas::get_next_id(count_);
             }
 
-            lower_ = lower;
-            upper_ = lower + count_;
+            if (!lower_)
+            {
+                lower_ = lower;
+                upper_ = lower + count_;
+            }
         }
 
         naming::gid_type result = lower_;
