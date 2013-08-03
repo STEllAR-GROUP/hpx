@@ -14,7 +14,7 @@
 #include <hpx/lcos/detail/full_empty_memory.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/value_or_error.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/if.hpp>

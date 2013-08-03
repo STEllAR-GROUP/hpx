@@ -10,7 +10,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/spinlock_pool.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/assert.hpp>
