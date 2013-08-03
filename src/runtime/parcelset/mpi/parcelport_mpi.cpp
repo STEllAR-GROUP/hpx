@@ -181,7 +181,7 @@ namespace hpx { namespace parcelset { namespace mpi
             // add new send requests
             senders_.splice(senders_.end(), parcel_cache_.get_senders(
                 HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this(), HPX_STD_PLACEHOLDERS::_1),
-                communicator, *this));
+                communicator, *this, senders_.size()));
 
             // handle all send requests
             for(senders_type::iterator it = senders_.begin(); it != senders_.end(); /**/)

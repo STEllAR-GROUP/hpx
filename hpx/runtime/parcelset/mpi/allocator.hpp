@@ -87,6 +87,11 @@ namespace hpx { namespace parcelset { namespace mpi {
                 return (std::numeric_limits<std::size_t>::max)() / sizeof(T);
             }
             
+            void construct(pointer p)
+            {
+                new ((void *)p) T();
+            }
+            
             void construct(pointer p, const T& val)
             {
                 new ((void *)p) T(val);

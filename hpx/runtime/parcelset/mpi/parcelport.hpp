@@ -138,7 +138,7 @@ namespace hpx { namespace parcelset { namespace mpi
         boost::atomic<bool> stopped_;
         boost::atomic<bool> handling_messages_;
 
-        int next_tag_;
+        std::size_t next_tag_;
         std::deque<int> free_tags_;
 
         bool get_next_tag(int& tag)
@@ -150,11 +150,11 @@ namespace hpx { namespace parcelset { namespace mpi
                 free_tags_.pop_front();
                 return true;
             }
-            if(next_tag_ + 1 > static_cast<int>((std::numeric_limits<int>::max)()))
+            if(next_tag_ + 1 > static_cast<std::size_t>((std::numeric_limits<int>::max)()))
             {
                 return false;
             }
-            tag = next_tag_++;
+            tag = static_cast<int>(next_tag_++);
             return true;
         }
 

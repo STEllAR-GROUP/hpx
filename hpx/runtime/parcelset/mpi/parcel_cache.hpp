@@ -43,12 +43,6 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             return parcels_.size();
         }
 
-        void clear()
-        {
-            parcels_.clear();
-            handlers_.clear();
-        }
-
         std::vector<parcel> parcels_;
         std::vector<write_handler_type> handlers_;
     };
@@ -101,8 +95,6 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         {
             int dest(pv[0].get_destination_locality().get_rank());
 
-            std::size_t i = (idx == std::size_t(-1)) ? hpx::get_worker_thread_num() : idx;
-
             typedef parcel_holders::iterator iterator;
             {
                 mutex_type::scoped_lock lk(parcel_holders_mtx_);
@@ -142,8 +134,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
 
             util::high_resolution_timer timer;
-            buffer->buffer_ = pp.buffer_pool_.get_buffer(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
-            buffer->buffer_->resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+            buffer->buffer_ = pp.buffer_pool_.get_buffer(arg_size + pv.size() * HPX_PARCEL_SERIALIZATION_OVERHEAD);
             buffer->send_data_.buffer_allocate_time_ = timer.elapsed_nanoseconds();
 
             // mark start of serialization
@@ -172,8 +163,6 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 }
 
                 arg_size = archive.bytes_written();
-
-                BOOST_ASSERT(arg_size == buffer->buffer_->size());
 
                 // store the time required for serialization
                 buffer->send_data_.serialization_time_ = timer.elapsed_nanoseconds() - serialization_start;;
@@ -229,43 +218,57 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         template <typename Parcelport>
         std::list<boost::shared_ptr<sender> > get_senders(
             HPX_STD_FUNCTION<bool(int&)> const& tag_generator, MPI_Comm communicator,
-            Parcelport& pp)
+            Parcelport& pp, std::size_t size)
         {
             std::list<boost::shared_ptr<sender> > res;
+            parcel_holders phs;
             {
                 mutex_type::scoped_try_lock lk0(parcel_holders_mtx_);
                 if(!lk0)
                 {
                     return res;
                 }
-                BOOST_FOREACH(parcel_holders::value_type & ph, parcel_holders_)
+                std::swap(parcel_holders_, phs);
+            }
+            bool tags_exhausted = false;
+            BOOST_FOREACH(parcel_holders::value_type & ph, phs)
+            {
+                if(ph.second.size() == 0) continue;
+                int tag;
+                if(!tag_generator(tag))
                 {
-                    if(ph.second.size() == 0) continue;
-                    int tag;
-                    if(!tag_generator(tag)) break;
+                    // If no new tag could be generated, we need to put the
+                    // remaining parcels back in the cache
+                    tags_exhausted=true;
+                    break;
+                }
 
-                    // collect outgoing data
-                    boost::shared_ptr<parcel_buffer> buffer(boost::make_shared<parcel_buffer>());
-                    std::swap(buffer->handlers_, ph.second.handlers_);
+                // collect outgoing data
+                boost::shared_ptr<parcel_buffer> buffer(boost::make_shared<parcel_buffer>());
+                std::vector<parcel> parcels;
+                
+                buffer->rank_ = ph.first;
+                std::swap(buffer->handlers_, ph.second.handlers_);
+                std::swap(parcels, ph.second.parcels_);
 
-                    std::vector<parcel> parcels;
-                    std::swap(parcels, ph.second.parcels_);
-                    ph.second.clear();
-                    {
-                        util::scoped_unlock<mutex_type::scoped_try_lock> ull0(lk0);
-                        encode_parcels(buffer, parcels, pp);
-                        res.push_back(
-                            boost::make_shared<sender>(
-                                header(
-                                    buffer->rank_
-                                  , tag
-                                  , static_cast<int>(buffer->buffer_->size())
-                                )
-                              , buffer
-                              , communicator
-                            )
-                        );
-                    }
+                encode_parcels(buffer, parcels, pp);
+                res.push_back(
+                    boost::make_shared<sender>(
+                        header(
+                            buffer->rank_
+                          , tag
+                          , static_cast<int>(buffer->buffer_->size())
+                        )
+                      , buffer
+                      , communicator
+                    )
+                );
+            }
+            if(tags_exhausted)
+            {
+                BOOST_FOREACH(parcel_holders::value_type & ph, phs)
+                {
+                    set_parcel(ph.second.parcels_, ph.second.handlers_);
                 }
             }
             return boost::move(res);
