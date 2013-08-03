@@ -283,7 +283,8 @@ public:
     }
 
     template <typename Container>
-    portable_binary_iarchive(Container const& buffer, std::vector<serialization_chunk>* chunks,
+    portable_binary_iarchive(Container const& buffer,
+            std::vector<serialization_chunk> const* chunks,
             boost::uint64_t inbound_data_size, unsigned flags = 0)
       : primitive_base_t(buffer, chunks, inbound_data_size),
         archive_base_t(flags)

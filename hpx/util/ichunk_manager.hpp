@@ -28,7 +28,8 @@ namespace hpx { namespace util { namespace detail
             chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
         {}
 
-        icontainer_type(Container const& cont, std::vector<serialization_chunk>* chunks,
+        icontainer_type(Container const& cont,
+                std::vector<serialization_chunk> const* chunks,
                 std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
@@ -136,7 +137,7 @@ namespace hpx { namespace util { namespace detail
         HPX_STD_UNIQUE_PTR<binary_filter> filter_;
         std::size_t decompressed_size_;
 
-        std::vector<serialization_chunk>* chunks_;
+        std::vector<serialization_chunk> const* chunks_;
         std::size_t current_chunk_;
         std::size_t current_chunk_size_;
     };

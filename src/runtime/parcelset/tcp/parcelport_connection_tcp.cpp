@@ -48,7 +48,7 @@ namespace hpx { namespace parcelset { namespace tcp
             performance_counters::parcels::gatherer& parcels_sent,
             boost::uint64_t max_outbound_size)
       : socket_(io_service), out_priority_(0), out_size_(0), out_data_size_(0)
-      , num_zero_copy_chunks_(0), num_non_zero_copy_chunks_(0)
+      , num_chunks_(count_chunks_type(0, 0))
       , max_outbound_size_(max_outbound_size)
 #if defined(HPX_HAVE_SECURITY)
       , first_message_(true)

@@ -110,17 +110,11 @@ namespace hpx { namespace parcelset { namespace tcp
                 ++index;
             }
 
-            num_zero_copy_chunks_ = out_transmission_chunks_.size();
-            num_non_zero_copy_chunks_ = out_chunks_.size() -
-                out_transmission_chunks_.size();
-
-            BOOST_FOREACH(util::serialization_chunk& c, out_chunks_)
-            {
-                if (c.type_ == util::chunk_type_index) {
-                    out_transmission_chunks_.push_back(
-                        transmission_chunk_type(c.data_.index_, c.size_));
-                }
-            }
+            num_chunks_ = count_chunks_type(
+                    static_cast<boost::uint32_t>(out_transmission_chunks_.size()),
+                    static_cast<boost::uint32_t>(out_chunks_.size() -
+                        out_transmission_chunks_.size())
+                );
 
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
@@ -130,22 +124,34 @@ namespace hpx { namespace parcelset { namespace tcp
             buffers.push_back(boost::asio::buffer(&out_data_size_, sizeof(out_data_size_)));
 
             // add chunk description
-            buffers.push_back(boost::asio::buffer(&num_zero_copy_chunks_,
-                sizeof(num_zero_copy_chunks_)));
-            buffers.push_back(boost::asio::buffer(&num_non_zero_copy_chunks_,
-                sizeof(num_non_zero_copy_chunks_)));
+            buffers.push_back(boost::asio::buffer(&num_chunks_, sizeof(num_chunks_)));
 
-            buffers.push_back(boost::asio::buffer(out_transmission_chunks_.data(),
-                out_transmission_chunks_.size()*sizeof(transmission_chunk_type)));
+            if (!out_transmission_chunks_.empty()) {
+                // the remaining number of chunks are non-zero-copy
+                BOOST_FOREACH(util::serialization_chunk& c, out_chunks_)
+                {
+                    if (c.type_ == util::chunk_type_index) {
+                        out_transmission_chunks_.push_back(
+                            transmission_chunk_type(c.data_.index_, c.size_));
+                    }
+                }
 
-            // add main buffer holding data which was serialized normally
-            buffers.push_back(boost::asio::buffer(out_buffer_));
+                buffers.push_back(boost::asio::buffer(out_transmission_chunks_.data(),
+                    out_transmission_chunks_.size()*sizeof(transmission_chunk_type)));
 
-            // now add chunks themselves, those hold zero-copy serialized chunks
-            BOOST_FOREACH(util::serialization_chunk& c, out_chunks_)
-            {
-                if (c.type_ == util::chunk_type_pointer)
-                    buffers.push_back(boost::asio::buffer(c.data_.cpos_, c.size_));
+                // add main buffer holding data which was serialized normally
+                buffers.push_back(boost::asio::buffer(out_buffer_));
+
+                // now add chunks themselves, those hold zero-copy serialized chunks
+                BOOST_FOREACH(util::serialization_chunk& c, out_chunks_)
+                {
+                    if (c.type_ == util::chunk_type_pointer)
+                        buffers.push_back(boost::asio::buffer(c.data_.cpos_, c.size_));
+                }
+            }
+            else {
+                // add main buffer holding data which was serialized normally
+                buffers.push_back(boost::asio::buffer(out_buffer_));
             }
 
             // this additional wrapping of the handler into a bind object is
@@ -190,8 +196,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
             out_chunks_.clear();
             out_transmission_chunks_.clear();
-            num_non_zero_copy_chunks_ = 0;
-            num_zero_copy_chunks_ = 0;
+            num_chunks_ = count_chunks_type(0, 0);
 
             send_data_.bytes_ = 0;
             send_data_.time_ = 0;
@@ -259,8 +264,11 @@ namespace hpx { namespace parcelset { namespace tcp
             transmission_chunk_type;
         std::vector<transmission_chunk_type> out_transmission_chunks_;
 
-        boost::integer::ulittle64_t num_zero_copy_chunks_;
-        boost::integer::ulittle64_t num_non_zero_copy_chunks_;
+        // pair of (zero-copy, non-zero-copy) chunks
+        typedef std::pair<
+            boost::integer::ulittle32_t, boost::integer::ulittle32_t
+        > count_chunks_type;
+        count_chunks_type num_chunks_;
 
         std::vector<util::serialization_chunk> out_chunks_;
         boost::uint64_t max_outbound_size_;
