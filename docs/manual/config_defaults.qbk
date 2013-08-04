@@ -460,7 +460,7 @@ to `ON`).
       false. Note that if `hpx.agas.use_range_caching` is true, this size will
       refer to the maximum number of ranges stored in the cache, not the number
       of entries spanned by the cache. Note also, that the size of the cache
-      will be determined by the large of the following two numbers: the value
+      will be determined by the larger of the following two numbers: the value
       of this key and the value of `hpx.agas.local_cache_size_per_thread`
       multiplied by the number of threads used systemwide in the running application.]
      [static information, the default depends on the compile time preprocessor
@@ -471,7 +471,7 @@ to `ON`).
       `hpx.agas.use_caching` is false. Note that if `hpx.agas.use_range_caching`
       is true, this size will refer to the maximum number of ranges stored in
       the cache, not the number of entries spanned by the cache. Note also,
-      that the size of the cache will be determined by the large of the following
+      that the size of the cache will be determined by the larger of the following
       two numbers: the `hpx.agas.local_cache_size` and the value of this key
       multiplied by the number of threads used system wide in the running application.]
      [static information, the default depends on the compile time preprocessor
