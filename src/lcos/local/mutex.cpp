@@ -64,7 +64,7 @@ namespace hpx { namespace lcos { namespace local
         reset_queue_entry r(e, queue_);
 
         {
-            util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            util::scoped_unlock<mutex_type::scoped_lock> ul(l);
 
             // timeout at the given time, if appropriate
             if (!wait_until.is_not_a_date_time())
