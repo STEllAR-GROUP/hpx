@@ -254,8 +254,6 @@ namespace hpx { namespace components { namespace detail
             value_type* addr = static_cast<value_type*>(pool_->address());
 
             if (!base_gid_) {
-                hpx::applier::applier& appl = hpx::applier::get_applier();
-
                 naming::gid_type base_gid;
 
                 {
@@ -263,20 +261,20 @@ namespace hpx { namespace components { namespace detail
                     // a sufficiently large range of global ids
                     util::scoped_unlock<scoped_lock> ul(l);
                     base_gid = ids.get_id(step_);
+
+                    // register the global ids and the base address of this heap
+                    // with the AGAS
+                    if (!applier::bind_range(base_gid, step_,
+                            naming::address(hpx::get_locality(),
+                                components::get_component_type<typename value_type::type_holder>(),
+                                addr),
+                            sizeof(value_type)))
+                    {
+                        return naming::invalid_gid;
+                    }
                 }
 
-                // register the global ids and the base address of this heap
-                // with the AGAS
-                if (!applier::bind_range(base_gid, step_,
-                        naming::address(appl.here(),
-                            components::get_component_type<typename value_type::type_holder>(),
-                            addr),
-                        sizeof(value_type)))
-                {
-                    return naming::invalid_gid;
-                }
-
-                // if some other thread has already set the base GID for this 
+                // if some other thread has already set the base GID for this
                 // heap, we ignore the result
                 if (!base_gid_)
                 {

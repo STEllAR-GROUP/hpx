@@ -25,7 +25,7 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(mtx_);
 
         // ensure next_id doesn't overflow
-        if (!lower_ || (lower_ + count) > upper_)
+        while (!lower_ || (lower_ + count) > upper_)
         {
             lower_ = naming::invalid_gid;
 
@@ -37,6 +37,8 @@ namespace hpx { namespace util
                 lower = hpx::agas::get_next_id(count_);
             }
 
+            // we ignore the result if some other thread has already set the
+            // new lower range
             if (!lower_)
             {
                 lower_ = lower;

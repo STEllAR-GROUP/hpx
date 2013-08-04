@@ -33,7 +33,7 @@ namespace hpx { namespace util
 
         /// size of the id range returned by command_getidrange
         /// FIXME: is this a policy?
-        enum { range_delta = 16384 };
+        enum { range_delta = 0x100000 };
 
     public:
         unique_id_ranges()
