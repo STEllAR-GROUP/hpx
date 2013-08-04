@@ -11,7 +11,7 @@
 #include <hpx/runtime/parcelset/mpi/sender.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
@@ -252,7 +252,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     std::swap(parcels, ph.second.parcels_);
                     ph.second.clear();
                     {
-                        util::unlock_the_lock<mutex_type::scoped_try_lock> ull0(lk0);
+                        util::scoped_unlock<mutex_type::scoped_try_lock> ull0(lk0);
                         encode_parcels(buffer, parcels, pp);
                         res.push_back(
                             boost::make_shared<sender>(

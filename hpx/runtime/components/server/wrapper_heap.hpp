@@ -261,7 +261,7 @@ namespace hpx { namespace components { namespace detail
                 {
                     // this is the first call to get_gid() for this heap - allocate
                     // a sufficiently large range of global ids
-                    util::unlock_the_lock<scoped_lock> ul(l);
+                    util::scoped_unlock<scoped_lock> ul(l);
                     base_gid = ids.get_id(step_);
                 }
 

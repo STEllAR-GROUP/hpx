@@ -14,7 +14,7 @@
 #include <hpx/lcos/detail/full_empty_memory.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/value_or_error.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/if.hpp>
@@ -178,7 +178,7 @@ namespace detail
                     &future_data_base::wake_me_up, this_, threads::get_self_id()),
                     l);
 
-                util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 this_thread::suspend(threads::suspended);
             }
         }
@@ -193,7 +193,7 @@ namespace detail
                     &future_data_base::wake_me_up, this_, threads::get_self_id()),
                     l);
 
-                util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(p) == threads::wait_signaled) ?
                     future_status::ready : future_status::timeout;
             }
@@ -210,7 +210,7 @@ namespace detail
                     &future_data_base::wake_me_up, this_, threads::get_self_id()),
                     l);
 
-                util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
+                util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(at) == threads::wait_signaled) ?
                     future_status::ready : future_status::timeout;
             }
@@ -498,7 +498,7 @@ namespace detail
 
                 {
                     // invoke the callback (continuation) function right away
-                    util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
 
                     if (!retval.empty())
                         retval(f);

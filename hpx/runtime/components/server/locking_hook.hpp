@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
@@ -111,7 +111,7 @@ namespace hpx { namespace components
             threads::thread_state_ex_enum result = threads::wait_unknown;
 
             {
-                util::unlock_the_lock<mutex_type> ul(mtx_);
+                util::scoped_unlock<mutex_type> ul(mtx_);
                 result = threads::get_self().yield_impl(state);
             }
 

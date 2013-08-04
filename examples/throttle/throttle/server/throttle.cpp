@@ -7,7 +7,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -95,7 +95,7 @@ namespace throttle { namespace server
             boost::system_time xt(boost::get_system_time() +
                 boost::posix_time::milliseconds(100));
 
-            hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+            hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
             boost::thread::sleep(xt);
         }
 

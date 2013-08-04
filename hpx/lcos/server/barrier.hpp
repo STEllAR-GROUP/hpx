@@ -12,7 +12,7 @@
 #include <boost/intrusive/slist.hpp>
 
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -156,7 +156,7 @@ namespace hpx { namespace lcos { namespace server
 
                 reset_queue_entry r(e, queue_);
                 {
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "barrier::set_event");
                 }

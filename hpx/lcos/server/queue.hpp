@@ -11,7 +11,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -226,7 +226,7 @@ namespace hpx { namespace lcos { namespace server
 
                 reset_queue_entry r(e, thread_queue_);
                 {
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended,
                         "queue::get_value");
                 }

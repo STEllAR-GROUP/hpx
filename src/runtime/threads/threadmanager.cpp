@@ -20,7 +20,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/itt_notify.hpp>
@@ -1419,7 +1419,7 @@ namespace hpx { namespace threads
                     LTM_(info) << "stop(" << i << "): join";
 
                     // unlock the lock while joining
-                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     threads_[i].join();
                 }
                 threads_.clear();
