@@ -9,7 +9,9 @@
 #include <hpx/config.hpp>
 #include <string>
 
-#ifdef __GNUC__
+// disable the code specific to gcc for now as this causes problems 
+// (see #811: simple_central_tuplespace_client run error) 
+#if 0 // defined(__GNUC__)
 #include <cxxabi.h>
 
 namespace hpx { namespace util
@@ -29,7 +31,7 @@ namespace hpx { namespace util
 
         char const* type_id() const
         {
-            return demangled_;
+            return demangled_ ? demangled_ : typeid(T).name();
         }
 
     private:
@@ -67,3 +69,4 @@ namespace hpx { namespace util
 }}
 
 #endif
+
