@@ -362,7 +362,7 @@ response symbol_namespace::resolve(
             naming::detail::add_credit_to_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
 
             {
-                hpx::util::unlock_the_lock<mutex_type::scoped_lock> ull(l);
+                hpx::util::scoped_unlock<mutex_type::scoped_lock> ull(l);
                 naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT, ec);
             }
 

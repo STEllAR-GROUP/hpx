@@ -17,7 +17,7 @@
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <vector>

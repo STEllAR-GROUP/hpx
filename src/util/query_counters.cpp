@@ -86,7 +86,7 @@ namespace hpx { namespace util
 
                 // find matching counter type
                 {
-                    hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                    hpx::util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                     performance_counters::discover_counter_type(name, func,
                         performance_counters::discover_counters_full);
                 }

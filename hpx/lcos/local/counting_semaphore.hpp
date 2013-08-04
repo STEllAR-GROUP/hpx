@@ -10,7 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/unlock_lock.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/stringstream.hpp>
 
 #include <boost/cstdint.hpp>
@@ -211,7 +211,7 @@ namespace hpx { namespace lcos { namespace local
                     reset_queue_entry r(e, queue_);
 
                     {
-                        util::unlock_the_lock<Lock> ul(l);
+                        util::scoped_unlock<Lock> ul(l);
                         this_thread::suspend(threads::suspended,
                             "lcos::counting_semaphore::wait");
                     }
