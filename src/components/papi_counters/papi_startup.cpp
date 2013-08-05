@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011-2012 Maciej Brodowicz
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -200,8 +200,10 @@ namespace hpx { namespace performance_counters { namespace papi
                 // this is just validation, no helptext required
                 if (!f(cnt_info, ec) || ec) return false;
             }
-            else // unsupported path components
+            // unsupported path components, let runtime handle this
+            else if (!f(cnt_info, ec) || ec) {
                 return false;
+            }
         }
 
         if (&ec != &hpx::throws)
