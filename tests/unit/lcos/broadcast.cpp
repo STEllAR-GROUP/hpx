@@ -34,6 +34,14 @@ HPX_PLAIN_ACTION(f3);
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f3_action)
 HPX_REGISTER_BROADCAST_ACTION(f3_action)
 
+void f4(boost::uint32_t i)
+{
+}
+HPX_PLAIN_ACTION(f4);
+
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f4_action)
+HPX_REGISTER_BROADCAST_ACTION(f4_action)
+
 int hpx_main()
 {
     hpx::id_type here = hpx::find_here();
@@ -59,6 +67,8 @@ int hpx_main()
         {
             HPX_TEST_EQ(f3_res[i], hpx::naming::get_locality_id_from_id(localities[i]) + 1);
         }
+        
+        hpx::lcos::broadcast<f4_action>(localities, 0).get();
     }
     return hpx::finalize();
 }

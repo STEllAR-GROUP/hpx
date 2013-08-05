@@ -128,6 +128,89 @@ namespace hpx { namespace lcos {
         )
         {
             if(ids.size() == 0) return;
+
+            hpx::id_type this_id = ids[0];
+            
+            if(ids.size() == 1)
+            {
+                act(
+                    ids[0]
+                    BOOST_PP_COMMA_IF(N)
+                    HPX_ENUM_FORWARD_ARGS(N, A, a)
+                );
+                return;
+            }
+            
+            if(ids.size() == 2)
+            {
+                hpx::future<void> f = hpx::async(
+                        act
+                      , ids[1]
+                      BOOST_PP_COMMA_IF(N)
+                      HPX_ENUM_FORWARD_ARGS(N, A, a)
+                    );
+                act(
+                    ids[0]
+                  BOOST_PP_COMMA_IF(N)
+                  HPX_ENUM_FORWARD_ARGS(N, A, a)
+                );
+                hpx::wait(f);
+                return;
+            }
+
+            std::vector<hpx::future<void> > broadcast_futures;
+            broadcast_futures.reserve(2);
+            std::size_t half = (ids.size() / 2) + 1;
+            if(half == 1) half = 2;
+            std::vector<hpx::id_type>
+                ids_first(ids.begin() + 1, ids.begin() + half);
+            std::vector<hpx::id_type>
+                ids_second(ids.begin() + half, ids.end());
+
+            typedef
+                typename impl::make_broadcast_action<
+                    Action
+                >::type
+                broadcast_impl_action;
+
+            hpx::id_type id = hpx::naming::get_locality_from_id(ids_first[0]);
+            broadcast_futures.push_back(
+                hpx::async<broadcast_impl_action>(
+                    id
+                  , act
+                  , boost::move(ids_first)
+                  BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
+                  , boost::integral_constant<bool, true>()
+                )
+            );
+
+            if(ids_second.size() > 0)
+            {
+                hpx::id_type id = hpx::naming::get_locality_from_id(ids_second[0]);
+                broadcast_futures.push_back(
+                    hpx::async<broadcast_impl_action>(
+                        id
+                      , act
+                      , boost::move(ids_second)
+                      BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
+                      , boost::integral_constant<bool, true>()
+                    )
+                );
+            }
+
+            act(
+                ids[0]
+              BOOST_PP_COMMA_IF(N)
+              HPX_ENUM_FORWARD_ARGS(N, A, a)
+            );
+
+            while(!broadcast_futures.empty())
+            {
+                HPX_STD_TUPLE<int, hpx::future<void> >
+                    f_res = hpx::wait_any(broadcast_futures);
+                int part = HPX_STD_GET(0, f_res);
+                broadcast_futures.erase(broadcast_futures.begin() + part);
+            }
         }
         
         template <
