@@ -7,7 +7,7 @@ set(HPX_ADDPSEUDOTARGET_LOADED TRUE)
 
 macro(add_hpx_pseudo_target)
   # Windows is evil
-  hpx_info("add_hpx_pseudo_target" "adding pseudo target: ${ARGV}")
+  hpx_debug("add_hpx_pseudo_target" "adding pseudo target: ${ARGV}")
   if(NOT WIN32)
     add_custom_target(${ARGV})
   endif()
