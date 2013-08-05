@@ -10,6 +10,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_any.hpp>
+#include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
@@ -103,6 +105,20 @@ namespace hpx { namespace lcos {
     )                                                                           \
 /**/
 
+#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_2(Action, Name)               \
+    HPX_REGISTER_ACTION_DECLARATION(                                            \
+        ::hpx::lcos::impl::make_broadcast_action<Action>::type                  \
+      , BOOST_PP_CAT(broadcast_, Name)                                          \
+    )                                                                           \
+/**/
+
+#define HPX_REGISTER_BROADCAST_ACTION_2(Action, Name)                           \
+    HPX_REGISTER_PLAIN_ACTION(                                                  \
+        ::hpx::lcos::impl::make_broadcast_action<Action>::type                  \
+      , BOOST_PP_CAT(broadcast_, Name)                                          \
+    )                                                                           \
+/**/
+
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,7 +139,7 @@ namespace hpx { namespace lcos {
         BOOST_PP_CAT(broadcast_impl, N)(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, A, a)
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
           , boost::mpl::true_
         )
         {
@@ -136,7 +152,7 @@ namespace hpx { namespace lcos {
                 act(
                     ids[0]
                     BOOST_PP_COMMA_IF(N)
-                    HPX_ENUM_FORWARD_ARGS(N, A, a)
+                    BOOST_PP_ENUM_PARAMS(N, a)
                 );
                 return;
             }
@@ -147,12 +163,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids[1]
                       BOOST_PP_COMMA_IF(N)
-                      HPX_ENUM_FORWARD_ARGS(N, A, a)
+                      BOOST_PP_ENUM_PARAMS(N, a)
                     );
                 act(
                     ids[0]
                   BOOST_PP_COMMA_IF(N)
-                  HPX_ENUM_FORWARD_ARGS(N, A, a)
+                  BOOST_PP_ENUM_PARAMS(N, a)
                 );
                 hpx::wait(f);
                 return;
@@ -179,7 +195,7 @@ namespace hpx { namespace lcos {
                     id
                   , act
                   , boost::move(ids_first)
-                  BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
+                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                   , boost::integral_constant<bool, true>()
                 )
             );
@@ -192,7 +208,7 @@ namespace hpx { namespace lcos {
                         id
                       , act
                       , boost::move(ids_second)
-                      BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
+                      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                       , boost::integral_constant<bool, true>()
                     )
                 );
@@ -201,7 +217,7 @@ namespace hpx { namespace lcos {
             act(
                 ids[0]
               BOOST_PP_COMMA_IF(N)
-              HPX_ENUM_FORWARD_ARGS(N, A, a)
+              BOOST_PP_ENUM_PARAMS(N, a)
             );
 
             while(!broadcast_futures.empty())
@@ -222,7 +238,7 @@ namespace hpx { namespace lcos {
         BOOST_PP_CAT(broadcast_impl, N)(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, A, a)
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
           , boost::mpl::false_
         )
         {
@@ -233,8 +249,8 @@ namespace hpx { namespace lcos {
             if(ids.size() == 0) return result_type();
 
             hpx::id_type this_id = ids[0];
-
-            result_type res(ids.size(), -1);
+            
+            result_type res(ids.size());
             if(ids.size() == 1)
             {
                 res[0]
@@ -242,7 +258,7 @@ namespace hpx { namespace lcos {
                         act(
                             ids[0]
                             BOOST_PP_COMMA_IF(N)
-                            HPX_ENUM_FORWARD_ARGS(N, A, a)
+                            BOOST_PP_ENUM_PARAMS(N, a)
                         )
                     );
                 return boost::move(res);
@@ -260,14 +276,14 @@ namespace hpx { namespace lcos {
                         act
                       , ids[1]
                       BOOST_PP_COMMA_IF(N)
-                      HPX_ENUM_FORWARD_ARGS(N, A, a)
+                      BOOST_PP_ENUM_PARAMS(N, a)
                     );
                 res[0]
                     = boost::move(
                         act(
                             ids[0]
                           BOOST_PP_COMMA_IF(N)
-                          HPX_ENUM_FORWARD_ARGS(N, A, a)
+                          BOOST_PP_ENUM_PARAMS(N, a)
                         )
                     );
                 res[1] = f.move();
@@ -295,7 +311,7 @@ namespace hpx { namespace lcos {
                     id
                   , act
                   , boost::move(ids_first)
-                  BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
+                  BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                   , boost::integral_constant<bool, false>()
                 )
             );
@@ -308,7 +324,7 @@ namespace hpx { namespace lcos {
                         id
                       , act
                       , boost::move(ids_second)
-                      BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
+                      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                       , boost::integral_constant<bool, false>()
                     )
                 );
@@ -319,7 +335,7 @@ namespace hpx { namespace lcos {
                     act(
                         ids[0]
                       BOOST_PP_COMMA_IF(N)
-                      HPX_ENUM_FORWARD_ARGS(N, A, a)
+                      BOOST_PP_ENUM_PARAMS(N, a)
                     )
                 );
 
@@ -361,7 +377,7 @@ namespace hpx { namespace lcos {
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
-              BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, A, a)
+              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
               , IsVoid
             )
             {
@@ -369,7 +385,7 @@ namespace hpx { namespace lcos {
                     BOOST_PP_CAT(broadcast_impl, N)(
                         act
                       , ids
-                      BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
+                      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                       , IsVoid()
                     );
             }
@@ -411,7 +427,7 @@ namespace hpx { namespace lcos {
     hpx::future<
         typename impl::broadcast_result<Action>::type
     > broadcast(std::vector<hpx::id_type> const & ids
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, A, a))
+          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {
         hpx::id_type dest = hpx::naming::get_locality_from_id(ids[0]);
 
@@ -430,7 +446,7 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , boost::move(ids)
-                BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
+                BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
               , typename boost::is_same<void, action_result>::type()
             );
     }
