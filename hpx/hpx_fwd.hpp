@@ -606,13 +606,6 @@ namespace hpx
         template <typename Result>
         class future;
 
-        template <typename Result>
-        future<typename boost::remove_const<
-            typename util::detail::remove_reference<Result>::type
-        >::type> make_ready_future(BOOST_FWD_REF(Result));
-
-        future<void> make_ready_future();
-
         template <typename ValueType>
         struct object_semaphore;
 
@@ -686,7 +679,6 @@ namespace hpx
     // Pulling important types into the main namespace
     using naming::id_type;
     using lcos::future;
-    using lcos::make_ready_future;
     using lcos::promise;
 
     /// \endcond

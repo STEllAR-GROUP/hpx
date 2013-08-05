@@ -532,6 +532,70 @@ namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
+    struct timed_future_data : future_data<Result>
+    {
+    public:
+        typedef future_data<Result> base_type;
+        typedef typename base_type::result_type result_type;
+        typedef typename base_type::mutex_type mutex_type;
+        typedef typename base_type::error_type error_type;
+        typedef typename base_type::data_type data_type;
+
+        template <typename T>
+        friend class lcos::future;
+
+    private:
+        void set_data(result_type const& value)
+        {
+            this->base_type::set_data(value);
+        }
+
+        template <typename TimeSpec, typename Result_>
+        void at_time(TimeSpec const& tpoint, BOOST_FWD_REF(Result_) init)
+        {
+            boost::intrusive_ptr<timed_future_data> this_(this);
+
+            error_code ec;
+            threads::thread_id_type id = threads::register_thread_nullary(
+                HPX_STD_BIND(&timed_future_data::set_data, this_,
+                    boost::forward<Result_>(init)),
+                "timed_future_data<Result>::timed_future_data",
+                threads::suspended, true, threads::thread_priority_normal,
+                std::size_t(-1), threads::thread_stacksize_default, ec);
+            if (ec) {
+                // thread creation failed, report error to the new future
+                this->base_type::set_exception(hpx::detail::access_exception(ec));
+            }
+
+            // start new thread at given point in time
+            threads::set_thread_state(id, tpoint, threads::pending,
+                threads::wait_timeout, threads::thread_priority_critical, ec);
+            if (ec) {
+                // thread scheduling failed, report error to the new future
+                this->base_type::set_exception(hpx::detail::access_exception(ec));
+            }
+        }
+
+    protected:
+        timed_future_data() {}
+
+        template <typename Result_>
+        timed_future_data(boost::posix_time::ptime const& at,
+            BOOST_FWD_REF(Result_) init)
+        {
+            at_time(at, boost::forward<Result_>(init));
+        }
+
+        template <typename Result_>
+        timed_future_data(boost::posix_time::time_duration const& d,
+            BOOST_RV_REF(Result_) init)
+        {
+            at_time(d, boost::forward<Result_>(init));
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result>
     struct task_base : future_data<Result>
     {
     private:

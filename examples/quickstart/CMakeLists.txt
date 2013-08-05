@@ -25,6 +25,7 @@ set(example_programs
     print_to_console
     quicksort
     simplest_hello_world
+    timed_futures
     timed_wake
     use_main_thread
     wait_composition
@@ -69,6 +70,7 @@ set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
 set(component_inheritance_FLAGS DEPENDENCIES iostreams_component)
 set(component_inheritance_simple_FLAGS DEPENDENCIES iostreams_component)
 set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
+set(timed_futures_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
   set(sources

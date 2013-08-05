@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -96,11 +96,9 @@ namespace hpx { namespace lcos
         template <typename Result_>
         friend detail::future_data_base<Result_> const*
             detail::get_future_data(lcos::future<Result_> const&);
-        
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
-
 
         explicit future(future_data_type* p)
           : future_data_(p)
@@ -143,13 +141,6 @@ namespace hpx { namespace lcos
             future_data_.swap(p);
         }
 
-        // accept wrapped future
-        future(BOOST_RV_REF(future<future>) other)
-        {
-            future f = boost::move(other.unwrap());
-            (*this).swap(f);
-        }
-
         explicit future(BOOST_RV_REF(Result) init)
         {
             typedef lcos::detail::future_data<Result> impl_type;
@@ -157,6 +148,32 @@ namespace hpx { namespace lcos
             static_cast<impl_type*>(p.get())->set_data(boost::move(init));
             future_data_.swap(p);
         }
+
+        // extension: accept wrapped future
+        future(BOOST_RV_REF(future<future>) other)
+        {
+            future f = boost::move(other.unwrap());
+            (*this).swap(f);
+        }
+
+        // extension: support timed future creation
+        future(boost::posix_time::ptime const& at, Result const& init)
+          : future_data_(new lcos::detail::timed_future_data<Result>(at, init))
+        {}
+
+        future(boost::posix_time::ptime const& at, BOOST_RV_REF(Result) init)
+          : future_data_(new lcos::detail::timed_future_data<Result>(
+                at, boost::move(init)))
+        {}
+
+        future(boost::posix_time::time_duration const& d, Result const& init)
+          : future_data_(new lcos::detail::timed_future_data<Result>(d, init))
+        {}
+
+        future(boost::posix_time::time_duration const& d, BOOST_RV_REF(Result) init)
+          : future_data_(new lcos::detail::timed_future_data<Result>(
+                d, boost::move(init)))
+        {}
 
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
@@ -266,7 +283,7 @@ namespace hpx { namespace lcos
 
         template <typename Clock, typename Duration>
         BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time) 
+        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time)
         {
             return wait_until(util::to_ptime(abs_time));
         }
@@ -297,6 +314,7 @@ namespace hpx { namespace lcos
         boost::intrusive_ptr<future_data_type> future_data_;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
     template <typename Result>
     future<typename boost::remove_const<
@@ -307,6 +325,56 @@ namespace hpx { namespace lcos
         return future<typename boost::remove_const<
             typename util::detail::remove_reference<Result>::type
         >::type>(boost::forward<Result>(init));
+    }
+
+    // extension: create a pre-initialized future object which gets ready at
+    // a given point in time
+    template <typename Result>
+    future<typename boost::remove_const<
+        typename util::detail::remove_reference<Result>::type
+    >::type>
+    make_ready_future_at(boost::posix_time::ptime const& at,
+        BOOST_FWD_REF(Result) init)
+    {
+        return future<typename boost::remove_const<
+            typename util::detail::remove_reference<Result>::type
+        >::type>(at, boost::forward<Result>(init));
+    }
+
+    template <typename Clock, typename Duration, typename Result>
+    future<typename boost::remove_const<
+        typename util::detail::remove_reference<Result>::type
+    >::type>
+    make_ready_future_at(boost::chrono::time_point<Clock, Duration> const& at,
+        BOOST_FWD_REF(Result) init)
+    {
+        return future<typename boost::remove_const<
+            typename util::detail::remove_reference<Result>::type
+        >::type>(util::to_ptime(at), boost::forward<Result>(init));
+    }
+
+    template <typename Result>
+    future<typename boost::remove_const<
+        typename util::detail::remove_reference<Result>::type
+    >::type>
+    make_ready_future_after(boost::posix_time::time_duration const& d,
+        BOOST_FWD_REF(Result) init)
+    {
+        return future<typename boost::remove_const<
+            typename util::detail::remove_reference<Result>::type
+        >::type>(d, boost::forward<Result>(init));
+    }
+
+    template <typename Rep, typename Period, typename Result>
+    future<typename boost::remove_const<
+        typename util::detail::remove_reference<Result>::type
+    >::type>
+    make_ready_future_after(boost::chrono::duration<Rep, Period> const& d,
+        BOOST_FWD_REF(Result) init)
+    {
+        return future<typename boost::remove_const<
+            typename util::detail::remove_reference<Result>::type
+        >::type>(util::to_time_duration(d), boost::forward<Result>(init));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -384,12 +452,23 @@ namespace hpx { namespace lcos
             future_data_.swap(other.future_data_);
         }
 
-        // accept wrapped future
+        // extension: accept wrapped future
         future(BOOST_RV_REF(future<future>) other)
         {
             future f = boost::move(other.unwrap());
             (*this).swap(f);
         }
+
+        // extension: support timed future creation
+        explicit future(boost::posix_time::ptime const& at)
+          : future_data_(new lcos::detail::timed_future_data<void>(
+                at, util::unused))
+        {}
+
+        explicit future(boost::posix_time::time_duration const& d)
+          : future_data_(new lcos::detail::timed_future_data<void>(
+                d, util::unused))
+        {}
 
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
@@ -513,6 +592,34 @@ namespace hpx { namespace lcos
     inline future<void> make_ready_future()
     {
         return future<void>(1);   // dummy argument
+    }
+
+    // extension: create a pre-initialized future object which gets ready at
+    // a given point in time
+    inline future<void> make_ready_future_at(
+        boost::posix_time::ptime const& at)
+    {
+        return future<void>(at);
+    }
+
+    template <typename Clock, typename Duration>
+    inline future<void> make_ready_future_at(
+        boost::chrono::time_point<Clock, Duration> const& at)
+    {
+        return future<void>(util::to_ptime(at));
+    }
+
+    inline future<void> make_ready_future_after(
+        boost::posix_time::time_duration const& d)
+    {
+        return future<void>(d);
+    }
+
+    template <typename Rep, typename Period>
+    inline future<void> make_ready_future_at(
+        boost::chrono::duration<Rep, Period> const& d)
+    {
+        return future<void>(util::to_time_duration(d));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -661,5 +768,14 @@ namespace hpx { namespace actions
         mutable lcos::future<void> deferred_result_;
     };
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+// hoist names into main namespace
+namespace hpx
+{
+    using lcos::make_ready_future;
+    using lcos::make_ready_future_at;
+    using lcos::make_ready_future_after;
+}
 
 #endif
