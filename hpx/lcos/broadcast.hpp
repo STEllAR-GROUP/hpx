@@ -39,7 +39,7 @@ namespace hpx { namespace lcos {
 
         template <typename Action, int N>
         struct make_broadcast_action_impl;
-        
+
         template <
             typename Action
         >
@@ -130,7 +130,7 @@ namespace hpx { namespace lcos {
             if(ids.size() == 0) return;
 
             hpx::id_type this_id = ids[0];
-            
+
             if(ids.size() == 1)
             {
                 act(
@@ -140,7 +140,7 @@ namespace hpx { namespace lcos {
                 );
                 return;
             }
-            
+
             if(ids.size() == 2)
             {
                 hpx::future<void> f = hpx::async(
@@ -212,7 +212,7 @@ namespace hpx { namespace lcos {
                 broadcast_futures.erase(broadcast_futures.begin() + part);
             }
         }
-        
+
         template <
             typename Action
             BOOST_PP_COMMA_IF(N)
@@ -233,7 +233,7 @@ namespace hpx { namespace lcos {
             if(ids.size() == 0) return result_type();
 
             hpx::id_type this_id = ids[0];
-            
+
             result_type res(ids.size(), -1);
             if(ids.size() == 1)
             {
@@ -247,7 +247,7 @@ namespace hpx { namespace lcos {
                     );
                 return boost::move(res);
             }
-            
+
             if(ids.size() == 2)
             {
                 hpx::future<
@@ -355,22 +355,25 @@ namespace hpx { namespace lcos {
             BOOST_PP_ENUM_PARAMS(N, typename A)
           , typename IsVoid
         >
-        typename broadcast_result<Action>::type
-        BOOST_PP_CAT(broadcast, N)(
-            Action const & act
-          , std::vector<hpx::id_type> const & ids
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, A, a)
-          , IsVoid
-        )
+        struct BOOST_PP_CAT(broadcast_invoker, N)
         {
-            return
-                BOOST_PP_CAT(broadcast_impl, N)(
-                    act
-                  , ids
-                  BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
-                  , IsVoid()
-                );
-        }
+            static typename broadcast_result<Action>::type
+            call(
+                Action const & act
+              , std::vector<hpx::id_type> const & ids
+              BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, A, a)
+              , IsVoid
+            )
+            {
+                return
+                    BOOST_PP_CAT(broadcast_impl, N)(
+                        act
+                      , ids
+                      BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)
+                      , IsVoid()
+                    );
+            }
+        };
 
         template <
             typename Action
@@ -383,9 +386,7 @@ namespace hpx { namespace lcos {
                 >::type
                 action_result;
 
-            typedef
-                typename HPX_MAKE_ACTION_TPL(
-                    (BOOST_PP_CAT(broadcast, N)<
+            typedef BOOST_PP_CAT(broadcast_invoker, N)<
                         Action
                         BOOST_PP_COMMA_IF(N)
                         BOOST_PP_ENUM(
@@ -394,8 +395,11 @@ namespace hpx { namespace lcos {
                           , _
                         )
                       , typename boost::is_same<void, action_result>::type
-                    >)
-                )::type
+                    >
+                    broadcast_invoker_type;
+
+            typedef
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
