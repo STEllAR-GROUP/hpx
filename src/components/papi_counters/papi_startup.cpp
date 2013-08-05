@@ -12,6 +12,7 @@
 #include <boost/program_options.hpp>
 
 #include <hpx/hpx.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/papi/server/papi.hpp>
 #include <hpx/components/papi/util/papi.hpp>
@@ -139,7 +140,7 @@ namespace hpx { namespace performance_counters { namespace papi
     }
 
     // discover available PAPI counters
-    bool discover_papi_counters(
+    bool discover_papi_counters_helper(
         hpx::performance_counters::counter_info const& info,
         HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
         hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
@@ -209,6 +210,19 @@ namespace hpx { namespace performance_counters { namespace papi
         if (&ec != &hpx::throws)
             ec = hpx::make_success_code();
         return true;
+    }
+
+    // wrap the actual discoverer allowing HPX to expand all wildcards it knows about
+    bool discover_papi_counters(
+        hpx::performance_counters::counter_info const& info,
+        HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
+        hpx::performance_counters::discover_counters_mode mode, hpx::error_code& ec)
+    {
+        using HPX_STD_PLACEHOLDERS::_1;
+        using HPX_STD_PLACEHOLDERS::_2;
+        return performance_counters::locality_counter_discoverer(info,
+            HPX_STD_BIND(&discover_papi_counters_helper, _1, f, mode, _2),
+            mode, ec);
     }
 
     // enable multiplexing with specified period for thread tix
