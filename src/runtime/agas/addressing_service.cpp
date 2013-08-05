@@ -1254,7 +1254,6 @@ void addressing_service::route(
           , new hpx::actions::transfer_action<action_type>(action_priority_, req));
 
         // send to the main AGAS instance for routing
-        request route_req(primary_ns_route, route_p);
         hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);
         return;
     }
