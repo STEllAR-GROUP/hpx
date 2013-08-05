@@ -118,7 +118,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         return start_all();
     }
 
-	bool thread_counters::read_value(papi_counter *cnt, bool reset)
+    bool thread_counters::read_value(papi_counter *cnt, bool reset)
     {
         if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
         timestamp_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
