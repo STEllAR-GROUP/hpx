@@ -143,6 +143,12 @@ namespace hpx { namespace actions
             typedef Result type;
         };
 
+        template <>
+        struct remote_action_result<lcos::future<void> >
+        {
+            typedef hpx::util::unused_type type;
+        };
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Action>
         struct action_registration
