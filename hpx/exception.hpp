@@ -202,7 +202,7 @@ namespace hpx
         struct lightweight_hpx_category_rethrow : hpx_category_rethrow {};
 
         ///////////////////////////////////////////////////////////////////////
-        boost::exception_ptr access_exception(error_code const&);
+        HPX_EXPORT boost::exception_ptr access_exception(error_code const&);
 
     } // namespace detail
     /// \endcond
