@@ -10,7 +10,6 @@
 
 boost::uint32_t f1()
 {
-    std::cout << hpx::get_locality_id() << "\n";
     return hpx::get_locality_id();
 }
 HPX_PLAIN_ACTION(f1);
@@ -26,6 +25,15 @@ HPX_PLAIN_ACTION(f2);
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f2_action)
 HPX_REGISTER_BROADCAST_ACTION(f2_action)
 
+boost::uint32_t f3(boost::uint32_t i)
+{
+    return hpx::get_locality_id() + i;
+}
+HPX_PLAIN_ACTION(f3);
+
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f3_action)
+HPX_REGISTER_BROADCAST_ACTION(f3_action)
+
 int hpx_main()
 {
     hpx::id_type here = hpx::find_here();
@@ -38,11 +46,19 @@ int hpx_main()
         HPX_TEST_EQ(f1_res.size(), localities.size());
         for(std::size_t i = 0; i < f1_res.size(); ++i)
         {
-            std::cout << i << " " << f1_res[i] << " " << hpx::naming::get_locality_id_from_id(localities[i]) << "\n";
-            //HPX_TEST_EQ(f1_res[i], hpx::naming::get_locality_id_from_id(localities[i]));
+            HPX_TEST_EQ(f1_res[i], hpx::naming::get_locality_id_from_id(localities[i]));
         }
         
         hpx::lcos::broadcast<f2_action>(localities).get();
+        
+        std::vector<boost::uint32_t> f3_res;
+        f3_res = hpx::lcos::broadcast<f3_action>(localities, 1).get();
+
+        HPX_TEST_EQ(f3_res.size(), localities.size());
+        for(std::size_t i = 0; i < f3_res.size(); ++i)
+        {
+            HPX_TEST_EQ(f3_res[i], hpx::naming::get_locality_id_from_id(localities[i]) + 1);
+        }
     }
     return hpx::finalize();
 }
