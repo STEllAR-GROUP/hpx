@@ -1589,7 +1589,7 @@ foreach(directory ${HPX_LINK_DIRECTORIES})
   set(external_rpath "${external_rpath}:${directory}")
 endforeach()
 
-hpx_info("external_link_directories" "hpx_LIBRARIES: ${hpx_LIBRARIES}")
+#hpx_info("external_link_directories" "hpx_LIBRARIES: ${hpx_LIBRARIES}")
 foreach(lib ${hpx_LIBRARIES})
   get_filename_component(lib_dir ${lib} PATH)
   if(lib_dir)
