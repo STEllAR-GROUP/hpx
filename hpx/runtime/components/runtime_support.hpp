@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +15,7 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     /// The \a runtime_support class is the client side representation of a
     /// \a server#runtime_support component
-    class runtime_support : public stubs::runtime_support
+    class HPX_EXPORT runtime_support : public stubs::runtime_support
     {
     private:
         typedef stubs::runtime_support base_type;
@@ -39,16 +39,8 @@ namespace hpx { namespace components
         ///         be created in blocks (i.e. more than one instance at once).
         ///         This function is used by the \a distributing_factory to
         ///         determine a correct allocation strategy
-        int get_factory_properties(components::component_type type)
-        {
-            return this->base_type::get_factory_properties(gid_, type);
-        }
-
-        lcos::future<int>
-        get_factory_properties_async(components::component_type type)
-        {
-            return this->base_type::get_factory_properties_async(gid_, type);
-        }
+        int get_factory_properties(components::component_type type);
+        lcos::future<int> get_factory_properties_async(components::component_type);
 
         /// Create a new component type using the runtime_support
         template <typename Component>

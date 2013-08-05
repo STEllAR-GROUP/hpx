@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,6 +34,14 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid, type);
     }
 
+    int runtime_support::get_factory_properties(naming::id_type const& targetgid,
+        components::component_type type)
+    {
+        // The following get yields control while the action above
+        // is executed and the result is returned to the future
+        return get_factory_properties_async(targetgid, type).get();
+    }
+
     ///////////////////////////////////////////////////////////////////////
     lcos::future<std::vector<naming::id_type> >
     runtime_support::bulk_create_components_async(
@@ -45,6 +53,15 @@ namespace hpx { namespace components { namespace stubs
         // to call get() on the return value to obtain the result
         typedef server::runtime_support::bulk_create_components_action action_type;
         return hpx::async<action_type>(gid, type, count);
+    }
+
+    std::vector<naming::id_type> runtime_support::bulk_create_components(
+        naming::id_type const& gid, components::component_type type,
+        std::size_t count)
+    {
+        // The following get yields control while the action above
+        // is executed and the result is returned to the future
+        return bulk_create_components_async(gid, type, count).get();
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -73,6 +90,11 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(gid);
     }
 
+    bool runtime_support::load_components(naming::id_type const& gid)
+    {
+        return load_components_async(gid).get();
+    }
+
     lcos::future<void>
     runtime_support::call_startup_functions_async(naming::id_type const& gid,
         bool pre_startup)
@@ -81,12 +103,30 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(gid, pre_startup);
     }
 
+    void runtime_support::call_startup_functions(naming::id_type const& gid,
+        bool pre_startup)
+    {
+        call_startup_functions_async(gid, pre_startup).get();
+    }
+
     lcos::future<void>
     runtime_support::call_shutdown_functions_async(naming::id_type const& gid,
         bool pre_shutdown)
     {
         typedef server::runtime_support::call_shutdown_functions_action action_type;
         return hpx::async<action_type>(gid, pre_shutdown);
+    }
+
+    void runtime_support::call_shutdown_functions(naming::id_type const& gid,
+        bool pre_shutdown)
+    {
+        call_shutdown_functions_async(gid, pre_shutdown).get();
+    }
+
+    void runtime_support::free_component_sync(components::component_type type,
+        naming::gid_type const& gid, boost::uint64_t count)
+    {
+        free_component_sync(type, gid, naming::gid_type(0, count));
     }
 
     void runtime_support::free_component_sync(components::component_type type,
@@ -130,6 +170,14 @@ namespace hpx { namespace components { namespace stubs
         return value.get_future();
     }
 
+    void runtime_support::shutdown(naming::id_type const& targetgid,
+        double timeout)
+    {
+        // The following get yields control while the action above
+        // is executed and the result is returned to the future
+        shutdown_async(targetgid, timeout).get();
+    }
+
     /// \brief Shutdown the runtime systems of all localities
     void runtime_support::shutdown_all(naming::id_type const& targetgid,
         double timeout)
@@ -160,6 +208,13 @@ namespace hpx { namespace components { namespace stubs
         lcos::promise<void> value;
         hpx::apply<action_type>(targetgid, value.get_gid());
         return value.get_future();
+    }
+
+    void runtime_support::terminate(naming::id_type const& targetgid)
+    {
+        // The following get yields control while the action above
+        // is executed and the result is returned to the future
+        terminate_async(targetgid).get();
     }
 
     /// \brief Terminate the runtime systems of all localities
@@ -222,6 +277,14 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid, info);
     }
 
+    naming::id_type
+    runtime_support::create_performance_counter(naming::id_type targetgid,
+        performance_counters::counter_info const& info,
+        error_code& ec)
+    {
+        return create_performance_counter_async(targetgid, info).get(ec);
+    }
+
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve configuration information
     lcos::future<util::section> runtime_support::get_config_async(
@@ -232,6 +295,14 @@ namespace hpx { namespace components { namespace stubs
         // to call get() on the return value to obtain the result
         typedef server::runtime_support::get_config_action action_type;
         return hpx::async<action_type>(targetgid);
+    }
+
+    void runtime_support::get_config(naming::id_type const& targetgid,
+        util::section& ini)
+    {
+        // The following get yields control while the action above
+        // is executed and the result is returned to the future
+        ini = get_config_async(targetgid).get();
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -245,6 +316,14 @@ namespace hpx { namespace components { namespace stubs
         typedef server::runtime_support::get_instance_count_action
             action_type;
         return hpx::async<action_type>(targetgid, type);
+    }
+
+    long runtime_support::get_instance_count(naming::id_type const& targetgid,
+        components::component_type type)
+    {
+        // The following get yields control while the action above
+        // is executed and the result is returned to the future
+        return get_instance_count_async(targetgid, type).get();
     }
 
     ///////////////////////////////////////////////////////////////////////
