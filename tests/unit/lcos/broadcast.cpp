@@ -56,9 +56,9 @@ int hpx_main()
         {
             HPX_TEST_EQ(f1_res[i], hpx::naming::get_locality_id_from_id(localities[i]));
         }
-  
+
         hpx::lcos::broadcast<f2_action>(localities).get();
-        
+
         std::vector<boost::uint32_t> f3_res;
         f3_res = hpx::lcos::broadcast<f3_action>(localities, 1).get();
 
@@ -67,7 +67,7 @@ int hpx_main()
         {
             HPX_TEST_EQ(f3_res[i], hpx::naming::get_locality_id_from_id(localities[i]) + 1);
         }
-        
+
         hpx::lcos::broadcast<f4_action>(localities, 0).get();
     }
     return hpx::finalize();
