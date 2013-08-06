@@ -50,45 +50,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
           , boost::is_base_and_derived<threads::executor, Policy>
         >
     {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Future
-      , typename IsFutureRange = typename traits::is_future_range<Future>::type
-    >
-    struct extract_completed_callback_type;
-
-    template <typename Future>
-    struct extract_completed_callback_type<Future, boost::mpl::true_>
-    {
-        typedef
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Future
-                >::type
-            >::type::value_type::future_data_type
-            future_data_type;
-
-        typedef
-            typename future_data_type::completed_callback_type
-            type;
-    };
-
-    template <typename Future>
-    struct extract_completed_callback_type<Future, boost::mpl::false_>
-    {
-        typedef
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    Future
-                >::type
-            >::type::future_data_type
-            future_data_type;
-
-        typedef
-            typename future_data_type::completed_callback_type
-            type;
-    };
 }}}}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -297,12 +258,6 @@ namespace hpx { namespace lcos { namespace local
                         = &BOOST_PP_CAT(dataflow_frame_, N)::await_range;
 
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -373,12 +328,6 @@ namespace hpx { namespace lcos { namespace local
                     void (BOOST_PP_CAT(dataflow_frame_, N)::*f)
                         (Iter, boost::mpl::false_)
                         = &BOOST_PP_CAT(dataflow_frame_, N)::await_next;
-
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
 
                     typedef
                         typename lcos::future_traits<

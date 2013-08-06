@@ -125,11 +125,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_1::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -190,11 +185,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_1::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_1::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -482,11 +472,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_2::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -547,11 +532,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_2::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_2::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -839,11 +819,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_3::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -904,11 +879,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_3::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_3::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -1196,11 +1166,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_4::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -1261,11 +1226,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_4::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_4::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -1553,11 +1513,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_5::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -1618,11 +1573,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_5::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_5::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -1910,11 +1860,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_6::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -1975,11 +1920,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_6::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_6::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -2267,11 +2207,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_7::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -2332,11 +2267,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_7::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_7::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -2624,11 +2554,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_8::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -2689,11 +2614,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_8::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_8::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -2981,11 +2901,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_9::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -3046,11 +2961,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_9::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_9::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -3338,11 +3248,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_10::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -3403,11 +3308,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_10::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_10::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -3695,11 +3595,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_11::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -3760,11 +3655,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_11::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_11::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -4052,11 +3942,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_12::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -4117,11 +4002,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_12::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_12::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -4409,11 +4289,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_13::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -4474,11 +4349,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_13::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_13::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -4766,11 +4636,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_14::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -4831,11 +4696,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_14::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_14::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -5123,11 +4983,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_15::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -5188,11 +5043,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_15::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_15::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -5480,11 +5330,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_16::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -5545,11 +5390,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_16::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_16::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -5837,11 +5677,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_17::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -5902,11 +5737,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_17::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_17::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -6194,11 +6024,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_18::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -6259,11 +6084,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_18::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_18::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -6551,11 +6371,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_19::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -6616,11 +6431,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_19::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_19::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
@@ -6908,11 +6718,6 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_20::await_range;
                     typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
-                    typedef
                         typename lcos::future_traits<
                             future_type
                         >::value_type
@@ -6973,11 +6778,6 @@ namespace hpx { namespace lcos { namespace local
                     void (dataflow_frame_20::*f)
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_20::await_next;
-                    typedef
-                        typename extract_completed_callback_type<
-                            future_type
-                        >::type
-                        completed_callback_type;
                     typedef
                         typename lcos::future_traits<
                             future_type
