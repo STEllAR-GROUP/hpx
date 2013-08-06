@@ -724,11 +724,18 @@ namespace hpx { namespace actions
                 << "typed_continuation<lcos::future<hpx::lcos::future<Result> > >::trigger("
                 << this->get_gid() << ")";
 
+            // if the future is ready, send the result back immediately
+            if (result.ready()) {
+                deferred_trigger(result);
+                return;
+            }
+
             // attach continuation to this future which will send the result back
             // once its ready
             deferred_result_ = result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(shared_from_this()),
+                    boost::static_pointer_cast<typed_continuation const>(
+                        shared_from_this()),
                     util::placeholders::_1));
         }
 
@@ -810,7 +817,7 @@ namespace hpx { namespace actions
             if (f_.empty()) {
                 if (!this->get_gid()) {
                     HPX_THROW_EXCEPTION(invalid_status,
-                        "typed_continuation<lcos::future<Result> >::trigger_value",
+                        "typed_continuation<lcos::future<void> >::trigger_value",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
@@ -829,11 +836,18 @@ namespace hpx { namespace actions
                 << "typed_continuation<lcos::future<hpx::lcos::future<void> > >::trigger("
                 << this->get_gid() << ")";
 
+            // if the future is ready, send the result back immediately
+            if (result.ready()) {
+                deferred_trigger(result);
+                return;
+            }
+
             // attach continuation to this future which will send the result back
             // once its ready
             deferred_result_ = result.then(
                 util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(shared_from_this()),
+                    boost::static_pointer_cast<typed_continuation const>(
+                        shared_from_this()),
                     util::placeholders::_1));
         }
 
