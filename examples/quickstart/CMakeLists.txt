@@ -19,6 +19,7 @@ set(example_programs
     fractals
     fractals_executor
     fractals_struct
+    hpx_tutorial
     interest_calculator
     non_atomic_rma
     pingpong
