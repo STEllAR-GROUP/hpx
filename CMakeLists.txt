@@ -271,9 +271,9 @@ endif()
 # If we are compiling with an intel compiler, we need to override the default
 # boost compiler config in order to have proper C++11 detection for more
 # recent intel compiler versions (>12.0)
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    hpx_add_definitions(-DBOOST_COMPILER_CONFIG="${CMAKE_SOURCE_DIR}/hpx/config/boost/compiler/intel.hpp")
-endif()
+#if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+#    hpx_add_definitions(-DBOOST_COMPILER_CONFIG="hpx/config/boost/compiler/intel.hpp")
+#endif()
 
 
 hpx_include(CompilerFlags)
