@@ -29,6 +29,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <hpx/config.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <omp.h>

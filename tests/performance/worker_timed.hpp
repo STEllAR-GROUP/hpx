@@ -9,8 +9,8 @@
 #ifndef HPX_TESTS_PERFORMANCE_WORKER_HPP
 #define HPX_TESTS_PERFORMANCE_WORKER_HPP
 
-#include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/config.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 #include <boost/cstdint.hpp>
 
 using hpx::util::high_resolution_timer;
