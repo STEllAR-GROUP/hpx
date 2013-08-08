@@ -24,7 +24,7 @@
 namespace hpx { namespace threads
 {
     /// \cond NOINTERNAL
-#if !defined(HPX_HAVE_MORE_THAN_64_THREADS)
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) && defined(HPX_MAX_CPU_COUNT) && MAX_CPU_COUNT <= 64
     typedef boost::uint64_t mask_type;
     typedef boost::uint64_t mask_cref_type;
 
@@ -95,8 +95,13 @@ namespace hpx { namespace threads
         return std::size_t(-1);
     }
 #else
+#  if defined(HPX_MAX_CPU_COUNT)
+    typedef std::bitset<HPX_MAX_CPU_COUNT> mask_type;
+    typedef std::bitset<HPX_MAX_CPU_COUNT> const& mask_cref_type;
+#  else
     typedef boost::dynamic_bitset<boost::uint64_t> mask_type;
     typedef boost::dynamic_bitset<boost::uint64_t> const& mask_cref_type;
+#  endif
 
     inline bool any(mask_cref_type mask)
     {
@@ -125,12 +130,28 @@ namespace hpx { namespace threads
 
     inline void resize(mask_type& mask, std::size_t s)
     {
+#  if defined(HPX_MAX_CPU_COUNT)
+        BOOST_ASSERT(s <= mask.size());
+#else
         return mask.resize(s);
+#endif
     }
 
     inline std::size_t find_first(mask_cref_type mask)
     {
+#  if defined(HPX_MAX_CPU_COUNT)
+        if(mask.any())
+        {
+            for(std::size_t i = 0; i < HPX_MAX_CPU_COUNT; ++i)
+            {
+                if(mask[i])
+                    return i;
+            }
+        }
+        return std::size_t(-1);
+#else
         return mask.find_first();
+#endif
     }
 #endif
     /// \endcond

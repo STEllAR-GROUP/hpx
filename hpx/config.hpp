@@ -662,6 +662,9 @@
 #if defined(__MIC__) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
 #  define HPX_HAVE_MORE_THAN_64_THREADS
 #endif
+#if defined(__MIC__) && !defined(HPX_MAX_CPU_COUNT)
+#  define HPX_MAX_CPU_COUNT 256
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_AGAS_BOOTSTRAP_PREFIX                    0U

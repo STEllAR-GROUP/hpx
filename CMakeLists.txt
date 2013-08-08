@@ -194,6 +194,7 @@ if(HPX_NATIVE_MIC)
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
   hpx_add_definitions(-DHPX_NATIVE_MIC)
+  hpx_add_definitions(-DHPX_MAX_CPU_COUNT=256)
   set(HPX_MALLOC "tbbmalloc")
 endif()
 
@@ -204,6 +205,8 @@ hpx_option(HPX_USE_MORE_THAN_64_THREADS BOOL
     "HPX applications will use more than 64 threads (default: OFF)." OFF ADVANCED)
 if(HPX_USE_MORE_THAN_64_THREADS OR HPX_NATIVE_MIC)
   hpx_add_definitions(-DHPX_HAVE_MORE_THAN_64_THREADS)
+else()
+  hpx_add_definitions(-DHPX_MAX_CPU_COUNT=64)
 endif()
 
 ###############################################################################
