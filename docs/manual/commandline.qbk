@@ -252,7 +252,7 @@ bind specification.
 
 The specified affinities refer to specific regions within a machine hardware
 topology. In order to understand the hardware topology of a particular machine
-it may be useful to run the lstopo tool which is part of __hwloc__to see the
+it may be useful to run the lstopo tool which is part of __hwloc__ to see the
 reported topology tree. Seeing and understanding a topology tree will definitely
 help in understanding the concepts that are discussed below.
 
