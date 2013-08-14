@@ -145,7 +145,7 @@ namespace hpx { namespace util { namespace plugin {
                 ::FreeLibrary(handle);
 
                 // report error
-                HPX_THROWS_IF(ec, filesystem_error,
+                HPX_THROWS_IF(ec, dynamic_link_failure,
                     "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
                 return std::pair<SymbolType, Deleter>();
             }

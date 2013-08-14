@@ -471,6 +471,11 @@ namespace hpx
 
     std::string get_error_what(hpx::error_code const& e)
     {
+        // if this is a lightweight error_code, return canned response
+        if (e.category() == hpx::get_lightweight_hpx_category())
+            return e.message();
+
+        // extract message from stored exception
         return get_error_what(detail::access_exception(e));
     }
 

@@ -345,7 +345,7 @@ namespace hpx { namespace util
             hpx::util::plugin::dll d(p.first.string(), p.second);
             d.load_library(ec);
             if (ec) {
-                LRT_(info) << "skipping " << p.first.string()
+                LRT_(info) << "skipping (load_library failed): " << p.first.string()
                     << ": " << get_error_what(ec);
                 continue;
             }
@@ -354,7 +354,7 @@ namespace hpx { namespace util
             std::string curr_fullname(p.first.parent_path().string());
             load_component_factory(d, ini, curr_fullname, p.second, ec);
             if (ec) {
-                LRT_(info) << "skipping " << p.first.string()
+                LRT_(info) << "skipping (load_component_factory failed): " << p.first.string()
                     << ": " << get_error_what(ec);
                 ec = error_code(lightweight);   // reinit ec
             }
@@ -362,7 +362,7 @@ namespace hpx { namespace util
             // get the plugin factory
             load_plugin_factory(d, ini, curr_fullname, p.second, ec);
             if (ec) {
-                LRT_(info) << "skipping " << p.first.string()
+                LRT_(info) << "skipping (load_plugin_factory failed): " << p.first.string()
                     << ": " << get_error_what(ec);
             }
         }

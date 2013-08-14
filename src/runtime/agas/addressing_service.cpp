@@ -1603,8 +1603,7 @@ void addressing_service::update_cache_entry(
 
         LAS_(debug) <<
             ( boost::format(
-                "updating cache entry (will override existing entry for this "
-                "GID), gid(%1%), count(%2%)"
+                "updating cache entry: gid(%1%), count(%2%)"
             ) % gid % count);
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
