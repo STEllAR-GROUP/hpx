@@ -186,27 +186,34 @@ endif()
 # XeonPhi
 ###############################################################################
 hpx_option(HPX_NATIVE_MIC BOOL
-    "Build HPX to run natively on the Intel MIC coprocessor (default: OFF)."
-    OFF ADVANCED)
+  "Build HPX to run natively on the Intel MIC coprocessor (default: OFF)."
+  OFF ADVANCED)
 
 if(HPX_NATIVE_MIC)
+  hpx_option(HPX_MAX_CPU_COUNT STRING
+    "HPX applications will not use more than this amount of OS-threads (default: 256)." 
+    "256" ADVANCED)
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
   hpx_add_definitions(-DHPX_NATIVE_MIC)
-  hpx_add_definitions(-DHPX_MAX_CPU_COUNT=256)
   set(HPX_MALLOC "tbbmalloc")
+else()
+  hpx_option(HPX_MAX_CPU_COUNT STRING
+    "HPX applications will not use more than this amount of OS-threads (default: 64)." 
+    "64" ADVANCED)
 endif()
 
 ###############################################################################
 # Configure upper limit for number of threads, this is important for XeonPhi
 ###############################################################################
 hpx_option(HPX_USE_MORE_THAN_64_THREADS BOOL
-    "HPX applications will use more than 64 threads (default: OFF)." OFF ADVANCED)
-if(HPX_USE_MORE_THAN_64_THREADS OR HPX_NATIVE_MIC)
+  "HPX applications will use more than 64 OS-threads (default: OFF)." OFF ADVANCED)
+
+if(HPX_USE_MORE_THAN_64_THREADS)
   hpx_add_definitions(-DHPX_HAVE_MORE_THAN_64_THREADS)
-else()
-  hpx_add_definitions(-DHPX_MAX_CPU_COUNT=64)
+elseif(HPX_MAX_CPU_COUNT)
+  hpx_add_definitions(-DHPX_MAX_CPU_COUNT=${HPX_MAX_CPU_COUNT})
 endif()
 
 ###############################################################################
