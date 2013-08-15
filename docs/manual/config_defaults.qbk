@@ -53,8 +53,8 @@ by section basis below.
 ``
     [hpx]
     location = ${HPX_LOCATION:$[system.prefix]}
-    component_path = $[hpx.location]/lib/hpx:$[system.executable_prefix]/lib/hpx
-    master_ini_path = $[hpx.location]/share/hpx-<version>
+    component_path = $[hpx.location]/lib/hpx:$[system.executable_prefix]/lib/hpx:$[system.executable_prefix]/../lib/hpx
+    master_ini_path = $[hpx.location]/share/hpx-<version>:$[system.executable_prefix]/share/hpx-<version>:$[system.executable_prefix]/../share/hpx-<version>
     ini_path = $[hpx.master_ini_path]/ini
     os_threads = 1
     localities = 1
@@ -81,11 +81,14 @@ by section basis below.
     [[`hpx.component_path`]
      [This is initialized to the list of directories where the __hpx__ runtime
       library will look for installed components. Duplicates are discarded.]
-     [static information]]
+     [static information, this property can refer to a list of directories
+      separated by `':'` (Linux, Android, and MacOS) or using `';'` (Windows).]]
     [[`hpx.master_ini_path`]
-     [This is initialized to the default path of the main hpx.ini configuration
-      file]
-     [static information, depends on __hpx__'s installation path]]
+     [This is initialized to the list of default paths of the main hpx.ini
+      configuration files]
+     [static information, depends on __hpx__'s installation path, , this property
+      can refer to a list of directories separated by `':'` (Linux, Android, and
+      MacOS) or using `';'` (Windows).]]
     [[`hpx.ini_path`]
      [This is initialized to the default path where __hpx__ will look for more
       ini configuration files. The value of this property will be interpreted
@@ -110,15 +113,15 @@ by section basis below.
       application instance.]
      [dynamic information, initialized from command line (argc/argv)]]
     [[`hpx.lock_detection`]
-     [This setting verifies that no locks are being held 
+     [This setting verifies that no locks are being held
       while a __hpx__ thread is suspended.]
      [dynamic information, by default this is set to '0', this setting is
-      effective only if `HPX_VERIFY_LOCKS` is set during configuration in 
+      effective only if `HPX_VERIFY_LOCKS` is set during configuration in
       cmake.]]
     [[`hpx.minimal_deadlock_detection`]
-     [This setting enables support for minimal deadlock detection 
+     [This setting enables support for minimal deadlock detection
       for __hpx__-threads..]
-     [dynamic information, by default this is set to '1' (for Debug builds) 
+     [dynamic information, by default this is set to '1' (for Debug builds)
       or to '0' (for Release, RelWithDebInfo, RelMinSize builds), this setting is
       effective only if `HPX_THREAD_MINIMAL_DEADLOCK_DETECTION` is set during
       configuration in cmake.]]
@@ -278,7 +281,7 @@ sections, one for each component.
      [static information, the default depends on the compile time preprocessor
       constant `HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY` (`4`)]]
     [[`hpx.parcel.max_message_size`]
-     [This property defines the maximum allowed message size which will be 
+     [This property defines the maximum allowed message size which will be
       transferrable through the parcel layer.]
      [static information, the default depends on the compile time preprocessor
       constant `HPX_PARCEL_MAX_MESSAGE_SIZE` (`1000000000`) bytes.]]
@@ -335,7 +338,7 @@ effect only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` is set
 
 The following settings relate to the Infiniband parcelport. These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` is set
-(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_IBVERBS`, and has to be 
+(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_IBVERBS`, and has to be
 set to `ON`).
 
 [teletype]
@@ -364,7 +367,7 @@ set to `ON`).
 
 The following settings relate to the MPI parcelport. These settings take
 effect only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` is set
-(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_MPI`, and has to be set 
+(the equivalent cmake variable is `HPX_HAVE_PARCELPORT_MPI`, and has to be set
 to `ON`).
 
 [teletype]

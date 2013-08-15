@@ -77,10 +77,22 @@ namespace hpx { namespace util
         namespace fs = boost::filesystem;
 
         // fall back: use compile time prefix
-        std::string ini_path(ini.get_entry("hpx.master_ini_path"));
-        bool result = handle_ini_file (ini, ini_path + "/hpx.ini");
-        if (result) {
-            LBT_(info) << "loaded configuration: " << ini_path << "/hpx.ini";
+        std::string ini_paths(ini.get_entry("hpx.master_ini_path"));
+
+        // split off the separate paths from the given path list
+        typedef boost::tokenizer<boost::char_separator<char> > tokenizer_type;
+
+        boost::char_separator<char> sep (HPX_INI_PATH_DELIMITER);
+        tokenizer_type tok(ini_paths, sep);
+        tokenizer_type::iterator end = tok.end();
+
+        bool result = false;
+        for (tokenizer_type::iterator it = tok.begin (); it != end; ++it) {
+            bool result2 = handle_ini_file (ini, *it + "/hpx.ini");
+            if (result2) {
+                LBT_(info) << "loaded configuration: " << *it << "/hpx.ini";
+            }
+            result = result2 || result;
         }
 
         // look in the current directory first
@@ -106,8 +118,6 @@ namespace hpx { namespace util
             result = result2 || result;
         }
 #endif
-//      FIXME: is this really redundant?
-//         result = handle_ini_file_env(ini, "HPX_LOCATION", "/share/hpx/hpx.ini") || result;
 
         result = handle_ini_file_env(ini, "HOME", "/.hpx.ini") || result;
         result = handle_ini_file_env(ini, "PWD", "/.hpx.ini") || result;
@@ -132,7 +142,7 @@ namespace hpx { namespace util
         std::string ini_path(ini.get_entry("hpx.ini_path", HPX_DEFAULT_INI_PATH));
         std::vector <std::string> ini_paths;
 
-        // split of the separate paths from the given path list
+        // split off the separate paths from the given path list
         typedef boost::tokenizer<boost::char_separator<char> > tokenizer_type;
 
         boost::char_separator<char> sep (HPX_INI_PATH_DELIMITER);
@@ -219,7 +229,7 @@ namespace hpx { namespace util
                     registry (pf.create(s, ec));
                 if (ec) return;
 
-                registry->get_component_info(ini_data);
+                registry->get_component_info(ini_data, curr);
             }
         }
 
@@ -276,13 +286,15 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void init_ini_data_default(std::string const& libs, util::section& ini)
+    void init_ini_data_default(std::string const& libs, util::section& ini,
+        std::map<std::string, boost::filesystem::path>& basenames)
     {
         namespace fs = boost::filesystem;
 
         typedef std::vector<std::pair<fs::path, std::string> >::iterator
             iterator_type;
 
+        // list of modules to load
         std::vector<std::pair<fs::path, std::string> > libdata;
         iterator_type end;
 
@@ -321,16 +333,36 @@ namespace hpx { namespace util
                 // ensure base directory, remove symlinks, etc.
                 boost::system::error_code fsec;
                 fs::path canonical_curr = util::canonical_path(curr, fsec);
-                libdata.push_back(std::make_pair(!fsec ? canonical_curr : curr, name));
+                if (fsec)
+                    canonical_curr = curr;
+
+                // make sure every module name is loaded exactly once, the
+                // first occurrence of a module name is used
+                std::string basename = canonical_curr.filename().string();
+                std::pair<std::map<std::string, fs::path>::iterator, bool> p =
+                    basenames.insert(std::make_pair(basename, canonical_curr));
+
+                if (p.second) {
+                    libdata.push_back(std::make_pair(canonical_curr, name));
+                }
+                else {
+                    LRT_(warning) << "skipping module " << basename
+                        << " (" << canonical_curr.string() << ")"
+                        << ": ignored because of: " << (*p.first).second.string();
+                }
             }
         }
         catch (fs::filesystem_error const& e) {
             LRT_(info) << "caught filesystem error: " << e.what();
         }
 
-        // make file name unique
-        std::sort(libdata.begin(), libdata.end(), detail::cmppath_less);
-        end = std::unique(libdata.begin(), libdata.end(), detail::cmppath_equal);
+        // return if no new modules have been found
+        if (libdata.empty())
+            return;
+
+//        // make file name unique
+//        std::sort(libdata.begin(), libdata.end(), detail::cmppath_less);
+//        end = std::unique(libdata.begin(), libdata.end(), detail::cmppath_equal);
 
         // make sure each node loads libraries in a different order
         std::srand(static_cast<unsigned>(std::time(0)));

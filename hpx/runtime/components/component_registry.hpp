@@ -51,14 +51,21 @@ namespace hpx { namespace components
         /// \return Returns \a true if the parameter \a fillini has been
         ///         successfully initialized with the registry data of all
         ///         implemented in this module.
-        bool get_component_info(std::vector<std::string>& fillini)
+        bool get_component_info(std::vector<std::string>& fillini,
+            std::string const& filepath)
         {
             using namespace boost::assign;
             fillini += std::string("[hpx.components.") +
                 unique_component_name<component_registry>::call() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
-            fillini += std::string("path = ") +
-                util::find_prefix(HPX_COMPONENT_STRING) + "/lib/hpx";
+
+            if (filepath.empty()) {
+                fillini += std::string("path = ") +
+                    util::find_prefix(HPX_COMPONENT_STRING) + "/lib/hpx";
+            }
+            else {
+                fillini += std::string("path = ") + filepath;
+            }
 
             switch (state) {
             case factory_enabled:

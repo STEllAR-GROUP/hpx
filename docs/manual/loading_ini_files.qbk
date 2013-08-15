@@ -18,17 +18,20 @@ All ini files found are merged into the internal configuration database.
 The merge operation itself conforms to the rules as described in the section
 __iniformat__.
 
-# Load all component shared libraries found in the directory specified by the
+# Load all component shared libraries found in the directories specified by the
   property `hpx.component_path` and retrieve their default configuration
-  information (see section __loading_components__ for more details).
-# Load a file named `hpx.ini` in the directory referenced by the property
-  `hpx.master_ini_path`.
+  information (see section __loading_components__ for more details). This
+  property can refer to a list of directories separated by `':'` (Linux,
+  Android, and MacOS) or using `';'` (Windows).
+# Load all files named `hpx.ini` in the directories referenced by the property
+  `hpx.master_ini_path`. This property can refer to a list of directories 
+  separated by `':'` (Linux, Android, and MacOS) or using `';'` (Windows).
 # Load a file named `.hpx.ini` in the current working directory, e.g. the
   directory the application was invoked from.
 # Load a file referenced by the environment variable `HPX_INI`. This
   variable is expected to provide the full path name of the ini configuration
   file (if any).
-# Load a file named `/etc/hpx.ini`. This lookup is done on Linux systems
+# Load a file named `/etc/hpx.ini`. This lookup is done on non-Windows systems
   only.
 # Load a file named `.hpx.ini` in the home directory of the current user,
   e.g. the directory referenced by the environment variable `HOME`.

@@ -73,7 +73,9 @@ namespace hpx { namespace util
             "component_path = $[hpx.location]/lib/hpx"
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/lib/hpx"
                 HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/../lib/hpx",
-            "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME,
+            "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/share/" HPX_BASE_DIR_NAME
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/../share/" HPX_BASE_DIR_NAME,
 #if HPX_HAVE_ITTNOTIFY != 0
             "use_itt_notify = ${HPX_HAVE_ITTNOTIFY:0}",
 #endif
@@ -219,6 +221,7 @@ namespace hpx { namespace util
             "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
             "enabled = 1"
         ;
+
         // don't overload user overrides
         this->parse("static defaults", lines, false);
 
@@ -244,6 +247,8 @@ namespace hpx { namespace util
 
     void runtime_configuration::load_components()
     {
+        namespace fs = boost::filesystem;
+
         // try to build default ini structure from shared libraries in default
         // installation location, this allows to install simple components
         // without the need to install an ini file
@@ -252,9 +257,12 @@ namespace hpx { namespace util
 
         std::string component_path(
             get_entry("hpx.component_path", HPX_DEFAULT_COMPONENT_PATH));
+
+        // protect against duplicate paths
         std::set<std::string> component_paths;
 
-        namespace fs = boost::filesystem;
+        // list of base names avoiding to load a module more than once
+        std::map<std::string, fs::path> basenames;
 
         boost::char_separator<char> sep (HPX_INI_PATH_DELIMITER);
         tokenizer_type tok(component_path, sep);
@@ -262,19 +270,24 @@ namespace hpx { namespace util
         for (tokenizer_type::iterator it = tok.begin(); it != end; ++it)
         {
             if (!(*it).empty()) {
-                fs::path p(*it);
-                component_paths.insert(util::native_file_string(util::normalize(p)));
-            }
-        }
+                fs::path this_p(*it);
+                boost::system::error_code fsec;
+                fs::path canonical_p = util::canonical_path(this_p, fsec);
+                if (fsec)
+                    canonical_p = this_p;
 
-        // have all path elements, now find ini files in there...
-        std::set<std::string>::iterator p_end = component_paths.end();
-        for (std::set<std::string>::iterator it = component_paths.begin();
-             it != p_end; ++it)
-        {
-            fs::path this_path (hpx::util::create_path(*it));
-            if (fs::exists(this_path))
-                util::init_ini_data_default(this_path.string(), *this);
+                std::pair<std::set<std::string>::iterator, bool> p =
+                    component_paths.insert(
+                        util::native_file_string(canonical_p));
+                if (p.second) {
+                    // have all path elements, now find ini files in there...
+                    fs::path this_path (hpx::util::create_path(*p.first));
+                    if (fs::exists(this_path)) {
+                        util::init_ini_data_default(
+                            this_path.string(), *this, basenames);
+                    }
+                }
+            }
         }
 
         // read system and user ini files _again_, to allow the user to

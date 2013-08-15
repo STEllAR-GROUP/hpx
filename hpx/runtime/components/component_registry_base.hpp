@@ -32,7 +32,8 @@ namespace hpx { namespace components
         /// \return Returns \a true if the parameter \a fillini has been
         ///         successfully initialized with the registry data of all
         ///         implemented in this module.
-        virtual bool get_component_info(std::vector<std::string>& fillini) = 0;
+        virtual bool get_component_info(std::vector<std::string>& fillini,
+            std::string const& filepath) = 0;
     };
 }}
 
