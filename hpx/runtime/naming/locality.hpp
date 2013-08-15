@@ -220,7 +220,8 @@ namespace hpx { namespace naming
         boost::io::ios_flags_saver ifs(os);
         os << l.address_ << ":" << l.port_;
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-        os << " (MPI Rank: " << l.rank_ << ")";
+        if (l.rank_ != -1)
+            os << ":" << l.rank_;
 #endif
         return os;
     }

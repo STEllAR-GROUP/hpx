@@ -1011,7 +1011,7 @@ namespace hpx { namespace components { namespace server
             boost::shared_ptr<component_startup_shutdown_base>
                 startup_shutdown(pf.create("startup_shutdown", ec));
             if (ec) {
-                LRT_(debug) << "loading of command-line options failed: "
+                LRT_(debug) << "loading of startup/shutdown functions failed: "
                             << d.get_name() << ": " << get_error_what(ec);
                 return false;
             }
