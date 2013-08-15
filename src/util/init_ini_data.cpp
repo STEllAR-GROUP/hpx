@@ -366,7 +366,7 @@ namespace hpx { namespace util
 
         // make sure each node loads libraries in a different order
         std::srand(static_cast<unsigned>(std::time(0)));
-        std::random_shuffle(libdata.begin(), end);
+        std::random_shuffle(libdata.begin(), libdata.end());
 
         typedef std::pair<fs::path, std::string> libdata_type;
         BOOST_FOREACH(libdata_type const& p,
