@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2012 Hartmut Kaiser
+//  Copyright (c) 2005-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -287,7 +287,8 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     void init_ini_data_default(std::string const& libs, util::section& ini,
-        std::map<std::string, boost::filesystem::path>& basenames)
+        std::map<std::string, boost::filesystem::path>& basenames,
+        std::map<std::string, hpx::util::plugin::dll>& modules)
     {
         namespace fs = boost::filesystem;
 
@@ -296,8 +297,6 @@ namespace hpx { namespace util
 
         // list of modules to load
         std::vector<std::pair<fs::path, std::string> > libdata;
-//        iterator_type end;
-
         try {
             fs::directory_iterator nodir;
             fs::path libs_path (hpx::util::create_path(libs));
@@ -360,10 +359,6 @@ namespace hpx { namespace util
         if (libdata.empty())
             return;
 
-//        // make file name unique
-//        std::sort(libdata.begin(), libdata.end(), detail::cmppath_less);
-//        end = std::unique(libdata.begin(), libdata.end(), detail::cmppath_equal);
-
         // make sure each node loads libraries in a different order
         std::srand(static_cast<unsigned>(std::time(0)));
         std::random_shuffle(libdata.begin(), libdata.end());
@@ -397,6 +392,9 @@ namespace hpx { namespace util
                 LRT_(info) << "skipping (load_plugin_factory failed): " << p.first.string()
                     << ": " << get_error_what(ec);
             }
+
+            // store loaded library for future use
+            modules.insert(std::make_pair(p.second, boost::move(d)));
         }
     }
 }}

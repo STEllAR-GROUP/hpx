@@ -141,6 +141,10 @@ namespace hpx { namespace util { namespace plugin {
         ///////////////////////////////////////////////////////////////////////
         struct plugin_factory_item_base
         {
+            plugin_factory_item_base(dll& d, std::string const& basename)
+              : m_dll(d), m_basename(basename)
+            {}
+
             void create(int******) const;
 
             void get_names(std::vector<std::string>& names, error_code& ec = throws) const
@@ -149,7 +153,7 @@ namespace hpx { namespace util { namespace plugin {
             }
 
         protected:
-            dll m_dll;
+            dll& m_dll;
             std::string m_basename;
         };
 
@@ -161,6 +165,10 @@ namespace hpx { namespace util { namespace plugin {
         struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<> >
         :   public Base
         {
+            plugin_factory_item(dll& d, std::string const& basename)
+              : Base(d, basename)
+            {}
+
             BasePlugin* create(std::string const& name, error_code& ec = throws) const
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
@@ -175,6 +183,10 @@ namespace hpx { namespace util { namespace plugin {
         struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1> >
         :   public Base
         {
+            plugin_factory_item(dll& d, std::string const& basename)
+              : Base(d, basename)
+            {}
+
             using Base::create;
             BasePlugin* create(std::string const& name, A1 a1) const
             {
@@ -197,6 +209,10 @@ namespace hpx { namespace util { namespace plugin {
         struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1, A2> >
         :   public Base
         {
+            plugin_factory_item(dll& d, std::string const& basename)
+              : Base(d, basename)
+            {}
+
             using Base::create;
             BasePlugin* create(std::string const& name, A1 a1, A2 a2) const
             {
@@ -223,6 +239,10 @@ namespace hpx { namespace util { namespace plugin {
         ///////////////////////////////////////////////////////////////////////
         struct static_plugin_factory_item_base
         {
+            static_plugin_factory_item_base(get_plugins_list_type const& f_)
+              : f(f_)
+            {}
+
             void create(int******) const;
 
         protected:
@@ -237,6 +257,10 @@ namespace hpx { namespace util { namespace plugin {
         struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<> >
         :   public Base
         {
+            static_plugin_factory_item(get_plugins_list_type const& f)
+              : Base(f)
+            {}
+
             BasePlugin* create(std::string const& name, error_code& ec = throws) const
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
@@ -252,6 +276,10 @@ namespace hpx { namespace util { namespace plugin {
         struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1> >
         :   public Base
         {
+            static_plugin_factory_item(get_plugins_list_type const& f)
+              : Base(f)
+            {}
+
             using Base::create;
             BasePlugin* create(std::string const& name, A1 a1) const
             {
@@ -276,6 +304,10 @@ namespace hpx { namespace util { namespace plugin {
         struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1, A2> >
         :   public Base
         {
+            static_plugin_factory_item(get_plugins_list_type const& f)
+              : Base(f)
+            {}
+
             using Base::create;
             BasePlugin* create(std::string const& name, A1 a1, A2 a2) const
             {
@@ -315,11 +347,18 @@ namespace hpx { namespace util { namespace plugin {
             detail::plugin_factory_item_base
         >::type
     {
-        plugin_factory(dll const& d, std::string const& basename)
-        {
-            this->m_dll = d;
-            this->m_basename = basename;
-        }
+    private:
+        typedef typename boost::mpl::inherit_linearly <
+            typename virtual_constructors<BasePlugin>::type,
+            detail::plugin_factory_item<BasePlugin,
+                boost::mpl::placeholders::_, boost::mpl::placeholders::_>,
+            detail::plugin_factory_item_base
+        >::type base_type;
+
+    public:
+        plugin_factory(dll& d, std::string const& basename)
+          : base_type(d, basename)
+        {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -332,10 +371,18 @@ namespace hpx { namespace util { namespace plugin {
             detail::static_plugin_factory_item_base
         >::type
     {
-        static_plugin_factory(get_plugins_list_type f)
-        {
-            this->f = f;
-        }
+    private:
+        typedef typename boost::mpl::inherit_linearly <
+            typename virtual_constructors<BasePlugin>::type,
+            detail::static_plugin_factory_item<BasePlugin,
+                boost::mpl::placeholders::_, boost::mpl::placeholders::_>,
+            detail::static_plugin_factory_item_base
+        >::type base_type;
+
+    public:
+        static_plugin_factory(get_plugins_list_type const& f)
+          : base_type(f)
+        {}
     };
 
 ///////////////////////////////////////////////////////////////////////////////

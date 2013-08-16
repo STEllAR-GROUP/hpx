@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/ini.hpp>
+#include <hpx/util/plugin/dll.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -38,7 +39,7 @@ namespace hpx { namespace util
         // any explicit command line options
         void reconfigure(std::vector<std::string> const& ini_defs);
 
-        void load_components();
+        void load_components(std::map<std::string, hpx::util::plugin::dll>& modules);
 
         // Returns the AGAS mode of this locality, returns either hosted (for
         // localities connecting to a remote AGAS server) or bootstrap for the

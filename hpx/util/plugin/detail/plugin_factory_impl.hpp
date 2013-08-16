@@ -46,6 +46,10 @@ namespace detail {
     >
     :   public Base
     {
+        plugin_factory_item(dll& d, std::string const& basename)
+          : Base(d, basename)
+        {}
+
         using Base::create;
         BasePlugin* create(std::string const& name, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
@@ -76,6 +80,10 @@ namespace detail {
     >
     :   public Base
     {
+        static_plugin_factory_item(get_plugins_list_type const& f)
+          : Base(f)
+        {}
+
         using Base::create;
         BasePlugin* create(std::string const& name, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {

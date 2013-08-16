@@ -245,7 +245,8 @@ namespace hpx { namespace util
         }
     }
 
-    void runtime_configuration::load_components()
+    void runtime_configuration::load_components(
+        std::map<std::string, hpx::util::plugin::dll>& modules)
     {
         namespace fs = boost::filesystem;
 
@@ -284,7 +285,7 @@ namespace hpx { namespace util
                     fs::path this_path (hpx::util::create_path(*p.first));
                     if (fs::exists(this_path)) {
                         util::init_ini_data_default(
-                            this_path.string(), *this, basenames);
+                            this_path.string(), *this, basenames, modules);
                     }
                 }
             }

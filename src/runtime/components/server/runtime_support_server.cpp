@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -484,6 +484,7 @@ namespace hpx { namespace components { namespace server
         }
 
         plugins_.clear();       // unload all plugins
+        modules_.clear();       // unload all modules
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -653,7 +654,7 @@ namespace hpx { namespace components { namespace server
     {
         // load components now that AGAS is up
         util::runtime_configuration& ini = get_runtime().get_config();
-        ini.load_components();
+        ini.load_components(modules_);
 
         naming::resolver_client& client = get_runtime().get_agas_client();
         bool result = load_components(ini, client.get_local_locality(), client);
@@ -923,15 +924,35 @@ namespace hpx { namespace components { namespace server
                 else
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
-                // first, try using the path as the full path to the library
-                if (!load_component(ini, instance, component, lib, prefix,
-                        agas_client, isdefault, isenabled, options,
-                        startup_handled))
-                {
-                    // build path to component to load
-                    std::string libname(HPX_MAKE_DLL_STRING(component));
-                    lib /= hpx::util::create_path(libname);
-                    if (!load_component(ini, instance, component, lib, prefix,
+                modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(component));
+                if (it != modules_.end()) {
+                    // use loaded module, instantiate the requested factory
+                    if (!load_component((*it).second, ini, instance, component, lib,
+                            prefix, agas_client, isdefault, isenabled, options,
+                            startup_handled))
+                    {
+                        continue;   // next please :-P
+                    }
+                }
+                else {
+                    // first, try using the path as the full path to the library
+                    error_code ec(lightweight);
+                    hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
+                    d.load_library(ec);
+                    if (ec) {
+                        // build path to component to load
+                        std::string libname(HPX_MAKE_DLL_STRING(component));
+                        lib /= hpx::util::create_path(libname);
+                        d.load_library(ec);
+                        if (ec) {
+                            LRT_(warning) << "dynamic loading failed: " << lib.string()
+                                          << ": " << instance << ": " << get_error_what(ec);
+                            continue;   // next please :-P
+                        }
+                    }
+
+                    // now, instantiate the requested factory
+                    if (!load_component(d, ini, instance, component, lib, prefix,
                             agas_client, isdefault, isenabled, options,
                             startup_handled))
                     {
@@ -1089,7 +1110,8 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::load_component(util::section& ini,
+    bool runtime_support::load_component(
+        hpx::util::plugin::dll& d, util::section& ini,
         std::string const& instance, std::string const& component,
         boost::filesystem::path lib, naming::gid_type const& prefix,
         naming::resolver_client& agas_client, bool isdefault, bool isenabled,
@@ -1097,23 +1119,7 @@ namespace hpx { namespace components { namespace server
         std::set<std::string>& startup_handled)
     {
         namespace fs = boost::filesystem;
-        if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
-        {
-            //LRT_(info) << lib.string() << " is not a shared object: " << instance;
-            return false;
-        }
-
         try {
-            // get the handle of the library
-            error_code ec(lightweight);
-            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
-            d.load_library(ec);
-            if (ec) {
-                LRT_(warning) << "dynamic loading failed: " << lib.string()
-                              << ": " << instance << ": " << get_error_what(ec);
-                return false;
-            }
-
             // initialize the factory instance using the preferences from the
             // ini files
             util::section const* glob_ini = NULL;
@@ -1125,6 +1131,7 @@ namespace hpx { namespace components { namespace server
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
 
+            error_code ec(lightweight);
             if (0 == component_ini || "0" == component_ini->get_entry("no_factory", "0"))
             {
                 // get the factory

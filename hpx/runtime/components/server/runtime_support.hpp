@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c)      2011 Bryce Lelbach
-//  Copyright (c)      2011 Thomas Heller
+//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -65,20 +65,20 @@ namespace hpx { namespace components { namespace server
 
         struct plugin_factory
         {
-            plugin_factory() : isenabled(false) {}
-
             plugin_factory(
                   boost::shared_ptr<plugins::plugin_factory_base> const& f,
                   hpx::util::plugin::dll const& d, bool enabled)
               : first(f), second(d), isenabled(enabled)
-            {};
+            {}
 
             boost::shared_ptr<plugins::plugin_factory_base> first;
-            hpx::util::plugin::dll second;
+            hpx::util::plugin::dll const& second;
             bool isenabled;
         };
         typedef plugin_factory plugin_factory_type;
         typedef std::map<std::string, plugin_factory_type> plugin_map_type;
+
+        typedef std::map<std::string, hpx::util::plugin::dll> modules_map_type;
 
     public:
         typedef runtime_support type_holder;
@@ -282,7 +282,7 @@ namespace hpx { namespace components { namespace server
             parcelset::parcelport* pp, std::size_t num_messages,
             std::size_t interval, error_code& ec);
         util::binary_filter* create_binary_filter(
-            char const* binary_filter_type, bool compress, 
+            char const* binary_filter_type, bool compress,
             util::binary_filter* next_filter, error_code& ec);
 
 #if defined(HPX_HAVE_SECURITY)
@@ -294,7 +294,8 @@ namespace hpx { namespace components { namespace server
         // Load all components from the ini files found in the configuration
         bool load_components(util::section& ini, naming::gid_type const& prefix,
             naming::resolver_client& agas_client);
-        bool load_component(util::section& ini, std::string const& instance,
+        bool load_component(hpx::util::plugin::dll& d,
+            util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled,
@@ -325,6 +326,7 @@ namespace hpx { namespace components { namespace server
 
         component_map_type components_;
         plugin_map_type plugins_;
+        modules_map_type modules_;
 
         lcos::local::spinlock globals_mtx_;
         std::list<HPX_STD_FUNCTION<void()> > pre_startup_functions_;

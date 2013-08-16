@@ -10,6 +10,7 @@
 #include <string>
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/plugin/dll.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -34,7 +35,8 @@ namespace hpx { namespace util
     // iterate over all shared libraries in the given directory and construct
     // default ini settings assuming all of those are components
     void init_ini_data_default(std::string const& libs, section& ini,
-        std::map<std::string, boost::filesystem::path>& basenames);
+        std::map<std::string, boost::filesystem::path>& basenames,
+        std::map<std::string, hpx::util::plugin::dll>& modules);
 
 }}
 
