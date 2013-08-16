@@ -16,7 +16,17 @@
 
 Here is a list of the important tickets we closed for this release.
 
-* [issue 806] - Create performance counters exposing overall AGAS statistics
+* [issue 815] - Create an lco that is performing an efficient broadcast of
+                actions
+* [issue 813] - Scoped unlock
+* [issue 811] - simple_central_tuplespace_client run error
+* [issue 809] - Optimize parcel serialization
+* [issue 808] - HPX applications throw exception when executed from the build
+                directory
+* [issue 807] - Create performance counters exposing overall AGAS statistics
+* [issue 795] - Create timed make_ready_future
+* [issue 577] - Allow for zero copy serialization/networking
+* [issue 316] - Add message size limitation
 
 [endsect]
 
@@ -69,7 +79,8 @@ Here is a list of the important tickets we closed for this release. This is agai
 a very long list of newly implemented features and fixed issues.
 
 * [issue 806] - make (all) in examples folder does nothing
-* [issue 805] - Adding the introduction and fixing DOCBOOK dependencies for widows use
+* [issue 805] - Adding the introduction and fixing DOCBOOK dependencies for
+                Windows use
 * [issue 804] - Add stackless (non-suspendable) thread type
 * [issue 803] - Create proper serialization support functions for util::tuple
 * [issue 800] - Add possibility to disable array optimizations during serialization
@@ -489,7 +500,7 @@ approximately 80 tickets (bugs, feature requests, etc.).
   creating (or invoking) any deferred work. These functions are usable with
   various types of functions, function objects, and actions and provide a
   uniform way to spawn deferred tasks.
-* __hpx__ now utilizes [funcref hpx::util::bind] to (partially) bind 
+* __hpx__ now utilizes [funcref hpx::util::bind] to (partially) bind
   local functions and function objects, and also actions. Remote bound actions
   can have placeholders as well.
 * __hpx__ continuations are now fully polymorphic. The class
