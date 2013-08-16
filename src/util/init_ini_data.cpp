@@ -296,7 +296,7 @@ namespace hpx { namespace util
 
         // list of modules to load
         std::vector<std::pair<fs::path, std::string> > libdata;
-        iterator_type end;
+//        iterator_type end;
 
         try {
             fs::directory_iterator nodir;
@@ -370,7 +370,7 @@ namespace hpx { namespace util
 
         typedef std::pair<fs::path, std::string> libdata_type;
         BOOST_FOREACH(libdata_type const& p,
-            boost::iterator_range<iterator_type>(libdata.begin(), end))
+            boost::iterator_range<iterator_type>(libdata.begin(), libdata.end()))
         {
             // get the handle of the library
             error_code ec(lightweight);
