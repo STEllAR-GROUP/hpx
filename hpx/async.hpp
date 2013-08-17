@@ -37,7 +37,7 @@ namespace hpx { namespace detail
         typedef lcos::future<Result> type;
     };
 #elif _MSC_VER >= 1700
-    // VS2012 has a decent implementtaion of std::result_of<>
+    // VS2012 has a decent implementation of std::result_of<>
     template <typename F, typename ResultOf = std::result_of<F> >
     struct create_future
     {
