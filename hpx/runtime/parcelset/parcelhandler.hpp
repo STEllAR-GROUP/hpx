@@ -95,7 +95,7 @@ namespace hpx { namespace parcelset
         void initialize(boost::shared_ptr<parcelport> pp);
 
         /// \brief Attach the given parcel port to this handler
-        void attach_parcelport(boost::shared_ptr<parcelport> pp, bool run = true);
+        void attach_parcelport(boost::shared_ptr<parcelport> const& pp, bool run = true);
 
         /// \brief Stop all parcelports associated with this parcelhandler
         void stop(bool blocking = true);
@@ -205,7 +205,7 @@ namespace hpx { namespace parcelset
         ///                 where \a err is the status code of the operation and
         ///                       \a size is the number of successfully
         ///                              transferred bytes.
-        void put_parcel(parcel& p, write_handler_type f);
+        void put_parcel(parcel& p, write_handler_type const& f);
 
         /// This put_parcel() function overload is asynchronous, but no
         /// callback functor is provided by the user.

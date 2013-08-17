@@ -191,29 +191,33 @@ namespace hpx
         {
             components::security::signed_certificate cert;
 
+            util::security::root_certificate_authority& root_ca =
+                security_data_->root_certificate_authority_;
+
             {
                 // Initialize the root-CA
                 lcos::local::spinlock::scoped_lock l(security_mtx_);
-                security_data_->root_certificate_authority_.initialize();
+
+                root_ca.initialize();
 
                 BOOST_ASSERT(security_data_->cert_store_.get() == 0);
                 security_data_->cert_store_.reset(
                     new components::security::certificate_store(
-                        security_data_->root_certificate_authority_.get_certificate()));
+                        root_ca.get_certificate()));
 
                 // initialize the sub-CA
-                security_data_->subordinate_certificate_authority_.initialize();
+                util::security::subordinate_certificate_authority& sub_ca =
+                    security_data_->subordinate_certificate_authority_;
+                sub_ca.initialize();
 
                 // sign the sub-CA's certificate
                 components::security::signed_certificate_signing_request csr =
-                    security_data_->subordinate_certificate_authority_.
-                        get_certificate_signing_request();
-                cert = security_data_->root_certificate_authority_.
-                    sign_certificate_signing_request(csr);
+                    sub_ca.get_certificate_signing_request();
+                cert = root_ca.sign_certificate_signing_request(csr);
 
                 // finalize initialization of sub-CA
                 security_data_->locality_certificate_ = cert;
-                security_data_->subordinate_certificate_authority_.set_certificate(cert);
+                sub_ca.set_certificate(cert);
             }
 
             // add the sub-CA's certificate to the local certificate store
@@ -221,7 +225,7 @@ namespace hpx
 
             LSEC_(debug) << (boost::format(
                 "runtime::init_security: initialized root certificate authority: %1%") %
-                security_data_->root_certificate_authority_.get_certificate());
+                root_ca.get_certificate());
         }
     }
 
@@ -720,7 +724,7 @@ namespace hpx
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
-    bool register_on_exit(HPX_STD_FUNCTION<void()> f)
+    bool register_on_exit(HPX_STD_FUNCTION<void()> const& f)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)
@@ -940,7 +944,8 @@ namespace hpx
         if (NULL == rt)
             return std::size_t(0);
         error_code ec(lightweight);
-        return rt->get_agas_client().get_num_overall_threads();
+        return static_cast<std::size_t>(
+            rt->get_agas_client().get_num_overall_threads());
     }
 
     bool is_scheduler_numa_sensitive()

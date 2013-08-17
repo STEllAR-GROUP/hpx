@@ -436,7 +436,7 @@ namespace hpx { namespace threads
             if (hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0)
             {
                 do {
-                    set(mask, obj->os_index);
+                    set(mask, obj->os_index); //-V106
                     {
                         scoped_lock lk(topo_mtx);
                         obj = hwloc_get_next_child(topo, parent, obj);
@@ -570,7 +570,7 @@ namespace hpx { namespace threads
             return extract_node_count(socket_obj, HWLOC_OBJ_CORE, pu_count);
         }
 
-        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+        return static_cast<std::size_t>(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE));
     }
 
     std::size_t hwloc_topology::get_number_of_numa_node_cores(
@@ -731,7 +731,7 @@ namespace hpx { namespace threads
         mask_type mask = mask_type();
         resize(mask, hardware_concurrency());
 
-        set(mask, obj->os_index);
+        set(mask, obj->os_index); //-V106
 
         return mask;
     } // }}}

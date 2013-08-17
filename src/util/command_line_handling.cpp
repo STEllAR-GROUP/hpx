@@ -634,7 +634,8 @@ namespace hpx { namespace util
         // will be considered now.
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-        node = util::mpi_environment::init(&argc, &argv, *this);
+        node = static_cast<std::size_t>(
+            util::mpi_environment::init(&argc, &argv, *this));
 #endif
 
         // minimally assume one locality and this is the console

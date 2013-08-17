@@ -234,7 +234,7 @@ namespace hpx { namespace threads { namespace detail
         thread_id_type id, thread_state_enum newstate,
         thread_state_ex_enum newstate_ex, thread_priority priority,
         thread_id_type timer_id,
-        boost::shared_ptr<boost::atomic<bool> > triggered)
+        boost::shared_ptr<boost::atomic<bool> > const& triggered)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,

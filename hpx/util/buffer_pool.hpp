@@ -81,7 +81,7 @@ namespace hpx { namespace util {
             size |= size >> 16;
             if(sizeof(size_type) == 8)
             {
-                size |= size >> 32;
+                size |= size >> 32; //-V112
             }
             size++;
             return size;

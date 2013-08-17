@@ -242,7 +242,7 @@ namespace hpx { namespace parcelset
         return pports_[type].get(); //-V108
     }
 
-    void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> pp,
+    void parcelhandler::attach_parcelport(boost::shared_ptr<parcelport> const& pp,
         bool run)
     {
         // register our callback function with the parcelport
@@ -413,7 +413,7 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelhandler::put_parcel(parcel& p, write_handler_type f)
+    void parcelhandler::put_parcel(parcel& p, write_handler_type const& f)
     {
         rethrow_exception();
 
@@ -683,7 +683,7 @@ namespace hpx { namespace parcelset
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->get_buffer_allocate_time_sent(reset) : 0;
+        return pp ? pp->get_buffer_allocate_time_received(reset) : 0;
     }
 
     // connection stack statistics

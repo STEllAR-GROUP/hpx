@@ -105,7 +105,7 @@ namespace hpx { namespace util
         /// calculate the hash value for the given key
         size_type operator()(std::string const& key) const
         {
-            return hash(key.c_str(), static_cast<size_type>(key.size()));
+            return hash(key.c_str(), static_cast<std::size_t>(key.size()));
         }
 
         /// re-seed the hash generator

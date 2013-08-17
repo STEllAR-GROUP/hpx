@@ -86,7 +86,7 @@ namespace hpx { namespace util
     }
 
     bool thread_mapper::register_callback(boost::uint32_t tix,
-                                          callback_type cb)
+        callback_type const& cb)
     {
         mutex_type::scoped_lock m(mtx_);
 

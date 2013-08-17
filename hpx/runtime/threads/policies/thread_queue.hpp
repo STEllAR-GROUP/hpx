@@ -223,7 +223,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             if (added) {
-                LTM_(debug) << "add_new: added " << added << " tasks to queues";
+                LTM_(debug) << "add_new: added " << added << " tasks to queues"; //-V128
             }
             return added;
         }

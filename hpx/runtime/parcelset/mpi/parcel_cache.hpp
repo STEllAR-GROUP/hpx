@@ -91,7 +91,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         }
 
         void set_parcel(std::vector<parcel> const& pv,
-            std::vector<write_handler_type> handlers, std::size_t idx = -1)
+            std::vector<write_handler_type> const& handlers, std::size_t idx = -1)
         {
             int dest(pv[0].get_destination_locality().get_rank());
 
@@ -107,8 +107,9 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 }
                 else
                 {
-                    it->second.parcels_.insert(it->second.parcels_.end(), pv.begin(), pv.end());
-                    it->second.handlers_.insert(it->second.handlers_.end(), handlers.begin(), handlers.end());
+                    parcel_holder& ph = it->second;
+                    ph.parcels_.insert(ph.parcels_.end(), pv.begin(), pv.end());
+                    ph.handlers_.insert(ph.handlers_.end(), handlers.begin(), handlers.end());
                 }
             }
         }
@@ -134,11 +135,15 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
 
             util::high_resolution_timer timer;
-            buffer->buffer_ = pp.buffer_pool_.get_buffer(arg_size + pv.size() * HPX_PARCEL_SERIALIZATION_OVERHEAD);
-            buffer->send_data_.buffer_allocate_time_ = timer.elapsed_nanoseconds();
+            buffer->buffer_ = pp.buffer_pool_.get_buffer(
+                arg_size + pv.size() * HPX_PARCEL_SERIALIZATION_OVERHEAD);
+
+            performance_counters::parcels::data_point& datapoint = buffer->send_data_;
+            datapoint.buffer_allocate_time_ = timer.elapsed_nanoseconds();
 
             // mark start of serialization
             boost::int64_t serialization_start = timer.elapsed_nanoseconds();
+
             // guard against serialization errors
             try {
                 // Serialize the data
@@ -155,7 +160,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     *buffer->buffer_, filter.get(), archive_flags);
 
                 std::size_t count = pv.size();
-                archive << count;
+                archive << count; //-V128
 
                 BOOST_FOREACH(parcel const& p, pv)
                 {
@@ -165,7 +170,8 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 arg_size = archive.bytes_written();
 
                 // store the time required for serialization
-                buffer->send_data_.serialization_time_ = timer.elapsed_nanoseconds() - serialization_start;;
+                datapoint.serialization_time_ =
+                    timer.elapsed_nanoseconds() - serialization_start;
             }
             catch (boost::archive::archive_exception const& e) {
                 // We have to repackage all exceptions thrown by the
@@ -208,11 +214,10 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                             buffer->buffer_->size() % max_outbound_size_));
                 return;
             }
-            
-            buffer->send_data_.raw_bytes_ = buffer->buffer_->size();
 
-            buffer->send_data_.num_parcels_ = pv.size();
-            buffer->send_data_.bytes_ = arg_size;
+            datapoint.raw_bytes_ = buffer->buffer_->size();
+            datapoint.num_parcels_ = pv.size();
+            datapoint.bytes_ = arg_size;
         }
 
         template <typename Parcelport>
@@ -246,7 +251,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 // collect outgoing data
                 boost::shared_ptr<parcel_buffer> buffer(boost::make_shared<parcel_buffer>());
                 std::vector<parcel> parcels;
-                
+
                 buffer->rank_ = ph.first;
                 std::swap(buffer->handlers_, ph.second.handlers_);
                 std::swap(parcels, ph.second.parcels_);

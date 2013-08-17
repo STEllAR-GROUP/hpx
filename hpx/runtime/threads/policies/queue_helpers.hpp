@@ -76,12 +76,12 @@ namespace detail
                 // log each thread only once
                 if (!logged_headline) {
                     if (running) {
-                        LTM_(error)
+                        LTM_(error) //-V128
                             << "Listing suspended threads while queue ("
                             << num_thread << ") is empty:";
                     }
                     else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error)
+                        LHPX_CONSOLE_(hpx::util::logging::level::error) //-V128
                             << "  [TM] Listing suspended threads while queue ("
                             << num_thread << ") is empty:\n";
                     }
@@ -89,7 +89,7 @@ namespace detail
                 }
 
                 if (running) {
-                    LTM_(error) << "queue(" << num_thread << "): "
+                    LTM_(error) << "queue(" << num_thread << "): " //-V128
                                 << get_thread_state_name(state)
                                 << "(" << std::hex << std::setw(8)
                                     << std::setfill('0') << (*it).first
@@ -106,7 +106,7 @@ namespace detail
                                 << ": " << thrd->get_lco_description();
                 }
                 else {
-                    LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] "
+                    LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] " //-V128
                                 << "queue(" << num_thread << "): "
                                 << get_thread_state_name(state)
                                 << "(" << std::hex << std::setw(8)

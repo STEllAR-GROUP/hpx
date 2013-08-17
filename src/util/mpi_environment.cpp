@@ -50,7 +50,7 @@ namespace hpx { namespace util
             MPI_Get_processor_name(name, &len);
 
             this_rank = rank();
-            cfg.num_localities_ = size();
+            cfg.num_localities_ = static_cast<std::size_t>(size());
 
             if(this_rank == 0)
             {

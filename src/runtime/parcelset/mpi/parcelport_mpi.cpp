@@ -233,7 +233,7 @@ namespace hpx { namespace parcelset { namespace mpi
         parcel_cache_.set_parcel(parcels, handlers);
     }
 
-    void parcelport::put_parcel(parcel const& p, write_handler_type f)
+    void parcelport::put_parcel(parcel const& p, write_handler_type const& f)
     {
         do_background_work();      // schedule message handler
         parcel_cache_.set_parcel(p, f);
@@ -267,7 +267,7 @@ namespace hpx { namespace parcelset { namespace mpi
                     parcel_data.size(), archive_flags);
 
                 std::size_t parcel_count = 0;
-                archive >> parcel_count;
+                archive >> parcel_count; //-V128
 
                 BOOST_ASSERT(parcel_count > 0);
                 for(std::size_t i = 0; i != parcel_count; ++i)

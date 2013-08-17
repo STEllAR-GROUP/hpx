@@ -505,7 +505,7 @@ In the above case:
             typename data::write to_write(m_to_write);
 
             for ( typename write_array::const_iterator b = to_write->begin(), e = to_write->end(); b != e; ++b) {
-                typename f_array::iterator del = std::remove( b->formats.begin(), b->formats.end(), fmt);
+                typename f_array::iterator del = std::remove( b->formats.begin(), b->formats.end(), fmt); //-V807
                 b->formats.erase(del, b->formats.end());
             }
         }
@@ -527,7 +527,7 @@ In the above case:
             typename data::write to_write(m_to_write);
 
             for ( typename write_array::const_iterator b = to_write->begin(), e = to_write->end(); b != e; ++b) {
-                typename d_array::iterator del = std::remove( b->destinations.begin(), b->destinations.end(), dest);
+                typename d_array::iterator del = std::remove( b->destinations.begin(), b->destinations.end(), dest); //-V807
                 b->destinations.erase(del, b->destinations.end());
 
                 // if from a write_once - all destinations are gone, don't clear_afterwards

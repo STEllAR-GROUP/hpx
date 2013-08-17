@@ -635,7 +635,7 @@ namespace hpx { namespace threads
         // Set the affinity for the current thread.
         threads::mask_cref_type mask = get_pu_mask(topology_, num_thread);
 
-        LTM_(info) << "tfunc(" << num_thread
+        LTM_(info) << "tfunc(" << num_thread //-V128
             << "): will run on one processing unit within this mask: "
             << std::hex << "0x" << mask;
 
@@ -643,7 +643,7 @@ namespace hpx { namespace threads
         topology_.set_thread_affinity_mask(mask, ec);
         if (ec)
         {
-            LTM_(warning) << "run: setting thread affinity on OS thread "
+            LTM_(warning) << "run: setting thread affinity on OS thread " //-V128
                 << num_thread << " failed with: " << ec.get_message();
         }
 
@@ -654,7 +654,7 @@ namespace hpx { namespace threads
             topology_.reduce_thread_priority(ec);
             if (ec)
             {
-                LTM_(warning) << "run: reducing thread priority on OS thread "
+                LTM_(warning) << "run: reducing thread priority on OS thread " //-V128
                     << num_thread << " failed with: " << ec.get_message();
             }
         }
@@ -671,20 +671,20 @@ namespace hpx { namespace threads
         scheduler_.on_start_thread(num_thread);
 
         {
-            LTM_(info) << "tfunc(" << num_thread << "): starting OS thread";
+            LTM_(info) << "tfunc(" << num_thread << "): starting OS thread"; //-V128
             try {
                 try {
                     tfunc_impl(num_thread);
                 }
                 catch (hpx::exception const& e) {
-                    LFATAL_ << "tfunc(" << num_thread
+                    LFATAL_ << "tfunc(" << num_thread //-V128
                             << "): caught hpx::exception: "
                             << e.what() << ", aborted thread execution";
                     report_error(num_thread, boost::current_exception());
                     return;
                 }
                 catch (boost::system::system_error const& e) {
-                    LFATAL_ << "tfunc(" << num_thread
+                    LFATAL_ << "tfunc(" << num_thread //-V128
                             << "): caught boost::system::system_error: "
                             << e.what() << ", aborted thread execution";
                     report_error(num_thread, boost::current_exception());
@@ -697,13 +697,13 @@ namespace hpx { namespace threads
                 }
             }
             catch (...) {
-                LFATAL_ << "tfunc(" << num_thread << "): caught unexpected "
+                LFATAL_ << "tfunc(" << num_thread << "): caught unexpected " //-V128
                     "exception, aborted thread execution";
                 report_error(num_thread, boost::current_exception());
                 return;
             }
 
-            LTM_(info) << "tfunc(" << num_thread << "): ending OS thread, "
+            LTM_(info) << "tfunc(" << num_thread << "): ending OS thread, " //-V128
                 "executed " << executed_threads_[num_thread] << " HPX threads";
         }
 
@@ -1318,9 +1318,9 @@ namespace hpx { namespace threads
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         run(std::size_t num_threads)
     {
-        LTM_(info) << "run: " << threads::hardware_concurrency()
+        LTM_(info) << "run: " << threads::hardware_concurrency() //-V128
                    << " number of cores available";
-        LTM_(info) << "run: creating " << num_threads << " OS thread(s)";
+        LTM_(info) << "run: creating " << num_threads << " OS thread(s)"; //-V128
 
         if (0 == num_threads) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -1351,7 +1351,7 @@ namespace hpx { namespace threads
             while (thread_num-- != 0) {
                 threads::mask_cref_type mask = get_pu_mask(topology_, thread_num);
 
-                LTM_(info) << "run: create OS thread " << thread_num
+                LTM_(info) << "run: create OS thread " << thread_num //-V128
                     << ": will run on one processing unit within this mask: "
                     << std::hex << "0x" << mask;
 
@@ -1364,7 +1364,7 @@ namespace hpx { namespace threads
                 topology_.set_thread_affinity_mask(threads_.back(), mask, ec);
                 if (ec)
                 {
-                    LTM_(warning) << "run: setting thread affinity on OS "
+                    LTM_(warning) << "run: setting thread affinity on OS " //-V128
                                      "thread " << thread_num << " failed with: "
                                   << ec.get_message();
                 }
@@ -1416,7 +1416,7 @@ namespace hpx { namespace threads
                     LTM_(info) << "stop: notify_all";
                     do_some_work();
 
-                    LTM_(info) << "stop(" << i << "): join";
+                    LTM_(info) << "stop(" << i << "): join"; //-V128
 
                     // unlock the lock while joining
                     util::scoped_unlock<mutex_type::scoped_lock> ul(l);

@@ -443,10 +443,10 @@ namespace hpx
     private:
         friend boost::exception_ptr detail::access_exception(error_code const&);
         friend class exception;
-        friend error_code make_error_code(boost::exception_ptr);
+        friend error_code make_error_code(boost::exception_ptr const&);
 
         inline error_code(int err, hpx::exception const& e);
-        inline explicit error_code(boost::exception_ptr e);
+        inline explicit error_code(boost::exception_ptr const& e);
 
         boost::exception_ptr exception_;
     };
@@ -513,7 +513,7 @@ namespace hpx
         return error_code(e, msg, func, file, line, mode);
     }
     inline error_code
-    make_error_code(boost::exception_ptr e)
+    make_error_code(boost::exception_ptr const& e)
     {
         return error_code(e);
     }
@@ -1494,7 +1494,7 @@ namespace hpx
         }
     }
 
-    inline error_code::error_code(boost::exception_ptr e)
+    inline error_code::error_code(boost::exception_ptr const& e)
       : boost::system::error_code(make_system_error_code(get_error(e), rethrow)),
         exception_(e)
     {}

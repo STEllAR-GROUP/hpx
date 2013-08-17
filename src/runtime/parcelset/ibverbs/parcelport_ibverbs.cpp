@@ -237,7 +237,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelport::put_parcel(parcel const& p, write_handler_type f)
+    void parcelport::put_parcel(parcel const& p, write_handler_type const& f)
     {
         typedef pending_parcels_map::iterator iterator;
         typedef pending_parcels_map::mapped_type mapped_type;

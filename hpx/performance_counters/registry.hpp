@@ -54,7 +54,7 @@ namespace hpx { namespace performance_counters
             discover_counters_mode mode, error_code& ec = throws);
 
         counter_status discover_counter_type(
-            counter_info const& info, HPX_STD_FUNCTION<discover_counter_func> f,
+            counter_info const& info, HPX_STD_FUNCTION<discover_counter_func> const& f,
             discover_counters_mode mode, error_code& ec = throws)
         {
             return discover_counter_type(info.fullname_, f, mode, ec);

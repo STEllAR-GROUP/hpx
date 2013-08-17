@@ -575,7 +575,7 @@ namespace hpx { namespace threads
 
         ~thread_data()
         {
-            LTM_(debug) << "~thread(" << this << "), description("
+            LTM_(debug) << "~thread(" << this << "), description(" //-V128
                         << get_description() << "), phase("
                         << get_thread_phase() << ")";
         }
@@ -669,7 +669,7 @@ namespace hpx { namespace threads
 
         ~stackless_thread_data()
         {
-            LTM_(debug) << "~stackless_thread(" << this << "), description("
+            LTM_(debug) << "~stackless_thread(" << this << "), description(" //-V128
                         << get_description() << "), phase("
                         << get_thread_phase() << ")";
         }

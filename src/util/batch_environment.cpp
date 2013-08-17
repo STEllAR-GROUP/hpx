@@ -169,7 +169,7 @@ namespace hpx { namespace util
 
     // this function tries to read from a PBS node-file, filling our
     // map of nodes and thread counts
-    std::string batch_environment::init_from_file(std::string nodefile,
+    std::string batch_environment::init_from_file(std::string const& nodefile,
         std::string const& agas_host)
     {
         if (!nodefile.empty()) {

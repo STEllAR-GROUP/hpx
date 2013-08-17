@@ -186,8 +186,8 @@ namespace hpx { namespace parcelset
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
                 data_.dest_size_ = 0;
-                data_.has_source_id_ = false;
-                data_.has_continuation_ = false;
+                data_.has_source_id_ = 0;
+                data_.has_continuation_ = 0;
             }
 
             single_destination_parcel_data(naming::gid_type const& apply_to,
@@ -197,8 +197,8 @@ namespace hpx { namespace parcelset
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
                 data_.dest_size_ = 1;
-                data_.has_source_id_ = false;
-                data_.has_continuation_ = false;
+                data_.has_source_id_ = 0;
+                data_.has_continuation_ = 0;
                 data_.dest_ = apply_to;
                 addr_ = addr;
 
@@ -214,8 +214,8 @@ namespace hpx { namespace parcelset
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
                 data_.dest_size_ = 1;
-                data_.has_source_id_ = false;
-                data_.has_continuation_ = do_after ? true : false;
+                data_.has_source_id_ = 0;
+                data_.has_continuation_ = do_after ? 1 : 0;
                 data_.dest_ = apply_to;
                 addr_ = addr;
 
@@ -231,8 +231,8 @@ namespace hpx { namespace parcelset
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
                 data_.dest_size_ = 1;
-                data_.has_source_id_ = false;
-                data_.has_continuation_ = do_after ? true : false;
+                data_.has_source_id_ = 0;
+                data_.has_continuation_ = do_after ? 1 : 0;
                 data_.dest_ = apply_to;
                 addr_ = addr;
 
@@ -368,8 +368,8 @@ namespace hpx { namespace parcelset
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
                 data_.dest_size_ = 0;
-                data_.has_source_id_ = false;
-                data_.has_continuation_ = false;
+                data_.has_source_id_ = 0;
+                data_.has_continuation_ = 0;
             }
 
             multi_destination_parcel_data(
@@ -381,8 +381,8 @@ namespace hpx { namespace parcelset
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
                 data_.dest_size_ = apply_to.size();
-                data_.has_source_id_ = false;
-                data_.has_continuation_ = false;
+                data_.has_source_id_ = 0;
+                data_.has_continuation_ = 0;
                 dests_ = apply_to;
                 addrs_ = addrs;
 

@@ -242,7 +242,7 @@ namespace hpx {
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
-        LBT_(info) << "(1st stage) runtime_impl::start: booting locality "
+        LBT_(info) << "(1st stage) runtime_impl::start: booting locality " //-V128
                    << here() << " on " << num_threads_ << " OS-thread"
                    << ((num_threads_ == 1) ? "" : "s");
 

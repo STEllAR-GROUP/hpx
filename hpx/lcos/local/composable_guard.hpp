@@ -66,7 +66,7 @@ public:
     guard_set() : guards(), sorted(true) {}
     ~guard_set() {}
 
-    void add(boost::shared_ptr<guard> guard_ptr) {
+    void add(boost::shared_ptr<guard> const& guard_ptr) {
         guards.push_back(guard_ptr);
         sorted = false;
     }

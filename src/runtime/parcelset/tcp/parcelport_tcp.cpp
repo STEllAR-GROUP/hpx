@@ -279,7 +279,7 @@ namespace hpx { namespace parcelset { namespace tcp
         get_connection_and_send_parcels(locality_id, parcel_id);
     }
 
-    void parcelport::put_parcel(parcel const& p, write_handler_type f)
+    void parcelport::put_parcel(parcel const& p, write_handler_type const& f)
     {
         typedef pending_parcels_map::mapped_type mapped_type;
 
@@ -535,10 +535,10 @@ namespace hpx { namespace parcelset { namespace tcp
 
         // make sure the Nagle algorithm is disabled for this socket,
         // disable lingering on close
-        client_connection->socket().set_option(
-            boost::asio::ip::tcp::no_delay(true));
-        client_connection->socket().set_option(
-            boost::asio::socket_base::linger(true, 0));
+        boost::asio::ip::tcp::socket& s = client_connection->socket();
+
+        s.set_option(boost::asio::ip::tcp::no_delay(true));
+        s.set_option(boost::asio::socket_base::linger(true, 0));
 
 #if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
         {
@@ -549,8 +549,8 @@ namespace hpx { namespace parcelset { namespace tcp
 #if defined(HPX_DEBUG)
         BOOST_ASSERT(l == client_connection->destination());
 
-        std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
-        boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
+        std::string connection_addr = s.remote_endpoint().address().to_string();
+        boost::uint16_t connection_port = s.remote_endpoint().port();
         BOOST_ASSERT(l.get_address() == connection_addr);
         BOOST_ASSERT(l.get_port() == connection_port);
 #endif
@@ -657,7 +657,7 @@ namespace hpx { namespace parcelset { namespace tcp
                         inbound_data_size, archive_flags);
 
                     std::size_t parcel_count = 0;
-                    archive >> parcel_count;
+                    archive >> parcel_count; //-V128
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
 #if defined(HPX_HAVE_SECURITY)

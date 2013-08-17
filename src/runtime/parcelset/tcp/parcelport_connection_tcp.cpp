@@ -210,7 +210,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 std::set<boost::uint32_t> localities;
 #endif
                 std::size_t count = pv.size();
-                archive << count;
+                archive << count; //-V128
 
                 BOOST_FOREACH(parcel const& p, pv)
                 {

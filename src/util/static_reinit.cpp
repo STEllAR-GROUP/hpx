@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,7 +24,8 @@ namespace hpx { namespace util
         typedef std::pair<construct_type, destruct_type> value_type;
         typedef std::vector<value_type> reinit_functions_type;
 
-        void register_functions(construct_type construct, destruct_type destruct)
+        void register_functions(construct_type const& construct,
+            destruct_type const& destruct)
         {
             mutex_type::scoped_lock l(mtx_);
             funcs_.push_back(value_type(construct, destruct));
@@ -62,12 +63,12 @@ namespace hpx { namespace util
         return storage.get();
     }
 
-    // This is a global API allowing to register functions to be called before 
-    // the runtime system is about to start and after the runtime system has 
+    // This is a global API allowing to register functions to be called before
+    // the runtime system is about to start and after the runtime system has
     // been terminated. This is used to initialize/reinitialize all
     // singleton instances.
-    void reinit_register(HPX_STD_FUNCTION<void()> construct,
-        HPX_STD_FUNCTION<void()> destruct)
+    void reinit_register(HPX_STD_FUNCTION<void()> const& construct,
+        HPX_STD_FUNCTION<void()> const& destruct)
     {
         reinit_functions_storage::get().register_functions(construct, destruct);
     }

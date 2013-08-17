@@ -352,7 +352,7 @@ namespace hpx { namespace components { namespace detail
             size_ = s / heap_size; //-V104
             free_size_ = size_;
 
-            LOSH_(info)
+            LOSH_(info) //-V128
                 << "wrapper_heap ("
                 << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                 << "): init_pool (" << std::hex << pool_ << ")"
@@ -364,7 +364,7 @@ namespace hpx { namespace components { namespace detail
         void tidy()
         {
             if (pool_ != NULL) {
-                LOSH_(debug)
+                LOSH_(debug) //-V128
                     << "wrapper_heap ("
                     << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                     << ")"
@@ -379,7 +379,7 @@ namespace hpx { namespace components { namespace detail
 #endif
                   )
                 {
-                    LOSH_(warning)
+                    LOSH_(warning) //-V128
                         << "wrapper_heap ("
                         << (!class_name_.empty() ? class_name_.c_str() : "<Unknown>")
                         << "): releasing heap (" << std::hex << pool_ << ")"
@@ -429,7 +429,7 @@ namespace hpx { namespace components { namespace detail
         // but which does not reallocate the heap (it doesn't grow)
         struct fixed_mallocator
         {
-            static void* alloc(std::size_t& size)
+            static void* alloc(std::size_t size)
             {
                 return ::malloc(size);
             }

@@ -64,7 +64,7 @@ namespace hpx
         virtual ~runtime();
 
         /// \brief Manage list of functions to call on exit
-        void on_exit(HPX_STD_FUNCTION<void()> f)
+        void on_exit(HPX_STD_FUNCTION<void()> const& f)
         {
             boost::mutex::scoped_lock l(mtx_);
             on_exit_functions_.push_back(f);
@@ -260,7 +260,7 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
-            boost::shared_ptr<util::query_counters> active_counters)
+            boost::shared_ptr<util::query_counters> const& active_counters)
         {
             active_counters_ = active_counters;
         }

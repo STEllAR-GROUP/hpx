@@ -31,7 +31,7 @@ void free(guard_task *task) {
     delete task;
 }
 
-bool sort_guard(boost::shared_ptr<guard> l1,boost::shared_ptr<guard> l2) {
+bool sort_guard(boost::shared_ptr<guard> const& l1,boost::shared_ptr<guard> const& l2) {
     return boost::get_pointer(l1) < boost::get_pointer(l2);
 }
 
@@ -136,8 +136,8 @@ void run_guarded(guard_set& guards,boost::function<void()> task) {
     int k = 0;
     sd->stages[k]->run = boost::bind(stage_task,sd,k,n);
     sd->gs = guards;
-    guard_task *stage = sd->stages[k];
-    run_guarded(*sd->gs.get(k),stage);
+    guard_task *stage = sd->stages[k]; //-V108
+    run_guarded(*sd->gs.get(k),stage); //-V106
 }
 
 void run_guarded(guard& guard,boost::function<void()> task) {

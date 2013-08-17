@@ -58,13 +58,13 @@ namespace hpx { namespace lcos { namespace server
 
         ~dataflow()
         {
-            BOOST_ASSERT(component_ptr);
-            component_ptr->finalize();
-            LLCO_(info)
-                << "~server::dataflow::dataflow()";
-            BOOST_ASSERT(component_ptr);
-            delete component_ptr;
+            LLCO_(info) << "~server::dataflow::dataflow()";
 
+            BOOST_ASSERT(component_ptr);
+            if (component_ptr) {
+                component_ptr->finalize();
+                delete component_ptr;
+            }
             detail::update_destructed_count();
         }
 

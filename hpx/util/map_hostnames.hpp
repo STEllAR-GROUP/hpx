@@ -41,7 +41,7 @@ namespace hpx { namespace util
             prefix_ = prefix;
         }
 
-        void use_transform(transform_function_type f)
+        void use_transform(transform_function_type const& f)
         {
             transform_ = f;
         }

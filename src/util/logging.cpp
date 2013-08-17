@@ -222,15 +222,15 @@ namespace hpx { namespace util
                 std::size_t phase = self->get_thread_phase();
                 if (0 != phase) {
                     std::stringstream out;
-                    out << std::hex << std::setw(4) << std::setfill('0')
-                        << self->get_thread_phase();
+                    out << std::hex << std::setw(sizeof(boost::uint32_t))
+                        << std::setfill('0') << self->get_thread_phase();
                     str.prepend_string(out.str());
                     return;
                 }
             }
 
             // called from outside a HPX thread or no phase given
-            str.prepend_string("----");
+            str.prepend_string(std::string(sizeof(boost::uint32_t), '-'));
         }
     };
 
@@ -247,8 +247,8 @@ namespace hpx { namespace util
             if (naming::invalid_locality_id != parent_locality_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint32_t)*2) << std::setfill('0')
-                    << parent_locality_id;
+                out << std::hex << std::setw(sizeof(boost::uint32_t)*2)
+                    << std::setfill('0') << parent_locality_id;
                 str.prepend_string(out.str());
             }
             else {
@@ -296,13 +296,13 @@ namespace hpx { namespace util
             if (0 != parent_phase) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(4) << std::setfill('0')
-                    << parent_phase;
+                out << std::hex << std::setw(sizeof(boost::uint32_t))
+                    << std::setfill('0') << parent_phase;
                 str.prepend_string(out.str());
             }
             else {
                 // called from outside a HPX thread
-                str.prepend_string("----");
+                str.prepend_string(std::string(sizeof(boost::uint32_t), '-'));
             }
         }
     };

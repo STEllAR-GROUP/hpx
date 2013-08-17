@@ -285,7 +285,7 @@ namespace hpx { namespace components
 
             BOOST_ASSERT(act);
 
-            ar << size;
+            ar << size; //-V128
             ar << act;
 
             BOOST_ASSERT(act->save());
@@ -317,7 +317,7 @@ namespace hpx { namespace components
             std::size_t size = 0;
             actions::manage_object_action_base* act = 0;
 
-            ar >> size;
+            ar >> size; //-V128
             ar >> act;
 
             typedef server::detail::memory_block_header alloc_type;

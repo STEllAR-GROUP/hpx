@@ -194,10 +194,10 @@ namespace detail
                     l);
 
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
-                return (this_thread::suspend(p) == threads::wait_signaled) ?
+                return (this_thread::suspend(p) == threads::wait_signaled) ? //-V110
                     future_status::ready : future_status::timeout;
             }
-            return future_status::ready;
+            return future_status::ready; //-V110
         }
 
         BOOST_SCOPED_ENUM(future_status)
@@ -211,10 +211,10 @@ namespace detail
                     l);
 
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
-                return (this_thread::suspend(at) == threads::wait_signaled) ?
+                return (this_thread::suspend(at) == threads::wait_signaled) ? //-V110
                     future_status::ready : future_status::timeout;
             }
-            return future_status::ready;
+            return future_status::ready; //-V110
         }
 
     protected:
@@ -451,7 +451,7 @@ namespace detail
 
         BOOST_SCOPED_ENUM(future_status) get_state() const
         {
-            return !data_.is_empty() ? future_status::ready : future_status::deferred;
+            return !data_.is_empty() ? future_status::ready : future_status::deferred; //-V110
         }
 
         /// Reset the promise to allow to restart an asynchronous

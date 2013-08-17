@@ -89,7 +89,7 @@ namespace hpx { namespace util
 
         // register callback function for a thread, invoked when unregistering
         // that thread
-        bool register_callback(boost::uint32_t tix, callback_type);
+        bool register_callback(boost::uint32_t tix, callback_type const&);
 
         // cancel callback
         bool revoke_callback(boost::uint32_t tix);

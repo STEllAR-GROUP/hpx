@@ -438,7 +438,7 @@ namespace hpx
     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
     /// Register a function to be called during system shutdown
-    HPX_API_EXPORT bool register_on_exit(HPX_STD_FUNCTION<void()>);
+    HPX_API_EXPORT bool register_on_exit(HPX_STD_FUNCTION<void()> const&);
 
     enum logging_destination
     {

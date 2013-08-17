@@ -174,7 +174,7 @@ namespace hpx { namespace components { namespace server
     // log result if requested
         if (LHPX_ENABLED(info))
         {
-            LRT_(info) << "successfully created " << count << " components "
+            LRT_(info) << "successfully created " << count << " components " //-V128
                         << " of type: "
                         << components::get_component_type_name(type);
         }
@@ -190,7 +190,7 @@ namespace hpx { namespace components { namespace server
         server::memory_block* c = server::memory_block::create(count, act);
         naming::gid_type gid = c->get_base_gid();
         if (gid) {
-            LRT_(info) << "successfully created memory block of size " << count
+            LRT_(info) << "successfully created memory block of size " << count //-V128
                        << ": " << gid;
             return gid;
         }
@@ -1113,7 +1113,7 @@ namespace hpx { namespace components { namespace server
     bool runtime_support::load_component(
         hpx::util::plugin::dll& d, util::section& ini,
         std::string const& instance, std::string const& component,
-        boost::filesystem::path lib, naming::gid_type const& prefix,
+        boost::filesystem::path const& lib, naming::gid_type const& prefix,
         naming::resolver_client& agas_client, bool isdefault, bool isenabled,
         boost::program_options::options_description& options,
         std::set<std::string>& startup_handled)
@@ -1294,7 +1294,7 @@ namespace hpx { namespace components { namespace server
 
     bool runtime_support::load_plugin(util::section& ini,
         std::string const& instance, std::string const& plugin,
-        boost::filesystem::path lib, bool isenabled)
+        boost::filesystem::path const& lib, bool isenabled)
     {
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)

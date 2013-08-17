@@ -206,7 +206,7 @@ namespace hpx { namespace util
             index = static_cast<int>(next_io_service_);
         }
         else {
-            next_io_service_ = index;
+            next_io_service_ = static_cast<std::size_t>(index);
         }
 
         return *io_services_[index]; //-V108
