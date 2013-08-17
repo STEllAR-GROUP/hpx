@@ -29,14 +29,21 @@
 
 namespace hpx { namespace detail
 {
+    // Defer the evaluation of result_of during the SFINAE checks below
 #if defined(__clang__)
     template <typename F, typename Result = typename boost::result_of<F>::type>
     struct create_future
     {
         typedef lcos::future<Result> type;
     };
+#elif _MSC_VER >= 1700
+    // VS2012 has a decent implementtaion of std::result_of<>
+    template <typename F, typename ResultOf = std::result_of<F> >
+    struct create_future
+    {
+        typedef lcos::future<typename ResultOf::type> type;
+    };
 #else
-    // Defer the evaluation of result_of during the SFINAE checks below
     template <typename F, typename ResultOf = boost::result_of<F> >
     struct create_future
     {
