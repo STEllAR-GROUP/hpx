@@ -184,27 +184,32 @@ namespace hpx { namespace performance_counters { namespace papi
         }
         else
         { // no wildcards expected here
-            if (p.instanceindex_ < 0 || p.parentinstanceindex_ < 0) return false;
-            hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
-            std::string lab = p.instancename_+"#"+
-                boost::lexical_cast<std::string>(p.instanceindex_);
-            if (p.objectname_ == "papi" &&
-                p.parentinstancename_ == "locality" &&
-                tm.get_thread_index(lab) != tm.invalid_index &&
-                !p.countername_.empty())
-            { // validate specific PAPI event
-                int code;
-                if (PAPI_event_name_to_code(const_cast<char *>(p.countername_.c_str()), &code) != PAPI_OK)
+            if (p.instanceindex_ < 0 || p.parentinstanceindex_ < 0) {
+                if (!f(cnt_info, ec) || ec)
                     return false;
-                hpx::performance_counters::counter_status status =
-                    get_counter_name(p, cnt_info.fullname_, ec);
-                if (!status_is_valid(status)) return false;
-                // this is just validation, no helptext required
-                if (!f(cnt_info, ec) || ec) return false;
             }
-            // unsupported path components, let runtime handle this
-            else if (!f(cnt_info, ec) || ec) {
-                return false;
+            else {
+                hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
+                std::string lab = p.instancename_+"#"+
+                    boost::lexical_cast<std::string>(p.instanceindex_);
+                if (p.objectname_ == "papi" &&
+                    p.parentinstancename_ == "locality" &&
+                    tm.get_thread_index(lab) != tm.invalid_index &&
+                    !p.countername_.empty())
+                { // validate specific PAPI event
+                    int code;
+                    if (PAPI_event_name_to_code(const_cast<char *>(p.countername_.c_str()), &code) != PAPI_OK)
+                        return false;
+                    hpx::performance_counters::counter_status status =
+                        get_counter_name(p, cnt_info.fullname_, ec);
+                    if (!status_is_valid(status)) return false;
+                    // this is just validation, no helptext required
+                    if (!f(cnt_info, ec) || ec) return false;
+                }
+                // unsupported path components, let runtime handle this
+                else if (!f(cnt_info, ec) || ec) {
+                    return false;
+                }
             }
         }
 
@@ -221,7 +226,7 @@ namespace hpx { namespace performance_counters { namespace papi
     {
         using HPX_STD_PLACEHOLDERS::_1;
         using HPX_STD_PLACEHOLDERS::_2;
-        return performance_counters::locality_counter_discoverer(info,
+        return performance_counters::locality_thread_counter_discoverer(info,
             HPX_STD_BIND(&discover_papi_counters_helper, _1, f, mode, _2),
             mode, ec);
     }
