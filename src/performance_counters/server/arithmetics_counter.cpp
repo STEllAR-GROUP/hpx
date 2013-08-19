@@ -123,6 +123,91 @@ namespace hpx { namespace performance_counters { namespace server
     }
 
     template <typename Operation>
+    bool arithmetics_counter<Operation>::start()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
+        {
+            if (!base_counter_ids_[i] &&
+                !ensure_base_counter(base_counter_ids_[i], base_counter_names_[i]))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "arithmetics_counter<Operation>::start",
+                    boost::str(boost::format(
+                        "could not get or create performance counter: '%s'") %
+                            base_counter_names_[i]));
+                return false;
+            }
+
+            using performance_counters::stubs::performance_counter;
+            if (!performance_counter::start(base_counter_ids_[i]))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "arithmetics_counter<Operation>::stop",
+                    boost::str(boost::format(
+                        "could not start performance counter: '%s'") %
+                            base_counter_names_[i]));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    template <typename Operation>
+    bool arithmetics_counter<Operation>::stop()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
+        {
+            if (!base_counter_ids_[i] &&
+                !ensure_base_counter(base_counter_ids_[i], base_counter_names_[i]))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "arithmetics_counter<Operation>::stop",
+                    boost::str(boost::format(
+                        "could not get or create performance counter: '%s'") %
+                            base_counter_names_[i]));
+                return false;
+            }
+
+            using performance_counters::stubs::performance_counter;
+            if (!performance_counter::stop(base_counter_ids_[i]))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "arithmetics_counter<Operation>::stop",
+                    boost::str(boost::format(
+                        "could not stop performance counter: '%s'") %
+                            base_counter_names_[i]));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    template <typename Operation>
+    void arithmetics_counter<Operation>::reset_counter_value()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        for (std::size_t i = 0; i != base_counter_names_.size(); ++i)
+        {
+            if (!base_counter_ids_[i] &&
+                !ensure_base_counter(base_counter_ids_[i], base_counter_names_[i]))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "arithmetics_counter<Operation>::reset_counter_value",
+                    boost::str(boost::format(
+                        "could not get or create performance counter: '%s'") %
+                            base_counter_names_[i]));
+                return;
+            }
+
+            using performance_counters::stubs::performance_counter;
+            performance_counter::reset(base_counter_ids_[i]);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Operation>
     bool arithmetics_counter<Operation>::ensure_base_counter(
         naming::id_type& base_counter_id, std::string const& base_counter_name)
     {
