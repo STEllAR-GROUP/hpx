@@ -55,7 +55,8 @@ namespace hpx { namespace performance_counters { namespace server
             counter_info const& info,
             std::vector<std::string> const& base_counter_names)
       : base_type_holder(info),
-        base_counter_names_(base_counter_names)
+        base_counter_names_(base_counter_names),
+        invocation_count_(0)
     {
         if (info.type_ != counter_aggregating) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -88,6 +89,9 @@ namespace hpx { namespace performance_counters { namespace server
 
                 base_values.push_back(value);
             }
+
+            // adjust local invocation count
+            base_values[0].count_ = ++invocation_count_;
         }
 
 //         if (base_value1.scaling_ != base_value2.scaling_ ||
