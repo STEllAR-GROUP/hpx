@@ -1510,7 +1510,7 @@ namespace hpx
                 return dynamic_cast<std::exception const*>(&be)->what();
             }
         }
-        return "";
+        return get_error_what(*this);   // provide at least minimal error text
     }
 
     ///////////////////////////////////////////////////////////////////////////
