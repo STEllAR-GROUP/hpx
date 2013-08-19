@@ -63,6 +63,7 @@ namespace hpx { namespace performance_counters { namespace server
                 "arithmetics_counter<Operation>::arithmetics_counter",
                 "unexpected counter type specified");
         }
+        base_counter_ids_.resize(base_counter_names_.size());
     }
 
     template <typename Operation>
@@ -71,7 +72,6 @@ namespace hpx { namespace performance_counters { namespace server
     {
         std::vector<counter_value> base_values;
         base_values.reserve(base_counter_names_.size());
-        base_counter_ids_.resize(base_counter_names_.size());
 
         // lock here to avoid checking out multiple reference counted GIDs
         // from AGAS
