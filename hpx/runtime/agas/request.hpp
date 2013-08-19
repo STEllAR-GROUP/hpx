@@ -102,9 +102,10 @@ struct request
       , naming::locality const& locality_
       , boost::uint64_t count_
       , boost::uint32_t num_threads_
+      , naming::gid_type prefix_ = naming::gid_type()
         )
       : mc(type_)
-      , data(util::make_tuple(locality_, count_, num_threads_))
+      , data(util::make_tuple(locality_, count_, num_threads_, prefix_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -394,6 +395,13 @@ struct request
         return get_data<subtype_locality_count, 2>(ec);
     }
 
+    naming::gid_type get_suggested_prefix(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_locality_count, 3>(ec);
+    }
+
   private:
     friend class boost::serialization::access;
 
@@ -450,6 +458,7 @@ struct request
             naming::locality // locality
           , boost::uint64_t  // count
           , boost::uint32_t  // num_threads
+          , naming::gid_type // suggested prefix
         >
         // 0x5
         // primary_ns_free

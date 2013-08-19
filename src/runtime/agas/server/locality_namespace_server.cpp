@@ -281,6 +281,7 @@ response locality_namespace::allocate(
     naming::locality ep = req.get_locality();
     boost::uint64_t const count = req.get_count();
     boost::uint32_t const num_threads = req.get_num_threads();
+    naming::gid_type const suggested_prefix = req.get_suggested_prefix();
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -331,7 +332,38 @@ response locality_namespace::allocate(
         }
 
         // Compute the locality's prefix.
-        boost::uint32_t prefix = prefix_counter_++;
+        boost::uint32_t prefix = naming::invalid_locality_id;
+
+        // check if the suggested prefix can be used instead of the next
+        // free one
+        boost::uint32_t suggested_locality_id =
+            naming::get_locality_id_from_gid(suggested_prefix);
+
+        if (suggested_locality_id != naming::invalid_locality_id)
+        {
+            reverse_partition_table_type::const_iterator it =
+                prefixes_.find(suggested_locality_id);
+
+            if (it == prefixes_.end())
+            {
+                prefix = suggested_locality_id;
+            }
+            else
+            {
+                do {
+                    prefix = prefix_counter_++;
+                    it = prefixes_.find(prefix);
+                } while (it != prefixes_.end());
+            }
+        }
+        else
+        {
+            reverse_partition_table_type::const_iterator it;
+            do {
+                prefix = prefix_counter_++;
+                it = prefixes_.find(prefix);
+            } while (it != prefixes_.end());
+        }
 
         // We need to create an entry in the partition table for this
         // locality.
@@ -349,6 +381,21 @@ response locality_namespace::allocate(
                     "partition table insertion failed due to a locking "
                     "error or memory corruption, endpoint(%1%), "
                     "prefix(%2%)") % ep % prefix));
+            return response();
+        }
+
+        // insert into reverse partition table
+        reverse_partition_table_type::iterator rpit;
+
+        if (HPX_UNLIKELY(!util::insert_checked(prefixes_.insert(prefix))))
+        {
+            partitions_.erase(pit);
+
+            HPX_THROWS_IF(ec, internal_server_error
+              , "locality_namespace::allocate"
+              , boost::str(boost::format(
+                    "reverse partition table insertion failed, prefix(%1%), "
+                    "endpoint(%2%)") % prefix % ep));
             return response();
         }
 
@@ -438,6 +485,10 @@ response locality_namespace::free(
         naming::gid_type locality =
             naming::get_gid_from_locality_id(at_c<0>(pit->second));
 
+        // first remove entry from reverse partition table
+        prefixes_.erase(at_c<0>(pit->second));
+
+        // now remove it from the main partition table
         partitions_.erase(pit);
 
         if (primary_)

@@ -55,8 +55,9 @@ struct HPX_EXPORT locality_namespace
         boost::uint32_t, boost::uint32_t>
     partition_type;
 
-    typedef std::map<naming::locality, partition_type>
-        partition_table_type;
+    typedef std::map<naming::locality, partition_type> partition_table_type;
+
+    typedef std::set<boost::uint32_t> reverse_partition_table_type;
     // }}}
 
   private:
@@ -66,6 +67,7 @@ struct HPX_EXPORT locality_namespace
     std::string instance_name_;
 
     partition_table_type partitions_;
+    reverse_partition_table_type prefixes_;
     boost::uint32_t prefix_counter_;
     primary_namespace* primary_;
 

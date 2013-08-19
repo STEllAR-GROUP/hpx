@@ -101,15 +101,18 @@ struct registration_header
         naming::locality const& locality_
       , boost::uint64_t primary_ns_ptr_
       , boost::uint32_t num_threads_
+      , naming::gid_type prefix_ = naming::gid_type()
     ) :
         locality(locality_)
       , primary_ns_ptr(primary_ns_ptr_)
       , num_threads(num_threads_)
+      , prefix(prefix_)
     {}
 
     naming::locality locality;
     boost::uint64_t primary_ns_ptr;
     boost::uint32_t num_threads;
+    naming::gid_type prefix;        // suggested prefix (optional)
 
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int)
@@ -117,6 +120,7 @@ struct registration_header
         ar & locality;
         ar & primary_ns_ptr;
         ar & num_threads;
+        ar & prefix;
     }
 };
 
@@ -284,7 +288,7 @@ namespace hpx { namespace agas
 void register_worker(registration_header const& header)
 {
     // This lock acquires the bbb mutex on creation. When it goes out of scope,
-    // it's dtor calls big_boot_barrier::notify().
+    // its dtor calls big_boot_barrier::notify().
     big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
     runtime& rt = get_runtime();
@@ -306,7 +310,18 @@ void register_worker(registration_header const& header)
           , "registration parcel received by non-bootstrap locality.");
     }
 
-    naming::gid_type prefix;
+    naming::gid_type prefix = header.prefix;
+    if (prefix != naming::invalid_gid && naming::get_locality_id_from_gid(prefix) == 0)
+    {
+        HPX_THROW_EXCEPTION(internal_server_error
+            , "agas::register_worker"
+            , boost::str(boost::format(
+                "worker node (%s) can't suggest locality_id zero, "
+                "this is reserved for the console") %
+                    header.locality));
+        return;
+    }
+
     if (!agas_client.register_locality(header.locality, prefix, header.num_threads))
     {
         HPX_THROW_EXCEPTION(internal_server_error
@@ -680,11 +695,20 @@ void big_boot_barrier::wait(void* primary_ns_server)
         boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
             rt.get_config().get_entry("hpx.os_threads", boost::uint32_t(1)));
 
+        naming::gid_type suggested_prefix;
+
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+        // if MPI parcelport is enabled we use the MPI rank as the suggested locality_id
+        if (util::mpi_environment::rank() != -1)
+            suggested_prefix = naming::get_gid_from_locality_id(util::mpi_environment::rank());
+#endif
+
         // contact the bootstrap AGAS node
         registration_header hdr(
             rt.here()
           , reinterpret_cast<boost::uint64_t>(primary_ns_server)
-          , num_threads);
+          , num_threads
+          , suggested_prefix);
 
         apply(
             naming::invalid_locality_id

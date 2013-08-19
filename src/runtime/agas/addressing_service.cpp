@@ -267,7 +267,7 @@ bool addressing_service::register_locality(
     )
 { // {{{
     try {
-        request req(locality_ns_allocate, ep, 0, num_threads);
+        request req(locality_ns_allocate, ep, 0, num_threads, prefix);
         response rep;
 
         if (is_bootstrap())
