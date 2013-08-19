@@ -804,6 +804,21 @@ system and application performance.
     ]
 ]
 
+[note The /arithmetics counters can consume an arbitrary number of other counters.
+    For this reason those have to be specified as parameters (a comma separated
+    list of counters appended after a `'@'`). For instance:
+    ```
+        ./bin/hello_world -t2 \
+            --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative \
+            --hpx:print-counter=/arithmetics/add@/threads{locality#0/worker-thread#*}/count/cumulative
+        hello world from OS-thread 0 on locality 0
+        hello world from OS-thread 1 on locality 0
+        /threads{locality#0/worker-thread#0}/count/cumulative,1,0.515640,[s],25
+        /threads{locality#0/worker-thread#1}/count/cumulative,1,0.515520,[s],36
+        /arithmetics/add@/threads{locality#0/worker-thread#*}/count/cumulative,1,0.516445,[s],64
+    ```
+]
+
 [c++]
 
 [endsect] [/ Existing __hpx__ Performance Counters]
