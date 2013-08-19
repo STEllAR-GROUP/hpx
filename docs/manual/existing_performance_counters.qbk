@@ -817,7 +817,7 @@ system and application performance.
         /threads{locality#0/worker-thread#1}/count/cumulative,1,0.515520,[s],36
         /arithmetics/add@/threads{locality#0/worker-thread#*}/count/cumulative,1,0.516445,[s],64
     ```
-    Since all wildcards in the parameters are exapnded, this example is fully equivalent to 
+    Since all wildcards in the parameters are expanded, this example is fully equivalent to
     specifying both counters separately to `/arithmetics/add`:
     ```
         ./bin/hello_world -t2 \
