@@ -25,7 +25,8 @@ namespace hpx { namespace parcelset { namespace mpi {
     class parcelport;
 
     void decode_message(
-        std::vector<char, allocator<char> > const & parcel_data, parcelport& pp,
+        std::vector<char, allocator<char> > const & parcel_data,
+        boost::uint64_t inbound_data_size, parcelport& pp,
         performance_counters::parcels::data_point& receive_data);
 
     struct receiver
@@ -39,7 +40,8 @@ namespace hpx { namespace parcelset { namespace mpi {
             receive_data_.time_ = util::high_resolution_clock::now();
             buffer_ = pp.buffer_pool_.get_buffer(h.size());
             buffer_->resize(h.size());
-            receive_data_.buffer_allocate_time_ = util::high_resolution_clock::now() - receive_data_.time_;
+            receive_data_.buffer_allocate_time_ =
+                util::high_resolution_clock::now() - receive_data_.time_;
             receive_data_.serialization_time_ = 0;
             receive_data_.bytes_ = 0;
             receive_data_.num_parcels_ = 0;
@@ -81,7 +83,7 @@ namespace hpx { namespace parcelset { namespace mpi {
                 receive_data_.time_ = util::high_resolution_clock::now() -
                     receive_data_.time_;
 
-                decode_message(*buffer_, pp, receive_data_);
+                decode_message(*buffer_, header_.numbytes(), pp, receive_data_);
                 pp.buffer_pool_.reclaim_buffer(buffer_);
                 return true;
             }

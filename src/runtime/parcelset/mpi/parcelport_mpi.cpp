@@ -179,8 +179,9 @@ namespace hpx { namespace parcelset { namespace mpi
             has_work = !receivers_.empty();
 
             // add new send requests
+            using HPX_STD_PLACEHOLDERS::_1;
             senders_.splice(senders_.end(), parcel_cache_.get_senders(
-                HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this(), HPX_STD_PLACEHOLDERS::_1),
+                HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this(), _1),
                 communicator, *this, senders_.size()));
 
             // handle all send requests
@@ -247,6 +248,7 @@ namespace hpx { namespace parcelset { namespace mpi
 
     void decode_message(
         std::vector<char, allocator<char> > const & parcel_data,
+        boost::uint64_t inbound_data_size,
         parcelport& pp,
         performance_counters::parcels::data_point& receive_data
     )
@@ -264,7 +266,7 @@ namespace hpx { namespace parcelset { namespace mpi
 
                 // De-serialize the parcel data
                 util::portable_binary_iarchive archive(parcel_data,
-                    parcel_data.size(), archive_flags);
+                    inbound_data_size, archive_flags);
 
                 std::size_t parcel_count = 0;
                 archive >> parcel_count; //-V128
@@ -275,6 +277,7 @@ namespace hpx { namespace parcelset { namespace mpi
                     // de-serialize parcel and add it to incoming parcel queue
                     parcel p;
                     archive >> p;
+
                     // make sure this parcel ended up on the right locality
                     BOOST_ASSERT(p.get_destination_locality().get_rank() == pp.here().get_rank());
 

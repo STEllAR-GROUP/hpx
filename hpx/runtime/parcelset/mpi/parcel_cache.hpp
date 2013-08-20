@@ -115,7 +115,8 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         }
 
         template <typename Parcelport>
-        void encode_parcels(boost::shared_ptr<parcel_buffer> & buffer, std::vector<parcel> const & pv, Parcelport& pp)
+        std::size_t encode_parcels(boost::shared_ptr<parcel_buffer> & buffer,
+            std::vector<parcel> const & pv, Parcelport& pp)
         {
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
@@ -126,7 +127,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 HPX_THROW_EXCEPTION(serialization_error,
                     "mpi::detail::parcel_cache::set_parcel",
                     "can't send over MPI without a known destination rank");
-                return;
+                return 0;
             }
 
             BOOST_FOREACH(parcel const & p, pv)
@@ -182,7 +183,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     boost::str(boost::format(
                         "parcelport: parcel serialization failed, caught "
                         "boost::archive::archive_exception: %s") % e.what()));
-                return;
+                return 0;
             }
             catch (boost::system::system_error const& e) {
                 HPX_THROW_EXCEPTION(serialization_error,
@@ -191,7 +192,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                         "parcelport: parcel serialization failed, caught "
                         "boost::system::system_error: %d (%s)") %
                             e.code().value() % e.code().message()));
-                return;
+                return 0;
             }
             catch (std::exception const& e) {
                 HPX_THROW_EXCEPTION(serialization_error,
@@ -199,7 +200,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     boost::str(boost::format(
                         "parcelport: parcel serialization failed, caught "
                         "std::exception: %s") % e.what()));
-                return;
+                return 0;
             }
 
             // make sure outgoing message is not larger than allowed
@@ -212,12 +213,14 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                         "than allowed (created: %ld, allowed: %ld), consider"
                         "configuring larger hpx.parcel.max_message_size") %
                             buffer->buffer_->size() % max_outbound_size_));
-                return;
+                return 0;
             }
 
             datapoint.raw_bytes_ = buffer->buffer_->size();
-            datapoint.num_parcels_ = pv.size();
             datapoint.bytes_ = arg_size;
+            datapoint.num_parcels_ = pv.size();
+
+            return arg_size;
         }
 
         template <typename Parcelport>
@@ -256,13 +259,14 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 std::swap(buffer->handlers_, ph.second.handlers_);
                 std::swap(parcels, ph.second.parcels_);
 
-                encode_parcels(buffer, parcels, pp);
+                std::size_t numbytes = encode_parcels(buffer, parcels, pp);
                 res.push_back(
                     boost::make_shared<sender>(
                         header(
                             buffer->rank_
                           , tag
                           , static_cast<int>(buffer->buffer_->size())
+                          , static_cast<int>(numbytes)
                         )
                       , buffer
                       , communicator
