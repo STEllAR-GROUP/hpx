@@ -347,7 +347,7 @@ naming::gid_type get_next_id(
     if (get_runtime_ptr() == 0)
     {
         HPX_THROWS_IF(ec, invalid_status,
-            "get_next_id", "the runtime system is has not been started yet.");
+            "get_next_id", "the runtime system has not been started yet.");
         return naming::invalid_gid;
     }
 
