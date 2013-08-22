@@ -67,7 +67,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         std::size_t num_system_pus = hardware_concurrency();
 
         // initialize affinity_masks and set the mask for the given virt_core
-        if (affinity_masks_.empty()) 
+        if (affinity_masks_.empty())
         {
             affinity_masks_.resize(num_threads_);
             for (std::size_t i = 0; i != num_threads_; ++i)
@@ -146,6 +146,12 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         // The resulting pu number has to be smaller than the available
         // number of processing units.
+#if !defined(HPX_NATIVE_MIC)
         return (num_pu + offset) % hardware_concurrency;
+#else
+        // the MIC pu numbers are rotated by one (thread 4 of the last core
+        // is pu 0)
+        return (num_pu + offset + 1) % hardware_concurrency;
+#endif
     }
 }}}}
