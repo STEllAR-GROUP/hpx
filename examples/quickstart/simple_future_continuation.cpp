@@ -14,14 +14,14 @@ int get_id(int i)
 
 int func1()
 {
-    hpx::cout << "func1 thread id: " << hpx::threads::get_self_id() << hpx::endl;
+    hpx::cout << "func1 thread id: " << hpx::this_thread::get_id() << hpx::endl;
     return get_id(1) ? 123 : 0;
 }
 
 // this continuation function will be executed by an HPX thread
 int cont1(hpx::future<int> f)
 {
-    hpx::cout << "cont1 thread id: " << hpx::threads::get_self_id() << hpx::endl;
+    hpx::cout << "cont1 thread id: " << hpx::this_thread::get_id() << hpx::endl;
     hpx::cout << "Status code (HPX thread): " << f.get() << hpx::endl;
     hpx::cout << hpx::flush;
     return 1;
@@ -31,7 +31,7 @@ int cont1(hpx::future<int> f)
 // not an HPX thread
 int cont2(hpx::future<int> f)
 {
-    std::cout << "Status code (main thread): " << f.get() << std::endl << std::flush;
+    std::cout << "Status code (main thread): " << f.get() << std::endl;
     return 1;
 }
 
