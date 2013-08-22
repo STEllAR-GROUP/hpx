@@ -603,7 +603,7 @@ namespace hpx { namespace lcos
 
         // bind an on_completed handler to this future which will invoke the
         // continuation
-        void (cont_impl_type::*cb)(lcos::future<void>&, threads::executor&)
+        void (cont_impl_type::*cb)(lcos::future<void>&, threads::executor&) =
             &cont_impl_type::template async<void>;
 
         future_data_->set_on_completed(util::bind(cb, p, *this, boost::ref(sched)));
