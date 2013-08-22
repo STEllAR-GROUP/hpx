@@ -70,6 +70,18 @@ namespace hpx { namespace lcos
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace local { namespace detail
+    {
+        template <typename Policy>
+        struct is_launch_policy
+          : boost::mpl::or_<
+                boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
+              , boost::is_base_and_derived<threads::executor, Policy>
+            >
+        {};
+    }}
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     class future
     {
@@ -262,6 +274,10 @@ namespace hpx { namespace lcos
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
+
+        template <typename F>
+        future<typename boost::result_of<F(future)>::type>
+        then(threads::executor& sched, BOOST_FWD_REF(F) f);
 
         // wait support
         void wait() const
@@ -551,6 +567,10 @@ namespace hpx { namespace lcos
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
+
+        template <typename F>
+        future<typename boost::result_of<F(future)>::type>
+        then(threads::executor& sched, BOOST_FWD_REF(F) f);
 
         // wait support
         void wait() const

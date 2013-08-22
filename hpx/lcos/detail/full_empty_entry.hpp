@@ -195,15 +195,15 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void enqueue_full_full(T& dest, error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (ec) return;
-
-            threads::thread_id_type id = self->get_thread_id();
-
             mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (ec) return;
+
+                threads::thread_id_type id = self->get_thread_id();
+
                 // enqueue the request and block this thread
                 queue_entry f(id);
                 read_queue_.push_back(f);
@@ -233,15 +233,15 @@ namespace hpx { namespace lcos { namespace detail
         // same as above, but for entries without associated data
         void enqueue_full_full(error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (ec) return;
-
-            threads::thread_id_type id = self->get_thread_id();
-
             mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (ec) return;
+
+                threads::thread_id_type id = self->get_thread_id();
+
                 // enqueue the request and block this thread
                 queue_entry f(id);
                 read_queue_.push_back(f);
@@ -270,15 +270,15 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void enqueue_full_empty(T& dest, error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (ec) return;
-
-            threads::thread_id_type id = self->get_thread_id();
-
             mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (ec) return;
+
+                threads::thread_id_type id = self->get_thread_id();
+
                 // enqueue the request and block this thread
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
@@ -310,15 +310,15 @@ namespace hpx { namespace lcos { namespace detail
         // same as above, but for entries without associated data
         void enqueue_full_empty(error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (ec) return;
-
-            threads::thread_id_type id = self->get_thread_id();
-
             mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (ec) return;
+
+                threads::thread_id_type id = self->get_thread_id();
+
                 // enqueue the request and block this thread
                 queue_entry f(id);
                 read_and_empty_queue_.push_back(f);
@@ -347,15 +347,15 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void enqueue_if_full(BOOST_FWD_REF(T) src, error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (ec) return;
-
-            threads::thread_id_type id = self->get_thread_id();
-
             mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is already full
             if (state_ == full) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (ec) return;
+
+                threads::thread_id_type id = self->get_thread_id();
+
                 // enqueue the request and block this thread
                 queue_entry f(id);
                 write_queue_.push_back(f);
@@ -385,15 +385,15 @@ namespace hpx { namespace lcos { namespace detail
         // same as above, but for entries without associated data
         void enqueue_if_full(error_code& ec = throws)
         {
-            threads::thread_self* self = threads::get_self_ptr_checked(ec);
-            if (ec) return;
-
-            threads::thread_id_type id = self->get_thread_id();
-
             mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is already full
             if (state_ == full) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (ec) return;
+
+                threads::thread_id_type id = self->get_thread_id();
+
                 // enqueue the request and block this thread
                 queue_entry f(id);
                 write_queue_.push_back(f);

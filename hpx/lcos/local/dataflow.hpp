@@ -42,14 +42,6 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     struct is_future_or_future_range
       : boost::mpl::or_<traits::is_future<T>, traits::is_future_range<T> >
     {};
-
-    template <typename Policy>
-    struct is_launch_policy
-      : boost::mpl::or_<
-            boost::is_same<BOOST_SCOPED_ENUM(launch), Policy>
-          , boost::is_base_and_derived<threads::executor, Policy>
-        >
-    {};
 }}}}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)

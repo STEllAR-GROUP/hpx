@@ -24,6 +24,7 @@ set(example_programs
     pingpong
     print_to_console
     quicksort
+    simple_future_continuation
     simplest_hello_world
     timed_futures
     timed_wake
@@ -70,6 +71,7 @@ set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
 set(component_inheritance_FLAGS DEPENDENCIES iostreams_component)
 set(component_inheritance_simple_FLAGS DEPENDENCIES iostreams_component)
 set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
+set(simple_future_continuation_FLAGS DEPENDENCIES iostreams_component)
 set(timed_futures_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
