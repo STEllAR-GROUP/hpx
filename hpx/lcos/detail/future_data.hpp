@@ -496,16 +496,12 @@ namespace detail
                 lcos::future<Result> f =
                     lcos::detail::make_future_from_data<Result>(this);
 
-                {
-                    // invoke the callback (continuation) function right away
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                // invoke the callback (continuation) function right away
+                util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
 
-                    if (!retval.empty())
-                        retval(f);
-                    data_sink(f);
-                }
-
-                return boost::move(retval);
+                if (!retval.empty())
+                    retval(f);
+                data_sink(f);
             }
             else if (!retval.empty()) {
                 // store a combined callback wrapping the old and the new one
