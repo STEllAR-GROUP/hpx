@@ -30,8 +30,12 @@ namespace hpx { namespace threads
     {
         if (!default_executor_instance.load())
         {
-            default_executor_instance.store(
-                scheduled_executor::default_executor());
+            scheduled_executor& default_exec =
+                scheduled_executor::default_executor();
+            scheduled_executor empty_exec;
+
+            default_executor_instance.compare_exchange_strong(
+                empty_exec, default_exec);
         }
         return default_executor_instance.load();
     }

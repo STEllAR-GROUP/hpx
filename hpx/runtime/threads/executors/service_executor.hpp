@@ -21,7 +21,7 @@ namespace hpx { namespace threads { namespace executors
     namespace detail
     {
         class HPX_EXPORT service_executor
-          : public threads::detail::executor_base
+          : public threads::detail::scheduled_executor_base
         {
         public:
             service_executor(char const* pool_name);
@@ -64,31 +64,31 @@ namespace hpx { namespace threads { namespace executors
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct io_pool_executor : public executor
+    struct io_pool_executor : public scheduled_executor
     {
         io_pool_executor()
-          : executor(new detail::service_executor("io-pool"))
+          : scheduled_executor(new detail::service_executor("io-pool"))
         {}
     };
 
-    struct parcel_pool_executor : public executor
+    struct parcel_pool_executor : public scheduled_executor
     {
         parcel_pool_executor()
-          : executor(new detail::service_executor("parcel-pool"))
+          : scheduled_executor(new detail::service_executor("parcel-pool"))
         {}
     };
 
-    struct timer_pool_executor : public executor
+    struct timer_pool_executor : public scheduled_executor
     {
         timer_pool_executor()
-          : executor(new detail::service_executor("timer-pool"))
+          : scheduled_executor(new detail::service_executor("timer-pool"))
         {}
     };
 
-    struct main_pool_executor : public executor
+    struct main_pool_executor : public scheduled_executor
     {
         main_pool_executor()
-          : executor(new detail::service_executor("main-pool"))
+          : scheduled_executor(new detail::service_executor("main-pool"))
         {}
     };
 }}}
