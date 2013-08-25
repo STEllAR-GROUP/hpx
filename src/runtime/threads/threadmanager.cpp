@@ -635,10 +635,6 @@ namespace hpx { namespace threads
         // Set the affinity for the current thread.
         threads::mask_cref_type mask = get_pu_mask(topology_, num_thread);
 
-        LTM_(info) << "tfunc(" << num_thread //-V128
-            << "): will run on one processing unit within this mask: "
-            << std::hex << "0x" << mask;
-
         error_code ec(lightweight);
         topology_.set_thread_affinity_mask(mask, ec);
         if (ec)
@@ -1352,8 +1348,12 @@ namespace hpx { namespace threads
                 threads::mask_cref_type mask = get_pu_mask(topology_, thread_num);
 
                 LTM_(info) << "run: create OS thread " << thread_num //-V128
-                    << ": will run on one processing unit within this mask: "
+                    << ": will run on processing units within this mask: "
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
                     << std::hex << "0x" << mask;
+#else
+                    << "0b" << mask;
+#endif
 
                 // create a new thread
                 threads_.push_back(new boost::thread(boost::bind(

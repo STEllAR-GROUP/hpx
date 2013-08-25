@@ -607,9 +607,15 @@ namespace hpx { namespace threads
         int i = 0;
         BOOST_FOREACH(mask_type const& m, affinities)
         {
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
             os << i++ << ": 0x"
                << std::hex << std::setw(sizeof(mask_type)*2)
                << std::setfill('0') << m << std::endl;
+#else
+            os << i++ << ": 0b"
+               << std::setw(sizeof(mask_type)*8)
+               << std::setfill('0') << m << std::endl;
+#endif
         }
     }
 }}
