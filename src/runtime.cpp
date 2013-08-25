@@ -883,6 +883,14 @@ namespace hpx
         return get_runtime().get_agas_client().get_num_localities(ec);
     }
 
+    boost::uint32_t get_initial_num_localities()
+    {
+        if (NULL == hpx::get_runtime_ptr())
+            return 0;
+
+        return get_runtime().get_config().get_num_localities();
+    }
+
     boost::uint32_t get_num_localities(components::component_type type,
         error_code& ec)
     {

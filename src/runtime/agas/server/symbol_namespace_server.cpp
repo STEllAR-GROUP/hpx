@@ -175,11 +175,11 @@ void symbol_namespace::register_counter_types(
         }
 
         performance_counters::install_counter_type(
-            "/agas/" + name
+            agas::service_name + name
           , performance_counters::counter_raw
           , help
           , creator
-          , &performance_counters::locality0_counter_discoverer
+          , &performance_counters::locality_counter_discoverer
           , HPX_PERFORMANCE_COUNTER_V1
           , detail::symbol_namespace_services[i].uom_
           , ec
@@ -190,13 +190,20 @@ void symbol_namespace::register_counter_types(
 
 void symbol_namespace::register_server_instance(
     char const* servicename
+  , boost::uint32_t locality_id
   , error_code& ec
     )
 {
+    // set locality_id for this component
+    if (locality_id != naming::invalid_locality_id)
+        locality_id = 0;        // if not given, we're on the root
+
+    this->base_type::set_locality_id(locality_id);
+
     // now register this AGAS instance with AGAS :-P
     instance_name_ = agas::service_name;
-    instance_name_ += agas::server::symbol_namespace_service_name;
     instance_name_ += servicename;
+    instance_name_ += agas::server::symbol_namespace_service_name;
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component

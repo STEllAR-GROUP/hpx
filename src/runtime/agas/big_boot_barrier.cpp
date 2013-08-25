@@ -100,17 +100,20 @@ struct registration_header
     registration_header(
         naming::locality const& locality_
       , boost::uint64_t primary_ns_ptr_
+      , boost::uint64_t symbol_ns_ptr_
       , boost::uint32_t num_threads_
       , naming::gid_type prefix_ = naming::gid_type()
     ) :
         locality(locality_)
       , primary_ns_ptr(primary_ns_ptr_)
+      , symbol_ns_ptr(symbol_ns_ptr_)
       , num_threads(num_threads_)
       , prefix(prefix_)
     {}
 
     naming::locality locality;
     boost::uint64_t primary_ns_ptr;
+    boost::uint64_t symbol_ns_ptr;
     boost::uint32_t num_threads;
     naming::gid_type prefix;        // suggested prefix (optional)
 
@@ -119,6 +122,7 @@ struct registration_header
     {
         ar & locality;
         ar & primary_ns_ptr;
+        ar & symbol_ns_ptr;
         ar & num_threads;
         ar & prefix;
     }
@@ -136,12 +140,14 @@ struct notification_header
       , naming::address const& primary_ns_address_
       , naming::address const& component_ns_address_
       , naming::address const& symbol_ns_address_
+      , boost::uint32_t num_localities_
     ) :
         prefix(prefix_)
       , locality_ns_address(locality_ns_address_)
       , primary_ns_address(primary_ns_address_)
       , component_ns_address(component_ns_address_)
       , symbol_ns_address(symbol_ns_address_)
+      , num_localities(num_localities_)
     {}
 
     naming::gid_type prefix;
@@ -149,6 +155,7 @@ struct notification_header
     naming::address primary_ns_address;
     naming::address component_ns_address;
     naming::address symbol_ns_address;
+    boost::uint32_t num_localities;
 
 #if defined(HPX_HAVE_SECURITY)
     components::security::signed_certificate root_certificate;
@@ -162,6 +169,7 @@ struct notification_header
         ar & primary_ns_address;
         ar & component_ns_address;
         ar & symbol_ns_address;
+        ar & num_localities;
 #if defined(HPX_HAVE_SECURITY)
         ar & root_certificate;
 #endif
@@ -339,6 +347,13 @@ void register_worker(registration_header const& header)
       , header.primary_ns_ptr);
     agas_client.bind(primary_ns_gid, primary_ns_address);
 
+    naming::gid_type symbol_ns_gid(
+        stubs::symbol_namespace::get_service_instance(prefix));
+    naming::address symbol_ns_address(header.locality
+      , components::get_component_type<agas::server::symbol_namespace>()
+      , header.symbol_ns_ptr);
+    agas_client.bind(symbol_ns_gid, symbol_ns_address);
+
     naming::address locality_addr(rt.here(),
         server::locality_namespace::get_component_type(),
             static_cast<void*>(&agas_client.bootstrap->locality_ns_server_));
@@ -353,7 +368,7 @@ void register_worker(registration_header const& header)
             static_cast<void*>(&agas_client.bootstrap->symbol_ns_server_));
 
     notification_header hdr (prefix, locality_addr, primary_addr
-      , component_addr, symbol_addr);
+      , component_addr, symbol_addr, rt.get_config().get_num_localities());
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -490,6 +505,15 @@ void notify_worker(notification_header const& header)
         agas_client.get_hosted_primary_ns_ptr());
     agas_client.bind(primary_gid, primary_addr);
 
+    // register local symbol namespace component
+    naming::gid_type const symbol_gid =
+        stubs::symbol_namespace::get_service_instance(
+            agas_client.get_local_locality());
+    naming::address const symbol_addr(here
+      , server::symbol_namespace::get_component_type(),
+        agas_client.get_hosted_symbol_ns_ptr());
+    agas_client.bind(symbol_gid, symbol_addr);
+
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
     rt.get_id_pool().set_range(parcel_lower, parcel_upper);
@@ -513,6 +537,9 @@ void notify_worker(notification_header const& header)
       , response_heap_type::block_type::heap_step
       , p->get_address()
       , response_heap_type::block_type::heap_size);
+
+    // store number of initial localities
+    rt.get_config().set_num_localities(header.num_localities);
 
 #if defined(HPX_HAVE_SECURITY)
     // initialize certificate store
@@ -678,7 +705,7 @@ void big_boot_barrier::apply(
     pp.send_early_parcel(p);
 } // }}}
 
-void big_boot_barrier::wait(void* primary_ns_server)
+void big_boot_barrier::wait(void* primary_ns_server, void* symbol_ns_server)
 { // {{{
     if (service_mode_bootstrap == service_type)
     {
@@ -690,6 +717,7 @@ void big_boot_barrier::wait(void* primary_ns_server)
     {
         // any worker sends a request for registration and waits
         BOOST_ASSERT(0 != primary_ns_server);
+        BOOST_ASSERT(0 != symbol_ns_server);
 
         runtime& rt = get_runtime();
         boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
@@ -707,6 +735,7 @@ void big_boot_barrier::wait(void* primary_ns_server)
         registration_header hdr(
             rt.here()
           , reinterpret_cast<boost::uint64_t>(primary_ns_server)
+          , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
           , num_threads
           , suggested_prefix);
 

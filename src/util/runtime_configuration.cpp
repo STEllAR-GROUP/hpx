@@ -310,7 +310,8 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration()
-      : small_stacksize(HPX_SMALL_STACK_SIZE),
+      : num_localities(0),
+        small_stacksize(HPX_SMALL_STACK_SIZE),
         medium_stacksize(HPX_MEDIUM_STACK_SIZE),
         large_stacksize(HPX_LARGE_STACK_SIZE),
         huge_stacksize(HPX_HUGE_STACK_SIZE),
@@ -530,19 +531,35 @@ namespace hpx { namespace util
         return agas::service_mode_hosted;
     }
 
-    std::size_t runtime_configuration::get_num_localities() const
+    boost::uint32_t runtime_configuration::get_num_localities() const
     {
-        // this function should only be called on the AGAS server
-        BOOST_ASSERT(agas::service_mode_bootstrap == get_agas_service_mode());
-
-        if (has_section("hpx")) {
-            util::section const* sec = get_section("hpx");
-            if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
-                    sec->get_entry("localities", 1));
+        if (num_localities == 0) {
+            if (has_section("hpx")) {
+                util::section const* sec = get_section("hpx");
+                if (NULL != sec) {
+                    num_localities = boost::lexical_cast<boost::uint32_t>(
+                        sec->get_entry("localities", 1));
+                }
             }
         }
-        return 1;
+
+        BOOST_ASSERT(num_localities != 0);
+        return num_localities;
+    }
+
+    void runtime_configuration::set_num_localities(boost::uint32_t num_localities_)
+    {
+        // this function should not be called on the AGAS server
+        BOOST_ASSERT(agas::service_mode_bootstrap != get_agas_service_mode());
+        num_localities = num_localities_;
+
+        if (has_section("hpx")) {
+            util::section* sec = get_section("hpx");
+            if (NULL != sec) {
+                sec->add_entry("localities",
+                    boost::lexical_cast<std::string>(num_localities));
+            }
+        }
     }
 
     std::size_t runtime_configuration::get_agas_local_cache_size(std::size_t dflt) const

@@ -400,7 +400,7 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
+              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -416,11 +416,11 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > /* act */
-          , std::vector<hpx::id_type> const & ids
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > /* act */
+      , std::vector<hpx::id_type> const & ids
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {
         return broadcast<Derived>(
                 ids
