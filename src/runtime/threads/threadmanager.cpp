@@ -901,20 +901,30 @@ namespace hpx { namespace threads
             p.instancename_ = "allocator#*";
             p.instanceindex_ = -1;
 
-            status = get_counter_name(p, i.fullname_, ec);
-            if (!status_is_valid(status) || !f(i, ec) || ec)
-                return false;
+            if (mode == performance_counters::discover_counters_full) {
+                for (std::size_t t = 0; t != HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
+                {
+                    p.instancename_ = "allocator";
+                    p.instanceindex_ = static_cast<boost::int32_t>(t);
+                    status = get_counter_name(p, i.fullname_, ec);
+                    if (!status_is_valid(status) || !f(i, ec) || ec)
+                        return false;
+                }
+            }
+            else {
+                status = get_counter_name(p, i.fullname_, ec);
+                if (!status_is_valid(status) || !f(i, ec) || ec)
+                    return false;
+            }
         }
-        if (p.instancename_ == "total" && p.instanceindex_ == -1)
-        {
+        else if (p.instancename_ == "total" && p.instanceindex_ == -1) {
             // overall counter
             status = get_counter_name(p, i.fullname_, ec);
             if (!status_is_valid(status) || !f(i, ec) || ec)
                 return false;
         }
-        else if (p.instancename_ == "allocator#*")
-        {
-            for (std::size_t t = 0; t < HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
+        else if (p.instancename_ == "allocator#*") {
+            for (std::size_t t = 0; t != HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
             {
                 p.instancename_ = "allocator";
                 p.instanceindex_ = static_cast<boost::int32_t>(t);

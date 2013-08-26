@@ -129,5 +129,34 @@ current hardware environment for the locality (such as whether the locality has
 access to accelerators), and the software environment of the application (such
 as the number of OS-threads used to execute __hpx__-threads).
 
+[heading:wildcards Using Wildcards in Performance Counter Names]
+
+It is possible to use wildcard characters when specifying performance counter
+names. Performance counter names can contain 2 types of wildcard characters:
+
+* Wildcard characters in the performance counter type
+* Wildcard characters in the performance counter instance name
+
+Wildcard character have a meaning which is very close to usual file name
+wildcard matching rules implemented by common shells (like bash).
+
+[table Wildcard characters in the performance counter type
+    [[Wildcard]     [Description]]
+    [[`*`]          [This wildchard character matches any number (zero or
+                     more) of arbitrary characters.]]
+    [[`?`]          [This wildchard character matches any single arbitrary
+                     character.]]
+    [[`[...]`]      [This wildchard character matches any single character
+                     from the list of specified within the square brackets.]]
+]
+
+[table Wildcard characters in the performance counter instance name
+    [[Wildcard]     [Description]]
+    [[`*`]          [This wildchard character matches any locality or any
+                     thread, depending on whether it is used for `locality#*`
+                     or `worker-thread#*`. No other wildcards are allowed
+                     in counter instance names.]]
+]
+
 [endsect] [/ Performance Counter Names]
 

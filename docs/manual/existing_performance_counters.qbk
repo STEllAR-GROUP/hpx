@@ -31,9 +31,10 @@ system and application performance.
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
           Currently, this value will be `locality#0`, where `0` is the root locality
           (the id of the locality hosting the AGAS service). Except for `<agas_service>`
-          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, and `change_credit`
-          for which the value for `*` can be any locality id (only the primary AGAS
-          service components live on all localities, whereas all other AGAS services
+          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, `change_credit`,
+          `bind`, `resolve`, `unbind`, and `iterate_names`
+          for which the value for `*` can be any locality id (only the primary and
+          symbol AGAS service components live on all localities, whereas all other AGAS services
           are available on `locality#0` only).
         ]
         [None]
@@ -50,8 +51,8 @@ system and application performance.
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
           Currently, this value will be `locality#0`, where `0` is the root locality
           (the id of the locality hosting the AGAS service). Except for
-          `<agas_service_category>` `primary`for which the value for `*` can be any
-          locality id (only the primary AGAS service components live on all localities,
+          `<agas_service_category>` `primary` or `symbol` for which the value for `*` can be any
+          locality id (only the primary and symbol AGAS service components live on all localities,
           whereas all other AGAS services are available on `locality#0` only).
         ]
         [None]
@@ -73,8 +74,9 @@ system and application performance.
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
           Currently, this value will be `locality#0`, where `0` is the root locality
           (the id of the locality hosting the AGAS service). Except for `<agas_service>`
-          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, and `change_credit`
-          for which the value for `*` can be any locality id (only the primary AGAS
+          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, , `change_credit`,
+          `bind`, `resolve`, `unbind`, and `iterate_names`
+          for which the value for `*` can be any locality id (only the primary and symbol AGAS
           service components live on all localities, whereas all other AGAS services
           are available on `locality#0` only).
         ]
@@ -92,8 +94,8 @@ system and application performance.
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
           Currently, this value will be `locality#0`, where `0` is the root locality
           (the id of the locality hosting the AGAS service). Except for
-          `<agas_service_category>` `primary`for which the value for `*` can be any
-          locality id (only the primary AGAS service components live on all localities,
+          `<agas_service_category>` `primary` or `symbol` for which the value for `*` can be any
+          locality id (only the primary and symbol AGAS service components live on all localities,
           whereas all other AGAS services are available on `locality#0` only).
         ]
         [None]

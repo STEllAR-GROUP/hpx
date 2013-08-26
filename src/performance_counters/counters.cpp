@@ -165,7 +165,7 @@ namespace hpx { namespace performance_counters
         }
 
         if (!path.parameters_.empty()) {
-            result += "#";
+            result += "@";
             result += path.parameters_;
         }
 
@@ -672,7 +672,7 @@ namespace hpx { namespace performance_counters
             if (ec) {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "no create function for performance counter found: " +
-                    remove_counter_prefix(info.fullname_) + 
+                    remove_counter_prefix(info.fullname_) +
                         " (" + ec.get_message() + ")");
                 return naming::invalid_gid;
             }
@@ -696,7 +696,7 @@ namespace hpx { namespace performance_counters
             if (ec) {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "couldn't create performance counter: " +
-                    remove_counter_prefix(info.fullname_) + 
+                    remove_counter_prefix(info.fullname_) +
                         " (" + ec.get_message() + ")");
                 return naming::invalid_gid;
             }
@@ -748,7 +748,7 @@ namespace hpx { namespace performance_counters
             HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
         {
             std::size_t num_threads = get_os_thread_count();
-            for (std::size_t l = 0; l < num_threads; ++l)
+            for (std::size_t l = 0; l != num_threads; ++l)
             {
                 p.instanceindex_ = static_cast<boost::int64_t>(l);
                 counter_status status = get_counter_name(p, i.fullname_, ec);
@@ -770,7 +770,7 @@ namespace hpx { namespace performance_counters
             }
 
             boost::uint32_t last_locality = get_num_localities();
-            for (boost::uint32_t l = 0; l < last_locality; ++l)
+            for (boost::uint32_t l = 0; l != last_locality; ++l)
             {
                 p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
                 if (expand_threads) {
@@ -785,6 +785,46 @@ namespace hpx { namespace performance_counters
             }
             return true;
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        bool expand_counter_info(
+            counter_info const& info, counter_path_elements& p,
+            HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
+        {
+            // A '*' wild-card as the instance name is equivalent to no instance
+            // name at all.
+            if (p.parentinstancename_ == "*")
+            {
+                BOOST_ASSERT(p.parentinstanceindex_ == -1);
+                p.parentinstancename_.clear();
+            }
+
+            // first expand "locality*"
+            if (p.parentinstancename_ == "locality#*")
+            {
+                counter_info i = info;
+                p.parentinstancename_ = "locality";
+                return detail::expand_counter_info_localities(i, p, f, ec);
+            }
+
+            // now expand "<...>-thread#*"
+            if (detail::is_thread_kind(p.instancename_))
+            {
+                counter_info i = info;
+                p.instancename_ = detail::get_thread_kind(p.instancename_) + "-thread";
+                return detail::expand_counter_info_threads(i, p, f, ec);
+            }
+
+            // handle wild-cards in aggregate counters
+            if (p.parentinstance_is_basename_)
+            {
+                counter_info i = info;
+                return detail::expand_basecounter(i, p, f, ec);
+            }
+
+            // everything else is handled directly
+            return f(info, ec);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -797,39 +837,7 @@ namespace hpx { namespace performance_counters
         counter_status status = get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        // A '*' wild-card as the instance name is equivalent to no instance
-        // name at all.
-        if (p.parentinstancename_ == "*")
-        {
-            BOOST_ASSERT(p.parentinstanceindex_ == -1);
-            p.parentinstancename_.clear();
-        }
-
-        // first expand "locality*"
-        if (p.parentinstancename_ == "locality#*")
-        {
-            counter_info i = info;
-            p.parentinstancename_ = "locality";
-            return detail::expand_counter_info_localities(i, p, f, ec);
-        }
-
-        // now expand "<...>-thread#*"
-        if (detail::is_thread_kind(p.instancename_))
-        {
-            counter_info i = info;
-            p.instancename_ = detail::get_thread_kind(p.instancename_) + "-thread";
-            return detail::expand_counter_info_threads(i, p, f, ec);
-        }
-
-        // handle wild-cards in aggregate counters
-        if (p.parentinstance_is_basename_)
-        {
-            counter_info i = info;
-            return detail::expand_basecounter(i, p, f, ec);
-        }
-
-        // everything else is handled directly
-        return f(info, ec);
+        return detail::expand_counter_info(info, p, f, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////

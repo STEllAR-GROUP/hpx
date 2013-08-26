@@ -16,6 +16,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
+#include <boost/regex.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
@@ -90,6 +91,89 @@ namespace hpx { namespace performance_counters
         return status_valid_data;
     }
 
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        inline std::string
+        regex_from_character_set(std::string::const_iterator& it,
+            std::string::const_iterator end, error_code& ec)
+        {
+            std::string::const_iterator start = it;
+            std::string result(1, *it);  // copy '['
+            if (*++it == '!') {
+                result.append(1, '^');   // negated character set
+            }
+            else if (*it == ']') {
+                HPX_THROWS_IF(ec, bad_parameter, "regex_from_character_set",
+                    "Invalid pattern (empty character set) at: " +
+                        std::string(start, end));
+                return "";
+            }
+            else {
+                result.append(1, *it);   // append this character
+            }
+
+            // copy while in character set
+            while (++it != end) {
+                result.append(1, *it);
+                if (*it == ']')
+                    break;
+            }
+
+            if (it == end || *it != ']') {
+                HPX_THROWS_IF(ec, bad_parameter, "regex_from_character_set",
+                    "Invalid pattern (missing closing ']') at: " +
+                        std::string(start, end));
+                return "";
+            }
+
+            return result;
+        }
+
+        inline std::string
+        regex_from_pattern(std::string const& pattern, error_code& ec)
+        {
+            std::string result;
+            std::string::const_iterator end = pattern.end();
+            for (std::string::const_iterator it = pattern.begin(); it != end; ++it)
+            {
+                char c = *it;
+                switch (c) {
+                case '*':
+                    result.append(".*");
+                    break;
+
+                case '?':
+                    result.append(1, '.');
+                    break;
+
+                case '[':
+                    {
+                        std::string r = regex_from_character_set(it, end, ec);
+                        if (ec) return "";
+                        result.append(r);
+                    }
+                    break;
+
+                case '\\':
+                    if (++it == end) {
+                        HPX_THROWS_IF(ec, bad_parameter,
+                            "regex_from_pattern",
+                            "Invalid escape sequence at: " + pattern);
+                        return "";
+                    }
+                    result.append(1, *it);
+                    break;
+
+                default:
+                    result.append(1, c);
+                    break;
+                }
+            }
+            return result;
+        }
+    }
+
     /// \brief Call the supplied function for the given registered counter type.
     counter_status registry::discover_counter_type(
         std::string const& fullname,
@@ -101,37 +185,87 @@ namespace hpx { namespace performance_counters
         counter_status status = get_counter_type_name(fullname, type_name, ec);
         if (!status_is_valid(status)) return status;
 
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
-        if (it == countertypes_.end()) {
-            // compose a list of known counter types
-            std::string types;
+        if (type_name.find_first_of("*?[]") == std::string::npos)
+        {
+            counter_type_map_type::iterator it = locate_counter_type(type_name);
+            if (it == countertypes_.end()) {
+                // compose a list of known counter types
+                std::string types;
+                counter_type_map_type::const_iterator end = countertypes_.end();
+                for (counter_type_map_type::const_iterator it = countertypes_.begin();
+                     it != end; ++it)
+                {
+                    types += "  " + (*it).first + "\n";
+                }
+
+                HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
+                    boost::str(boost::format("unknown counter type: %s, known counter types: \n%s") % 
+                        type_name % types));
+                return status_counter_type_unknown;
+            }
+
+            if (mode == discover_counters_full)
+            {
+                using HPX_STD_PLACEHOLDERS::_1;
+                discover_counter = HPX_STD_BIND(&expand_counter_info, _1,
+                    discover_counter, boost::ref(ec));
+            }
+
+            counter_info info = (*it).second.info_;
+            info.fullname_ = fullname;
+
+            if (!(*it).second.discover_counters_.empty() &&
+                !(*it).second.discover_counters_(info, discover_counter, mode, ec))
+            {
+                return status_invalid_data;
+            }
+        }
+        else
+        {
+            std::string str_rx(detail::regex_from_pattern(type_name, ec));
+            if (ec) return status_invalid_data;
+
+            if (mode == discover_counters_full)
+            {
+                using HPX_STD_PLACEHOLDERS::_1;
+                discover_counter = HPX_STD_BIND(&expand_counter_info, _1,
+                    discover_counter, boost::ref(ec));
+            }
+
+            bool found_one = false;
+            boost::regex rx(str_rx, boost::regex::perl);
+
             counter_type_map_type::const_iterator end = countertypes_.end();
             for (counter_type_map_type::const_iterator it = countertypes_.begin();
                  it != end; ++it)
             {
-                types += "  " + (*it).first + "\n";
+                if (!boost::regex_match((*it).first, rx))
+                    continue;
+                found_one = true;
+
+                if (!(*it).second.discover_counters_.empty() &&
+                    !(*it).second.discover_counters_((*it).second.info_,
+                        discover_counter, mode, ec))
+                {
+                    return status_invalid_data;
+                }
             }
 
-            HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
-                boost::str(boost::format("unknown counter type: %s, known counter types: \n%s") % 
-                    type_name % types));
-            return status_counter_type_unknown;
-        }
+            if (!found_one) {
+                // compose a list of known counter types
+                std::string types;
+                counter_type_map_type::const_iterator end = countertypes_.end();
+                for (counter_type_map_type::const_iterator it = countertypes_.begin();
+                     it != end; ++it)
+                {
+                    types += "  " + (*it).first + "\n";
+                }
 
-        if (mode == discover_counters_full)
-        {
-            using HPX_STD_PLACEHOLDERS::_1;
-            discover_counter = HPX_STD_BIND(&expand_counter_info, _1,
-                discover_counter, boost::ref(ec));
-        }
-
-        counter_info info = (*it).second.info_;
-        info.fullname_ = fullname;
-
-        if (!(*it).second.discover_counters_.empty() &&
-            !(*it).second.discover_counters_(info, discover_counter, mode, ec))
-        {
-            return status_invalid_data;
+                HPX_THROWS_IF(ec, bad_parameter, "registry::discover_counter_type",
+                    boost::str(boost::format("counter type: %s does not match any known type"
+                        ", known counter types: \n%s") % type_name % types));
+                return status_counter_type_unknown;
+            }
         }
 
         if (&ec != &throws)
