@@ -225,7 +225,7 @@ void primary_namespace::register_server_instance(
     )
 {
     // set locality_id for this component
-    if (locality_id != naming::invalid_locality_id)
+    if (locality_id == naming::invalid_locality_id)
         locality_id = 0;        // if not given, we're on the root
 
     this->base_type::set_locality_id(locality_id);
