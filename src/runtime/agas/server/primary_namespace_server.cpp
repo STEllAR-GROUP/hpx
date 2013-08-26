@@ -205,7 +205,7 @@ void primary_namespace::register_counter_types(
         }
 
         performance_counters::install_counter_type(
-            "/agas/" + name
+            agas::service_name + name
           , performance_counters::counter_raw
           , help
           , creator
@@ -226,14 +226,14 @@ void primary_namespace::register_server_instance(
 {
     // set locality_id for this component
     if (locality_id != naming::invalid_locality_id)
-    {
-        this->base_type::set_locality_id(locality_id);
-    }
+        locality_id = 0;        // if not given, we're on the root
+
+    this->base_type::set_locality_id(locality_id);
 
     // now register this AGAS instance with AGAS :-P
     instance_name_ = agas::service_name;
-    instance_name_ += agas::server::primary_namespace_service_name;
     instance_name_ += servicename;
+    instance_name_ += agas::server::primary_namespace_service_name;
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component

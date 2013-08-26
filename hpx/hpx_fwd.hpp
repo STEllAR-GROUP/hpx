@@ -933,6 +933,20 @@ namespace hpx
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities_async
     HPX_API_EXPORT boost::uint32_t get_num_localities(error_code& ec = throws);
 
+    /// \brief Return the number of localities which were registered at startup
+    ///        for the running application.
+    ///
+    /// The function \a get_initial_num_localities returns the number of localities
+    /// which were connected to the console at application startup.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
+    HPX_API_EXPORT boost::uint32_t get_initial_num_localities();
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Asynchronously return the number of localities which are
     ///        currently registered for the running application.

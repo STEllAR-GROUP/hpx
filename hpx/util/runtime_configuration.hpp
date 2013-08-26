@@ -46,8 +46,9 @@ namespace hpx { namespace util
         // locality hosting the AGAS server.
         agas::service_mode get_agas_service_mode() const;
 
-        // AGAS server only: get number of localities served
-        std::size_t get_num_localities() const;
+        // initial number of localities
+        boost::uint32_t get_num_localities() const;
+        void set_num_localities(boost::uint32_t);
 
         // Get the AGAS locality to use
         naming::locality get_agas_locality() const;
@@ -137,6 +138,7 @@ namespace hpx { namespace util
         void reconfigure();
 
     private:
+        mutable boost::uint32_t num_localities;
         std::ptrdiff_t small_stacksize;
         std::ptrdiff_t medium_stacksize;
         std::ptrdiff_t large_stacksize;

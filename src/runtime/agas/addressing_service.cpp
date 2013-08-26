@@ -14,6 +14,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/lcos/broadcast.hpp>
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -62,7 +63,8 @@ void addressing_service::initialize()
     else
     {
         launch_hosted();
-        get_big_boot_barrier().wait(&hosted->primary_ns_server_);
+        get_big_boot_barrier().wait(&hosted->primary_ns_server_,
+            &hosted->symbol_ns_server_);
     }
 
     set_status(running);
@@ -88,9 +90,9 @@ void addressing_service::launch_bootstrap(
 
     runtime& rt = get_runtime();
 
-    const naming::locality ep = ini_.get_agas_locality();
-    const naming::gid_type here
-        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
+    naming::locality const ep = ini_.get_agas_locality();
+    naming::gid_type const here =
+        naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     naming::gid_type const locality_gid = bootstrap_locality_namespace_gid();
     gva locality_gva(ep,
@@ -157,13 +159,9 @@ void addressing_service::launch_bootstrap(
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
         bootstrap->primary_ns_server_.remote_service(reqs[i]);
 
-    bootstrap->symbol_ns_server_.remote_service(
-        request(symbol_ns_bind, "/locality(agas#0)", here));
-
-    if (is_console()) {
-        bootstrap->symbol_ns_server_.remote_service(
-            request(symbol_ns_bind, "/locality(console)", here));
-    }
+    register_name("/0/agas/locality#0", here);
+    if (is_console())
+        register_name("/0/locality#console", here);
 
     naming::gid_type lower, upper;
     get_id_range(ep, HPX_INITIAL_GID_RANGE, lower, upper);
@@ -221,7 +219,7 @@ response addressing_service::service(
     {
         if (is_bootstrap())
             return bootstrap->primary_ns_server_.service(req, ec);
-        return hosted->primary_ns_.service(req, action_priority_, ec);
+        return hosted->primary_ns_server_.service(req, ec);
     }
 
     else if (req.get_action_code() & component_ns_service)
@@ -235,7 +233,14 @@ response addressing_service::service(
     {
         if (is_bootstrap())
             return bootstrap->symbol_ns_server_.service(req, ec);
-        return hosted->symbol_ns_.service(req, action_priority_, ec);
+        return hosted->symbol_ns_server_.service(req, ec);
+    }
+
+    else if (req.get_action_code() & locality_ns_service)
+    {
+        if (is_bootstrap())
+            return bootstrap->locality_ns_server_.service(req, ec);
+        return hosted->locality_ns_.service(req, action_priority_, ec);
     }
 
     HPX_THROWS_IF(ec, bad_action_code
@@ -255,8 +260,7 @@ std::vector<response> addressing_service::bulk_service(
     // also route requests intended for the primary namespace).
     if (is_bootstrap())
         return bootstrap->primary_ns_server_.bulk_service(req, ec);
-
-    return hosted->primary_ns_.bulk_service(req, action_priority_, ec);
+    return hosted->primary_ns_server_.bulk_service(req, ec);
 } // }}}
 
 bool addressing_service::register_locality(
@@ -381,13 +385,15 @@ bool addressing_service::get_console_locality(
             }
         }
 
-        request req(symbol_ns_resolve, std::string("/locality(console)"));
+        std::string key("/0/locality#console");
+
+        request req(symbol_ns_resolve, key);
         response rep;
 
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+            rep = stubs::symbol_namespace::service(key, req, action_priority_, ec);
 
         if (!ec && (rep.get_gid() != naming::invalid_gid) &&
             (rep.get_status() == success))
@@ -1246,16 +1252,20 @@ void addressing_service::route(
 
     // apply remotely, route through main AGAS service if the destination is
     // a service instance
-    if (!addr && stubs::primary_namespace::is_service_instance(gids[0]))
+    if (!addr)
     {
-        // construct wrapper parcel
-        parcelset::parcel route_p(bootstrap_primary_namespace_gid()
-          , primary_ns_addr_
-          , new hpx::actions::transfer_action<action_type>(action_priority_, req));
+        if (stubs::primary_namespace::is_service_instance(gids[0]) ||
+            stubs::symbol_namespace::is_service_instance(gids[0]))
+        {
+            // construct wrapper parcel
+            parcelset::parcel route_p(bootstrap_primary_namespace_gid()
+              , primary_ns_addr_
+              , new hpx::actions::transfer_action<action_type>(action_priority_, req));
 
-        // send to the main AGAS instance for routing
-        hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);
-        return;
+            // send to the main AGAS instance for routing
+            hpx::applier::get_applier().get_parcel_handler().put_parcel(route_p, f);
+            return;
+        }
     }
 
     // apply directly as we have the resolved destination address
@@ -1322,7 +1332,7 @@ void addressing_service::decref(
         // reschedule this call as an HPX thread
         threads::register_thread_nullary(
             HPX_STD_BIND(&addressing_service::decref, this,
-                lower, upper, credit, boost::ref(throws)), 
+                lower, upper, credit, boost::ref(throws)),
                 "addressing_service::decref");
         return;
     }
@@ -1359,10 +1369,10 @@ bool addressing_service::register_name(
         request req(symbol_ns_bind, name, id);
         response rep;
 
-        if (is_bootstrap())
+        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
             rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
 
         return !ec && (success == rep.get_status());
     }
@@ -1409,8 +1419,9 @@ lcos::future<bool> addressing_service::register_name_async(
     }
 
     request req(symbol_ns_bind, name, new_gid);
-    naming::id_type const target = bootstrap_symbol_namespace_id();
-    future<bool> f = stubs::symbol_namespace::service_async<bool>(target, req);
+
+    future<bool> f = stubs::symbol_namespace::service_async<bool>(
+        name, req, action_priority_);
 
     using HPX_STD_PLACEHOLDERS::_1;
     f.then(
@@ -1432,10 +1443,10 @@ bool addressing_service::unregister_name(
         request req(symbol_ns_unbind, name);
         response rep;
 
-        if (is_bootstrap())
+        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
             rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -1456,8 +1467,9 @@ lcos::future<naming::id_type> addressing_service::unregister_name_async(
     )
 { // {{{
     request req(symbol_ns_unbind, name);
-    naming::id_type const target = bootstrap_symbol_namespace_id();
-    return stubs::symbol_namespace::service_async<naming::id_type>(target, req);
+
+    return stubs::symbol_namespace::service_async<naming::id_type>(
+        name, req, action_priority_);
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1471,10 +1483,10 @@ bool addressing_service::resolve_name(
         request req(symbol_ns_resolve, name);
         response rep;
 
-        if (is_bootstrap())
+        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
             rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -1496,10 +1508,22 @@ lcos::future<naming::id_type> addressing_service::resolve_name_async(
     )
 { // {{{
     request req(symbol_ns_resolve, name);
-    naming::id_type const gid = bootstrap_symbol_namespace_id();
-    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
+
+    return stubs::symbol_namespace::service_async<naming::id_type>(
+        name, req, action_priority_);
 } // }}}
 
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+typedef hpx::agas::server::symbol_namespace::service_action
+    symbol_namespace_service_action;
+
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action)
+HPX_REGISTER_BROADCAST_ACTION(symbol_namespace_service_action)
+
+namespace hpx { namespace agas
+{
 /// Invoke the supplied hpx::function for every registered global name
 bool addressing_service::iterate_ids(
     iterate_names_function_type const& f
@@ -1507,15 +1531,12 @@ bool addressing_service::iterate_ids(
     )
 { // {{{
     try {
+        symbol_namespace_service_action act;
+
         request req(symbol_ns_iterate_names, f);
-        response rep;
+        lcos::broadcast(act, hpx::find_all_localities(), req).get(ec);
 
-        if (is_bootstrap())
-            rep = bootstrap->symbol_ns_server_.service(req, ec);
-        else
-            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
-
-        return !ec && (success == rep.get_status());
+        return !ec;
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::iterate_ids");
@@ -1785,7 +1806,7 @@ namespace detail
 }
 
 bool addressing_service::retrieve_statistics_counter(
-    std::string const& counter_name
+    std::string const& name
   , naming::gid_type& counter
   , error_code& ec
     )
@@ -1793,23 +1814,24 @@ bool addressing_service::retrieve_statistics_counter(
     try {
         // retrieve counter type
         namespace_action_code service_code =
-            detail::retrieve_action_service_code(counter_name, ec);
+            detail::retrieve_action_service_code(name, ec);
         if (invalid_request == service_code) return false;
 
         // compose request
-        request req(service_code, counter_name);
+        request req(service_code, name);
         response rep;
 
-        if (is_bootstrap())
+        if (is_bootstrap() && name.size() >= 2 && name[1] == '0' && name[0] == '/')
             rep = bootstrap->symbol_ns_server_.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
+            rep = stubs::symbol_namespace::service(name, req, action_priority_, ec);
 
         if (!ec && (success == rep.get_status()))
         {
             counter = rep.get_statistics_counter();
             return true;
         }
+
         return false;
     }
     catch (hpx::exception const& e) {
@@ -1900,7 +1922,7 @@ void addressing_service::register_counter_types()
         bootstrap->register_counter_types();
 
         // always register root server as 'locality#0'
-        bootstrap->register_server_instance("locality#0");
+        bootstrap->register_server_instance("locality#0/");
     }
     else {
         // install counters for services
@@ -1908,7 +1930,7 @@ void addressing_service::register_counter_types()
 
         boost::uint32_t locality_id =
             naming::get_locality_id_from_gid(get_local_locality());
-        std::string str("locality#" + boost::lexical_cast<std::string>(locality_id));
+        std::string str("locality#" + boost::lexical_cast<std::string>(locality_id) + "/");
         hosted->register_server_instance(str.c_str(), locality_id);
     }
 } // }}}

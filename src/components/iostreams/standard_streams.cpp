@@ -50,8 +50,8 @@ namespace hpx { namespace iostreams
             return std::cerr;
         }
 
-        char const* const cout_name = "/locality(console)/output_stream(cout)";
-        char const* const cerr_name = "/locality(console)/output_stream(cerr)";
+        char const* const cout_name = "/locality#console/output_stream#cout";
+        char const* const cerr_name = "/locality#console/output_stream#cerr";
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -191,9 +191,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         void unregister_server_instance(error_code& ec)
         {
             locality_ns_server_.unregister_server_instance(ec);
-            primary_ns_server_.unregister_server_instance(ec);
-            component_ns_server_.unregister_server_instance(ec);
-            symbol_ns_server_.unregister_server_instance(ec);
+            if (!ec) primary_ns_server_.unregister_server_instance(ec);
+            if (!ec) component_ns_server_.unregister_server_instance(ec);
+            if (!ec) symbol_ns_server_.unregister_server_instance(ec);
         }
 
         server::primary_namespace primary_ns_server_;
@@ -204,28 +204,35 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     struct hosted_data_type
     { // {{{
+        hosted_data_type()
+          : primary_ns_server_()
+          , symbol_ns_server_()
+        {}
+
         void register_counter_types()
         {
             server::primary_namespace::register_counter_types();
+            server::symbol_namespace::register_counter_types();
         }
 
         void register_server_instance(char const* servicename
           , boost::uint32_t locality_id)
         {
             primary_ns_server_.register_server_instance(servicename, locality_id);
+            symbol_ns_server_.register_server_instance(servicename, locality_id);
         }
 
         void unregister_server_instance(error_code& ec)
         {
             primary_ns_server_.unregister_server_instance(ec);
+            if (!ec) symbol_ns_server_.unregister_server_instance(ec);
         }
 
         locality_namespace locality_ns_;
-        primary_namespace primary_ns_;
         component_namespace component_ns_;
-        symbol_namespace symbol_ns_;
 
         server::primary_namespace primary_ns_server_;
+        server::symbol_namespace symbol_ns_server_;
     }; // }}}
 
     mutable cache_mutex_type gva_cache_mtx_;
@@ -345,6 +352,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     {
         BOOST_ASSERT(0 != hosted.get());
         return &hosted->primary_ns_server_;
+    }
+
+    void* get_hosted_symbol_ns_ptr() const
+    {
+        BOOST_ASSERT(0 != hosted.get());
+        return &hosted->symbol_ns_server_;
     }
 
 protected:
