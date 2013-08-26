@@ -16,10 +16,16 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 820] - Allow wildcards to be used for performance counter names
+* [issue 818] - Add future::then() overload taking an executor
+* [issue 817] - Fixed typo
 * [issue 815] - Create an lco that is performing an efficient broadcast of
                 actions
+* [issue 814] - Papi counters cannot specify thread#* to get the counts for
+                all threads
 * [issue 813] - Scoped unlock
 * [issue 811] - simple_central_tuplespace_client run error
+* [issue 810] - ostream error when << any objects
 * [issue 809] - Optimize parcel serialization
 * [issue 808] - HPX applications throw exception when executed from the build
                 directory
