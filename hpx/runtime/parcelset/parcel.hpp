@@ -404,6 +404,7 @@ namespace hpx { namespace parcelset
                         BOOST_ASSERT(components::types_are_compatible(
                             comptype, addrs[i].type_));
                     }
+                    (void)comptype;
                 }
 #endif
             }
