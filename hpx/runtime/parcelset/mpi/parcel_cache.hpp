@@ -126,7 +126,6 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         {
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
-            std::vector<parcel>& pv = buffer->parcels_;
 
             buffer->rank_ = pv[0].get_destination_locality().get_rank();
             if (buffer->rank_ == -1)
@@ -143,8 +142,8 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
 
             util::high_resolution_timer timer;
-            buffer->buffer_ = pp.buffer_pool_.get_buffer(
-                arg_size + pv.size() * HPX_PARCEL_SERIALIZATION_OVERHEAD);
+            buffer->buffer_ = pp.get_buffer(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+            buffer->buffer_->resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
             performance_counters::parcels::data_point& datapoint = buffer->send_data_;
             datapoint.buffer_allocate_time_ = timer.elapsed_nanoseconds();
