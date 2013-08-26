@@ -25,6 +25,7 @@
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/binary_filter.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
 
 #include <boost/config.hpp>
@@ -1114,21 +1115,54 @@ namespace hpx { namespace util
     typedef basic_any<void, void, wchar_t> wany_nonser;
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        struct hash_binary_filter : util::binary_filter
+        {
+            explicit hash_binary_filter(std::size_t seed = 0)
+              : hash(seed)
+            {}
+
+            // compression API
+            void set_max_length(std::size_t size)
+            {}
+            void save(void const* src, std::size_t src_count)
+            {
+                char const* data = static_cast<char const*>(src);
+                boost::hash_range(hash, data, data + src_count);
+            }
+            bool flush(void* dst, std::size_t dst_count, 
+                std::size_t& written)
+            {
+                return true;
+            }
+
+            // decompression API
+            std::size_t init_data(char const* buffer,
+                std::size_t size, std::size_t buffer_size)
+            {
+                return 0;
+            }
+            void load(void* dst, std::size_t dst_count)
+            {}
+
+            std::size_t hash;
+        };
+    }
+
     struct hash_any
     {
         size_t operator()(const any &elem ) const
         {
-            std::vector<char> data;
-
+            detail::hash_binary_filter hasher;
             {
+                std::vector<char> data;
                 portable_binary_oarchive ar (
-                        data, 0, boost::archive::no_header);
+                        data, &hasher, boost::archive::no_header);
                 ar << elem;
             }  // let archive go out of scope
 
-            // now 'data' has the serialized binary byte stream
-
-            return boost::hash_range(data.begin(), data.end());
+            return hasher.hash;
         }
     };
 }}    // namespace hpx::util
