@@ -87,7 +87,7 @@ namespace hpx { namespace threads
 
     bool topology::reduce_thread_priority(error_code& ec) const
     {
-#if defined(_POSIX_VERSION) && !defined(__ANDROID__)
+#if defined(__linux__) && !defined(__ANDROID__)
         pid_t tid;
         tid = syscall(SYS_gettid);
         if (setpriority(PRIO_PROCESS, tid, 19))
