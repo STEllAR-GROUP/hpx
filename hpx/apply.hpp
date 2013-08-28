@@ -23,6 +23,7 @@
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
+#include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/mpl/identity.hpp>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -54,35 +55,33 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     // Define apply() overloads for plain local functions and function objects.
-    //
-    // Note that these overloads are limited to function objects supporting the
-    // result_of protocol. We will need to revisit this as soon as we will be
-    // able to implement a proper is_callable trait (current compiler support
-    // does not allow to do that portably).
 
     // simply launch the given function or function object asynchronously
 
 #define HPX_UTIL_BOUND_FUNCTION_APPLY(Z, N, D)                                \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
     typename boost::lazy_enable_if<                                           \
-        traits::is_callable<F>                                                \
+        traits::detail::is_callable_not_action<F                              \
+          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>                      \
       , boost::mpl::identity<bool>                                            \
     >::type                                                                   \
     apply(threads::executor& sched, BOOST_FWD_REF(F) f,                       \
         HPX_ENUM_FWD_ARGS(N, A, a))                                           \
     {                                                                         \
-        sched.add(util::bind(boost::forward<F>(f),                            \
+        sched.add(util::bind(util::protect(boost::forward<F>(f)),             \
             HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
         return false;                                                         \
     }                                                                         \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
     typename boost::lazy_enable_if<                                           \
-        traits::is_callable<F>                                                \
+        traits::detail::is_callable_not_action<F                              \
+          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>                      \
       , boost::mpl::identity<bool>                                            \
     >::type                                                                   \
     apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                     \
     {                                                                         \
-        threads::register_thread(util::bind(boost::forward<F>(f),             \
+        threads::register_thread(util::bind(                                  \
+            util::protect(boost::forward<F>(f)),                              \
             HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
         return false;                                                         \
     }                                                                         \
@@ -121,285 +120,6 @@ namespace hpx
 
 namespace hpx
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // apply a nullary bound function
-    template <
-        typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    bool apply(
-        threads::executor& sched,
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_function, N)<
-                R
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, T)
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            >
-        ))) bound)
-    {
-        sched.add(boost::move(bound), "hpx::apply");
-        return false;   // executed locally
-    }
-
-    template <
-        typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    bool apply(
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_function, N)<
-                R
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, T)
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            >
-        ))) bound)
-    {
-        threads::register_thread(boost::move(bound), "hpx::apply");
-        return false;   // executed locally
-    }
-
-    // define apply() overloads for n-nary bound functions
-#define HPX_UTIL_BOUND_FUNCTION_APPLY(Z, N, D)                                \
-    template <                                                                \
-        typename R                                                            \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename T)              \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    bool apply(threads::executor& sched,                                      \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_function, NN)<              \
-                R                                                             \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, T)               \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        sched.add(util::bind(boost::move(bound),                              \
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
-        return false;                                                         \
-    }                                                                         \
-    template <                                                                \
-        typename R                                                            \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename T)              \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    bool apply(                                                               \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_function, NN)<              \
-                R                                                             \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, T)               \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        threads::register_thread(util::bind(util::protect(boost::move(bound)),\
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
-        return false;                                                         \
-    }                                                                         \
-    /**/
-
-    BOOST_PP_REPEAT_FROM_TO(
-        1
-      , HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_UTIL_BOUND_FUNCTION_APPLY, _
-    )
-
-#undef HPX_UTIL_BOUND_FUNCTION_APPLY
-
-    ///////////////////////////////////////////////////////////////////////////
-    // apply a nullary bound member function
-    template <
-        typename R
-      , typename C
-      BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-            BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), typename T)
-      BOOST_PP_COMMA_IF(N)  BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    bool apply(threads::executor& sched,
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_member_function, N)<
-                R
-              , C
-              BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-                    BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), T)
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            >
-        ))) bound)
-    {
-        sched.add(boost::move(bound), "hpx::apply");
-        return false;   // executed locally
-    }
-
-    template <
-        typename R
-      , typename C
-      BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-            BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), typename T)
-      BOOST_PP_COMMA_IF(N)  BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    bool apply(
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_member_function, N)<
-                R
-              , C
-              BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-                    BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), T)
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            >
-        ))) bound)
-    {
-        threads::register_thread(boost::move(bound), "hpx::apply");
-        return false;   // executed locally
-    }
-
-    // define apply() overloads for n-nary bound actions
-#define HPX_UTIL_BOUND_MEMBER_FUNCTION_APPLY(Z, N, D)                         \
-    template <                                                                \
-        typename R                                                            \
-      , typename C                                                            \
-      BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                     \
-          BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), typename T)                  \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    bool apply(threads::executor& sched,                                      \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_member_function, NN)<       \
-                R                                                             \
-              , C                                                             \
-              BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                             \
-                    BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), T)                 \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        sched.add(util::bind(boost::move(bound),                              \
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
-        return false;                                                         \
-    }                                                                         \
-    template <                                                                \
-        typename R                                                            \
-      , typename C                                                            \
-      BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                     \
-          BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), typename T)                  \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    bool apply(                                                               \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_member_function, NN)<       \
-                R                                                             \
-              , C                                                             \
-              BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                             \
-                    BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(NN), T)                 \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        threads::register_thread(util::bind(util::protect(boost::move(bound)),\
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
-        return false;                                                         \
-    }                                                                         \
-    /**/
-
-    BOOST_PP_REPEAT_FROM_TO(
-        1
-      , HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_UTIL_BOUND_MEMBER_FUNCTION_APPLY, _
-    )
-
-#undef HPX_UTIL_BOUND_MEMBER_FUNCTION_APPLY
-
-    ///////////////////////////////////////////////////////////////////////////
-    // apply a nullary bound function object
-    template <
-        typename F
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    bool apply(threads::executor& sched,
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
-                F
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            >
-        ))) bound)
-    {
-        sched.add(boost::move(bound), "hpx::apply");
-        return false;   // executed locally
-    }
-
-    template <
-        typename F
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    bool apply(
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
-                F
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            >
-        ))) bound)
-    {
-        threads::register_thread(boost::move(bound), "hpx::apply");
-        return false;   // executed locally
-    }
-
-    // define apply() overloads for n-nary bound actions
-#define HPX_UTIL_BOUND_FUNCTOR_APPLY(Z, N, D)                                 \
-    template <                                                                \
-        typename F                                                            \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    bool apply(threads::executor& sched,                                      \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_functor, NN)<               \
-                F                                                             \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        sched.add(util::bind(boost::move(bound),                              \
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
-        return false;                                                         \
-    }                                                                         \
-    template <                                                                \
-        typename F                                                            \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename Arg)            \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    bool apply(                                                               \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_functor, NN)<               \
-                F                                                             \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, Arg)             \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        threads::register_thread(util::bind(util::protect(boost::move(bound)),\
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
-        return false;                                                         \
-    }                                                                         \
-    /**/
-
-    BOOST_PP_REPEAT_FROM_TO(
-        1
-      , HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_UTIL_BOUND_FUNCTOR_APPLY, _
-    )
-
-#undef HPX_UTIL_BOUND_FUNCTOR_APPLY
-
     ///////////////////////////////////////////////////////////////////////////
     // apply a nullary bound action
     template <

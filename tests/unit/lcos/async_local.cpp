@@ -9,6 +9,8 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/config.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 boost::int32_t increment(boost::int32_t i)
 {
@@ -73,6 +75,10 @@ struct do_nothing_member
     {
     }
 };
+
+#ifndef BOOST_NO_CXX11_LAMBDAS
+auto increment_lambda = [](boost::int32_t i){ return i + 1; };
+#endif /*BOOST_NO_CXX11_LAMBDAS*/
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
@@ -169,19 +175,15 @@ int hpx_main()
         f6.get();
     }
 
-// We are currently not able to detect whether a type is callable. We need the
-// C++11 is_callable trait for this. For now, please use hpx::util::bind to
-// wrap your function object in order to pass it to async (see below).
+    {
+        mult2 mult;
+        
+        hpx::future<boost::int32_t> f1 = hpx::async(mult, 42);
+        HPX_TEST_EQ(f1.get(), 84);
 
-//     {
-//         mult2 mult;
-//
-//         hpx::future<boost::int32_t> f1 = hpx::async(mult, 42);
-//         HPX_TEST_EQ(f1.get(), 84);
-//
-//         hpx::future<boost::int32_t> f2 = hpx::async(hpx::launch::all, mult, 42);
-//         HPX_TEST_EQ(f2.get(), 84);
-//     }
+        hpx::future<boost::int32_t> f2 = hpx::async(hpx::launch::all, mult, 42);
+        HPX_TEST_EQ(f2.get(), 84);
+    }
 
     {
         mult2 mult;

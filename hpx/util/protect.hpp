@@ -15,6 +15,8 @@
 #include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/mpl/identity.hpp>
+#include <boost/type_traits/is_class.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
 
 namespace hpx { namespace util { namespace detail
@@ -226,22 +228,29 @@ namespace hpx { namespace util { namespace detail
 namespace hpx { namespace util
 {
     template <typename F>
-    detail::protected_bind<typename detail::remove_reference<F>::type>
+    typename boost::enable_if<
+        boost::is_class<F>
+      , detail::protected_bind<typename detail::remove_reference<F>::type>
+    >::type
     protect(BOOST_FWD_REF(F) f)
     {
         return detail::protected_bind<
             typename detail::remove_reference<F>::type
         >(boost::forward<F>(f));
     }
-
-    // handle nullary functions separately as those don't have any typename
-    // F::result_type defined
-    template <typename R>
-    typename boost::mpl::identity<R>::type
-    protect(R (*f)())
+    
+    // handle everything that is not a class separately as those
+    // don't have any typename T::result_type defined
+    template <typename T>
+    typename boost::disable_if<
+        boost::is_class<T>
+      , BOOST_FWD_REF(T)
+    >::type
+    protect(BOOST_FWD_REF(T) v)
     {
-        return f;
+        return boost::forward<T>(v);
     }
+
 }} // namespace hpx::util
 
 namespace boost

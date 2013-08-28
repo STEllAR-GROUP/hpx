@@ -8,6 +8,8 @@
 #include <hpx/include/apply.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/config.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 boost::atomic<boost::int32_t> accumulator;
 
@@ -45,6 +47,10 @@ struct increment_type
     }
 };
 
+#ifndef BOOST_NO_CXX11_LAMBDAS
+auto increment_lambda = [](boost::int32_t i){ accumulator += i; };
+#endif /*BOOST_NO_CXX11_LAMBDAS*/
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -81,15 +87,25 @@ int hpx_main()
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
 
-// We are currently not able to detect whether a type is callable. We need the
-// C++11 is_callable trait for this. For now, please use hpx::util::bind to
-// wrap your function object in order to pass it to async (see below).
-//
-//         hpx::apply(obj, 1);
+        hpx::apply(obj, 1);
 
         hpx::apply(hpx::util::bind(obj, 1));
         hpx::apply(hpx::util::bind(obj, _1), 1);
     }
+    
+#   ifndef BOOST_NO_CXX11_LAMBDAS
+    {
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+        
+// Lambdas are not assignable...
+//
+//        hpx::apply(increment_lambda, 1);      
+//
+//        hpx::apply(hpx::util::bind(increment_lambda, 1));
+//        hpx::apply(hpx::util::bind(increment_lambda, _1), 1);
+    }
+#   endif /*BOOST_NO_CXX11_LAMBDAS*/
 
     return hpx::finalize();
 }
@@ -101,8 +117,12 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
-
-    HPX_TEST_EQ(accumulator.load(), 11);
+    
+#   ifndef BOOST_NO_CXX11_LAMBDAS
+    HPX_TEST_EQ(accumulator.load(), 12);
+#   else /*BOOST_NO_CXX11_LAMBDAS*/
+    HPX_TEST_EQ(accumulator.load(), 12);
+#   endif /*BOOST_NO_CXX11_LAMBDAS*/
 
     return hpx::util::report_errors();
 }

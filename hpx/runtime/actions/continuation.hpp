@@ -39,7 +39,9 @@ namespace hpx
     // forward declaration
     template <typename F, typename Arg1, typename Arg2>
     inline typename boost::lazy_enable_if<
-        traits::is_callable<F>, boost::mpl::identity<bool>
+        traits::detail::is_callable_not_action<F
+          , BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2)>
+      , boost::mpl::identity<bool>
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
 
