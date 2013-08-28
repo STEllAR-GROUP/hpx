@@ -10,8 +10,8 @@
 #define HPX_UTIL_PROTECT_SEP_23_2011_1230PM
 
 #include <boost/config.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/always_void.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/mpl/identity.hpp>
@@ -58,6 +58,16 @@ namespace hpx { namespace util { namespace detail
                f_ = boost::move(rhs.f_);
             return *this;
         }
+        
+        template <typename>
+        struct result
+        {};
+
+        BOOST_FORCEINLINE
+        void operator()() const
+        {
+            f_();
+        }
 
     protected:
         F f_;
@@ -68,7 +78,7 @@ namespace hpx { namespace util { namespace detail
 
     template <typename F>
     class nullary_protected_bind<
-        F, typename util::always_void<typename F::result_type>::type>
+        F, typename boost::enable_if<traits::is_callable<F()>>::type>
     {
     public:
         nullary_protected_bind(nullary_protected_bind const& other)
@@ -104,32 +114,23 @@ namespace hpx { namespace util { namespace detail
             return *this;
         }
 
-        //
-        typedef typename F::result_type result_type;
-
         template <typename>
         struct result;
 
         template <typename This>
         struct result<This()>
         {
-            typedef typename F::result_type type;
-        };
-
-        template <typename This>
-        struct result<This const ()>
-        {
-            typedef typename F::result_type type;
+            typedef typename boost::result_of<F()>::type type;
         };
 
         BOOST_FORCEINLINE
-        typename F::result_type operator()()
+        typename boost::result_of<F()>::type operator()()
         {
             return f_();
         }
 
         BOOST_FORCEINLINE
-        typename F::result_type operator()() const
+        typename boost::result_of<F const()>::type operator()() const
         {
             return f_();
         }
@@ -178,8 +179,12 @@ namespace hpx { namespace util { namespace detail
             return *this;
         }
 
-        template <typename>
-        struct result;
+        template <typename S>
+        struct result
+          : nullary_protected_bind<F>::template result<S>
+        {};
+
+        using nullary_protected_bind<F>::operator();
 
 #define HPX_UTIL_PROTECT_OPERATOR(Z, N, D)                                      \
         template <typename This, BOOST_PP_ENUM_PARAMS(N, typename A)>           \
