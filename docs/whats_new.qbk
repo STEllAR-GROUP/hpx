@@ -16,7 +16,12 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 824] - Enable lambda functions to be used with hpx::async/hpx::apply
+* [issue 823] - Using a hashing filter
+* [issue 822] - Silence unused variable warning
+* [issue 821] - Detect if a function object is callable with given arguments
 * [issue 820] - Allow wildcards to be used for performance counter names
+* [issue 819] - Make the AGAS symbolic name registry distributed
 * [issue 818] - Add future::then() overload taking an executor
 * [issue 817] - Fixed typo
 * [issue 815] - Create an lco that is performing an efficient broadcast of
