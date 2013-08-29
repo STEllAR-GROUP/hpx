@@ -308,7 +308,7 @@ namespace hpx { namespace threads { namespace policies
 
         void set_max_count(std::size_t max_count = max_thread_count)
         {
-            max_count_ = (0 == max_count) ? max_thread_count : max_count; //-V105
+            max_count_ = (0 == max_count) ? std::size_t(max_thread_count) : max_count; //-V105
         }
 
         ///////////////////////////////////////////////////////////////////////
