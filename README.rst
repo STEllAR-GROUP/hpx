@@ -235,4 +235,10 @@ Windows
 
 9) Build the INSTALL target.
 
+******************
+ Acknowledgements
+******************
 
+This work is supported by the National Science Foundation through awards 1117470 (APX) 
+and 1240655 (STAR). This work is also supported by the Center of Computation and 
+Technology at Louisiana State University. 
