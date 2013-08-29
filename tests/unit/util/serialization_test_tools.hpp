@@ -197,7 +197,9 @@ int test_main(int argc, char * argv[]);
 int
 main(int argc, char * argv[]){
     
-    boost::serialization::singleton_module::lock();
+    //// Locking the singleton_module causes assertions when manually
+    //// registering types via hpx::actions::detail::guid_initialization
+    //boost::serialization::singleton_module::lock();
 
     BOOST_TRY{
         test_main(argc, argv);
@@ -212,7 +214,7 @@ main(int argc, char * argv[]){
     }
     BOOST_CATCH_END
 
-    boost::serialization::singleton_module::unlock();
+    //boost::serialization::singleton_module::unlock();
 
     return boost::report_errors();
 }
