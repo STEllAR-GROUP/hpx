@@ -10,12 +10,12 @@
 #define HPX_UTIL_PROTECT_SEP_23_2011_1230PM
 
 #include <boost/config.hpp>
+#include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/mpl/identity.hpp>
-#include <boost/type_traits/is_class.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
 
@@ -181,7 +181,11 @@ namespace hpx { namespace util { namespace detail
 
         template <typename S>
         struct result
+#       if defined(BOOST_MSVC)
+          : nullary_protected_bind<F>::result<S>
+#       else
           : nullary_protected_bind<F>::template result<S>
+#       endif
         {};
 
         using nullary_protected_bind<F>::operator();
@@ -234,7 +238,7 @@ namespace hpx { namespace util
 {
     template <typename F>
     typename boost::enable_if<
-        boost::is_class<F>
+        traits::is_bind_expression<typename detail::remove_reference<F>::type>
       , detail::protected_bind<typename detail::remove_reference<F>::type>
     >::type
     protect(BOOST_FWD_REF(F) f)
@@ -248,7 +252,7 @@ namespace hpx { namespace util
     // don't have any typename T::result_type defined
     template <typename T>
     typename boost::disable_if<
-        boost::is_class<T>
+        traits::is_bind_expression<typename detail::remove_reference<T>::type>
       , BOOST_FWD_REF(T)
     >::type
     protect(BOOST_FWD_REF(T) v)
