@@ -240,5 +240,9 @@ Windows
 ******************
 
 This work is supported by the National Science Foundation through awards 1117470 (APX) 
-and 1240655 (STAR). This work is also supported by the Center of Computation and 
+and 1240655 (STAR). Any opinions, findings, and conclusions or recommendations expressed
+in this material are those of the author(s) and do not necessarily reflect the views of
+the National Science Foundation.
+
+This work is also supported by the Center of Computation and 
 Technology at Louisiana State University. 
