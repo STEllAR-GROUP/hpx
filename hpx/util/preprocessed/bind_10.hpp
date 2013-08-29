@@ -983,6 +983,48 @@ namespace hpx { namespace util
             );
     }
 }}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0
+      , typename Arg0
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function1<
+            R
+          , T0
+          , Arg0
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , 
+       typename Arg0
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function1<
+            R
+          , C
+          , 
+           Arg0
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor1<
+            F
+          , Arg0
+        >
+    > : boost::mpl::true_
+    {};
+}}
 namespace boost {
     template <
         typename F
@@ -2003,6 +2045,48 @@ namespace hpx { namespace util
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
             );
     }
+}}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1
+      , typename Arg0 , typename Arg1
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function2<
+            R
+          , T0 , T1
+          , Arg0 , Arg1
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0
+      , typename Arg0 , typename Arg1
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function2<
+            R
+          , C
+          , T0
+          , Arg0 , Arg1
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor2<
+            F
+          , Arg0 , Arg1
+        >
+    > : boost::mpl::true_
+    {};
 }}
 namespace boost {
     template <
@@ -3025,6 +3109,48 @@ namespace hpx { namespace util
             );
     }
 }}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2
+      , typename Arg0 , typename Arg1 , typename Arg2
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function3<
+            R
+          , T0 , T1 , T2
+          , Arg0 , Arg1 , Arg2
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1
+      , typename Arg0 , typename Arg1 , typename Arg2
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function3<
+            R
+          , C
+          , T0 , T1
+          , Arg0 , Arg1 , Arg2
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor3<
+            F
+          , Arg0 , Arg1 , Arg2
+        >
+    > : boost::mpl::true_
+    {};
+}}
 namespace boost {
     template <
         typename F
@@ -4045,6 +4171,48 @@ namespace hpx { namespace util
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
             );
     }
+}}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function4<
+            R
+          , T0 , T1 , T2 , T3
+          , Arg0 , Arg1 , Arg2 , Arg3
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function4<
+            R
+          , C
+          , T0 , T1 , T2
+          , Arg0 , Arg1 , Arg2 , Arg3
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor4<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3
+        >
+    > : boost::mpl::true_
+    {};
 }}
 namespace boost {
     template <
@@ -5067,6 +5235,48 @@ namespace hpx { namespace util
             );
     }
 }}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function5<
+            R
+          , T0 , T1 , T2 , T3 , T4
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function5<
+            R
+          , C
+          , T0 , T1 , T2 , T3
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor5<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
+        >
+    > : boost::mpl::true_
+    {};
+}}
 namespace boost {
     template <
         typename F
@@ -6087,6 +6297,48 @@ namespace hpx { namespace util
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )
             );
     }
+}}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function6<
+            R
+          , T0 , T1 , T2 , T3 , T4 , T5
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function6<
+            R
+          , C
+          , T0 , T1 , T2 , T3 , T4
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor6<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
+        >
+    > : boost::mpl::true_
+    {};
 }}
 namespace boost {
     template <
@@ -7109,6 +7361,48 @@ namespace hpx { namespace util
             );
     }
 }}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function7<
+            R
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function7<
+            R
+          , C
+          , T0 , T1 , T2 , T3 , T4 , T5
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor7<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
+        >
+    > : boost::mpl::true_
+    {};
+}}
 namespace boost {
     template <
         typename F
@@ -8129,6 +8423,48 @@ namespace hpx { namespace util
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 )
             );
     }
+}}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function8<
+            R
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function8<
+            R
+          , C
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor8<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
+        >
+    > : boost::mpl::true_
+    {};
 }}
 namespace boost {
     template <
@@ -9151,6 +9487,48 @@ namespace hpx { namespace util
             );
     }
 }}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function9<
+            R
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function9<
+            R
+          , C
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor9<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8
+        >
+    > : boost::mpl::true_
+    {};
+}}
 namespace boost {
     template <
         typename F
@@ -10171,6 +10549,48 @@ namespace hpx { namespace util
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 )
             );
     }
+}}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function10<
+            R
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function10<
+            R
+          , C
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor10<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9
+        >
+    > : boost::mpl::true_
+    {};
 }}
 namespace boost {
     template <
@@ -11193,6 +11613,48 @@ namespace hpx { namespace util
             );
     }
 }}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function11<
+            R
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function11<
+            R
+          , C
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor11<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10
+        >
+    > : boost::mpl::true_
+    {};
+}}
 namespace boost {
     template <
         typename F
@@ -12214,6 +12676,48 @@ namespace hpx { namespace util
             );
     }
 }}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function12<
+            R
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function12<
+            R
+          , C
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor12<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11
+        >
+    > : boost::mpl::true_
+    {};
+}}
 namespace boost {
     template <
         typename F
@@ -13234,6 +13738,48 @@ namespace hpx { namespace util
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 )
             );
     }
+}}
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_function13<
+            R
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_member_function13<
+            R
+          , C
+          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor13<
+            F
+          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12
+        >
+    > : boost::mpl::true_
+    {};
 }}
 namespace boost {
     template <

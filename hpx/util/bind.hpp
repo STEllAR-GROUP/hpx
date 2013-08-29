@@ -1,4 +1,5 @@
 //  Copyright (c) 2011-2012 Thomas Heller
+//  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
@@ -360,6 +362,22 @@ namespace hpx { namespace util {
     {
         return detail::bound_functor0<F>(boost::forward<F>(f));
     }
+}}
+
+namespace hpx { namespace traits
+{
+    template <typename R>
+    struct is_bind_expression<
+        hpx::util::detail::bound_function0<R>
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+    >
+    struct is_bind_expression<
+        hpx::util::detail::bound_functor0<F>
+    > : boost::mpl::true_
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1271,6 +1289,49 @@ namespace hpx { namespace util
               , HPX_ENUM_FORWARD_ARGS(N, A, a)
             );
     }
+}}
+
+namespace hpx { namespace traits
+{
+    template <
+        typename R
+      , BOOST_PP_ENUM_PARAMS(N, typename T)
+      , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+    >
+    struct is_bind_expression<
+        hpx::util::detail::BOOST_PP_CAT(bound_function, N)<
+            R
+          , BOOST_PP_ENUM_PARAMS(N, T)
+          , BOOST_PP_ENUM_PARAMS(N, Arg)
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename R
+      , typename C
+      , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), typename T)
+      BOOST_PP_COMMA_IF(BOOST_PP_DEC(N)) BOOST_PP_ENUM_PARAMS(N, typename Arg)
+    >
+    struct is_bind_expression<
+        hpx::util::detail::BOOST_PP_CAT(bound_member_function, N)<
+            R
+          , C
+          , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), T)
+          BOOST_PP_COMMA_IF(BOOST_PP_DEC(N)) BOOST_PP_ENUM_PARAMS(N, Arg)
+        >
+    > : boost::mpl::true_
+    {};
+    template <
+        typename F
+      , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+    >
+    struct is_bind_expression<
+        hpx::util::detail::BOOST_PP_CAT(bound_functor, N)<
+            F
+          , BOOST_PP_ENUM_PARAMS(N, Arg)
+        >
+    > : boost::mpl::true_
+    {};
 }}
 
 namespace boost {
