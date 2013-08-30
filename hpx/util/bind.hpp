@@ -446,14 +446,10 @@ namespace boost { namespace serialization
     BOOST_PP_CAT(arg, N)(boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N)))\
 /**/
 #define HPX_UTIL_BIND_MEMBER_TYPE(Z, NN, D)                                     \
-    typename boost::remove_const<                                               \
-        typename decay<BOOST_PP_CAT(Arg, NN)>::type                             \
-    >::type                                                                     \
+    typename decay<BOOST_PP_CAT(Arg, NN)>::type                                 \
 /**/
 #define HPX_UTIL_BIND_MEMBER(Z, N, D)                                           \
-    typename boost::remove_const<                                               \
-        typename decay<BOOST_PP_CAT(Arg, N)>::type                              \
-    >::type BOOST_PP_CAT(arg, N);                                               \
+    typename decay<BOOST_PP_CAT(Arg, N)>::type BOOST_PP_CAT(arg, N);            \
 /**/
 
 #define HPX_UTIL_BIND_INIT_COPY_MEMBER(Z, N, D)                                 \

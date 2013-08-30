@@ -19,7 +19,6 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
-#include <boost/type_traits/decay.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -31,6 +30,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/serialize_empty_type.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_pointer.hpp>
@@ -390,11 +390,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
 
                 vptr = detail::get_table<
@@ -456,11 +452,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
 
             vtable_ptr_type * f_vptr

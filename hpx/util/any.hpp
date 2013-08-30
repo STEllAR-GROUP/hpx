@@ -42,7 +42,6 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
-#include <boost/type_traits/decay.hpp>
 
 #include <stdexcept>
 #include <typeinfo>

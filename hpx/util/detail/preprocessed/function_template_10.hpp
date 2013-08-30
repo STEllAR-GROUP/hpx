@@ -59,11 +59,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -119,11 +115,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -289,11 +281,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -349,11 +337,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -519,11 +503,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -579,11 +559,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -749,11 +725,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -809,11 +781,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -979,11 +947,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -1039,11 +1003,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -1209,11 +1169,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -1269,11 +1225,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -1439,11 +1391,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -1499,11 +1447,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -1669,11 +1613,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -1729,11 +1669,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -1899,11 +1835,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -1959,11 +1891,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -2129,11 +2057,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -2189,11 +2113,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -2359,11 +2279,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -2419,11 +2335,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -2589,11 +2501,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -2649,11 +2557,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -2819,11 +2723,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -2879,11 +2779,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
@@ -3049,11 +2945,7 @@ namespace hpx { namespace util {
             if (!detail::is_empty_function(f))
             {
                 typedef
-                    typename boost::remove_const<
-                        typename boost::decay<
-                            typename hpx::util::detail::remove_reference<Functor>::type
-                        >::type
-                    >::type
+                    typename util::decay<Functor>::type
                     functor_type;
                 vptr = detail::get_table<
                             functor_type
@@ -3109,11 +3001,7 @@ namespace hpx { namespace util {
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
             typedef
-                typename boost::remove_const<
-                    typename boost::decay<
-                        typename hpx::util::detail::remove_reference<Functor>::type
-                    >::type
-                >::type
+                typename util::decay<Functor>::type
                 functor_type;
             vtable_ptr_type * f_vptr
                 = detail::get_table<
