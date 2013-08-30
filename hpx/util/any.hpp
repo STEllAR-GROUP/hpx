@@ -37,6 +37,7 @@
 #include <boost/assert.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/ref.hpp>
 
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/base_object.hpp>
@@ -1157,7 +1158,7 @@ namespace hpx { namespace util
             {
                 std::vector<char> data;
                 portable_binary_oarchive ar (
-                        data, &hasher, boost::archive::no_header);
+                        boost::ref(data), &hasher, boost::archive::no_header);
                 ar << elem;
             }  // let archive go out of scope
 
