@@ -134,6 +134,7 @@ namespace hpx { namespace parcelset { namespace mpi
         /// The pool of io_service objects used to perform asynchronous operations.
         util::io_service_pool io_service_pool_;
 
+        std::size_t max_requests_;
         detail::parcel_cache parcel_cache_;
         boost::atomic<bool> stopped_;
         boost::atomic<bool> handling_messages_;

@@ -59,6 +59,7 @@ namespace hpx { namespace parcelset { namespace mpi
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
       : parcelset::parcelport(ini),
         io_service_pool_(1, on_start_thread, on_stop_thread, "parcel_pool_mpi", "-mpi"),
+        max_requests_(ini.get_max_mpi_requests()),
         parcel_cache_(ini.get_os_thread_count(), this->get_max_message_size()),
         stopped_(false),
         handling_messages_(false),
@@ -151,6 +152,8 @@ namespace hpx { namespace parcelset { namespace mpi
         bool bootstrapping = hpx::is_starting();
         bool has_work = true;
 
+        std::size_t num_requests = 0;
+
         hpx::util::high_resolution_timer t;
 
         // We let the message handling loop spin for another 2 seconds to avoid the
@@ -158,10 +161,14 @@ namespace hpx { namespace parcelset { namespace mpi
         while(bootstrapping || (!stopped_ && has_work) || (t.elapsed() < 2.0))
         {
             // add new receive requests
-            std::pair<bool, header> next(acceptor_.next_header());
-            if(next.first)
+            if(num_requests < max_requests_)
             {
-                receivers_.push_back(boost::make_shared<receiver>(next.second, communicator, *this));
+                std::pair<bool, header> next(acceptor_.next_header());
+                if(next.first)
+                {
+                    receivers_.push_back(boost::make_shared<receiver>(next.second, communicator, *this));
+                    ++num_requests;
+                }
             }
 
             // handle all receive requests
@@ -170,6 +177,7 @@ namespace hpx { namespace parcelset { namespace mpi
                 if((*it)->done(*this))
                 {
                     it = receivers_.erase(it);
+                    --num_requests;
                 }
                 else
                 {
@@ -182,7 +190,7 @@ namespace hpx { namespace parcelset { namespace mpi
             using HPX_STD_PLACEHOLDERS::_1;
             senders_.splice(senders_.end(), parcel_cache_.get_senders(
                 HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this(), _1),
-                communicator, *this, senders_.size()));
+                communicator, *this, num_requests, max_requests_));
 
             // handle all send requests
             for(senders_type::iterator it = senders_.begin(); it != senders_.end(); /**/)
@@ -191,6 +199,7 @@ namespace hpx { namespace parcelset { namespace mpi
                 {
                     free_tags_.push_back((*it)->tag());
                     it = senders_.erase(it);
+                    --num_requests;
                 }
                 else
                 {
@@ -205,7 +214,26 @@ namespace hpx { namespace parcelset { namespace mpi
                 bootstrapping = hpx::is_starting();
 
             if(has_work)
+            {
                 t.restart();
+            }
+            else
+            {
+#if defined( WIN32 ) || defined( _WIN32 ) || defined( __WIN32__ ) || defined( __CYGWIN__ )
+                Sleep( 1 );
+#elif defined( BOOST_HAS_PTHREADS )
+                // g++ -Wextra warns on {} or {0}
+                struct timespec rqtp = { 0, 0 };
+
+                // POSIX says that timespec has tv_sec and tv_nsec
+                // But it doesn't guarantee order or placement
+
+                rqtp.tv_sec = 0;
+                rqtp.tv_nsec = 1000;
+
+                nanosleep( &rqtp, 0 );
+#endif
+            }
         }
     }
 

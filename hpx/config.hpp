@@ -244,6 +244,17 @@
 #  define HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE 512
 #endif
 
+/// This defines the number of MPI requests in flight
+/// This value can be changed at runtime by setting the configuration parameter:
+///
+///   hpx.parcel.mpi.max_requests = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_PARCEL_MPI_MAX_REQUESTS).
+#if !defined(HPX_PARCEL_MPI_MAX_REQUESTS)
+#  define HPX_PARCEL_MPI_MAX_REQUESTS 2147483647
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive (to
 /// each of the other localities). This value can be changed at runtime by

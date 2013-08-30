@@ -43,6 +43,12 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             return parcels_.size();
         }
 
+        void clear()
+        {
+            parcels_.clear();
+            handlers_.clear();
+        }
+
         std::vector<parcel> parcels_;
         std::vector<write_handler_type> handlers_;
     };
@@ -226,7 +232,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         template <typename Parcelport>
         std::list<boost::shared_ptr<sender> > get_senders(
             HPX_STD_FUNCTION<bool(int&)> const& tag_generator, MPI_Comm communicator,
-            Parcelport& pp, std::size_t size)
+            Parcelport& pp, std::size_t & num_requests, std::size_t max_requests)
         {
             std::list<boost::shared_ptr<sender> > res;
             parcel_holders phs;
@@ -238,16 +244,21 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 }
                 std::swap(parcel_holders_, phs);
             }
-            bool tags_exhausted = false;
+            bool early_exit = false;
             BOOST_FOREACH(parcel_holders::value_type & ph, phs)
             {
                 if(ph.second.size() == 0) continue;
+                if(num_requests >= max_requests)
+                {
+                    early_exit=true;
+                    break;
+                }
                 int tag;
                 if(!tag_generator(tag))
                 {
                     // If no new tag could be generated, we need to put the
                     // remaining parcels back in the cache
-                    tags_exhausted=true;
+                    early_exit=true;
                     break;
                 }
 
@@ -272,12 +283,15 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                       , communicator
                     )
                 );
+                ++num_requests;
             }
-            if(tags_exhausted)
+            if(early_exit)
             {
                 BOOST_FOREACH(parcel_holders::value_type & ph, phs)
                 {
+                    if(ph.second.size() == 0) continue;
                     set_parcel(ph.second.parcels_, ph.second.handlers_);
+                    ph.second.clear();
                 }
             }
             return boost::move(res);

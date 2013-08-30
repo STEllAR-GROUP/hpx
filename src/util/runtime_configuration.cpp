@@ -153,6 +153,7 @@ namespace hpx { namespace util
             // MPI related settings
             "[hpx.parcel.mpi]",
             "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
+            "max_requests = ${HPX_PARCEL_MPI_MAX_REQUESTS:100}",
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -504,6 +505,23 @@ namespace hpx { namespace util
             }
         }
         return HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE;
+    }
+    
+    std::size_t runtime_configuration::get_max_mpi_requests() const
+    {
+        if (has_section("hpx.parcel"))
+        {
+            util::section const * sec = get_section("hpx.parcel.mpi");
+            if(NULL != sec)
+            {
+                std::string cfg_max_mpi_requests(
+                    sec->get_entry("max_requests",
+                        HPX_PARCEL_MPI_MAX_REQUESTS));
+
+                return boost::lexical_cast<std::size_t>(cfg_max_mpi_requests);
+            }
+        }
+        return HPX_PARCEL_MPI_MAX_REQUESTS;
     }
 
     agas::service_mode runtime_configuration::get_agas_service_mode() const
