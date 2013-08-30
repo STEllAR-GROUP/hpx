@@ -34,20 +34,13 @@ namespace hpx { namespace traits
         {
             return rhs;
         }
-#if !defined(BOOST_NO_RVALUE_REFERENCES)
 #if __GNUC__ == 4 && __GNUC_MINOR__ == 4
         static Result&& call(Result&& rhs)
         {
           return rhs;
         }
 #else
-        static Result&& call(Result&& rhs) //-V659
-        {
-          return boost::move(rhs);
-        }
-#endif
-#else
-        static ::boost::rv<Result>& call(BOOST_RV_REF(Result) rhs)
+        static BOOST_RV_REF(Result) call(BOOST_RV_REF(Result) rhs)
         {
           return boost::move(rhs);
         }
