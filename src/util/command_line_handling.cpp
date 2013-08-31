@@ -11,6 +11,9 @@
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/util/mpi_environment.hpp>
@@ -685,23 +688,63 @@ namespace hpx { namespace util
 #if defined(HPX_HAVE_HWLOC)
         if (vm_.count("hpx:print-bind")) {
             if (!vm_.count("hpx:bind")) {
-                throw std::logic_error("Invalid command line option "
-                    "--hpx:print-bind, valid only if --hpx:bind is "
-                    "specified as well.");
-            }
+                std::size_t num_threads = 1;
+                if (vm_.count("hpx:threads")) {
+                    std::string threads = vm_["hpx:threads"].as<std::string>();
+                    if (threads == "all")
+                        num_threads = threads::hardware_concurrency();
+                    else
+                        num_threads = boost::lexical_cast<std::size_t>(threads);
+                }
 
-            std::string affinity_desc;
-            std::vector<std::string> bind_affinity =
-                vm_["hpx:bind"].as<std::vector<std::string> >();
-            BOOST_FOREACH(std::string const& s, bind_affinity)
-            {
-                if (!affinity_desc.empty())
-                    affinity_desc += ";";
-                affinity_desc += s;
-            }
+                std::size_t pu_offset = 0;
+                if (vm_.count("hpx:pu-offset"))
+                    pu_offset = vm_["hpx:pu-offset"].as<std::size_t>();
 
-            threads::print_affinity_options(std::cout, num_threads_,
-                affinity_desc);
+                std::size_t pu_step = 1;
+                if (vm_.count("hpx:pu-step"))
+                    pu_step = vm_["hpx:pu-step"].as<std::size_t>();
+
+                std::string affinity_domain;
+                if (vm_.count("hpx:affinity"))
+                    affinity_domain = vm_["hpx:affinity"].as<std::string>();
+
+                threads::policies::detail::affinity_data aff(num_threads,
+                    pu_offset, pu_step, affinity_domain, "");
+
+                bool numa_sensitive = vm_.count("hpx:numa-sensitive") ? true : false;
+                HPX_STD_UNIQUE_PTR<threads::topology> top(threads::create_topology());
+                for (std::size_t i = 0; i != num_threads; ++i)
+                {
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) || (defined(HPX_MAX_CPU_COUNT) && HPX_MAX_CPU_COUNT <= 64)
+                    std::cout << i << ": 0x"
+                        << std::hex << std::setw(sizeof(threads::mask_type)*2)
+                        << std::setfill('0')
+                        << aff.get_pu_mask(*top, i, numa_sensitive)
+                        << std::endl;
+#else
+                    std::cout << i << ": 0b"
+                        << std::setw(sizeof(threads::mask_type)*8)
+                        << std::setfill('0')
+                        << aff.get_pu_mask(*top, i, numa_sensitive)
+                        << std::endl;
+#endif
+                }
+            }
+            else {
+                std::string affinity_desc;
+                std::vector<std::string> bind_affinity =
+                    vm_["hpx:bind"].as<std::vector<std::string> >();
+                BOOST_FOREACH(std::string const& s, bind_affinity)
+                {
+                    if (!affinity_desc.empty())
+                        affinity_desc += ";";
+                    affinity_desc += s;
+                }
+
+                threads::print_affinity_options(std::cout, num_threads_,
+                    affinity_desc);
+            }
             return 1;
         }
 #endif
