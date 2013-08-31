@@ -33,6 +33,7 @@
 #include <boost/integer_traits.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/ref.hpp>
 
 #include <boost/serialization/is_bitwise_serializable.hpp>
 #include <boost/mpl/placeholders.hpp>
@@ -201,7 +202,7 @@ namespace hpx { namespace util
         template <typename Container>
         basic_binary_oprimitive(Container& buffer, unsigned flags = 0)
           : size_(0),
-            buffer_(boost::make_shared<detail::container_type<Container> >(buffer))
+            buffer_(boost::make_shared<detail::container_type<Container> >(boost::ref(buffer)))
         {
             init(flags);
         }
