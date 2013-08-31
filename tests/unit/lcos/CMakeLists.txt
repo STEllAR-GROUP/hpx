@@ -25,7 +25,7 @@ set(tests
    )
 
 # include some of the tests for non-gcc 4.4 only
-set(gcc_version 0)
+set(gcc_version 040500)
 if(GCC_VERSION)
   set(gcc_version ${GCC_VERSION})
 endif()
