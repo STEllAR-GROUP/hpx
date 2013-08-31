@@ -7,10 +7,6 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
-#if defined(__INTEL_COMPILER) && !defined(BOOST_COMPILER_CONFIG)
-#  define BOOST_COMPILER_CONFIG <hpx/config/boost/compiler/intel.hpp>
-#endif
-
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 // Intel MPI requires this to be included before anything else
 #include <mpi.h>
