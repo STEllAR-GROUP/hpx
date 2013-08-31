@@ -27,6 +27,10 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#if !defined(BOOST_SYSTEM_NOEXCEPT)
+#define BOOST_SYSTEM_NOEXCEPT BOOST_NOEXCEPT
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -168,12 +172,12 @@ namespace hpx
         class hpx_category : public boost::system::error_category
         {
         public:
-            const char* name() const BOOST_NOEXCEPT
+            const char* name() const BOOST_SYSTEM_NOEXCEPT
             {
                 return "HPX";
             }
 
-            std::string message(int value) const BOOST_NOEXCEPT
+            std::string message(int value) const
             {
                 if (value >= success && value < last_error)
                     return std::string("HPX(") + error_names[value] + ")";
@@ -188,7 +192,7 @@ namespace hpx
         class hpx_category_rethrow : public boost::system::error_category
         {
         public:
-            const char* name() const BOOST_NOEXCEPT
+            const char* name() const BOOST_SYSTEM_NOEXCEPT
             {
                 return "";
             }

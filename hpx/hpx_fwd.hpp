@@ -32,6 +32,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
+#include <boost/system/error_code.hpp>
 
 #include <hpx/config/function.hpp>
 #include <hpx/traits.hpp>

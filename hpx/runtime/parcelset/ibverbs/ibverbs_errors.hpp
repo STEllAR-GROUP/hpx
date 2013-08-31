@@ -15,6 +15,10 @@
 
 #include <string>
 
+#if !defined(BOOST_SYSTEM_NOEXCEPT)
+#define BOOST_SYSTEM_NOEXCEPT BOOST_NOEXCEPT
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace ibverbs
 {
