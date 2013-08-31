@@ -9,10 +9,9 @@
 #include <vector>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/access.hpp>
-#include <boost/type_traits/remove_const.hpp>
 
 #include <hpx/util/any.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/decay.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace storage
@@ -79,9 +78,7 @@ namespace hpx { namespace util { namespace storage
             tuple& push_back(const T& field, 
                     typename boost::disable_if<boost::is_same<
                         elem_type, 
-                        typename boost::remove_const<
-                            typename util::detail::remove_reference<T>::type
-                        >::type
+                        typename util::decay<T>::type
                     > >::type* = 0)
             {
                 tuple_.push_back(elem_type(field)); // insert an any object

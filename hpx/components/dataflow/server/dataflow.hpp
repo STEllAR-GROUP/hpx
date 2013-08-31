@@ -17,6 +17,7 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/components/dataflow/server/detail/dataflow_impl.hpp>
 #include <hpx/components/dataflow/server/detail/component_wrapper.hpp>
+#include <hpx/util/decay.hpp>
 
 namespace hpx { namespace lcos { namespace server
 {
@@ -193,11 +194,7 @@ namespace hpx { namespace lcos { namespace server
 #define M0(Z, N, D) BOOST_FWD_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)
 #define M1(Z, N, D) boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N))
 #define M2(Z, N, D)                                                             \
-    typename boost::remove_const<                                               \
-            typename hpx::util::detail::remove_reference<                       \
-                BOOST_PP_CAT(A, N)                                              \
-            >::type                                                             \
-        >::type                                                                 \
+    typename util::decay<BOOST_PP_CAT(A, N)>::type                              \
 /**/
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>

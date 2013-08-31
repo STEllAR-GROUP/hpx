@@ -24,8 +24,9 @@
 #include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/binary_filter.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/traits/supports_streaming_with_any.hpp>
 
 #include <boost/config.hpp>
@@ -490,15 +491,11 @@ namespace hpx { namespace util
         template <typename T>
         explicit basic_any(T const& x)
           : table(detail::any::get_table<
-                      typename boost::remove_const<
-                          typename util::detail::remove_reference<T>::type
-                      >::type
+                      typename util::decay<T>::type
                   >::template get<IArchive, OArchive, Char>()),
             object(0)
         {
-            typedef typename boost::remove_const<
-                typename util::detail::remove_reference<T>::type
-            >::type value_type;
+            typedef typename util::decay<T>::type value_type;
 
             if (detail::any::get_table<value_type>::is_small::value)
                 new (&object) value_type(x);
@@ -523,20 +520,14 @@ namespace hpx { namespace util
             typename boost::disable_if<
                 boost::is_same<
                     basic_any,
-                    typename boost::remove_const<
-                        typename util::detail::remove_reference<T>::type
-                    >::type
+                    typename util::decay<T>::type
                 > >::type* = 0)
           : table(detail::any::get_table<
-                      typename boost::remove_const<
-                          typename util::detail::remove_reference<T>::type
-                      >::type
+                      typename util::decay<T>::type
                   >::template get<IArchive, OArchive, Char>()),
             object(0)
         {
-            typedef typename boost::remove_const<
-                typename util::detail::remove_reference<T>::type
-            >::type value_type;
+            typedef typename util::decay<T>::type value_type;
 
             if (detail::any::get_table<value_type>::is_small::value)
                 new (&object) value_type(boost::forward<T>(x));
@@ -629,9 +620,7 @@ namespace hpx { namespace util
         template <typename T>
         friend bool operator==(basic_any const& b, T const& x)
         {
-            typedef typename boost::remove_const<
-                typename util::detail::remove_reference<T>::type
-            >::type value_type;
+            typedef typename util::decay<T>::type value_type;
 
             if (b.type() == BOOST_SP_TYPEID(value_type)) // same type
             {
@@ -808,15 +797,11 @@ namespace hpx { namespace util
         template <typename T>
         explicit basic_any(T const& x)
           : table(detail::any::get_table<
-                      typename boost::remove_const<
-                          typename util::detail::remove_reference<T>::type
-                      >::type
+                      typename util::decay<T>::type
                   >::template get<void, void, Char>()),
             object(0)
         {
-            typedef typename boost::remove_const<
-                typename util::detail::remove_reference<T>::type
-            >::type value_type;
+            typedef typename util::decay<T>::type value_type;
 
             if (detail::any::get_table<value_type>::is_small::value)
                 new (&object) value_type(x);
@@ -841,20 +826,14 @@ namespace hpx { namespace util
             typename boost::disable_if<
                 boost::is_same<
                     basic_any,
-                    typename boost::remove_const<
-                        typename util::detail::remove_reference<T>::type
-                    >::type
+                    typename util::decay<T>::type
                 > >::type* = 0)
           : table(detail::any::get_table<
-                      typename boost::remove_const<
-                          typename util::detail::remove_reference<T>::type
-                      >::type
+                      typename util::decay<T>::type
                   >::template get<void, void, Char>()),
             object(0)
         {
-            typedef typename boost::remove_const<
-                typename util::detail::remove_reference<T>::type
-            >::type value_type;
+            typedef typename util::decay<T>::type value_type;
 
             if (detail::any::get_table<value_type>::is_small::value)
                 new (&object) value_type(boost::forward<T>(x));
@@ -945,9 +924,7 @@ namespace hpx { namespace util
         template <typename T>
         friend bool operator==(basic_any const& b, T const& x)
         {
-            typedef typename boost::remove_const<
-                typename util::detail::remove_reference<T>::type
-            >::type value_type;
+            typedef typename util::decay<T>::type value_type;
 
             if (b.type() == BOOST_SP_TYPEID(value_type)) // same type
             {

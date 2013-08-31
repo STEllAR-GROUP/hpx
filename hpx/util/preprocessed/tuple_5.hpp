@@ -187,10 +187,10 @@ namespace hpx { namespace util
     
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type>
+    tuple<typename util::decay<Arg0>::type>
     make_tuple(BOOST_FWD_REF(Arg0) arg0)
     {
-        typedef tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type> result_type;
+        typedef tuple<typename util::decay<Arg0>::type> result_type;
         return result_type(boost::forward<Arg0>(arg0),
             typename result_type::forwarding_tag());
     }
@@ -382,10 +382,10 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
-    tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type>
+    tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type>
     make_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
-        return tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type>(
+        return tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
 }}
@@ -576,10 +576,10 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
-    tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type>
+    tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type>
     make_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
-        return tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type>(
+        return tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
 }}
@@ -770,10 +770,10 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
-    tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type>
+    tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type>
     make_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
-        return tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type>(
+        return tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
 }}
@@ -964,10 +964,10 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
-    tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg4>::type >::type>
+    tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type , typename util::decay<Arg4>::type>
     make_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
-        return tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg4>::type >::type>(
+        return tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type , typename util::decay<Arg4>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
 }}
@@ -1158,10 +1158,10 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
-    tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg4>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg5>::type >::type>
+    tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type , typename util::decay<Arg4>::type , typename util::decay<Arg5>::type>
     make_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
     {
-        return tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg4>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg5>::type >::type>(
+        return tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type , typename util::decay<Arg4>::type , typename util::decay<Arg5>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
     }
 }}
@@ -1352,10 +1352,10 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
-    tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg4>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg5>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg6>::type >::type>
+    tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type , typename util::decay<Arg4>::type , typename util::decay<Arg5>::type , typename util::decay<Arg6>::type>
     make_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
     {
-        return tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg4>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg5>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg6>::type >::type>(
+        return tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type , typename util::decay<Arg4>::type , typename util::decay<Arg5>::type , typename util::decay<Arg6>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
     }
 }}
@@ -1546,10 +1546,10 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
-    tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg4>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg5>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg6>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg7>::type >::type>
+    tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type , typename util::decay<Arg4>::type , typename util::decay<Arg5>::type , typename util::decay<Arg6>::type , typename util::decay<Arg7>::type>
     make_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
     {
-        return tuple<typename boost::remove_const< typename detail::remove_reference<Arg0>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg1>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg2>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg3>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg4>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg5>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg6>::type >::type , typename boost::remove_const< typename detail::remove_reference<Arg7>::type >::type>(
+        return tuple<typename util::decay<Arg0>::type , typename util::decay<Arg1>::type , typename util::decay<Arg2>::type , typename util::decay<Arg3>::type , typename util::decay<Arg4>::type , typename util::decay<Arg5>::type , typename util::decay<Arg6>::type , typename util::decay<Arg7>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
     }
 }}

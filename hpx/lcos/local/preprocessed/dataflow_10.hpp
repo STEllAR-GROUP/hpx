@@ -17,7 +17,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type
+                        typename util::decay<F0>::type
                     )
                 >::type
             >
@@ -25,7 +25,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type;
+            typedef typename util::decay<F0>::type f0_type;
             typedef
                 hpx::util::tuple1<
                     f0_type
@@ -37,7 +37,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type
+                        typename util::decay<F0>::type
                     )
                 >::type
                 result_type;
@@ -257,9 +257,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_1<
             BOOST_SCOPED_ENUM(launch)
@@ -292,9 +290,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_1<
             threads::executor
@@ -327,9 +323,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_1<
             BOOST_SCOPED_ENUM(launch)
@@ -364,7 +358,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type
                     )
                 >::type
             >
@@ -372,7 +366,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type;
+            typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type;
             typedef
                 hpx::util::tuple2<
                     f0_type , f1_type
@@ -384,7 +378,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type
                     )
                 >::type
                 result_type;
@@ -604,9 +598,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_2<
             BOOST_SCOPED_ENUM(launch)
@@ -639,9 +631,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_2<
             threads::executor
@@ -674,9 +664,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_2<
             BOOST_SCOPED_ENUM(launch)
@@ -711,7 +699,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type
                     )
                 >::type
             >
@@ -719,7 +707,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type;
+            typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type;
             typedef
                 hpx::util::tuple3<
                     f0_type , f1_type , f2_type
@@ -731,7 +719,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type
                     )
                 >::type
                 result_type;
@@ -951,9 +939,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_3<
             BOOST_SCOPED_ENUM(launch)
@@ -986,9 +972,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_3<
             threads::executor
@@ -1021,9 +1005,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_3<
             BOOST_SCOPED_ENUM(launch)
@@ -1058,7 +1040,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type
                     )
                 >::type
             >
@@ -1066,7 +1048,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type;
+            typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type;
             typedef
                 hpx::util::tuple4<
                     f0_type , f1_type , f2_type , f3_type
@@ -1078,7 +1060,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type
                     )
                 >::type
                 result_type;
@@ -1298,9 +1280,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_4<
             BOOST_SCOPED_ENUM(launch)
@@ -1333,9 +1313,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_4<
             threads::executor
@@ -1368,9 +1346,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_4<
             BOOST_SCOPED_ENUM(launch)
@@ -1405,7 +1381,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type
                     )
                 >::type
             >
@@ -1413,7 +1389,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type;
+            typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type;
             typedef
                 hpx::util::tuple5<
                     f0_type , f1_type , f2_type , f3_type , f4_type
@@ -1425,7 +1401,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type
                     )
                 >::type
                 result_type;
@@ -1645,9 +1621,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_5<
             BOOST_SCOPED_ENUM(launch)
@@ -1680,9 +1654,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_5<
             threads::executor
@@ -1715,9 +1687,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_5<
             BOOST_SCOPED_ENUM(launch)
@@ -1752,7 +1722,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type
                     )
                 >::type
             >
@@ -1760,7 +1730,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type;
+            typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type;
             typedef
                 hpx::util::tuple6<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type
@@ -1772,7 +1742,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type
                     )
                 >::type
                 result_type;
@@ -1992,9 +1962,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_6<
             BOOST_SCOPED_ENUM(launch)
@@ -2027,9 +1995,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_6<
             threads::executor
@@ -2062,9 +2028,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_6<
             BOOST_SCOPED_ENUM(launch)
@@ -2099,7 +2063,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type
                     )
                 >::type
             >
@@ -2107,7 +2071,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type;
+            typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type;
             typedef
                 hpx::util::tuple7<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type
@@ -2119,7 +2083,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type
                     )
                 >::type
                 result_type;
@@ -2339,9 +2303,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_7<
             BOOST_SCOPED_ENUM(launch)
@@ -2374,9 +2336,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_7<
             threads::executor
@@ -2409,9 +2369,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_7<
             BOOST_SCOPED_ENUM(launch)
@@ -2446,7 +2404,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type
                     )
                 >::type
             >
@@ -2454,7 +2412,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type;
+            typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type;
             typedef
                 hpx::util::tuple8<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type
@@ -2466,7 +2424,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type
                     )
                 >::type
                 result_type;
@@ -2686,9 +2644,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_8<
             BOOST_SCOPED_ENUM(launch)
@@ -2721,9 +2677,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_8<
             threads::executor
@@ -2756,9 +2710,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_8<
             BOOST_SCOPED_ENUM(launch)
@@ -2793,7 +2745,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type
                     )
                 >::type
             >
@@ -2801,7 +2753,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type;
+            typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type;
             typedef
                 hpx::util::tuple9<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type
@@ -2813,7 +2765,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type
                     )
                 >::type
                 result_type;
@@ -3033,9 +2985,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_9<
             BOOST_SCOPED_ENUM(launch)
@@ -3068,9 +3018,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_9<
             threads::executor
@@ -3103,9 +3051,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_9<
             BOOST_SCOPED_ENUM(launch)
@@ -3140,7 +3086,7 @@ namespace hpx { namespace lcos { namespace local
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
                     typename hpx::util::detail::remove_reference<Func>::type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type , typename util::decay<F9>::type
                     )
                 >::type
             >
@@ -3148,7 +3094,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename hpx::util::detail::remove_reference<Func>::type
                 func_type;
-            typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type f0_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type f1_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type f2_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type f3_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type f4_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type f5_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type f6_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type f7_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type f8_type; typedef typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type f9_type;
+            typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type;
             typedef
                 hpx::util::tuple10<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type
@@ -3160,7 +3106,7 @@ namespace hpx { namespace lcos { namespace local
             typedef
                 typename boost::result_of<
                     func_type(
-                        typename boost::remove_const< typename hpx::util::detail::remove_reference< F0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F6 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F7 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F8 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< F9 >::type >::type
+                        typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type , typename util::decay<F9>::type
                     )
                 >::type
                 result_type;
@@ -3380,9 +3326,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_10<
             BOOST_SCOPED_ENUM(launch)
@@ -3415,9 +3359,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_10<
             threads::executor
@@ -3450,9 +3392,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , detail::dataflow_frame_10<
             BOOST_SCOPED_ENUM(launch)

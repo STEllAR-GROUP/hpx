@@ -19,7 +19,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
+                  , typename util::decay<A0>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -41,7 +41,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
+                  , typename util::decay<A0>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -75,7 +75,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -97,7 +97,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -131,7 +131,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -153,7 +153,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -187,7 +187,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -209,7 +209,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -243,7 +243,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -265,7 +265,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -299,7 +299,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -321,7 +321,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -355,7 +355,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -377,7 +377,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -411,7 +411,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const & , typename util::decay<A7>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -433,7 +433,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const & , typename util::decay<A7>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -467,7 +467,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const & , typename util::decay<A7>::type const & , typename util::decay<A8>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -489,7 +489,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const & , typename util::decay<A7>::type const & , typename util::decay<A8>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -523,7 +523,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A9>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const & , typename util::decay<A7>::type const & , typename util::decay<A8>::type const & , typename util::decay<A9>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -545,7 +545,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A9>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const & , typename util::decay<A7>::type const & , typename util::decay<A8>::type const & , typename util::decay<A9>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -579,7 +579,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A9>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A10>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const & , typename util::decay<A7>::type const & , typename util::decay<A8>::type const & , typename util::decay<A9>::type const & , typename util::decay<A10>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -601,7 +601,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A9>::type>::type const & , typename boost::remove_const< typename hpx::util::detail::remove_reference< A10>::type>::type const &
+                  , typename util::decay<A0>::type const & , typename util::decay<A1>::type const & , typename util::decay<A2>::type const & , typename util::decay<A3>::type const & , typename util::decay<A4>::type const & , typename util::decay<A5>::type const & , typename util::decay<A6>::type const & , typename util::decay<A7>::type const & , typename util::decay<A8>::type const & , typename util::decay<A9>::type const & , typename util::decay<A10>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(

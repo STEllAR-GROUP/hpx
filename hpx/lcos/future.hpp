@@ -12,7 +12,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/date_time_chrono.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -339,64 +339,48 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
     template <typename Result>
-    future<typename boost::remove_const<
-        typename util::detail::remove_reference<Result>::type
-    >::type>
+    future<typename util::decay<Result>::type>
     make_ready_future(BOOST_FWD_REF(Result) init)
     {
-        return future<typename boost::remove_const<
-            typename util::detail::remove_reference<Result>::type
-        >::type>(boost::forward<Result>(init));
+        return future<typename util::decay<Result>::type>(
+            boost::forward<Result>(init));
     }
 
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
     template <typename Result>
-    future<typename boost::remove_const<
-        typename util::detail::remove_reference<Result>::type
-    >::type>
+    future<typename util::decay<Result>::type>
     make_ready_future_at(boost::posix_time::ptime const& at,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename boost::remove_const<
-            typename util::detail::remove_reference<Result>::type
-        >::type>(at, boost::forward<Result>(init));
+        return future<typename util::decay<Result>::type>(
+            at, boost::forward<Result>(init));
     }
 
     template <typename Clock, typename Duration, typename Result>
-    future<typename boost::remove_const<
-        typename util::detail::remove_reference<Result>::type
-    >::type>
+    future<typename util::decay<Result>::type>
     make_ready_future_at(boost::chrono::time_point<Clock, Duration> const& at,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename boost::remove_const<
-            typename util::detail::remove_reference<Result>::type
-        >::type>(util::to_ptime(at), boost::forward<Result>(init));
+        return future<typename util::decay<Result>::type>(
+            util::to_ptime(at), boost::forward<Result>(init));
     }
 
     template <typename Result>
-    future<typename boost::remove_const<
-        typename util::detail::remove_reference<Result>::type
-    >::type>
+    future<typename util::decay<Result>::type>
     make_ready_future_after(boost::posix_time::time_duration const& d,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename boost::remove_const<
-            typename util::detail::remove_reference<Result>::type
-        >::type>(d, boost::forward<Result>(init));
+        return future<typename util::decay<Result>::type>(
+            d, boost::forward<Result>(init));
     }
 
     template <typename Rep, typename Period, typename Result>
-    future<typename boost::remove_const<
-        typename util::detail::remove_reference<Result>::type
-    >::type>
+    future<typename util::decay<Result>::type>
     make_ready_future_after(boost::chrono::duration<Rep, Period> const& d,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename boost::remove_const<
-            typename util::detail::remove_reference<Result>::type
-        >::type>(util::to_time_duration(d), boost::forward<Result>(init));
+        return future<typename util::decay<Result>::type>(util::to_time_duration(d), boost::forward<Result>(init));
     }
 
     ///////////////////////////////////////////////////////////////////////////

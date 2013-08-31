@@ -13,7 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/include/async.hpp>
 
 #include <boost/serialization/serialization.hpp>
@@ -28,8 +28,7 @@
 /**/
 
 #define HPX_UTIL_BIND_REMOVE_REFERENCE(Z, N, D)                               \
-    typename boost::remove_const<                                             \
-        typename detail::remove_reference<BOOST_PP_CAT(D, N)>::type>::type    \
+    typename util::decay<BOOST_PP_CAT(D, N)>::type                            \
 /**/
 
 #define HPX_UTIL_BIND_REFERENCE(Z, N, D)                                      \

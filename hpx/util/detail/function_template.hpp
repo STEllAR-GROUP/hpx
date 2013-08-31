@@ -117,11 +117,7 @@ namespace hpx { namespace util
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function
-                  , typename boost::remove_const<
-                        typename hpx::util::detail::remove_reference<
-                            Functor
-                        >::type
-                    >::type
+                  , typename util::decay<Functor>::type
                 >::type
             >::type * = 0
         )
@@ -210,11 +206,7 @@ namespace hpx { namespace util
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function
-                  , typename boost::remove_const<
-                        typename hpx::util::detail::remove_reference<
-                            Functor
-                        >::type
-                    >::type
+                  , typename util::decay<Functor>::type
                 >::type
             >::type * = 0
         )
@@ -264,11 +256,7 @@ namespace hpx { namespace util
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function_nonser
-                  , typename boost::remove_const<
-                        typename hpx::util::detail::remove_reference<
-                            Functor
-                        >::type
-                    >::type
+                  , typename util::decay<Functor>::type
                 >::type
             >::type * = 0
         )
@@ -376,11 +364,7 @@ namespace hpx { namespace util {
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function_base
-                  , typename boost::remove_const<
-                        typename hpx::util::detail::remove_reference<
-                            Functor
-                        >::type
-                    >::type
+                  , typename util::decay<Functor>::type
                 >::type
             >::type * dummy = 0
         )

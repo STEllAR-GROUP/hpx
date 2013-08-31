@@ -20,7 +20,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type
+                  , typename util::decay<A0>::type
                 >
                 wrapped_type;
             typedef
@@ -59,7 +59,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1 >::type >::type
+                  , typename util::decay<A0>::type , typename util::decay<A1>::type
                 >
                 wrapped_type;
             typedef
@@ -98,7 +98,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2 >::type >::type
+                  , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type
                 >
                 wrapped_type;
             typedef
@@ -137,7 +137,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3 >::type >::type
+                  , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type
                 >
                 wrapped_type;
             typedef
@@ -176,7 +176,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4 >::type >::type
+                  , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type
                 >
                 wrapped_type;
             typedef
@@ -215,7 +215,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5 >::type >::type
+                  , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type
                 >
                 wrapped_type;
             typedef
@@ -254,7 +254,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6 >::type >::type
+                  , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type
                 >
                 wrapped_type;
             typedef
@@ -293,7 +293,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7 >::type >::type
+                  , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type
                 >
                 wrapped_type;
             typedef
@@ -332,7 +332,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8 >::type >::type
+                  , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type
                 >
                 wrapped_type;
             typedef
@@ -371,7 +371,7 @@
             typedef
                 detail::dataflow_impl<
                     Action
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A1 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A2 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A3 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A4 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A5 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A6 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A7 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A8 >::type >::type , typename boost::remove_const< typename hpx::util::detail::remove_reference< A9 >::type >::type
+                  , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type
                 >
                 wrapped_type;
             typedef

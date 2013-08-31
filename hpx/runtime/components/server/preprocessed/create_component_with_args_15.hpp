@@ -39,11 +39,7 @@
               , typename ::boost::disable_if<
                     typename boost::is_same<
                         component_constructor_functor1
-                      , typename boost::remove_const<
-                            typename hpx::util::detail::remove_reference<
-                                T0
-                            >::type
-                        >::type
+                      , typename util::decay<T0>::type
                     >::type
                 >::type * dummy = 0
             )
@@ -53,7 +49,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0;
+            typename util::decay<A0>::type a0;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor1)
         };
@@ -100,7 +96,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor2)
         };
@@ -147,7 +143,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor3)
         };
@@ -194,7 +190,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor4)
         };
@@ -241,7 +237,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor5)
         };
@@ -288,7 +284,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor6)
         };
@@ -335,7 +331,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5; typename boost::remove_const<typename hpx::util::detail::remove_reference<A6>::type >::type a6;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor7)
         };
@@ -382,7 +378,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5; typename boost::remove_const<typename hpx::util::detail::remove_reference<A6>::type >::type a6; typename boost::remove_const<typename hpx::util::detail::remove_reference<A7>::type >::type a7;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor8)
         };
@@ -429,7 +425,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7) , boost::move(a8));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5; typename boost::remove_const<typename hpx::util::detail::remove_reference<A6>::type >::type a6; typename boost::remove_const<typename hpx::util::detail::remove_reference<A7>::type >::type a7; typename boost::remove_const<typename hpx::util::detail::remove_reference<A8>::type >::type a8;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7; typename util::decay<A8>::type a8;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor9)
         };
@@ -476,7 +472,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7) , boost::move(a8) , boost::move(a9));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5; typename boost::remove_const<typename hpx::util::detail::remove_reference<A6>::type >::type a6; typename boost::remove_const<typename hpx::util::detail::remove_reference<A7>::type >::type a7; typename boost::remove_const<typename hpx::util::detail::remove_reference<A8>::type >::type a8; typename boost::remove_const<typename hpx::util::detail::remove_reference<A9>::type >::type a9;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7; typename util::decay<A8>::type a8; typename util::decay<A9>::type a9;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor10)
         };
@@ -523,7 +519,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7) , boost::move(a8) , boost::move(a9) , boost::move(a10));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5; typename boost::remove_const<typename hpx::util::detail::remove_reference<A6>::type >::type a6; typename boost::remove_const<typename hpx::util::detail::remove_reference<A7>::type >::type a7; typename boost::remove_const<typename hpx::util::detail::remove_reference<A8>::type >::type a8; typename boost::remove_const<typename hpx::util::detail::remove_reference<A9>::type >::type a9; typename boost::remove_const<typename hpx::util::detail::remove_reference<A10>::type >::type a10;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7; typename util::decay<A8>::type a8; typename util::decay<A9>::type a9; typename util::decay<A10>::type a10;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor11)
         };
@@ -570,7 +566,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7) , boost::move(a8) , boost::move(a9) , boost::move(a10) , boost::move(a11));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5; typename boost::remove_const<typename hpx::util::detail::remove_reference<A6>::type >::type a6; typename boost::remove_const<typename hpx::util::detail::remove_reference<A7>::type >::type a7; typename boost::remove_const<typename hpx::util::detail::remove_reference<A8>::type >::type a8; typename boost::remove_const<typename hpx::util::detail::remove_reference<A9>::type >::type a9; typename boost::remove_const<typename hpx::util::detail::remove_reference<A10>::type >::type a10; typename boost::remove_const<typename hpx::util::detail::remove_reference<A11>::type >::type a11;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7; typename util::decay<A8>::type a8; typename util::decay<A9>::type a9; typename util::decay<A10>::type a10; typename util::decay<A11>::type a11;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor12)
         };
@@ -617,7 +613,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7) , boost::move(a8) , boost::move(a9) , boost::move(a10) , boost::move(a11) , boost::move(a12));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5; typename boost::remove_const<typename hpx::util::detail::remove_reference<A6>::type >::type a6; typename boost::remove_const<typename hpx::util::detail::remove_reference<A7>::type >::type a7; typename boost::remove_const<typename hpx::util::detail::remove_reference<A8>::type >::type a8; typename boost::remove_const<typename hpx::util::detail::remove_reference<A9>::type >::type a9; typename boost::remove_const<typename hpx::util::detail::remove_reference<A10>::type >::type a10; typename boost::remove_const<typename hpx::util::detail::remove_reference<A11>::type >::type a11; typename boost::remove_const<typename hpx::util::detail::remove_reference<A12>::type >::type a12;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7; typename util::decay<A8>::type a8; typename util::decay<A9>::type a9; typename util::decay<A10>::type a10; typename util::decay<A11>::type a11; typename util::decay<A12>::type a12;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor13)
         };
@@ -664,7 +660,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7) , boost::move(a8) , boost::move(a9) , boost::move(a10) , boost::move(a11) , boost::move(a12) , boost::move(a13));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5; typename boost::remove_const<typename hpx::util::detail::remove_reference<A6>::type >::type a6; typename boost::remove_const<typename hpx::util::detail::remove_reference<A7>::type >::type a7; typename boost::remove_const<typename hpx::util::detail::remove_reference<A8>::type >::type a8; typename boost::remove_const<typename hpx::util::detail::remove_reference<A9>::type >::type a9; typename boost::remove_const<typename hpx::util::detail::remove_reference<A10>::type >::type a10; typename boost::remove_const<typename hpx::util::detail::remove_reference<A11>::type >::type a11; typename boost::remove_const<typename hpx::util::detail::remove_reference<A12>::type >::type a12; typename boost::remove_const<typename hpx::util::detail::remove_reference<A13>::type >::type a13;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7; typename util::decay<A8>::type a8; typename util::decay<A9>::type a9; typename util::decay<A10>::type a10; typename util::decay<A11>::type a11; typename util::decay<A12>::type a12; typename util::decay<A13>::type a13;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor14)
         };
@@ -711,7 +707,7 @@
             {
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7) , boost::move(a8) , boost::move(a9) , boost::move(a10) , boost::move(a11) , boost::move(a12) , boost::move(a13) , boost::move(a14));
             }
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<A0>::type >::type a0; typename boost::remove_const<typename hpx::util::detail::remove_reference<A1>::type >::type a1; typename boost::remove_const<typename hpx::util::detail::remove_reference<A2>::type >::type a2; typename boost::remove_const<typename hpx::util::detail::remove_reference<A3>::type >::type a3; typename boost::remove_const<typename hpx::util::detail::remove_reference<A4>::type >::type a4; typename boost::remove_const<typename hpx::util::detail::remove_reference<A5>::type >::type a5; typename boost::remove_const<typename hpx::util::detail::remove_reference<A6>::type >::type a6; typename boost::remove_const<typename hpx::util::detail::remove_reference<A7>::type >::type a7; typename boost::remove_const<typename hpx::util::detail::remove_reference<A8>::type >::type a8; typename boost::remove_const<typename hpx::util::detail::remove_reference<A9>::type >::type a9; typename boost::remove_const<typename hpx::util::detail::remove_reference<A10>::type >::type a10; typename boost::remove_const<typename hpx::util::detail::remove_reference<A11>::type >::type a11; typename boost::remove_const<typename hpx::util::detail::remove_reference<A12>::type >::type a12; typename boost::remove_const<typename hpx::util::detail::remove_reference<A13>::type >::type a13; typename boost::remove_const<typename hpx::util::detail::remove_reference<A14>::type >::type a14;
+            typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7; typename util::decay<A8>::type a8; typename util::decay<A9>::type a9; typename util::decay<A10>::type a10; typename util::decay<A11>::type a11; typename util::decay<A12>::type a12; typename util::decay<A13>::type a13; typename util::decay<A14>::type a14;
             private:
                 BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor15)
         };

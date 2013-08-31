@@ -15,6 +15,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
@@ -53,11 +54,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 #endif
 
 #define HPX_LCOS_LOCAL_DATAFLOW_FRAME_RESULT_OF(z, n, d)                        \
-    typename boost::remove_const<                                               \
-        typename hpx::util::detail::remove_reference<                           \
-            BOOST_PP_CAT(F, n)                                                  \
-        >::type                                                                 \
-    >::type                                                                     \
+    typename util::decay<BOOST_PP_CAT(F, n)>::type                              \
 /**/
 
 #define HPX_LCOS_LOCAL_DATAFLOW_FRAME_CTOR_LIST(z, n, d)                        \
@@ -69,11 +66,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 /**/
 #define HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER_TYPES(z, n, d)                     \
     typedef                                                                     \
-        typename boost::remove_const<                                           \
-            typename hpx::util::detail::remove_reference<                       \
-                BOOST_PP_CAT(F, n)                                              \
-            >::type                                                             \
-        >::type                                                                 \
+        typename util::decay<BOOST_PP_CAT(F, n)>::type                          \
         BOOST_PP_CAT(BOOST_PP_CAT(f, n), _type);                                \
 /**/
 
@@ -405,9 +398,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , BOOST_PP_CAT(detail::dataflow_frame_, N)<
             BOOST_SCOPED_ENUM(launch)
@@ -443,9 +434,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_future_or_future_range<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , BOOST_PP_CAT(detail::dataflow_frame_, N)<
             threads::executor
@@ -481,9 +470,7 @@ namespace hpx { namespace lcos { namespace local
     BOOST_FORCEINLINE
     typename boost::lazy_disable_if<
         detail::is_launch_policy<
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<Func>::type
-            >::type
+            typename util::decay<Func>::type
         >
       , BOOST_PP_CAT(detail::dataflow_frame_, N)<
             BOOST_SCOPED_ENUM(launch)

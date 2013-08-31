@@ -48,6 +48,7 @@
 #include <hpx/util/coroutine/detail/self.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/util/decay.hpp>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
@@ -257,9 +258,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef coroutine_impl<CoroutineType, ContextImpl, Heap> super_type;
     typedef typename super_type::thread_id_type thread_id_type;
 
-    typedef typename hpx::util::detail::remove_reference<
-        typename boost::remove_const<FunctorType>::type
-    >::type functor_type;
+    typedef typename util::decay<FunctorType>::type functor_type;
 
     template <typename Functor>
     coroutine_impl_wrapper(BOOST_FWD_REF(Functor) f, thread_id_type id,
@@ -516,9 +515,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   coroutine_impl<CoroutineType, ContextImpl, Heap>::
       create(BOOST_FWD_REF(Functor) f, thread_id_type id, std::ptrdiff_t stack_size)
   {
-      typedef typename hpx::util::detail::remove_reference<
-          typename boost::remove_const<Functor>::type
-      >::type functor_type;
+      typedef typename hpx::util::decay<Functor>::type functor_type;
 
       typedef coroutine_impl_wrapper<
           functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;

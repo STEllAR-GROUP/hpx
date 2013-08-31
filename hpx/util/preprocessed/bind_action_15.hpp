@@ -653,7 +653,7 @@ namespace hpx { namespace util
     >
     detail::bound_action1<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type
+      , typename util::decay<A0>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0
@@ -663,7 +663,7 @@ namespace hpx { namespace util
             detail::bound_action1<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type
+                  typename util::decay<A0>::type
             > (boost::forward<A0>( a0 ));
     }
     
@@ -673,7 +673,7 @@ namespace hpx { namespace util
     >
     detail::bound_action1<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type
+      , typename util::decay<A0>::type
     >
     bind(
         hpx::actions::action<
@@ -686,7 +686,7 @@ namespace hpx { namespace util
             detail::bound_action1<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type
+                  typename util::decay<A0>::type
             > (boost::forward<A0>( a0 ));
     }
 }}
@@ -1365,7 +1365,7 @@ namespace hpx { namespace util
     >
     detail::bound_action2<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
@@ -1375,7 +1375,7 @@ namespace hpx { namespace util
             detail::bound_action2<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
     }
     
@@ -1385,7 +1385,7 @@ namespace hpx { namespace util
     >
     detail::bound_action2<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type
     >
     bind(
         hpx::actions::action<
@@ -1398,7 +1398,7 @@ namespace hpx { namespace util
             detail::bound_action2<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
     }
 }}
@@ -2077,7 +2077,7 @@ namespace hpx { namespace util
     >
     detail::bound_action3<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
@@ -2087,7 +2087,7 @@ namespace hpx { namespace util
             detail::bound_action3<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
     }
     
@@ -2097,7 +2097,7 @@ namespace hpx { namespace util
     >
     detail::bound_action3<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type
     >
     bind(
         hpx::actions::action<
@@ -2110,7 +2110,7 @@ namespace hpx { namespace util
             detail::bound_action3<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
     }
 }}
@@ -2789,7 +2789,7 @@ namespace hpx { namespace util
     >
     detail::bound_action4<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
@@ -2799,7 +2799,7 @@ namespace hpx { namespace util
             detail::bound_action4<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
     }
     
@@ -2809,7 +2809,7 @@ namespace hpx { namespace util
     >
     detail::bound_action4<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type
     >
     bind(
         hpx::actions::action<
@@ -2822,7 +2822,7 @@ namespace hpx { namespace util
             detail::bound_action4<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
     }
 }}
@@ -3501,7 +3501,7 @@ namespace hpx { namespace util
     >
     detail::bound_action5<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
@@ -3511,7 +3511,7 @@ namespace hpx { namespace util
             detail::bound_action5<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
     }
     
@@ -3521,7 +3521,7 @@ namespace hpx { namespace util
     >
     detail::bound_action5<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type
     >
     bind(
         hpx::actions::action<
@@ -3534,7 +3534,7 @@ namespace hpx { namespace util
             detail::bound_action5<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
     }
 }}
@@ -4213,7 +4213,7 @@ namespace hpx { namespace util
     >
     detail::bound_action6<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
@@ -4223,7 +4223,7 @@ namespace hpx { namespace util
             detail::bound_action6<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
     }
     
@@ -4233,7 +4233,7 @@ namespace hpx { namespace util
     >
     detail::bound_action6<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type
     >
     bind(
         hpx::actions::action<
@@ -4246,7 +4246,7 @@ namespace hpx { namespace util
             detail::bound_action6<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
     }
 }}
@@ -4925,7 +4925,7 @@ namespace hpx { namespace util
     >
     detail::bound_action7<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
@@ -4935,7 +4935,7 @@ namespace hpx { namespace util
             detail::bound_action7<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
     }
     
@@ -4945,7 +4945,7 @@ namespace hpx { namespace util
     >
     detail::bound_action7<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type
     >
     bind(
         hpx::actions::action<
@@ -4958,7 +4958,7 @@ namespace hpx { namespace util
             detail::bound_action7<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
     }
 }}
@@ -5637,7 +5637,7 @@ namespace hpx { namespace util
     >
     detail::bound_action8<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
@@ -5647,7 +5647,7 @@ namespace hpx { namespace util
             detail::bound_action8<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
     }
     
@@ -5657,7 +5657,7 @@ namespace hpx { namespace util
     >
     detail::bound_action8<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type
     >
     bind(
         hpx::actions::action<
@@ -5670,7 +5670,7 @@ namespace hpx { namespace util
             detail::bound_action8<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
     }
 }}
@@ -6349,7 +6349,7 @@ namespace hpx { namespace util
     >
     detail::bound_action9<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8
@@ -6359,7 +6359,7 @@ namespace hpx { namespace util
             detail::bound_action9<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ));
     }
     
@@ -6369,7 +6369,7 @@ namespace hpx { namespace util
     >
     detail::bound_action9<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type
     >
     bind(
         hpx::actions::action<
@@ -6382,7 +6382,7 @@ namespace hpx { namespace util
             detail::bound_action9<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ));
     }
 }}
@@ -7061,7 +7061,7 @@ namespace hpx { namespace util
     >
     detail::bound_action10<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9
@@ -7071,7 +7071,7 @@ namespace hpx { namespace util
             detail::bound_action10<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ));
     }
     
@@ -7081,7 +7081,7 @@ namespace hpx { namespace util
     >
     detail::bound_action10<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type
     >
     bind(
         hpx::actions::action<
@@ -7094,7 +7094,7 @@ namespace hpx { namespace util
             detail::bound_action10<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ));
     }
 }}
@@ -7773,7 +7773,7 @@ namespace hpx { namespace util
     >
     detail::bound_action11<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10
@@ -7783,7 +7783,7 @@ namespace hpx { namespace util
             detail::bound_action11<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ));
     }
     
@@ -7793,7 +7793,7 @@ namespace hpx { namespace util
     >
     detail::bound_action11<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type
     >
     bind(
         hpx::actions::action<
@@ -7806,7 +7806,7 @@ namespace hpx { namespace util
             detail::bound_action11<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ));
     }
 }}
@@ -8485,7 +8485,7 @@ namespace hpx { namespace util
     >
     detail::bound_action12<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11
@@ -8495,7 +8495,7 @@ namespace hpx { namespace util
             detail::bound_action12<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ));
     }
     
@@ -8505,7 +8505,7 @@ namespace hpx { namespace util
     >
     detail::bound_action12<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type
     >
     bind(
         hpx::actions::action<
@@ -8518,7 +8518,7 @@ namespace hpx { namespace util
             detail::bound_action12<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ));
     }
 }}
@@ -9197,7 +9197,7 @@ namespace hpx { namespace util
     >
     detail::bound_action13<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12
@@ -9207,7 +9207,7 @@ namespace hpx { namespace util
             detail::bound_action13<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ));
     }
     
@@ -9217,7 +9217,7 @@ namespace hpx { namespace util
     >
     detail::bound_action13<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type
     >
     bind(
         hpx::actions::action<
@@ -9230,7 +9230,7 @@ namespace hpx { namespace util
             detail::bound_action13<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ));
     }
 }}
@@ -9909,7 +9909,7 @@ namespace hpx { namespace util
     >
     detail::bound_action14<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13
@@ -9919,7 +9919,7 @@ namespace hpx { namespace util
             detail::bound_action14<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ));
     }
     
@@ -9929,7 +9929,7 @@ namespace hpx { namespace util
     >
     detail::bound_action14<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type
     >
     bind(
         hpx::actions::action<
@@ -9942,7 +9942,7 @@ namespace hpx { namespace util
             detail::bound_action14<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ));
     }
 }}
@@ -10621,7 +10621,7 @@ namespace hpx { namespace util
     >
     detail::bound_action15<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14
@@ -10631,7 +10631,7 @@ namespace hpx { namespace util
             detail::bound_action15<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ));
     }
     
@@ -10641,7 +10641,7 @@ namespace hpx { namespace util
     >
     detail::bound_action15<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type
     >
     bind(
         hpx::actions::action<
@@ -10654,7 +10654,7 @@ namespace hpx { namespace util
             detail::bound_action15<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ));
     }
 }}
@@ -11333,7 +11333,7 @@ namespace hpx { namespace util
     >
     detail::bound_action16<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15
@@ -11343,7 +11343,7 @@ namespace hpx { namespace util
             detail::bound_action16<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ));
     }
     
@@ -11353,7 +11353,7 @@ namespace hpx { namespace util
     >
     detail::bound_action16<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type
     >
     bind(
         hpx::actions::action<
@@ -11366,7 +11366,7 @@ namespace hpx { namespace util
             detail::bound_action16<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ));
     }
 }}
@@ -12045,7 +12045,7 @@ namespace hpx { namespace util
     >
     detail::bound_action17<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type , typename boost::remove_const< typename detail::remove_reference<A16>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type , typename util::decay<A16>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16
@@ -12055,7 +12055,7 @@ namespace hpx { namespace util
             detail::bound_action17<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type , typename boost::remove_const< typename detail::remove_reference<A16>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type , typename util::decay<A16>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ));
     }
     
@@ -12065,7 +12065,7 @@ namespace hpx { namespace util
     >
     detail::bound_action17<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type , typename boost::remove_const< typename detail::remove_reference<A16>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type , typename util::decay<A16>::type
     >
     bind(
         hpx::actions::action<
@@ -12078,7 +12078,7 @@ namespace hpx { namespace util
             detail::bound_action17<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type , typename boost::remove_const< typename detail::remove_reference<A16>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type , typename util::decay<A16>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ));
     }
 }}
@@ -12757,7 +12757,7 @@ namespace hpx { namespace util
     >
     detail::bound_action18<
         Action
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type , typename boost::remove_const< typename detail::remove_reference<A16>::type>::type , typename boost::remove_const< typename detail::remove_reference<A17>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type , typename util::decay<A16>::type , typename util::decay<A17>::type
     >
     bind(
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17
@@ -12767,7 +12767,7 @@ namespace hpx { namespace util
             detail::bound_action18<
                 Action
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type , typename boost::remove_const< typename detail::remove_reference<A16>::type>::type , typename boost::remove_const< typename detail::remove_reference<A17>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type , typename util::decay<A16>::type , typename util::decay<A17>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ));
     }
     
@@ -12777,7 +12777,7 @@ namespace hpx { namespace util
     >
     detail::bound_action18<
         Derived
-      , typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type , typename boost::remove_const< typename detail::remove_reference<A16>::type>::type , typename boost::remove_const< typename detail::remove_reference<A17>::type>::type
+      , typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type , typename util::decay<A16>::type , typename util::decay<A17>::type
     >
     bind(
         hpx::actions::action<
@@ -12790,7 +12790,7 @@ namespace hpx { namespace util
             detail::bound_action18<
                 Derived
               ,
-                  typename boost::remove_const< typename detail::remove_reference<A0>::type>::type , typename boost::remove_const< typename detail::remove_reference<A1>::type>::type , typename boost::remove_const< typename detail::remove_reference<A2>::type>::type , typename boost::remove_const< typename detail::remove_reference<A3>::type>::type , typename boost::remove_const< typename detail::remove_reference<A4>::type>::type , typename boost::remove_const< typename detail::remove_reference<A5>::type>::type , typename boost::remove_const< typename detail::remove_reference<A6>::type>::type , typename boost::remove_const< typename detail::remove_reference<A7>::type>::type , typename boost::remove_const< typename detail::remove_reference<A8>::type>::type , typename boost::remove_const< typename detail::remove_reference<A9>::type>::type , typename boost::remove_const< typename detail::remove_reference<A10>::type>::type , typename boost::remove_const< typename detail::remove_reference<A11>::type>::type , typename boost::remove_const< typename detail::remove_reference<A12>::type>::type , typename boost::remove_const< typename detail::remove_reference<A13>::type>::type , typename boost::remove_const< typename detail::remove_reference<A14>::type>::type , typename boost::remove_const< typename detail::remove_reference<A15>::type>::type , typename boost::remove_const< typename detail::remove_reference<A16>::type>::type , typename boost::remove_const< typename detail::remove_reference<A17>::type>::type
+                  typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type , typename util::decay<A15>::type , typename util::decay<A16>::type , typename util::decay<A17>::type
             > (boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ));
     }
 }}

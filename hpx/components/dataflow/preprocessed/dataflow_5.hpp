@@ -19,7 +19,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
+                  , typename util::decay<A0>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(
@@ -41,7 +41,7 @@
                     server::dataflow
                   , detail::action_wrapper<Action> const &
                   , naming::id_type const &
-                  , typename boost::remove_const< typename hpx::util::detail::remove_reference< A0>::type>::type const &
+                  , typename util::decay<A0>::type const &
                 > create_component_action;
             return
                 async<create_component_action>(

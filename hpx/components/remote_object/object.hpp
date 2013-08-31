@@ -11,6 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
@@ -37,11 +38,7 @@ namespace hpx { namespace components
               , typename ::boost::disable_if<
                     typename boost::is_same<
                         invoke_apply_fun
-                      , typename boost::remove_const<
-                            typename hpx::util::detail::remove_reference<
-                                Functor
-                            >::type
-                        >::type
+                      , typename util::decay<Functor>::type
                     >::type
                 >::type * = 0
             )
@@ -85,11 +82,7 @@ namespace hpx { namespace components
                 ar & f;
             }
 
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    F
-                >::type
-            >::type f;
+            typename util::decay<F>::type f;
 
             private:
                 BOOST_COPYABLE_AND_MOVABLE(invoke_apply_fun)

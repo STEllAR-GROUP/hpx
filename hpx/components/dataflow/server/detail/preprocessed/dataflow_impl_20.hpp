@@ -389,11 +389,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -692,11 +688,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -995,11 +987,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -1298,11 +1286,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -1601,11 +1585,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -1904,11 +1884,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -2207,11 +2183,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -2510,11 +2482,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -2813,11 +2781,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -3116,11 +3080,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -3419,11 +3379,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -3722,11 +3678,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -4025,11 +3977,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -4328,11 +4276,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -4631,11 +4575,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -4934,11 +4874,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -5237,11 +5173,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -5540,11 +5472,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -5843,11 +5771,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>
@@ -6146,11 +6070,7 @@
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
             typedef
                 dataflow_slot<dataflow_type, Slot, dataflow_impl>

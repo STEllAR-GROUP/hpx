@@ -9,7 +9,7 @@
 #define HPX_COMPONENTS_REMOTE_OBJECT_CTOR_FUN_HPP
 
 #include <hpx/util/move.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
@@ -50,9 +50,7 @@ namespace hpx { namespace components { namespace remote_object
 /**/
 
 #define HPX_REMOTE_OBJECT_M2(Z, N, D)                                           \
-    typename boost::remove_const<                                               \
-        typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, N)>::type  \
-    >::type BOOST_PP_CAT(a, N);                                                 \
+    typename util::decay<BOOST_PP_CAT(A, N)>::type BOOST_PP_CAT(a, N);          \
 /**/
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)

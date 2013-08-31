@@ -9,6 +9,7 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 
+#include <hpx/util/decay.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/fusion/include/transform_view.hpp>
@@ -89,11 +90,7 @@ namespace hpx { namespace util {
             typedef
                 std::vector<
                     typename hpx::lcos::detail::future_traits<
-                        typename boost::remove_const<
-                            typename detail::remove_reference<
-                                Future
-                            >::type
-                        >::type::value_type
+                        typename util::decay<Future>::type::value_type
                     >::type
                 >
                 type;
@@ -129,17 +126,9 @@ namespace hpx { namespace util {
                 typedef
                     typename boost::mpl::eval_if<
                         boost::is_same<value_type, hpx::util::unused_type>
-                      , boost::remove_const<
-                            typename detail::remove_reference<
-                                Tuple
-                            >::type
-                        >
+                      , boost::decay<Tuple>
                       , boost::fusion::result_of::push_back<
-                            typename boost::remove_const<
-                                typename detail::remove_reference<
-                                    Tuple
-                                >::type
-                            >::type const
+                            typename util::decay<Tuple>::type const
                           , value_type
                         >
                     >::type

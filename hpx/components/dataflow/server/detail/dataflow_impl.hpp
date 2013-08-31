@@ -28,6 +28,7 @@
 #include <hpx/components/dataflow/server/detail/dataflow_impl_helpers.hpp>
 #include <hpx/components/dataflow/server/detail/component_wrapper.hpp>
 
+#include <hpx/util/decay.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
@@ -380,11 +381,7 @@ namespace hpx { namespace traits
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
             typedef
-                typename boost::remove_const<
-                    typename util::detail::remove_reference<
-                        A
-                    >::type
-                >::type
+                typename util::decay<A>::type
                 dataflow_type;
 
             typedef

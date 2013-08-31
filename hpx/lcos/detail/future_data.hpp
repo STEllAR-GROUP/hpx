@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/detail/full_empty_memory.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/value_or_error.hpp>
 #include <hpx/util/scoped_unlock.hpp>
@@ -349,9 +350,7 @@ namespace detail
 
             // set the received result, reset error status
             try {
-               typedef typename hpx::util::detail::remove_reference<
-                    typename boost::remove_const<T>::type
-                >::type naked_type;
+               typedef typename util::decay<T>::type naked_type;
 
                 typedef traits::get_remote_result<
                     result_type, naked_type

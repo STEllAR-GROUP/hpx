@@ -21,6 +21,7 @@
 
 #include <hpx/traits/is_action.hpp>
 
+#include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
@@ -139,9 +140,9 @@ namespace hpx { namespace traits
         template <typename T, std::size_t Arity>
         struct callable_wrapper<T, Arity
           , typename boost::enable_if<
-                boost::is_class<typename util::detail::remove_reference<T>::type>
+                boost::is_class<typename util::decay<T>::type>
             >::type
-        > : util::detail::remove_reference<T>::type
+        > : util::decay<T>::type
           , callable_wrapper_fallback<T, Arity>
         {};
 
@@ -362,7 +363,7 @@ namespace hpx { namespace traits
 #include <hpx/config.hpp>
 
 #include <hpx/traits/is_action.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/not.hpp>
@@ -386,7 +387,7 @@ namespace hpx { namespace traits { namespace detail
       : boost::mpl::and_<                                                       \
             is_callable<T BOOST_PP_ENUM_TRAILING_PARAMS(n, A)>                  \
           , boost::mpl::not_<traits::is_action<                                 \
-                typename util::detail::remove_reference<T>::type>>              \
+                typename util::decay<T>::type>>                                 \
         >                                                                       \
     {};                                                                         \
     /**/

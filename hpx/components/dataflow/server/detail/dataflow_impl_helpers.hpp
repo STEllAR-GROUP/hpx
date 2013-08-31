@@ -10,28 +10,16 @@
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
 #include <hpx/components/dataflow/dataflow_trigger_fwd.hpp>
 #include <hpx/components/dataflow/is_dataflow.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/mpl/at.hpp>
 
 namespace hpx { namespace lcos { namespace server { namespace detail
 {
     template <typename T>
-    struct strip_cv_ref
-    {
-        typedef
-            typename boost::remove_const<
-                typename hpx::util::detail::remove_reference<
-                    T
-                >::type
-            >::type
-            type;
-    };
-
-    template <typename T>
     struct dataflow_result
     {
-        typedef typename strip_cv_ref<typename T::result_type>::type type;
+        typedef typename util::decay<typename T::result_type>::type type;
     };
 
     template <typename Vector>
@@ -142,7 +130,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                         >
                       , boost::fusion::result_of::push_back<
                             boost::mpl::_1
-                          , strip_cv_ref<boost::mpl::_2>
+                          , util::decay<boost::mpl::_2>
                         >
                     >
                 >::type

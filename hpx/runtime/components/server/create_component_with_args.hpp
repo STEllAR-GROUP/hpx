@@ -8,7 +8,7 @@
 #ifndef HPX_RUNTIME_COMPONENTS_SERVER_CREATE_COMPONENT_WITH_ARGS_HPP
 #define HPX_RUNTIME_COMPONENTS_SERVER_CREATE_COMPONENT_WITH_ARGS_HPP
 
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 
@@ -27,9 +27,7 @@ namespace hpx { namespace components { namespace server
             (BOOST_PP_CAT(t, N)))                                             \
     /**/
 #define HPX_RUNTIME_SUPPORT_CTOR_M1(Z, N, D)                                  \
-        typename boost::remove_const<typename                                 \
-            hpx::util::detail::remove_reference<BOOST_PP_CAT(A, N)>::type     \
-        >::type                                                               \
+        typename util::decay<BOOST_PP_CAT(A, N)>::type                        \
             BOOST_PP_CAT(a, N);                                               \
     /**/
 #define HPX_RUNTIME_SUPPORT_CTOR_M2(Z, N, D)                                  \
@@ -126,11 +124,7 @@ namespace hpx { namespace components { namespace server
               , typename ::boost::disable_if<
                     typename boost::is_same<
                         BOOST_PP_CAT(component_constructor_functor, N)
-                      , typename boost::remove_const<
-                            typename hpx::util::detail::remove_reference<
-                                T0
-                            >::type
-                        >::type
+                      , typename util::decay<T0>::type
                     >::type
                 >::type * dummy = 0
 #endif

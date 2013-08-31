@@ -13,6 +13,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/serialize_sequence.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
@@ -717,9 +718,7 @@ namespace hpx { namespace util
     };
 
 #define HPX_UTIL_MAKE_TUPLE_ARG(Z, N, D)                                      \
-    typename boost::remove_const<                                             \
-        typename detail::remove_reference<BOOST_PP_CAT(D, N)>::type           \
-    >::type                                                                   \
+    typename util::decay<BOOST_PP_CAT(D, N)>::type                            \
 /**/
 
 #if N == 1
