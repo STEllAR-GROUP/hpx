@@ -6,8 +6,6 @@
 set(tests
     path_elements)
 
-set(merging_map_FLAGS NOLIBS)
-
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
