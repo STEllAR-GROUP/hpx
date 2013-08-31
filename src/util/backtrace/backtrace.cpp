@@ -12,6 +12,8 @@
 
 #if defined(HPX_HAVE_STACKTRACES)
 
+#include <hpx/async.hpp>
+
 #define HPX_BACKTRACE_SOURCE
 
 #include <boost/config.hpp>
@@ -382,6 +384,12 @@ namespace hpx { namespace util {
 #endif
     } // stack_trace
 
+    std::string backtrace::trace_on_new_stack() const
+    {
+        if(frames_.empty())
+            return std::string();
+        return hpx::async(util::bind(stack_trace::get_symbols, &frames_.front(), frames_.size())).get();
+    }
 }} // hpx::util
 
 #endif
