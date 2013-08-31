@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPILER_SPECIFIC_201204261048)
 #define HPX_COMPILER_SPECIFIC_201204261048
 
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
 
 // macros to facilitate handling of compiler-specific issues
 #  define HPX_GCC_VERSION (__GNUC__*10000 + __GNUC_MINOR__*100 + __GNUC__PATCHLEVEL__)
