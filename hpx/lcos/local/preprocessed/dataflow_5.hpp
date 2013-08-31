@@ -125,9 +125,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_1::await_range;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>
@@ -186,9 +186,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_1::await_next;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>
@@ -472,9 +472,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_2::await_range;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>
@@ -533,9 +533,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_2::await_next;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>
@@ -819,9 +819,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_3::await_range;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>
@@ -880,9 +880,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_3::await_next;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>
@@ -1166,9 +1166,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_4::await_range;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>
@@ -1227,9 +1227,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_4::await_next;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>
@@ -1513,9 +1513,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, Iter)
                         = &dataflow_frame_5::await_range;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>
@@ -1574,9 +1574,9 @@ namespace hpx { namespace lcos { namespace local
                         (Iter, boost::mpl::false_)
                         = &dataflow_frame_5::await_next;
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
                     boost::intrusive_ptr<
                         lcos::detail::future_data_base<future_result_type>

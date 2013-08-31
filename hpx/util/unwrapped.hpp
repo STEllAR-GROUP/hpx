@@ -32,13 +32,13 @@ namespace hpx { namespace util {
             typedef
                 boost::mpl::bool_<
                     boost::is_void<
-                        typename hpx::lcos::future_traits<
+                        typename hpx::lcos::detail::future_traits<
                             typename boost::remove_const<
                                 typename detail::remove_reference<
                                     Future
                                 >::type
                             >::type::value_type
-                        >::value_type
+                        >::type
                     >::type::value
                 >
                 type;
@@ -50,7 +50,9 @@ namespace hpx { namespace util {
             typedef
                 boost::mpl::bool_<
                     boost::is_void<
-                        typename hpx::lcos::future_traits<Future>::value_type
+                        typename hpx::lcos::detail::future_traits<
+                            Future
+                        >::type
                     >::type::value
                 >
                 type;
@@ -86,23 +88,21 @@ namespace hpx { namespace util {
         {
             typedef
                 std::vector<
-                    typename hpx::lcos::future_traits<
+                    typename hpx::lcos::detail::future_traits<
                         typename boost::remove_const<
                             typename detail::remove_reference<
                                 Future
                             >::type
                         >::type::value_type
-                    >::value_type
+                    >::type
                 >
                 type;
         };
 
         template <typename Future>
         struct unwrapped_param_type_impl<Future, boost::mpl::false_, boost::mpl::false_>
+          : hpx::lcos::detail::future_traits<Future>
         {
-            typedef
-                typename hpx::lcos::future_traits<Future>::value_type
-                type;
         };
 
         template <typename Future>
@@ -164,7 +164,7 @@ namespace hpx { namespace util {
             invoke(Tuple t, Future & f, boost::mpl::false_, boost::mpl::false_) const
             {
                 BOOST_ASSERT(f.ready());
-                typename lcos::future_traits<Future>::value_type
+                typename lcos::detail::future_traits<Future>::type
                     val(boost::move(f.get()));
                 f = Future();
                 return

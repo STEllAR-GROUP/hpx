@@ -167,12 +167,12 @@ namespace hpx
 
     template <typename Iterator>
     lcos::future<std::vector<HPX_STD_TUPLE<int, lcos::future<
-        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+        typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
     > > > >
     when_n(std::size_t n, Iterator begin, Iterator end)
     {
-        typedef typename lcos::future_iterator_traits<
-            Iterator>::traits_type::value_type value_type;
+        typedef typename lcos::detail::future_iterator_traits<
+            Iterator>::traits_type::type value_type;
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<value_type> > > 
             return_type;
 
@@ -278,12 +278,12 @@ namespace hpx
 
     template <typename Iterator>
     std::vector<HPX_STD_TUPLE<int, lcos::future<
-        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+        typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
     > > >
     wait_n(Iterator begin, Iterator end, error_code& ec = throws)
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<
-            typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+            typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
         > > > result_type;
 
         lcos::future<result_type> f = wait_n(begin, end);

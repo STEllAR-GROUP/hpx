@@ -27,47 +27,56 @@
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct future_traits
+    namespace detail
     {
-    };
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct future_traits
+        {};
 
-    template <typename T>
-    struct future_traits<lcos::future<T> >
-    {
-        typedef T value_type;
-    };
+        template <typename T>
+        struct future_traits<lcos::future<T> >
+        {
+            typedef T type;
+        };
 
-    template <typename T>
-    struct future_traits<lcos::future<T> const>
-    {
-        typedef T value_type;
-    };
+        template <typename T>
+        struct future_traits<lcos::future<T> const>
+        {
+            typedef T type;
+        };
 
-    template <typename T>
-    struct future_traits<lcos::future<T> &>
-    {
-        typedef T value_type;
-    };
+        template <typename T>
+        struct future_traits<lcos::future<T> &>
+        {
+            typedef T type;
+        };
 
-    template <typename T>
-    struct future_traits<lcos::future<T> const &>
-    {
-        typedef T value_type;
-    };
+        template <typename T>
+        struct future_traits<lcos::future<T> const &>
+        {
+            typedef T type;
+        };
 
-    template <typename Iter>
-    struct future_iterator_traits
-    {
-        typedef future_traits<
-            typename boost::detail::iterator_traits<Iter>::value_type
-        > traits_type;
-    };
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result>
+        struct unwrapped_future_result
+          : boost::mpl::if_<traits::is_future<Result>, Result, void>
+        {};
 
-    template <typename T>
-    struct future_iterator_traits<future<T> >
-    {
-    };
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Iter>
+        struct future_iterator_traits
+        {
+            typedef future_traits<
+                typename boost::detail::iterator_traits<Iter>::value_type
+            > traits_type;
+        };
+
+        template <typename T>
+        struct future_iterator_traits<future<T> >
+        {};
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace local { namespace detail
@@ -311,11 +320,8 @@ namespace hpx { namespace lcos
             return wait_for(util::to_time_duration(rel_time));
         }
 
-        future<typename future_traits<
-            typename boost::mpl::if_<
-                traits::is_future<Result>, Result, future<void>
-            >::type
-        >::value_type> unwrap(error_code& ec = throws);
+        typename detail::unwrapped_future_result<Result>::type
+        unwrap(error_code& ec = throws);
 
     private:
         template <typename InnerResult, typename UnwrapResult>

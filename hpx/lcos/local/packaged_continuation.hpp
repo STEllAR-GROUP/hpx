@@ -353,7 +353,7 @@ namespace hpx { namespace lcos { namespace local
         void transfer_result(Source& src, Destination& dest)
         {
             typedef typename boost::is_void<
-                typename future_traits<Source>::value_type
+                typename lcos::detail::future_traits<Source>::type
             >::type predicate;
             transfer_result(src, dest, predicate());
         }
@@ -613,17 +613,13 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
-    future<typename future_traits<
-        typename boost::mpl::if_<
-            traits::is_future<Result>, Result, future<void>
-        >::type
-    >::value_type>
+    typename lcos::detail::unwrapped_future_result<Result>::type
     future<Result>::unwrap(error_code& ec)
     {
         BOOST_STATIC_ASSERT_MSG(
             traits::is_future<Result>::value, "invalid use of unwrap");
 
-        typedef typename future_traits<Result>::value_type result_type;
+        typedef typename lcos::detail::future_traits<Result>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!valid()) {
@@ -663,7 +659,7 @@ namespace hpx { namespace lcos
     void future<Result>::on_outer_ready(
         boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
     {
-        typedef typename future_traits<Result>::value_type inner_result_type;
+        typedef typename lcos::detail::future_traits<Result>::type inner_result_type;
 
         void (future::*inner_ready)(future<inner_result_type>&,
             boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> >) =

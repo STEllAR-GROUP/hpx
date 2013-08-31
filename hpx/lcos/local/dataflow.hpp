@@ -250,9 +250,9 @@ namespace hpx { namespace lcos { namespace local
                         = &BOOST_PP_CAT(dataflow_frame_, N)::await_range;
 
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
 
                     boost::intrusive_ptr<
@@ -322,9 +322,9 @@ namespace hpx { namespace lcos { namespace local
                         = &BOOST_PP_CAT(dataflow_frame_, N)::await_next;
 
                     typedef
-                        typename lcos::future_traits<
+                        typename lcos::detail::future_traits<
                             future_type
-                        >::value_type
+                        >::type
                         future_result_type;
 
                     boost::intrusive_ptr<

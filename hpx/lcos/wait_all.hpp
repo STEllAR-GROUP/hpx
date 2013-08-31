@@ -259,12 +259,12 @@ namespace hpx
 
     template <typename Iterator>
     lcos::future<std::vector<lcos::future<
-        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+        typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
     > > >
     when_all(Iterator begin, Iterator end)
     {
-        typedef typename lcos::future_iterator_traits<
-            Iterator>::traits_type::value_type value_type;
+        typedef typename lcos::detail::future_iterator_traits<
+            Iterator>::traits_type::type value_type;
         typedef std::vector<lcos::future<value_type> > return_type;
 
         return_type lazy_values;
@@ -323,12 +323,12 @@ namespace hpx
 
     template <typename Iterator>
     std::vector<
-        typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+        typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
     >
     wait_all(Iterator begin, Iterator end, error_code& ec = throws)
     {
         typedef std::vector<
-            typename lcos::future_iterator_traits<Iterator>::traits_type::value_type
+            typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
         > result_type;
 
         lcos::future<result_type> f = when_all(begin, end);
