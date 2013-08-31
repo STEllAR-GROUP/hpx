@@ -13,8 +13,6 @@ set(tests
     parse_slurm_nodelist
    )
 
-set(merging_map_FLAGS NOLIBS)
-
 if(HWLOC_FOUND)
   set(tests ${tests} parse_affinity_options)
   set(parse_affinity_options_PARAMETERS THREADS_PER_LOCALITY 2)
