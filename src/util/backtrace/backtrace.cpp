@@ -388,7 +388,10 @@ namespace hpx { namespace util {
     {
         if(frames_.empty())
             return std::string();
-        return hpx::async(util::bind(stack_trace::get_symbols, &frames_.front(), frames_.size())).get();
+        if (0 == threads::get_self_ptr())
+            return trace();
+        error_code ec(lightweight);
+        return hpx::async(util::bind(stack_trace::get_symbols, &frames_.front(), frames_.size())).get(ec);
     }
 }} // hpx::util
 
