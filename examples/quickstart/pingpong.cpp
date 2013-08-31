@@ -39,11 +39,11 @@ void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
 
 ///////////////////////////////////////////////////////////////////////////////
 void on_recv_ind(hpx::naming::id_type to,
-    boost::shared_ptr<std::vector<double> > in, std::size_t counter);
+    boost::shared_ptr<std::vector<double> > const& in, std::size_t counter);
 HPX_PLAIN_ACTION(on_recv_ind, on_recv_ind_action);
 
 void on_recv_ind(hpx::naming::id_type to,
-    boost::shared_ptr<std::vector<double> > in, std::size_t counter)
+    boost::shared_ptr<std::vector<double> > const& in, std::size_t counter)
 {
     // received vector in
     if (--counter == 0) return;
