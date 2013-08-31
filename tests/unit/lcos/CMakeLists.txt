@@ -30,7 +30,7 @@ if(GCC_VERSION)
   set(gcc_version ${GCC_VERSION})
 endif()
 
-if(040500 EQUAL ${gcc_version} OR 040500 GREATER ${gcc_version})
+if(040500 EQUAL ${gcc_version} OR 040500 LESS ${gcc_version})
 set(tests
     ${tests}
     broadcast
