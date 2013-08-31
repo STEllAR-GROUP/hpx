@@ -8,10 +8,9 @@ set(tests
     apply_local
     apply_remote
     async_continue
-    broadcast
-    composable_guard
     async_local
     async_remote
+    composable_guard
     barrier
     dataflow
     deferred_packaged_task
@@ -25,6 +24,19 @@ set(tests
     packaged_action
     promise
    )
+
+# include the test broadcast for non-gcc 4.4 only
+set(gcc_version 0)
+if(GCC_VERSION)
+  set(gcc_version ${GCC_VERSION})
+endif()
+
+if(040500 EQUAL ${gcc_version} OR 040500 GREATER ${gcc_version})
+set(tests
+    ${tests}
+    broadcast
+   )
+endif()
 
 set(async_continue_PARAMETERS LOCALITIES 2)
 
