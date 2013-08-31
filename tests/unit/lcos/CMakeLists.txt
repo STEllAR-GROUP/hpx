@@ -14,7 +14,6 @@ set(tests
     barrier
     dataflow
     deferred_packaged_task
-    for_each
     future
     future_wait
     local_barrier
@@ -25,7 +24,7 @@ set(tests
     promise
    )
 
-# include the test broadcast for non-gcc 4.4 only
+# include some of the tests for non-gcc 4.4 only
 set(gcc_version 0)
 if(GCC_VERSION)
   set(gcc_version ${GCC_VERSION})
@@ -35,6 +34,7 @@ if(040500 EQUAL ${gcc_version} OR 040500 GREATER ${gcc_version})
 set(tests
     ${tests}
     broadcast
+    for_each
    )
 endif()
 
