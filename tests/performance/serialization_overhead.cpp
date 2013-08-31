@@ -123,14 +123,14 @@ int hpx_main(boost::program_options::variables_map& vm)
     bool continuation = (vm.count("continuation") != 0) ? true : false;
 
     std::vector<hpx::future<double> > timings;
-    for (int i = 0; i != concurrency; ++i)
+    for (std::size_t i = 0; i != concurrency; ++i)
     {
         timings.push_back(hpx::async(hpx::util::bind(
             &benchmark_serialization, data_size, iterations, continuation)));
     }
 
     double overall_time = 0;
-    for (int i = 0; i != concurrency; ++i)
+    for (std::size_t i = 0; i != concurrency; ++i)
         overall_time += timings[i].get();
 
     if (print_header)
