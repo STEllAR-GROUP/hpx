@@ -46,9 +46,9 @@ struct increment_type
     }
 };
 
-#if !defined(BOOST_NO_CXX11_LAMBDAS) || !defined( BOOST_NO_CXX11_AUTO_DECLARATIONS)
+#if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
 auto increment_lambda = [](boost::int32_t i){ accumulator += i; };
-#endif /*BOOST_NO_CXX11_LAMBDAS*/
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
