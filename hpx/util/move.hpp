@@ -6,6 +6,7 @@
 #ifndef HPX_UTIL_MOVE_HPP
 #define HPX_UTIL_MOVE_HPP
 
+#include <hpx/config.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/preprocessor/cat.hpp>
@@ -50,7 +51,7 @@
 
 namespace hpx { namespace util { namespace detail
 {
-#if !defined(BOOST_NO_RVALUE_REFERENCES)
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
     template <typename T, bool IsRvalueRef =
         std::is_rvalue_reference<T>::type::value>
 #else

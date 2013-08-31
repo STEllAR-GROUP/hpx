@@ -6,6 +6,8 @@
 #ifndef HPX_UTIL_DETAIL_REMOVE_REFERENCE_HPP
 #define HPX_UTIL_DETAIL_REMOVE_REFERENCE_HPP
 
+#include <hpx/config.hpp>
+
 #ifdef HPX_HAVE_CXX11_RVALUE_REFERENCES
 #define BOOST_MOVE_USE_STANDARD_MOVE
 #endif
@@ -16,7 +18,7 @@
 
 namespace hpx { namespace util { namespace detail
 {
-#if defined(BOOST_NO_RVALUE_REFERENCES)
+#if defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
     template <typename T>
     struct remove_reference
     {

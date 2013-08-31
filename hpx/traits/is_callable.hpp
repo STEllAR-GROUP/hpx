@@ -7,7 +7,7 @@
 #if !defined(HPX_TRAITS_IS_CALLABLE_APR_15_2012_0601PM)
 #define HPX_TRAITS_IS_CALLABLE_APR_15_2012_0601PM
 
-#include <boost/config.hpp>
+#include <hpx/config.hpp>
 
 #if BOOST_VERSION < 105100
 #   define BOOST_NO_CXX11_DECLTYPE_N3276
@@ -16,8 +16,6 @@
 #if defined(BOOST_NO_SFINAE_EXPR)                                              \
  || defined(BOOST_NO_CXX11_DECLTYPE_N3276)                                     \
  || defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) // C++03
-
-#include <hpx/config.hpp>
 
 #include <hpx/traits/is_action.hpp>
 
@@ -359,8 +357,6 @@ namespace hpx { namespace traits
 //}}
 
 #endif
-
-#include <hpx/config.hpp>
 
 #include <hpx/traits/is_action.hpp>
 #include <hpx/util/decay.hpp>

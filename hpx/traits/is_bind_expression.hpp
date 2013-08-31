@@ -6,7 +6,7 @@
 #if !defined(HPX_TRAITS_IS_BIND_EXPRESSION_AUG_28_2013_0603PM)
 #define HPX_TRAITS_IS_BIND_EXPRESSION_AUG_28_2013_0603PM
 
-#include <boost/config.hpp>
+#include <hpx/config.hpp>
 
 #include <boost/mpl/bool.hpp>
 

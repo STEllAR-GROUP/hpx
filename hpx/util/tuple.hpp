@@ -50,7 +50,7 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-#if defined(BOOST_NO_RVALUE_REFERENCES)
+#if defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
         template <typename T>
         struct env_value_type
         {
@@ -565,7 +565,7 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
 
-#if !defined(BOOST_NO_RVALUE_REFERENCES)
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
 #define HPX_UTIL_MAKE_ARGUMENT_PACK(Z, N, D)                                  \
     typename detail::env_value_type<BOOST_PP_CAT(D, N)>::type                 \
 /**/

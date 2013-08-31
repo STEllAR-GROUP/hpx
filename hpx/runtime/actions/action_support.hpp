@@ -59,7 +59,7 @@
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/identity.hpp>
-#if defined(BOOST_NO_DECLTYPE)
+#if defined(BOOST_NO_CXX11_DECLTYPE)
 #  include <boost/typeof/typeof.hpp>
 #endif
 #include <boost/utility/enable_if.hpp>

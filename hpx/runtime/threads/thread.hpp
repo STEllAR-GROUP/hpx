@@ -48,7 +48,7 @@ namespace hpx
             start_thread(boost::move(HPX_STD_FUNCTION<void()>(boost::forward<F>(f))));
         }
 
-// #if !defined(BOOST_NO_VARIADIC_TEMPLATES)
+// #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 //         template <typename F, typename ...Args>
 //         explicit thread(F&& f, Args&&... args)
 //         {
@@ -65,7 +65,7 @@ namespace hpx
 
         ~thread();
 
-#if !defined(BOOST_NO_DELETED_FUNCTIONS)
+#if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
         thread(thread const&) = delete;
         thread& operator=(thread const&) = delete;
 #else
