@@ -118,12 +118,13 @@ struct HPX_EXPORT symbol_namespace
         return naming::replace_locality_id(service, service_locality_id);
     }
 
-    static naming::gid_type get_service_instance(naming::gid_type const& dest)
+    static naming::gid_type get_service_instance(naming::gid_type const& dest,
+        error_code& ec = throws)
     {
         boost::uint32_t service_locality_id = naming::get_locality_id_from_gid(dest);
         if (service_locality_id == naming::invalid_locality_id)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROWS_IF(ec, bad_parameter,
                 "symbol_namespace::get_service_instance",
                 boost::str(boost::format(
                         "can't retrieve a valid locality id from global address: "

@@ -14,7 +14,9 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
 #include <hpx/lcos/broadcast.hpp>
+#endif
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -1515,12 +1517,16 @@ lcos::future<naming::id_type> addressing_service::resolve_name_async(
 
 }}
 
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::agas::server::symbol_namespace::service_action
     symbol_namespace_service_action;
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(symbol_namespace_service_action)
 HPX_REGISTER_BROADCAST_ACTION(symbol_namespace_service_action)
+
+#endif
 
 namespace hpx { namespace agas
 {
@@ -1531,10 +1537,23 @@ bool addressing_service::iterate_ids(
     )
 { // {{{
     try {
-        symbol_namespace_service_action act;
-
         request req(symbol_ns_iterate_names, f);
+
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+        symbol_namespace_service_action act;
         lcos::broadcast(act, hpx::find_all_localities(), req).get(ec);
+#else
+        BOOST_FOREACH(naming::id_type id, hpx::find_all_localities())
+        {
+            naming::id_type service_id(
+                stubs::symbol_namespace::get_service_instance(id.get_gid(), ec),
+                naming::id_type::unmanaged);
+            if (ec) return false;
+
+            stubs::symbol_namespace::service(service_id, req, action_priority_, ec);
+            if (ec) return false;
+        }
+#endif
 
         return !ec;
     }
