@@ -659,7 +659,8 @@ namespace detail
         }
 
         // run in a separate thread
-        void apply()
+        void apply(threads::thread_priority priority,
+            threads::thread_stacksize stacksize)
         {
             check_started();
             future_base_type this_(this);
@@ -671,7 +672,8 @@ namespace detail
             else {
                 threads::register_thread_plain(
                     HPX_STD_BIND(&task_base::run_impl, this_),
-                    "task_base::apply", threads::pending, false);
+                    "task_base::apply", threads::pending, false,
+                    priority, std::size_t(-1), stacksize);
             }
         }
 

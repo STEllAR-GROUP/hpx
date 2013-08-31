@@ -390,8 +390,13 @@ namespace hpx { namespace util {
             return std::string();
         if (0 == threads::get_self_ptr())
             return trace();
+
+        lcos::local::futures_factory<std::string()> p(
+            util::bind(stack_trace::get_symbols, &frames_.front(), frames_.size()));
+        p.apply(threads::thread_priority_default, threads::thread_stacksize_medium);
+
         error_code ec(lightweight);
-        return hpx::async(util::bind(stack_trace::get_symbols, &frames_.front(), frames_.size())).get(ec);
+        return p.get_future().get(ec);
     }
 }} // hpx::util
 
