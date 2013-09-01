@@ -119,7 +119,7 @@ fi
 DIRECTORY=$(cd $DIRECTORY; pwd)
 ORIGINAL_DIRECTORY=$PWD
 
-BJAM=$DIRECTORY/source/bjam
+BJAM=$DIRECTORY/source/b2
 
 error()
 {
