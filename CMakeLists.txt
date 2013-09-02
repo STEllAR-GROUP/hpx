@@ -1647,7 +1647,7 @@ get_directory_property(definitions DEFINITIONS)
 set(external_definitions "")
 
 foreach(definition ${definitions})
-    string(REGEX REPLACE "\"" "\\\\\\\\\\\\\\\\\"" definition ${definition})
+#    string(REGEX REPLACE "\"" "\\\\\\\\\\\\\\\\\"" definition ${definition})
     set(external_definitions "${external_definitions} ${definition}")
 endforeach()
 
