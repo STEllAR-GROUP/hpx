@@ -8,7 +8,7 @@
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
 #if defined(__INTEL_COMPILER) && !defined(BOOST_COMPILER_CONFIG)
-#  define BOOST_COMPILER_CONFIG <hpx/config/boost/compiler/intel.hpp>
+#  error Boost.Config does not detect C++11 mode for this compiler. Please set BOOST_COMPILER_CONFIG="hpx/config/boost/compiler/intel.hpp"
 #endif
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
