@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file HPX_RUNTIME_ACTIONS_POLYMORPHIC_FACTORY_HPP.hpp
+/// \file polymorphic_factory.hpp
 
-#if !defined(HPX_RUNTIME_ACTIONS_POLYMORPHIC_FACTORY_HPP)
-#define HPX_RUNTIME_ACTIONS_POLYMORPHIC_FACTORY_HPP
+#if !defined(HPX_RUNTIME_UTIL_POLYMORPHIC_FACTORY_HPP)
+#define HPX_RUNTIME_UTIL_POLYMORPHIC_FACTORY_HPP
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/static.hpp>
@@ -29,16 +29,22 @@ namespace hpx { namespace traits
     {};
 }}
 
-namespace hpx { namespace actions
+namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    struct action_registration;
+
+    template <typename Continuation>
+    struct continuation_registration;
+}}}
+
+namespace hpx { namespace util
+{
     namespace detail
     {
-        template <typename Action>
-        struct action_registration;
-
-        template <typename Continuation>
-        struct continuation_registration;
+        template <typename Function>
+        struct function_registration;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -64,10 +70,13 @@ namespace hpx { namespace actions
         ctor_map ctor_map_;
 
         template <typename Action>
-        friend struct detail::action_registration;
+        friend struct actions::detail::action_registration;
 
         template <typename Continuation>
-        friend struct detail::continuation_registration;
+        friend struct actions::detail::continuation_registration;
+
+        template <typename Function>
+        friend struct util::detail::function_registration;
     };
 }}
 

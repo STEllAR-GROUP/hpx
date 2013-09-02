@@ -1,4 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -67,6 +68,10 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
 
 namespace hpx { namespace util { namespace detail {
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Function>
+    struct init_registration;
+
     template <
         typename R
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -102,14 +107,16 @@ namespace hpx { namespace util { namespace detail {
             base_type::clone = Vtable::clone;
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
-
-            // make sure the global gets instantiated;
-            hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
 
-        static void register_base()
+        ~vtable_ptr()
         {
-            util::void_cast_register_nonvirt<vtable_ptr, base_type>();
+            init_registration<vtable_ptr>::g.register_function();
+        }
+
+        char const* get_function_name() const
+        {
+            return get_function_name<vtable_ptr>();
         }
 
         virtual base_type * get_ptr()
@@ -119,20 +126,43 @@ namespace hpx { namespace util { namespace detail {
 
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
-            ar & Vtable::get(object);
+            ar << Vtable::get(object);
         }
         void load_object(void ** object, IArchive & ar, unsigned)
         {
-            ar & Vtable::construct(object);
-        }
-
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar >> Vtable::construct(object);
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    // registration code for serialization
+    template <
+        typename R
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct init_registration<
+        vtable_ptr<
+            R(BOOST_PP_ENUM_PARAMS(N, A))
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+    {
+        typedef vtable_ptr<
+            R(BOOST_PP_ENUM_PARAMS(N, A))
+          , IArchive
+          , OArchive
+          , Vtable
+        > vtable_ptr_type;
+
+        static automatic_function_registration<vtable_ptr_type> g;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <
         typename R
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)

@@ -11,7 +11,7 @@
 #include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/actions/polymorphic_factory.hpp>
+#include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/serialize_empty_type.hpp>
 #include <hpx/util/demangle_helper.hpp>
@@ -117,7 +117,7 @@ namespace hpx { namespace actions
 
             continuation_registration()
             {
-                polymorphic_factory<continuation>::get_instance().
+                util::polymorphic_factory<continuation>::get_instance().
                     add_factory_function(
                         detail::get_continuation_name<Continuation>()
                       , &continuation_registration::create

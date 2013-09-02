@@ -59,12 +59,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(BOOST_PP_ENUM_PARAMS(N, A))
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -74,6 +69,19 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(BOOST_PP_ENUM_PARAMS(N, A))
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
 
             typedef
