@@ -27,7 +27,6 @@ namespace hpx { namespace util {
 
         shared_buffer_type get_buffer(size_type size)
         {
-/*
             size_type capacity = next_power_of_two(size);
             typename buffer_map::iterator it = buffers_.find(capacity);
             shared_buffer_type res;
@@ -42,13 +41,10 @@ namespace hpx { namespace util {
                 it->second.pop_front();
             }
             return res;
-*/
-            return shared_buffer_type(new buffer_type());
         }
 
         void reclaim_buffer(shared_buffer_type buffer)
         {
-/*
             size_type capacity = next_power_of_two(buffer->capacity());
             buffer->clear();
             if(capacity != buffer->capacity())
@@ -62,7 +58,6 @@ namespace hpx { namespace util {
                 it = buffers_.insert(it, std::make_pair(capacity, std::list<shared_buffer_type>()));
             }
             it->second.push_back(buffer);
-*/
         }
 
         void clear()
