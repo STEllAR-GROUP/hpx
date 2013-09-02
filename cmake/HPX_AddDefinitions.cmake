@@ -9,13 +9,11 @@ include(HPX_Include)
 
 hpx_include(Message)
 
-set(HPX_PREPROCESS_DEFINITIONS CACHE INTERNAL "" FORCE)
+set(HPX_DEFINITIONS CACHE INTERNAL "" FORCE)
 
 macro(hpx_add_definitions definition)
   hpx_debug("add_definitions" "${definition}")
-  if(HPX_AUTOMATIC_PREPROCESSING AND ${BOOST_MINOR_VERSION} GREATER 50)
-    set(HPX_PREPROCESS_DEFINITIONS ${HPX_PREPROCESS_DEFINITIONS} ${definition})
-  endif()
+  set(HPX_DEFINITIONS ${HPX_DEFINITIONS} ${definition})
   add_definitions(${definition})
 endmacro()
 

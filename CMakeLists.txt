@@ -282,7 +282,7 @@ endif()
 # boost compiler config in order to have proper C++11 detection for more
 # recent intel compiler versions (>12.0)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    hpx_add_definitions(-DBOOST_COMPILER_CONFIG="hpx/config/boost/compiler/intel.hpp")
+  add_definitions(-DBOOST_COMPILER_CONFIG="hpx/config/boost/compiler/intel.hpp")
 endif()
 
 
@@ -691,7 +691,7 @@ if(HPX_NATIVE_MIC)
 endif()
 
 if(MSVC)
-  add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
+  hpx_add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
   foreach(language CXX C Fortran)
     set(CMAKE_${language}_FLAGS_DEBUG
         "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG")
@@ -950,14 +950,14 @@ if(MSVC)
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
-  add_definitions(-D_WINDOWS)
-  add_definitions(-D_WIN32)
-  add_definitions(-D_WIN32_WINNT=0x0601)
-  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
-  add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-  add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
+  hpx_add_definitions(-D_WINDOWS)
+  hpx_add_definitions(-D_WIN32)
+  hpx_add_definitions(-D_WIN32_WINNT=0x0601)
+  hpx_add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+  hpx_add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  hpx_add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
+  hpx_add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+  hpx_add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
 
   ##############################################################################
   # Boost
@@ -1642,11 +1642,9 @@ foreach(library ${BOOST_LIBRARIES})
     "${boost_library_info}    CACHE FILEPATH \"Boost ${library} shared library.\")\n")
 endforeach()
 
-get_directory_property(definitions DEFINITIONS)
-
 set(external_definitions "")
 
-foreach(definition ${definitions})
+foreach(definition ${HPX_DEFINITIONS})
 #    string(REGEX REPLACE "\"" "\\\\\\\\\\\\\\\\\"" definition ${definition})
     set(external_definitions "${external_definitions} ${definition}")
 endforeach()

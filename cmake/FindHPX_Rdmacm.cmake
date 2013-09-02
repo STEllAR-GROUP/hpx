@@ -16,8 +16,8 @@ hpx_find_package(RDMACM
     HEADER_PATHS include)
 
 if(RDMACM_FOUND)
-    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${RDMACM_LIBRARY})
-    hpx_include_sys_directories(${RDMACM_INCLUDE_DIR})
-    hpx_link_sys_directories(${RDMACM_LIBRARY_DIR})
-    add_definitions(-DHPX_HAVE_RDMACM)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${RDMACM_LIBRARY})
+  hpx_include_sys_directories(${RDMACM_INCLUDE_DIR})
+  hpx_link_sys_directories(${RDMACM_LIBRARY_DIR})
+  hpx_add_definitions(-DHPX_HAVE_RDMACM)
 endif()

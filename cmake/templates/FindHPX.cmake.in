@@ -28,6 +28,10 @@ set(HPX_CXX_COMPILE_FLAGS "@CMAKE_CXX_FLAGS@ @external_definitions@"
 set(HPX_Fortran_COMPILE_FLAGS "@CMAKE_Fortran_FLAGS@ @external_definitions@"
     CACHE STRING "Fortran compile flags for HPX")
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  add_definitions(-DBOOST_COMPILER_CONFIG="hpx/config/boost/compiler/intel.hpp")
+endif()
+
 set(HPX_PREFIX @CMAKE_INSTALL_PREFIX@
     CACHE PATH "HPX installation prefix")
 

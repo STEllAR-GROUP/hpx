@@ -227,7 +227,7 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 // had an incorrect __INTEL_COMPILER value of 9999. Intel say this has been fixed. 
 #if defined(BOOST_INTEL_STDCXX0X) && (BOOST_INTEL_CXX_VERSION > 1200)
 #  undef  BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS
-#  undef  BOOST_NO_CXX11_NULLPTR
+//#  undef  BOOST_NO_CXX11_NULLPTR
 #  undef  BOOST_NO_CXX11_RVALUE_REFERENCES
 #  undef  BOOST_NO_SFINAE_EXPR
 #  undef  BOOST_NO_CXX11_TEMPLATE_ALIASES
