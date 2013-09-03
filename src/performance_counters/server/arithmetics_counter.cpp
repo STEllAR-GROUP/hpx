@@ -359,12 +359,24 @@ namespace hpx { namespace performance_counters { namespace detail
                         }
                     }
 
-                    if (names.size() < 2)
+                    if (paths.countername_ == "divide")
+                    {
+                        if (names.size() < 1)
+                        {
+                            HPX_THROWS_IF(ec, bad_parameter,
+                                "arithmetics_counter_creator",
+                                "the parameter specification for an arithmetic counter "
+                                "has to expand to more than one counter name: " +
+                                paths.parameters_);
+                            return naming::invalid_gid;
+                        }
+                    }
+                    else if (names.empty())
                     {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "arithmetics_counter_creator",
                             "the parameter specification for an arithmetic counter "
-                            "has to expand to more than one counter name: " +
+                            "has to expand to at least one counter name: " +
                             paths.parameters_);
                         return naming::invalid_gid;
                     }
