@@ -153,6 +153,13 @@ namespace hpx { namespace lcos
             future_data_.swap(other.future_data_);
         }
 
+        // accept wrapped future
+        future(BOOST_RV_REF(future<future>) other)
+        {
+            future f = boost::move(other.unwrap());
+            (*this).swap(f);
+        }
+
         // extension: init from given value, set future to ready right away
         explicit future(Result const& init)
         {
@@ -168,13 +175,6 @@ namespace hpx { namespace lcos
             boost::intrusive_ptr<future_data_type> p(new impl_type());
             static_cast<impl_type*>(p.get())->set_data(boost::move(init));
             future_data_.swap(p);
-        }
-
-        // extension: accept wrapped future
-        future(BOOST_RV_REF(future<future>) other)
-        {
-            future f = boost::move(other.unwrap());
-            (*this).swap(f);
         }
 
         // extension: support timed future creation
