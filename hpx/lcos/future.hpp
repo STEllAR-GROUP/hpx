@@ -249,9 +249,9 @@ namespace hpx { namespace lcos
         }
 
         // state introspection
-        bool ready() const
+        bool is_ready() const
         {
-            return future_data_ && future_data_->ready();
+            return future_data_ && future_data_->is_ready();
         }
 
         bool has_value() const
@@ -529,9 +529,9 @@ namespace hpx { namespace lcos
         }
 
         // state introspection
-        bool ready() const
+        bool is_ready() const
         {
-            return future_data_->ready();
+            return future_data_->is_ready();
         }
 
         bool has_value() const
@@ -760,7 +760,7 @@ namespace hpx { namespace actions
                 << this->get_gid() << ")";
 
             // if the future is ready, send the result back immediately
-            if (result.ready()) {
+            if (result.is_ready()) {
                 deferred_trigger(result);
                 return;
             }
@@ -872,7 +872,7 @@ namespace hpx { namespace actions
                 << this->get_gid() << ")";
 
             // if the future is ready, send the result back immediately
-            if (result.ready()) {
+            if (result.is_ready()) {
                 deferred_trigger(result);
                 return;
             }

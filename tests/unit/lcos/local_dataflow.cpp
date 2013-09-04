@@ -122,16 +122,16 @@ void function_pointers()
 boost::atomic<boost::uint32_t> future_void_f1_count;
 boost::atomic<boost::uint32_t> future_void_f2_count;
 
-void future_void_f1(future<void> f1) { HPX_TEST(f1.ready()); ++future_void_f1_count;}
-void future_void_f2(future<void> f1, future<void> f2) { HPX_TEST(f1.ready()); HPX_TEST(f2.ready()); ++future_void_f2_count;}
+void future_void_f1(future<void> f1) { HPX_TEST(f1.is_ready()); ++future_void_f1_count;}
+void future_void_f2(future<void> f1, future<void> f2) { HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready()); ++future_void_f2_count;}
 
 boost::atomic<boost::uint32_t> future_int_f1_count;
 boost::atomic<boost::uint32_t> future_int_f2_count;
 
-int future_int_f1(future<void> f1) { HPX_TEST(f1.ready()); ++future_int_f1_count; return 1;}
+int future_int_f1(future<void> f1) { HPX_TEST(f1.is_ready()); ++future_int_f1_count; return 1;}
 int future_int_f2(future<int> f1, future<int> f2)
 {
-    HPX_TEST(f1.ready()); HPX_TEST(f2.ready());
+    HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready());
     ++future_int_f2_count;
     return f1.get() + f2.get();
 }
@@ -143,7 +143,7 @@ int future_int_f_vector(std::vector<future<int> > const & vf)
     int sum = 0;
     BOOST_FOREACH(future<int> f, vf)
     {
-        HPX_TEST(f.ready());
+        HPX_TEST(f.is_ready());
         sum += f.get();
     }
     return sum;

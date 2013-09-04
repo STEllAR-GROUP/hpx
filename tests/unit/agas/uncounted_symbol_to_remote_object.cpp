@@ -94,7 +94,7 @@ void hpx_test_main(
             id_type id = monitor.detach().get();
 
             // The component should still be alive.
-            HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
+            HPX_TEST_EQ(false, monitor.is_ready(milliseconds(delay)));
 
             // let id go out of scope. id was the last reference to the
             // component
@@ -105,7 +105,7 @@ void hpx_test_main(
 
         // The component should not be alive anymore, as the symbolic binding
         // does not hold a reference to it.
-        HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
+        HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
 
         // Remove the symbolic name.
         HPX_TEST_EQ(raw_gid, unregister_name(name).get_gid());
@@ -114,7 +114,7 @@ void hpx_test_main(
         garbage_collect();
 
         // The component should be out of scope now.
-        HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
+        HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
     }
 }
 

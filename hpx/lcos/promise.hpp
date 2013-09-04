@@ -358,9 +358,9 @@ namespace hpx { namespace lcos
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready() const
+        bool is_ready() const
         {
-            return (*impl_)->ready();
+            return (*impl_)->is_ready();
         }
 
         /// Return whether this instance has been properly initialized
@@ -481,9 +481,9 @@ namespace hpx { namespace lcos
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready() const
+        bool is_ready() const
         {
-            return (*impl_)->ready();
+            return (*impl_)->is_ready();
         }
 
         typedef util::unused_type result_type;

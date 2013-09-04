@@ -56,7 +56,7 @@ namespace hpx { namespace plugins { namespace compression
             using namespace boost::iostreams;
             using namespace boost::iostreams::bzip2;
 
-            if (!this->ready())
+            if (!this->is_ready())
                 init();
             if (eof_)
                 return false;
@@ -81,7 +81,7 @@ namespace hpx { namespace plugins { namespace compression
                 else
                     this->close();
             }
-            if (!this->ready())
+            if (!this->is_ready())
                 init();
 
             this->before(src_begin, src_end, dest_begin, dest_end);

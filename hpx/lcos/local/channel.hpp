@@ -118,7 +118,7 @@ struct channel
     void post(BOOST_RV_REF(T) result)
     {
         BOOST_ASSERT(data_);
-        //if (data_->ready())
+        //if (data_->is_ready())
         //    data_->move_data();
         data_->set_data(result);
     }
@@ -126,7 +126,7 @@ struct channel
     void post(T const& result)
     {
         BOOST_ASSERT(data_);
-        //if (data_->ready())
+        //if (data_->is_ready())
         //    data_->move_data();
         data_->set_data(result);
     }
@@ -140,10 +140,10 @@ struct channel
             (boost::forward<F>(f));
     }
 
-    bool ready() const
+    bool is_ready() const
     {
         BOOST_ASSERT(data_);
-        return data_->ready();
+        return data_->is_ready();
     }
 };
 
@@ -237,7 +237,7 @@ struct channel<void>
     void post()
     {
         BOOST_ASSERT(data_);
-        //if (data_->ready())
+        //if (data_->is_ready())
         //    data_->move_data();
         data_->set_data(hpx::util::unused);
     }
@@ -251,10 +251,10 @@ struct channel<void>
             (boost::forward<completed_callback_type>(f));
     }
 
-    bool ready() const
+    bool is_ready() const
     {
         BOOST_ASSERT(data_);
-        return data_->ready();
+        return data_->is_ready();
     }
 };
 

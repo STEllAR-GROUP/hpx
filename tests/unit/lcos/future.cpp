@@ -75,7 +75,7 @@ void test_store_value_from_thread()
     hpx::thread t(&set_promise_thread, &pi2);
     int j = fi2.get();
     HPX_TEST_EQ(j, 42);
-    HPX_TEST(fi2.ready());
+    HPX_TEST(fi2.is_ready());
     HPX_TEST(fi2.has_value());
     HPX_TEST(!fi2.has_exception());
     HPX_TEST(fi2.get_state() == hpx::lcos::future_status::ready);
@@ -96,7 +96,7 @@ void test_store_exception()
         HPX_TEST(true);
     }
 
-    HPX_TEST(fi3.ready());
+    HPX_TEST(fi3.is_ready());
     HPX_TEST(!fi3.has_value());
     HPX_TEST(fi3.has_exception());
     HPX_TEST(fi3.get_state() ==  hpx::lcos::future_status::ready);
@@ -107,7 +107,7 @@ void test_store_exception()
 void test_initial_state()
 {
     hpx::lcos::future<int> fi;
-    HPX_TEST(!fi.ready());
+    HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
     HPX_TEST(fi.get_state() == hpx::lcos::future_status::uninitialized);
@@ -131,7 +131,7 @@ void test_waiting_future()
     hpx::lcos::future<int> fi;
     fi = pi.get_future();
 
-    HPX_TEST(!fi.ready());
+    HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
     HPX_TEST(fi.get_state() == hpx::lcos::future_status::deferred);
@@ -164,7 +164,7 @@ void test_set_value_updates_future_status()
 
     pi.set_value(42);
 
-    HPX_TEST(fi.ready());
+    HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
     HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
@@ -181,7 +181,7 @@ void test_set_value_can_be_retrieved()
 
     int i = fi.get();
     HPX_TEST_EQ(i, 42);
-    HPX_TEST(fi.ready());
+    HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
     HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
@@ -199,7 +199,7 @@ void test_set_value_can_be_moved()
     int i=0;
     HPX_TEST(i = fi.get());
     HPX_TEST_EQ(i, 42);
-    HPX_TEST(fi.ready());
+    HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
     HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
@@ -211,7 +211,7 @@ void test_future_from_packaged_task_is_waiting()
     hpx::lcos::local::packaged_task<int()> pt(make_int);
     hpx::lcos::future<int> fi = pt.get_future();
 
-    HPX_TEST(!fi.ready());
+    HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
     HPX_TEST(fi.get_state() == hpx::lcos::future_status::deferred);
@@ -225,7 +225,7 @@ void test_invoking_a_packaged_task_populates_future()
 
     pt();
 
-    HPX_TEST(fi.ready());
+    HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
     HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
@@ -281,7 +281,7 @@ void test_task_stores_exception_if_function_throws()
 
     pt();
 
-    HPX_TEST(fi.ready());
+    HPX_TEST(fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(fi.has_exception());
     HPX_TEST(fi.get_state()==hpx::lcos::future_status::ready);
@@ -303,7 +303,7 @@ void test_void_promise()
     hpx::lcos::future<void> f = p.get_future();
 
     p.set_value();
-    HPX_TEST(f.ready());
+    HPX_TEST(f.is_ready());
     HPX_TEST(f.has_value());
     HPX_TEST(!f.has_exception());
     HPX_TEST(f.get_state() == hpx::lcos::future_status::ready);
@@ -315,7 +315,7 @@ void test_void_promise()
 //     hpx::lcos::future<int&> f = p.get_future();
 //     int i = 42;
 //     p.set_value(i);
-//     HPX_TEST(f.ready());
+//     HPX_TEST(f.is_ready());
 //     HPX_TEST(f.has_value());
 //     HPX_TEST(!f.has_exception());
 //     HPX_TEST(f.get_state() == hpx::lcos::future_status::ready);
@@ -333,7 +333,7 @@ void test_task_returning_void()
 
     pt();
 
-    HPX_TEST(fi.ready());
+    HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
     HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
@@ -353,7 +353,7 @@ void test_task_returning_void()
 //
 //     pt();
 //
-//     HPX_TEST(fi.ready());
+//     HPX_TEST(fi.is_ready());
 //     HPX_TEST(fi.has_value());
 //     HPX_TEST(!fi.has_exception());
 //     HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
@@ -371,7 +371,7 @@ void test_shared_future()
 
     pt();
 
-    HPX_TEST(sf.ready());
+    HPX_TEST(sf.is_ready());
     HPX_TEST(sf.has_value());
     HPX_TEST(!sf.has_exception());
     HPX_TEST(sf.get_state() == hpx::lcos::future_status::ready);
@@ -396,7 +396,7 @@ void test_copies_of_shared_future_become_ready_together()
 
     pt();
 
-    HPX_TEST(sf1.ready());
+    HPX_TEST(sf1.is_ready());
     HPX_TEST(sf1.has_value());
     HPX_TEST(!sf1.has_exception());
     HPX_TEST(sf1.get_state() == hpx::lcos::future_status::ready);
@@ -404,7 +404,7 @@ void test_copies_of_shared_future_become_ready_together()
     HPX_TEST_EQ(i, 42);
 
     i = 0;
-    HPX_TEST(sf2.ready());
+    HPX_TEST(sf2.is_ready());
     HPX_TEST(sf2.has_value());
     HPX_TEST(!sf2.has_exception());
     HPX_TEST(sf2.get_state() == hpx::lcos::future_status::ready);
@@ -412,7 +412,7 @@ void test_copies_of_shared_future_become_ready_together()
     HPX_TEST_EQ(i, 42);
 
     i = 0;
-    HPX_TEST(sf3.ready());
+    HPX_TEST(sf3.is_ready());
     HPX_TEST(sf3.has_value());
     HPX_TEST(!sf3.has_exception());
     HPX_TEST(sf3.get_state() == hpx::lcos::future_status::ready);
@@ -429,7 +429,7 @@ void test_shared_future_can_be_move_assigned_from_unique_future()
     sf = boost::move(fi);
     HPX_TEST(fi.get_state() == hpx::lcos::future_status::uninitialized);
 
-    HPX_TEST(!sf.ready());
+    HPX_TEST(!sf.is_ready());
     HPX_TEST(!sf.has_value());
     HPX_TEST(!sf.has_exception());
     HPX_TEST(sf.get_state() == hpx::lcos::future_status::deferred);
@@ -445,7 +445,7 @@ void test_shared_future_void()
 
     pt();
 
-    HPX_TEST(sf.ready());
+    HPX_TEST(sf.is_ready());
     HPX_TEST(sf.has_value());
     HPX_TEST(!sf.has_exception());
     HPX_TEST(sf.get_state() == hpx::lcos::future_status::ready);
@@ -458,7 +458,7 @@ void test_shared_future_void()
 //     hpx::lcos::future<int&> f(p.get_future());
 //     int i = 42;
 //     p.set_value(i);
-//     HPX_TEST(f.ready());
+//     HPX_TEST(f.is_ready());
 //     HPX_TEST(f.has_value());
 //     HPX_TEST(!f.has_exception());
 //     HPX_TEST(f.get_state() == hpx::lcos::future_status::ready);
@@ -474,12 +474,12 @@ void test_can_get_a_second_future_from_a_moved_promise()
     hpx::lcos::future<int> fi2 = pi.get_future();
 
     pi2.set_value(3);
-    HPX_TEST(fi1.ready());
-    HPX_TEST(!fi2.ready());
+    HPX_TEST(fi1.is_ready());
+    HPX_TEST(!fi2.is_ready());
     HPX_TEST_EQ(fi1.get(), 3);
 
     pi.set_value(42);
-    HPX_TEST(fi2.ready());
+    HPX_TEST(fi2.is_ready());
     HPX_TEST_EQ(fi2.get(), 42);
 }
 
@@ -492,10 +492,10 @@ void test_can_get_a_second_future_from_a_moved_void_promise()
     hpx::lcos::future<void> fi2 = pi.get_future();
 
     pi2.set_value();
-    HPX_TEST(fi1.ready());
-    HPX_TEST(!fi2.ready());
+    HPX_TEST(fi1.is_ready());
+    HPX_TEST(!fi2.is_ready());
     pi.set_value();
-    HPX_TEST(fi2.ready());
+    HPX_TEST(fi2.is_ready());
 }
 
 // void test_unique_future_for_move_only_udt()
@@ -638,10 +638,10 @@ void test_packaged_task_can_be_moved()
 {
     hpx::lcos::local::packaged_task<int()> pt(make_int);
     hpx::lcos::future<int> fi = pt.get_future();
-    HPX_TEST(!fi.ready());
+    HPX_TEST(!fi.is_ready());
 
     hpx::lcos::local::packaged_task<int()> pt2(boost::move(pt));
-    HPX_TEST(!fi.ready());
+    HPX_TEST(!fi.is_ready());
 
     try {
         pt();
@@ -654,11 +654,11 @@ void test_packaged_task_can_be_moved()
         HPX_TEST(false);
     }
 
-    HPX_TEST(!fi.ready());
+    HPX_TEST(!fi.is_ready());
 
     pt2();
 
-    HPX_TEST(fi.ready());
+    HPX_TEST(fi.is_ready());
 }
 
 void test_destroying_a_promise_stores_broken_promise()
@@ -670,7 +670,7 @@ void test_destroying_a_promise_stores_broken_promise()
         f = p.get_future();
     }
 
-    HPX_TEST(f.ready());
+    HPX_TEST(f.is_ready());
     HPX_TEST(f.has_exception());
     try {
         f.get();
@@ -693,7 +693,7 @@ void test_destroying_a_packaged_task_stores_broken_task()
         f = p.get_future();
     }
 
-    HPX_TEST(f.ready());
+    HPX_TEST(f.is_ready());
     HPX_TEST(f.has_exception());
     try {
         f.get();
@@ -728,11 +728,11 @@ void test_wait_for_either_of_two_futures_1()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 0);
-    HPX_TEST(f1.ready());
-    HPX_TEST(!f2.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(!f2.is_ready());
     HPX_TEST_EQ(f1.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -750,11 +750,11 @@ void test_wait_for_either_of_two_futures_2()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 1);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(f2.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(f2.is_ready());
     HPX_TEST_EQ(f2.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -773,11 +773,11 @@ void test_wait_for_either_of_two_futures_list_1()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 0);
-    HPX_TEST(futures[0].ready());
-    HPX_TEST(!futures[1].ready());
+    HPX_TEST(futures[0].is_ready());
+    HPX_TEST(!futures[1].is_ready());
     HPX_TEST_EQ(futures[0].get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -796,11 +796,11 @@ void test_wait_for_either_of_two_futures_list_2()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 1);
-    HPX_TEST(!futures[0].ready());
-    HPX_TEST(futures[1].ready());
+    HPX_TEST(!futures[0].is_ready());
+    HPX_TEST(futures[1].is_ready());
     HPX_TEST_EQ(futures[1].get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -820,12 +820,12 @@ void test_wait_for_either_of_three_futures_1()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 0);
-    HPX_TEST(f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(!f3.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(!f3.is_ready());
     HPX_TEST_EQ(f1.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -845,12 +845,12 @@ void test_wait_for_either_of_three_futures_2()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 1);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(f2.ready());
-    HPX_TEST(!f3.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(!f3.is_ready());
     HPX_TEST_EQ(f2.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -870,12 +870,12 @@ void test_wait_for_either_of_three_futures_3()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 2);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(f3.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(f3.is_ready());
     HPX_TEST_EQ(f3.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -897,13 +897,13 @@ void test_wait_for_either_of_four_futures_1()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 0);
-    HPX_TEST(f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(!f4.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(!f4.is_ready());
     HPX_TEST_EQ(f1.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -925,13 +925,13 @@ void test_wait_for_either_of_four_futures_2()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 1);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(!f4.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(!f4.is_ready());
     HPX_TEST_EQ(f2.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -953,13 +953,13 @@ void test_wait_for_either_of_four_futures_3()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 2);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(f3.ready());
-    HPX_TEST(!f4.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(f3.is_ready());
+    HPX_TEST(!f4.is_ready());
     HPX_TEST_EQ(f3.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -981,13 +981,13 @@ void test_wait_for_either_of_four_futures_4()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 3);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(f4.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(f4.is_ready());
     HPX_TEST_EQ(f4.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -1018,14 +1018,14 @@ void test_wait_for_either_of_five_futures_1_from_list()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t = r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 0);
-    HPX_TEST(f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(!f4.ready());
-    HPX_TEST(!f5.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(!f4.is_ready());
+    HPX_TEST(!f5.is_ready());
     HPX_TEST_EQ(f1.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -1056,14 +1056,14 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t = r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 0);
-    HPX_TEST(f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(!f4.ready());
-    HPX_TEST(!f5.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(!f4.is_ready());
+    HPX_TEST(!f5.is_ready());
     HPX_TEST_EQ(f1.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -1087,14 +1087,14 @@ void test_wait_for_either_of_five_futures_1()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 0);
-    HPX_TEST(f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(!f4.ready());
-    HPX_TEST(!f5.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(!f4.is_ready());
+    HPX_TEST(!f5.is_ready());
     HPX_TEST_EQ(f1.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -1118,14 +1118,14 @@ void test_wait_for_either_of_five_futures_2()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 1);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(!f4.ready());
-    HPX_TEST(!f5.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(!f4.is_ready());
+    HPX_TEST(!f5.is_ready());
     HPX_TEST_EQ(f2.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -1149,14 +1149,14 @@ void test_wait_for_either_of_five_futures_3()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 2);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(f3.ready());
-    HPX_TEST(!f4.ready());
-    HPX_TEST(!f5.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(f3.is_ready());
+    HPX_TEST(!f4.is_ready());
+    HPX_TEST(!f5.is_ready());
     HPX_TEST_EQ(f3.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -1180,14 +1180,14 @@ void test_wait_for_either_of_five_futures_4()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 3);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(f4.ready());
-    HPX_TEST(!f5.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(f4.is_ready());
+    HPX_TEST(!f5.is_ready());
     HPX_TEST_EQ(f4.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -1211,14 +1211,14 @@ void test_wait_for_either_of_five_futures_5()
     HPX_STD_TUPLE<int, hpx::lcos::future<int> > t= r.get();
 
     HPX_TEST_EQ(HPX_STD_GET(0, t), 4);
-    HPX_TEST(!f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(!f4.ready());
-    HPX_TEST(f5.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(!f4.is_ready());
+    HPX_TEST(f5.is_ready());
     HPX_TEST_EQ(f5.get(), 42);
 
-    HPX_TEST(HPX_STD_GET(1, t).ready());
+    HPX_TEST(HPX_STD_GET(1, t).is_ready());
     HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
 }
 
@@ -1262,11 +1262,11 @@ void test_wait_for_either_of_five_futures_5()
 //         {
 //             if (j != i)
 //             {
-//                 HPX_TEST(!futures[j].ready());
+//                 HPX_TEST(!futures[j].is_ready());
 //             }
 //             else
 //             {
-//                 HPX_TEST(futures[j].ready());
+//                 HPX_TEST(futures[j].is_ready());
 //             }
 //         }
 //         HPX_TEST_EQ(futures[i].get(), 42);
@@ -1292,8 +1292,8 @@ void test_wait_for_all_from_list()
     HPX_TEST_EQ(futures.size(), result.size());
     for (unsigned j = 0; j < count; ++j)
     {
-        HPX_TEST(futures[j].ready());
-        HPX_TEST(result[j].ready());
+        HPX_TEST(futures[j].is_ready());
+        HPX_TEST(result[j].is_ready());
     }
 }
 
@@ -1316,8 +1316,8 @@ void test_wait_for_all_from_list_iterators()
     HPX_TEST_EQ(futures.size(), result.size());
     for (unsigned j = 0; j < count; ++j)
     {
-        HPX_TEST(futures[j].ready());
-        HPX_TEST(result[j].ready());
+        HPX_TEST(futures[j].is_ready());
+        HPX_TEST(result[j].is_ready());
     }
 }
 
@@ -1340,10 +1340,10 @@ void test_wait_for_all_two_futures()
     HPX_TEST_EQ(result.size(), count);
     for (unsigned j = 0; j < count; ++j)
     {
-        HPX_TEST(result[j].ready());
+        HPX_TEST(result[j].is_ready());
     }
-    HPX_TEST(f1.ready());
-    HPX_TEST(f2.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(f2.is_ready());
 }
 
 void test_wait_for_all_three_futures()
@@ -1368,11 +1368,11 @@ void test_wait_for_all_three_futures()
     HPX_TEST_EQ(result.size(), count);
     for (unsigned j = 0; j < count; ++j)
     {
-        HPX_TEST(result[j].ready());
+        HPX_TEST(result[j].is_ready());
     }
-    HPX_TEST(f1.ready());
-    HPX_TEST(f2.ready());
-    HPX_TEST(f3.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(f3.is_ready());
 }
 
 void test_wait_for_all_four_futures()
@@ -1400,12 +1400,12 @@ void test_wait_for_all_four_futures()
     HPX_TEST_EQ(result.size(), count);
     for (unsigned j = 0; j < count; ++j)
     {
-        HPX_TEST(result[j].ready());
+        HPX_TEST(result[j].is_ready());
     }
-    HPX_TEST(f1.ready());
-    HPX_TEST(f2.ready());
-    HPX_TEST(f3.ready());
-    HPX_TEST(f4.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(f3.is_ready());
+    HPX_TEST(f4.is_ready());
 }
 
 void test_wait_for_all_five_futures()
@@ -1436,13 +1436,13 @@ void test_wait_for_all_five_futures()
     HPX_TEST_EQ(result.size(), count);
     for (unsigned j = 0; j < count; ++j)
     {
-        HPX_TEST(result[j].ready());
+        HPX_TEST(result[j].is_ready());
     }
-    HPX_TEST(f1.ready());
-    HPX_TEST(f2.ready());
-    HPX_TEST(f3.ready());
-    HPX_TEST(f4.ready());
-    HPX_TEST(f5.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(f3.is_ready());
+    HPX_TEST(f4.is_ready());
+    HPX_TEST(f5.is_ready());
 }
 
 void test_wait_for_two_out_of_five_futures()
@@ -1470,13 +1470,13 @@ void test_wait_for_two_out_of_five_futures()
     HPX_TEST_EQ(result.size(), count);
     for (unsigned j = 0; j < count; ++j)
     {
-        HPX_TEST(HPX_STD_GET(1, result[j]).ready());
+        HPX_TEST(HPX_STD_GET(1, result[j]).is_ready());
     }
-    HPX_TEST(!f1.ready());
-    HPX_TEST(f2.ready());
-    HPX_TEST(!f3.ready());
-    HPX_TEST(f4.ready());
-    HPX_TEST(!f5.ready());
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(f4.is_ready());
+    HPX_TEST(!f5.is_ready());
 
     HPX_TEST_EQ(HPX_STD_GET(0, result[0]), 1);
     HPX_TEST_EQ(HPX_STD_GET(0, result[1]), 3);
@@ -1508,13 +1508,13 @@ void test_wait_for_three_out_of_five_futures()
     HPX_TEST_EQ(result.size(), count);
     for (unsigned j = 0; j < count; ++j)
     {
-        HPX_TEST(HPX_STD_GET(1, result[j]).ready());
+        HPX_TEST(HPX_STD_GET(1, result[j]).is_ready());
     }
-    HPX_TEST(f1.ready());
-    HPX_TEST(!f2.ready());
-    HPX_TEST(f3.ready());
-    HPX_TEST(!f4.ready());
-    HPX_TEST(f5.ready());
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(f3.is_ready());
+    HPX_TEST(!f4.is_ready());
+    HPX_TEST(f5.is_ready());
 
     HPX_TEST_EQ(HPX_STD_GET(0, result[0]), 0);
     HPX_TEST_EQ(HPX_STD_GET(0, result[1]), 2);

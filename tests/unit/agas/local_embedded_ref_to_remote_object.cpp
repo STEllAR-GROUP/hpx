@@ -89,16 +89,16 @@ void hpx_test_main(
             id_type id2 = monitor_local.detach().get();
 
             // Both components should still be alive.
-            HPX_TEST_EQ(false, monitor_remote.ready(milliseconds(delay)));
-            HPX_TEST_EQ(false, monitor_local.ready(milliseconds(delay)));
+            HPX_TEST_EQ(false, monitor_remote.is_ready(milliseconds(delay)));
+            HPX_TEST_EQ(false, monitor_local.is_ready(milliseconds(delay)));
         }
 
         // Flush pending reference counting operations.
         garbage_collect();
 
         // Both components should be out of scope now.
-        HPX_TEST_EQ(true, monitor_remote.ready(milliseconds(delay)));
-        HPX_TEST_EQ(true, monitor_local.ready(milliseconds(delay)));
+        HPX_TEST_EQ(true, monitor_remote.is_ready(milliseconds(delay)));
+        HPX_TEST_EQ(true, monitor_local.is_ready(milliseconds(delay)));
     }
 }
 

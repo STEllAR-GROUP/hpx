@@ -145,7 +145,7 @@ void hpx_test_main(
     garbage_collect();
 
     // The component should be out of scope now.
-    HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
+    HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
