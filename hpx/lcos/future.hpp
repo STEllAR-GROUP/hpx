@@ -57,6 +57,19 @@ namespace hpx { namespace lcos
         {
             typedef T type;
         };
+        
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result, typename Enable = void>
+        struct then_future_result
+        {
+            typedef lcos::future<Result> type;
+        };
+
+        template <typename Result>
+        struct then_future_result<lcos::future<Result>>
+        {
+            typedef lcos::future<Result> type;
+        };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
@@ -277,15 +290,21 @@ namespace hpx { namespace lcos
 
         // continuation support
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(BOOST_FWD_REF(F) f);
 
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(threads::executor& sched, BOOST_FWD_REF(F) f);
 
         // wait support
@@ -551,15 +570,21 @@ namespace hpx { namespace lcos
 
         // continuation support
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(BOOST_FWD_REF(F) f);
 
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(threads::executor& sched, BOOST_FWD_REF(F) f);
 
         // wait support
