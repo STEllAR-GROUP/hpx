@@ -409,6 +409,13 @@ namespace hpx { namespace lcos
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
+    
+    // [N3722, 4.1] asks for this...
+    template <typename Result>
+    inline future<Result>::future(promise<Result>& promise)
+    {
+        promise.get_future().swap(*this);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
@@ -518,6 +525,12 @@ namespace hpx { namespace lcos
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
+    
+    // [N3722, 4.1] asks for this...
+    inline future<void>::future(promise<void>& promise)
+    {
+        promise.get_future().swap(*this);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

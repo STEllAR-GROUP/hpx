@@ -148,6 +148,7 @@ namespace hpx { namespace lcos
         }
 
     public:
+        typedef lcos::promise<Result> promise_type;
         typedef Result result_type;
 
         future()
@@ -209,6 +210,9 @@ namespace hpx { namespace lcos
                 d, boost::move(init)))
         {}
 
+        // [N3722, 4.1] asks for this...
+        explicit future(promise_type& promise);
+
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
@@ -219,7 +223,8 @@ namespace hpx { namespace lcos
 
         future& operator=(BOOST_RV_REF(future) other)
         {
-            if (this != &other) {
+            if (this != &other)
+            {
                 future_data_.swap(other.future_data_);
                 other.future_data_.reset();
             }
@@ -459,6 +464,7 @@ namespace hpx { namespace lcos
         }
 
     public:
+        typedef lcos::promise<void> promise_type;
         typedef void result_type;
 
         future()
@@ -495,6 +501,10 @@ namespace hpx { namespace lcos
                 d, util::unused))
         {}
 
+        // [N3722, 4.1] asks for this...
+        explicit future(promise_type& promise);
+
+        // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
             if (this != &other)
