@@ -457,11 +457,11 @@ namespace hpx {
         start(func);
 
         // now wait for everything to finish
-        int result = wait();
+        wait();
         stop();
 
         parcel_handler_.stop();      // stops parcelport for sure
-        return result;
+        return result_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
