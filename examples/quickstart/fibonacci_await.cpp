@@ -111,7 +111,7 @@ void _fibonacci(boost::shared_ptr<_fibonacci_frame> const& frame_)
     // hpx::future<boost::uint64_t> rhs = fibonacci(n-2);
     frame->rhs_ = fibonacci(frame->n_-2);
 
-    if (!frame->lhs_.ready())
+    if (!frame->lhs_.is_ready())
     {
         frame->state_ = 1;
         if (!frame->result_.valid())
@@ -123,7 +123,7 @@ void _fibonacci(boost::shared_ptr<_fibonacci_frame> const& frame_)
 L1:
     frame->lhs_result_ = frame->lhs_.get();
 
-    if ( !frame->rhs_.ready())
+    if ( !frame->rhs_.is_ready())
     {
         frame->state_ = 2;
         if (!frame->result_.valid())

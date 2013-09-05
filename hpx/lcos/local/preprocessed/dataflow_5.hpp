@@ -119,7 +119,7 @@ namespace hpx { namespace lcos { namespace local
                         Iter
                     >::value_type
                     future_type;
-                if(!next->ready())
+                if(!next->is_ready())
                 {
                     void (dataflow_frame_1::*f)
                         (Iter, Iter)
@@ -180,7 +180,7 @@ namespace hpx { namespace lcos { namespace local
                     future_type;
                 future_type & f_ =
                     boost::fusion::deref(iter);
-                if(!f_.ready())
+                if(!f_.is_ready())
                 {
                     void (dataflow_frame_1::*f)
                         (Iter, boost::mpl::false_)
@@ -460,7 +460,7 @@ namespace hpx { namespace lcos { namespace local
                         Iter
                     >::value_type
                     future_type;
-                if(!next->ready())
+                if(!next->is_ready())
                 {
                     void (dataflow_frame_2::*f)
                         (Iter, Iter)
@@ -521,7 +521,7 @@ namespace hpx { namespace lcos { namespace local
                     future_type;
                 future_type & f_ =
                     boost::fusion::deref(iter);
-                if(!f_.ready())
+                if(!f_.is_ready())
                 {
                     void (dataflow_frame_2::*f)
                         (Iter, boost::mpl::false_)
@@ -801,7 +801,7 @@ namespace hpx { namespace lcos { namespace local
                         Iter
                     >::value_type
                     future_type;
-                if(!next->ready())
+                if(!next->is_ready())
                 {
                     void (dataflow_frame_3::*f)
                         (Iter, Iter)
@@ -862,7 +862,7 @@ namespace hpx { namespace lcos { namespace local
                     future_type;
                 future_type & f_ =
                     boost::fusion::deref(iter);
-                if(!f_.ready())
+                if(!f_.is_ready())
                 {
                     void (dataflow_frame_3::*f)
                         (Iter, boost::mpl::false_)
@@ -1142,7 +1142,7 @@ namespace hpx { namespace lcos { namespace local
                         Iter
                     >::value_type
                     future_type;
-                if(!next->ready())
+                if(!next->is_ready())
                 {
                     void (dataflow_frame_4::*f)
                         (Iter, Iter)
@@ -1203,7 +1203,7 @@ namespace hpx { namespace lcos { namespace local
                     future_type;
                 future_type & f_ =
                     boost::fusion::deref(iter);
-                if(!f_.ready())
+                if(!f_.is_ready())
                 {
                     void (dataflow_frame_4::*f)
                         (Iter, boost::mpl::false_)
@@ -1483,7 +1483,7 @@ namespace hpx { namespace lcos { namespace local
                         Iter
                     >::value_type
                     future_type;
-                if(!next->ready())
+                if(!next->is_ready())
                 {
                     void (dataflow_frame_5::*f)
                         (Iter, Iter)
@@ -1544,7 +1544,7 @@ namespace hpx { namespace lcos { namespace local
                     future_type;
                 future_type & f_ =
                     boost::fusion::deref(iter);
-                if(!f_.ready())
+                if(!f_.is_ready())
                 {
                     void (dataflow_frame_5::*f)
                         (Iter, boost::mpl::false_)

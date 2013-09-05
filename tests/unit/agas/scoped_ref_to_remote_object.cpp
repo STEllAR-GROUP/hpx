@@ -78,14 +78,14 @@ void hpx_test_main(
             id_type id = monitor.detach().get();
 
             // The component should still be alive.
-            HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
+            HPX_TEST_EQ(false, monitor.is_ready(milliseconds(delay)));
         }
 
         // Flush pending reference counting operations.
         garbage_collect();
 
         // The component should be out of scope now.
-        HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
+        HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
     }
 }
 

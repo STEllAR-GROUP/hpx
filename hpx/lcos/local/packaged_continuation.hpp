@@ -206,7 +206,7 @@ namespace hpx { namespace lcos { namespace detail
                     return;
                 }
 
-                if (this->ready())
+                if (this->is_ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {
@@ -501,7 +501,9 @@ namespace hpx { namespace lcos
     // attach a local continuation to this future instance
     template <typename Result>
     template <typename F>
-    inline future<typename boost::result_of<F(future<Result>)>::type>
+    inline typename detail::then_future_result<
+        typename boost::result_of<F(future<Result>)>::type
+    >::type
     future<Result>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future)>::type result_type;
@@ -527,7 +529,9 @@ namespace hpx { namespace lcos
 
     template <typename Result>
     template <typename F>
-    inline future<typename boost::result_of<F(future<Result>)>::type>
+    inline typename detail::then_future_result<
+        typename boost::result_of<F(future<Result>)>::type
+    >::type
     future<Result>::then(BOOST_FWD_REF(F) f)
     {
         return then(launch::all, boost::forward<F>(f));
@@ -535,7 +539,9 @@ namespace hpx { namespace lcos
 
     template <typename Result>
     template <typename F>
-    inline future<typename boost::result_of<F(future<Result>)>::type>
+    inline typename detail::then_future_result<
+        typename boost::result_of<F(future<Result>)>::type
+    >::type
     future<Result>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future)>::type result_type;
@@ -558,7 +564,9 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    inline future<typename boost::result_of<F(future<void>)>::type>
+    inline typename detail::then_future_result<
+        typename boost::result_of<F(future<void>)>::type
+    >::type
     future<void>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future)>::type result_type;
@@ -583,14 +591,18 @@ namespace hpx { namespace lcos
     }
 
     template <typename F>
-    inline future<typename boost::result_of<F(future<void>)>::type>
+    inline typename detail::then_future_result<
+        typename boost::result_of<F(future<void>)>::type
+    >::type
     future<void>::then(BOOST_FWD_REF(F) f)
     {
         return then(launch::all, boost::forward<F>(f));
     }
 
     template <typename F>
-    inline future<typename boost::result_of<F(future<void>)>::type>
+    inline typename detail::then_future_result<
+        typename boost::result_of<F(future<void>)>::type
+    >::type
     future<void>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future)>::type result_type;

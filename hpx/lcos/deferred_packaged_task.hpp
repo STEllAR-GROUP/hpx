@@ -132,7 +132,7 @@ namespace hpx { namespace lcos
             // as the underlying FEB prevents the action from being called
             // more than once; but it would be more efficient to reduce the
             // number of calls to apply().
-            if (!((*th->impl_)->ready()))
+            if (!((*th->impl_)->is_ready()))
                 th->apply(gid);
         }
 
@@ -205,7 +205,7 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         void invoke1(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
-            if (!((*this->impl_)->ready()))
+            if (!((*this->impl_)->is_ready()))
                 this->apply(gid, boost::forward<Arg0>(arg0));
         }
 
@@ -341,7 +341,7 @@ namespace hpx { namespace lcos
         static void invoke(hpx::lcos::deferred_packaged_task<Action,Result,boost::mpl::true_> *th,
                            naming::id_type const& gid)
         {
-            if (!((*th->impl_)->ready()))
+            if (!((*th->impl_)->is_ready()))
               th->apply(gid);
         }
 
@@ -426,7 +426,7 @@ namespace hpx { namespace lcos
         static void invoke1(hpx::lcos::deferred_packaged_task<Action,Result,boost::mpl::true_> *th,
                             naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
-            if (!((*th->impl_)->ready()))
+            if (!((*th->impl_)->is_ready()))
                 th->apply(gid, boost::forward<Arg0>(arg0));
         }
 

@@ -15,6 +15,7 @@ set(tests
     dataflow
     deferred_packaged_task
     future
+    future_then
     future_wait
     local_barrier
     local_dataflow

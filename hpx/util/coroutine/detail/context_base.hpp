@@ -189,7 +189,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
      * not running (is delivered synchronously).
      * This means that state MUST NOT be busy.
      * It may be ready or waiting.
-     * returns 'ready()'.
+     * returns 'is_ready()'.
      * Nothrow.
      */
     bool signal () throw() {
@@ -199,7 +199,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       --m_wait_counter;
       if(!m_wait_counter && m_state == ctx_waiting)
         m_state = ctx_ready;
-      return ready();
+      return is_ready();
     }
 #endif
 
@@ -220,7 +220,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
      *
      */
     bool wake_up() {
-      BOOST_ASSERT(ready());
+      BOOST_ASSERT(is_ready());
       do_invoke();
       // TODO: could use a binary 'or' here to eliminate
       // shortcut evaluation (and a branch), but maybe the compiler is
@@ -246,7 +246,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     /*
      * Returns true if the context is runnable.
      */
-    bool ready() const {
+    bool is_ready() const {
       return m_state == ctx_ready;
     }
 
@@ -278,7 +278,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // Note, it guarantees that the coroutine is resumed. Can throw only
     // on return.
     void invoke() {
-      BOOST_ASSERT(ready());
+      BOOST_ASSERT(is_ready());
       do_invoke();
       // TODO: could use a binary or here to eliminate
       // shortcut evaluation (and a branch), but maybe the compiler is
@@ -364,7 +364,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     void yield_to(context_base& to) {
       BOOST_ASSERT(m_exit_state < ctx_exit_signaled); //prevent infinite loops
       BOOST_ASSERT(m_state == ctx_running);
-      BOOST_ASSERT(to.ready());
+      BOOST_ASSERT(to.is_ready());
       BOOST_ASSERT(!to.pending());
 
       std::swap(m_caller, to.m_caller);
@@ -382,7 +382,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // Nothrow.
     void exit() throw(){
       BOOST_ASSERT(!pending());
-      BOOST_ASSERT(ready()) ;
+      BOOST_ASSERT(is_ready()) ;
       if(m_exit_state < ctx_exit_pending)
         m_exit_state = ctx_exit_pending;
       do_invoke();
@@ -517,7 +517,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     // Nothrow.
     void do_invoke() throw () {
-      BOOST_ASSERT(ready() || waiting());
+      BOOST_ASSERT(is_ready() || waiting());
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
       ++m_phase;
 #endif

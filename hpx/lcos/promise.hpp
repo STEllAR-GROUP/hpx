@@ -358,9 +358,9 @@ namespace hpx { namespace lcos
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready() const
+        bool is_ready() const
         {
-            return (*impl_)->ready();
+            return (*impl_)->is_ready();
         }
 
         /// Return whether this instance has been properly initialized
@@ -409,6 +409,13 @@ namespace hpx { namespace lcos
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
+    
+    // [N3722, 4.1] asks for this...
+    template <typename Result>
+    inline future<Result>::future(promise<Result>& promise)
+    {
+        promise.get_future().swap(*this);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
@@ -481,9 +488,9 @@ namespace hpx { namespace lcos
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready() const
+        bool is_ready() const
         {
-            return (*impl_)->ready();
+            return (*impl_)->is_ready();
         }
 
         typedef util::unused_type result_type;
@@ -518,6 +525,12 @@ namespace hpx { namespace lcos
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
+    
+    // [N3722, 4.1] asks for this...
+    inline future<void>::future(promise<void>& promise)
+    {
+        promise.get_future().swap(*this);
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

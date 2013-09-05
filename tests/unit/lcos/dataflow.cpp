@@ -92,7 +92,7 @@ hpx::lcos::dataflow_base<boost::uint64_t> fib(boost::uint64_t n)
     HPX_REGISTER_PLAIN_ACTION(BOOST_PP_CAT(BOOST_PP_CAT(f, N), action));      \
 /**/
 
-BOOST_PP_REPEAT(10, M0, _)
+BOOST_PP_REPEAT(5, M0, _)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map & vm)
@@ -125,56 +125,38 @@ int hpx_main(variables_map & vm)
         called_trigger = false;
 
         std::vector<hpx::lcos::dataflow_base<void> > trigger;
+        trigger.push_back(hpx::lcos::dataflow<f0action>(here));
         trigger.push_back(hpx::lcos::dataflow<f1action>(here));
         trigger.push_back(hpx::lcos::dataflow<f2action>(here));
         trigger.push_back(hpx::lcos::dataflow<f3action>(here));
         trigger.push_back(hpx::lcos::dataflow<f4action>(here));
-        trigger.push_back(hpx::lcos::dataflow<f5action>(here));
-        trigger.push_back(hpx::lcos::dataflow<f6action>(here));
-        trigger.push_back(hpx::lcos::dataflow<f7action>(here));
-        trigger.push_back(hpx::lcos::dataflow<f8action>(here));
 
         hpx::lcos::dataflow_trigger(here, trigger).get_future().get();
+        HPX_TEST(called_f0);
         HPX_TEST(called_f1);
         HPX_TEST(called_f2);
         HPX_TEST(called_f3);
         HPX_TEST(called_f4);
-        HPX_TEST(called_f5);
-        HPX_TEST(called_f6);
-        HPX_TEST(called_f7);
-        HPX_TEST(called_f8);
+        called_f0 = false;
         called_f1 = false;
         called_f2 = false;
         called_f3 = false;
         called_f4 = false;
-        called_f5 = false;
-        called_f6 = false;
-        called_f7 = false;
-        called_f8 = false;
+        hpx::lcos::future<void> f0 = hpx::lcos::dataflow<f0action>(here).get_future();
         hpx::lcos::future<void> f1 = hpx::lcos::dataflow<f1action>(here).get_future();
         hpx::lcos::future<void> f2 = hpx::lcos::dataflow<f2action>(here).get_future();
         hpx::lcos::future<void> f3 = hpx::lcos::dataflow<f3action>(here).get_future();
         hpx::lcos::future<void> f4 = hpx::lcos::dataflow<f4action>(here).get_future();
-        hpx::lcos::future<void> f5 = hpx::lcos::dataflow<f5action>(here).get_future();
-        hpx::lcos::future<void> f6 = hpx::lcos::dataflow<f6action>(here).get_future();
-        hpx::lcos::future<void> f7 = hpx::lcos::dataflow<f7action>(here).get_future();
-        hpx::lcos::future<void> f8 = hpx::lcos::dataflow<f8action>(here).get_future();
+        f0.get();
         f1.get();
         f2.get();
         f3.get();
         f4.get();
-        f5.get();
-        f6.get();
-        f7.get();
-        f8.get();
+        HPX_TEST(called_f0);
         HPX_TEST(called_f1);
         HPX_TEST(called_f2);
         HPX_TEST(called_f3);
         HPX_TEST(called_f4);
-        HPX_TEST(called_f5);
-        HPX_TEST(called_f6);
-        HPX_TEST(called_f7);
-        HPX_TEST(called_f8);
 
         /*
         hpx::lcos::dataflow<f9action>(

@@ -271,7 +271,7 @@ namespace hpx
             void cancel()
             {
                 mutex_type::scoped_lock l(this->mtx_);
-                if (!this->ready()) {
+                if (!this->is_ready()) {
                     threads::interrupt_thread(id_);
                     this->set_error(thread_interrupted,
                         "thread_task_base::cancel",
@@ -285,7 +285,7 @@ namespace hpx
             {
                 // might have been finished or canceled
                 mutex_type::scoped_lock l(this->mtx_);
-                if (!this->ready())
+                if (!this->is_ready())
                     this->set_data(result_type());
                 id_ = threads::invalid_thread_id;
             }

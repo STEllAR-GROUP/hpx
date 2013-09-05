@@ -57,6 +57,19 @@ namespace hpx { namespace lcos
         {
             typedef T type;
         };
+        
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result, typename Enable = void>
+        struct then_future_result
+        {
+            typedef lcos::future<Result> type;
+        };
+
+        template <typename Result>
+        struct then_future_result<lcos::future<Result>>
+        {
+            typedef lcos::future<Result> type;
+        };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
@@ -135,6 +148,7 @@ namespace hpx { namespace lcos
         }
 
     public:
+        typedef lcos::promise<Result> promise_type;
         typedef Result result_type;
 
         future()
@@ -153,6 +167,13 @@ namespace hpx { namespace lcos
             future_data_.swap(other.future_data_);
         }
 
+        // accept wrapped future
+        future(BOOST_RV_REF(future<future>) other)
+        {
+            future f = boost::move(other.unwrap());
+            (*this).swap(f);
+        }
+
         // extension: init from given value, set future to ready right away
         explicit future(Result const& init)
         {
@@ -168,13 +189,6 @@ namespace hpx { namespace lcos
             boost::intrusive_ptr<future_data_type> p(new impl_type());
             static_cast<impl_type*>(p.get())->set_data(boost::move(init));
             future_data_.swap(p);
-        }
-
-        // extension: accept wrapped future
-        future(BOOST_RV_REF(future<future>) other)
-        {
-            future f = boost::move(other.unwrap());
-            (*this).swap(f);
         }
 
         // extension: support timed future creation
@@ -196,6 +210,9 @@ namespace hpx { namespace lcos
                 d, boost::move(init)))
         {}
 
+        // [N3722, 4.1] asks for this...
+        explicit future(promise_type& promise);
+
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
@@ -206,7 +223,8 @@ namespace hpx { namespace lcos
 
         future& operator=(BOOST_RV_REF(future) other)
         {
-            if (this != &other) {
+            if (this != &other)
+            {
                 future_data_.swap(other.future_data_);
                 other.future_data_.reset();
             }
@@ -236,9 +254,9 @@ namespace hpx { namespace lcos
         }
 
         // state introspection
-        bool ready() const
+        bool is_ready() const
         {
-            return future_data_ && future_data_->ready();
+            return future_data_ && future_data_->is_ready();
         }
 
         bool has_value() const
@@ -277,15 +295,21 @@ namespace hpx { namespace lcos
 
         // continuation support
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(BOOST_FWD_REF(F) f);
 
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(threads::executor& sched, BOOST_FWD_REF(F) f);
 
         // wait support
@@ -440,6 +464,7 @@ namespace hpx { namespace lcos
         }
 
     public:
+        typedef lcos::promise<void> promise_type;
         typedef void result_type;
 
         future()
@@ -476,6 +501,10 @@ namespace hpx { namespace lcos
                 d, util::unused))
         {}
 
+        // [N3722, 4.1] asks for this...
+        explicit future(promise_type& promise);
+
+        // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
             if (this != &other)
@@ -510,9 +539,9 @@ namespace hpx { namespace lcos
         }
 
         // state introspection
-        bool ready() const
+        bool is_ready() const
         {
-            return future_data_->ready();
+            return future_data_->is_ready();
         }
 
         bool has_value() const
@@ -551,15 +580,21 @@ namespace hpx { namespace lcos
 
         // continuation support
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(BOOST_FWD_REF(F) f);
 
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         template <typename F>
-        future<typename boost::result_of<F(future)>::type>
+        typename detail::then_future_result<
+            typename boost::result_of<F(future)>::type
+        >::type
         then(threads::executor& sched, BOOST_FWD_REF(F) f);
 
         // wait support
@@ -735,7 +770,7 @@ namespace hpx { namespace actions
                 << this->get_gid() << ")";
 
             // if the future is ready, send the result back immediately
-            if (result.ready()) {
+            if (result.is_ready()) {
                 deferred_trigger(result);
                 return;
             }
@@ -847,7 +882,7 @@ namespace hpx { namespace actions
                 << this->get_gid() << ")";
 
             // if the future is ready, send the result back immediately
-            if (result.ready()) {
+            if (result.is_ready()) {
                 deferred_trigger(result);
                 return;
             }

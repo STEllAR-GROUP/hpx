@@ -67,7 +67,7 @@ int monitor(double runfor, std::string const& name, boost::uint64_t pause)
     while (runfor < 0 || t.elapsed() < runfor)
     {
         // stop collecting data when the runtime is exiting
-        if (!hpx::is_running() || f.ready())
+        if (!hpx::is_running() || f.is_ready())
             return 0;
 
         // Query the performance counter.

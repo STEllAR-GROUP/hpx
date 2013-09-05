@@ -193,7 +193,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
             catch (boost::system::system_error const& e) {
                 HPX_THROW_EXCEPTION(serialization_error,
-                    "MaMaMaMaMaMaMaMampi::detail::parcel_cache::set_parcel",
+                    "mpi::detail::parcel_cache::set_parcel",
                     boost::str(boost::format(
                         "parcelport: parcel serialization failed, caught "
                         "boost::system::system_error: %d (%s)") %
