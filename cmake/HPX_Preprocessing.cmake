@@ -99,7 +99,7 @@ else()
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-S${dir}\n")
         endforeach()
 
-        foreach(def ${HPX_DEFINITIONS})
+        foreach(def ${HPX_PREPROCESS_DEFINITIONS})
             set(HPX_WAVE_DEFINITIONS "${HPX_WAVE_DEFINITIONS}${def}\n")
         endforeach()
 

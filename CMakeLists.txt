@@ -950,14 +950,14 @@ if(MSVC)
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
-  hpx_add_definitions(-D_WINDOWS)
-  hpx_add_definitions(-D_WIN32)
-  hpx_add_definitions(-D_WIN32_WINNT=0x0601)
-  hpx_add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-  hpx_add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  hpx_add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
-  hpx_add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-  hpx_add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
+  hpx_add_definitions(-D_WINDOWS NOPREPROCESS)
+  hpx_add_definitions(-D_WIN32 NOPREPROCESS)
+  hpx_add_definitions(-D_WIN32_WINNT=0x0601 NOPREPROCESS)
+  hpx_add_definitions(-D_SCL_SECURE_NO_WARNINGS NOPREPROCESS)
+  hpx_add_definitions(-D_CRT_SECURE_NO_WARNINGS NOPREPROCESS)
+  hpx_add_definitions(-D_SCL_SECURE_NO_DEPRECATE NOPREPROCESS)
+  hpx_add_definitions(-D_CRT_SECURE_NO_DEPRECATE NOPREPROCESS)
+  hpx_add_definitions(-D_CRT_NONSTDC_NO_WARNINGS NOPREPROCESS)
 
   ##############################################################################
   # Boost
