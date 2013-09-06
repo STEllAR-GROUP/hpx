@@ -71,18 +71,18 @@ struct managed_refcnt_monitor
         return this->base_type::take_reference(get_gid(), gid);
     }
 
-    bool ready()
+    bool is_ready()
     {
         // Flush pending reference counting operations on the target locality.
         agas::garbage_collect(locality_);
 
-        return flag_.ready();
+        return flag_.is_ready();
     }
 
     template <
         typename Duration
     >
-    bool ready(
+    bool is_ready(
         Duration const& d
         )
     {
@@ -95,7 +95,7 @@ struct managed_refcnt_monitor
         // Suspend this pxthread.
         threads::get_self().yield(threads::suspended);
 
-        return flag_.ready();
+        return flag_.is_ready();
     }
 };
 

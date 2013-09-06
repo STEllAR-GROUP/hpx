@@ -23,7 +23,7 @@ private:
         naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
-        if (!((*th->impl_)->ready()))
+        if (!((*th->impl_)->is_ready()))
             th->apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
 public:
@@ -72,7 +72,7 @@ private:
         naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
-        if (!((*th->impl_)->ready()))
+        if (!((*th->impl_)->is_ready()))
             th->apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
 public:
@@ -121,7 +121,7 @@ private:
         naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
-        if (!((*th->impl_)->ready()))
+        if (!((*th->impl_)->is_ready()))
             th->apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
 public:
@@ -170,7 +170,7 @@ private:
         naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
-        if (!((*th->impl_)->ready()))
+        if (!((*th->impl_)->is_ready()))
             th->apply(gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
 public:

@@ -236,7 +236,7 @@ namespace hpx { namespace lcos { namespace local
                     >::value_type
                     future_type;
 
-                if(!next->ready())
+                if(!next->is_ready())
                 {
                     void (BOOST_PP_CAT(dataflow_frame_, N)::*f)
                         (Iter, Iter)
@@ -308,7 +308,7 @@ namespace hpx { namespace lcos { namespace local
                 future_type &  f_ =
                     boost::fusion::deref(iter);
 
-                if(!f_.ready())
+                if(!f_.is_ready())
                 {
                     void (BOOST_PP_CAT(dataflow_frame_, N)::*f)
                         (Iter, boost::mpl::false_)

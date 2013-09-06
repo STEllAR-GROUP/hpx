@@ -358,9 +358,9 @@ namespace hpx { namespace lcos
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready() const
+        bool is_ready() const
         {
-            return (*impl_)->ready();
+            return (*impl_)->is_ready();
         }
 
         /// Return whether this instance has been properly initialized
@@ -405,10 +405,27 @@ namespace hpx { namespace lcos
             (*impl_)->set_local_data(boost::forward<Result>(result));
         }
 
+#       ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // [N3722, 4.1] asks for this...
+        explicit operator lcos::future<Result>()
+        {
+            return get_future();
+        }
+#       endif
+
     protected:
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
+    
+#   ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+    // [N3722, 4.1] asks for this...
+    template <typename Result>
+    inline future<Result>::future(promise<Result>& promise)
+    {
+        promise.get_future().swap(*this);
+    }
+#   endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
@@ -481,9 +498,9 @@ namespace hpx { namespace lcos
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready() const
+        bool is_ready() const
         {
-            return (*impl_)->ready();
+            return (*impl_)->is_ready();
         }
 
         typedef util::unused_type result_type;
@@ -514,10 +531,26 @@ namespace hpx { namespace lcos
             (*impl_)->set_exception(e);
         }
 
+#       ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // [N3722, 4.1] asks for this...
+        explicit operator lcos::future<void>()
+        {
+            return get_future();
+        }
+#       endif
+
     protected:
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
+    
+#   ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+    // [N3722, 4.1] asks for this...
+    inline future<void>::future(promise<void>& promise)
+    {
+        promise.get_future().swap(*this);
+    }
+#   endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

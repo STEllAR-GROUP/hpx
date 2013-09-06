@@ -91,7 +91,7 @@ void hpx_test_main(
             id_type id = monitor.detach().get();
 
             // The component should still be alive.
-            HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
+            HPX_TEST_EQ(false, monitor.is_ready(milliseconds(delay)));
 
             gid = id.get_gid();
 
@@ -103,7 +103,7 @@ void hpx_test_main(
 
         // The component should still be alive, as the symbolic binding holds
         // a reference to it.
-        HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
+        HPX_TEST_EQ(false, monitor.is_ready(milliseconds(delay)));
 
         // Remove the symbolic name. This should return the final credits
         // to AGAS.
@@ -113,7 +113,7 @@ void hpx_test_main(
         garbage_collect();
 
         // The component should be destroyed.
-        HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
+        HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
     }
 }
 

@@ -206,7 +206,7 @@ namespace hpx { namespace lcos { namespace detail
                     return;
                 }
 
-                if (this->ready())
+                if (this->is_ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {

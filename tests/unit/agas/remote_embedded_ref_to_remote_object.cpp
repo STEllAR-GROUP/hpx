@@ -88,16 +88,16 @@ void hpx_test_main(
             id_type id2 = monitor1.detach().get();
 
             // Both components should still be alive.
-            HPX_TEST_EQ(false, monitor0.ready(milliseconds(delay)));
-            HPX_TEST_EQ(false, monitor1.ready(milliseconds(delay)));
+            HPX_TEST_EQ(false, monitor0.is_ready(milliseconds(delay)));
+            HPX_TEST_EQ(false, monitor1.is_ready(milliseconds(delay)));
         }
 
         // Flush pending reference counting operations.
         garbage_collect();
 
         // Both components should be out of scope now.
-        HPX_TEST_EQ(true, monitor0.ready(milliseconds(delay)));
-        HPX_TEST_EQ(true, monitor1.ready(milliseconds(delay)));
+        HPX_TEST_EQ(true, monitor0.is_ready(milliseconds(delay)));
+        HPX_TEST_EQ(true, monitor1.is_ready(milliseconds(delay)));
     }
 }
 

@@ -148,6 +148,7 @@ namespace hpx { namespace lcos
         }
 
     public:
+        typedef lcos::promise<Result> promise_type;
         typedef Result result_type;
 
         future()
@@ -208,6 +209,11 @@ namespace hpx { namespace lcos
           : future_data_(new lcos::detail::timed_future_data<Result>(
                 d, boost::move(init)))
         {}
+        
+#       ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // [N3722, 4.1] asks for this... defined at promise.hpp
+        explicit future(promise_type& promise);
+#       endif
 
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
@@ -219,7 +225,8 @@ namespace hpx { namespace lcos
 
         future& operator=(BOOST_RV_REF(future) other)
         {
-            if (this != &other) {
+            if (this != &other)
+            {
                 future_data_.swap(other.future_data_);
                 other.future_data_.reset();
             }
@@ -249,9 +256,9 @@ namespace hpx { namespace lcos
         }
 
         // state introspection
-        bool ready() const
+        bool is_ready() const
         {
-            return future_data_ && future_data_->ready();
+            return future_data_ && future_data_->is_ready();
         }
 
         bool has_value() const
@@ -460,6 +467,7 @@ namespace hpx { namespace lcos
         }
 
     public:
+        typedef lcos::promise<void> promise_type;
         typedef void result_type;
 
         future()
@@ -495,7 +503,13 @@ namespace hpx { namespace lcos
           : future_data_(new lcos::detail::timed_future_data<void>(
                 d, util::unused))
         {}
+        
+#       ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // [N3722, 4.1] asks for this... defined at promise.hpp
+        explicit future(promise_type& promise);
+#       endif
 
+        // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
             if (this != &other)
@@ -530,9 +544,9 @@ namespace hpx { namespace lcos
         }
 
         // state introspection
-        bool ready() const
+        bool is_ready() const
         {
-            return future_data_->ready();
+            return future_data_->is_ready();
         }
 
         bool has_value() const
@@ -761,7 +775,7 @@ namespace hpx { namespace actions
                 << this->get_gid() << ")";
 
             // if the future is ready, send the result back immediately
-            if (result.ready()) {
+            if (result.is_ready()) {
                 deferred_trigger(result);
                 return;
             }
@@ -873,7 +887,7 @@ namespace hpx { namespace actions
                 << this->get_gid() << ")";
 
             // if the future is ready, send the result back immediately
-            if (result.ready()) {
+            if (result.is_ready()) {
                 deferred_trigger(result);
                 return;
             }
