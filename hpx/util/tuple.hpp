@@ -225,6 +225,31 @@ namespace hpx { namespace util
         struct tuple_element;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <int N, typename Tuple, typename Enable = void>
+    struct tuple_element;
+
+    template <int N, typename Tuple>
+    struct tuple_element<N, Tuple
+      , typename boost::enable_if<
+            is_tuple<typename boost::remove_cv<Tuple>::type>>::type>
+    {
+        typedef typename detail::tuple_element<N, Tuple>::type type;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Tuple, typename Enable = void>
+    struct tuple_size;
+
+    template <typename Tuple>
+    struct tuple_size<Tuple
+      , typename boost::enable_if<
+            is_tuple<typename boost::remove_cv<Tuple>::type>>::type>
+    {
+        static const std::size_t value = Tuple::size_value;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <int N, typename Tuple>
     BOOST_FORCEINLINE BOOST_CONSTEXPR
     typename detail::tuple_element<N, Tuple>::rtype
