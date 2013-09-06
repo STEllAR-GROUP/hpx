@@ -62,7 +62,6 @@ set(HPX_INTERNAL_CMAKE ON)
 set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
 
 # include additional macro definitions
-set(HPX_DEFINITIONS CACHE INTERNAL "" FORCE)
 include(HPX_Utils)
 
 include(HPX_Distclean)
@@ -204,7 +203,6 @@ else()
     "HPX applications will not use more than this amount of OS-threads (default: 64)." 
     "64" ADVANCED)
 endif()
-
 
 ###############################################################################
 # Configure upper limit for number of threads, this is important for XeonPhi
@@ -1644,7 +1642,15 @@ foreach(library ${BOOST_LIBRARIES})
     "${boost_library_info}    CACHE FILEPATH \"Boost ${library} shared library.\")\n")
 endforeach()
 
-set(external_definitions ${HPX_DEFINITIONS})
+set(external_definitions "")
+
+foreach(definition ${HPX_DEFINITIONS})
+#    string(REGEX REPLACE "\"" "\\\\\\\\\\\\\\\\\"" definition ${definition})
+    set(external_definitions "${external_definitions} ${definition}")
+endforeach()
+
+# make list unique
+list(REMOVE_DUPLICATES external_definitions)
 
 set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 
@@ -1672,11 +1678,6 @@ configure_file(${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in
 if(NOT HPX_NO_INSTALL)
   install(FILES ${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake
           DESTINATION share/${cmake_dir}/Modules)
-endif()
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-  set(external_definitions "${external_definitions}
-  -DBOOST_COMPILER_CONFIG=\\\"hpx/config/boost/compiler/intel.hpp\\\"")
 endif()
 
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))

@@ -296,8 +296,6 @@ set_property(TARGET hpx_serialization APPEND
   "HPX_PREFIX=\"${HPX_PREFIX}\""
   "HPX_GIT_COMMIT=\"${HPX_GIT_COMMIT}\""
   "HPX_COROUTINE_EXPORTS")
-set_property(TARGET hpx_serialization APPEND
-  PROPERTY COMPILE_FLAGS ${HPX_DEFINITIONS})
 
 if(NOT HPX_NO_INSTALL)
   hpx_library_install(hpx_serialization lib/hpx)
@@ -384,8 +382,6 @@ set_property(TARGET hpx APPEND
   "HPX_FUNCTION_ARGUMENT_LIMIT=7"
   "BOOST_ENABLE_ASSERT_HANDLER"
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
-set_property(TARGET hpx APPEND
-  PROPERTY COMPILE_FLAGS ${HPX_DEFINITIONS})
 
 if(NOT HPX_NO_INSTALL)
   hpx_library_install(hpx lib/hpx)
@@ -409,8 +405,6 @@ set_property(TARGET hpx_init APPEND
   "HPX_ACTION_ARGUMENT_LIMIT=4"
   "HPX_FUNCTION_ARGUMENT_LIMIT=7"
   "BOOST_ENABLE_ASSERT_HANDLER")
-set_property(TARGET hpx_init APPEND
-  PROPERTY COMPILE_FLAGS ${HPX_DEFINITIONS})
 
 if(MSVC)
   set_target_properties(hpx_init PROPERTIES

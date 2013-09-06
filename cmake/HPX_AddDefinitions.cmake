@@ -9,11 +9,11 @@ include(HPX_Include)
 
 hpx_include(Message)
 
+set(HPX_DEFINITIONS CACHE INTERNAL "" FORCE)
+
 macro(hpx_add_definitions definition)
   hpx_debug("add_definitions" "${definition}")
-  string(FIND "${HPX_DEFINITIONS}" "${definition}" DEFINITION_FOUND)
-  if(${DEFINITION_FOUND} EQUAL -1)
-    set(HPX_DEFINITIONS "${HPX_DEFINITIONS} ${definition}")
-  endif()
+  set(HPX_DEFINITIONS ${HPX_DEFINITIONS} ${definition})
+  add_definitions(${definition})
 endmacro()
 

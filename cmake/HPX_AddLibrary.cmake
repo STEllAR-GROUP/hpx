@@ -201,8 +201,6 @@ macro(add_hpx_library name)
         LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${name}_OUTPUT_SUFFIX})
     endif()
   endif()
-  
-  hpx_append_property(${name}_lib COMPILE_FLAGS ${HPX_DEFINITIONS})
 
   if(${name}_COMPILE_FLAGS)
     hpx_append_property(${name}_lib COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
@@ -218,7 +216,6 @@ macro(add_hpx_library name)
 
   if(HPX_${${name}_LANGUAGE}_COMPILE_FLAGS)
     hpx_append_property(${name}_lib COMPILE_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
-    message("${name} appending  ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS}")
     if(NOT MSVC)
       hpx_append_property(${name}_lib LINK_FLAGS ${HPX_${${name}_LANGUAGE}_COMPILE_FLAGS})
     endif()
