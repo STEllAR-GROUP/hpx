@@ -399,7 +399,8 @@ namespace hpx { namespace lcos
     make_ready_future_after(boost::chrono::duration<Rep, Period> const& d,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename util::decay<Result>::type>(util::to_time_duration(d), boost::forward<Result>(init));
+        return future<typename util::decay<Result>::type>(
+            util::to_time_duration(d), boost::forward<Result>(init));
     }
 
     ///////////////////////////////////////////////////////////////////////////
