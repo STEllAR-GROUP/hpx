@@ -77,6 +77,7 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_NAME=${name}"
                "HPX_APPLICATION_STRING=\"${name}\""
                "HPX_APPLICATION_EXPORTS")
+  hpx_append_property(${name}_exe COMPILE_FLAGS ${HPX_DEFINITIONS})
 
   if(${name}_COMPILE_FLAGS)
     hpx_append_property(${name}_exe COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
