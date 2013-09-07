@@ -136,7 +136,7 @@ namespace hpx { namespace util
         basic_binary_oprimitive(Container& buffer, unsigned flags = 0)
           : flags_(flags & all_archive_flags),
             size_(0),
-            buffer_(boost::make_shared<detail::container_type<Container> >(boost::ref(buffer)))
+            buffer_(boost::make_shared<detail::ocontainer_type<Container> >(boost::ref(buffer)))
         {
             init(flags);
         }
