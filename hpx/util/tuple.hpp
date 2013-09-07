@@ -160,7 +160,7 @@ namespace hpx { namespace util
     {};
     
     ///////////////////////////////////////////////////////////////////////////
-    detail::ignore_type const ignore = detail::ignore_type{};
+    detail::ignore_type const ignore = {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Dummy = void>
