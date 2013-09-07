@@ -16,6 +16,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
+#include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -148,6 +149,9 @@ namespace hpx { namespace util
     struct is_tuple<T const&>
       : is_tuple<T>
     {};
+    
+    ///////////////////////////////////////////////////////////////////////////
+    hpx::util::unused_type const ignore = {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Dummy = void>
@@ -169,6 +173,11 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
 
+    inline tuple0<> tie() BOOST_NOEXCEPT
+    {
+        return tuple0<>();
+    }
+
     inline tuple0<> forward_as_tuple() BOOST_NOEXCEPT
     {
         return tuple0<>();
@@ -177,7 +186,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
     template <BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(
-        HPX_TUPLE_LIMIT, typename A, util::unused_type), typename Dummy = void>
+        HPX_TUPLE_LIMIT, typename A, void), typename Dummy = void>
     struct tuple;
 
     template <BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, typename A)>
@@ -186,7 +195,7 @@ namespace hpx { namespace util
     {};
 #else
     template <BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(
-        HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), typename A, util::unused_type), typename Dummy = void>
+        HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), typename A, void), typename Dummy = void>
     struct tuple;
 
     template <BOOST_PP_ENUM_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), typename A)>
@@ -194,7 +203,7 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
 #endif
-
+    
     template <>
     struct tuple<> : tuple0<>
     {
@@ -521,6 +530,15 @@ namespace hpx { namespace util
             BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER, A)
             return *this;
         }
+        
+        template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+        HPX_UTIL_TUPLE_NAME & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
+                HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>
+            ))) other)
+        {
+            BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_COPY_MEMBER, T)
+            return *this;
+        }
 
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
         HPX_UTIL_TUPLE_NAME & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
@@ -616,6 +634,16 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
     BOOST_FORCEINLINE
+    tuple1<Arg0> 
+    tie(Arg0& arg0) BOOST_NOEXCEPT
+    {
+        typedef tuple1<Arg0> result_type;
+        return result_type(arg0,
+            typename result_type::forwarding_tag());
+    }
+
+    template <typename Arg0>
+    BOOST_FORCEINLINE
     tuple1<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)> 
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
@@ -625,6 +653,16 @@ namespace hpx { namespace util
     }
 #else
     ///////////////////////////////////////////////////////////////////////////
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE
+    HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, & BOOST_PP_INTERCEPT)>
+    tie(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, & arg)) BOOST_NOEXCEPT
+    {
+        return HPX_UTIL_TUPLE_NAME<
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, & BOOST_PP_INTERCEPT)>(
+            BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     BOOST_FORCEINLINE
     HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>

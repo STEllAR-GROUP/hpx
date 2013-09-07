@@ -49,6 +49,15 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0);
             return *this;
         }
+        
+        template <typename T0>
+        tuple1 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
+                tuple1<T0>
+            ))) other)
+        {
+            a0 = other.a0;
+            return *this;
+        }
         template <typename T0>
         tuple1 & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple1<T0>
@@ -56,6 +65,10 @@ namespace hpx { namespace util
         {
             a0 = detail::move_if_no_ref<T0>::call( other.a0);
             return *this;
+        }
+        void swap(tuple1& other)
+        {
+            boost::swap(a0, other.a0);
         }
         template <typename Arg0>
         explicit tuple1(BOOST_FWD_REF(Arg0) arg0,
@@ -93,6 +106,15 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
     
+    template <typename Arg0>
+    BOOST_FORCEINLINE
+    tuple1<Arg0> 
+    tie(Arg0& arg0) BOOST_NOEXCEPT
+    {
+        typedef tuple1<Arg0> result_type;
+        return result_type(arg0,
+            typename result_type::forwarding_tag());
+    }
     template <typename Arg0>
     BOOST_FORCEINLINE
     tuple1<typename detail::env_value_type<Arg0>::type> 
@@ -264,6 +286,15 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1);
             return *this;
         }
+        
+        template <typename T0 , typename T1>
+        tuple2 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
+                tuple2<T0 , T1>
+            ))) other)
+        {
+            a0 = other.a0; a1 = other.a1;
+            return *this;
+        }
         template <typename T0 , typename T1>
         tuple2 & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple2<T0 , T1>
@@ -271,6 +302,10 @@ namespace hpx { namespace util
         {
             a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1);
             return *this;
+        }
+        void swap(tuple2& other)
+        {
+            boost::swap(a0, other.a0); boost::swap(a1, other.a1);
         }
         template <typename Arg0 , typename Arg1>
         tuple2(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
@@ -298,6 +333,15 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
     
+    template <typename Arg0 , typename Arg1>
+    BOOST_FORCEINLINE
+    tuple2<Arg0 & , Arg1 &>
+    tie(Arg0 & arg0 , Arg1 & arg1) BOOST_NOEXCEPT
+    {
+        return tuple2<
+                Arg0 & , Arg1 &>(
+            arg0 , arg1);
+    }
     template <typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
     tuple2<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type>
@@ -458,6 +502,15 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2);
             return *this;
         }
+        
+        template <typename T0 , typename T1 , typename T2>
+        tuple3 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
+                tuple3<T0 , T1 , T2>
+            ))) other)
+        {
+            a0 = other.a0; a1 = other.a1; a2 = other.a2;
+            return *this;
+        }
         template <typename T0 , typename T1 , typename T2>
         tuple3 & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple3<T0 , T1 , T2>
@@ -465,6 +518,10 @@ namespace hpx { namespace util
         {
             a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2);
             return *this;
+        }
+        void swap(tuple3& other)
+        {
+            boost::swap(a0, other.a0); boost::swap(a1, other.a1); boost::swap(a2, other.a2);
         }
         template <typename Arg0 , typename Arg1 , typename Arg2>
         tuple3(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -492,6 +549,15 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
     
+    template <typename Arg0 , typename Arg1 , typename Arg2>
+    BOOST_FORCEINLINE
+    tuple3<Arg0 & , Arg1 & , Arg2 &>
+    tie(Arg0 & arg0 , Arg1 & arg1 , Arg2 & arg2) BOOST_NOEXCEPT
+    {
+        return tuple3<
+                Arg0 & , Arg1 & , Arg2 &>(
+            arg0 , arg1 , arg2);
+    }
     template <typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
     tuple3<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type>
@@ -652,6 +718,15 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3);
             return *this;
         }
+        
+        template <typename T0 , typename T1 , typename T2 , typename T3>
+        tuple4 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
+                tuple4<T0 , T1 , T2 , T3>
+            ))) other)
+        {
+            a0 = other.a0; a1 = other.a1; a2 = other.a2; a3 = other.a3;
+            return *this;
+        }
         template <typename T0 , typename T1 , typename T2 , typename T3>
         tuple4 & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple4<T0 , T1 , T2 , T3>
@@ -659,6 +734,10 @@ namespace hpx { namespace util
         {
             a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3);
             return *this;
+        }
+        void swap(tuple4& other)
+        {
+            boost::swap(a0, other.a0); boost::swap(a1, other.a1); boost::swap(a2, other.a2); boost::swap(a3, other.a3);
         }
         template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         tuple4(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
@@ -686,6 +765,15 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
     
+    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
+    BOOST_FORCEINLINE
+    tuple4<Arg0 & , Arg1 & , Arg2 & , Arg3 &>
+    tie(Arg0 & arg0 , Arg1 & arg1 , Arg2 & arg2 , Arg3 & arg3) BOOST_NOEXCEPT
+    {
+        return tuple4<
+                Arg0 & , Arg1 & , Arg2 & , Arg3 &>(
+            arg0 , arg1 , arg2 , arg3);
+    }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
     tuple4<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type>
@@ -846,6 +934,15 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4);
             return *this;
         }
+        
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
+        tuple5 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
+                tuple5<T0 , T1 , T2 , T3 , T4>
+            ))) other)
+        {
+            a0 = other.a0; a1 = other.a1; a2 = other.a2; a3 = other.a3; a4 = other.a4;
+            return *this;
+        }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
         tuple5 & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple5<T0 , T1 , T2 , T3 , T4>
@@ -853,6 +950,10 @@ namespace hpx { namespace util
         {
             a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4);
             return *this;
+        }
+        void swap(tuple5& other)
+        {
+            boost::swap(a0, other.a0); boost::swap(a1, other.a1); boost::swap(a2, other.a2); boost::swap(a3, other.a3); boost::swap(a4, other.a4);
         }
         template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         tuple5(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -880,6 +981,15 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
     
+    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
+    BOOST_FORCEINLINE
+    tuple5<Arg0 & , Arg1 & , Arg2 & , Arg3 & , Arg4 &>
+    tie(Arg0 & arg0 , Arg1 & arg1 , Arg2 & arg2 , Arg3 & arg3 , Arg4 & arg4) BOOST_NOEXCEPT
+    {
+        return tuple5<
+                Arg0 & , Arg1 & , Arg2 & , Arg3 & , Arg4 &>(
+            arg0 , arg1 , arg2 , arg3 , arg4);
+    }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
     tuple5<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type>
@@ -1040,6 +1150,15 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5);
             return *this;
         }
+        
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
+        tuple6 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
+                tuple6<T0 , T1 , T2 , T3 , T4 , T5>
+            ))) other)
+        {
+            a0 = other.a0; a1 = other.a1; a2 = other.a2; a3 = other.a3; a4 = other.a4; a5 = other.a5;
+            return *this;
+        }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
         tuple6 & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple6<T0 , T1 , T2 , T3 , T4 , T5>
@@ -1047,6 +1166,10 @@ namespace hpx { namespace util
         {
             a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5);
             return *this;
+        }
+        void swap(tuple6& other)
+        {
+            boost::swap(a0, other.a0); boost::swap(a1, other.a1); boost::swap(a2, other.a2); boost::swap(a3, other.a3); boost::swap(a4, other.a4); boost::swap(a5, other.a5);
         }
         template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
         tuple6(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
@@ -1074,6 +1197,15 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
     
+    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
+    BOOST_FORCEINLINE
+    tuple6<Arg0 & , Arg1 & , Arg2 & , Arg3 & , Arg4 & , Arg5 &>
+    tie(Arg0 & arg0 , Arg1 & arg1 , Arg2 & arg2 , Arg3 & arg3 , Arg4 & arg4 , Arg5 & arg5) BOOST_NOEXCEPT
+    {
+        return tuple6<
+                Arg0 & , Arg1 & , Arg2 & , Arg3 & , Arg4 & , Arg5 &>(
+            arg0 , arg1 , arg2 , arg3 , arg4 , arg5);
+    }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
     tuple6<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type>
@@ -1234,6 +1366,15 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6);
             return *this;
         }
+        
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
+        tuple7 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
+                tuple7<T0 , T1 , T2 , T3 , T4 , T5 , T6>
+            ))) other)
+        {
+            a0 = other.a0; a1 = other.a1; a2 = other.a2; a3 = other.a3; a4 = other.a4; a5 = other.a5; a6 = other.a6;
+            return *this;
+        }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
         tuple7 & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple7<T0 , T1 , T2 , T3 , T4 , T5 , T6>
@@ -1241,6 +1382,10 @@ namespace hpx { namespace util
         {
             a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5); a6 = detail::move_if_no_ref<T6>::call( other.a6);
             return *this;
+        }
+        void swap(tuple7& other)
+        {
+            boost::swap(a0, other.a0); boost::swap(a1, other.a1); boost::swap(a2, other.a2); boost::swap(a3, other.a3); boost::swap(a4, other.a4); boost::swap(a5, other.a5); boost::swap(a6, other.a6);
         }
         template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
         tuple7(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
@@ -1268,6 +1413,15 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
     
+    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
+    BOOST_FORCEINLINE
+    tuple7<Arg0 & , Arg1 & , Arg2 & , Arg3 & , Arg4 & , Arg5 & , Arg6 &>
+    tie(Arg0 & arg0 , Arg1 & arg1 , Arg2 & arg2 , Arg3 & arg3 , Arg4 & arg4 , Arg5 & arg5 , Arg6 & arg6) BOOST_NOEXCEPT
+    {
+        return tuple7<
+                Arg0 & , Arg1 & , Arg2 & , Arg3 & , Arg4 & , Arg5 & , Arg6 &>(
+            arg0 , arg1 , arg2 , arg3 , arg4 , arg5 , arg6);
+    }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
     tuple7<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type>
@@ -1428,6 +1582,15 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6); a7 = detail::move_if_no_ref<A7>::call( other.a7);
             return *this;
         }
+        
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
+        tuple8 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
+                tuple8<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7>
+            ))) other)
+        {
+            a0 = other.a0; a1 = other.a1; a2 = other.a2; a3 = other.a3; a4 = other.a4; a5 = other.a5; a6 = other.a6; a7 = other.a7;
+            return *this;
+        }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
         tuple8 & operator=(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple8<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7>
@@ -1435,6 +1598,10 @@ namespace hpx { namespace util
         {
             a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5); a6 = detail::move_if_no_ref<T6>::call( other.a6); a7 = detail::move_if_no_ref<T7>::call( other.a7);
             return *this;
+        }
+        void swap(tuple8& other)
+        {
+            boost::swap(a0, other.a0); boost::swap(a1, other.a1); boost::swap(a2, other.a2); boost::swap(a3, other.a3); boost::swap(a4, other.a4); boost::swap(a5, other.a5); boost::swap(a6, other.a6); boost::swap(a7, other.a7);
         }
         template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
         tuple8(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
@@ -1462,6 +1629,15 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
     
+    template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
+    BOOST_FORCEINLINE
+    tuple8<Arg0 & , Arg1 & , Arg2 & , Arg3 & , Arg4 & , Arg5 & , Arg6 & , Arg7 &>
+    tie(Arg0 & arg0 , Arg1 & arg1 , Arg2 & arg2 , Arg3 & arg3 , Arg4 & arg4 , Arg5 & arg5 , Arg6 & arg6 , Arg7 & arg7) BOOST_NOEXCEPT
+    {
+        return tuple8<
+                Arg0 & , Arg1 & , Arg2 & , Arg3 & , Arg4 & , Arg5 & , Arg6 & , Arg7 &>(
+            arg0 , arg1 , arg2 , arg3 , arg4 , arg5 , arg6 , arg7);
+    }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
     tuple8<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type>
