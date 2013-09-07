@@ -278,7 +278,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                     first_message_ = decode_message(parcelport_, data, chunks.get(),
                         inbound_data_size, receive_data, first_message_);
 #else
-                    decode_message(parcelport_, data, chunks, inbound_data_size,
+                    decode_message(parcelport_, data, chunks.get(), inbound_data_size,
                         receive_data);
 #endif
                 }
