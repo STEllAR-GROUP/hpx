@@ -23,6 +23,7 @@
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/at_c.hpp>
+#include <boost/fusion/include/comparison.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/int.hpp>
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500 || defined(BOOST_INTEL)
@@ -182,12 +183,12 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
 
-    inline tuple0<> tie() BOOST_NOEXCEPT
+    BOOST_FORCEINLINE tuple0<> tie() BOOST_NOEXCEPT
     {
         return tuple0<>();
     }
 
-    inline tuple0<> forward_as_tuple() BOOST_NOEXCEPT
+    BOOST_FORCEINLINE tuple0<> forward_as_tuple() BOOST_NOEXCEPT
     {
         return tuple0<>();
     }
@@ -287,6 +288,14 @@ namespace hpx { namespace util
     {
         return t.template get<N>();
     }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    using boost::fusion::operator==;
+    using boost::fusion::operator!=;
+    using boost::fusion::operator<;
+    using boost::fusion::operator>;
+    using boost::fusion::operator<=;
+    using boost::fusion::operator>=;
 }}
 
 namespace boost
