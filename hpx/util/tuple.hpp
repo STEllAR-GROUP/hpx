@@ -29,6 +29,7 @@
 #include <boost/mpl/fold.hpp>
 #include <boost/mpl/and.hpp>
 #endif
+#include <boost/utility/swap.hpp>
 
 #include <boost/serialization/is_bitwise_serializable.hpp>
 
@@ -154,6 +155,9 @@ namespace hpx { namespace util
     {
         typedef boost::mpl::int_<0> size_type;
         static const int size_value = 0;
+
+        void swap(tuple0& other)
+        {}
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
@@ -469,6 +473,9 @@ namespace hpx { namespace util { namespace detail
     BOOST_PP_CAT(a, N) = detail::move_if_no_ref<BOOST_PP_CAT(D, N)>::call(    \
         BOOST_PP_CAT(other.a, N));                                            \
 /**/
+#define HPX_UTIL_TUPLE_SWAP_MEMBER(Z, N, D)                                   \
+    boost::swap(BOOST_PP_CAT(a, N), BOOST_PP_CAT(other.a, N));                \
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -522,6 +529,11 @@ namespace hpx { namespace util
         {
             BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER, T)
             return *this;
+        }
+
+        void swap(HPX_UTIL_TUPLE_NAME& other)
+        {
+            BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_SWAP_MEMBER, T)
         }
 
 #if N == 1
@@ -826,5 +838,6 @@ namespace boost { namespace serialization
 #undef HPX_UTIL_TUPLE_INIT_MOVE_MEMBER
 #undef HPX_UTIL_TUPLE_ASSIGN_COPY_MEMBER
 #undef HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER
+#undef HPX_UTIL_TUPLE_SWAP_MEMBER
 
 #endif
