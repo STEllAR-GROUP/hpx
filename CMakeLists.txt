@@ -66,6 +66,8 @@ include(HPX_Utils)
 
 include(HPX_Distclean)
 
+set(HPX_DEFINITIONS CACHE INTERNAL "" FORCE)
+
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
 if(NOT HPX_CMAKE_LOGLEVEL)
@@ -950,14 +952,14 @@ if(MSVC)
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
-  hpx_add_definitions(-D_WINDOWS NOPREPROCESS)
-  hpx_add_definitions(-D_WIN32 NOPREPROCESS)
-  hpx_add_definitions(-D_WIN32_WINNT=0x0601 NOPREPROCESS)
-  hpx_add_definitions(-D_SCL_SECURE_NO_WARNINGS NOPREPROCESS)
-  hpx_add_definitions(-D_CRT_SECURE_NO_WARNINGS NOPREPROCESS)
-  hpx_add_definitions(-D_SCL_SECURE_NO_DEPRECATE NOPREPROCESS)
-  hpx_add_definitions(-D_CRT_SECURE_NO_DEPRECATE NOPREPROCESS)
-  hpx_add_definitions(-D_CRT_NONSTDC_NO_WARNINGS NOPREPROCESS)
+  hpx_add_definitions(-D_WINDOWS)
+  hpx_add_definitions(-D_WIN32)
+  hpx_add_definitions(-D_WIN32_WINNT=0x0601)
+  hpx_add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+  hpx_add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  hpx_add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
+  hpx_add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+  hpx_add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
 
   ##############################################################################
   # Boost
