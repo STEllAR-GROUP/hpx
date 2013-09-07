@@ -49,7 +49,6 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0);
             return *this;
         }
-        
         template <typename T0>
         tuple1 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
                 tuple1<T0>
@@ -108,7 +107,7 @@ namespace hpx { namespace util
     
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple1<Arg0> 
+    tuple1<Arg0>
     tie(Arg0& arg0) BOOST_NOEXCEPT
     {
         typedef tuple1<Arg0> result_type;
@@ -117,7 +116,7 @@ namespace hpx { namespace util
     }
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple1<typename detail::env_value_type<Arg0>::type> 
+    tuple1<typename detail::env_value_type<Arg0>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
         typedef tuple1<typename detail::env_value_type<Arg0>::type> result_type;
@@ -286,7 +285,6 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1);
             return *this;
         }
-        
         template <typename T0 , typename T1>
         tuple2 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
                 tuple2<T0 , T1>
@@ -502,7 +500,6 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2);
             return *this;
         }
-        
         template <typename T0 , typename T1 , typename T2>
         tuple3 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
                 tuple3<T0 , T1 , T2>
@@ -718,7 +715,6 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3);
             return *this;
         }
-        
         template <typename T0 , typename T1 , typename T2 , typename T3>
         tuple4 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
                 tuple4<T0 , T1 , T2 , T3>
@@ -934,7 +930,6 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4);
             return *this;
         }
-        
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
         tuple5 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
                 tuple5<T0 , T1 , T2 , T3 , T4>
@@ -1150,7 +1145,6 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5);
             return *this;
         }
-        
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
         tuple6 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
                 tuple6<T0 , T1 , T2 , T3 , T4 , T5>
@@ -1366,7 +1360,6 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6);
             return *this;
         }
-        
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
         tuple7 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
                 tuple7<T0 , T1 , T2 , T3 , T4 , T5 , T6>
@@ -1582,7 +1575,6 @@ namespace hpx { namespace util
             a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6); a7 = detail::move_if_no_ref<A7>::call( other.a7);
             return *this;
         }
-        
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
         tuple8 & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
                 tuple8<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7>

@@ -149,7 +149,7 @@ namespace hpx { namespace util
     struct is_tuple<T const&>
       : is_tuple<T>
     {};
-    
+
     ///////////////////////////////////////////////////////////////////////////
     hpx::util::unused_type const ignore = hpx::util::unused_type();
 
@@ -203,7 +203,7 @@ namespace hpx { namespace util
       : boost::mpl::true_
     {};
 #endif
-    
+
     template <>
     struct tuple<> : tuple0<>
     {
@@ -530,7 +530,7 @@ namespace hpx { namespace util
             BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER, A)
             return *this;
         }
-        
+
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>
         HPX_UTIL_TUPLE_NAME & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_STRIP((
                 HPX_UTIL_TUPLE_NAME<BOOST_PP_ENUM_PARAMS(N, T)>
@@ -634,7 +634,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple1<Arg0> 
+    tuple1<Arg0>
     tie(Arg0& arg0) BOOST_NOEXCEPT
     {
         typedef tuple1<Arg0> result_type;
@@ -644,7 +644,7 @@ namespace hpx { namespace util
 
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple1<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)> 
+    tuple1<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
         typedef tuple1<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)> result_type;
