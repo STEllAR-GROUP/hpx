@@ -147,7 +147,7 @@ namespace hpx { namespace util
           : flags_(flags & all_archive_flags),
             size_(0),
             buffer_(boost::make_shared<detail::ocontainer_type<Container> >(
-                buffer, chunks))
+                boost::ref(buffer), chunks))
         {
             init(flags);
         }
