@@ -151,7 +151,7 @@ namespace hpx { namespace util
     {};
     
     ///////////////////////////////////////////////////////////////////////////
-    hpx::util::unused_type const ignore = {};
+    hpx::util::unused_type const ignore = hpx::util::unused_type();
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Dummy = void>
