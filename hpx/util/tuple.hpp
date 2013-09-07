@@ -11,7 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/unused.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -108,6 +107,16 @@ namespace hpx { namespace util
         };
 #endif
 
+        ///////////////////////////////////////////////////////////////////////
+        struct ignore_type
+        {
+            template <typename T>
+            ignore_type const& operator=(T const&) const
+            {
+                return *this;
+            }
+        };
+
 // gcc 4.4.x is not able to cope with this, thus we disable the optimization
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500 || defined(BOOST_INTEL)
         ///////////////////////////////////////////////////////////////////////
@@ -151,7 +160,7 @@ namespace hpx { namespace util
     {};
     
     ///////////////////////////////////////////////////////////////////////////
-    hpx::util::unused_type const ignore = hpx::util::unused_type();
+    detail::ignore_type const ignore = detail::ignore_type{};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Dummy = void>
