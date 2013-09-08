@@ -5,6 +5,7 @@
 
 set(tests
     contains_test
+    function_arith
     function_test
     nothrow_swap
    )

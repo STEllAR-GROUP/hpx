@@ -62,5 +62,5 @@ int main(int, char* [])
     HPX_TEST(f() == 2);
     HPX_TEST(g() == 1);
 
-    return 0;
+    return hpx::util::report_errors();
 }

@@ -796,5 +796,5 @@ int main(int, char* [])
     test_call();
     test_move_semantics<hpx::util::function_nonser<void()> >();
 
-    return 0;
+    return hpx::util::report_errors();
 }

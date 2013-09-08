@@ -223,5 +223,5 @@ int main(int, char*[])
 //    equal_test();
 //    ref_equal_test();
 
-    return 0;
+    return hpx::util::report_errors();
 }
