@@ -14,13 +14,13 @@
 #include <iosfwd>
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
 #include <boost/current_function.hpp>
+#include <boost/exception_ptr.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/system/system_error.hpp>

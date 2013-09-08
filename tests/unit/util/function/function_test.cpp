@@ -71,7 +71,7 @@ static void
 
     // clear() method
     v1.clear();
-    HPX_TEST(v1 == 0);
+    HPX_TEST(v1.empty());
 
     // Assignment to an empty function
     v1 = three;
@@ -97,7 +97,7 @@ static void
     HPX_TEST(0 == v1);
 
     // Assignment to an empty function from a free function
-    v1 = BOOST_FUNCTION_TARGET_FIX(&) write_five;
+    v1 = write_five;
     HPX_TEST(0 != v1);
 
     // Invocation
@@ -106,7 +106,7 @@ static void
     HPX_TEST(global_int == 5);
 
     // Assignment to a non-empty function from a free function
-    v1 = BOOST_FUNCTION_TARGET_FIX(&) write_three;
+    v1 = write_three;
     HPX_TEST(!v1.empty());
 
     // Invocation
@@ -158,7 +158,7 @@ static void
     HPX_TEST(v2.empty());
 
     // Assignment to an empty function from a free function
-    v2 = (BOOST_FUNCTION_TARGET_FIX(&) write_five);
+    v2 = (write_five);
     HPX_TEST(v2? true : false);
 
     // Invocation
@@ -222,7 +222,7 @@ static void
     HPX_TEST(global_int == 3);
 
     // Assign to a function from a function with a function
-    v2 = BOOST_FUNCTION_TARGET_FIX(&) write_five;
+    v2 = write_five;
     v1 = v2;
     HPX_TEST(!v1.empty());
     HPX_TEST(!v2.empty());
@@ -627,7 +627,7 @@ static void
         hpx::util::function_nonser<int (int, int)> f(boost::ref(atc));
         HPX_TEST(f(1, 3) == 4);
     }
-    catch(std::runtime_error e) {
+    catch(std::runtime_error const& /*e*/) {
         HPX_TEST_MSG(false, "Nonthrowing constructor threw an exception");
     }
 }
@@ -643,14 +643,14 @@ static void test_empty_ref()
         f2();
         HPX_TEST_MSG(false, "Exception didn't throw for reference to empty function.");
     }
-    catch(std::runtime_error e) {}
+    catch(std::runtime_error const& /*e*/) {}
 
     f1 = dummy;
 
     try {
         f2();
     }
-    catch(std::runtime_error e) {
+    catch(std::runtime_error const&) {
         HPX_TEST_MSG(false, "Error calling referenced function.");
     }
 }
@@ -663,7 +663,7 @@ static void test_exception()
         f(5, 4);
         HPX_TEST(false);
     }
-    catch(boost::bad_function_call) {
+    catch(std::runtime_error const&) {
         // okay
     }
 }
@@ -677,12 +677,12 @@ static void test_implicit()
     m = mapped_type();
 }
 
-static void test_call_obj(boost::function<int (int, int)> f)
+static void test_call_obj(hpx::util::function_nonser<int (int, int)> f)
 {
     HPX_TEST(!f.empty());
 }
 
-static void test_call_cref(const boost::function<int (int, int)>& f)
+static void test_call_cref(const hpx::util::function_nonser<int (int, int)>& f)
 {
     HPX_TEST(!f.empty());
 }

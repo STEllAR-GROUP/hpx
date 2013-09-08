@@ -38,12 +38,33 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
 
+#include <stdexcept>
+
 #ifndef HPX_FUNCTION_VERSION
 #define HPX_FUNCTION_VERSION 0x10
 #endif
 
 namespace hpx { namespace util
 {
+    template <
+        typename Sig
+      , typename IArchive = void
+      , typename OArchive = void
+    >
+    struct function_base;
+
+    template <
+        typename Sig
+      , typename IArchive = portable_binary_iarchive
+      , typename OArchive = portable_binary_oarchive
+    >
+    struct function;
+
+    template <
+        typename Sig
+    >
+    struct function_nonser;
+
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
@@ -87,23 +108,34 @@ namespace hpx { namespace util
         {
             return is_empty_function_impl<Functor>::call(f);
         }
+
+        template <
+            typename Sig
+            , typename IArchive
+            , typename OArchive
+        >
+        bool is_empty_function(function<Sig, IArchive, OArchive> const& f)
+        {
+            return f.empty();
+        }
+
+        template <
+            typename Sig
+        >
+        bool is_empty_function(function_nonser<Sig> const& f)
+        {
+            return f.empty();
+        }
     }
 
     template <
         typename Sig
-      , typename IArchive = void
-      , typename OArchive = void
-    >
-    struct function_base;
-
-    template <
-        typename Sig
-      , typename IArchive = portable_binary_iarchive
-      , typename OArchive = portable_binary_oarchive
+      , typename IArchive
+      , typename OArchive
     >
     struct function : function_base<Sig, IArchive, OArchive>
     {
-        typedef typename function_base<Sig, IArchive, OArchive>::result_type 
+        typedef typename function_base<Sig, IArchive, OArchive>::result_type
             result_type;
 
         using function_base<Sig, IArchive, OArchive>::reset;
@@ -435,6 +467,9 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
+
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -549,13 +584,19 @@ namespace hpx { namespace util {
 
         BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
 
         BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
 

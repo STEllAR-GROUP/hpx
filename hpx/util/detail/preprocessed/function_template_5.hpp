@@ -110,6 +110,8 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -211,12 +213,18 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()() const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object );
         }
         BOOST_FORCEINLINE R operator()()
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object );
         }
     private:
@@ -328,6 +336,8 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -429,12 +439,18 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0) const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0);
         }
         BOOST_FORCEINLINE R operator()(A0 a0)
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0);
         }
     private:
@@ -546,6 +562,8 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -647,12 +665,18 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1) const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1)
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1);
         }
     private:
@@ -764,6 +788,8 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -865,12 +891,18 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2) const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2)
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2);
         }
     private:
@@ -982,6 +1014,8 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -1083,12 +1117,18 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3) const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3)
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3);
         }
     private:
@@ -1200,6 +1240,8 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -1301,12 +1343,18 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4) const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
         }
     private:
@@ -1418,6 +1466,8 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -1519,12 +1569,18 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5) const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
         }
     private:
@@ -1636,6 +1692,8 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -1737,12 +1795,18 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6) const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
         }
     private:
@@ -1854,6 +1918,8 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
@@ -1955,12 +2021,18 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7) const
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
         {
-            BOOST_ASSERT(!empty());
+            if (empty()) {
+                throw std::runtime_error("function_base::operator(): "
+                    "function object should not be empty");
+            }
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
         }
     private:
