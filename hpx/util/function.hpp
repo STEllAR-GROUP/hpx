@@ -7,6 +7,7 @@
 #define HPX_UTIL_FUNCTION_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/error.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/function_template.hpp>
 #include <hpx/util/detail/vtable_ptr_base.hpp>

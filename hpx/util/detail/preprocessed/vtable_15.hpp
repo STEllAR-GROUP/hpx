@@ -34,9 +34,9 @@
                       , R()
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -110,9 +110,9 @@
                       , void()
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -190,9 +190,9 @@
                       , R(A0)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -266,9 +266,9 @@
                       , void(A0)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -346,9 +346,9 @@
                       , R(A0 , A1)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -422,9 +422,9 @@
                       , void(A0 , A1)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -502,9 +502,9 @@
                       , R(A0 , A1 , A2)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -578,9 +578,9 @@
                       , void(A0 , A1 , A2)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -658,9 +658,9 @@
                       , R(A0 , A1 , A2 , A3)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -734,9 +734,9 @@
                       , void(A0 , A1 , A2 , A3)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -814,9 +814,9 @@
                       , R(A0 , A1 , A2 , A3 , A4)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -890,9 +890,9 @@
                       , void(A0 , A1 , A2 , A3 , A4)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -970,9 +970,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1046,9 +1046,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1126,9 +1126,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1202,9 +1202,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1282,9 +1282,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1358,9 +1358,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1438,9 +1438,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1514,9 +1514,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1594,9 +1594,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1670,9 +1670,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1750,9 +1750,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1826,9 +1826,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1906,9 +1906,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -1982,9 +1982,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2062,9 +2062,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2138,9 +2138,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2218,9 +2218,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2294,9 +2294,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2374,9 +2374,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2450,9 +2450,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2530,9 +2530,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2606,9 +2606,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2686,9 +2686,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2762,9 +2762,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2842,9 +2842,9 @@
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {
@@ -2918,9 +2918,9 @@
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
                     >::template get<IArchive, OArchive>();
             }
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
             static Functor & construct(void ** f)
             {

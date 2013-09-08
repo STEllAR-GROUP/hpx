@@ -141,7 +141,9 @@ namespace hpx { namespace util
         using function_base<Sig, IArchive, OArchive>::reset;
 
         typedef function_base<Sig, IArchive, OArchive> base_type;
-        function() : base_type() {}
+
+        function() BOOST_NOEXCEPT
+          : base_type() {}
 
         template <typename Functor>
         function(
@@ -230,7 +232,8 @@ namespace hpx { namespace util
         using function_base<Sig, void, void>::reset;
 
         typedef function_base<Sig, void, void> base_type;
-        function() : base_type() {}
+        function() BOOST_NOEXCEPT
+          : base_type() {}
 
         template <typename Functor>
         function(
@@ -280,7 +283,9 @@ namespace hpx { namespace util
         using function_base<Sig, void, void>::reset;
 
         typedef function_base<Sig, void, void> base_type;
-        function_nonser() : base_type() {}
+
+        function_nonser() BOOST_NOEXCEPT
+          : base_type() {}
 
         template <typename Functor>
         function_nonser(
@@ -368,7 +373,7 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
+        function_base() BOOST_NOEXCEPT
             : vptr(0)
             , object(0)
         {}
@@ -557,17 +562,17 @@ namespace hpx { namespace util {
             return *this;
         }
 
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
             return (vptr == 0) && (object == 0);
         }
 
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
 
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -585,8 +590,9 @@ namespace hpx { namespace util {
         BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) const
         {
             if (empty()) {
-                throw std::runtime_error("function_base::operator(): "
-                    "function object should not be empty");
+                hpx::throw_exception(bad_function_call,
+                    "function object should not be empty",
+                    "function_base::operator()", __FILE__, __LINE__);
             }
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
@@ -594,10 +600,68 @@ namespace hpx { namespace util {
         BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
             if (empty()) {
-                throw std::runtime_error("function_base::operator(): "
-                    "function object should not be empty");
+                hpx::throw_exception(bad_function_call,
+                    "function object should not be empty",
+                    "function_base::operator()", __FILE__, __LINE__);
             }
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
+        }
+
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+
+            vtable_ptr_type* f_vptr
+                = detail::get_table<
+                      functor_type
+                    , R(BOOST_PP_ENUM_PARAMS(N, A))
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+
+            if (vptr != f_vptr || empty())
+                return 0;
+
+            if (sizeof(functor_type) <= sizeof(void *))  // is_small
+                return reinterpret_cast<functor_type *>(&object);
+
+            return reinterpret_cast<functor_type *>(object);
+        }
+
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+
+            vtable_ptr_type* f_vptr
+                = detail::get_table<
+                      functor_type
+                    , R(BOOST_PP_ENUM_PARAMS(N, A))
+                  >::template get<
+                      IArchive
+                    , OArchive
+                  >();
+
+            if (vptr != f_vptr || empty())
+                return 0;
+
+            if (sizeof(functor_type) <= sizeof(void *))  // is_small
+                return reinterpret_cast<functor_type const*>(&object);
+
+            return reinterpret_cast<functor_type const*>(object);
         }
 
     private:

@@ -122,9 +122,9 @@ namespace hpx { namespace util { namespace detail {
                     >::template get<IArchive, OArchive>();
             }
 
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
 
             static Functor & construct(void ** f)
@@ -209,9 +209,9 @@ namespace hpx { namespace util { namespace detail {
                     >::template get<IArchive, OArchive>();
             }
 
-            static boost::detail::sp_typeinfo const & get_type()
+            static std::type_info const& get_type()
             {
-                return BOOST_SP_TYPEID(Functor);
+                return typeid(Functor);
             }
 
             static Functor & construct(void ** f)
