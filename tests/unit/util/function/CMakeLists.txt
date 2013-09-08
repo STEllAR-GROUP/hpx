@@ -6,6 +6,7 @@
 set(tests
     contains_test
     function_test
+    nothrow_swap
    )
 
 foreach(test ${tests})
