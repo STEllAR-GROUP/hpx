@@ -4,10 +4,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    bind_test
     contains_test
     function_arith
+    function_ref
     function_test
     nothrow_swap
+    stateless_test
+    sum_avg
    )
 
 foreach(test ${tests})
