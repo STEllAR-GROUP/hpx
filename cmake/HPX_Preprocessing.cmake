@@ -105,7 +105,7 @@ else()
 
         set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}#\n")
         set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}# Specify compiler specific macro names (adapt for your compiler)\n")
-        set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}# \n")
+        set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}#\n")
         if(MSVC)
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-DWIN32\n")
             set(HPX_WAVE_ARGUMENTS "${HPX_WAVE_ARGUMENTS}-D_MT\n")
