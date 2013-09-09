@@ -39,7 +39,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f )
         {
             hpx::throw_exception(bad_function_call,
@@ -79,7 +79,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0)
         {
             hpx::throw_exception(bad_function_call,
@@ -119,7 +119,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1)
         {
             hpx::throw_exception(bad_function_call,
@@ -159,7 +159,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2)
         {
             hpx::throw_exception(bad_function_call,
@@ -199,7 +199,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3)
         {
             hpx::throw_exception(bad_function_call,
@@ -239,7 +239,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
         {
             hpx::throw_exception(bad_function_call,
@@ -279,7 +279,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
         {
             hpx::throw_exception(bad_function_call,
@@ -319,7 +319,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
         {
             hpx::throw_exception(bad_function_call,
@@ -359,7 +359,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
         {
             hpx::throw_exception(bad_function_call,
@@ -399,7 +399,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
         {
             hpx::throw_exception(bad_function_call,
@@ -439,7 +439,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
         {
             hpx::throw_exception(bad_function_call,
@@ -479,7 +479,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
         {
             hpx::throw_exception(bad_function_call,
@@ -519,7 +519,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
         {
             hpx::throw_exception(bad_function_call,
@@ -559,7 +559,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
         {
             hpx::throw_exception(bad_function_call,
@@ -599,7 +599,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13)
         {
             hpx::throw_exception(bad_function_call,
@@ -639,7 +639,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14)
         {
             hpx::throw_exception(bad_function_call,
@@ -679,7 +679,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15)
         {
             hpx::throw_exception(bad_function_call,
@@ -719,7 +719,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16)
         {
             hpx::throw_exception(bad_function_call,
@@ -759,7 +759,7 @@ namespace hpx { namespace util { namespace detail
         {
             return typeid(functor_type);
         }
-        __declspec(noreturn) static R
+        BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17)
         {
             hpx::throw_exception(bad_function_call,
