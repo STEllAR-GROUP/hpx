@@ -11,7 +11,9 @@ set(allocator_error "HPX_MALLOC was set to ${HPX_MALLOC}, but ${HPX_MALLOC} coul
 
 hpx_info("malloc" "Using ${HPX_MALLOC} allocator.")
 
-if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
+string(TOUPPER "${HPX_MALLOC}" HPX_MALLOC_UPPER)
+
+if("${HPX_MALLOC_UPPER}" STREQUAL "TCMALLOC")
   find_package(HPX_TCMalloc)
   if(NOT TCMALLOC_FOUND)
     hpx_error("malloc" ${allocator_error})
@@ -27,7 +29,7 @@ if("${HPX_MALLOC}" MATCHES "tcmalloc|TCMalloc|TCMALLOC")
   set(HPX_USE_CUSTOM_ALLOCATOR On)
 endif()
 
-if("${HPX_MALLOC}" MATCHES "jemalloc|Jemalloc|JEMALLOC")
+if("${HPX_MALLOC_UPPER}" STREQUAL "JEMALLOC")
     if(MSVC)
       hpx_error("malloc" "jemalloc is not usable with MSVC")
     endif()
@@ -43,7 +45,7 @@ if("${HPX_MALLOC}" MATCHES "jemalloc|Jemalloc|JEMALLOC")
     set(HPX_USE_CUSTOM_ALLOCATOR On)
 endif()
 
-if("${HPX_MALLOC}" MATCHES "tbbmalloc|TBBMalloc|TBBMALLOC|TBBmalloc")
+if("${HPX_MALLOC_UPPER}" STREQUAL "TBBMALLOC")
   find_package(HPX_TBBmalloc)
   if(NOT TBBMALLOC_FOUND)
     hpx_error("malloc" ${allocator_error})
