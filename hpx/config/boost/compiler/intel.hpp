@@ -215,7 +215,7 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 //#  undef  BOOST_NO_CXX11_RVALUE_REFERENCES // Enabling this breaks Filesystem and Exception libraries
 //#  undef  BOOST_NO_CXX11_SCOPED_ENUMS  // doesn't really work!!
 #  undef  BOOST_NO_CXX11_DELETED_FUNCTIONS
-#  undef  BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
+//#  undef  BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
 #  undef  BOOST_NO_CXX11_LAMBDAS
 #  undef  BOOST_NO_CXX11_LOCAL_CLASS_TEMPLATE_PARAMETERS
 #  undef  BOOST_NO_CXX11_DECLTYPE

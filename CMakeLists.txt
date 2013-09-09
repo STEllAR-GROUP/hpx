@@ -176,6 +176,12 @@ hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 if(${BOOST_MINOR_VERSION} LESS 49)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
 endif()
+# If we compile natively for the MIC, we need some workarounds for certain
+# boost headers
+# FIXME: push changes upstream
+if(HPX_NATIVE_MIC)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/asio)
+endif()
 
 if(UNIX)
   hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
@@ -1486,6 +1492,16 @@ if(NOT HPX_NO_INSTALL)
     # install Boost.Serialization patch for older Boost versions only
     install(
       DIRECTORY external/serialization/boost
+      DESTINATION include/hpx/external
+      COMPONENT core
+      FILES_MATCHING PATTERN "*.hpp"
+      PATTERN ".git" EXCLUDE)
+  endif()
+
+  if(HPX_NATIVE_MIC)
+    # FIXME: push changes upstream
+    install(
+      DIRECTORY external/asio/boost
       DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
