@@ -14,6 +14,8 @@
 #include <hpx/util/detail/vtable_ptr.hpp>
 #include <hpx/util/detail/get_table.hpp>
 #include <hpx/util/detail/vtable.hpp>
+#include <hpx/util/detail/get_empty_table.hpp>
+#include <hpx/util/detail/empty_vtable.hpp>
 
 #define HPX_UTIL_REGISTER_FUNCTION_DECLARATION(Sig, Functor, Name)            \
     namespace hpx { namespace traits {                                        \

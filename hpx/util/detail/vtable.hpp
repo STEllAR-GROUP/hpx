@@ -10,15 +10,66 @@
 
 #include <hpx/config/forceinline.hpp>
 #include <boost/ref.hpp>
-#include <boost/detail/sp_typeinfo.hpp>
+
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+
+#include <typeinfo>
 
 namespace hpx { namespace util { namespace detail {
 
     template <>
     struct vtable<true>
     {
+        template <typename Functor>
+        struct type_base
+        {
+            enum { empty = false };
+
+            static std::type_info const& get_type()
+            {
+                return typeid(Functor);
+            }
+
+            static Functor & construct(void ** f)
+            {
+                new (f) Functor;
+                return *reinterpret_cast<Functor *>(f);
+            }
+
+            static Functor & get(void **f)
+            {
+                return *reinterpret_cast<Functor *>(f);
+            }
+
+            static Functor const & get(void *const*f)
+            {
+                return *reinterpret_cast<Functor const *>(f);
+            }
+
+            static void static_delete(void ** f)
+            {
+                reinterpret_cast<Functor*>(f)->~Functor();
+            }
+
+            static void destruct(void ** f)
+            {
+                reinterpret_cast<Functor*>(f)->~Functor();
+            }
+
+            static void clone(void *const* src, void ** dest)
+            {
+                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
+            }
+
+            static void copy(void *const* f, void ** dest)
+            {
+                reinterpret_cast<Functor*>(dest)->~Functor();
+                *reinterpret_cast<Functor*>(dest) =
+                    *reinterpret_cast<Functor const *>(f);
+            }
+        };
+
         template <typename Functor, typename Sig, typename IArchive, typename OArchive>
         struct type;
 
@@ -54,6 +105,55 @@ namespace hpx { namespace util { namespace detail {
     template <>
     struct vtable<false>
     {
+        template <typename Functor>
+        struct type_base
+        {
+            enum { empty = false };
+
+            static std::type_info const & get_type()
+            {
+                return typeid(Functor);
+            }
+
+            static Functor & construct(void ** f)
+            {
+                *f = new Functor;
+                return **reinterpret_cast<Functor **>(f);
+            }
+
+            static Functor & get(void **f)
+            {
+                return **reinterpret_cast<Functor **>(f);
+            }
+
+            static Functor const & get(void *const*f)
+            {
+                return **reinterpret_cast<Functor *const *>(f);
+            }
+
+            static void static_delete(void ** f)
+            {
+                delete (*reinterpret_cast<Functor **>(f));
+            }
+
+            static void destruct(void ** f)
+            {
+                (*reinterpret_cast<Functor**>(f))->~Functor();
+            }
+
+            static void clone(void *const* src, void ** dest)
+            {
+                *dest = new Functor(**reinterpret_cast<Functor *const*>(src));
+            }
+
+            static void copy(void *const* f, void ** dest)
+            {
+                (*reinterpret_cast<Functor**>(dest))->~Functor();
+                **reinterpret_cast<Functor**>(dest) =
+                    **reinterpret_cast<Functor * const *>(f);
+            }
+        };
+
         template <typename Functor, typename Sig, typename IArchive, typename OArchive>
         struct type;
 
@@ -108,6 +208,7 @@ namespace hpx { namespace util { namespace detail {
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
@@ -120,49 +221,6 @@ namespace hpx { namespace util { namespace detail {
                         Functor
                       , R(BOOST_PP_ENUM_PARAMS(N, A))
                     >::template get<IArchive, OArchive>();
-            }
-
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
 
             BOOST_FORCEINLINE static R
@@ -195,6 +253,7 @@ namespace hpx { namespace util { namespace detail {
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(BOOST_PP_ENUM_PARAMS(N, A))
@@ -207,49 +266,6 @@ namespace hpx { namespace util { namespace detail {
                         Functor
                       , void(BOOST_PP_ENUM_PARAMS(N, A))
                     >::template get<IArchive, OArchive>();
-            }
-
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
 
             static
@@ -273,7 +289,6 @@ namespace hpx { namespace util { namespace detail {
             }
         };
 
-
 #endif
 
 #if BOOST_PP_ITERATION_FLAGS() == 2
@@ -291,6 +306,7 @@ namespace hpx { namespace util { namespace detail {
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
@@ -303,49 +319,6 @@ namespace hpx { namespace util { namespace detail {
                         Functor
                       , R(BOOST_PP_ENUM_PARAMS(N, A))
                     >::template get<IArchive, OArchive>();
-            }
-
-            static boost::detail::sp_typeinfo const & get_type()
-            {
-                return BOOST_SP_TYPEID(Functor);
-            }
-
-            static Functor & construct(void ** f)
-            {
-                *f = new Functor;
-                return **reinterpret_cast<Functor **>(f);
-            }
-
-            static Functor & get(void **f)
-            {
-                return **reinterpret_cast<Functor **>(f);
-            }
-
-            static Functor const & get(void *const*f)
-            {
-                return **reinterpret_cast<Functor *const *>(f);
-            }
-
-            static void static_delete(void ** f)
-            {
-                delete (*reinterpret_cast<Functor **>(f));
-            }
-
-            static void destruct(void ** f)
-            {
-                (*reinterpret_cast<Functor**>(f))->~Functor();
-            }
-
-            static void clone(void *const* src, void ** dest)
-            {
-                *dest = new Functor(**reinterpret_cast<Functor *const*>(src));
-            }
-
-            static void copy(void *const* f, void ** dest)
-            {
-                (*reinterpret_cast<Functor**>(dest))->~Functor();
-                **reinterpret_cast<Functor**>(dest) =
-                    **reinterpret_cast<Functor * const *>(f);
             }
 
             BOOST_FORCEINLINE static R
@@ -378,6 +351,7 @@ namespace hpx { namespace util { namespace detail {
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(BOOST_PP_ENUM_PARAMS(N, A))
@@ -390,49 +364,6 @@ namespace hpx { namespace util { namespace detail {
                         Functor
                       , void(BOOST_PP_ENUM_PARAMS(N, A))
                     >::template get<IArchive, OArchive>();
-            }
-
-            static boost::detail::sp_typeinfo const & get_type()
-            {
-                return BOOST_SP_TYPEID(Functor);
-            }
-
-            static Functor & construct(void ** f)
-            {
-                *f = new Functor;
-                return **reinterpret_cast<Functor **>(f);
-            }
-
-            static Functor & get(void **f)
-            {
-                return **reinterpret_cast<Functor **>(f);
-            }
-
-            static Functor const & get(void *const*f)
-            {
-                return **reinterpret_cast<Functor *const *>(f);
-            }
-
-            static void static_delete(void ** f)
-            {
-                delete (*reinterpret_cast<Functor **>(f));
-            }
-
-            static void destruct(void ** f)
-            {
-                (*reinterpret_cast<Functor**>(f))->~Functor();
-            }
-
-            static void clone(void *const* src, void ** dest)
-            {
-                *dest = new Functor(**reinterpret_cast<Functor *const*>(src));
-            }
-
-            static void copy(void *const* f, void ** dest)
-            {
-                (*reinterpret_cast<Functor**>(dest))->~Functor();
-                **reinterpret_cast<Functor**>(dest) =
-                    **reinterpret_cast<Functor * const *>(f);
             }
 
             static

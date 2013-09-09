@@ -78,6 +78,10 @@ namespace hpx { namespace util
         struct vtable;
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Sig>
+        struct get_empty_table;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Functor>
         struct is_empty_function_impl
         {
@@ -374,7 +378,7 @@ namespace hpx { namespace util {
     >
     {
         function_base() BOOST_NOEXCEPT
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
 
@@ -405,7 +409,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -414,14 +418,7 @@ namespace hpx { namespace util {
                     typename util::decay<Functor>::type
                     functor_type;
 
-                vptr = detail::get_table<
-                            functor_type
-                          , R(BOOST_PP_ENUM_PARAMS(N, A))
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
-
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *))  // is_small
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -434,7 +431,7 @@ namespace hpx { namespace util {
         }
 
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -444,7 +441,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
 
@@ -479,15 +476,7 @@ namespace hpx { namespace util {
                 typename util::decay<Functor>::type
                 functor_type;
 
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(BOOST_PP_ENUM_PARAMS(N, A))
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
-
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *))  // is_small
@@ -507,13 +496,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
-
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *))  // is_small
@@ -548,7 +531,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
 
@@ -564,7 +547,7 @@ namespace hpx { namespace util {
 
         bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
 
         operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
@@ -582,28 +565,40 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
 
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R(BOOST_PP_ENUM_PARAMS(N, A))
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R(BOOST_PP_ENUM_PARAMS(N, A))
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+
         BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) const
         {
-            if (empty()) {
-                hpx::throw_exception(bad_function_call,
-                    "function object should not be empty",
-                    "function_base::operator()", __FILE__, __LINE__);
-            }
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
 
         BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
-            if (empty()) {
-                hpx::throw_exception(bad_function_call,
-                    "function object should not be empty",
-                    "function_base::operator()", __FILE__, __LINE__);
-            }
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
 
@@ -621,15 +616,7 @@ namespace hpx { namespace util {
                 typename util::decay<T>::type
                 functor_type;
 
-            vtable_ptr_type* f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(BOOST_PP_ENUM_PARAMS(N, A))
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
-
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if (vptr != f_vptr || empty())
                 return 0;
 
@@ -646,15 +633,7 @@ namespace hpx { namespace util {
                 typename util::decay<T>::type
                 functor_type;
 
-            vtable_ptr_type* f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(BOOST_PP_ENUM_PARAMS(N, A))
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
-
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if (vptr != f_vptr || empty())
                 return 0;
 

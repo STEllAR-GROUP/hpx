@@ -21,6 +21,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R()
@@ -33,41 +34,6 @@
                         Functor
                       , R()
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f )
@@ -97,6 +63,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void()
@@ -109,41 +76,6 @@
                         Functor
                       , void()
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             static
             BOOST_FORCEINLINE void
@@ -177,6 +109,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0)
@@ -189,41 +122,6 @@
                         Functor
                       , R(A0)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0)
@@ -253,6 +151,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(A0)
@@ -265,41 +164,6 @@
                         Functor
                       , void(A0)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             static
             BOOST_FORCEINLINE void
@@ -333,6 +197,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1)
@@ -345,41 +210,6 @@
                         Functor
                       , R(A0 , A1)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1)
@@ -409,6 +239,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(A0 , A1)
@@ -421,41 +252,6 @@
                         Functor
                       , void(A0 , A1)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             static
             BOOST_FORCEINLINE void
@@ -489,6 +285,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2)
@@ -501,41 +298,6 @@
                         Functor
                       , R(A0 , A1 , A2)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2)
@@ -565,6 +327,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(A0 , A1 , A2)
@@ -577,41 +340,6 @@
                         Functor
                       , void(A0 , A1 , A2)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             static
             BOOST_FORCEINLINE void
@@ -645,6 +373,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3)
@@ -657,41 +386,6 @@
                         Functor
                       , R(A0 , A1 , A2 , A3)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3)
@@ -721,6 +415,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(A0 , A1 , A2 , A3)
@@ -733,41 +428,6 @@
                         Functor
                       , void(A0 , A1 , A2 , A3)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             static
             BOOST_FORCEINLINE void
@@ -801,6 +461,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4)
@@ -813,41 +474,6 @@
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
@@ -877,6 +503,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(A0 , A1 , A2 , A3 , A4)
@@ -889,41 +516,6 @@
                         Functor
                       , void(A0 , A1 , A2 , A3 , A4)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             static
             BOOST_FORCEINLINE void
@@ -957,6 +549,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5)
@@ -969,41 +562,6 @@
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
@@ -1033,6 +591,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(A0 , A1 , A2 , A3 , A4 , A5)
@@ -1045,41 +604,6 @@
                         Functor
                       , void(A0 , A1 , A2 , A3 , A4 , A5)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             static
             BOOST_FORCEINLINE void
@@ -1113,6 +637,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
@@ -1125,41 +650,6 @@
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
@@ -1189,6 +679,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(A0 , A1 , A2 , A3 , A4 , A5 , A6)
@@ -1201,41 +692,6 @@
                         Functor
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             static
             BOOST_FORCEINLINE void
@@ -1269,6 +725,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
@@ -1281,41 +738,6 @@
                         Functor
                       , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
@@ -1345,6 +767,7 @@
           , IArchive
           , OArchive
         >
+            : type_base<Functor>
         {
             static vtable_ptr_base<
                 void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
@@ -1357,41 +780,6 @@
                         Functor
                       , void(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
                     >::template get<IArchive, OArchive>();
-            }
-            static std::type_info const& get_type()
-            {
-                return typeid(Functor);
-            }
-            static Functor & construct(void ** f)
-            {
-                new (f) Functor;
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor & get(void **f)
-            {
-                return *reinterpret_cast<Functor *>(f);
-            }
-            static Functor const & get(void *const*f)
-            {
-                return *reinterpret_cast<Functor const *>(f);
-            }
-            static void static_delete(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void destruct(void ** f)
-            {
-                reinterpret_cast<Functor*>(f)->~Functor();
-            }
-            static void clone(void *const* src, void ** dest)
-            {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
-            }
-            static void copy(void *const* f, void ** dest)
-            {
-                reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
             }
             static
             BOOST_FORCEINLINE void

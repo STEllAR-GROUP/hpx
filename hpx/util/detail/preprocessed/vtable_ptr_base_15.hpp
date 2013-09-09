@@ -22,6 +22,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -45,6 +46,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -80,6 +82,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -103,6 +106,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -138,6 +142,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -161,6 +166,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -196,6 +202,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -219,6 +226,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -254,6 +262,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -277,6 +286,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -312,6 +322,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -335,6 +346,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -370,6 +382,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -393,6 +406,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -428,6 +442,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -451,6 +466,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -486,6 +502,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -509,6 +526,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -544,6 +562,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -567,6 +586,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -602,6 +622,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -625,6 +646,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -660,6 +682,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -683,6 +706,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -718,6 +742,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -741,6 +766,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -776,6 +802,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -799,6 +826,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -834,6 +862,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -857,6 +886,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -892,6 +922,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -915,6 +946,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -950,6 +982,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -973,6 +1006,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -1008,6 +1042,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -1031,6 +1066,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -1066,6 +1102,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
@@ -1089,6 +1126,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
