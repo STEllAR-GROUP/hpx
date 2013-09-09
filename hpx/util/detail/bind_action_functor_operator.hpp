@@ -10,7 +10,7 @@
     BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a))
     {
         typedef
-            BOOST_PP_CAT(hpx::util::tuple, NNN)<
+            hpx::util::tuple<
                 BOOST_PP_ENUM(NNN, HPX_UTIL_BIND_REFERENCE, A)
             >
             env_type;
@@ -24,7 +24,7 @@
     BOOST_FORCEINLINE result_type operator()(HPX_ENUM_FWD_ARGS(NNN, A, a)) const
     {
         typedef
-            BOOST_PP_CAT(hpx::util::tuple, NNN)<
+            hpx::util::tuple<
                 BOOST_PP_ENUM(NNN, HPX_UTIL_BIND_REFERENCE, A)
             >
             env_type;

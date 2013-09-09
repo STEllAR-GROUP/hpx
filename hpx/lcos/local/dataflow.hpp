@@ -122,7 +122,7 @@ namespace hpx { namespace lcos { namespace local
 
             BOOST_PP_REPEAT(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER_TYPES, _)
             typedef
-                BOOST_PP_CAT(hpx::util::tuple, N)<
+                hpx::util::tuple<
                     BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER, _)
                 >
                 futures_type;

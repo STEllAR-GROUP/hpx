@@ -26,14 +26,14 @@ namespace hpx { namespace actions
         typename Component, typename Result,
         Result (Component::*F)() const, typename Derived>
     class base_result_action0<Result (Component::*)() const, F, Derived>
-      : public action<Component const, Result, hpx::util::tuple0<>, Derived>
+      : public action<Component const, Result, hpx::util::tuple<>, Derived>
     {
     public:
         typedef Result result_type;
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
 
-        typedef hpx::util::tuple0<> arguments_type;
+        typedef hpx::util::tuple<> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
 
@@ -224,13 +224,13 @@ namespace hpx { namespace actions
     template <typename Component, void (Component::*F)() const, typename Derived>
     class base_action0<void (Component::*)() const, F, Derived>
       : public action<Component const, util::unused_type,
-            hpx::util::tuple0<>, Derived>
+            hpx::util::tuple<>, Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
 
-        typedef hpx::util::tuple0<> arguments_type;
+        typedef hpx::util::tuple<> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
 

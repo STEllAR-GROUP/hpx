@@ -406,7 +406,7 @@ struct response
         // symbol_ns_bind
         // symbol_ns_iterate_names
         // primary_ns_change_credit
-      , util::tuple0<
+      , util::tuple<
         >
         // 0x8
         // component_ns_get_component_typename

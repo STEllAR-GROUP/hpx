@@ -69,12 +69,12 @@ namespace hpx { namespace actions
     class BOOST_PP_CAT(base_result_action, N)
       : public action<
             Component, Result,
-            BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef BOOST_PP_CAT(hpx::util::tuple, N)<
+        typedef hpx::util::tuple<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -307,12 +307,12 @@ namespace hpx { namespace actions
     class BOOST_PP_CAT(base_action, N)
       : public action<
             Component, util::unused_type,
-            BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef BOOST_PP_CAT(hpx::util::tuple, N)<
+        typedef hpx::util::tuple<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;

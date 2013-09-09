@@ -44,14 +44,14 @@ namespace hpx { namespace actions
     class plain_base_result_action0
       : public action<
             components::server::plain_function<Derived>,
-            Result, hpx::util::tuple0<>, Derived>
+            Result, hpx::util::tuple<>, Derived>
     {
     public:
         typedef Result result_type;
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
 
-        typedef hpx::util::tuple0<> arguments_type;
+        typedef hpx::util::tuple<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
             remote_result_type, arguments_type, Derived
@@ -205,14 +205,14 @@ namespace hpx { namespace actions
     class plain_base_action0
       : public action<
             components::server::plain_function<Derived>,
-            util::unused_type, hpx::util::tuple0<>,
+            util::unused_type, hpx::util::tuple<>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
 
-        typedef hpx::util::tuple0<> arguments_type;
+        typedef hpx::util::tuple<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
             remote_result_type, arguments_type, Derived

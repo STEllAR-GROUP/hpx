@@ -19,12 +19,12 @@ namespace hpx { namespace actions
     class base_result_action1
       : public action<
             Component, Result,
-            hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple1<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -237,12 +237,12 @@ namespace hpx { namespace actions
     class base_action1
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple1<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;
@@ -454,12 +454,12 @@ namespace hpx { namespace actions
     class base_result_action2
       : public action<
             Component, Result,
-            hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple2<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -672,12 +672,12 @@ namespace hpx { namespace actions
     class base_action2
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple2<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;
@@ -889,12 +889,12 @@ namespace hpx { namespace actions
     class base_result_action3
       : public action<
             Component, Result,
-            hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple3<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -1107,12 +1107,12 @@ namespace hpx { namespace actions
     class base_action3
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple3<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;
@@ -1324,12 +1324,12 @@ namespace hpx { namespace actions
     class base_result_action4
       : public action<
             Component, Result,
-            hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple4<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -1542,12 +1542,12 @@ namespace hpx { namespace actions
     class base_action4
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple4<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;
@@ -1759,12 +1759,12 @@ namespace hpx { namespace actions
     class base_result_action5
       : public action<
             Component, Result,
-            hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple5<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -1977,12 +1977,12 @@ namespace hpx { namespace actions
     class base_action5
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple5<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;
@@ -2194,12 +2194,12 @@ namespace hpx { namespace actions
     class base_result_action6
       : public action<
             Component, Result,
-            hpx::util::tuple6<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple6<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -2412,12 +2412,12 @@ namespace hpx { namespace actions
     class base_action6
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple6<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple6<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;
@@ -2629,12 +2629,12 @@ namespace hpx { namespace actions
     class base_result_action7
       : public action<
             Component, Result,
-            hpx::util::tuple7<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple7<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -2847,12 +2847,12 @@ namespace hpx { namespace actions
     class base_action7
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple7<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple7<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;
@@ -3064,12 +3064,12 @@ namespace hpx { namespace actions
     class base_result_action8
       : public action<
             Component, Result,
-            hpx::util::tuple8<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple8<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -3282,12 +3282,12 @@ namespace hpx { namespace actions
     class base_action8
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple8<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple8<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;
@@ -3499,12 +3499,12 @@ namespace hpx { namespace actions
     class base_result_action9
       : public action<
             Component, Result,
-            hpx::util::tuple9<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple9<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -3717,12 +3717,12 @@ namespace hpx { namespace actions
     class base_action9
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple9<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple9<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;
@@ -3934,12 +3934,12 @@ namespace hpx { namespace actions
     class base_result_action10
       : public action<
             Component, Result,
-            hpx::util::tuple10<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple10<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -4152,12 +4152,12 @@ namespace hpx { namespace actions
     class base_action10
       : public action<
             Component, util::unused_type,
-            hpx::util::tuple10<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple10<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
             base_type;

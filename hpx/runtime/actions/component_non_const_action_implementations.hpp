@@ -63,7 +63,7 @@ namespace hpx { namespace actions
             Result (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
       : public action<
             Component, Result,
-            BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
     {
     public:
@@ -71,7 +71,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
 
-        typedef BOOST_PP_CAT(hpx::util::tuple, N)<
+        typedef hpx::util::tuple<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
@@ -272,14 +272,14 @@ namespace hpx { namespace actions
             void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)), F, Derived>
       : public action<
             Component, util::unused_type,
-            BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
 
-        typedef BOOST_PP_CAT(hpx::util::tuple, N)<
+        typedef hpx::util::tuple<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;

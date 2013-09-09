@@ -162,7 +162,7 @@ namespace hpx { namespace util
             // apply() invokes the embedded action fully asynchronously
             bool apply()
             {
-                typedef hpx::util::tuple0<> env_type;
+                typedef hpx::util::tuple<> env_type;
                 env_type env;
                 return hpx::apply<Action>(
                     hpx::util::detail::eval(env, arg0)
@@ -172,7 +172,7 @@ namespace hpx { namespace util
 
             bool apply() const
             {
-                typedef hpx::util::tuple0<> env_type;
+                typedef hpx::util::tuple<> env_type;
                 env_type env;
                 return hpx::apply<Action>(
                     hpx::util::detail::eval(env, arg0)
@@ -185,7 +185,7 @@ namespace hpx { namespace util
     bool apply(HPX_ENUM_FWD_ARGS(N, A, a))                                    \
     {                                                                         \
         typedef                                                               \
-            BOOST_PP_CAT(hpx::util::tuple, N)<                                \
+            hpx::util::tuple<                                                 \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
             >                                                                 \
             env_type;                                                         \
@@ -199,7 +199,7 @@ namespace hpx { namespace util
     bool apply(HPX_ENUM_FWD_ARGS(N, A, a)) const                              \
     {                                                                         \
         typedef                                                               \
-            BOOST_PP_CAT(hpx::util::tuple, N)<                                \
+            hpx::util::tuple<                                                 \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
             >                                                                 \
             env_type;                                                         \
@@ -221,7 +221,7 @@ namespace hpx { namespace util
             // a future representing the result of the embedded operation
             hpx::lcos::future<result_type> async()
             {
-                typedef hpx::util::tuple0<> env_type;
+                typedef hpx::util::tuple<> env_type;
                 env_type env;
                 return hpx::async<Action>(
                     hpx::util::detail::eval(env, arg0)
@@ -231,7 +231,7 @@ namespace hpx { namespace util
 
             hpx::lcos::future<result_type> async() const
             {
-                typedef hpx::util::tuple0<> env_type;
+                typedef hpx::util::tuple<> env_type;
                 env_type env;
                 return hpx::async<Action>(
                     hpx::util::detail::eval(env, arg0)
@@ -245,7 +245,7 @@ namespace hpx { namespace util
     async(HPX_ENUM_FWD_ARGS(N, A, a))                                         \
     {                                                                         \
         typedef                                                               \
-            BOOST_PP_CAT(hpx::util::tuple, N)<                                \
+            hpx::util::tuple<                                                 \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
             >                                                                 \
             env_type;                                                         \
@@ -260,7 +260,7 @@ namespace hpx { namespace util
     async(HPX_ENUM_FWD_ARGS(N, A, a)) const                                   \
     {                                                                         \
         typedef                                                               \
-            BOOST_PP_CAT(hpx::util::tuple, N)<                                \
+            hpx::util::tuple<                                                 \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
             >                                                                 \
             env_type;                                                         \
@@ -281,7 +281,7 @@ namespace hpx { namespace util
             // The operator()() invokes the embedded action synchronously.
             BOOST_FORCEINLINE result_type operator()()
             {
-                typedef hpx::util::tuple0<> env_type;
+                typedef hpx::util::tuple<> env_type;
                 env_type env;
                 return hpx::async<Action>(
                     hpx::util::detail::eval(env, arg0)
@@ -291,7 +291,7 @@ namespace hpx { namespace util
 
             BOOST_FORCEINLINE result_type operator()() const
             {
-                typedef hpx::util::tuple0<> env_type;
+                typedef hpx::util::tuple<> env_type;
                 env_type env;
                 return hpx::async<Action>(
                     hpx::util::detail::eval(env, arg0)

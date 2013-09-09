@@ -69,7 +69,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
     {
     public:
@@ -77,7 +77,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
 
-        typedef BOOST_PP_CAT(hpx::util::tuple, N)<
+        typedef hpx::util::tuple<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -260,7 +260,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived>
     {
     public:
@@ -268,7 +268,7 @@ namespace hpx { namespace actions
         typedef util::unused_type remote_result_type;
 
         typedef
-            BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>
+            hpx::util::tuple<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,

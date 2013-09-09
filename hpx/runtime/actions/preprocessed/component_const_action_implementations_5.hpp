@@ -20,14 +20,14 @@ namespace hpx { namespace actions
             Result (Component::*)(T0) const, F, Derived>
       : public action<
             Component const, Result,
-            hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
-        typedef hpx::util::tuple1<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
@@ -212,13 +212,13 @@ namespace hpx { namespace actions
             void (Component::*)(T0) const, F, Derived>
       : public action<
             Component const, util::unused_type,
-            hpx::util::tuple1<typename detail::remove_qualifiers<T0>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
-        typedef hpx::util::tuple1<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
@@ -416,14 +416,14 @@ namespace hpx { namespace actions
             Result (Component::*)(T0 , T1) const, F, Derived>
       : public action<
             Component const, Result,
-            hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
-        typedef hpx::util::tuple2<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
@@ -608,13 +608,13 @@ namespace hpx { namespace actions
             void (Component::*)(T0 , T1) const, F, Derived>
       : public action<
             Component const, util::unused_type,
-            hpx::util::tuple2<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
-        typedef hpx::util::tuple2<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
@@ -812,14 +812,14 @@ namespace hpx { namespace actions
             Result (Component::*)(T0 , T1 , T2) const, F, Derived>
       : public action<
             Component const, Result,
-            hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
-        typedef hpx::util::tuple3<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
@@ -1004,13 +1004,13 @@ namespace hpx { namespace actions
             void (Component::*)(T0 , T1 , T2) const, F, Derived>
       : public action<
             Component const, util::unused_type,
-            hpx::util::tuple3<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
-        typedef hpx::util::tuple3<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
@@ -1208,14 +1208,14 @@ namespace hpx { namespace actions
             Result (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>
       : public action<
             Component const, Result,
-            hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
-        typedef hpx::util::tuple4<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
@@ -1400,13 +1400,13 @@ namespace hpx { namespace actions
             void (Component::*)(T0 , T1 , T2 , T3) const, F, Derived>
       : public action<
             Component const, util::unused_type,
-            hpx::util::tuple4<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
-        typedef hpx::util::tuple4<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
@@ -1604,14 +1604,14 @@ namespace hpx { namespace actions
             Result (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>
       : public action<
             Component const, Result,
-            hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
             Derived>
     {
     public:
         typedef Result result_type;
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
-        typedef hpx::util::tuple5<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
@@ -1796,13 +1796,13 @@ namespace hpx { namespace actions
             void (Component::*)(T0 , T1 , T2 , T3 , T4) const, F, Derived>
       : public action<
             Component const, util::unused_type,
-            hpx::util::tuple5<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
+            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
-        typedef hpx::util::tuple5<
+        typedef hpx::util::tuple<
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;

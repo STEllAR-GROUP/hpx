@@ -11,7 +11,7 @@
     {
         using detail::get_pointer;
         typedef
-            BOOST_PP_CAT(hpx::util::tuple, NNN)<
+            hpx::util::tuple<
                 BOOST_PP_ENUM(NNN, HPX_UTIL_BIND_REFERENCE, A)
             >
             env_type;
@@ -26,7 +26,7 @@
     {
         using detail::get_pointer;
         typedef
-            BOOST_PP_CAT(hpx::util::tuple, NNN)<
+            hpx::util::tuple<
                 BOOST_PP_ENUM(NNN, HPX_UTIL_BIND_REFERENCE, A)
             >
             env_type;
