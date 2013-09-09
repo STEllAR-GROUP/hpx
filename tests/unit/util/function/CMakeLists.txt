@@ -1,29 +1,18 @@
-# Copyright (c) 2011 Bryce Adelstein-Lelbach
+# Copyright (c) 2013 Hartmut Kaiser
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    any
-    any_serialization
-    boost_any
-    bind_action
-    function
-    merging_map
-    parse_slurm_nodelist
-    tuple
-    zero_copy_serialization
+    bind_test
+    contains_test
+    function_arith
+    function_ref
+    function_test
+    nothrow_swap
+    stateless_test
+    sum_avg
    )
-
-set(subdirs
-    function
-   )
-
-###############################################################################
-if(HWLOC_FOUND)
-  set(tests ${tests} parse_affinity_options)
-  set(parse_affinity_options_PARAMETERS THREADS_PER_LOCALITY 2)
-endif()
 
 foreach(test ${tests})
   set(sources
@@ -35,9 +24,9 @@ foreach(test ${tests})
   add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
-                     FOLDER "Tests/Unit/Util/")
+                     FOLDER "Tests/Unit/Util/Function")
 
-  add_hpx_unit_test(${test} ${${test}_PARAMETERS})  
+  add_hpx_unit_test(${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.util.${test})
@@ -51,10 +40,4 @@ foreach(test ${tests})
                               ${test}_test_exe)
 endforeach()
 
-# add sub directories
-foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.function.${subdir})
-  add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.function tests.unit.function.${subdir})
-endforeach()
 

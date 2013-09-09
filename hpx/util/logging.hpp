@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -102,14 +102,6 @@ namespace hpx { namespace util
         // get the data to use to pre-fill the runtime_configuration instance
         // with logging specific data
         std::vector<std::string> const& get_logging_data();
-
-        // the init_logging type will be used for initialization purposes only as
-        // well
-        struct init_logging
-        {
-            init_logging(runtime_configuration& ini, bool isconsole,
-                naming::resolver_client& agas_client);
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -171,13 +163,6 @@ namespace hpx { namespace util { namespace detail
     // get the data to use to pre-fill the runtime_configuration instance
     // with logging specific data
     HPX_EXPORT std::vector<std::string> get_logging_data();
-
-    // the init_logging type will be used for initialization purposes only as
-    // well
-    struct init_logging
-    {
-        init_logging(runtime_configuration&, bool, naming::resolver_client&);
-    };
 
     struct dummy_log_impl {};
     HPX_EXPORT extern dummy_log_impl dummy_log;

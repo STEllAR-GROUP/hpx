@@ -18,6 +18,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/logging/format/named_write.hpp>
 #include <hpx/util/logging/format/destination/defaults.hpp>
+#include <hpx/util/init_logging.hpp>
 
 #include <boost/version.hpp>
 #include <boost/config.hpp>

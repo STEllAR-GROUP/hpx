@@ -1,12 +1,13 @@
 //  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !BOOST_PP_IS_ITERATING
 
-#ifndef HPX_FUNCTION_DETAIL_GET_TABLE_HPP
-#define HPX_FUNCTION_DETAIL_GET_TABLE_HPP
+#ifndef HPX_FUNCTION_DETAIL_GET_EMPTY_TABLE_HPP
+#define HPX_FUNCTION_DETAIL_GET_EMPTY_TABLE_HPP
 
 #include <hpx/config/forceinline.hpp>
 
@@ -16,11 +17,11 @@
 #include <typeinfo>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/util/detail/preprocessed/get_table.hpp>
+#  include <hpx/util/detail/preprocessed/get_empty_table.hpp>
 #else
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/get_table_" HPX_LIMIT_STR ".hpp")
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/get_empty_table_" HPX_LIMIT_STR ".hpp")
 #endif
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
@@ -29,7 +30,7 @@
       , (                                                                       \
             0                                                                   \
           , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
-          , <hpx/util/detail/get_table.hpp>                                     \
+          , <hpx/util/detail/get_empty_table.hpp>                               \
         )                                                                       \
     )                                                                           \
 /**/
@@ -50,13 +51,11 @@
 namespace hpx { namespace util { namespace detail {
 
     template <
-        typename Functor
-      , typename R
+        typename R
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
-    struct get_table<
-        Functor
-      , R(BOOST_PP_ENUM_PARAMS(N, A))
+    struct get_empty_table<
+        R(BOOST_PP_ENUM_PARAMS(N, A))
     >
     {
         template <typename IArchive, typename OArchive>
@@ -68,10 +67,8 @@ namespace hpx { namespace util { namespace detail {
         get()
         {
             typedef
-                typename vtable<sizeof(Functor) <= sizeof(void *)>::
-                    template type<
-                        Functor
-                      , R(BOOST_PP_ENUM_PARAMS(N, A))
+                empty_vtable<
+                        R(BOOST_PP_ENUM_PARAMS(N, A))
                       , IArchive
                       , OArchive
                     >
