@@ -7,7 +7,7 @@
 #define HPX_PARCELSET_MPI_PARCELCACHE_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/parcelset/mpi/allocator.hpp>
+//#include <hpx/runtime/parcelset/mpi/allocator.hpp>
 #include <hpx/runtime/parcelset/mpi/sender.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -85,6 +85,8 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 get_config_entry("hpx.parcel.array_optimization", "1");
             if (boost::lexical_cast<int>(array_optimization) == 0)
                 archive_flags_ |= util::disable_array_optimization;
+
+            archive_flags_ |= util::disable_data_chunking;
         }
 
         ~parcel_cache()
@@ -142,8 +144,11 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
 
             util::high_resolution_timer timer;
-            buffer->buffer_ = pp.get_buffer(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
-            buffer->buffer_->resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+            buffer->buffer_.reset(
+                new std::vector<char/*, allocator<char>*/ >(
+                    arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD
+                )
+            );
 
             performance_counters::parcels::data_point& datapoint = buffer->send_data_;
             datapoint.buffer_allocate_time_ = timer.elapsed_nanoseconds();

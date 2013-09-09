@@ -28,7 +28,7 @@ namespace hpx { namespace parcelset { namespace mpi
         > write_handler_type;
 
         int rank_;
-        boost::shared_ptr<std::vector<char, allocator<char> > > buffer_;
+        boost::shared_ptr<std::vector<char/*, allocator<char>*/ > > buffer_;
         std::vector<util::serialization_chunk> chunks_;
         std::vector<parcel> parcels_;
         std::vector<write_handler_type> handlers_;
@@ -139,7 +139,6 @@ namespace hpx { namespace parcelset { namespace mpi
                 buffer_->send_data_.time_ = util::high_resolution_clock::now() -
                     buffer_->send_data_.time_;
                 pp.add_sent_data(buffer_->send_data_);
-                pp.reclaim_buffer(buffer_->buffer_);
                 return true;
             default:
             case invalid:

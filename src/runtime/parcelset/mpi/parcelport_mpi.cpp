@@ -106,7 +106,6 @@ namespace hpx { namespace parcelset { namespace mpi
             io_service_pool_.join();
             io_service_pool_.clear();
         }
-        buffer_pool_.clear();
     }
 
     // Make sure all pending requests are handled
@@ -274,7 +273,7 @@ namespace hpx { namespace parcelset { namespace mpi
     }
 
     void decode_message(
-        std::vector<char, allocator<char> > const & parcel_data,
+        std::vector<char/*, allocator<char>*/ > const & parcel_data,
         boost::uint64_t inbound_data_size,
         parcelport& pp,
         performance_counters::parcels::data_point& receive_data
@@ -283,6 +282,8 @@ namespace hpx { namespace parcelset { namespace mpi
         unsigned archive_flags = boost::archive::no_header;
         if (!pp.allow_array_optimizations())
             archive_flags |= util::disable_array_optimization;
+                
+        archive_flags |= util::disable_data_chunking;
 
         // protect from un-handled exceptions bubbling up
         try {

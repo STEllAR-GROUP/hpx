@@ -16,7 +16,6 @@
 #include <hpx/runtime/parcelset/mpi/acceptor.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/buffer_pool.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
@@ -115,22 +114,6 @@ namespace hpx { namespace parcelset { namespace mpi
 
         /// Make sure all pending requests are handled
         void do_background_work();
-
-        // get a sufficiently large buffer for serialized parcel data
-        boost::shared_ptr<std::vector<char, allocator<char> > >
-        get_buffer(std::size_t size)
-        {
-            return buffer_pool_.get_buffer(size);
-        }
-
-        void reclaim_buffer(boost::shared_ptr<std::vector<char, allocator<char> > > buffer)
-        {
-            return buffer_pool_.reclaim_buffer(buffer);
-        }
-
-    private:
-        // Pooling used buffers for speedy allocation
-        util::buffer_pool<char, allocator<char> > buffer_pool_;
 
     private:
         /// support enable_shared_from_this
