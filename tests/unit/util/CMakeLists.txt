@@ -11,6 +11,7 @@ set(tests
     function
     merging_map
     parse_slurm_nodelist
+    tuple
     zero_copy_serialization
    )
 

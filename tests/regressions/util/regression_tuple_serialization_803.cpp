@@ -14,7 +14,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 typedef hpx::util::tuple<int, double, std::string> tuple_type;
-typedef hpx::util::tuple3<int, double, std::string> tuple_base_type;
+typedef hpx::util::tuple<int, double, std::string> tuple_base_type;
 
 void worker1(tuple_type t)
 {
