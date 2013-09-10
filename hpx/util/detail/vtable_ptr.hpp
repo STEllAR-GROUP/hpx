@@ -115,6 +115,13 @@ namespace hpx { namespace util { namespace detail {
         }
 
         char const* get_function_name() const
+
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
+
+        static void register_base()
         {
             return get_function_name<vtable_ptr>();
         }
@@ -187,6 +194,11 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
 
         vtable_ptr()
         {

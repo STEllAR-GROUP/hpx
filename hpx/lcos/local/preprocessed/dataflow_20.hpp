@@ -27,7 +27,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type;
             typedef
-                hpx::util::tuple1<
+                hpx::util::tuple<
                     f0_type
                 >
                 futures_type;
@@ -368,7 +368,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type;
             typedef
-                hpx::util::tuple2<
+                hpx::util::tuple<
                     f0_type , f1_type
                 >
                 futures_type;
@@ -709,7 +709,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type;
             typedef
-                hpx::util::tuple3<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type
                 >
                 futures_type;
@@ -1050,7 +1050,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type;
             typedef
-                hpx::util::tuple4<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type
                 >
                 futures_type;
@@ -1391,7 +1391,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type;
             typedef
-                hpx::util::tuple5<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type
                 >
                 futures_type;
@@ -1732,7 +1732,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type;
             typedef
-                hpx::util::tuple6<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type
                 >
                 futures_type;
@@ -2073,7 +2073,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type;
             typedef
-                hpx::util::tuple7<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type
                 >
                 futures_type;
@@ -2414,7 +2414,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type;
             typedef
-                hpx::util::tuple8<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type
                 >
                 futures_type;
@@ -2755,7 +2755,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type;
             typedef
-                hpx::util::tuple9<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type
                 >
                 futures_type;
@@ -3096,7 +3096,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type;
             typedef
-                hpx::util::tuple10<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type
                 >
                 futures_type;
@@ -3437,7 +3437,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type;
             typedef
-                hpx::util::tuple11<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type
                 >
                 futures_type;
@@ -3778,7 +3778,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type;
             typedef
-                hpx::util::tuple12<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type , f11_type
                 >
                 futures_type;
@@ -4119,7 +4119,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type;
             typedef
-                hpx::util::tuple13<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type , f11_type , f12_type
                 >
                 futures_type;
@@ -4460,7 +4460,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type; typedef typename util::decay<F13>::type f13_type;
             typedef
-                hpx::util::tuple14<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type , f11_type , f12_type , f13_type
                 >
                 futures_type;
@@ -4801,7 +4801,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type; typedef typename util::decay<F13>::type f13_type; typedef typename util::decay<F14>::type f14_type;
             typedef
-                hpx::util::tuple15<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type , f11_type , f12_type , f13_type , f14_type
                 >
                 futures_type;
@@ -5142,7 +5142,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type; typedef typename util::decay<F13>::type f13_type; typedef typename util::decay<F14>::type f14_type; typedef typename util::decay<F15>::type f15_type;
             typedef
-                hpx::util::tuple16<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type , f11_type , f12_type , f13_type , f14_type , f15_type
                 >
                 futures_type;
@@ -5483,7 +5483,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type; typedef typename util::decay<F13>::type f13_type; typedef typename util::decay<F14>::type f14_type; typedef typename util::decay<F15>::type f15_type; typedef typename util::decay<F16>::type f16_type;
             typedef
-                hpx::util::tuple17<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type , f11_type , f12_type , f13_type , f14_type , f15_type , f16_type
                 >
                 futures_type;
@@ -5824,7 +5824,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type; typedef typename util::decay<F13>::type f13_type; typedef typename util::decay<F14>::type f14_type; typedef typename util::decay<F15>::type f15_type; typedef typename util::decay<F16>::type f16_type; typedef typename util::decay<F17>::type f17_type;
             typedef
-                hpx::util::tuple18<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type , f11_type , f12_type , f13_type , f14_type , f15_type , f16_type , f17_type
                 >
                 futures_type;
@@ -6165,7 +6165,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type; typedef typename util::decay<F13>::type f13_type; typedef typename util::decay<F14>::type f14_type; typedef typename util::decay<F15>::type f15_type; typedef typename util::decay<F16>::type f16_type; typedef typename util::decay<F17>::type f17_type; typedef typename util::decay<F18>::type f18_type;
             typedef
-                hpx::util::tuple19<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type , f11_type , f12_type , f13_type , f14_type , f15_type , f16_type , f17_type , f18_type
                 >
                 futures_type;
@@ -6506,7 +6506,7 @@ namespace hpx { namespace lcos { namespace local
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type; typedef typename util::decay<F13>::type f13_type; typedef typename util::decay<F14>::type f14_type; typedef typename util::decay<F15>::type f15_type; typedef typename util::decay<F16>::type f16_type; typedef typename util::decay<F17>::type f17_type; typedef typename util::decay<F18>::type f18_type; typedef typename util::decay<F19>::type f19_type;
             typedef
-                hpx::util::tuple20<
+                hpx::util::tuple<
                     f0_type , f1_type , f2_type , f3_type , f4_type , f5_type , f6_type , f7_type , f8_type , f9_type , f10_type , f11_type , f12_type , f13_type , f14_type , f15_type , f16_type , f17_type , f18_type , f19_type
                 >
                 futures_type;

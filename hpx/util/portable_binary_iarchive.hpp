@@ -124,7 +124,6 @@ public:
     friend class boost::archive::load_access;
 protected:
 #endif
-    boost::uint32_t m_flags;
 
     HPX_ALWAYS_EXPORT void load_impl(boost::int64_t& l, char const maxsize);
     HPX_ALWAYS_EXPORT void load_impl(boost::uint64_t& l, char const maxsize);
@@ -271,22 +270,26 @@ protected:
     // binary files don't include the optional information
     void load_override(boost::archive::class_id_optional_type&, int) {}
 
-    HPX_ALWAYS_EXPORT void init(unsigned int flags);
+    HPX_ALWAYS_EXPORT boost::uint32_t init(boost::uint32_t flags);
 
 public:
-    template <typename Vector>
-    portable_binary_iarchive(Vector const& buffer,
+    template <typename Container>
+    portable_binary_iarchive(Container const& buffer,
             boost::uint64_t inbound_data_size, unsigned flags = 0)
-      : primitive_base_t(buffer, inbound_data_size, flags),
-        archive_base_t(flags),
-        m_flags(0)
+      : primitive_base_t(buffer, inbound_data_size),
+        archive_base_t(flags)
     {
-        init(flags);
+        this->set_flags(init(flags));
     }
 
-    boost::uint32_t flags() const
+    template <typename Container>
+    portable_binary_iarchive(Container const& buffer,
+            std::vector<serialization_chunk> const* chunks,
+            boost::uint64_t inbound_data_size, unsigned flags = 0)
+      : primitive_base_t(buffer, chunks, inbound_data_size),
+        archive_base_t(flags)
     {
-        return m_flags;
+        this->set_flags(init(flags));
     }
 
     // the optimized load_array dispatches to load_binary
@@ -296,40 +299,40 @@ public:
         // If we need to potentially flip bytes we serialize each element
         // separately.
 #ifdef BOOST_BIG_ENDIAN
-        if (m_flags & (endian_little | disable_array_optimization)) {
+        if (this->flags() & (endian_little | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 load(a.address()[i]);
         }
 #else
-        if (m_flags & (endian_big | disable_array_optimization)) {
+        if (this->flags() & (endian_big | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 load(a.address()[i]);
         }
 #endif
         else {
-            this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(T));
+            this->primitive_base_t::load_array(a);
         }
     }
 
     void load_array(boost::serialization::array<float>& a, unsigned int)
     {
-        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(float));
+        this->primitive_base_t::load_array(a);
     }
     void load_array(boost::serialization::array<double>& a, unsigned int)
     {
-        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(double));
+        this->primitive_base_t::load_array(a);
     }
     void load_array(boost::serialization::array<char>& a, unsigned int)
     {
-        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(char));
+        this->primitive_base_t::load_array(a);
     }
     void load_array(boost::serialization::array<unsigned char>& a, unsigned int)
     {
-        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(unsigned char));
+        this->primitive_base_t::load_array(a);
     }
     void load_array(boost::serialization::array<signed char>& a, signed int)
     {
-        this->primitive_base_t::load_binary(a.address(), a.count()*sizeof(signed char));
+        this->primitive_base_t::load_array(a);
     }
 };
 

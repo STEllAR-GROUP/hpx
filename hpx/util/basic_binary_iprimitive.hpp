@@ -36,14 +36,17 @@
 #include <boost/throw_exception.hpp>
 #include <boost/integer.hpp>
 #include <boost/integer_traits.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <boost/archive/archive_exception.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/serialization/is_bitwise_serializable.hpp>
 
-#include <boost/archive/detail/abi_prefix.hpp> // must be the last header
-
 #include <hpx/util/binary_filter.hpp>
+#include <hpx/util/ichunk_manager.hpp>
+
+#include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
 #if !defined(BOOST_WINDOWS)
 #  pragma GCC visibility push(default)
@@ -63,7 +66,7 @@
 
 namespace hpx { namespace util
 {
-    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////--
     // class basic_binary_iprimitive - read serialized objects from a input
     // binary character buffer
     template <typename Archive>
@@ -72,28 +75,18 @@ namespace hpx { namespace util
     protected:
         void load_binary(void* address, std::size_t count)
         {
-            if (count)
-            {
-                if (filter_.get()) {
-                    filter_->load(address, count);
-                }
-                else {
-                    if (current_+count > size_)
-                    {
-                        BOOST_THROW_EXCEPTION(
-                            boost::archive::archive_exception(
-                                boost::archive::archive_exception::input_stream_error,
-                                "archive data bstream is too short"));
-                        return;
-                    }
+            if (0 == count) return;
 
-                    if (count == 1)
-                        *static_cast<unsigned char*>(address) = buffer_[current_];
-                    else
-                        std::memcpy(address, &buffer_[current_], count);
-                    current_ += count;
-                }
-            }
+            buffer_->load_binary(address, count);
+            size_ += count;
+        }
+
+        void load_binary_chunk(void* address, std::size_t count)
+        {
+            if (0 == count) return;
+
+            buffer_->load_binary_chunk(address, count);
+            size_ += count;
         }
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
@@ -103,11 +96,9 @@ namespace hpx { namespace util
     public:
 #endif
 
-        char const* buffer_;
+        boost::uint32_t flags_;
         std::size_t size_;
-        std::size_t decompressed_size_;
-        std::size_t current_;
-        HPX_STD_UNIQUE_PTR<binary_filter> filter_;
+        boost::shared_ptr<detail::erase_icontainer_type> buffer_;
 
         // return a pointer to the most derived class
         Archive* This()
@@ -166,16 +157,24 @@ namespace hpx { namespace util
 
         HPX_ALWAYS_EXPORT void init(unsigned flags);
 
-        template <typename Vector>
-        basic_binary_iprimitive(Vector const& buffer,
-                boost::uint64_t inbound_data_size, unsigned flags = 0)
-          : buffer_(buffer.data()),
-            size_(buffer.size()),
-            decompressed_size_(inbound_data_size),
-            current_(0)
-        {
-            init(flags);
-        }
+        template <typename Container>
+        basic_binary_iprimitive(Container const& buffer,
+                boost::uint64_t inbound_data_size)
+          : flags_(0),
+            size_(0),
+            buffer_(boost::make_shared<detail::icontainer_type<Container> >(
+                buffer, inbound_data_size))
+        {}
+
+        template <typename Container>
+        basic_binary_iprimitive(Container const& buffer,
+                std::vector<serialization_chunk> const* chunks,
+                boost::uint64_t inbound_data_size)
+          : flags_(0),
+            size_(0),
+            buffer_(boost::make_shared<detail::icontainer_type<Container> >(
+                buffer, chunks, inbound_data_size))
+        {}
 
     public:
         // we provide an optimized load for all fundamental types
@@ -183,7 +182,7 @@ namespace hpx { namespace util
         // use_array_optimization;
         struct use_array_optimization
         {
-    #if defined(BOOST_NO_DEPENDENT_NESTED_DERIVATIONS)
+#if defined(BOOST_NO_DEPENDENT_NESTED_DERIVATIONS)
             template <typename T>
             struct apply
             {
@@ -191,43 +190,43 @@ namespace hpx { namespace util
                     boost::serialization::is_bitwise_serializable<T>::type
                 type;
             };
-    #else
+#else
             template <typename T>
             struct apply
               : public boost::serialization::is_bitwise_serializable<T>
             {};
-    #endif
+#endif
         };
 
         std::size_t bytes_read() const
         {
-            return current_;
+            return size_;
+        }
+
+        boost::uint32_t flags() const
+        {
+            return flags_;
+        }
+        void set_flags(boost::uint32_t flags)
+        {
+            flags_ = flags;
+            init(flags_);
         }
 
     protected:
         // the optimized load_array dispatches to load_binary
         template <typename T>
-        void load_array(boost::serialization::array<T>& a, unsigned int)
+        void load_array(boost::serialization::array<T>& a)
         {
-            load_binary(a.address(), a.count()*sizeof(T));
+            if (flags() & disable_data_chunking)
+                load_binary(a.address(), a.count()*sizeof(T));
+            else
+                load_binary_chunk(a.address(), a.count()*sizeof(T));
         }
 
         void set_filter(util::binary_filter* filter)
         {
-            filter_.reset(filter);
-            if (filter) {
-                current_ = filter->init_data(&buffer_[current_],
-                    size_-current_, decompressed_size_);
-
-                if (decompressed_size_ < current_)
-                {
-                    BOOST_THROW_EXCEPTION(
-                        boost::archive::archive_exception(
-                            boost::archive::archive_exception::input_stream_error,
-                            "archive data bstream is too short"));
-                    return;
-                }
-            }
+            buffer_->set_filter(filter);
         }
     };
 }}

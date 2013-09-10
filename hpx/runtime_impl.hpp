@@ -24,6 +24,7 @@
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/thread_mapper.hpp>
+#include <hpx/util/init_logging.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>

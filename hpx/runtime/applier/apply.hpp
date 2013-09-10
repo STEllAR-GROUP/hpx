@@ -159,7 +159,7 @@ namespace hpx
                 components::get_component_type<
                     typename action_type::component_type>()));
 
-            util::tuple0<> env;
+            util::tuple<> env;
             apply_helper<action_type>::call(addr.address_, priority, env);
             return true;     // no parcel has been sent (dest is local)
         }
@@ -329,7 +329,7 @@ namespace hpx
                     typename action_type::component_type>()));
 
             actions::continuation_type cont(c);
-            util::tuple0<> env;
+            util::tuple<> env;
             apply_helper<action_type>::call(cont, addr.address_, priority, env);
             return true;     // no parcel has been sent (dest is local)
         }

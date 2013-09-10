@@ -9,10 +9,6 @@
 
 #include <hpx/config.hpp>
 
-#if BOOST_VERSION < 105100
-#   define BOOST_NO_CXX11_DECLTYPE_N3276
-#endif
-
 #if defined(BOOST_NO_SFINAE_EXPR)                                              \
  || defined(BOOST_NO_CXX11_DECLTYPE_N3276)                                     \
  || defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) // C++03

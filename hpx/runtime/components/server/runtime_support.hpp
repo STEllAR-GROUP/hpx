@@ -436,6 +436,8 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::create_performance_counter_action,
     create_performance_counter_action)
+HPX_ACTION_USES_MEDIUM_STACK(
+    hpx::components::server::runtime_support::create_performance_counter_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::get_instance_count_action,
     get_instance_count_action)

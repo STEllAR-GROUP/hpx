@@ -40,6 +40,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
     bool decode_message(parcelport&,
         boost::shared_ptr<std::vector<char> > buffer,
+        std::vector<util::serialization_chunk> const* chunks,
         boost::uint64_t inbound_data_size,
         performance_counters::parcels::data_point receive_data,
         bool first_message = false);
@@ -60,6 +61,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 parcelset::tcp::parcelport& parcelport)
           : socket_(io_service), in_priority_(0), in_size_(0), in_data_size_(0)
           , in_buffer_()
+          , num_chunks_(count_chunks_type(0, 0))
           , max_inbound_size_(get_max_inbound_size(parcelport))
 #if defined(HPX_HAVE_SECURITY)
           , first_message_(true)
@@ -100,18 +102,24 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
             in_size_ = 0;
             in_data_size_ = 0;
 
+            num_chunks_ = count_chunks_type(0, 0);
+
+            in_chunks_.reset(new std::vector<std::vector<char> >());
+            in_transmission_chunks_.clear();
+
             using boost::asio::buffer;
             std::vector<boost::asio::mutable_buffer> buffers;
             buffers.push_back(buffer(&in_priority_, sizeof(in_priority_)));
             buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
             buffers.push_back(buffer(&in_data_size_, sizeof(in_data_size_)));
 
+            buffers.push_back(buffer(&num_chunks_, sizeof(num_chunks_)));
+
 #if defined(__linux) || defined(linux) || defined(__linux__)
             boost::asio::detail::socket_option::boolean<
                 IPPROTO_TCP, TCP_QUICKACK> quickack(true);
             socket_.set_option(quickack);
 #endif
-
             boost::asio::async_read(socket_, buffers,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error,
@@ -146,10 +154,42 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                     return;
                 }
 
-                receive_data_.bytes_ = std::size_t(inbound_size);
+                receive_data_.bytes_ = static_cast<std::size_t>(inbound_size);
+
+                // receive buffers
+                std::vector<boost::asio::mutable_buffer> buffers;
+
+                // determine the size of the chunk buffer
+                boost::uint32_t num_zero_copy_chunks = num_chunks_.first;
+                boost::uint32_t num_non_zero_copy_chunks = num_chunks_.second;
+
+                if (num_zero_copy_chunks != 0) {
+                    in_transmission_chunks_.resize(static_cast<std::size_t>(
+                        num_zero_copy_chunks + num_non_zero_copy_chunks));
+
+                    buffers.push_back(boost::asio::buffer(in_transmission_chunks_.data(),
+                        in_transmission_chunks_.size()*sizeof(transmission_chunk_type)));
+
+                    // add main buffer holding data which was serialized normally
+                    in_buffer_->resize(static_cast<std::size_t>(inbound_size));
+                    buffers.push_back(boost::asio::buffer(*in_buffer_));
+
+                    // add appropriately sized chunk buffers for the zero-copy data
+                    in_chunks_->resize(num_zero_copy_chunks);
+                    for (boost::uint32_t i = 0; i != num_zero_copy_chunks; ++i)
+                    {
+                        std::size_t chunk_size = in_transmission_chunks_[i].second;
+                        (*in_chunks_)[i].resize(chunk_size);
+                        buffers.push_back(boost::asio::buffer((*in_chunks_)[i]));
+                    }
+                }
+                else {
+                    // add main buffer holding data which was serialized normally
+                    in_buffer_->resize(static_cast<std::size_t>(inbound_size));
+                    buffers.push_back(boost::asio::buffer(*in_buffer_));
+                }
 
                 // Start an asynchronous call to receive the data.
-                in_buffer_->resize(static_cast<std::size_t>(inbound_size));
                 void (parcelport_connection::*f)(boost::system::error_code const&,
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_data<Handler>;
@@ -159,9 +199,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                     IPPROTO_TCP, TCP_QUICKACK> quickack(true);
                 socket_.set_option(quickack);
 #endif
-
-                boost::asio::async_read(socket_,
-                    boost::asio::buffer(*in_buffer_),
+                boost::asio::async_read(socket_, buffers,
                     boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
             }
@@ -190,22 +228,73 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
 
                 // hold on to received data to avoid data races
                 boost::shared_ptr<std::vector<char> > data(in_buffer_);
-                performance_counters::parcels::data_point receive_data = 
+
+                performance_counters::parcels::data_point receive_data =
                     receive_data_;
 
                 // add parcel data to incoming parcel queue
                 boost::uint64_t inbound_data_size = in_data_size_;
 
+                boost::uint32_t num_zero_copy_chunks = num_chunks_.first;
+
+                if (num_zero_copy_chunks != 0) {
+                    // decode chunk information
+                    boost::shared_ptr<std::vector<std::vector<char> > > in_chunks(in_chunks_);
+                    boost::shared_ptr<std::vector<util::serialization_chunk> > chunks(
+                        boost::make_shared<std::vector<util::serialization_chunk> >());
+
+                    boost::uint32_t num_non_zero_copy_chunks = num_chunks_.second;
+                    chunks->resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
+
+                    // place the zero-copy chunks at their spots first
+                    for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
+                    {
+                        transmission_chunk_type& c = in_transmission_chunks_[i];
+                        boost::uint64_t first = c.first, second = c.second;
+
+                        BOOST_ASSERT((*in_chunks_)[i].size() == second);
+
+                        (*chunks)[first] = util::create_pointer_chunk(
+                            (*in_chunks_)[i].data(), second);
+                    }
+
+                    std::size_t index = 0;
+                    for (std::size_t i = num_zero_copy_chunks; i != num_non_zero_copy_chunks; ++i)
+                    {
+                        transmission_chunk_type& c = in_transmission_chunks_[i];
+                        boost::uint64_t first = c.first, second = c.second;
+
+                        // find next free entry
+                        while ((*chunks)[index].size_ != 0)
+                            ++index;
+
+                        // place the index based chunk at the right spot
+                        (*chunks)[index] = util::create_index_chunk(first, second);
+                        ++index;
+                    }
+                    BOOST_ASSERT(index == num_zero_copy_chunks + num_non_zero_copy_chunks);
+
 #if defined(HPX_HAVE_SECURITY)
-                first_message_ = decode_message(parcelport_, data,
-                    inbound_data_size, receive_data, first_message_);
+                    first_message_ = decode_message(parcelport_, data, chunks.get(),
+                        inbound_data_size, receive_data, first_message_);
 #else
-                decode_message(parcelport_, data, inbound_data_size, receive_data);
+                    decode_message(parcelport_, data, chunks.get(), inbound_data_size,
+                        receive_data);
 #endif
+                }
+                else {
+#if defined(HPX_HAVE_SECURITY)
+                    first_message_ = decode_message(parcelport_, data, 0,
+                        inbound_data_size, receive_data, first_message_);
+#else
+                    decode_message(parcelport_, data, 0, inbound_data_size,
+                        receive_data);
+#endif
+                }
                 ack_ = true;
                 boost::asio::async_write(socket_,
                     boost::asio::buffer(&ack_, sizeof(ack_)),
-                    boost::bind(f, shared_from_this(), 
+                    boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
             }
         }
@@ -231,6 +320,20 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
         boost::integer::ulittle64_t in_data_size_;
         boost::shared_ptr<std::vector<char> > in_buffer_;
 
+        typedef std::pair<boost::integer::ulittle64_t, boost::integer::ulittle64_t>
+            transmission_chunk_type;
+        std::vector<transmission_chunk_type> in_transmission_chunks_;
+
+        // pair of (zero-copy, non-zero-copy) chunks
+        typedef std::pair<
+            boost::integer::ulittle32_t, boost::integer::ulittle32_t
+        > count_chunks_type;
+        count_chunks_type num_chunks_;
+
+        boost::integer::ulittle64_t num_zero_copy_chunks_;
+        boost::integer::ulittle64_t num_non_zero_copy_chunks_;
+
+        boost::shared_ptr<std::vector<std::vector<char> > > in_chunks_;
         boost::uint64_t max_inbound_size_;
 
         bool ack_;

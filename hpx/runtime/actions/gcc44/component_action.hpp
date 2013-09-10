@@ -22,11 +22,11 @@ namespace hpx { namespace actions
         typename Component, typename Result,
         Result (Component::*F)(), typename Derived>
     class base_result_action0
-      : public action<Component, Result, hpx::util::tuple0<>, Derived>
+      : public action<Component, Result, hpx::util::tuple<>, Derived>
     {
     public:
         typedef Result result_type;
-        typedef hpx::util::tuple0<> arguments_type;
+        typedef hpx::util::tuple<> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 
@@ -211,11 +211,11 @@ namespace hpx { namespace actions
     template <typename Component, void (Component::*F)(), typename Derived>
     class base_action0
       : public action<Component, util::unused_type,
-            hpx::util::tuple0<>, Derived>
+            hpx::util::tuple<>, Derived>
     {
     public:
         typedef util::unused_type result_type;
-        typedef hpx::util::tuple0<> arguments_type;
+        typedef hpx::util::tuple<> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
 

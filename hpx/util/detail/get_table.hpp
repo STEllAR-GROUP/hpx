@@ -10,9 +10,10 @@
 
 #include <hpx/config/forceinline.hpp>
 
-#include <boost/detail/sp_typeinfo.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+
+#include <typeinfo>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/get_table.hpp>

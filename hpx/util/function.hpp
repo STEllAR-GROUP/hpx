@@ -6,13 +6,16 @@
 #ifndef HPX_UTIL_FUNCTION_HPP
 #define HPX_UTIL_FUNCTION_HPP
 
-#include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/error.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/detail/function_template.hpp>
 #include <hpx/util/detail/vtable_ptr_base.hpp>
 #include <hpx/util/detail/vtable_ptr.hpp>
 #include <hpx/util/detail/get_table.hpp>
 #include <hpx/util/detail/vtable.hpp>
+#include <hpx/util/detail/get_empty_table.hpp>
+#include <hpx/util/detail/empty_vtable.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <boost/preprocessor/cat.hpp>

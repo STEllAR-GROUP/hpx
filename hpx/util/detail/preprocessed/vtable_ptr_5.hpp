@@ -46,6 +46,10 @@ namespace hpx { namespace util { namespace detail {
             
             hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
@@ -92,6 +96,10 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         vtable_ptr()
         {
             base_type::get_type = Vtable::get_type;
@@ -155,6 +163,10 @@ namespace hpx { namespace util { namespace detail {
             
             hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
@@ -201,6 +213,10 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         vtable_ptr()
         {
             base_type::get_type = Vtable::get_type;
@@ -264,6 +280,10 @@ namespace hpx { namespace util { namespace detail {
             
             hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
@@ -310,6 +330,10 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         vtable_ptr()
         {
             base_type::get_type = Vtable::get_type;
@@ -373,6 +397,10 @@ namespace hpx { namespace util { namespace detail {
             
             hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
@@ -419,6 +447,10 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         vtable_ptr()
         {
             base_type::get_type = Vtable::get_type;
@@ -482,6 +514,10 @@ namespace hpx { namespace util { namespace detail {
             
             hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
@@ -528,6 +564,10 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         vtable_ptr()
         {
             base_type::get_type = Vtable::get_type;
@@ -591,6 +631,10 @@ namespace hpx { namespace util { namespace detail {
             
             hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
@@ -637,6 +681,10 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         vtable_ptr()
         {
             base_type::get_type = Vtable::get_type;
@@ -700,6 +748,10 @@ namespace hpx { namespace util { namespace detail {
             
             hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
@@ -746,6 +798,10 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         vtable_ptr()
         {
             base_type::get_type = Vtable::get_type;
@@ -809,6 +865,10 @@ namespace hpx { namespace util { namespace detail {
             
             hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
@@ -855,6 +915,10 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         vtable_ptr()
         {
             base_type::get_type = Vtable::get_type;
@@ -918,6 +982,10 @@ namespace hpx { namespace util { namespace detail {
             
             hpx::actions::detail::guid_initialization<vtable_ptr>();
         }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         static void register_base()
         {
             util::void_cast_register_nonvirt<vtable_ptr, base_type>();
@@ -964,6 +1032,10 @@ namespace hpx { namespace util { namespace detail {
               , void
             >
             base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
         vtable_ptr()
         {
             base_type::get_type = Vtable::get_type;

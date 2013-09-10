@@ -236,14 +236,14 @@ namespace hpx { namespace util {
             struct result<This(BOOST_PP_ENUM_PARAMS(N, A))>                     \
             {                                                                   \
                 typedef                                                         \
-                    BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_ENUM_PARAMS(N, A)>\
+                    hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, A)>                \
                     params_type;                                                \
                 typedef                                                         \
                     typename boost::fusion::result_of::invoke<                  \
                         F                                                       \
                       , typename boost::fusion::result_of::fold<                \
                             params_type                                         \
-                          , hpx::util::tuple0<>                                 \
+                          , hpx::util::tuple<>                                  \
                           , unwrapped_param_value                               \
                         >::type                                                 \
                     >::type                                                     \
@@ -255,7 +255,7 @@ namespace hpx { namespace util {
             operator()(HPX_ENUM_FWD_ARGS(N, A, a))                              \
             {                                                                   \
                 typedef                                                         \
-                    BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_ENUM_PARAMS(N, A)>\
+                    hpx::util::tuple<BOOST_PP_ENUM_PARAMS(N, A)>                \
                     params_type;                                                \
                                                                                 \
                 params_type params(HPX_ENUM_FORWARD_ARGS(N, A, a));             \
@@ -265,7 +265,7 @@ namespace hpx { namespace util {
                         f_                                                      \
                       , boost::fusion::fold(                                    \
                             params                                              \
-                          , hpx::util::tuple0<>()                               \
+                          , hpx::util::tuple<>()                                \
                           , unwrapped_param_value()                             \
                         )                                                       \
                     );                                                          \

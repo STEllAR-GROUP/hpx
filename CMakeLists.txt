@@ -66,6 +66,8 @@ include(HPX_Utils)
 
 include(HPX_Distclean)
 
+set(HPX_DEFINITIONS CACHE INTERNAL "" FORCE)
+
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
 if(NOT HPX_CMAKE_LOGLEVEL)
@@ -173,6 +175,12 @@ hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
 hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 if(${BOOST_MINOR_VERSION} LESS 49)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
+endif()
+# If we compile natively for the MIC, we need some workarounds for certain
+# boost headers
+# FIXME: push changes upstream
+if(HPX_NATIVE_MIC)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/asio)
 endif()
 
 if(UNIX)
@@ -809,7 +817,11 @@ if(HPX_GOOGLE_PERFTOOLS)
 endif()
 
 if(NOT HPX_MALLOC)
-  set(HPX_MALLOC "TCMalloc")
+  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    set(HPX_MALLOC "TCMalloc")
+  else()
+    set(HPX_MALLOC "system")
+  endif()
 endif()
 set(hpx_MALLOC_LIBRARY "")
 hpx_include(SetAllocator)
@@ -1484,6 +1496,16 @@ if(NOT HPX_NO_INSTALL)
     # install Boost.Serialization patch for older Boost versions only
     install(
       DIRECTORY external/serialization/boost
+      DESTINATION include/hpx/external
+      COMPONENT core
+      FILES_MATCHING PATTERN "*.hpp"
+      PATTERN ".git" EXCLUDE)
+  endif()
+
+  if(HPX_NATIVE_MIC)
+    # FIXME: push changes upstream
+    install(
+      DIRECTORY external/asio/boost
       DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"

@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-    typedef hpx::util::tuple3<
+    typedef hpx::util::tuple<
         logging_destination, std::size_t, std::string
     > message_type;
 

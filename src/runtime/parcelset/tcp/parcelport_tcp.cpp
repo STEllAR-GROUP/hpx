@@ -636,6 +636,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
     bool decode_message(parcelport& pp,
         boost::shared_ptr<std::vector<char> > parcel_data,
+        std::vector<util::serialization_chunk> const* chunks,
         boost::uint64_t inbound_data_size,
         performance_counters::parcels::data_point receive_data,
         bool first_message)
@@ -654,7 +655,7 @@ namespace hpx { namespace parcelset { namespace tcp
                 {
                     // De-serialize the parcel data
                     util::portable_binary_iarchive archive(*parcel_data,
-                        inbound_data_size, archive_flags);
+                        chunks, inbound_data_size, archive_flags);
 
                     std::size_t parcel_count = 0;
                     archive >> parcel_count; //-V128

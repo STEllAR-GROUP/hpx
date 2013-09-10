@@ -122,7 +122,6 @@ public:
     friend class boost::archive::save_access;
 protected:
 #endif
-    boost::uint32_t m_flags;
 
     HPX_ALWAYS_EXPORT void save_impl(boost::int64_t const l, char const maxsize);
     HPX_ALWAYS_EXPORT void save_impl(boost::uint64_t const l, char const maxsize);
@@ -244,18 +243,22 @@ public:
     template <typename Container>
     portable_binary_oarchive(Container& buffer, binary_filter* filter = 0, unsigned flags = 0)
       : primitive_base_t(buffer, flags),
-        archive_base_t(flags),
-        m_flags(flags & (enable_compression | endian_big | endian_little | disable_array_optimization))
+        archive_base_t(flags)
     {
         init(filter, flags);
     }
 
-    boost::uint32_t flags() const
+    template <typename Container>
+    portable_binary_oarchive(Container& buffer, std::vector<serialization_chunk>* chunks,
+            binary_filter* filter = 0, unsigned flags = 0)
+      : primitive_base_t(buffer, chunks, flags),
+        archive_base_t(flags)
     {
-        return m_flags;
+        init(filter, flags);
     }
 
-    // the optimized save_array dispatches to save_binary
+    // the optimized save_array dispatches to the base class save_array
+    // implementation
 
     // default fall through for any types not specified here
     template <typename T>
@@ -264,40 +267,40 @@ public:
         // If we need to potentially flip bytes we serialize each element
         // separately.
 #ifdef BOOST_BIG_ENDIAN
-        if (m_flags & (endian_little | disable_array_optimization)) {
+        if (this->flags() & (endian_little | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 save(a.address()[i]);
         }
 #else
-        if (m_flags & (endian_big | disable_array_optimization)) {
+        if (this->flags() & (endian_big | disable_array_optimization)) {
             for (std::size_t i = 0; i != a.count(); ++i)
                 save(a.address()[i]);
         }
 #endif
         else {
-            this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(T));
+            this->primitive_base_t::save_array(a);
         }
     }
 
     void save_array(boost::serialization::array<float> const& a, unsigned int)
     {
-        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(float));
+        this->primitive_base_t::save_array(a);
     }
     void save_array(boost::serialization::array<double> const& a, unsigned int)
     {
-        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(double));
+        this->primitive_base_t::save_array(a);
     }
     void save_array(boost::serialization::array<char> const& a, unsigned int)
     {
-        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(char));
+        this->primitive_base_t::save_array(a);
     }
     void save_array(boost::serialization::array<unsigned char> const& a, unsigned int)
     {
-        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(unsigned char));
+        this->primitive_base_t::save_array(a);
     }
     void save_array(boost::serialization::array<signed char> const& a, unsigned int)
     {
-        this->primitive_base_t::save_binary(a.address(), a.count()*sizeof(signed char));
+        this->primitive_base_t::save_array(a);
     }
 };
 

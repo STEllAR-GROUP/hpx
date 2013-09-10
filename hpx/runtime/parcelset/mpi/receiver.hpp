@@ -7,7 +7,6 @@
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/runtime/parcelset/mpi/header.hpp>
-#include <hpx/runtime/parcelset/mpi/allocator.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
 #include <boost/assert.hpp>
@@ -25,7 +24,7 @@ namespace hpx { namespace parcelset { namespace mpi {
     class parcelport;
 
     void decode_message(
-        std::vector<char, allocator<char> > const & parcel_data,
+        std::vector<char/*, allocator<char>*/ > const & parcel_data,
         boost::uint64_t inbound_data_size, parcelport& pp,
         performance_counters::parcels::data_point& receive_data);
 
@@ -38,7 +37,7 @@ namespace hpx { namespace parcelset { namespace mpi {
         {
             // start collecting statistics for this receive operation
             receive_data_.time_ = util::high_resolution_clock::now();
-            buffer_ = pp.buffer_pool_.get_buffer(h.size());
+            buffer_.reset(new std::vector<char/*, allocator<char>*/ >());
             buffer_->resize(h.size());
             receive_data_.buffer_allocate_time_ =
                 util::high_resolution_clock::now() - receive_data_.time_;
@@ -84,7 +83,6 @@ namespace hpx { namespace parcelset { namespace mpi {
                     receive_data_.time_;
 
                 decode_message(*buffer_, header_.numbytes(), pp, receive_data_);
-                pp.buffer_pool_.reclaim_buffer(buffer_);
                 return true;
             }
             return false;
@@ -92,7 +90,7 @@ namespace hpx { namespace parcelset { namespace mpi {
 
     private:
         header header_;
-        boost::shared_ptr<std::vector<char, allocator<char> > > buffer_;
+        boost::shared_ptr<std::vector<char/*, allocator<char>*/ > > buffer_;
 
         MPI_Request request_;
 

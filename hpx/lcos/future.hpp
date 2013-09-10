@@ -209,9 +209,11 @@ namespace hpx { namespace lcos
           : future_data_(new lcos::detail::timed_future_data<Result>(
                 d, boost::move(init)))
         {}
-
-        // [N3722, 4.1] asks for this...
+        
+#       ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // [N3722, 4.1] asks for this... defined at promise.hpp
         explicit future(promise_type& promise);
+#       endif
 
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
@@ -404,7 +406,8 @@ namespace hpx { namespace lcos
     make_ready_future_after(boost::chrono::duration<Rep, Period> const& d,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename util::decay<Result>::type>(util::to_time_duration(d), boost::forward<Result>(init));
+        return future<typename util::decay<Result>::type>(
+            util::to_time_duration(d), boost::forward<Result>(init));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -500,9 +503,11 @@ namespace hpx { namespace lcos
           : future_data_(new lcos::detail::timed_future_data<void>(
                 d, util::unused))
         {}
-
-        // [N3722, 4.1] asks for this...
+        
+#       ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // [N3722, 4.1] asks for this... defined at promise.hpp
         explicit future(promise_type& promise);
+#       endif
 
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)

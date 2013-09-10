@@ -7,9 +7,8 @@ set(HPX_ADD_DEFINITION_LOADED TRUE)
 
 include(HPX_Include)
 
-hpx_include(Message)
-
-set(HPX_DEFINITIONS CACHE INTERNAL "" FORCE)
+hpx_include(Message
+            ParseArguments)
 
 macro(hpx_add_definitions definition)
   hpx_debug("add_definitions" "${definition}")

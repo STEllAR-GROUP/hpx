@@ -21,8 +21,8 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
-            : vptr(0)
+        function_base() BOOST_NOEXCEPT
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
         ~function_base()
@@ -49,7 +49,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -57,13 +57,7 @@ namespace hpx { namespace util {
                 typedef
                     typename util::decay<Functor>::type
                     functor_type;
-                vptr = detail::get_table<
-                            functor_type
-                          , R()
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -75,7 +69,7 @@ namespace hpx { namespace util {
             }
         }
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -84,7 +78,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
         function_base &assign(function_base const & other)
@@ -110,17 +104,12 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R()
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *)) 
@@ -140,12 +129,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *)) 
@@ -177,7 +161,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
             return *this;
@@ -188,15 +172,15 @@ namespace hpx { namespace util {
             std::swap(object, f.object);
             return *this;
         }
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -205,19 +189,69 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R()
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R()
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
         BOOST_FORCEINLINE R operator()() const
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object );
         }
         BOOST_FORCEINLINE R operator()()
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object );
+        }
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type *>(&object);
+            return reinterpret_cast<functor_type *>(object);
+        }
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type const*>(&object);
+            return reinterpret_cast<functor_type const*>(object);
         }
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_base);
@@ -239,8 +273,8 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
-            : vptr(0)
+        function_base() BOOST_NOEXCEPT
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
         ~function_base()
@@ -267,7 +301,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -275,13 +309,7 @@ namespace hpx { namespace util {
                 typedef
                     typename util::decay<Functor>::type
                     functor_type;
-                vptr = detail::get_table<
-                            functor_type
-                          , R(A0)
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -293,7 +321,7 @@ namespace hpx { namespace util {
             }
         }
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -302,7 +330,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
         function_base &assign(function_base const & other)
@@ -328,17 +356,12 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(A0)
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *)) 
@@ -358,12 +381,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *)) 
@@ -395,7 +413,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
             return *this;
@@ -406,15 +424,15 @@ namespace hpx { namespace util {
             std::swap(object, f.object);
             return *this;
         }
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -423,19 +441,69 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R(A0)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R(A0)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
         BOOST_FORCEINLINE R operator()(A0 a0) const
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0);
         }
         BOOST_FORCEINLINE R operator()(A0 a0)
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0);
+        }
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type *>(&object);
+            return reinterpret_cast<functor_type *>(object);
+        }
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type const*>(&object);
+            return reinterpret_cast<functor_type const*>(object);
         }
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_base);
@@ -457,8 +525,8 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
-            : vptr(0)
+        function_base() BOOST_NOEXCEPT
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
         ~function_base()
@@ -485,7 +553,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -493,13 +561,7 @@ namespace hpx { namespace util {
                 typedef
                     typename util::decay<Functor>::type
                     functor_type;
-                vptr = detail::get_table<
-                            functor_type
-                          , R(A0 , A1)
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -511,7 +573,7 @@ namespace hpx { namespace util {
             }
         }
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -520,7 +582,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
         function_base &assign(function_base const & other)
@@ -546,17 +608,12 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(A0 , A1)
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *)) 
@@ -576,12 +633,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *)) 
@@ -613,7 +665,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
             return *this;
@@ -624,15 +676,15 @@ namespace hpx { namespace util {
             std::swap(object, f.object);
             return *this;
         }
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -641,19 +693,69 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R(A0 , A1)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R(A0 , A1)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1) const
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1)
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1);
+        }
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type *>(&object);
+            return reinterpret_cast<functor_type *>(object);
+        }
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type const*>(&object);
+            return reinterpret_cast<functor_type const*>(object);
         }
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_base);
@@ -675,8 +777,8 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
-            : vptr(0)
+        function_base() BOOST_NOEXCEPT
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
         ~function_base()
@@ -703,7 +805,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -711,13 +813,7 @@ namespace hpx { namespace util {
                 typedef
                     typename util::decay<Functor>::type
                     functor_type;
-                vptr = detail::get_table<
-                            functor_type
-                          , R(A0 , A1 , A2)
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -729,7 +825,7 @@ namespace hpx { namespace util {
             }
         }
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -738,7 +834,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
         function_base &assign(function_base const & other)
@@ -764,17 +860,12 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(A0 , A1 , A2)
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *)) 
@@ -794,12 +885,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *)) 
@@ -831,7 +917,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
             return *this;
@@ -842,15 +928,15 @@ namespace hpx { namespace util {
             std::swap(object, f.object);
             return *this;
         }
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -859,19 +945,69 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R(A0 , A1 , A2)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R(A0 , A1 , A2)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2) const
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2)
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2);
+        }
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type *>(&object);
+            return reinterpret_cast<functor_type *>(object);
+        }
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type const*>(&object);
+            return reinterpret_cast<functor_type const*>(object);
         }
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_base);
@@ -893,8 +1029,8 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
-            : vptr(0)
+        function_base() BOOST_NOEXCEPT
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
         ~function_base()
@@ -921,7 +1057,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -929,13 +1065,7 @@ namespace hpx { namespace util {
                 typedef
                     typename util::decay<Functor>::type
                     functor_type;
-                vptr = detail::get_table<
-                            functor_type
-                          , R(A0 , A1 , A2 , A3)
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -947,7 +1077,7 @@ namespace hpx { namespace util {
             }
         }
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -956,7 +1086,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
         function_base &assign(function_base const & other)
@@ -982,17 +1112,12 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(A0 , A1 , A2 , A3)
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1012,12 +1137,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1049,7 +1169,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
             return *this;
@@ -1060,15 +1180,15 @@ namespace hpx { namespace util {
             std::swap(object, f.object);
             return *this;
         }
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -1077,19 +1197,69 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R(A0 , A1 , A2 , A3)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R(A0 , A1 , A2 , A3)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3) const
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3)
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3);
+        }
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type *>(&object);
+            return reinterpret_cast<functor_type *>(object);
+        }
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type const*>(&object);
+            return reinterpret_cast<functor_type const*>(object);
         }
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_base);
@@ -1111,8 +1281,8 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
-            : vptr(0)
+        function_base() BOOST_NOEXCEPT
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
         ~function_base()
@@ -1139,7 +1309,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -1147,13 +1317,7 @@ namespace hpx { namespace util {
                 typedef
                     typename util::decay<Functor>::type
                     functor_type;
-                vptr = detail::get_table<
-                            functor_type
-                          , R(A0 , A1 , A2 , A3 , A4)
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -1165,7 +1329,7 @@ namespace hpx { namespace util {
             }
         }
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -1174,7 +1338,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
         function_base &assign(function_base const & other)
@@ -1200,17 +1364,12 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(A0 , A1 , A2 , A3 , A4)
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1230,12 +1389,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1267,7 +1421,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
             return *this;
@@ -1278,15 +1432,15 @@ namespace hpx { namespace util {
             std::swap(object, f.object);
             return *this;
         }
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -1295,19 +1449,69 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R(A0 , A1 , A2 , A3 , A4)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R(A0 , A1 , A2 , A3 , A4)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4) const
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
+        }
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type *>(&object);
+            return reinterpret_cast<functor_type *>(object);
+        }
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type const*>(&object);
+            return reinterpret_cast<functor_type const*>(object);
         }
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_base);
@@ -1329,8 +1533,8 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
-            : vptr(0)
+        function_base() BOOST_NOEXCEPT
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
         ~function_base()
@@ -1357,7 +1561,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -1365,13 +1569,7 @@ namespace hpx { namespace util {
                 typedef
                     typename util::decay<Functor>::type
                     functor_type;
-                vptr = detail::get_table<
-                            functor_type
-                          , R(A0 , A1 , A2 , A3 , A4 , A5)
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -1383,7 +1581,7 @@ namespace hpx { namespace util {
             }
         }
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -1392,7 +1590,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
         function_base &assign(function_base const & other)
@@ -1418,17 +1616,12 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(A0 , A1 , A2 , A3 , A4 , A5)
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1448,12 +1641,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1485,7 +1673,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
             return *this;
@@ -1496,15 +1684,15 @@ namespace hpx { namespace util {
             std::swap(object, f.object);
             return *this;
         }
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -1513,19 +1701,69 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R(A0 , A1 , A2 , A3 , A4 , A5)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R(A0 , A1 , A2 , A3 , A4 , A5)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5) const
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
+        }
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type *>(&object);
+            return reinterpret_cast<functor_type *>(object);
+        }
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type const*>(&object);
+            return reinterpret_cast<functor_type const*>(object);
         }
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_base);
@@ -1547,8 +1785,8 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
-            : vptr(0)
+        function_base() BOOST_NOEXCEPT
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
         ~function_base()
@@ -1575,7 +1813,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -1583,13 +1821,7 @@ namespace hpx { namespace util {
                 typedef
                     typename util::decay<Functor>::type
                     functor_type;
-                vptr = detail::get_table<
-                            functor_type
-                          , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -1601,7 +1833,7 @@ namespace hpx { namespace util {
             }
         }
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -1610,7 +1842,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
         function_base &assign(function_base const & other)
@@ -1636,17 +1868,12 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1666,12 +1893,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1703,7 +1925,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
             return *this;
@@ -1714,15 +1936,15 @@ namespace hpx { namespace util {
             std::swap(object, f.object);
             return *this;
         }
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -1731,19 +1953,69 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6) const
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
+        }
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type *>(&object);
+            return reinterpret_cast<functor_type *>(object);
+        }
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type const*>(&object);
+            return reinterpret_cast<functor_type const*>(object);
         }
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_base);
@@ -1765,8 +2037,8 @@ namespace hpx { namespace util {
       , OArchive
     >
     {
-        function_base()
-            : vptr(0)
+        function_base() BOOST_NOEXCEPT
+            : vptr(get_empty_table_ptr())
             , object(0)
         {}
         ~function_base()
@@ -1793,7 +2065,7 @@ namespace hpx { namespace util {
                 >::type
             >::type * dummy = 0
         )
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             if (!detail::is_empty_function(f))
@@ -1801,13 +2073,7 @@ namespace hpx { namespace util {
                 typedef
                     typename util::decay<Functor>::type
                     functor_type;
-                vptr = detail::get_table<
-                            functor_type
-                          , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                        >::template get<
-                            IArchive
-                          , OArchive
-                        >();
+                vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *)) 
                 {
                     new (&object) functor_type(boost::forward<Functor>(f));
@@ -1819,7 +2085,7 @@ namespace hpx { namespace util {
             }
         }
         function_base(function_base const & other)
-            : vptr(0)
+            : vptr(get_empty_table_ptr())
             , object(0)
         {
             assign(other);
@@ -1828,7 +2094,7 @@ namespace hpx { namespace util {
             : vptr(other.vptr)
             , object(other.object)
         {
-            other.vptr = 0;
+            other.vptr = get_empty_table_ptr();
             other.object = 0;
         }
         function_base &assign(function_base const & other)
@@ -1854,17 +2120,12 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
+            if (this == &f)
+                return *this;
             typedef
                 typename util::decay<Functor>::type
                 functor_type;
-            vtable_ptr_type * f_vptr
-                = detail::get_table<
-                      functor_type
-                    , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-                  >::template get<
-                      IArchive
-                    , OArchive
-                  >();
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
             if(vptr == f_vptr && !empty())
             {
                 if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1884,12 +2145,7 @@ namespace hpx { namespace util {
             }
             else
             {
-                if (!empty())
-                {
-                    vptr->static_delete(&object);
-                    vptr = 0;
-                    object = 0;
-                }
+                reset();
                 if (!detail::is_empty_function(f))
                 {
                     if (sizeof(functor_type) <= sizeof(void *)) 
@@ -1921,7 +2177,7 @@ namespace hpx { namespace util {
                 reset();
                 vptr = t.vptr;
                 object = t.object;
-                t.vptr = 0;
+                t.vptr = get_empty_table_ptr();
                 t.object = 0;
             }
             return *this;
@@ -1932,15 +2188,15 @@ namespace hpx { namespace util {
             std::swap(object, f.object);
             return *this;
         }
-        bool empty() const
+        bool empty() const BOOST_NOEXCEPT
         {
-            return (vptr == 0) && (object == 0);
+            return object == 0 && vptr->empty();
         }
-        operator typename util::safe_bool<function_base>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const BOOST_NOEXCEPT
         {
             return util::safe_bool<function_base>()(!empty());
         }
-        bool operator!() const
+        bool operator!() const BOOST_NOEXCEPT
         {
             return empty();
         }
@@ -1949,19 +2205,69 @@ namespace hpx { namespace util {
             if (!empty())
             {
                 vptr->static_delete(&object);
-                vptr = 0;
+                vptr = get_empty_table_ptr();
                 object = 0;
             }
         }
+        static vtable_ptr_type* get_empty_table_ptr()
+        {
+            return detail::get_empty_table<
+                        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
+        template <typename Functor>
+        static vtable_ptr_type* get_table_ptr()
+        {
+            return detail::get_table<
+                        Functor
+                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
+                    >::template get<
+                        IArchive
+                      , OArchive
+                    >();
+        }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7) const
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
         {
-            BOOST_ASSERT(!empty());
             return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
+        }
+        std::type_info const& target_type() const BOOST_NOEXCEPT
+        {
+            if (empty())
+                return typeid(void);
+            return vptr->get_type();
+        }
+        template <typename T>
+        T* target() BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type *>(&object);
+            return reinterpret_cast<functor_type *>(object);
+        }
+        template <typename T>
+        T const* target() const BOOST_NOEXCEPT
+        {
+            typedef
+                typename util::decay<T>::type
+                functor_type;
+            vtable_ptr_type* f_vptr = get_table_ptr<functor_type>();
+            if (vptr != f_vptr || empty())
+                return 0;
+            if (sizeof(functor_type) <= sizeof(void *)) 
+                return reinterpret_cast<functor_type const*>(&object);
+            return reinterpret_cast<functor_type const*>(object);
         }
     private:
         BOOST_COPYABLE_AND_MOVABLE(function_base);
