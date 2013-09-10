@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2013 Thomas Heller
 //  Copyright (c) 2011-2013 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
@@ -15,6 +15,7 @@
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/tuple_helper.hpp>
 
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/facilities/intercept.hpp>
@@ -55,99 +56,6 @@
 
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
-        template <typename T, bool IsRvalueRef =
-            std::is_rvalue_reference<T>::type::value>
-#else
-        template <typename T, bool IsRvalueRef = false>
-#endif
-        struct env_value_type
-        {
-            typedef typename hpx::util::detail::remove_reference<T>::type type;
-        };
-
-        template <typename T>
-        struct env_value_type<T, false>
-        {
-            typedef T type;
-        };
-
-        template <typename T>
-        struct env_value_type<T const, false>
-        {
-            typedef T const type;
-        };
-
-        template <typename T>
-        struct env_value_type<T &, false>
-        {
-            typedef typename hpx::util::detail::remove_reference<T>::type & type;
-        };
-
-        template <typename T>
-        struct env_value_type<T const &, false>
-        {
-            typedef typename hpx::util::detail::remove_reference<T>::type const & type;
-        };
-
-        struct forwarding_tag {};
-
-        struct ignore_type
-        {
-            template <typename T>
-            ignore_type const& operator=(T const&) const
-            {
-                return *this;
-            }
-        };
-
-// gcc 4.4.x is not able to cope with this, thus we disable the optimization
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40500 || defined(BOOST_INTEL)
-        ///////////////////////////////////////////////////////////////////////
-        struct compute_sequence_is_bitwise_serializable
-        {
-            template <typename State, typename T>
-            struct apply
-              : boost::mpl::and_<
-                    boost::serialization::is_bitwise_serializable<T>, State>
-            {};
-        };
-
-        template <typename Seq>
-        struct sequence_is_bitwise_serializable
-          : boost::mpl::fold<
-                Seq, boost::mpl::true_, compute_sequence_is_bitwise_serializable>
-        {};
-#else
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Seq>
-        struct sequence_is_bitwise_serializable
-          : boost::mpl::false_
-        {};
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct is_tuple
-      : boost::mpl::false_
-    {};
-
-    template <typename T>
-    struct is_tuple<T&>
-      : is_tuple<T>
-    {};
-
-    template <typename T>
-    struct is_tuple<T const&>
-      : is_tuple<T>
-    {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    detail::ignore_type const ignore = {};
-
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
     template <BOOST_PP_ENUM_BINARY_PARAMS(HPX_TUPLE_LIMIT
@@ -158,6 +66,15 @@ namespace hpx { namespace util
     struct is_tuple<tuple<BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, A)> >
       : boost::mpl::true_
     {};
+
+    template <BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, typename A)>
+    void
+    swap(
+        tuple<BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, A)>& t0
+      , tuple<BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, A)>& t1)
+    {
+        t0.swap(t1);
+    }
 #else
     template <BOOST_PP_ENUM_BINARY_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
       , typename A, = void BOOST_PP_INTERCEPT), typename Dummy = void>
@@ -167,6 +84,15 @@ namespace hpx { namespace util
     struct is_tuple<tuple<BOOST_PP_ENUM_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), A)> >
       : boost::mpl::true_
     {};
+
+    template <BOOST_PP_ENUM_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), typename A)>
+    void
+    swap(
+        tuple<BOOST_PP_ENUM_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), A)>& t0
+      , tuple<BOOST_PP_ENUM_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), A)>& t1)
+    {
+        t0.swap(t1);
+    }
 #endif
 
     template <>
@@ -575,34 +501,17 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        typedef detail::forwarding_tag forwarding_tag;
-
         tuple()
           : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_DEFAULT_CONSTRUCT_MEMBER, A)
         {}
 
 #       if N == 1
         template <typename Arg0>
-        tuple(Arg0 const& arg0, forwarding_tag)
-          : a0(arg0)
-        {}
-
-        template <typename Arg0>
-        tuple(BOOST_RV_REF(Arg0) arg0, forwarding_tag)
-          : a0(boost::forward<Arg0>(arg0))
-        {}
-
-        template <typename Arg0>
-        tuple(Arg0 const& arg0
-          , typename boost::disable_if<is_tuple<Arg0>>::type* = 0)
-          : a0(arg0)
-        {}
-
-        template <typename Arg0>
-        tuple(BOOST_RV_REF(Arg0) arg0
+        tuple(BOOST_FWD_REF(Arg0) arg0
           , typename boost::disable_if<is_tuple<Arg0>>::type* = 0)
           : a0(boost::forward<Arg0>(arg0))
         {}
+
 #       else
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -737,8 +646,7 @@ namespace hpx { namespace util
     make_tuple(BOOST_FWD_REF(Arg0) arg0)
     {
         typedef tuple<HPX_UTIL_MAKE_TUPLE_ARG(_, 0, Arg)> result_type;
-        return result_type(boost::forward<Arg0>(arg0),
-            typename detail::forwarding_tag());
+        return result_type(boost::forward<Arg0>(arg0));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -748,19 +656,17 @@ namespace hpx { namespace util
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
         typedef tuple<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)> result_type;
-        return result_type(boost::forward<Arg0>(arg0),
-            typename detail::forwarding_tag());
+        return result_type(boost::forward<Arg0>(arg0));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple<Arg0>
+    tuple<Arg0&>
     tie(Arg0& arg0) BOOST_NOEXCEPT
     {
-        typedef tuple<Arg0> result_type;
-        return result_type(arg0,
-            typename detail::forwarding_tag());
+        typedef tuple<Arg0&> result_type;
+        return result_type(arg0);
     }
 
     ///////////////////////////////////////////////////////////////////////////

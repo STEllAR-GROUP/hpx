@@ -372,7 +372,7 @@ namespace hpx { namespace actions
             }
         };
     }
-    
+
     template <typename Action>
     struct init_registration;
 
@@ -420,8 +420,7 @@ namespace hpx { namespace actions
 
         template <typename Arg0>
         explicit transfer_action(BOOST_FWD_REF(Arg0) arg0)
-          : arguments_(boost::forward<Arg0>(arg0),
-                typename arguments_type::forwarding_tag()),
+          : arguments_(boost::forward<Arg0>(arg0)),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
@@ -439,8 +438,7 @@ namespace hpx { namespace actions
 
         template <typename Arg0>
         transfer_action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
-          : arguments_(boost::forward<Arg0>(arg0),
-                typename arguments_type::forwarding_tag()),
+          : arguments_(boost::forward<Arg0>(arg0)),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
@@ -1168,7 +1166,7 @@ namespace hpx { namespace actions
 
     template <typename Action>
     detail::automatic_action_registration<transfer_action<Action> >
-        init_registration<transfer_action<Action> >::g = 
+        init_registration<transfer_action<Action> >::g =
             detail::automatic_action_registration<transfer_action<Action> >();
 }}
 

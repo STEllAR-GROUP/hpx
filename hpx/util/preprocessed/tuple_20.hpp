@@ -34,25 +34,11 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0()
         {}
         template <typename Arg0>
-        tuple(Arg0 const& arg0, forwarding_tag)
-          : a0(arg0)
-        {}
-        template <typename Arg0>
-        tuple(BOOST_RV_REF(Arg0) arg0, forwarding_tag)
-          : a0(boost::forward<Arg0>(arg0))
-        {}
-        template <typename Arg0>
-        tuple(Arg0 const& arg0
-          , typename boost::disable_if<is_tuple<Arg0>>::type* = 0)
-          : a0(arg0)
-        {}
-        template <typename Arg0>
-        tuple(BOOST_RV_REF(Arg0) arg0
+        tuple(BOOST_FWD_REF(Arg0) arg0
           , typename boost::disable_if<is_tuple<Arg0>>::type* = 0)
           : a0(boost::forward<Arg0>(arg0))
         {}
@@ -116,8 +102,7 @@ namespace hpx { namespace util
     make_tuple(BOOST_FWD_REF(Arg0) arg0)
     {
         typedef tuple<typename util::decay<Arg0>::type> result_type;
-        return result_type(boost::forward<Arg0>(arg0),
-            typename detail::forwarding_tag());
+        return result_type(boost::forward<Arg0>(arg0));
     }
     
     template <typename Arg0>
@@ -126,18 +111,16 @@ namespace hpx { namespace util
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
         typedef tuple<typename detail::env_value_type<Arg0>::type> result_type;
-        return result_type(boost::forward<Arg0>(arg0),
-            typename detail::forwarding_tag());
+        return result_type(boost::forward<Arg0>(arg0));
     }
     
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple<Arg0>
+    tuple<Arg0&>
     tie(Arg0& arg0) BOOST_NOEXCEPT
     {
-        typedef tuple<Arg0> result_type;
-        return result_type(arg0,
-            typename detail::forwarding_tag());
+        typedef tuple<Arg0&> result_type;
+        return result_type(arg0);
     }
     
     template <typename T0>
@@ -187,7 +170,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1()
         {}
@@ -219,8 +201,8 @@ namespace hpx { namespace util
         {}
         template <typename U1, typename U2>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((std::pair<U1, U2>))) other)
-          : a0(boost::forward<U1>(other.first))
-          , a1(boost::forward<U1>(other.second))
+          : a0(boost::move(other.first))
+          , a1(boost::move(other.second))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -348,7 +330,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2()
         {}
@@ -497,7 +478,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3()
         {}
@@ -646,7 +626,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4()
         {}
@@ -795,7 +774,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5()
         {}
@@ -944,7 +922,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6()
         {}
@@ -1093,7 +1070,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7()
         {}
@@ -1242,7 +1218,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8()
         {}
@@ -1391,7 +1366,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9()
         {}
@@ -1540,7 +1514,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10()
         {}
@@ -1689,7 +1662,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10() , a11()
         {}
@@ -1838,7 +1810,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10() , a11() , a12()
         {}
@@ -1987,7 +1958,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10() , a11() , a12() , a13()
         {}
@@ -2136,7 +2106,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10() , a11() , a12() , a13() , a14()
         {}
@@ -2285,7 +2254,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10() , a11() , a12() , a13() , a14() , a15()
         {}
@@ -2434,7 +2402,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10() , a11() , a12() , a13() , a14() , a15() , a16()
         {}
@@ -2583,7 +2550,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10() , a11() , a12() , a13() , a14() , a15() , a16() , a17()
         {}
@@ -2732,7 +2698,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10() , a11() , a12() , a13() , a14() , a15() , a16() , a17() , a18()
         {}
@@ -2881,7 +2846,6 @@ namespace hpx { namespace util
             return detail::tuple_element<E, tuple const>::get(*this);
         }
         
-        typedef detail::forwarding_tag forwarding_tag;
         tuple()
           : a0() , a1() , a2() , a3() , a4() , a5() , a6() , a7() , a8() , a9() , a10() , a11() , a12() , a13() , a14() , a15() , a16() , a17() , a18() , a19()
         {}

@@ -183,7 +183,7 @@ void element_access_test()
 
     HPX_TEST((boost::is_const<hpx::util::tuple_element<1, hpx::util::tuple<int, float> >::type>::value != true));
     HPX_TEST((boost::is_const<hpx::util::tuple_element<1, const hpx::util::tuple<int, float> >::type>::value));
-    
+
     dummy(i); dummy(i2); dummy(j); dummy(e); // avoid warns for unused variables
 }
 
@@ -388,8 +388,11 @@ void tuple_swap_test()
     HPX_TEST(hpx::util::get<2>(t2) == 3.0);
 
     int i = 1,j = 2;
+
     hpx::util::tuple<int&> t3(i), t4(j);
     boost::swap(t3, t4);
+    HPX_TEST(hpx::util::get<0>(t3) == 2);
+    HPX_TEST(hpx::util::get<0>(t4) == 1);
     HPX_TEST(i == 2);
     HPX_TEST(j == 1);
 }
