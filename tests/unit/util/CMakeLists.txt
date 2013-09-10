@@ -53,8 +53,8 @@ endforeach()
 
 # add sub directories
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.util.${subdir})
+  add_hpx_pseudo_target(tests.unit.util.${subdir}dir)
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.unit.util tests.unit.util.${subdir})
+  add_hpx_pseudo_dependencies(tests.unit.util tests.unit.util.${subdir}dir)
 endforeach()
 
