@@ -20,9 +20,9 @@ int main()
 {
     stateful_type a_function_object;
     hpx::util::function_nonser<int (int)> f;
-    HPX_TEST_EQ(f(42), 42);
 
     f = boost::ref(a_function_object);
+    HPX_TEST_EQ(f(42), 42);
     hpx::util::function_nonser<int (int)> f2(f);
     HPX_TEST_EQ(f2(42), 42);
 
