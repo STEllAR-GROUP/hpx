@@ -640,8 +640,8 @@ namespace hpx { namespace util
 
         template <typename U1, typename U2>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((std::pair<U1, U2>))) other)
-          : a0(boost::forward<U1>(other.first))
-          , a1(boost::forward<U1>(other.second))
+          : a0(boost::move(other.first))
+          , a1(boost::move(other.second))
         {}
 #       endif
 
