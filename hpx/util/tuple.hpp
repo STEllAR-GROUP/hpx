@@ -512,6 +512,10 @@ namespace hpx { namespace util
           : a0(boost::forward<Arg0>(arg0))
         {}
 
+        template <typename Arg0>
+        tuple(BOOST_FWD_REF(Arg0) arg0, detail::forwarding_tag)
+          : a0(boost::forward<Arg0>(arg0))
+        {}
 #       else
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -646,7 +650,7 @@ namespace hpx { namespace util
     make_tuple(BOOST_FWD_REF(Arg0) arg0)
     {
         typedef tuple<HPX_UTIL_MAKE_TUPLE_ARG(_, 0, Arg)> result_type;
-        return result_type(boost::forward<Arg0>(arg0));
+        return result_type(boost::forward<Arg0>(arg0), detail::forwarding_tag());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -656,7 +660,7 @@ namespace hpx { namespace util
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
         typedef tuple<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)> result_type;
-        return result_type(boost::forward<Arg0>(arg0));
+        return result_type(boost::forward<Arg0>(arg0), detail::forwarding_tag());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -666,7 +670,7 @@ namespace hpx { namespace util
     tie(Arg0& arg0) BOOST_NOEXCEPT
     {
         typedef tuple<Arg0&> result_type;
-        return result_type(arg0);
+        return result_type(arg0, detail::forwarding_tag());
     }
 
     ///////////////////////////////////////////////////////////////////////////

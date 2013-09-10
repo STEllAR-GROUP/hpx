@@ -420,7 +420,8 @@ namespace hpx { namespace actions
 
         template <typename Arg0>
         explicit transfer_action(BOOST_FWD_REF(Arg0) arg0)
-          : arguments_(boost::forward<Arg0>(arg0)),
+          : arguments_(boost::forward<Arg0>(arg0),
+                util::detail::forwarding_tag()),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
@@ -438,7 +439,8 @@ namespace hpx { namespace actions
 
         template <typename Arg0>
         transfer_action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
-          : arguments_(boost::forward<Arg0>(arg0)),
+          : arguments_(boost::forward<Arg0>(arg0),
+                util::detail::forwarding_tag()),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),

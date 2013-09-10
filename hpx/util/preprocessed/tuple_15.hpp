@@ -42,6 +42,10 @@ namespace hpx { namespace util
           , typename boost::disable_if<is_tuple<Arg0>>::type* = 0)
           : a0(boost::forward<Arg0>(arg0))
         {}
+        template <typename Arg0>
+        tuple(BOOST_FWD_REF(Arg0) arg0, detail::forwarding_tag)
+          : a0(boost::forward<Arg0>(arg0))
+        {}
         
         tuple(tuple const& other)
           : a0(other.a0)
@@ -102,7 +106,7 @@ namespace hpx { namespace util
     make_tuple(BOOST_FWD_REF(Arg0) arg0)
     {
         typedef tuple<typename util::decay<Arg0>::type> result_type;
-        return result_type(boost::forward<Arg0>(arg0));
+        return result_type(boost::forward<Arg0>(arg0), detail::forwarding_tag());
     }
     
     template <typename Arg0>
@@ -111,7 +115,7 @@ namespace hpx { namespace util
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
         typedef tuple<typename detail::env_value_type<Arg0>::type> result_type;
-        return result_type(boost::forward<Arg0>(arg0));
+        return result_type(boost::forward<Arg0>(arg0), detail::forwarding_tag());
     }
     
     template <typename Arg0>
@@ -120,7 +124,7 @@ namespace hpx { namespace util
     tie(Arg0& arg0) BOOST_NOEXCEPT
     {
         typedef tuple<Arg0&> result_type;
-        return result_type(arg0);
+        return result_type(arg0, detail::forwarding_tag());
     }
     
     template <typename T0>

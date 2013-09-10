@@ -84,6 +84,7 @@ namespace hpx { namespace util
           : boost::mpl::false_
         {};
 #endif
+        struct forwarding_tag {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
