@@ -16,6 +16,7 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 843] - Tests should use CTest
 * [issue 842] - Remove buffer_pool from MPI parcelport
 * [issue 838] - Simplify util::tuple
 * [issue 837] - Adopt boost::tuple tests for util::tuple
