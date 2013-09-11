@@ -355,7 +355,7 @@ namespace test
                 HPX_TEST(type_name == t->typename_);
             }
             else {
-                HPX_TEST(type_name == t->typename_ + '#' + t->path_.parameters_);
+                HPX_TEST(type_name == t->typename_ + '@' + t->path_.parameters_);
             }
 
             HPX_TEST(status_valid_data == get_counter_type_path_elements(t->typename_, tp2, ec));
