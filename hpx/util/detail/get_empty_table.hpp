@@ -16,6 +16,12 @@
 
 #include <typeinfo>
 
+namespace hpx { namespace util { namespace detail
+{
+    template <typename Sig, typename IArchive, typename OArchive>
+    struct empty_vtable;
+}}}
+
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/get_empty_table.hpp>
 #else
