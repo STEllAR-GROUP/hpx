@@ -24,6 +24,15 @@ if __name__ == '__main__':
   # {{{ main
     usage = "Usage: %prog [ctest option files]"
 
+    parser.add_option("--prefix",
+                    action="store", type="string",
+                    dest="prefix", default="",
+                    help="")
+
+    parser.add_option("--log-stdout",
+                    action="store_true", dest="log_stdout", default=False,
+                    help="Send logs to stdout (overrides --log-prefix)")
+
     parser = OptionParser(usage=usage)
     (ignore, files) = parser.parse_args();
     base_cmd = "ctest "
