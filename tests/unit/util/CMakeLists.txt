@@ -37,7 +37,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      FOLDER "Tests/Unit/Util/")
 
-  add_hpx_unit_test(${test} ${${test}_PARAMETERS})  
+  add_hpx_unit_test("util" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.util.${test})
@@ -58,3 +58,4 @@ foreach(subdir ${subdirs})
   add_hpx_pseudo_dependencies(tests.unit.util tests.unit.util.${subdir}dir)
 endforeach()
 
+#add_test(NAME tests.unit.util.tuple COMMAND ${CMAKE_SOURCE_DIR}/test.sh $<TARGET_FILE:tuple_test_exe>)

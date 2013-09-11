@@ -50,7 +50,7 @@ if(HPX_HAVE_CXX11)
                          ${${test}_FLAGS}
                          FOLDER "Tests/Regressions/Actions")
 
-      add_hpx_regression_test(${test} ${${test}_PARAMETERS})  
+      add_hpx_regression_test("actions" ${test} ${${test}_PARAMETERS})
 
       # add a custom target for this example
       add_hpx_pseudo_target(tests.regressions.actions.${test})

@@ -41,6 +41,8 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      FOLDER "Tests/Regressions/Util")
 
+  add_hpx_regression_test("util" ${test} ${${test}_PARAMETERS})
+
   # add a custom target for this example
   add_hpx_pseudo_target(tests.regressions.util.${test})
 

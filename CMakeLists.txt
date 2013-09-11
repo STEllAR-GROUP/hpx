@@ -199,7 +199,7 @@ hpx_option(HPX_NATIVE_MIC BOOL
 
 if(HPX_NATIVE_MIC)
   hpx_option(HPX_MAX_CPU_COUNT STRING
-    "HPX applications will not use more than this amount of OS-threads (default: 256)." 
+    "HPX applications will not use more than this amount of OS-threads (default: 256)."
     "256" ADVANCED)
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
@@ -208,7 +208,7 @@ if(HPX_NATIVE_MIC)
   set(HPX_MALLOC "tbbmalloc")
 else()
   hpx_option(HPX_MAX_CPU_COUNT STRING
-    "HPX applications will not use more than this amount of OS-threads (default: 64)." 
+    "HPX applications will not use more than this amount of OS-threads (default: 64)."
     "64" ADVANCED)
 endif()
 
@@ -1352,15 +1352,11 @@ if(HPX_BUILD_TESTS)
 
   add_hpx_pseudo_target(tests)
 
+  enable_testing()
+  include(CTest)
+
   add_custom_command(TARGET tests POST_BUILD
-    COMMAND ${CMAKE_SOURCE_DIR}/python/scripts/hpx_run_tests.py
-    ARGS --prefix=${CMAKE_BINARY_DIR}/bin/
-         --args=\${HPX_TEST_ARGUMENTS}
-         --log-stdout
-         --no-exit-code
-         ${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
-         ${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests
-    COMMENT "Running HPX tests")
+    COMMAND ctest)
 
   hpx_include_directories(tests)
   add_subdirectory(tests)
@@ -1744,11 +1740,9 @@ execute_process(COMMAND
   "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
   WORKING_DIRECTORY ${output_dir}/share)
 
-file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
-           "[\n${HPX_UNIT_TEST_LIST}\n]\n")
+file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests "\"-R tests.unit\"")
 
-file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests
-           "[\n${HPX_REGRESSION_TEST_LIST}\n]\n")
+file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests "\"-R tests.regression\"")
 
 if(NOT HPX_NO_INSTALL)
   install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
@@ -1756,8 +1750,4 @@ if(NOT HPX_NO_INSTALL)
   install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests
           DESTINATION share/hpx-${HPX_VERSION}/tests)
 endif()
-
-unset(HPX_UNIT_TEST_LIST CACHE)
-unset(HPX_REGRESSION_TEST_LIST CACHE)
-
 

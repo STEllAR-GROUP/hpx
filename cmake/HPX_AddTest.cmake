@@ -17,7 +17,7 @@ macro(hpx_make_python_list input output)
   set(${output} "${${output}}]")
 endmacro()
 
-macro(add_hpx_test name test_list)
+macro(add_hpx_test name category)
   hpx_parse_arguments(${name} "TIMEOUT;LOCALITIES;THREADS_PER_LOCALITY;ARGS"
                               "FAILURE_EXPECTED" ${ARGN})
 
@@ -47,7 +47,7 @@ macro(add_hpx_test name test_list)
 
   hpx_make_python_list(args ${name}_ARGS)
 
-  set(test_input "'${name}'"
+  set(test_input "'$<TARGET_FILE:${name}_test_exe>'"
                  ${${name}_TIMEOUT}
                  ${expected}
                  ${${name}_LOCALITIES}
@@ -58,15 +58,18 @@ macro(add_hpx_test name test_list)
 
   set(test_output "  ${test_output},\n")
 
-  set(${test_list} "${${test_list}}${test_output}"
-      CACHE STRING "Test description list" FORCE)
+  add_test(
+    NAME "${category}.${name}"
+    COMMAND ${CMAKE_SOURCE_DIR}/python/scripts/hpx_run_test.py
+            --log-stdout
+            "[${test_output}]")
 endmacro()
 
-macro(add_hpx_unit_test name)
-  add_hpx_test(${name} HPX_UNIT_TEST_LIST ${ARGN})
+macro(add_hpx_unit_test category name)
+  add_hpx_test(${name} "tests.unit.${category}" ${ARGN})
 endmacro()
 
-macro(add_hpx_regression_test name)
-  add_hpx_test(${name} HPX_REGRESSION_TEST_LIST ${ARGN})
+macro(add_hpx_regression_test category name)
+  add_hpx_test(${name} "tests.regressions.${category}" ${ARGN})
 endmacro()
 

@@ -27,7 +27,7 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      FOLDER "Tests/Regressions/Threads")
 
-  add_hpx_regression_test(${test} ${${test}_PARAMETERS})  
+  add_hpx_regression_test("threads" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.regressions.threads.${test})

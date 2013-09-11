@@ -32,7 +32,7 @@ foreach(test ${tests})
                        FOLDER "Tests/Regressions/performance_counters")
   endif()
 
-  add_hpx_regression_test(${test} ${${test}_PARAMETERS})
+  add_hpx_regression_test("performance_counters" ${test} ${${test}_PARAMETERS})
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.regressions.performance_counters.${test})
