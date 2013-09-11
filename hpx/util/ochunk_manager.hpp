@@ -33,7 +33,7 @@ namespace hpx { namespace util { namespace detail
             (*chunks_)[chunk].size_ = size;
         }
 
-        chunk_type get_chunk_type(std::size_t chunk) const
+        boost::uint8_t get_chunk_type(std::size_t chunk) const
         {
             return (*chunks_)[chunk].type_;
         }
