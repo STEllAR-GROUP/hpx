@@ -42,9 +42,9 @@
                 Sig                                                           \
               , portable_binary_iarchive                                      \
               , portable_binary_oarchive                                      \
-              , vtable<sizeof(typename util::decay<Functor>::type) <=         \
+              , vtable<sizeof(util::decay<Functor>::type) <=                  \
                        sizeof(void *)>::type<                                 \
-                    typename util::decay<Functor>::type                       \
+                    util::decay<Functor>::type                                \
                   , Sig                                                       \
                   , portable_binary_iarchive                                  \
                   , portable_binary_oarchive                                  \
