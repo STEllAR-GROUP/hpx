@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/actions/polymorphic_factory.hpp>
+#include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/serialize_intrusive_ptr.hpp>
@@ -71,7 +71,7 @@ namespace hpx { namespace parcelset
             std::string action_name;
             ar.load(action_name);
 
-            action_ = actions::polymorphic_factory<
+            action_ = util::polymorphic_factory<
                 actions::base_action>::create(action_name);
             action_->load(ar);
 
@@ -80,7 +80,7 @@ namespace hpx { namespace parcelset
                 std::string continuation_name;
                 ar.load(continuation_name);
 
-                continuation_ = actions::polymorphic_factory<
+                continuation_ = util::polymorphic_factory<
                     actions::continuation>::create(continuation_name);
                 continuation_->load(ar);
             }

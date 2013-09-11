@@ -1,8 +1,8 @@
 //  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
 
 #if !BOOST_PP_IS_ITERATING
 
@@ -132,6 +132,7 @@ namespace hpx { namespace util
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <
         typename Sig
       , typename IArchive
@@ -192,21 +193,31 @@ namespace hpx { namespace util
         void load(IArchive &ar, const unsigned version)
         {
             bool is_empty;
-            ar & is_empty;
+            ar.load(is_empty);
 
-            if(is_empty)
+            if (is_empty)
             {
                 this->reset();
             }
             else
             {
-                typedef typename base_type::vtable_ptr_type vtable_ptr_type;
+                typedef
+                    typename base_type::vtable_virtbase_type
+                    vtable_virtbase_type;
 
-                vtable_ptr_type* ptr = 0;
-                ar >> ptr;
+                typedef
+                    typename base_type::vtable_ptr_type
+                    vtable_ptr_type;
 
-                boost::scoped_ptr<vtable_ptr_type> p(ptr);
-                this->vptr = ptr->get_ptr();
+                std::string function_name;
+                ar.load(function_name);
+
+                boost::shared_ptr<vtable_virtbase_type> p(
+                    util::polymorphic_factory<
+                        vtable_virtbase_type
+                    >::create(function_name));
+
+                this->vptr = static_cast<vtable_ptr_type*>(p->get_ptr());
                 this->vptr->load_object(&this->object, ar, version);
             }
         }
@@ -214,11 +225,13 @@ namespace hpx { namespace util
         void save(OArchive &ar, const unsigned version) const
         {
             bool is_empty = this->empty();
-            ar & is_empty;
+            ar.save(is_empty);
 
-            if(!this->empty())
+            if (!is_empty)
             {
-                ar << this->vptr;
+                std::string function_name = this->vptr->get_function_name();
+                ar.save(function_name);
+
                 this->vptr->save_object(&this->object, ar, version);
             }
         }
@@ -226,6 +239,7 @@ namespace hpx { namespace util
         BOOST_SERIALIZATION_SPLIT_MEMBER()
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     template <
         typename Sig
     >
@@ -391,6 +405,12 @@ namespace hpx { namespace util {
         }
 
         typedef R result_type;
+
+        typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
 
         typedef
             detail::vtable_ptr_base<

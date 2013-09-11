@@ -1,4 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -45,20 +46,6 @@
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (
-        template <
-            typename Sig
-          , typename IArchive
-          , typename OArchive
-          , typename Vtable
-        >
-    )
-  , (
-        hpx::util::detail::vtable_ptr<Sig, IArchive, OArchive, Vtable>
-    )
-)
-
 #endif
 
 #else
@@ -66,6 +53,10 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
 #define N BOOST_PP_ITERATION()
 
 namespace hpx { namespace util { namespace detail {
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Function>
+    struct init_registration;
 
     template <
         typename R
@@ -80,14 +71,18 @@ namespace hpx { namespace util { namespace detail {
       , OArchive
       , Vtable
     >
-        : hpx::util::detail::vtable_ptr_base<
+        : util::detail::vtable_ptr_base<
             R(BOOST_PP_ENUM_PARAMS(N, A))
           , IArchive
           , OArchive
         >
     {
         typedef
-            hpx::util::detail::vtable_ptr_base<
+            util::detail::vtable_ptr_virtbase<IArchive, OArchive>
+            vtable_ptr_virtbase_type;
+
+        typedef
+            util::detail::vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
               , IArchive
               , OArchive
@@ -102,19 +97,21 @@ namespace hpx { namespace util { namespace detail {
             base_type::clone = Vtable::clone;
             base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
+        }
 
-            // make sure the global gets instantiated;
-            hpx::actions::detail::guid_initialization<vtable_ptr>();
+        ~vtable_ptr()
+        {
+            init_registration<vtable_ptr>::g.register_function();
+        }
+
+        char const* get_function_name() const
+        {
+            return util::detail::get_function_name<vtable_ptr>();
         }
 
         virtual bool empty() const
         {
             return Vtable::empty;
-        }
-
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
 
         virtual base_type * get_ptr()
@@ -124,20 +121,74 @@ namespace hpx { namespace util { namespace detail {
 
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
-            ar & Vtable::get(object);
+            ar << Vtable::get(object);
         }
         void load_object(void ** object, IArchive & ar, unsigned)
         {
-            ar & Vtable::construct(object);
-        }
-
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar >> Vtable::construct(object);
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    // registration code for serialization
+    template <
+        typename R
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct init_registration<
+        vtable_ptr<
+            R(BOOST_PP_ENUM_PARAMS(N, A))
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+    {
+        typedef vtable_ptr<
+            R(BOOST_PP_ENUM_PARAMS(N, A))
+          , IArchive
+          , OArchive
+          , Vtable
+        > vtable_ptr_type;
+
+        static automatic_function_registration<vtable_ptr_type> g;
+    };
+
+    template <
+        typename R
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    automatic_function_registration<
+        vtable_ptr<
+            R(BOOST_PP_ENUM_PARAMS(N, A))
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+        init_registration<
+            vtable_ptr<
+                R(BOOST_PP_ENUM_PARAMS(N, A))
+              , IArchive
+              , OArchive
+              , Vtable
+            >
+        >::g = automatic_function_registration<
+                    vtable_ptr<
+                        R(BOOST_PP_ENUM_PARAMS(N, A))
+                      , IArchive
+                      , OArchive
+                      , Vtable
+                    >
+                >();
+
+    ///////////////////////////////////////////////////////////////////////////
     template <
         typename R
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -149,14 +200,14 @@ namespace hpx { namespace util { namespace detail {
       , void
       , Vtable
     >
-        : hpx::util::detail::vtable_ptr_base<
+        : util::detail::vtable_ptr_base<
             R(BOOST_PP_ENUM_PARAMS(N, A))
           , void
           , void
         >
     {
         typedef
-            hpx::util::detail::vtable_ptr_base<
+            util::detail::vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
               , void
               , void

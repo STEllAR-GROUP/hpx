@@ -4,11 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file polymorphic_factory.cpp
-
-#include <hpx/config.hpp>
-#include <hpx/runtime/actions/polymorphic_factory.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/polymorphic_factory.hpp>
+#include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 
 #include <hpx/util/static.hpp>
 #include <hpx/util/jenkins_hash.hpp>
@@ -16,6 +15,12 @@
 #include <boost/foreach.hpp>
 
 namespace hpx { namespace actions
+{
+    class HPX_EXPORT continuation;
+    struct base_action;
+}}
+
+namespace hpx { namespace util
 {
     template <typename Base>
     typename polymorphic_factory<Base>::ctor_map::const_iterator
@@ -87,6 +92,10 @@ namespace hpx { namespace actions
         return factory.get();
     }
 
-    template class HPX_EXPORT polymorphic_factory<base_action>;
-    template class HPX_EXPORT polymorphic_factory<continuation>;
+    template class HPX_EXPORT polymorphic_factory<actions::base_action>;
+    template class HPX_EXPORT polymorphic_factory<actions::continuation>;
+    template class HPX_EXPORT polymorphic_factory<
+        detail::vtable_ptr_virtbase<
+            portable_binary_iarchive, portable_binary_oarchive
+        > >;
 }}

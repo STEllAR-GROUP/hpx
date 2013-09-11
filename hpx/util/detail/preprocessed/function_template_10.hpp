@@ -34,6 +34,11 @@ namespace hpx { namespace util {
         }
         typedef R result_type;
         typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
+        typedef
             detail::vtable_ptr_base<
                 R()
               , IArchive
@@ -285,6 +290,11 @@ namespace hpx { namespace util {
             }
         }
         typedef R result_type;
+        typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
         typedef
             detail::vtable_ptr_base<
                 R(A0)
@@ -538,6 +548,11 @@ namespace hpx { namespace util {
         }
         typedef R result_type;
         typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
+        typedef
             detail::vtable_ptr_base<
                 R(A0 , A1)
               , IArchive
@@ -789,6 +804,11 @@ namespace hpx { namespace util {
             }
         }
         typedef R result_type;
+        typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
         typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2)
@@ -1042,6 +1062,11 @@ namespace hpx { namespace util {
         }
         typedef R result_type;
         typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
+        typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3)
               , IArchive
@@ -1293,6 +1318,11 @@ namespace hpx { namespace util {
             }
         }
         typedef R result_type;
+        typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
         typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4)
@@ -1546,6 +1576,11 @@ namespace hpx { namespace util {
         }
         typedef R result_type;
         typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
+        typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5)
               , IArchive
@@ -1797,6 +1832,11 @@ namespace hpx { namespace util {
             }
         }
         typedef R result_type;
+        typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
         typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
@@ -2050,6 +2090,11 @@ namespace hpx { namespace util {
         }
         typedef R result_type;
         typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
+        typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
               , IArchive
@@ -2301,6 +2346,11 @@ namespace hpx { namespace util {
             }
         }
         typedef R result_type;
+        typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
         typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
@@ -2554,6 +2604,11 @@ namespace hpx { namespace util {
         }
         typedef R result_type;
         typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
+        typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
               , IArchive
@@ -2805,6 +2860,11 @@ namespace hpx { namespace util {
             }
         }
         typedef R result_type;
+        typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
         typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
@@ -3058,6 +3118,11 @@ namespace hpx { namespace util {
         }
         typedef R result_type;
         typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
+        typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
               , IArchive
@@ -3309,6 +3374,11 @@ namespace hpx { namespace util {
             }
         }
         typedef R result_type;
+        typedef
+            detail::vtable_ptr_virtbase<
+                IArchive
+              , OArchive
+            > vtable_virtbase_type;
         typedef
             detail::vtable_ptr_base<
                 R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
