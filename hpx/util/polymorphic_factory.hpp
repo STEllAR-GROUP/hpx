@@ -29,7 +29,7 @@ namespace hpx { namespace traits
     {};
 }}
 
-namespace hpx { namespace util { namespace detail
+namespace hpx { namespace actions { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>

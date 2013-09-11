@@ -95,7 +95,7 @@ namespace hpx { namespace util
     template class HPX_EXPORT polymorphic_factory<actions::base_action>;
     template class HPX_EXPORT polymorphic_factory<actions::continuation>;
     template class HPX_EXPORT polymorphic_factory<
-        vtable_ptr_virtbase<
+        detail::vtable_ptr_virtbase<
             portable_binary_iarchive, portable_binary_oarchive
         > >;
 }}

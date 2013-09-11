@@ -33,6 +33,7 @@ namespace hpx { namespace util { namespace detail {
 
         virtual vtable_ptr_virtbase* get_ptr() = 0;
         virtual char const* get_function_name() const = 0;
+        virtual bool empty() const = 0;
 
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
@@ -62,10 +63,9 @@ namespace hpx { namespace util { namespace detail {
     template <typename Function>
     struct function_registration
     {
-        typedef vtable_ptr_virtbase<
-            typename Function::iarchive_type
-          , typename Function::oarchive_type
-        > vtable_ptr_virtbase_type;
+        typedef
+            typename Function::vtable_ptr_virtbase_type
+            vtable_ptr_virtbase_type;
 
         static boost::shared_ptr<vtable_ptr_virtbase_type> create()
         {
@@ -174,9 +174,6 @@ namespace hpx { namespace util { namespace detail {
         : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-
-        virtual vtable_ptr_base * get_ptr() = 0;
 
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);

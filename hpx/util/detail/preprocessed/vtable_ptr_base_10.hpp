@@ -20,21 +20,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** );
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
        
@@ -80,21 +76,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0
@@ -140,21 +132,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1
@@ -200,21 +188,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2
@@ -260,21 +244,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3
@@ -320,21 +300,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
@@ -380,21 +356,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
@@ -440,21 +412,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
@@ -500,21 +468,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
@@ -560,21 +524,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
@@ -620,21 +580,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
@@ -680,21 +636,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
@@ -740,21 +692,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
@@ -800,21 +748,17 @@ namespace hpx { namespace util { namespace detail {
       , IArchive
       , OArchive
     >
+        : vtable_ptr_virtbase<IArchive, OArchive>
     {
         virtual ~vtable_ptr_base() {}
-        virtual bool empty() const = 0;
-        virtual vtable_ptr_base * get_ptr() = 0;
         std::type_info const& (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12);
-        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
-        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive & ar, unsigned) {}
     };
+    
     template <
         typename R
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12

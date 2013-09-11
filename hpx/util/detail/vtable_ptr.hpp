@@ -46,20 +46,6 @@
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (
-        template <
-            typename Sig
-          , typename IArchive
-          , typename OArchive
-          , typename Vtable
-        >
-    )
-  , (
-        hpx::util::detail::vtable_ptr<Sig, IArchive, OArchive, Vtable>
-    )
-)
-
 #endif
 
 #else
@@ -85,14 +71,18 @@ namespace hpx { namespace util { namespace detail {
       , OArchive
       , Vtable
     >
-        : hpx::util::detail::vtable_ptr_base<
+        : util::detail::vtable_ptr_base<
             R(BOOST_PP_ENUM_PARAMS(N, A))
           , IArchive
           , OArchive
         >
     {
         typedef
-            hpx::util::detail::vtable_ptr_base<
+            util::detail::vtable_ptr_virtbase<IArchive, OArchive>
+            vtable_ptr_virtbase_type;
+
+        typedef
+            util::detail::vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
               , IArchive
               , OArchive
@@ -115,15 +105,13 @@ namespace hpx { namespace util { namespace detail {
         }
 
         char const* get_function_name() const
+        {
+            return util::detail::get_function_name<vtable_ptr>();
+        }
 
         virtual bool empty() const
         {
             return Vtable::empty;
-        }
-
-        static void register_base()
-        {
-            return get_function_name<vtable_ptr>();
         }
 
         virtual base_type * get_ptr()
@@ -169,6 +157,37 @@ namespace hpx { namespace util { namespace detail {
         static automatic_function_registration<vtable_ptr_type> g;
     };
 
+    template <
+        typename R
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    automatic_function_registration<
+        vtable_ptr<
+            R(BOOST_PP_ENUM_PARAMS(N, A))
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+        init_registration<
+            vtable_ptr<
+                R(BOOST_PP_ENUM_PARAMS(N, A))
+              , IArchive
+              , OArchive
+              , Vtable
+            >
+        >::g = automatic_function_registration<
+                    vtable_ptr<
+                        R(BOOST_PP_ENUM_PARAMS(N, A))
+                      , IArchive
+                      , OArchive
+                      , Vtable
+                    >
+                >();
+
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename R
@@ -181,14 +200,14 @@ namespace hpx { namespace util { namespace detail {
       , void
       , Vtable
     >
-        : hpx::util::detail::vtable_ptr_base<
+        : util::detail::vtable_ptr_base<
             R(BOOST_PP_ENUM_PARAMS(N, A))
           , void
           , void
         >
     {
         typedef
-            hpx::util::detail::vtable_ptr_base<
+            util::detail::vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
               , void
               , void

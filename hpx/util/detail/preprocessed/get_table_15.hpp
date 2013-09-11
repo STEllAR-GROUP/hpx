@@ -20,12 +20,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R()
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -35,6 +30,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R()
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -61,12 +68,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -76,6 +78,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -102,12 +116,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -117,6 +126,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -143,12 +164,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -158,6 +174,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -184,12 +212,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -199,6 +222,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -225,12 +260,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -240,6 +270,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -266,12 +308,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -281,6 +318,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -307,12 +356,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -322,6 +366,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -348,12 +404,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -363,6 +414,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -389,12 +452,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -404,6 +462,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -430,12 +500,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -445,6 +510,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -471,12 +548,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -486,6 +558,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -512,12 +596,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -527,6 +606,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -553,12 +644,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -568,6 +654,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -594,12 +692,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -609,6 +702,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -635,12 +740,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -650,6 +750,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -676,12 +788,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -691,6 +798,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -717,12 +836,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -732,6 +846,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<
@@ -758,12 +884,7 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         template <typename IArchive, typename OArchive>
-        BOOST_FORCEINLINE static vtable_ptr_base<
-            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
-          , IArchive
-          , OArchive
-        >*
-        get()
+        struct generate_vtable
         {
             typedef
                 typename vtable<sizeof(Functor) <= sizeof(void *)>::
@@ -773,6 +894,18 @@ namespace hpx { namespace util { namespace detail {
                       , IArchive
                       , OArchive
                     >
+                type;
+        };
+        template <typename IArchive, typename OArchive>
+        BOOST_FORCEINLINE static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17)
+          , IArchive
+          , OArchive
+        >*
+        get()
+        {
+            typedef
+                typename generate_vtable<IArchive, OArchive>::type
                 vtable_type;
             typedef
                 vtable_ptr<

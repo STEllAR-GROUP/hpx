@@ -1,4 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -53,14 +54,14 @@
                 BOOST_PP_CAT(hpx_function_serialization_, Name)), _type);     \
     }}}                                                                       \
     HPX_DECLARE_GET_FUNCTION_NAME(                                            \
-        BOOST_PP_CAT(BOOST_PP_CAT(__,                                         \
+        BOOST_PP_CAT(BOOST_PP_CAT(hpx::util::detail::__,                      \
             BOOST_PP_CAT(hpx_function_serialization_, Name)), _type)          \
         , Name)                                                               \
     namespace hpx { namespace traits {                                        \
         template <>                                                           \
         struct needs_automatic_registration<                                  \
-            BOOST_PP_CAT(BOOST_PP_CAT(__,                                     \
-                BOOST_PP_CAT(hpx_function_serialization_, Name)), _type)      \
+            BOOST_PP_CAT(BOOST_PP_CAT(util::detail::__,                       \
+                BOOST_PP_CAT(hpx_function_serialization_, Name)), _type)>     \
           : boost::mpl::false_                                                \
         {};                                                                   \
     }}                                                                        \

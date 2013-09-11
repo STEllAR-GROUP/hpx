@@ -143,9 +143,6 @@ namespace hpx { namespace util
         typedef typename function_base<Sig, IArchive, OArchive>::result_type
             result_type;
 
-        typedef IArchive iarchive_type;
-        typedef OArchive oarchive_type;
-
         using function_base<Sig, IArchive, OArchive>::reset;
 
         typedef function_base<Sig, IArchive, OArchive> base_type;
@@ -204,19 +201,23 @@ namespace hpx { namespace util
             }
             else
             {
-                typedef typename base_type::vtable_base_type vtable_base_type;
+                typedef
+                    typename base_type::vtable_virtbase_type
+                    vtable_virtbase_type;
+
+                typedef
+                    typename base_type::vtable_ptr_type
+                    vtable_ptr_type;
 
                 std::string function_name;
                 ar.load(function_name);
 
-                boost::scoped_ptr<vtable_base_type> p(
+                boost::shared_ptr<vtable_virtbase_type> p(
                     util::polymorphic_factory<
-                        vtable_base_type
+                        vtable_virtbase_type
                     >::create(function_name));
 
-                typedef typename base_type::vtable_ptr_type vtable_ptr_type;
-
-                this->vptr = static_cast<vtable_ptr_type>(p->get_ptr());
+                this->vptr = static_cast<vtable_ptr_type*>(p->get_ptr());
                 this->vptr->load_object(&this->object, ar, version);
             }
         }
@@ -409,7 +410,7 @@ namespace hpx { namespace util {
             detail::vtable_ptr_virtbase<
                 IArchive
               , OArchive
-            > vtable_base_type;
+            > vtable_virtbase_type;
 
         typedef
             detail::vtable_ptr_base<
