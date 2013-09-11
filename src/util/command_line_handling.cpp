@@ -90,15 +90,19 @@ namespace hpx { namespace util
                 << std::endl;
         }
 
-        void report_locality_warning(std::string const& batch_name)
+        void report_locality_warning(std::string const& batch_name,
+            std::size_t batch_localities, std::size_t num_localities)
         {
             std::cerr << "hpx::init: command line warning: "
                     "--hpx:localities used when running with "
                 << batch_name
-                << ", requesting a different number of localities than have "
-                    "been assigned by "
+                << ", requesting a different number of localities ("
+                << num_localities
+                << ") than have been assigned by "
                 << batch_name
-                << ", the application might not run properly."
+                << " ("
+                << batch_localities
+                << "), the application might not run properly."
                 << std::endl;
         }
     }
@@ -253,7 +257,8 @@ namespace hpx { namespace util
         if ((env.run_with_pbs() || env.run_with_slurm()) &&
             using_nodelist && (batch_localities != num_localities_))
         {
-            detail::report_locality_warning(env.get_batch_name());
+            detail::report_locality_warning(env.get_batch_name(),
+                batch_localities, num_localities_);
         }
 
         if (vm.count("hpx:localities")) {
@@ -261,7 +266,8 @@ namespace hpx { namespace util
             if ((env.run_with_pbs() || env.run_with_slurm()) &&
                 using_nodelist && (localities != num_localities_))
             {
-                detail::report_locality_warning(env.get_batch_name());
+                detail::report_locality_warning(env.get_batch_name(),
+                    num_localities, num_localities_);
             }
             num_localities_ = localities;
         }
