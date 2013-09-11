@@ -250,8 +250,10 @@ namespace hpx { namespace util
         std::size_t batch_localities = env.retrieve_number_of_localities();
         if (num_localities_ == 1)
         {
-            num_localities_ = cfgmap.get_value<std::size_t>(
+            std::size_t cfg_num_localities = cfgmap.get_value<std::size_t>(
                 "hpx.localities", batch_localities);
+            if (cfg_num_localities > 1)
+                num_localities_ = cfg_num_localities;
         }
 
         if ((env.run_with_pbs() || env.run_with_slurm()) &&
