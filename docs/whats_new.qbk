@@ -16,6 +16,11 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 842] - Remove buffer_pool from MPI parcelport
+* [issue 838] - Simplify util::tuple
+* [issue 837] - Adopt boost::tuple tests for util::tuple
+* [issue 836] - Adopt boost::function tests for util::function
+* [issue 835] - Tuple interface missing pieces
 * [issue 833] - Partially preprocessing files not working
 * [issue 832] - Native papi counters do not work with wild cards
 * [issue 831] - Arithmetics counter fails if only one parameter is given
@@ -46,6 +51,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 807] - Create performance counters exposing overall AGAS statistics
 * [issue 795] - Create timed make_ready_future
 * [issue 721] - Make HPX usable for Xeon Phi
+* [issue 683] - python/hpx/process.py imports epoll on all platforms
 * [issue 577] - Allow for zero copy serialization/networking
 * [issue 316] - Add message size limitation
 
