@@ -31,6 +31,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/serialize_empty_type.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/polymorphic_factory.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_pointer.hpp>
