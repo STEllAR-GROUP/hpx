@@ -22,6 +22,28 @@ namespace hpx { namespace util { namespace detail
     template <typename Container>
     struct icontainer_type : erase_icontainer_type
     {
+    private:
+        std::size_t get_chunk_size(std::size_t chunk) const
+        {
+            return (*chunks_)[chunk].size_;
+        }
+
+        chunk_type get_chunk_type(std::size_t chunk) const
+        {
+            return (*chunks_)[chunk].type_;
+        }
+
+        chunk_data get_chunk_data(std::size_t chunk) const
+        {
+            return (*chunks_)[chunk].data_;
+        }
+
+        std::size_t get_num_chunks() const
+        {
+            return chunks_->size();
+        }
+
+    public:
         icontainer_type(Container const& cont, std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
@@ -35,7 +57,7 @@ namespace hpx { namespace util { namespace detail
             decompressed_size_(inbound_data_size),
             chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
         {
-            if (chunks && chunks->size() != 0)
+            if (chunks && get_num_chunks() != 0)
             {
                 chunks_ = chunks;
                 current_chunk_ = 0;
@@ -87,7 +109,7 @@ namespace hpx { namespace util { namespace detail
                     current_chunk_size_ += count;
 
                     // make sure we switch to the next serialization_chunk if necessary
-                    std::size_t current_chunk_size = (*chunks_)[current_chunk_].size_;
+                    std::size_t current_chunk_size = get_chunk_size(current_chunk_)
                     if (current_chunk_size != 0 && current_chunk_size_ >= current_chunk_size)
                     {
                         // raise an error if we read past the serialization_chunk
@@ -114,9 +136,9 @@ namespace hpx { namespace util { namespace detail
             }
             else {
                 BOOST_ASSERT(current_chunk_ != std::size_t(-1));
-                BOOST_ASSERT((*chunks_)[current_chunk_].type_ == chunk_type_pointer);
+                BOOST_ASSERT(get_chunk_type(current_chunk) == chunk_type_pointer);
 
-                if ((*chunks_)[current_chunk_].size_ != count) 
+                if (get_chunk_size(current_chunk_) != count) 
                 {
                     BOOST_THROW_EXCEPTION(
                         boost::archive::archive_exception(
@@ -127,7 +149,7 @@ namespace hpx { namespace util { namespace detail
 
                 // unfortunately we can't implement a zero copy policy on the receiving end
                 // as the memory was already allocated by the serialization code
-                std::memcpy(address, (*chunks_)[current_chunk_].data_.pos_, count);
+                std::memcpy(address, get_chunk_data(current_chunk_).pos_, count);
                 ++current_chunk_;
             }
         }

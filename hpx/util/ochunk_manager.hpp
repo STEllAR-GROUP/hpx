@@ -22,6 +22,33 @@ namespace hpx { namespace util { namespace detail
     template <typename Container>
     struct ocontainer_type : erase_ocontainer_type
     {
+    private:
+        std::size_t get_chunk_size(std::size_t chunk) const
+        {
+            return (*chunks_)[chunk].size_;
+        }
+
+        void set_chunk_size(std::size_t chunk, std::size_t size)
+        {
+            (*chunks_)[chunk].size_ = size;
+        }
+
+        chunk_type get_chunk_type(std::size_t chunk) const
+        {
+            return (*chunks_)[chunk].type_;
+        }
+
+        chunk_data get_chunk_data(std::size_t chunk) const
+        {
+            return (*chunks_)[chunk].data_;
+        }
+
+        std::size_t get_num_chunks() const
+        {
+            return chunks_->size();
+        }
+
+    public:
         ocontainer_type(Container& cont)
           : cont_(cont), current_(0), start_compressing_at_(0), filter_(0),
             chunks_(0), current_chunk_(std::size_t(-1))
@@ -64,16 +91,17 @@ namespace hpx { namespace util { namespace detail
                 cont_.resize(current_);         // truncate container
             }
             else if (chunks_) {
-                BOOST_ASSERT((*chunks_)[current_chunk_].type_ == chunk_type_index ||
-                    (*chunks_)[current_chunk_].size_ != 0);
+                BOOST_ASSERT(
+                    get_chunk_type(current_chunk_) == chunk_type_index ||
+                    get_chunk_size(current_chunk_) != 0);
 
                 // complement current serialization_chunk by setting its length
-                if ((*chunks_)[current_chunk_].type_ == chunk_type_index)
+                if (get_chunk_type(current_chunk_) == chunk_type_index)
                 {
-                    BOOST_ASSERT((*chunks_)[current_chunk_].size_ == 0);
+                    BOOST_ASSERT(get_chunk_size(current_chunk_) == 0);
 
-                    (*chunks_)[current_chunk_].size_ =
-                        current_ - (*chunks_)[current_chunk_].data_.index_;
+                    set_chunk_size(current_chunk_,
+                        current_ - get_chunk_data(current_chunk_).index_);
                 }
             }
         }
@@ -85,7 +113,7 @@ namespace hpx { namespace util { namespace detail
             start_compressing_at_ = current_;
 
             if (chunks_) {
-                BOOST_ASSERT(chunks_->size() == 1 && (*chunks_)[0].size_ == 0);
+                BOOST_ASSERT(get_num_chunks() == 1 && get_chunk_size(0) == 0);
                 chunks_->clear();
             }
         }
@@ -98,9 +126,9 @@ namespace hpx { namespace util { namespace detail
                     filter_->save(address, count);
                 }
                 else {
-                    // make sure there is current serialization_chunk descriptor available
-                    if (chunks_ && ((*chunks_)[current_chunk_].type_ == chunk_type_pointer ||
-                        (*chunks_)[current_chunk_].size_ != 0))
+                    // make sure there is a current serialization_chunk descriptor available
+                    if (chunks_ && (get_chunk_type(current_chunk_) == chunk_type_pointer ||
+                        get_chunk_size(current_chunk_) != 0))
                     {
                         // add a new serialization_chunk
                         chunks_->push_back(create_index_chunk(current_, 0));
@@ -126,16 +154,17 @@ namespace hpx { namespace util { namespace detail
                 this->ocontainer_type::save_binary(address, count);
             }
             else {
-                BOOST_ASSERT((*chunks_)[current_chunk_].type_ == chunk_type_index ||
-                    (*chunks_)[current_chunk_].size_ != 0);
+                BOOST_ASSERT(
+                    get_chunk_type(current_chunk_) == chunk_type_index ||
+                    get_chunk_size(current_chunk_) != 0);
 
                 // complement current serialization_chunk by setting its length
-                if ((*chunks_)[current_chunk_].type_ == chunk_type_index)
+                if (get_chunk_type(current_chunk_) == chunk_type_index)
                 {
-                    BOOST_ASSERT((*chunks_)[current_chunk_].size_ == 0);
+                    BOOST_ASSERT(get_chunk_size(current_chunk_) == 0);
 
-                    (*chunks_)[current_chunk_].size_ =
-                        current_ - (*chunks_)[current_chunk_].data_.index_;
+                    set_chunk_size(current_chunk_,
+                        current_ - get_chunk_data(current_chunk_).index_);
                 }
 
                 // add a new serialization_chunk referring to the external buffer
