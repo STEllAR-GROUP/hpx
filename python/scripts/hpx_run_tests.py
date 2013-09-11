@@ -35,13 +35,17 @@ if __name__ == '__main__':
                     help="Send logs to stdout (overrides --log-prefix)")
 
     (ignore, files) = parser.parse_args();
-    base_cmd = "ctest "
+    base_cmd = "ctest --output-on-failure "
 
     options = "";
     for f in files:
         options += eval(open(f).read())
 
     cmd = base_cmd + options
-    os.system(cmd)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+
+    result, out = p.communicate()
+
+    exit(result)
   # }}}
 
