@@ -136,7 +136,7 @@ namespace hpx { namespace util { namespace detail
             }
             else {
                 BOOST_ASSERT(current_chunk_ != std::size_t(-1));
-                BOOST_ASSERT(get_chunk_type(current_chunk) == chunk_type_pointer);
+                BOOST_ASSERT(get_chunk_type(current_chunk_) == chunk_type_pointer);
 
                 if (get_chunk_size(current_chunk_) != count) 
                 {
