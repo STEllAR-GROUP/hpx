@@ -257,7 +257,8 @@ namespace hpx { namespace util
         }
 
         if ((env.run_with_pbs() || env.run_with_slurm()) &&
-            using_nodelist && (batch_localities != num_localities_))
+            using_nodelist && (batch_localities != num_localities_) &&
+            (num_localities_ != 1))
         {
             detail::report_locality_warning(env.get_batch_name(),
                 batch_localities, num_localities_);
@@ -266,7 +267,8 @@ namespace hpx { namespace util
         if (vm.count("hpx:localities")) {
             std::size_t localities = vm["hpx:localities"].as<std::size_t>();
             if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                using_nodelist && (localities != num_localities_))
+                using_nodelist && (localities != num_localities_) &&
+                (num_localities_ != 1))
             {
                 detail::report_locality_warning(env.get_batch_name(),
                     localities, num_localities_);
