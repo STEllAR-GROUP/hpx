@@ -109,7 +109,7 @@ namespace hpx { namespace util { namespace detail
                     current_chunk_size_ += count;
 
                     // make sure we switch to the next serialization_chunk if necessary
-                    std::size_t current_chunk_size = get_chunk_size(current_chunk_)
+                    std::size_t current_chunk_size = get_chunk_size(current_chunk_);
                     if (current_chunk_size != 0 && current_chunk_size_ >= current_chunk_size)
                     {
                         // raise an error if we read past the serialization_chunk
