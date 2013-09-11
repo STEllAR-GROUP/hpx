@@ -267,7 +267,7 @@ namespace hpx { namespace util
                 using_nodelist && (localities != num_localities_))
             {
                 detail::report_locality_warning(env.get_batch_name(),
-                    num_localities, num_localities_);
+                    localities, num_localities_);
             }
             num_localities_ = localities;
         }
