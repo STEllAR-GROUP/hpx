@@ -844,6 +844,12 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -RTC1")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -RTC1")
 
+  # VS2012 and above has a special flag for improving the debug experience by
+  # adding more symbol information to the build
+  if(NOT MSVC10)
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -d2Zi+")
+  endif()
+
   # Exceptions
   hpx_append_flag(-EHsc)
 
