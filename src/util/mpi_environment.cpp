@@ -22,7 +22,7 @@ namespace hpx { namespace util
         bool detect_mpi_environment(util::runtime_configuration const& cfg)
         {
             std::string mpi_environment_strings = cfg.get_entry(
-                "hpx.parcel.mpi.env", "PMI_RANK;OMPI_COMM_WORLD_SIZE");
+                "hpx.parcel.mpi.env", "PMI_RANK,OMPI_COMM_WORLD_SIZE");
 
             typedef
                 boost::tokenizer<boost::char_separator<char> >
@@ -34,7 +34,7 @@ namespace hpx { namespace util
                 char *env = std::getenv(it->c_str());
                 if(env) return true;
             }
-            return false;;
+            return false;
         }
     }
 
