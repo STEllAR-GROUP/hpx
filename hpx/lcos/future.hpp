@@ -298,19 +298,19 @@ namespace hpx { namespace lcos
         // continuation support
         template <typename F>
         typename detail::then_future_result<
-            typename boost::result_of<F(future)>::type
+            typename boost::result_of<F(future&)>::type
         >::type
         then(BOOST_FWD_REF(F) f);
 
         template <typename F>
         typename detail::then_future_result<
-            typename boost::result_of<F(future)>::type
+            typename boost::result_of<F(future&)>::type
         >::type
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         template <typename F>
         typename detail::then_future_result<
-            typename boost::result_of<F(future)>::type
+            typename boost::result_of<F(future&)>::type
         >::type
         then(threads::executor& sched, BOOST_FWD_REF(F) f);
 
@@ -586,19 +586,19 @@ namespace hpx { namespace lcos
         // continuation support
         template <typename F>
         typename detail::then_future_result<
-            typename boost::result_of<F(future)>::type
+            typename boost::result_of<F(future&)>::type
         >::type
         then(BOOST_FWD_REF(F) f);
 
         template <typename F>
         typename detail::then_future_result<
-            typename boost::result_of<F(future)>::type
+            typename boost::result_of<F(future&)>::type
         >::type
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         template <typename F>
         typename detail::then_future_result<
-            typename boost::result_of<F(future)>::type
+            typename boost::result_of<F(future&)>::type
         >::type
         then(threads::executor& sched, BOOST_FWD_REF(F) f);
 

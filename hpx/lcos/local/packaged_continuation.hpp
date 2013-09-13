@@ -502,11 +502,11 @@ namespace hpx { namespace lcos
     template <typename Result>
     template <typename F>
     inline typename detail::then_future_result<
-        typename boost::result_of<F(future<Result>)>::type
+        typename boost::result_of<F(future<Result>&)>::type
     >::type
     future<Result>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future)>::type result_type;
+        typedef typename boost::result_of<F(future&)>::type result_type;
 
         // create continuation
         typedef lcos::detail::continuation_base<result_type> cont_impl_type;
@@ -530,7 +530,7 @@ namespace hpx { namespace lcos
     template <typename Result>
     template <typename F>
     inline typename detail::then_future_result<
-        typename boost::result_of<F(future<Result>)>::type
+        typename boost::result_of<F(future<Result>&)>::type
     >::type
     future<Result>::then(BOOST_FWD_REF(F) f)
     {
@@ -540,11 +540,11 @@ namespace hpx { namespace lcos
     template <typename Result>
     template <typename F>
     inline typename detail::then_future_result<
-        typename boost::result_of<F(future<Result>)>::type
+        typename boost::result_of<F(future<Result>&)>::type
     >::type
     future<Result>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future)>::type result_type;
+        typedef typename boost::result_of<F(future&)>::type result_type;
 
         // create continuation
         typedef lcos::detail::continuation_base<result_type> cont_impl_type;
@@ -565,11 +565,11 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
     inline typename detail::then_future_result<
-        typename boost::result_of<F(future<void>)>::type
+        typename boost::result_of<F(future<void>&)>::type
     >::type
     future<void>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future)>::type result_type;
+        typedef typename boost::result_of<F(future&)>::type result_type;
 
         // create continuation
         typedef lcos::detail::continuation_base<result_type> cont_impl_type;
@@ -592,7 +592,7 @@ namespace hpx { namespace lcos
 
     template <typename F>
     inline typename detail::then_future_result<
-        typename boost::result_of<F(future<void>)>::type
+        typename boost::result_of<F(future<void>&)>::type
     >::type
     future<void>::then(BOOST_FWD_REF(F) f)
     {
@@ -601,11 +601,11 @@ namespace hpx { namespace lcos
 
     template <typename F>
     inline typename detail::then_future_result<
-        typename boost::result_of<F(future<void>)>::type
+        typename boost::result_of<F(future<void>&)>::type
     >::type
     future<void>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future)>::type result_type;
+        typedef typename boost::result_of<F(future&)>::type result_type;
 
         // create continuation
         typedef lcos::detail::continuation_base<result_type> cont_impl_type;
