@@ -153,7 +153,7 @@ bool pre_main(runtime_mode mode)
             }
 
             std::size_t const num_localities =
-                stztic_cast<std::size_t>(cfg.get_num_localities());
+                static_cast<std::size_t>(cfg.get_num_localities());
 
             second_stage = create_barrier(num_localities, second_barrier);
             third_stage = create_barrier(num_localities, third_barrier);
