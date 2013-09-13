@@ -152,7 +152,11 @@ namespace hpx { namespace util
 
             // MPI related settings
             "[hpx.parcel.mpi]",
+#if defined(HPX_HAVE_PARCELPORT_MPI)
             "enable = ${HPX_HAVE_PARCELPORT_MPI:1}",
+#else
+            "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
+#endif
             "max_requests = ${HPX_PARCEL_MPI_MAX_REQUESTS:100}",
 
             // predefine command line aliases
