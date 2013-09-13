@@ -58,6 +58,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 683] - python/hpx/process.py imports epoll on all platforms
 * [issue 577] - Allow for zero copy serialization/networking
 * [issue 316] - Add message size limitation
+* [issue 249] - Clean up locking code in big boot barrier
 
 [endsect]
 
