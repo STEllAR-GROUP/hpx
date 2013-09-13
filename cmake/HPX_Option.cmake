@@ -8,10 +8,14 @@
 set(HPX_OPTION_LOADED TRUE)
 
 macro(hpx_option option type description default)
+#  hpx_info("option.${option}" "type:${type}")
+#  hpx_info("option.${option}" "description:${description}")
+#  hpx_info("option.${option}" "default:${default}")
+
   if(DEFINED ${option})
-    set(${option} "${${option}}" CACHE ${type} ${description} FORCE)
+    set(${option} "${${option}}" CACHE ${type} "${description}" FORCE)
   else()
-    set(${option} "${default}" CACHE ${type} ${description} FORCE)
+    set(${option} "${default}" CACHE ${type} "${description}" FORCE)
   endif()
 
   foreach(arg ${ARGN})

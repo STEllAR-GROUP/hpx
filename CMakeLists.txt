@@ -396,14 +396,15 @@ if(HPX_HAVE_PARCELPORT_MPI)
     # This list is to detect if we run inside an mpi environment
     # if one of those environment variables is set, the MPI parcelport
     # is enabled by default
-    set(HPX_PARCELPORT_MPI_ENV
-      ${HPX_PARCELPORT_MPI_ENV}
-      PMI_RANK # Intel MPI and MVAPICH2
-      OMPI_COMM_WORLD_SIZE # OpenMPI starting at version 1.3
-    )
-    configure_file(${hpx_SOURCE_DIR}/cmake/templates/mpi_environment_detection.hpp.in
-      ${CMAKE_BINARY_DIR}/hpx/util/mpi_environment_detection.hpp
-      ESCAPE_QUOTES @ONLY)
+    # PMI_RANK: Intel MPI and MVAPICH2
+    # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
+    hpx_option(HPX_PARCELPORT_MPI_ENV STRING 
+      "List of environment variables checked to detect MPI (default: PMI_RANK;OMPI_COMM_WORLD_SIZE)." 
+      "PMI_RANK;OMPI_COMM_WORLD_SIZE" ADVANCED)
+    if(HPX_PARCELPORT_MPI_ENV)
+      string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_PARCELPORT_MPI_ENV}")
+      hpx_add_definitions("-DHPX_PARCELPORT_MPI_ENV=\"${hpx_parcelport_mpi_env_}\"")
+    endif()
   else()
     hpx_error("parcelport"
         "HPX_HAVE_PARCELPORT_MPI is set but MPI could not be found."

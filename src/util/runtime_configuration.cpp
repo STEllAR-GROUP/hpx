@@ -154,10 +154,15 @@ namespace hpx { namespace util
             "[hpx.parcel.mpi]",
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             "enable = ${HPX_HAVE_PARCELPORT_MPI:1}",
+            "max_requests = ${HPX_PARCEL_MPI_MAX_REQUESTS:100}",
+# if defined(HPX_PARCELPORT_MPI_ENV)
+            "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}",
+# else
+            "env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}",
+# endif
 #else
             "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
 #endif
-            "max_requests = ${HPX_PARCEL_MPI_MAX_REQUESTS:100}",
 
             // predefine command line aliases
             "[hpx.commandline]",

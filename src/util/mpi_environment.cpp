@@ -9,33 +9,35 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/command_line_handling.hpp>
 #include <hpx/util/mpi_environment.hpp>
-#include <hpx/util/mpi_environment_detection.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <cstdlib>
 
-namespace {
-    bool detect_mpi_environment()
-    {
-        std::string environment_strings(hpx::util::detail::mpi_environment_strings);
-        typedef
-            boost::tokenizer<boost::char_separator<char> >
-            tokenizer;
-        boost::char_separator<char> sep(";");
-        tokenizer tokens(environment_strings, sep);
-        for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
-        {
-            char *env = std::getenv(it->c_str());
-            if(env) return true;
-        }
-        return false;;
-    }
-}
-
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        bool detect_mpi_environment(util::runtime_configuration const& cfg)
+        {
+            std::string mpi_environment_strings = cfg.get_entry(
+                "hpx.parcel.mpi.env", "PMI_RANK;OMPI_COMM_WORLD_SIZE");
+
+            typedef
+                boost::tokenizer<boost::char_separator<char> >
+                tokenizer;
+            boost::char_separator<char> sep(";,: ");
+            tokenizer tokens(mpi_environment_strings, sep);
+            for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+            {
+                char *env = std::getenv(it->c_str());
+                if(env) return true;
+            }
+            return false;;
+        }
+    }
+
     MPI_Comm mpi_environment::communicator_ = 0;
 
     int mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
@@ -47,14 +49,13 @@ namespace hpx { namespace util
                 cfg.rtcfg_.get_entry("hpx.parcel.mpi.enable", "1")
             );
 
-        enable_mpi = enable_mpi && ::detect_mpi_environment();
-        
+        enable_mpi = enable_mpi && detail::detect_mpi_environment(cfg.rtcfg_);
         if(!enable_mpi) return -1;
 
         cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
 
         int this_rank = -1;
-        
+
         MPI_Init(argc, argv);
         MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
 
