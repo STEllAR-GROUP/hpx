@@ -244,7 +244,6 @@ if(NOT MSVC)
 endif()
 hpx_add_definitions(-DHPX_LOG_NO_TSS)
 hpx_add_definitions(-DHPX_LOG_NO_TS)
-hpx_add_definitions(-DHPX_PLUGIN_SYMBOLS_PREFIX=hpx)
 hpx_add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 
 # disable usage of std::atomics in lockfree
