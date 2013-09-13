@@ -1746,9 +1746,7 @@ if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
                    ${output_dir}/lib/pkgconfig/hpx_component.pc
                    @ONLY)
-endif()
-
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+else()
     configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in
                    ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
                    @ONLY)
@@ -1764,9 +1762,7 @@ if(NOT HPX_NO_INSTALL)
             DESTINATION lib/pkgconfig)
     install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
             DESTINATION lib/pkgconfig)
-  endif()
-
-  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  else()
     install(FILES ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
             DESTINATION lib/pkgconfig)
     install(FILES ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
