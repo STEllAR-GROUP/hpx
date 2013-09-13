@@ -287,6 +287,10 @@ with __hpx__.
      [Enable parcelport based on MPI. Please set `MPI_CXX_COMPILER` and `MPI_C_COMPILER`
       to point to the correct location of your MPI compiler wrappers (default: OFF)]
     ]
+    [[`HPX_PARCELPORT_MPI_ENV:LIST`]
+     [Additional environment variable names for automatic MPI detection. By default HPX
+     checks for PMI_RANK (Intel MPI and MVAPICH2) and OMPI_COMM_WORLD_SIZE (OpenMPI)]
+    ]
 ]
 
 Here is a list of options controlling the scheduling policies available for

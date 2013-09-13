@@ -28,6 +28,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 831] - Arithmetics counter fails if only one parameter is given
 * [issue 829] - Consistently use `decay<T>` instead of `remove_const< remove_reference<T>>`
 * [issue 828] - Update future implementation to N3721 and N3722
+* [issue 827] - Enable MPI parcelport for bootstrapping whenever application
+                was started using mpirun
 * [issue 826] - Support command line option `--hpx:print-bind` even if
                 `--hpx::bind` was not used
 * [issue 825] - Memory counters give segfault when attempting to use thread

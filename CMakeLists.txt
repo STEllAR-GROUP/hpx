@@ -144,6 +144,7 @@ endif()
 # search path configuration
 ################################################################################
 hpx_include_directories(${hpx_SOURCE_DIR})
+include_directories(${CMAKE_BINARY_DIR})
 if(HPX_INTERNAL_MOVE)
   hpx_add_definitions(-DHPX_INTERNAL_MOVE)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
@@ -392,6 +393,22 @@ if(HPX_HAVE_PARCELPORT_MPI)
         set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_EXTRA_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${MPI_EXTRA_LIBRARY})
     endif()
+    # This list is to detect if we run inside an mpi environment
+    # if one of those environment variables is set, the MPI parcelport
+    # is enabled by default
+    set(HPX_PARCELPORT_MPI_ENV
+      ${HPX_PARCELPORT_MPI_ENV}
+      PMI_RANK # Intel MPI and MVAPICH2
+      OMPI_COMM_WORLD_SIZE # OpenMPI starting at version 1.3
+    )
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/mpi_environment_detection.hpp.in
+      ${CMAKE_BINARY_DIR}/hpx/util/mpi_environment_detection.hpp
+      ESCAPE_QUOTES @ONLY)
+  else()
+    hpx_error("parcelport"
+        "HPX_HAVE_PARCELPORT_MPI is set but MPI could not be found."
+        "Please set MPI_CXX_COMPILER, MPI_C_COMPILER and"
+        "MPI_FORTRAN_COMPILER to the appropraite mpi compiler wrapper")
   endif()
 endif()
 
@@ -1400,6 +1417,17 @@ endif()
 if(NOT HPX_NO_INSTALL)
   install( # install all hpx header files
     DIRECTORY hpx/
+    DESTINATION include/hpx
+    COMPONENT core
+    FILES_MATCHING PATTERN "*.hpp"
+    PATTERN ".git" EXCLUDE
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "CTestFiles" EXCLUDE)
+
+  # install all hpx header that have been configured using various
+  # cmake options
+  install(
+    DIRECTORY ${CMAKE_BINARY_DIR}/hpx/
     DESTINATION include/hpx
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"

@@ -373,7 +373,7 @@ to `ON`).
 [teletype]
 ``
     [hpx.parcel.mpi]
-    enable = ${HPX_HAVE_PARCELPORT_MPI:0}
+    enable = ${HPX_HAVE_PARCELPORT_MPI:1}
     rank = <MPI_rank>
     processor_name = <MPI_processor_name>
 ``
@@ -382,10 +382,12 @@ to `ON`).
 [table:ini_hpx_parcel_mpi
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.parcel.mpi.enable`]
-     [Enable the use of the MPI parcelport for connections between
-      localities running on a node with MPI support. Note
-      that the initial bootstrap of the overall __hpx__ application will
-      still be performed using MPI as well.]
+     [Disable the use of the MPI parcelport. HPX tries to detect if the
+     application was started within a parallel MPI environment. If the
+     detection was succesful, the MPI parcelport is enabled by default. To
+     explicitly disable the MPI parcelport, set to 0. Note that the initial
+     bootstrap of the overall __hpx__ application will be performed using MPI
+     as well.]
      [static information, the connections are disabled by default.]]
     [[`hpx.parcel.mpi.rank`]
      [This property will be initialized to the MPI rank of the locality.]
