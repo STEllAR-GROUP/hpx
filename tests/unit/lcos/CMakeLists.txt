@@ -31,12 +31,12 @@ if(GCC_VERSION)
   set(gcc_version ${GCC_VERSION})
 endif()
 
-if(040500 EQUAL ${gcc_version} OR 040500 LESS ${gcc_version})
-set(tests
-    ${tests}
-    broadcast
-    for_each
-   )
+if(040500 EQUAL ${gcc_version} OR 040500 LESS ${gcc_version} OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+  set(tests
+      ${tests}
+      broadcast
+      for_each
+     )
 endif()
 
 set(async_continue_PARAMETERS LOCALITIES 2)

@@ -42,6 +42,42 @@ HPX_PLAIN_ACTION(f4);
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f4_action)
 HPX_REGISTER_BROADCAST_ACTION(f4_action)
 
+
+boost::uint32_t f1_idx(std::size_t)
+{
+    return hpx::get_locality_id();
+}
+HPX_PLAIN_ACTION(f1_idx);
+
+HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f1_idx_action)
+HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f1_idx_action)
+
+void f2_idx(std::size_t)
+{
+}
+HPX_PLAIN_ACTION(f2_idx);
+
+HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f2_idx_action)
+HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f2_idx_action)
+
+boost::uint32_t f3_idx(boost::uint32_t i, std::size_t)
+{
+    return hpx::get_locality_id() + i;
+}
+HPX_PLAIN_ACTION(f3_idx);
+
+HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f3_idx_action)
+HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f3_idx_action)
+
+void f4_idx(boost::uint32_t i, std::size_t)
+{
+}
+HPX_PLAIN_ACTION(f4_idx);
+
+HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f4_idx_action)
+HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f4_idx_action)
+
+
 int hpx_main()
 {
     hpx::id_type here = hpx::find_here();
@@ -69,6 +105,29 @@ int hpx_main()
         }
 
         hpx::lcos::broadcast<f4_action>(localities, 0).get();
+    }
+    {
+        std::vector<boost::uint32_t> f1_res;
+        f1_res = hpx::lcos::broadcast_with_index<f1_idx_action>(localities).get();
+
+        HPX_TEST_EQ(f1_res.size(), localities.size());
+        for(std::size_t i = 0; i < f1_res.size(); ++i)
+        {
+            HPX_TEST_EQ(f1_res[i], hpx::naming::get_locality_id_from_id(localities[i]));
+        }
+
+        hpx::lcos::broadcast_with_index<f2_idx_action>(localities).get();
+
+        std::vector<boost::uint32_t> f3_res;
+        f3_res = hpx::lcos::broadcast_with_index<f3_idx_action>(localities, 1).get();
+
+        HPX_TEST_EQ(f3_res.size(), localities.size());
+        for(std::size_t i = 0; i < f3_res.size(); ++i)
+        {
+            HPX_TEST_EQ(f3_res[i], hpx::naming::get_locality_id_from_id(localities[i]) + 1);
+        }
+
+        hpx::lcos::broadcast_with_index<f4_idx_action>(localities, 0).get();
     }
     return hpx::finalize();
 }
