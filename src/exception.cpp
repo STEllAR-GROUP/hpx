@@ -309,7 +309,7 @@ namespace hpx { namespace detail
 namespace hpx
 {
     /// \brief throw an hpx::exception initialized from the given arguments
-    HPX_EXPORT void throw_exception(error e, std::string msg,
+    HPX_EXPORT void throw_exception(error e, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
         boost::filesystem::path p__(hpx::util::create_path(file));

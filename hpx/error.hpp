@@ -146,8 +146,8 @@ namespace hpx
 
     /// \brief throw an hpx::exception initialized from the given arguments
     BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
-    void throw_exception(error e, std::string msg, std::string const& func,
-        std::string const& file = "", long line = -1);
+    void throw_exception(error e, std::string const& msg,
+        std::string const& func, std::string const& file = "", long line = -1);
 }
 
 #endif

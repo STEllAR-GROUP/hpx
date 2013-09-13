@@ -50,9 +50,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////
     union chunk_data
     {
-        std::size_t index_;     // position inside the data buffer
-        void const* cpos_;      // const pointer to external data buffer
-        void* pos_;             // pointer to external data buffer
+        std::size_t index_;     // position inside the data buffer //-V117
+        void const* cpos_;      // const pointer to external data buffer //-V117
+        void* pos_;             // pointer to external data buffer //-V117
     };
 
     enum chunk_type

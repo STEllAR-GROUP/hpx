@@ -665,7 +665,8 @@ inline std::size_t get_number_of_bootstrap_connections(
 
     if (service_mode_bootstrap == service_type)
     {
-        std::size_t num_localities = ini.get_num_localities();
+        std::size_t num_localities =
+            static_cast<std::size_t>(ini.get_num_localities());
         result = num_localities ? num_localities-1 : 0;
     }
 

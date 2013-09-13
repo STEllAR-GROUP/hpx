@@ -56,7 +56,7 @@ namespace hpx { namespace util
             return;
 
         using namespace boost::assign;
-        std::vector<std::string> lines;
+        std::vector<std::string> lines; //-V808
         lines +=
             // create an empty application section
             "[application]",

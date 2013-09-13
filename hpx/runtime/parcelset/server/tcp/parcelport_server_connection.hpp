@@ -160,8 +160,12 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 std::vector<boost::asio::mutable_buffer> buffers;
 
                 // determine the size of the chunk buffer
-                boost::uint32_t num_zero_copy_chunks = num_chunks_.first;
-                boost::uint32_t num_non_zero_copy_chunks = num_chunks_.second;
+                std::size_t num_zero_copy_chunks =
+                    static_cast<std::size_t>(
+                        static_cast<boost::uint32_t>(num_chunks_.first));
+                std::size_t num_non_zero_copy_chunks =
+                    static_cast<std::size_t>(
+                        static_cast<boost::uint32_t>(num_chunks_.second));
 
                 if (num_zero_copy_chunks != 0) {
                     in_transmission_chunks_.resize(static_cast<std::size_t>(
@@ -176,7 +180,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
 
                     // add appropriately sized chunk buffers for the zero-copy data
                     in_chunks_->resize(num_zero_copy_chunks);
-                    for (boost::uint32_t i = 0; i != num_zero_copy_chunks; ++i)
+                    for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
                     {
                         std::size_t chunk_size = in_transmission_chunks_[i].second;
                         (*in_chunks_)[i].resize(chunk_size);
@@ -235,7 +239,9 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                 // add parcel data to incoming parcel queue
                 boost::uint64_t inbound_data_size = in_data_size_;
 
-                boost::uint32_t num_zero_copy_chunks = num_chunks_.first;
+                std::size_t num_zero_copy_chunks =
+                    static_cast<std::size_t>(
+                        static_cast<boost::uint32_t>(num_chunks_.first));
 
                 if (num_zero_copy_chunks != 0) {
                     // decode chunk information
@@ -243,7 +249,9 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                     boost::shared_ptr<std::vector<util::serialization_chunk> > chunks(
                         boost::make_shared<std::vector<util::serialization_chunk> >());
 
-                    boost::uint32_t num_non_zero_copy_chunks = num_chunks_.second;
+                    std::size_t num_non_zero_copy_chunks =
+                        static_cast<std::size_t>(
+                            static_cast<boost::uint32_t>(num_chunks_.second));
                     chunks->resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
 
                     // place the zero-copy chunks at their spots first
