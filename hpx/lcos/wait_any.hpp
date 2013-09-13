@@ -52,42 +52,44 @@ namespace hpx
     template <typename R>
     lcos::future<std::vector<lcos::future<R> > >
     when_any(BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<R> >))) lazy_values)
+        std::vector<lcos::future<R> >))) lazy_values,
+        error_code& ec = throws)
     {
         typedef std::vector<lcos::future<R> > return_type;
 
         if (lazy_values.empty())
             return lcos::make_ready_future(return_type());
 
-        return when_n(1, lazy_values);
+        return when_n(1, lazy_values, ec);
     }
 
     template <typename R>
     lcos::future<std::vector<lcos::future<R> > > //-V659
-    when_any(std::vector<lcos::future<R> > const& lazy_values)
+    when_any(std::vector<lcos::future<R> > const& lazy_values,
+        error_code& ec = throws)
     {
         typedef std::vector<lcos::future<R> > result_type;
         
         result_type lazy_values_(lazy_values);
-        return when_any(boost::move(lazy_values_));
+        return when_any(boost::move(lazy_values_), ec);
     }
 
     template <typename Iterator>
     lcos::future<std::vector<lcos::future<
         typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
     > > >
-    when_any(Iterator begin, Iterator end)
+    when_any(Iterator begin, Iterator end, error_code& ec = throws)
     {
         typedef typename lcos::detail::future_iterator_traits<
             Iterator>::traits_type::type value_type;
         typedef std::vector<lcos::future<value_type> > result_type;
 
         result_type lazy_values_(begin, end);
-        return when_any(boost::move(lazy_values_));
+        return when_any(boost::move(lazy_values_), ec);
     }
 
     inline lcos::future<HPX_STD_TUPLE<>>
-    when_any()
+    when_any(error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<> result_type;
 
@@ -111,7 +113,7 @@ namespace hpx
     {
         typedef std::vector<lcos::future<R> > result_type;
 
-        lcos::future<result_type> f = when_any(lazy_values);
+        lcos::future<result_type> f = when_any(lazy_values, ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any",
                 "lcos::when_any didn't return a valid future");
@@ -151,7 +153,7 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<> result_type;
 
-        lcos::future<result_type> f = when_any();
+        lcos::future<result_type> f = when_any(ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
                 "lcos::when_any didn't return a valid future");
@@ -202,12 +204,13 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename R)>
     lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_TYPE, _)>>
-    when_any(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_ARG, _))
+    when_any(BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_ARG, _),
+        error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_TYPE, _)>
             result_type;
 
-        return when_n(1, BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _));
+        return when_n(1, BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _), ec);
     }
     
     template <BOOST_PP_ENUM_PARAMS(N, typename R)>
@@ -219,7 +222,7 @@ namespace hpx
             result_type;
 
         lcos::future<result_type> f = when_any(
-            BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _));
+            BOOST_PP_ENUM(N, HPX_WHEN_ANY_FUTURE_VAR, _), ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_any", 
                 "lcos::when_any didn't return a valid future");

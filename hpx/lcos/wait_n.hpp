@@ -171,7 +171,8 @@ namespace hpx
     template <typename R>
     lcos::future<std::vector<lcos::future<R> > >
     when_n(std::size_t n, BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<R> >))) lazy_values)
+        std::vector<lcos::future<R> >))) lazy_values,
+        error_code& ec = throws)
     {
         typedef std::vector<lcos::future<R> > result_type;
 
@@ -182,7 +183,7 @@ namespace hpx
 
         if (n > lazy_values.size())
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+            HPX_THROWS_IF(ec, hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
@@ -201,30 +202,32 @@ namespace hpx
 
     template <typename R>
     lcos::future<std::vector<lcos::future<R> > > //-V659
-    when_n(std::size_t n, std::vector<lcos::future<R> > const& lazy_values)
+    when_n(std::size_t n, std::vector<lcos::future<R> > const& lazy_values,
+        error_code& ec = throws)
     {
         typedef std::vector<lcos::future<R> > result_type;
         
         result_type lazy_values_(lazy_values);
-        return when_n(n, boost::move(lazy_values_));
+        return when_n(n, boost::move(lazy_values_), ec);
     }
 
     template <typename Iterator>
     lcos::future<std::vector<lcos::future<
         typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
     > > >
-    when_n(std::size_t n, Iterator begin, Iterator end)
+    when_n(std::size_t n, Iterator begin, Iterator end,
+        error_code& ec = throws)
     {
         typedef typename lcos::detail::future_iterator_traits<
             Iterator>::traits_type::type value_type;
         typedef std::vector<lcos::future<value_type> > result_type;
 
         result_type lazy_values_(begin, end);
-        return when_n(n, boost::move(lazy_values_));
+        return when_n(n, boost::move(lazy_values_), ec);
     }
 
     inline lcos::future<HPX_STD_TUPLE<>>
-    when_n(std::size_t n)
+    when_n(std::size_t n, error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<> result_type;
 
@@ -237,7 +240,7 @@ namespace hpx
 
         if (n > 0)
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+            HPX_THROWS_IF(ec, hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
@@ -260,7 +263,7 @@ namespace hpx
     {
         typedef std::vector<lcos::future<R> > result_type;
 
-        lcos::future<result_type> f = when_n(n, lazy_values);
+        lcos::future<result_type> f = when_n(n, lazy_values, ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
                 "lcos::when_n didn't return a valid future");
@@ -300,7 +303,7 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<> result_type;
 
-        lcos::future<result_type> f = when_n(n);
+        lcos::future<result_type> f = when_n(n, ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
                 "lcos::when_n didn't return a valid future");
@@ -351,7 +354,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename R)>
     lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_TYPE, _)>>
-    when_n(std::size_t n, BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_ARG, _))
+    when_n(std::size_t n, BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_ARG, _),
+        error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_TYPE, _)>
             result_type;
@@ -365,7 +369,7 @@ namespace hpx
 
         if (n > N)
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, 
+            HPX_THROWS_IF(ec, hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
@@ -391,7 +395,7 @@ namespace hpx
             result_type;
 
         lcos::future<result_type> f = when_n(n, 
-            BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_VAR, _));
+            BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_VAR, _), ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
                 "lcos::when_n didn't return a valid future");
