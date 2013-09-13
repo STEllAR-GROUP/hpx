@@ -73,10 +73,10 @@ inline std::string HPX_PLUGIN_OSSTREAM_GETSTRING(std::ostrstream& ss)
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_SYMBOLS_PREFIX)
 # if defined(HPX_DEBUG)
-#   define HPX_PLUGIN_SYMBOLS_PREFIX hpx
-# else
 #   define HPX_PLUGIN_SYMBOLS_PREFIX hpxd
-#endif
+# else
+#   define HPX_PLUGIN_SYMBOLS_PREFIX hpx
+# endif
 #endif
 
 #define HPX_PLUGIN_SYMBOLS_PREFIX_STR BOOST_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX)
