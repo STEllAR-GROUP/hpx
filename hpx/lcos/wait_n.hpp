@@ -55,7 +55,7 @@ namespace hpx
                 lcos::detail::future_data_base<R>* future_data =
                     get_future_data(future);
 
-                future_data->set_on_completed(callback_);
+                future_data->set_on_completed(Callback(callback_));
             }
 
             template <typename Sequence>
