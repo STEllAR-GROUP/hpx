@@ -7,6 +7,7 @@
 #define HPX_PLUGIN_CONFIG_HPP_HK_2005_11_07
 
 #include <boost/config.hpp>
+#include <hpx/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef BOOST_NO_STRINGSTREAM
@@ -71,7 +72,11 @@ inline std::string HPX_PLUGIN_OSSTREAM_GETSTRING(std::ostrstream& ss)
 //
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_SYMBOLS_PREFIX)
-#define HPX_PLUGIN_SYMBOLS_PREFIX hpx
+# if defined(HPX_DEBUG)
+#   define HPX_PLUGIN_SYMBOLS_PREFIX hpx
+# else
+#   define HPX_PLUGIN_SYMBOLS_PREFIX hpxd
+#endif
 #endif
 
 #define HPX_PLUGIN_SYMBOLS_PREFIX_STR BOOST_PP_STRINGIZE(HPX_PLUGIN_SYMBOLS_PREFIX)
