@@ -238,13 +238,13 @@ namespace hpx
             return lcos::make_ready_future(boost::move(lazy_values));
         }
 
-        if (n > 0)
-        {
+        //if (n > 0)
+        //{
             HPX_THROWS_IF(ec, hpx::bad_parameter, 
                 "hpx::lcos::when_n", 
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
-        }
+        //}
     }
 
     /// The function \a wait_n is a operator allowing to join on the result
