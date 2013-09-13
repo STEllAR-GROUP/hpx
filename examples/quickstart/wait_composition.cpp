@@ -12,14 +12,21 @@
 struct cout_continuation
 {
     typedef void result_type;
+    typedef HPX_STD_TUPLE<
+            hpx::lcos::future<int>
+          , hpx::lcos::future<int>
+          , hpx::lcos::future<int> > data_type;
 
-    result_type operator()(hpx::future<std::vector<hpx::future<int> > > f) const
+    result_type operator()(
+        hpx::lcos::future<data_type> data
+    ) const
     {
-        for (std::size_t i = 0; i < f.get().size(); ++i)
-            std::cout << f.get()[i].get() << "\n";
+        data_type v = data.move();
+        std::cout << HPX_STD_GET(0, v).get() << "\n";
+        std::cout << HPX_STD_GET(1, v).get() << "\n";
+        std::cout << HPX_STD_GET(2, v).get() << "\n";
     }
 };
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {

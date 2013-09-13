@@ -42,13 +42,16 @@ hpx::id_type here;
 struct when_all_wrapper
 {
     typedef boost::uint64_t result_type;
+    typedef HPX_STD_TUPLE<
+            hpx::lcos::future<uint64_t>
+          , hpx::lcos::future<uint64_t> > data_type;
 
     boost::uint64_t operator()(
-        hpx::lcos::future<std::vector<hpx::lcos::future<uint64_t> > > data
+        hpx::lcos::future<data_type> data
     ) const
     {
-        std::vector<hpx::lcos::future<uint64_t> > v = data.move();
-        return v[0].get() + v[1].get();
+        data_type v = data.move();
+        return HPX_STD_GET(0, v).get() + HPX_STD_GET(1, v).get();
     }
 };
 

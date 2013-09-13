@@ -407,7 +407,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::size_t i = 0;
         while (!bulk_tests.empty()) 
         {
-            HPX_STD_TUPLE<int, hpx::future<void> > r = hpx::wait_any(bulk_tests);
+            std::vector<hpx::future<void> > r = hpx::wait_any(bulk_tests);
             bulk_tests.erase(bulk_tests.begin() + HPX_STD_GET(0, r));
             wait_for_bulk_task(i++, t);
         }

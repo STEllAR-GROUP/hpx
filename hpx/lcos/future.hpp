@@ -59,7 +59,7 @@ namespace hpx { namespace lcos
         };
         
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result, typename Enable = void>
+        template <typename Result>
         struct then_future_result
         {
             typedef lcos::future<Result> type;
