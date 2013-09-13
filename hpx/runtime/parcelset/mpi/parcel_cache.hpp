@@ -149,7 +149,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                  buffer->buffer_;
 
             b.reset(new std::vector<char/*, allocator<char>*/ >());
-            b.reserve(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
+            b->reserve(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
             performance_counters::parcels::data_point& datapoint = buffer->send_data_;
             datapoint.buffer_allocate_time_ = timer.elapsed_nanoseconds();
