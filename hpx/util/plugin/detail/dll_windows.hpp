@@ -147,8 +147,6 @@ namespace hpx { namespace util { namespace plugin {
                     << symbol_name << "' in the shared library '"
                     << dll_name << "'";
 
-                ::FreeLibrary(handle);
-
                 // report error
                 HPX_THROWS_IF(ec, dynamic_link_failure,
                     "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));

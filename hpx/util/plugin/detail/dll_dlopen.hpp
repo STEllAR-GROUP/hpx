@@ -221,7 +221,6 @@ namespace hpx { namespace util { namespace plugin {
                     << dll_name << "' (dlerror: " << dlerror () << ")";
 
                 dlerror();
-                MyFreeLibrary(handle);
 
                 // report error
                 HPX_THROWS_IF(ec, dynamic_link_failure,
