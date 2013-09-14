@@ -70,6 +70,8 @@
 [def __hwloc_downloads__        [@http://http://www.open-mpi.org/software/hwloc/v1.7/ hwloc Downloads]]
 [def __doxygen__                [@http://www.doxygen.org Doxygen]]
 
+[def __macports__               [@http://www.macports.org/ MacPorts]]
+
 [/ External dependencies]
 [def __cmake__                  [@http://www.cmake.org CMake]]
 [def __cmake_download__         [@http://www.cmake.org/cmake/resources/software.html CMake Downloads]]

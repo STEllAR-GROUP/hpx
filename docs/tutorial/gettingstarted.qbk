@@ -388,25 +388,25 @@ HPX_MALLOC as this is crucial for getting decent performance.
 Alternatively, you can install a recent version of gcc as well as all
 required libraries via MacPorts:
 
-1) Install MacPorts <http://www.macports.org/>
+# Install __macports__
 
-2) Install Boost, CMake, gcc 4.8, and hwloc:
-
+# Install Boost, CMake, gcc 4.8, and hwloc:
+``
    $ sudo port install boost
    $ sudo port install gcc48
    $ sudo port install hwloc
-
+``
    You may also want:
-
+``
    $ sudo port install cmake
    $ sudo port install git-core
-
-3) Make this version of gcc your default compiler:
-
+``
+# Make this version of gcc your default compiler:
+``
    $ sudo port install gcc_select
    $ sudo port select gcc mp-gcc48
-
-4) Build HPX as described above in the __unix_installation__ section.
+``
+# Build HPX as described above in the __unix_installation__ section.
 
 
 [c++]
