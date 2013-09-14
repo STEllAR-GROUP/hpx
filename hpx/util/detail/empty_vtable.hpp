@@ -23,6 +23,11 @@ namespace hpx { namespace util { namespace detail
     {
         enum { empty = true };
 
+        static std::type_info const& get_type()
+        {
+            return typeid(void);
+        }
+
         static void static_delete(void ** f) {}
         static void destruct(void ** f) {}
         static void clone(void *const* src, void ** dest) {}
@@ -121,11 +126,6 @@ namespace hpx { namespace util { namespace detail
                 get_empty_table<
                     R(BOOST_PP_ENUM_PARAMS(N, A))
                 >::template get<IArchive, OArchive>();
-        }
-
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
         }
 
         BOOST_ATTRIBUTE_NORETURN static R

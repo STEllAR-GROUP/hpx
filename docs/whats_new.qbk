@@ -16,6 +16,7 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 845] - Issues with having both debug and release modules in the same directory
 * [issue 843] - Tests should use CTest
 * [issue 842] - Remove buffer_pool from MPI parcelport
 * [issue 841] - Add possibility to broadcast an index with hpx::lcos::broadcast

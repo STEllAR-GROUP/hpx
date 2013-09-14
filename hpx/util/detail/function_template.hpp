@@ -625,8 +625,6 @@ namespace hpx { namespace util {
 
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
-            if (empty())
-                return typeid(void);
             return vptr->get_type();
         }
 

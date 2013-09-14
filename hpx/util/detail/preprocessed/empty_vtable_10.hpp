@@ -35,10 +35,6 @@ namespace hpx { namespace util { namespace detail
                     R()
                 >::template get<IArchive, OArchive>();
         }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
-        }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f )
         {
@@ -74,10 +70,6 @@ namespace hpx { namespace util { namespace detail
                 get_empty_table<
                     R(A0)
                 >::template get<IArchive, OArchive>();
-        }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
         }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0)
@@ -115,10 +107,6 @@ namespace hpx { namespace util { namespace detail
                     R(A0 , A1)
                 >::template get<IArchive, OArchive>();
         }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
-        }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1)
         {
@@ -154,10 +142,6 @@ namespace hpx { namespace util { namespace detail
                 get_empty_table<
                     R(A0 , A1 , A2)
                 >::template get<IArchive, OArchive>();
-        }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
         }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2)
@@ -195,10 +179,6 @@ namespace hpx { namespace util { namespace detail
                     R(A0 , A1 , A2 , A3)
                 >::template get<IArchive, OArchive>();
         }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
-        }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3)
         {
@@ -234,10 +214,6 @@ namespace hpx { namespace util { namespace detail
                 get_empty_table<
                     R(A0 , A1 , A2 , A3 , A4)
                 >::template get<IArchive, OArchive>();
-        }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
         }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
@@ -275,10 +251,6 @@ namespace hpx { namespace util { namespace detail
                     R(A0 , A1 , A2 , A3 , A4 , A5)
                 >::template get<IArchive, OArchive>();
         }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
-        }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
         {
@@ -314,10 +286,6 @@ namespace hpx { namespace util { namespace detail
                 get_empty_table<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6)
                 >::template get<IArchive, OArchive>();
-        }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
         }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
@@ -355,10 +323,6 @@ namespace hpx { namespace util { namespace detail
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
                 >::template get<IArchive, OArchive>();
         }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
-        }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
         {
@@ -394,10 +358,6 @@ namespace hpx { namespace util { namespace detail
                 get_empty_table<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
                 >::template get<IArchive, OArchive>();
-        }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
         }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
@@ -435,10 +395,6 @@ namespace hpx { namespace util { namespace detail
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
                 >::template get<IArchive, OArchive>();
         }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
-        }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
         {
@@ -474,10 +430,6 @@ namespace hpx { namespace util { namespace detail
                 get_empty_table<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)
                 >::template get<IArchive, OArchive>();
-        }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
         }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
@@ -515,10 +467,6 @@ namespace hpx { namespace util { namespace detail
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)
                 >::template get<IArchive, OArchive>();
         }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
-        }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
         {
@@ -554,10 +502,6 @@ namespace hpx { namespace util { namespace detail
                 get_empty_table<
                     R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)
                 >::template get<IArchive, OArchive>();
-        }
-        static std::type_info const& get_type()
-        {
-            return typeid(functor_type);
         }
         BOOST_ATTRIBUTE_NORETURN static R
         invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
