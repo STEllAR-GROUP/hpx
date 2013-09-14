@@ -137,7 +137,23 @@ namespace hpx { namespace util { namespace plugin {
             if (ec) return std::pair<SymbolType, Deleter>();
 
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
-            typedef typename boost::remove_pointer<SymbolType>::type PointedType;
+
+            // Cast the to right type.
+            SymbolType address = (SymbolType)GetProcAddress(dll_handle, symbol_name.c_str());
+            if (NULL == address)
+            {
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Unable to locate the exported symbol name '"
+                    << symbol_name << "' in the shared library '"
+                    << dll_name << "'";
+
+                ::FreeLibrary(handle);
+
+                // report error
+                HPX_THROWS_IF(ec, dynamic_link_failure,
+                    "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                return std::pair<SymbolType, Deleter>();
+            }
 
             // Open the library. Yes, we do it on every access to
             // a symbol, the LoadLibrary function increases the refcnt of the dll
@@ -156,22 +172,6 @@ namespace hpx { namespace util { namespace plugin {
             }
             BOOST_ASSERT(handle == dll_handle);
 
-            // Cast the to right type.
-            SymbolType address = (SymbolType)GetProcAddress(dll_handle, symbol_name.c_str());
-            if (NULL == address)
-            {
-                HPX_PLUGIN_OSSTREAM str;
-                str << "Hpx.Plugin: Unable to locate the exported symbol name '"
-                    << symbol_name << "' in the shared library '"
-                    << dll_name << "'";
-
-                ::FreeLibrary(handle);
-
-                // report error
-                HPX_THROWS_IF(ec, dynamic_link_failure,
-                    "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
-                return std::pair<SymbolType, Deleter>();
-            }
             return std::make_pair(address, detail::free_dll<SymbolType>(handle));
         }
 

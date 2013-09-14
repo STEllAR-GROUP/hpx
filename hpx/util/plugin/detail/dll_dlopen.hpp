@@ -211,6 +211,24 @@ namespace hpx { namespace util { namespace plugin {
 
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
 
+            SymbolType address = very_detail::nasty_cast<SymbolType>(
+                MyGetProcAddress(dll_handle, symbol_name.c_str()));
+            if (NULL == address)
+            {
+                HPX_PLUGIN_OSSTREAM str;
+                str << "Hpx.Plugin: Unable to locate the exported symbol name '"
+                    << symbol_name << "' in the shared library '"
+                    << dll_name << "' (dlerror: " << dlerror () << ")";
+
+                dlerror();
+                MyFreeLibrary(handle);
+
+                // report error
+                HPX_THROWS_IF(ec, dynamic_link_failure,
+                    "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
+                return std::pair<SymbolType, Deleter>();
+            }
+
             // Open the library. Yes, we do it on every access to
             // a symbol, the LoadLibrary function increases the refcnt of the dll
             // so in the end the dll class holds one refcnt and so does every
@@ -240,23 +258,6 @@ namespace hpx { namespace util { namespace plugin {
             // Cast to the right type.
             dlerror();              // Clear the error state.
 
-            SymbolType address = very_detail::nasty_cast<SymbolType>(
-                MyGetProcAddress(dll_handle, symbol_name.c_str()));
-            if (NULL == address)
-            {
-                HPX_PLUGIN_OSSTREAM str;
-                str << "Hpx.Plugin: Unable to locate the exported symbol name '"
-                    << symbol_name << "' in the shared library '"
-                    << dll_name << "' (dlerror: " << dlerror () << ")";
-
-                dlerror();
-                MyFreeLibrary(handle);
-
-                // report error
-                HPX_THROWS_IF(ec, dynamic_link_failure,
-                    "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
-                return std::pair<SymbolType, Deleter>();
-            }
             return std::make_pair(address, free_dll<SymbolType>(handle));
         }
 
