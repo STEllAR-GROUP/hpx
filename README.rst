@@ -96,6 +96,7 @@ Linux
 
     $ cmake -DBOOST_ROOT=/your_boost_directory \
          -DHWLOC_ROOT=/your_hwloc_directory \
+         -DCMAKE_INSTALL_PREFIX=/where_hpx_should_be_installed \
          [other CMake variable definitions] \
          /path/to/hpx/source/tree
 
@@ -120,8 +121,12 @@ Linux
 
    to build and install the examples.
 
-Mac OSX
--------
+OS X (Mac)
+----------
+
+The standard system compiler on OS X is too old to build HPX. You will
+have to install a newer compiler manually, either Clang or GCC. Below
+we describe two possibilities:
 
 1) Install a recent version of LLVM and Clang.
    In order to build hpx you will need a fairly recent version of Clang
@@ -197,6 +202,31 @@ Mac OSX
     $ make install
 
    to build and install the examples.
+
+
+Alternatively, you can install a recent version of gcc as well as all
+required libraries via MacPorts:
+
+1) Install MacPorts <http://www.macports.org/>
+
+2) Install Boost, CMake, gcc 4.8, and hwloc:
+
+   $ sudo port install boost
+   $ sudo port install gcc48
+   $ sudo port install hwloc
+
+   You may also want:
+
+   $ sudo port install cmake
+   $ sudo port install git-core
+
+3) Make this version of gcc your default compiler:
+
+   $ sudo port install gcc_select
+   $ sudo port select gcc mp-gcc48
+
+4) Build HPX as described above in the ``Linux'' section.
+
 
 Windows
 -------

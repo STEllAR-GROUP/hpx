@@ -261,12 +261,16 @@ HPX_MALLOC as this is crucial for getting decent performance.
 [endsect] [/ How to Install __hpx__ on Unix Variants]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:macos_installation How to Install __hpx__ on MacOS]
+[section:macos_installation How to Install __hpx__ on OS X (Mac)]
 
-This section describes how to build__hpx__ for Mac OS X (with recent versions
+This section describes how to build__hpx__ for OS X (Mac) (with recent versions
 of Clang, libc++, and Boost).
 
 [teletype]
+
+The standard system compiler on OS X is too old to build HPX. You will
+have to install a newer compiler manually, either Clang or GCC. Below
+we describe two possibilities:
 
 [heading Install a recent version of LLVM and Clang]
 
@@ -378,6 +382,32 @@ of Clang, libc++, and Boost).
 For more detailed information about using __cmake__ please refer its documentation
 and to the section __cmake_hpx__ for. Please pay special attention to the section about
 HPX_MALLOC as this is crucial for getting decent performance.
+
+[heading Alternative Installation method of HPX on OS X (Mac)]
+
+Alternatively, you can install a recent version of gcc as well as all
+required libraries via MacPorts:
+
+1) Install MacPorts <http://www.macports.org/>
+
+2) Install Boost, CMake, gcc 4.8, and hwloc:
+
+   $ sudo port install boost
+   $ sudo port install gcc48
+   $ sudo port install hwloc
+
+   You may also want:
+
+   $ sudo port install cmake
+   $ sudo port install git-core
+
+3) Make this version of gcc your default compiler:
+
+   $ sudo port install gcc_select
+   $ sudo port select gcc mp-gcc48
+
+4) Build HPX as described above in the __unix_installation__ section.
+
 
 [c++]
 [endsect]
