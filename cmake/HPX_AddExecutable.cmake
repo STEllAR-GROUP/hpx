@@ -18,16 +18,91 @@ macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
     "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;COMPILE_FLAGS;LINK_FLAGS;FOLDER;SOURCE_ROOT;HEADER_ROOT;SOURCE_GLOB;HEADER_GLOB;OUTPUT_SUFFIX;INSTALL_SUFFIX;LANGUAGE"
-    "ESSENTIAL;NOLIBS;NOHPXINIT" ${ARGN})
+    "ESSENTIAL;NOLIBS;NOHPXINIT;AUTOGLOB" ${ARGN})
+
+  if(NOT ${name}_LANGUAGE)
+    set(${name}_LANGUAGE CXX)
+  endif()
+
+  if(NOT ${name}_SOURCE_ROOT)
+    set(${name}_SOURCE_ROOT ".")
+  endif()
+  hpx_debug("add_executable.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
+
+  if(NOT ${name}_HEADER_ROOT)
+    set(${name}_HEADER_ROOT ".")
+  endif()
+  hpx_debug("add_executable.${name}" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
+
+  # Collect sources and headers from the given (current) directory
+  # (recursively), but only if AUTOGLOB flag is specified.
+  if(${${name}_AUTOGLOB})
+    if(NOT ${name}_SOURCE_GLOB)
+      set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp"
+                              "${${name}_SOURCE_ROOT}/*.c"
+                              "${${name}_SOURCE_ROOT}/*.f"
+                              "${${name}_SOURCE_ROOT}/*.F"
+                              "${${name}_SOURCE_ROOT}/*.f77"
+                              "${${name}_SOURCE_ROOT}/*.F77"
+                              "${${name}_SOURCE_ROOT}/*.f90"
+                              "${${name}_SOURCE_ROOT}/*.F90"
+                              "${${name}_SOURCE_ROOT}/*.f95"
+                              "${${name}_SOURCE_ROOT}/*.F95")
+    endif()
+    hpx_debug("add_executable.${name}" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
+
+    add_hpx_library_sources(${name}_executable
+      GLOB_RECURSE GLOBS "${${name}_SOURCE_GLOB}")
+
+    set(${name}_SOURCES ${${name}_executable_SOURCES})
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Source Files"
+      ROOT ${${name}_SOURCE_ROOT}
+      TARGETS ${${name}_executable_SOURCES})
+
+    if(NOT ${name}_HEADER_GLOB)
+      set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.hpp"
+                              "${${name}_HEADER_ROOT}/*.h")
+    endif()
+    hpx_debug("add_executable.${name}" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
+
+    add_hpx_library_headers(${name}_executable
+      GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
+
+    set(${name}_HEADERS ${${name}_executable_HEADERS})
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Header Files"
+      ROOT ${${name}_HEADER_ROOT}
+      TARGETS ${${name}_executable_HEADERS})
+  else()
+    add_hpx_library_sources_noglob(${name}_executable
+        SOURCES "${${name}_SOURCES}")
+
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Source Files"
+      ROOT ${${name}_SOURCE_ROOT}
+      TARGETS ${${name}_executable_SOURCES})
+
+    add_hpx_library_headers_noglob(${name}_executable
+        HEADERS "${${name}_HEADERS}")
+
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Header Files"
+      ROOT ${${name}_HEADER_ROOT}
+      TARGETS ${${name}_executable_HEADERS})
+  endif()
+
+  set(${name}_SOURCES ${${name}_executable_SOURCES})
+  set(${name}_HEADERS ${${name}_executable_HEADERS})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
   hpx_print_list("DEBUG" "add_executable.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
-
-  if(NOT ${name}_LANGUAGE)
-    set(${name}_LANGUAGE CXX)
-  endif()
 
   # add the executable build target
   if(NOT HPX_EXTERNAL_CMAKE)
