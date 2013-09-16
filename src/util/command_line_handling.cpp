@@ -126,8 +126,12 @@ namespace hpx { namespace util
 
         // The AGAS host name and port number are pre-initialized from
         //the command line
-        std::string agas_host;
-        boost::uint16_t agas_port = HPX_INITIAL_IP_PORT;
+        std::string agas_host = 
+            cfgmap.get_value<std::string>("hpx.agas.address", "");
+        boost::uint16_t agas_port =
+            cfgmap.get_value<boost::uint16_t>("hpx.agas.port", 
+                HPX_INITIAL_IP_PORT);
+
         if (vm.count("hpx:agas")) {
             if (!util::split_ip_address(
                 vm["hpx:agas"].as<std::string>(), agas_host, agas_port))
@@ -184,8 +188,12 @@ namespace hpx { namespace util
         agas_host = env.agas_host_name(
             agas_host.empty() ? HPX_INITIAL_IP_ADDRESS : agas_host);
 
-        std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
-        boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT;
+        std::string hpx_host = 
+            cfgmap.get_value<std::string>("hpx.parcel.address",
+                env.host_name(HPX_INITIAL_IP_ADDRESS));
+        boost::uint16_t hpx_port =
+            cfgmap.get_value<boost::uint16_t>("hpx.parcel.port", 
+                HPX_INITIAL_IP_PORT);
 
         // handle number of threads
         std::size_t batch_threads = env.retrieve_number_of_threads();
