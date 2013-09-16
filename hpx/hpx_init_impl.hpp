@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -73,14 +73,16 @@ namespace hpx
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
-    init(int argc, char* argv[], std::vector<std::string> const& cfg)
+    init(int argc, char* argv[], std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
 
         options_description desc_commandline(
             "Usage: " HPX_APPLICATION_STRING " [options]");
 
-        return init(desc_commandline, argc, argv, cfg);
+        HPX_STD_FUNCTION<void()> const empty;
+        return init(desc_commandline, argc, argv, cfg, empty, empty, mode);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -108,10 +110,12 @@ namespace hpx
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
     inline int
-    init(std::string const& app_name, int argc, char* argv[])
+    init(std::string const& app_name, int argc, char* argv[],
+        hpx::runtime_mode mode)
     {
+        HPX_STD_FUNCTION<void()> const empty;
         return init(static_cast<hpx_main_type>(::hpx_main), app_name,
-            argc, argv);
+            argc, argv, empty, empty, mode);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -119,10 +123,30 @@ namespace hpx
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
-    inline int init(int argc, char* argv[])
+    inline int init(int argc, char* argv[], hpx::runtime_mode mode)
     {
         return init(static_cast<hpx_main_type>(::hpx_main),
-            HPX_APPLICATION_STRING, argc, argv);
+            HPX_APPLICATION_STRING, argc, argv, mode);
+    }
+
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main entry point, which can be used to set up the
+    /// runtime for an HPX application (the runtime system will be set up in
+    /// console mode or worker mode depending on the command line settings).
+    inline int init(std::vector<std::string> const& cfg, 
+        hpx::runtime_mode mode)
+    {
+        using boost::program_options::options_description;
+
+        options_description desc_commandline(
+            std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
+
+        char *dummy_argv[1] = { HPX_APPLICATION_STRING };
+        HPX_STD_FUNCTION<void()> const empty;
+
+        return init(static_cast<hpx_main_type>(::hpx_main), desc_commandline, 
+            1, dummy_argv, cfg, empty, empty, mode);
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -131,7 +155,8 @@ namespace hpx
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
     inline int init(int (*f)(boost::program_options::variables_map& vm),
-        std::string const& app_name, int argc, char* argv[])
+        std::string const& app_name, int argc, char* argv[],
+        hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
 
@@ -141,11 +166,11 @@ namespace hpx
         if (argc == 0 || argv == 0)
         {
             char *dummy_argv[1] = { const_cast<char*>(app_name.c_str()) };
-            return init(desc_commandline, 1, dummy_argv);
+            return init(desc_commandline, 1, dummy_argv, mode);
         }
 
         HPX_STD_FUNCTION<void()> const empty;
-        return init(f, desc_commandline, argc, argv, empty, empty);
+        return init(f, desc_commandline, argc, argv, empty, empty, mode);
     }
 }
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,7 @@
 #if !defined(HPX_START_IMPL_OCT_04_2012_0252PM)
 #define HPX_START_IMPL_OCT_04_2012_0252PM
 
-#if !defined(HPX_START_OCT_04_2012_048PM)
+#if !defined(HPX_START_OCT_04_2012_0148PM)
 #  error Do not directly include hpx/hpx_start_impl.hpp, use hpx/hpx_start.hpp instead!
 #endif
 
@@ -87,9 +87,12 @@ namespace hpx
     /// settings). It will return immediatly after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline void
-    start(std::string const& app_name, int argc, char* argv[])
+    start(std::string const& app_name, int argc, char* argv[],
+        hpx::runtime_mode mode)
     {
-        start(static_cast<hpx_main_type>(::hpx_main), app_name, argc, argv);
+        HPX_STD_FUNCTION<void()> const empty;
+        start(static_cast<hpx_main_type>(::hpx_main), app_name, argc, argv,
+            empty, empty, mode);
     }
 
     /// \brief Main, non-blocking entry point for launching the HPX runtime system.
@@ -99,10 +102,32 @@ namespace hpx
     /// be set up in console mode or worker mode depending on the command line
     /// settings). It will return immediatly after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
-    inline void start(int argc, char* argv[])
+    inline void start(int argc, char* argv[], hpx::runtime_mode mode)
     {
         start(static_cast<hpx_main_type>(::hpx_main),
-            HPX_APPLICATION_STRING, argc, argv);
+            HPX_APPLICATION_STRING, argc, argv, mode);
+    }
+
+    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
+    inline void start(std::vector<std::string> const& cfg, 
+        hpx::runtime_mode mode)
+    {
+        using boost::program_options::options_description;
+
+        options_description desc_commandline(
+            std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
+
+        char *dummy_argv[1] = { HPX_APPLICATION_STRING };
+        HPX_STD_FUNCTION<void()> const empty;
+
+        start(static_cast<hpx_main_type>(::hpx_main), desc_commandline, 
+            1, dummy_argv, cfg, empty, empty, mode);
     }
 
     /// \brief Main, non-blocking entry point for launching the HPX runtime system.
@@ -113,7 +138,8 @@ namespace hpx
     /// settings). It will return immediatly after that. Use `hpx::wait` and
     /// `hpx::stop` to synchronize with the runtime system's execution.
     inline void start(int (*f)(boost::program_options::variables_map& vm),
-        std::string const& app_name, int argc, char* argv[])
+        std::string const& app_name, int argc, char* argv[],
+        hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
 
@@ -123,12 +149,12 @@ namespace hpx
         if (argc == 0 || argv == 0)
         {
             char *dummy_argv[1] = { const_cast<char*>(app_name.c_str()) };
-            start(desc_commandline, 1, dummy_argv);
+            start(desc_commandline, 1, dummy_argv, mode);
             return;
         }
 
         HPX_STD_FUNCTION<void()> const empty;
-        start(f, desc_commandline, argc, argv, empty, empty);
+        start(f, desc_commandline, argc, argv, empty, empty, mode);
     }
 }
 
