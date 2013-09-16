@@ -309,16 +309,14 @@ namespace hpx { namespace util
 
                 // do not execute any explicit hpx_main except if asked
                 // otherwise
-                if (!vm.count("hpx:run-hpx-main"))
+                if (!vm.count("hpx:run-hpx-main") &&
+                    !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
+                {
                     hpx_main_f_ = 0;
+                }
             }
             else if (vm.count("hpx:connect")) {
                 mode_ = hpx::runtime_mode_connect;
-
-                // do not execute any explicit hpx_main except if asked
-                // otherwise
-                if (!vm.count("hpx:run-hpx-main"))
-                    hpx_main_f_ = 0;
             }
         }
 
@@ -327,6 +325,14 @@ namespace hpx { namespace util
         if (mode_ == hpx::runtime_mode_connect) {
             // when connecting we need to select a unique port
             hpx_port = HPX_CONNECTING_IP_PORT;
+
+            // do not execute any explicit hpx_main except if asked
+            // otherwise
+            if (!vm.count("hpx:run-hpx-main") && 
+                !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
+            {
+                hpx_main_f_ = 0;
+            }
         }
         else if (node != std::size_t(-1) || vm.count("hpx:node")) {
             // command line overwrites the environment
@@ -351,8 +357,11 @@ namespace hpx { namespace util
 
                     // do not execute any explicit hpx_main except if asked
                     // otherwise
-                    if (!vm.count("hpx:run-hpx-main"))
+                    if (!vm.count("hpx:run-hpx-main") &&
+                        !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
+                    {
                         hpx_main_f_ = 0;
+                    }
                 }
             }
 
@@ -416,8 +425,11 @@ namespace hpx { namespace util
 
             // do not execute any explicit hpx_main except if asked
             // otherwise
-            if (!vm.count("hpx:run-hpx-main"))
+            if (!vm.count("hpx:run-hpx-main") &&
+                !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
+            {
                 hpx_main_f_ = 0;
+            }
         }
 
         // write HPX and AGAS network parameters to the proper ini-file entries

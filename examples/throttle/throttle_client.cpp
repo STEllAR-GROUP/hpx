@@ -93,8 +93,9 @@ int main(int argc, char* argv[])
     // Disable loading of all external components
     std::vector<std::string> cfg;
     cfg.push_back("hpx.components.load_external=0");
-    HPX_STD_FUNCTION<void()> empty;
+    cfg.push_back("hpx.run_hpx_main!=1");
 
+    HPX_STD_FUNCTION<void()> const empty;
     return hpx::init(cmdline, argc, argv, cfg, empty, empty, hpx::runtime_mode_connect);
 }
 
