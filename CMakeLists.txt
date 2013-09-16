@@ -987,8 +987,8 @@ if(MSVC)
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
-  hpx_add_config_definitions(-D_WINDOWS)
-  hpx_add_config_definitions(-D_WIN32)
+  hpx_add_definitions(-D_WINDOWS)
+  hpx_add_definitions(-D_WIN32)
   hpx_add_config_define(_WIN32_WINNT 0x0601)
   hpx_add_config_define(_SCL_SECURE_NO_WARNINGS)
   hpx_add_config_define(_CRT_SECURE_NO_WARNINGS)
