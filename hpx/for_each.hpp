@@ -37,7 +37,7 @@ namespace hpx {
     template <typename Range, typename F>
     inline std::vector<
         lcos::future<
-#if HPX_HAVE_CXX11_DECLTYPE
+#if defined(HPX_HAVE_CXX11_DECLTYPE)
             decltype(boost::declval<F>()(boost::declval<typename boost::range_value<Range>::type>()))
 #else
             typename boost::result_of<
@@ -49,7 +49,7 @@ namespace hpx {
     for_each(Range const & range, F f)
     {
         typedef typename boost::range_value<Range>::type value_type;
-#if HPX_HAVE_CXX11_DECLTYPE
+#if defined(HPX_HAVE_CXX11_DECLTYPE)
         typedef decltype(boost::declval<F>()(boost::declval<value_type>())) result_type;
 #else
         typedef typename boost::result_of<F(value_type)>::type result_type;

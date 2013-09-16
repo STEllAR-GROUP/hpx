@@ -223,8 +223,6 @@ macro(add_hpx_executable name)
     endif()
     set_property(TARGET ${name}_exe APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                 "HPX_PREFIX=\"${HPX_PREFIX}\""
-                 "HPX_GIT_COMMIT=\"${HPX_GIT_COMMIT}\""
                  "BOOST_ENABLE_ASSERT_HANDLER")
   else()
     target_link_libraries(${name}_exe ${${name}_DEPENDENCIES})

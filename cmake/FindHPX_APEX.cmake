@@ -30,7 +30,7 @@ if(APEX_FOUND)
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${APEX_LIBRARY})
   hpx_include_sys_directories(${APEX_INCLUDE_DIR})
   hpx_link_sys_directories(${APEX_LIBRARY_DIR})
-  hpx_add_definitions(-DHPX_HAVE_APEX)
+  hpx_add_config_define(HPX_HAVE_APEX)
 
   # APEX can support the amplifier interface, so enable that, too
   if(NOT AMPLIFIER_ROOT)

@@ -131,8 +131,6 @@ macro(add_hpx_component name)
 
     set_property(TARGET ${name}_component APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                 "HPX_PREFIX=\"${HPX_PREFIX}\""
-                 "HPX_GIT_COMMIT=\"${HPX_GIT_COMMIT}\""
                  "BOOST_ENABLE_ASSERT_HANDLER")
 
     if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")

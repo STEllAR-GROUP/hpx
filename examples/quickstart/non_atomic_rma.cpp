@@ -9,8 +9,6 @@
 //  accesses and writes occur on the remote locality.
 //
 // Note that this is a *non-atomic* example.
-#include <iostream>
-#include <time.h>
 
 //HPX includes
 #include <hpx/hpx.hpp>
@@ -33,6 +31,9 @@
 
 #include <algorithm>
 #include <vector>
+
+#include <iostream>
+#include <ctime>
 
 using namespace hpx;
 namespace po = boost::program_options;

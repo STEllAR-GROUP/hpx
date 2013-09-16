@@ -4,16 +4,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include<iostream>
-#include<vector>
-#include<math.h>
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include "ag/server/allgather.hpp"
 #include "ag/server/allgather_and_gate.hpp"
+
+#include <iostream>
+#include <vector>
+#include <math.h>
 
 /// This function initializes a vector of \a ag::point clients,
 /// connecting them to components created with

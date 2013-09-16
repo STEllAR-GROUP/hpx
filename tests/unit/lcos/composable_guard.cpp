@@ -2,11 +2,11 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#include <iostream>
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/local/composable_guard.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/hpx_init.hpp>
+#include <iostream>
 #include <stdlib.h>
 
 typedef boost::atomic<int> int_atomic;

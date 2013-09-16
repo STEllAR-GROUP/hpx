@@ -22,6 +22,6 @@ hpx_find_package(PAPI
   HEADER_PATHS include)
 
 if(PAPI_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_PAPI)
+  hpx_add_config_define(HPX_HAVE_PAPI)
 endif()
 

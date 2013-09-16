@@ -16,3 +16,7 @@ macro(hpx_add_definitions definition)
   add_definitions(${definition})
 endmacro()
 
+macro(hpx_add_config_define definition)
+  set(${definition}_define ${ARGN} CACHE INTERNAL "${definition}" FORCE)
+  set(HPX_CONFIG_DEFINITIONS ${HPX_CONFIG_DEFINITIONS} ${definition})
+endmacro()

@@ -6,6 +6,8 @@
 #ifndef HPX_UTIL_MPI_ENV_HPP
 #define HPX_UTIL_MPI_ENV_HPP
 
+#include <hpx/config/defines.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/hpx_fwd.hpp>

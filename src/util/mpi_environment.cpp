@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
 #include <hpx/hpx_fwd.hpp>
@@ -22,7 +24,7 @@ namespace hpx { namespace util
         bool detect_mpi_environment(util::runtime_configuration const& cfg)
         {
             std::string mpi_environment_strings = cfg.get_entry(
-                "hpx.parcel.mpi.env", "PMI_RANK,OMPI_COMM_WORLD_SIZE");
+                "hpx.parcel.mpi.env", HPX_PARCELPORT_MPI_ENV);
 
             typedef
                 boost::tokenizer<boost::char_separator<char> >

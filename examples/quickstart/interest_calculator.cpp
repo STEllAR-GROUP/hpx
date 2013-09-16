@@ -19,12 +19,12 @@
 // as this example uses up to 6 arguments for one of its components.
 #define HPX_LIMIT 6
 
-#include <iostream>
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/components/dataflow/dataflow.hpp>
+
+#include <iostream>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

@@ -8,6 +8,7 @@
 #if !defined(HPX_0097965D_313C_40DB_ABD0_5EA9537DDF8F)
 #define HPX_0097965D_313C_40DB_ABD0_5EA9537DDF8F
 
+#include <hpx/config.hpp>
 #include <functional>
 #include <iostream>
 #include <list>

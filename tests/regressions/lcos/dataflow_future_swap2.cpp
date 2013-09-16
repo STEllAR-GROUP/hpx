@@ -6,8 +6,6 @@
 // This test case demonstrates the issue described in #778: swapping futures
 // segfaults.
 
-#include <iostream>
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
@@ -17,6 +15,8 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/thread/thread.hpp>
+
+#include <iostream>
 
 using hpx::util::unwrapped;
 

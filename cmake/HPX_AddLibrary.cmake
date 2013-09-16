@@ -235,8 +235,6 @@ macro(add_hpx_library name)
 
   set_property(TARGET ${name}_lib APPEND
                PROPERTY COMPILE_DEFINITIONS
-                 "HPX_PREFIX=\"${HPX_PREFIX}\""
-                 "HPX_GIT_COMMIT=\"${HPX_GIT_COMMIT}\""
                  "HPX_LIBRARY_EXPORTS")
 
   if(NOT HPX_NO_INSTALL)

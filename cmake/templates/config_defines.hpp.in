@@ -1,0 +1,13 @@
+//  Copyright (c) 2012-2013 Thomas Heller
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !defined(HPX_CONFIG_DEFINES_HPP)
+#define HPX_CONFIG_DEFINES_HPP
+
+#if defined(__INTEL_COMPILER)
+#define BOOST_COMPILER_CONFIG "hpx/config/boost/compiler/intel.hpp"
+#endif
+@hpx_config_defines@
+#endif

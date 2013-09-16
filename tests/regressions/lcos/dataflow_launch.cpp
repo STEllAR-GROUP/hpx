@@ -6,12 +6,12 @@
 // This test case demonstrates the issue described in #774: using local dataflow
 // without explicit namespace.
 
-#include <iostream>
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
+
+#include <iostream>
 
 using hpx::lcos::local::dataflow;
 

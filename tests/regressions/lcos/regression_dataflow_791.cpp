@@ -5,9 +5,6 @@
 
 // Static blocked LU Decomposition
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/include/lcos.hpp>
@@ -18,6 +15,9 @@
 #include <vector>
 
 #include <hpx/util/lightweight_test.hpp>
+
+#include <cstdio>
+#include <cstdlib>
 
 using std::vector;
 using hpx::lcos::future;

@@ -42,4 +42,3 @@ macro(add_bzip2_module)
     endif()
   endif()
 endmacro()
-

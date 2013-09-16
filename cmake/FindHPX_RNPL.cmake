@@ -24,7 +24,7 @@ hpx_find_package(RNPL
   HEADER_PATHS include)
 
 if(RNPL_FOUND AND NOT HPX_SET_RNPL_MACRO)
-  hpx_add_definitions(-DSDF_FOUND)
-  hpx_add_definitions(-DRNPL_FOUND)
+  hpx_add_config_define(SDF_FOUND)
+  hpx_add_config_define(RNPL_FOUND)
 endif()
 

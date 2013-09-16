@@ -67,6 +67,7 @@ include(HPX_Utils)
 include(HPX_Distclean)
 
 set(HPX_DEFINITIONS CACHE INTERNAL "" FORCE)
+set(HPX_CONFIG_DEFINITIONS CACHE INTERNAL "" FORCE)
 
 hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists.")
 
@@ -144,9 +145,9 @@ endif()
 # search path configuration
 ################################################################################
 hpx_include_directories(${hpx_SOURCE_DIR})
-include_directories(${CMAKE_BINARY_DIR})
+hpx_include_directories(${CMAKE_BINARY_DIR})
 if(HPX_INTERNAL_MOVE)
-  hpx_add_definitions(-DHPX_INTERNAL_MOVE)
+  hpx_add_config_define(HPX_INTERNAL_MOVE)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
 if(${BOOST_MINOR_VERSION} LESS 53)
@@ -155,15 +156,16 @@ else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} atomic)
 endif()
 if(HPX_INTERNAL_CHRONO)
-  hpx_add_definitions(-DHPX_INTERNAL_CHRONO)
-  hpx_add_definitions(-DBOOST_CHRONO_NO_LIB)
+  hpx_add_config_define(HPX_INTERNAL_CHRONO)
+  hpx_add_config_define(BOOST_CHRONO_NO_LIB)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
 if(HPX_USE_GENERIC_COROUTINE_CONTEXT)
   if(${BOOST_MINOR_VERSION} GREATER 50)
-    hpx_add_definitions("-DHPX_HAVE_GENERIC_CONTEXT_COROUTINES=1")
+    #hpx_add_definitions("-DHPX_HAVE_GENERIC_CONTEXT_COROUTINES=1")
+    hpx_add_config_define(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
     set(BOOST_LIBRARIES ${BOOST_LIBRARIES} context)
   else()
     hpx_error("boost_version" "Boost V1.51.0 or higher is required to use the Boost.Context library.")
@@ -205,7 +207,7 @@ if(HPX_NATIVE_MIC)
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
-  hpx_add_definitions(-DHPX_NATIVE_MIC)
+  hpx_add_config_define(HPX_NATIVE_MIC)
   set(HPX_MALLOC "tbbmalloc")
 else()
   hpx_option(HPX_MAX_CPU_COUNT STRING
@@ -220,9 +222,9 @@ hpx_option(HPX_USE_MORE_THAN_64_THREADS BOOL
   "HPX applications will use more than 64 OS-threads (default: OFF)." OFF ADVANCED)
 
 if(HPX_USE_MORE_THAN_64_THREADS)
-  hpx_add_definitions(-DHPX_HAVE_MORE_THAN_64_THREADS)
+  hpx_add_config_define(HPX_HAVE_MORE_THAN_64_THREADS)
 elseif(HPX_MAX_CPU_COUNT)
-  hpx_add_definitions(-DHPX_MAX_CPU_COUNT=${HPX_MAX_CPU_COUNT})
+  hpx_add_config_define(HPX_MAX_CPU_COUNT ${HPX_MAX_CPU_COUNT})
 endif()
 
 ###############################################################################
@@ -237,18 +239,18 @@ if(NOT MSVC)
 endif()
 
 # Boost preprocessor definitions
-hpx_add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
-hpx_add_definitions(-DHPX_COROUTINE_ARG_MAX=1)
+hpx_add_config_define(BOOST_PARAMETER_MAX_ARITY 7)
+hpx_add_config_define(HPX_COROUTINE_ARG_MAX 1)
 if(NOT MSVC)
-  hpx_add_definitions(-DHPX_COROUTINE_NO_SEPARATE_CALL_SITES)
+  hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
 endif()
-hpx_add_definitions(-DHPX_LOG_NO_TSS)
-hpx_add_definitions(-DHPX_LOG_NO_TS)
-hpx_add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
+hpx_add_config_define(HPX_LOG_NO_TSS)
+hpx_add_config_define(HPX_LOG_NO_TS)
+hpx_add_config_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
 # disable usage of std::atomics in lockfree
 if(${BOOST_MINOR_VERSION} LESS 53)
-  hpx_add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
+  hpx_add_config_define(BOOST_NO_0X_HDR_ATOMIC)
 endif()
 
 ################################################################################
@@ -286,20 +288,13 @@ if(CMAKE_Fortran_COMPILER)
   endif()
 endif()
 
-# If we are compiling with an intel compiler, we need to override the default
-# boost compiler config in order to have proper C++11 detection for more
-# recent intel compiler versions (>12.0)
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-  add_definitions(-DBOOST_COMPILER_CONFIG="hpx/config/boost/compiler/intel.hpp")
-endif()
-
-
 hpx_include(CompilerFlags)
 
 ################################################################################
 # Git commit detection
 ################################################################################
 include(HPX_GitCommit)
+hpx_add_config_define(HPX_GIT_COMMIT "\"${HPX_GIT_COMMIT}\"")
 
 ################################################################################
 # Installation configuration
@@ -338,7 +333,7 @@ endif()
 if(${BOOST_MINOR_VERSION} GREATER 51)
   hpx_option(HPX_HAVE_PARCELPORT_SHMEM BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
   if(HPX_HAVE_PARCELPORT_SHMEM)
-    hpx_add_definitions(-DHPX_HAVE_PARCELPORT_SHMEM)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_SHMEM)
   endif()
 endif()
 
@@ -350,7 +345,7 @@ if(HPX_HAVE_PARCELPORT_IBVERBS)
   find_package(HPX_Ibverbs)
   find_package(HPX_Rdmacm)
   if(IBVERBS_FOUND AND RDMACM_FOUND)
-    hpx_add_definitions(-DHPX_HAVE_PARCELPORT_IBVERBS)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_IBVERBS)
   endif()
 endif()
 
@@ -371,7 +366,7 @@ if(HPX_HAVE_PARCELPORT_MPI)
       set(CMAKE_${language}_FLAGS_RELEASE
           "${CMAKE_${language}_FLAGS_RELEASE} ${MPI_${language}_COMPILE_FLAGS}")
     endforeach()
-    hpx_add_definitions(-DHPX_HAVE_PARCELPORT_MPI)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI)
     foreach(language CXX C)
       if(MPI_${language}_COMPILE_FLAGS)
         hpx_add_definitions(${MPI_${language}_COMPILE_FLAGS})
@@ -402,7 +397,8 @@ if(HPX_HAVE_PARCELPORT_MPI)
       "PMI_RANK;OMPI_COMM_WORLD_SIZE" ADVANCED)
     if(HPX_PARCELPORT_MPI_ENV)
       string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_PARCELPORT_MPI_ENV}")
-      hpx_add_definitions("-DHPX_PARCELPORT_MPI_ENV=\"${hpx_parcelport_mpi_env_}\"")
+      hpx_add_config_define(HPX_PARCELPORT_MPI_ENV
+          "\"${hpx_parcelport_mpi_env_}\"")
     endif()
   else()
     hpx_error("parcelport"
@@ -417,7 +413,7 @@ endif()
 ################################################################################
 hpx_option(HPX_NO_LOGGING BOOL "Build hpx with logging completely disabled (default: OFF)." OFF ADVANCED)
 if(HPX_NO_LOGGING)
-  hpx_add_definitions("-DHPX_NO_LOGGING=1")
+  hpx_add_config_define(HPX_NO_LOGGING 1)
 endif()
 
 ################################################################################
@@ -437,7 +433,7 @@ else()
   set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Where the hpx applications look for component dlls" FORCE)
 endif()
 
-#add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
+hpx_add_config_define(HPX_PREFIX "\"${HPX_PREFIX}\"")
 
 # Make sure the specified build type is valid.
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
@@ -463,7 +459,7 @@ endif()
 hpx_option(HPX_HAVE_CXX11 BOOL "Use C++11 support, if available (default: ON)" ON ADVANCED)
 
 if(HPX_HAVE_CXX11)
-  hpx_add_definitions(-DHPX_HAVE_CXX11)
+  hpx_add_config_define(HPX_HAVE_CXX11)
 endif()
 
 ################################################################################
@@ -476,9 +472,9 @@ else()
 endif()
 
 if(HPX_HAVE_VERIFY_LOCKS)
-  hpx_add_definitions(-DHPX_HAVE_VERIFY_LOCKS=1)
+  hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS 1)
 else()
-  hpx_add_definitions(-DHPX_HAVE_VERIFY_LOCKS=0)
+  hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS 0)
 endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -490,51 +486,51 @@ endif()
 if(NOT MSVC)
   hpx_option(HPX_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON ADVANCED)
   if(HPX_THREAD_GUARD_PAGE)
-    hpx_add_definitions(-DHPX_THREAD_GUARD_PAGE=1)
+    hpx_add_config_define(HPX_THREAD_GUARD_PAGE 1)
   else()
-    hpx_add_definitions(-DHPX_THREAD_GUARD_PAGE=0)
+    hpx_add_config_define(HPX_THREAD_GUARD_PAGE 0)
   endif()
 endif()
 
 if(NOT MSVC)
   hpx_option(HPX_USE_MMAP BOOL "Use mmap for stack allocation (default: ON)" ON ADVANCED)
   if(HPX_USE_MMAP)
-    hpx_add_definitions(-DHPX_USE_MMAP)
+    hpx_add_config_define(HPX_USE_MMAP)
   endif()
 endif()
 
 if(HPX_THREAD_DEBUG_INFO)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_PARENT_REFERENCE=1)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_PHASE_INFORMATION=1)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_DESCRIPTION=1)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_PARENT_REFERENCE 1)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION 1)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION 1)
 else()
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_PARENT_REFERENCE=0)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_PHASE_INFORMATION=0)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_DESCRIPTION=0)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_PARENT_REFERENCE 0)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION 0)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION 0)
 endif()
 
 hpx_option(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL "Enable thread stack back trace being captured on suspension (default: OFF)" OFF ADVANCED)
 
 if(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   hpx_option(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH STRING "Thread stack back trace depth being captured on suspension (default: 5)" "5" ADVANCED)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION=1)
-  hpx_add_definitions(-DHPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH=${HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION 1)
+  hpx_add_config_define(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH ${HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
 else()
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION=0)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION 0)
 endif()
 
 hpx_option(HPX_THREAD_MAINTAIN_TARGET_ADDRESS BOOL "Enable storing target address in thread for NUMA awareness (default: OFF)" OFF ADVANCED)
 if(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_TARGET_ADDRESS=1)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_TARGET_ADDRESS 1)
 else()
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_TARGET_ADDRESS=0)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_TARGET_ADDRESS 0)
 endif()
 
 hpx_option(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME BOOL "Enable collecting queue wait times for threads (default: ON)" ON ADVANCED)
 if(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME)
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_QUEUE_WAITTIME=1)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 1)
 else()
-  hpx_add_definitions(-DHPX_THREAD_MAINTAIN_QUEUE_WAITTIME=0)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 0)
 endif()
 
 ################################################################################
@@ -556,7 +552,7 @@ if(NOT HPX_DISABLE_HWLOC)
   if(HWLOC_FOUND)
     hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
     hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
-    hpx_add_definitions(-DHPX_HAVE_HWLOC)
+    hpx_add_config_define(HPX_HAVE_HWLOC)
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
   endif()
 endif()
@@ -568,17 +564,17 @@ find_package(HPX_Sodium)
 if(SODIUM_FOUND)
   hpx_option(HPX_HAVE_SECURITY BOOL "Enable enable security options (default: OFF)" OFF ADVANCED)
 
-  hpx_add_definitions(-DHPX_HAVE_SODIUM)
+  hpx_add_config_define(HPX_HAVE_SODIUM)
 
   hpx_include_sys_directories(${SODIUM_INCLUDE_DIR})
   hpx_link_sys_directories(${SODIUM_LIBRARY_DIR})
   if(MSVC)
-    hpx_add_definitions(-DSODIUM_STATIC)
+    hpx_add_config_define(SODIUM_STATIC)
   endif()
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${SODIUM_LIBRARY})
 
   if(HPX_HAVE_SECURITY)
-    hpx_add_definitions(-DHPX_HAVE_SECURITY)
+    hpx_add_config_define(HPX_HAVE_SECURITY)
   endif()
 
 elseif(HPX_HAVE_SECURITY)
@@ -593,17 +589,17 @@ add_hpx_pseudo_target(plugins)
 add_subdirectory(plugins)
 
 if(HPX_HAVE_COMPRESSION_BZIP2 AND BZIP2_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_BZIP2)
+  hpx_add_config_define(HPX_HAVE_COMPRESSION_BZIP2)
 endif()
 if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_SNAPPY)
+  hpx_add_config_define(HPX_HAVE_COMPRESSION_SNAPPY)
 endif()
 if(HPX_HAVE_COMPRESSION_ZLIB AND ZLIB_FOUND)
-  hpx_add_definitions(-DHPX_HAVE_COMPRESSION_ZLIB)
+  hpx_add_config_define(HPX_HAVE_COMPRESSION_ZLIB)
 endif()
 
 # Parcel coalescing is used by the main HPX library, enable it always
-hpx_add_definitions(-DHPX_HAVE_PARCEL_COALESCING)
+hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
 
 ################################################################################
 # Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
@@ -627,7 +623,7 @@ hpx_option(HPX_HAVE_STACKTRACES BOOL "Attach backtraces to HPX exceptions (defau
 
 if(HPX_HAVE_STACKTRACES OR HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
   hpx_info("stacktraces" "Stack traces are enabled.")
-  hpx_add_definitions(-DHPX_HAVE_STACKTRACES)
+  hpx_add_config_define(HPX_HAVE_STACKTRACES)
 endif()
 
 ################################################################################
@@ -656,7 +652,7 @@ if(HPX_HAVE_ITTNOTIFY)
   find_package(HPX_Amplifier)
   if(AMPLIFIER_FOUND)
     hpx_info("itt" "Binding to Intel Amplifier tool is enabled.")
-    hpx_add_definitions(-DHPX_HAVE_ITTNOTIFY=1)
+    hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)
     hpx_include_sys_directories(${AMPLIFIER_INCLUDE_DIR})
     hpx_link_sys_directories(${AMPLIFIER_LIBRARY_DIR})
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${AMPLIFIER_LIBRARY})
@@ -677,7 +673,7 @@ endif()
 
 if(HPX_HAVE_NATIVE_TLS)
   hpx_info("tls" "Native TLS is enabled.")
-  hpx_add_definitions(-DHPX_HAVE_NATIVE_TLS)
+  hpx_add_config_define(HPX_HAVE_NATIVE_TLS)
 endif()
 
 ################################################################################
@@ -687,7 +683,7 @@ hpx_option(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION BOOL "Do not use preprocessed he
 
 if(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
   hpx_info("ppheaders" "Use of preprocessed headers is disabled.")
-  hpx_add_definitions(-DHPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+  hpx_add_config_define(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 endif()
 
 ################################################################################
@@ -716,7 +712,7 @@ if(HPX_NATIVE_MIC)
 endif()
 
 if(MSVC)
-  hpx_add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
+  hpx_add_config_define(HPX_BUILD_TYPE "$(Configuration)")
   foreach(language CXX C Fortran)
     set(CMAKE_${language}_FLAGS_DEBUG
         "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG")
@@ -734,19 +730,19 @@ if(MSVC)
 else()
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     hpx_add_definitions(-DDEBUG)
-    hpx_add_definitions(-DHPX_BUILD_TYPE=debug)
+    hpx_add_config_define(HPX_BUILD_TYPE debug)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     hpx_add_definitions(-DNDEBUG)
     hpx_add_definitions(-DBOOST_DISABLE_ASSERTS)
-    hpx_add_definitions(-DHPX_BUILD_TYPE=relwithdebinfo)
+    hpx_add_config_define(HPX_BUILD_TYPE relwithdebinfo)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     hpx_add_definitions(-DNDEBUG)
     hpx_add_definitions(-DBOOST_DISABLE_ASSERTS)
-    hpx_add_definitions(-DHPX_BUILD_TYPE=minsizerel)
+    hpx_add_config_define(HPX_BUILD_TYPE minsizerel)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     hpx_add_definitions(-DNDEBUG)
     hpx_add_definitions(-DBOOST_DISABLE_ASSERTS)
-    hpx_add_definitions(-DHPX_BUILD_TYPE=release)
+    hpx_add_config_define(HPX_BUILD_TYPE release)
   endif()
 endif()
 
@@ -760,19 +756,19 @@ set(HPX_DEBUG_POSTFIX "d")
 hpx_option(HPX_UTIL_BIND BOOL "Use hpx::util::bind instead of boost::bind or std::bind (default: ON)" ON ADVANCED)
 
 if(HPX_UTIL_BIND)
-  hpx_add_definitions(-DHPX_UTIL_BIND)
+  hpx_add_config_define(HPX_UTIL_BIND)
 endif()
 
 hpx_option(HPX_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON ADVANCED)
 
 if(HPX_UTIL_FUNCTION)
-  hpx_add_definitions(-DHPX_UTIL_FUNCTION)
+  hpx_add_config_define(HPX_UTIL_FUNCTION)
 endif()
 
 hpx_option(HPX_UTIL_TUPLE BOOL "Use hpx::util::tuple instead of boost::tuple or std::tuple (default: ON)" ON ADVANCED)
 
 if(HPX_UTIL_TUPLE)
-  hpx_add_definitions(-DHPX_UTIL_TUPLE)
+  hpx_add_config_define(HPX_UTIL_TUPLE)
 endif()
 
 ################################################################################
@@ -781,43 +777,43 @@ endif()
 hpx_option(HPX_GLOBAL_SCHEDULER BOOL "Enable the use of --queueing=global (default: OFF)" OFF ADVANCED)
 
 if(HPX_GLOBAL_SCHEDULER)
-  hpx_add_definitions(-DHPX_GLOBAL_SCHEDULER)
+  hpx_add_config_define(HPX_GLOBAL_SCHEDULER)
 endif()
 
 hpx_option(HPX_LOCAL_SCHEDULER BOOL "Enable the use of --queueing=local (default: OFF)" OFF ADVANCED)
 
 if(HPX_LOCAL_SCHEDULER)
-  hpx_add_definitions(-DHPX_LOCAL_SCHEDULER)
+  hpx_add_config_define(HPX_LOCAL_SCHEDULER)
 endif()
 
 hpx_option(HPX_STATIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=static (default: On)" On ADVANCED)
 
 if(HPX_STATIC_PRIORITY_SCHEDULER)
-  hpx_add_definitions(-DHPX_STATIC_PRIORITY_SCHEDULER)
+  hpx_add_config_define(HPX_STATIC_PRIORITY_SCHEDULER)
 endif()
 
 hpx_option(HPX_ABP_SCHEDULER BOOL "Enable the use of --queueing=abp (default: OFF)" OFF ADVANCED)
 
 if(HPX_ABP_SCHEDULER)
-  hpx_add_definitions(-DHPX_ABP_SCHEDULER)
+  hpx_add_config_define(HPX_ABP_SCHEDULER)
 endif()
 
 hpx_option(HPX_ABP_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=priority_abp (default: OFF)" OFF ADVANCED)
 
 if(HPX_ABP_PRIORITY_SCHEDULER)
-  hpx_add_definitions(-DHPX_ABP_PRIORITY_SCHEDULER)
+  hpx_add_config_define(HPX_ABP_PRIORITY_SCHEDULER)
 endif()
 
 hpx_option(HPX_HIERARCHY_SCHEDULER BOOL "Enable the use of --queueing=hierarchy (default: OFF)" OFF ADVANCED)
 
 if(HPX_HIERARCHY_SCHEDULER)
-  hpx_add_definitions(-DHPX_HIERARCHY_SCHEDULER)
+  hpx_add_config_define(HPX_HIERARCHY_SCHEDULER)
 endif()
 
 hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=periodic (default: OFF)" OFF ADVANCED)
 
 if(HPX_PERIODIC_PRIORITY_SCHEDULER)
-  hpx_add_definitions(-DHPX_PERIODIC_PRIORITY_SCHEDULER)
+  hpx_add_config_define(HPX_PERIODIC_PRIORITY_SCHEDULER)
 endif()
 
 hpx_option(HPX_GOOGLE_PERFTOOLS BOOL
@@ -829,7 +825,7 @@ if(HPX_GOOGLE_PERFTOOLS)
     set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
     hpx_include_sys_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
     hpx_link_sys_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
-    hpx_add_definitions(-DHPX_GOOGLE_PERFTOOLS)
+    hpx_add_config_define(HPX_GOOGLE_PERFTOOLS)
   endif()
 endif()
 
@@ -902,23 +898,23 @@ if(MSVC)
     # C++11 support
     hpx_option(HPX_HAVE_CXX11_RVALUE_REFERENCES BOOL "Compiler supports C++11 rvalue references (default: ON)." ON ADVANCED)
     if(HPX_HAVE_CXX11_RVALUE_REFERENCES)
-      hpx_add_definitions(-DHPX_HAVE_CXX11_RVALUE_REFERENCES)
+      hpx_add_config_define(HPX_HAVE_CXX11_RVALUE_REFERENCES)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_LAMBDAS BOOL "Compiler supports C++11 lambda functions (default: ON)." ON ADVANCED)
     if(HPX_HAVE_CXX11_LAMBDAS)
-      hpx_add_definitions(-DHPX_HAVE_CXX11_LAMBDAS)
+      hpx_add_config_define(HPX_HAVE_CXX11_LAMBDAS)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_AUTO BOOL "Compiler supports C++11 auto keyword (default: ON)." ON ADVANCED)
     if(HPX_HAVE_CXX11_AUTO)
-      hpx_add_definitions(-DHPX_HAVE_CXX11_AUTO)
+      hpx_add_config_define(HPX_HAVE_CXX11_AUTO)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_DECLTYPE BOOL "Compiler supports C++11 decltype keyword (default: ON)." ON ADVANCED)
     if(HPX_HAVE_CXX11_DECLTYPE)
-      hpx_add_definitions(-DHPX_HAVE_CXX11_DECLTYPE)
-      hpx_add_definitions(-DBOOST_RESULT_OF_USE_DECLTYPE)
+      hpx_add_config_define(HPX_HAVE_CXX11_DECLTYPE)
+      hpx_add_config_define(BOOST_RESULT_OF_USE_DECLTYPE)
     endif()
 
     if(MSVC12)
@@ -928,18 +924,18 @@ if(MSVC)
     endif()
 
     if(HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
-      hpx_add_definitions(-DHPX_HAVE_CXX11_VARIADIC_TEMPLATES)
+      hpx_add_config_define(HPX_HAVE_CXX11_VARIADIC_TEMPLATES)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_UNIQUE_PTR BOOL "Compiler supports C++11 std::unique_ptr (default: ON)." ON ADVANCED)
     if(HPX_HAVE_CXX11_UNIQUE_PTR)
-      hpx_add_definitions(-DHPX_HAVE_CXX11_STD_UNIQUE_PTR)
-      hpx_add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+      hpx_add_config_define(HPX_HAVE_CXX11_STD_UNIQUE_PTR)
+      hpx_add_config_define(BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
     endif()
 
     hpx_option(HPX_HAVE_CXX11_STD_TUPLE BOOL "Compiler supports C++11 (movable) std::tuple (default: ON)." ON ADVANCED)
     if(NOT HPX_UTIL_TUPLE AND HPX_HAVE_CXX11_STD_TUPLE)
-      hpx_add_definitions(-DHPX_HAVE_CXX11_STD_TUPLE)
+      hpx_add_config_define(HPX_HAVE_CXX11_STD_TUPLE)
     else()
       set(HPX_HAVE_CXX11_STD_TUPLE OFF CACHE BOOL "Compiler supports C++11 (movable) std::tuple." FORCE)
       hpx_info("C++11" "HPX_UTIL_TUPLE is enabled: even while std::tuple is available it will not be used.")
@@ -947,7 +943,7 @@ if(MSVC)
 
     hpx_option(HPX_HAVE_CXX11_STD_BIND  BOOL "Compiler supports C++11 (movable) std::bind (default: OFF)." OFF ADVANCED)
     if(NOT HPX_UTIL_BIND)
-      hpx_add_definitions(-DHPX_HAVE_CXX11_STD_BIND)
+      hpx_add_config_define(HPX_HAVE_CXX11_STD_BIND)
     else()
       set(HPX_HAVE_CXX11_STD_BIND OFF CACHE BOOL "Compiler supports C++11 (movable) std::bind." FORCE)
       hpx_info("C++11" "HPX_UTIL_BIND is enabled: even while std::bind is available it will not be used.")
@@ -955,7 +951,7 @@ if(MSVC)
 
     hpx_option(HPX_HAVE_CXX11_STD_FUNCTION BOOL "Compiler supports C++11 (movable) std::function (default: OFF)." OFF ADVANCED)
     if(NOT HPX_UTIL_FUNCTION AND HPX_HAVE_CXX11_STD_FUNCTION)
-      hpx_add_definitions(-DHPX_HAVE_CXX11_STD_FUNCTION)
+      hpx_add_config_define(HPX_HAVE_CXX11_STD_FUNCTION)
     else()
       set(HPX_HAVE_CXX11_STD_FUNCTION OFF CACHE BOOL "Compiler supports C++11 (movable) std::function." FORCE)
       hpx_info("C++11" "HPX_UTIL_FUNCTION is enabled: even while std::function is available it will not be used.")
@@ -1184,9 +1180,9 @@ else()
            "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
            "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
 
-          hpx_add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
-          hpx_add_definitions(-DHPX_COROUTINE_GCC_HAVE_VISIBILITY)
-          hpx_add_definitions(-DHPX_PLUGIN_GCC_HAVE_VISIBILITY)
+          hpx_add_config_define(HPX_ELF_HIDDEN_VISIBILITY)
+          hpx_add_config_define(HPX_COROUTINE_GCC_HAVE_VISIBILITY)
+          hpx_add_config_define(HPX_PLUGIN_GCC_HAVE_VISIBILITY)
           hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX C Fortran)
         endif()
       endif()
@@ -1280,8 +1276,8 @@ else()
   hpx_use_flag_if_available(-mcx16 LANGUAGES CXX C Fortran)
 
   if(HPX_CXX_FLAG_MCX16)
-    hpx_add_definitions(-DHPX_HAVE_GNU_SYNC_16)
-    hpx_add_definitions(-DBOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
+    hpx_add_config_define(-DHPX_HAVE_GNU_SYNC_16)
+    hpx_add_config_define(-DBOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
   endif()
 
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
@@ -1344,11 +1340,7 @@ else()
 endif()
 
 if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
-  hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
-endif()
-
-if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
-  hpx_add_definitions(-DHPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
+  hpx_add_config_define(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
 ################################################################################
@@ -1363,7 +1355,7 @@ hpx_option(HPX_BUILD_EXAMPLES BOOL "Build HPX examples (default: ON)" ON ADVANCE
 
 if(HPX_BUILD_EXAMPLES)
   add_hpx_pseudo_target(examples)
-  hpx_include_directories(examples)
+  include_directories(examples)
   add_subdirectory(examples)
 endif()
 
@@ -1388,7 +1380,7 @@ if(HPX_BUILD_TESTS)
   add_custom_command(TARGET tests POST_BUILD
     COMMAND ctest)
 
-  hpx_include_directories(tests)
+  include_directories(tests)
   add_subdirectory(tests)
 else()
   unset(HPX_BUILD_TESTS_BENCHMARKS CACHE)
@@ -1417,6 +1409,20 @@ endif()
 if(${BOOST_MINOR_VERSION} GREATER 50)
   add_subdirectory(preprocess)
 endif()
+
+################################################################################
+# Configure the header to include all compile definitions
+################################################################################
+list(SORT HPX_CONFIG_DEFINITIONS)
+list(REMOVE_DUPLICATES HPX_CONFIG_DEFINITIONS)
+set(hpx_config_defines "\n")
+foreach(def ${HPX_CONFIG_DEFINITIONS})
+    set(hpx_config_defines "${hpx_config_defines}#define ${def} ${${def}_define}\n")#"
+endforeach()
+
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in
+               ${CMAKE_BINARY_DIR}/hpx/config/defines.hpp
+               @ONLY)
 
 ################################################################################
 # installation instructions
@@ -1680,6 +1686,14 @@ list(REMOVE_DUPLICATES external_link_directories)
 list(REMOVE_DUPLICATES external_libraries)
 list(REMOVE_DUPLICATES external_libraries_name)
 
+if(HPX_NO_INSTALL)
+  list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES ${HPX_PREFIX}/include)
+  list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES ${HPX_PREFIX}/include/hpx/external)
+else()
+  list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES ${hpx_SOURCE_DIR})
+  list(REMOVE_ITEM HPX_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR})
+endif()
+
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
   string(REGEX REPLACE "([ ()])" "\\\\\\1" directory "${directory}")
   set(external_include_directories "${external_include_directories} ${directory}")
@@ -1704,7 +1718,6 @@ endforeach()
 set(external_definitions "")
 
 foreach(definition ${HPX_DEFINITIONS})
-#    string(REGEX REPLACE "\"" "\\\\\\\\\\\\\\\\\"" definition ${definition})
     set(external_definitions "${external_definitions} ${definition}")
 endforeach()
 
