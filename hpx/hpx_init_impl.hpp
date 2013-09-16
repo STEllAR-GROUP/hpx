@@ -142,7 +142,7 @@ namespace hpx
         options_description desc_commandline(
             std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
 
-        char *dummy_argv[1] = { HPX_APPLICATION_STRING };
+        char *dummy_argv[1] = { const_cast<char*>(HPX_APPLICATION_STRING) };
         HPX_STD_FUNCTION<void()> const empty;
 
         return init(static_cast<hpx_main_type>(::hpx_main), desc_commandline, 

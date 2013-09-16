@@ -313,7 +313,7 @@ namespace hpx
     ///                     parameter\p mode.
     inline void
     start(boost::program_options::options_description const& desc_cmdline, int argc,
-        char* argv[], hpx::runtime_mode mode = hpx::runtime_mode_default);
+        char* argv[], hpx::runtime_mode mode);
 
     /// \fn int start(std::string const& app_name, int argc = 0, char* argv[] = 0)
     ///
