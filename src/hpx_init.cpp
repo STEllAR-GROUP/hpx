@@ -1206,6 +1206,12 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int finalize(double shutdown_timeout, double localwait, error_code& ec)
     {
+        if (!threads::get_self_ptr()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+                "this function can be called from an HPX thread only");
+            return -1;
+        }
+
         if (!is_running()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
                 "the runtime system is not active (did you already "
@@ -1244,8 +1250,14 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int disconnect(double shutdown_timeout, double localwait, error_code& ec)
     {
+        if (!threads::get_self_ptr()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+                "this function can be called from an HPX thread only");
+            return -1;
+        }
+
         if (!is_running()) {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
                 "the runtime system is not active (did you already "
                 "call finalize?)");
             return -1;
@@ -1283,6 +1295,12 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     void terminate()
     {
+        if (!threads::get_self_ptr()) {
+            HPX_THROWS_IF(ec, invalid_status, "hpx::terminate",
+                "this function can be called from an HPX thread only");
+            return -1;
+        }
+
         components::server::runtime_support* p =
             reinterpret_cast<components::server::runtime_support*>(
                   get_runtime().get_runtime_support_lva());
