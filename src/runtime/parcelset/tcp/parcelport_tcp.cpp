@@ -602,8 +602,8 @@ namespace hpx { namespace parcelset { namespace tcp
         bool has_certificate = false;
         archive >> has_certificate;
 
-        components::security::signed_certificate certificate;
         if (has_certificate) {
+            components::security::signed_certificate certificate;
             archive >> certificate;
             add_locality_certificate(certificate);
             if (first_message)
