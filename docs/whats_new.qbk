@@ -16,7 +16,12 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 854] - hpx/hpx.hpp does not include hpx/include/iostreams.hpp
+* [issue 853] - Feature request: null future
+* [issue 851] - hpx::cout output does not appear on screen 
+* [issue 846] - Update hpx_external_example
 * [issue 845] - Issues with having both debug and release modules in the same directory
+* [issue 844] - Create configuration header
 * [issue 843] - Tests should use CTest
 * [issue 842] - Remove buffer_pool from MPI parcelport
 * [issue 841] - Add possibility to broadcast an index with hpx::lcos::broadcast
