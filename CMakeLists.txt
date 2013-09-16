@@ -711,7 +711,16 @@ if(HPX_NATIVE_MIC)
 endif()
 
 if(MSVC)
-  hpx_add_config_define(HPX_BUILD_TYPE "$(Configuration)")
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    hpx_add_config_define(HPX_BUILD_TYPE debug)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    hpx_add_config_define(HPX_BUILD_TYPE relwithdebinfo)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+    hpx_add_config_define(HPX_BUILD_TYPE minsizerel)
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    hpx_add_config_define(HPX_BUILD_TYPE release)
+  endif()
+
   foreach(language CXX C Fortran)
     set(CMAKE_${language}_FLAGS_DEBUG
         "${CMAKE_${language}_FLAGS_DEBUG} -D_DEBUG")

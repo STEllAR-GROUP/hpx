@@ -120,7 +120,7 @@ if(MSVC)
       DEPENDS ${switch_to_fiber_source})
     set(hpx_external_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
       CACHE INTERNAL "External object files for HPX." FORCE)
-    hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION)
+    hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION 1)
   endif()
 endif()
 
