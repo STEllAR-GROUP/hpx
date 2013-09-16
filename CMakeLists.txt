@@ -164,7 +164,6 @@ else()
 endif()
 if(HPX_USE_GENERIC_COROUTINE_CONTEXT)
   if(${BOOST_MINOR_VERSION} GREATER 50)
-    #hpx_add_definitions("-DHPX_HAVE_GENERIC_CONTEXT_COROUTINES=1")
     hpx_add_config_define(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
     set(BOOST_LIBRARIES ${BOOST_LIBRARIES} context)
   else()
@@ -988,14 +987,14 @@ if(MSVC)
   ##############################################################################
   # Macro definitions for system headers
   ##############################################################################
-  hpx_add_definitions(-D_WINDOWS)
-  hpx_add_definitions(-D_WIN32)
-  hpx_add_definitions(-D_WIN32_WINNT=0x0601)
-  hpx_add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-  hpx_add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  hpx_add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
-  hpx_add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-  hpx_add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
+  hpx_add_config_define(_WINDOWS)
+  hpx_add_config_define(_WIN32)
+  hpx_add_config_define(_WIN32_WINNT 0x0601)
+  hpx_add_config_define(_SCL_SECURE_NO_WARNINGS)
+  hpx_add_config_define(_CRT_SECURE_NO_WARNINGS)
+  hpx_add_config_define(_SCL_SECURE_NO_DEPRECATE)
+  hpx_add_config_define(_CRT_SECURE_NO_DEPRECATE)
+  hpx_add_config_define(_CRT_NONSTDC_NO_WARNINGS)
 
   ##############################################################################
   # Boost
@@ -1004,10 +1003,10 @@ if(MSVC)
   set(BOOST_FOUND_LIBRARIES "")
   set(BOOST_serialization_LIBRARY "")
 
-  hpx_add_definitions(-DBOOST_USE_WINDOWS_H)
-  hpx_add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
-  hpx_add_definitions(-DHPX_HAVE_FIBER_BASED_COROUTINES)
-  hpx_add_definitions(-DPSAPI_VERSION=1)
+  hpx_add_config_define(BOOST_USE_WINDOWS_H)
+  hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
+  hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
+  hpx_add_config_define(PSAPI_VERSION 1)
 
 ################################################################################
 # GCC-compatible compiler configuration

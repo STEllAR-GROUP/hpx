@@ -97,7 +97,7 @@
      make copyable.
 */
 
-#if HPX_HAVE_GENERIC_CONTEXT_COROUTINES != 0
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
 #if BOOST_VERSION >= 105100
 
