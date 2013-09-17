@@ -18,7 +18,8 @@ set(function_argument_limit_preprocessing_files
   "hpx/util/detail/vtable_ptr.hpp"
   "hpx/util/detail/vtable_ptr_base.hpp"
   "hpx/util/bind.hpp"
-  "hpx/util/bind_action.hpp")
+  "hpx/util/bind_action.hpp"
+  "hpx/util/invoke.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_FUNCTION_ARGUMENT_LIMIT)
 endforeach()

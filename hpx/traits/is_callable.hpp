@@ -18,6 +18,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/util/detail/qualify_as.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/function_types/components.hpp>
@@ -56,40 +57,6 @@ namespace hpx { namespace traits
 {
     namespace detail
     {
-        // creates a type `T` with the (cv-ref)qualifiers of `U`
-        template <typename T, typename U>
-        struct qualify_as
-        {
-            typedef T type;
-        };
-
-        template <typename T, typename U>
-        struct qualify_as<T, U&>
-        {
-            typedef typename qualify_as<T, U>::type& type;
-        };
-        template <typename T, typename U>
-        struct qualify_as<T, BOOST_FWD_REF(U)>
-        {
-            typedef BOOST_FWD_REF(HPX_UTIL_STRIP((typename qualify_as<T, U>::type))) type;
-        };
-    
-        template <typename T, typename U>
-        struct qualify_as<T, U const>
-        {
-            typedef typename qualify_as<T, U>::type const type;
-        };
-        template <typename T, typename U>
-        struct qualify_as<T, U volatile>
-        {
-            typedef typename qualify_as<T, U>::type volatile type;
-        };
-        template <typename T, typename U>
-        struct qualify_as<T, U const volatile>
-        {
-            typedef typename qualify_as<T, U>::type const volatile type;
-        };
-
         struct fallback_call
         {
             fallback_call const& operator,(int) const volatile;
@@ -120,7 +87,7 @@ namespace hpx { namespace traits
         /**/
 
         BOOST_PP_REPEAT(HPX_FUNCTION_ARGUMENT_LIMIT
-          , HPX_TRAITS_DECL_FALLBACK, ~);
+          , HPX_TRAITS_DECL_FALLBACK, _);
 
 #       undef HPX_TRAITS_DECL_FALLBACK
 
@@ -199,7 +166,7 @@ namespace hpx { namespace traits
         template <typename F BOOST_PP_ENUM_TRAILING_PARAMS(n, typename T)>      \
         struct is_callable_impl<F BOOST_PP_ENUM_TRAILING_PARAMS(n, T)>          \
         {                                                                       \
-            typedef typename qualify_as<                                        \
+            typedef typename util::detail::qualify_as<                          \
                     detail::callable_wrapper<F, n>, F                           \
                 >::type callable_wrapper;                                       \
             typedef char (&no_type)[1];                                         \
@@ -219,7 +186,7 @@ namespace hpx { namespace traits
         /**/
 
         BOOST_PP_REPEAT(HPX_FUNCTION_ARGUMENT_LIMIT
-          , HPX_TRAITS_DECL_IS_CALLABLE_IMPL, ~);
+          , HPX_TRAITS_DECL_IS_CALLABLE_IMPL, _);
 
 #       undef HPX_TRAITS_DECL_IS_CALLABLE_IMPL
     }
@@ -385,7 +352,7 @@ namespace hpx { namespace traits { namespace detail
     /**/
     
     BOOST_PP_REPEAT(HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION, ~);
+      , HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION, _);
 
 #   undef HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION
 }}}
