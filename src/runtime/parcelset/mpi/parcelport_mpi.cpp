@@ -4,9 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <mpi.h>
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -86,7 +88,8 @@ namespace hpx { namespace parcelset { namespace mpi
     {
         io_service_pool_.run(false);    // start pool
 
-        acceptor_.run(util::mpi_environment::communicator());
+        MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
+        acceptor_.run(communicator_);
         do_background_work();      // schedule message handler
 
         if (blocking)
@@ -145,8 +148,6 @@ namespace hpx { namespace parcelset { namespace mpi
     {
         detail::handling_messages hm(handling_messages_);       // reset on exit
 
-        MPI_Comm communicator = util::mpi_environment::communicator();
-
         bool bootstrapping = hpx::is_starting();
         bool has_work = true;
 
@@ -164,7 +165,7 @@ namespace hpx { namespace parcelset { namespace mpi
                 std::pair<bool, header> next(acceptor_.next_header());
                 if(next.first)
                 {
-                    receivers_.push_back(boost::make_shared<receiver>(next.second, communicator, *this));
+                    receivers_.push_back(boost::make_shared<receiver>(next.second, communicator_, *this));
                     ++num_requests;
                 }
             }
@@ -188,7 +189,7 @@ namespace hpx { namespace parcelset { namespace mpi
             using HPX_STD_PLACEHOLDERS::_1;
             senders_.splice(senders_.end(), parcel_cache_.get_senders(
                 HPX_STD_BIND(&parcelport::get_next_tag, this->shared_from_this(), _1),
-                communicator, *this, num_requests, max_requests_));
+                communicator_, *this, num_requests, max_requests_));
 
             // handle all send requests
             for(senders_type::iterator it = senders_.begin(); it != senders_.end(); /**/)
@@ -232,6 +233,13 @@ namespace hpx { namespace parcelset { namespace mpi
                 nanosleep( &rqtp, 0 );
 #endif
             }
+        }
+
+        if(stopped_ == true)
+        {
+            MPI_Comm communicator = communicator_;
+            communicator_ = 0;
+            MPI_Comm_free(&communicator);
         }
     }
 

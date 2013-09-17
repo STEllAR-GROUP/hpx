@@ -13,13 +13,6 @@
 #  error Boost.Config does not detect C++11 mode for this compiler. Please set BOOST_COMPILER_CONFIG="hpx/config/boost/compiler/intel.hpp"
 #endif
 
-#if defined(HPX_HAVE_PARCELPORT_MPI) && defined(HPX_EXPORTS)
-// Intel MPI requires this to be included before anything else
-#  include <mpi.h>
-#else
-#  undef HPX_HAVE_PARCELPORT_MPI
-#endif
-
 #include <hpx/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>

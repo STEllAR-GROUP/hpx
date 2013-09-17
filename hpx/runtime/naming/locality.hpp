@@ -7,11 +7,11 @@
 #if !defined(HPX_NAMING_LOCALITY_MAR_24_2008_0942AM)
 #define HPX_NAMING_LOCALITY_MAR_24_2008_0942AM
 
-#include <hpx/config.hpp>
-
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/util/mpi_environment.hpp>
 #endif
+
+#include <hpx/config.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>

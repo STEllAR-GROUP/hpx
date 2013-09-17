@@ -7,6 +7,7 @@
 #if !defined(HPX_PARCELSET_MPI_PARCELPORT_HPP)
 #define HPX_PARCELSET_MPI_PARCELPORT_HPP
 
+#include <mpi.h>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/mpi/parcel_cache.hpp>
@@ -158,6 +159,7 @@ namespace hpx { namespace parcelset { namespace mpi
             return true;
         }
 
+        MPI_Comm communicator_;
         // handle messages
         acceptor acceptor_;
 

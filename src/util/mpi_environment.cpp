@@ -3,9 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
+#include <mpi.h>
+#include <hpx/config.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -40,7 +42,7 @@ namespace hpx { namespace util
         }
     }
 
-    MPI_Comm mpi_environment::communicator_ = 0;
+    bool mpi_environment::enabled_ = false;
 
     int mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
     {
@@ -51,15 +53,14 @@ namespace hpx { namespace util
                 cfg.rtcfg_.get_entry("hpx.parcel.mpi.enable", "1")
             );
 
-        enable_mpi = enable_mpi && detail::detect_mpi_environment(cfg.rtcfg_);
-        if(!enable_mpi) return -1;
+        enabled_ = enable_mpi && detail::detect_mpi_environment(cfg.rtcfg_);
+        if(!enabled_) return -1;
 
         cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
 
         int this_rank = -1;
 
         MPI_Init(argc, argv);
-        MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
 
         char name[MPI_MAX_PROCESSOR_NAME+1] = { '\0' };
         int len = 0;
@@ -89,28 +90,20 @@ namespace hpx { namespace util
     {
         if(enabled())
         {
-            MPI_Comm communicator = communicator_;
-            communicator_ = 0;
-            MPI_Comm_free(&communicator);
             MPI_Finalize();
         }
     }
 
-    MPI_Comm &mpi_environment::communicator()
-    {
-        return communicator_;
-    }
-
     bool mpi_environment::enabled()
     {
-        return communicator_ != 0;
+        return enabled_;
     }
 
     int mpi_environment::size()
     {
         int res(-1);
         if(enabled())
-            MPI_Comm_size(communicator_, &res);
+            MPI_Comm_size(MPI_COMM_WORLD, &res);
         return res;
     }
 
@@ -118,7 +111,7 @@ namespace hpx { namespace util
     {
         int res(-1);
         if(enabled())
-            MPI_Comm_rank(communicator_, &res);
+            MPI_Comm_rank(MPI_COMM_WORLD, &res);
         return res;
     }
 }}

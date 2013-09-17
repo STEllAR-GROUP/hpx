@@ -6,10 +6,9 @@
 #ifndef HPX_UTIL_MPI_ENV_HPP
 #define HPX_UTIL_MPI_ENV_HPP
 
-#include <hpx/config.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-
 #include <hpx/hpx_fwd.hpp>
 #include <cstdlib>
 
@@ -20,13 +19,12 @@ namespace hpx { namespace util {
     {
         static int init(int *argc, char ***argv, command_line_handling& cfg);
         static void finalize();
-        static MPI_Comm &communicator();
         static bool enabled();
 
         static int rank();
         static int size();
     private:
-        static MPI_Comm communicator_;
+        static bool enabled_;
     };
 }}
 
