@@ -8,7 +8,7 @@
 
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
-#include <boost/move/core.hpp>
+#include <boost/move/move.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
