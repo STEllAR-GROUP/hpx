@@ -1293,12 +1293,12 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void terminate()
+    void terminate(error_code& ec)
     {
         if (!threads::get_self_ptr()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::terminate",
                 "this function can be called from an HPX thread only");
-            return -1;
+            return;
         }
 
         components::server::runtime_support* p =

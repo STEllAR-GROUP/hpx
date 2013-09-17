@@ -467,7 +467,7 @@ namespace hpx
     ///                     runtime system will not support any of the default
     ///                     command line options as described in the section
     ///                     'HPX Command Line Options'.
-    inline int init(std::vector<std::string> const& cfg, 
+    inline int init(std::vector<std::string> const& cfg,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \fn int init(int (*f)(boost::program_options::variables_map& vm), std::string const& app_name, int argc, char* argv[])
@@ -510,7 +510,7 @@ namespace hpx
 
 #ifndef DOXYGEN
 ///////////////////////////////////////////////////////////////////////////////
-// Pull in the implementation of the inlined hpx::init functions if we're not 
+// Pull in the implementation of the inlined hpx::init functions if we're not
 // compiling the core HPX library.
 #if !defined(HPX_EXPORTS)
 #  include <hpx/hpx_init_impl.hpp>

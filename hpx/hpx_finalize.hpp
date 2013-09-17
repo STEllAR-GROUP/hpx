@@ -107,9 +107,20 @@ namespace hpx
     /// application immediately. It can be called from any locality and will
     /// terminate all localities currently used by the application.
     ///
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    ///
     /// \note    This function will cause HPX to call `std::terminate()` on
-    ///          all localities associated with this application.
-    HPX_EXPORT void terminate();
+    ///          all localities associated with this application. If the function
+    ///          is called not from an HPX thread it will fail and return an error
+    ///          using the argument \a ec.
+    HPX_EXPORT void terminate(error_code& ec = throws);
 
     /// \brief Disconnect this locality from the application.
     ///
