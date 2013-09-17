@@ -153,4 +153,6 @@ int main(int argc, char* argv[])
 {
     // run local tests
     run_local_tests();
+    
+    return hpx::util::report_errors();
 }

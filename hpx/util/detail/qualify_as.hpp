@@ -6,45 +6,70 @@
 #ifndef HPX_UTIL_DETAIL_QUALIFY_AS_HPP
 #define HPX_UTIL_DETAIL_QUALIFY_AS_HPP
 
+#include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/move/move.hpp>
 
+#include <boost/ref.hpp>
+
+#include <boost/type_traits/add_const.hpp>
+#include <boost/type_traits/add_cv.hpp>
+#include <boost/type_traits/add_volatile.hpp>
+#include <boost/type_traits/add_reference.hpp>
+
+#include <boost/utility/enable_if.hpp>
+
 namespace hpx { namespace util { namespace detail
 {
-    // creates a type `T` with the (cv-ref)qualifiers of `U`
     template <typename T, typename U>
-    struct qualify_as
+    struct qualify_as_impl
     {
         typedef T type;
     };
-
-    template <typename T, typename U>
-    struct qualify_as<T, U&>
-    {
-        typedef typename qualify_as<T, U>::type& type;
-    };
-    template <typename T, typename U>
-    struct qualify_as<T, BOOST_FWD_REF(U)>
-    {
-        typedef BOOST_FWD_REF(HPX_UTIL_STRIP((typename qualify_as<T, U>::type))) type;
-    };
     
     template <typename T, typename U>
-    struct qualify_as<T, U const>
-    {
-        typedef typename qualify_as<T, U>::type const type;
-    };
+    struct qualify_as_impl<T, U const>
+      : boost::add_const<typename qualify_as_impl<T, U>::type >
+    {};
+
     template <typename T, typename U>
-    struct qualify_as<T, U volatile>
-    {
-        typedef typename qualify_as<T, U>::type volatile type;
-    };
+    struct qualify_as_impl<T, U volatile>
+      : boost::add_volatile<typename qualify_as_impl<T, U>::type >
+    {};
+
     template <typename T, typename U>
-    struct qualify_as<T, U const volatile>
+    struct qualify_as_impl<T, U const volatile>
+      : boost::add_cv<typename qualify_as_impl<T, U>::type >
+    {};
+
+    template <typename T, typename U>
+    struct qualify_as_impl<T, U&>
+      : boost::add_reference<typename qualify_as_impl<T, U>::type>
+    {};
+
+    template <typename T, typename U>
+    struct qualify_as_impl<T, BOOST_FWD_REF(U)>
     {
-        typedef typename qualify_as<T, U>::type const volatile type;
+        typedef BOOST_FWD_REF(HPX_UTIL_STRIP((typename qualify_as_impl<T, U>::type))) type;
     };
+    
+    ///////////////////////////////////////////////////////////////////////////
+    /// creates a type `T` with the (cv-ref)qualifiers of `U`
+    template <typename T, typename U, typename Enable = void>
+    struct qualify_as
+      : qualify_as_impl<T, U>
+    {};
+
+    template <typename T, typename U>
+    struct qualify_as<T, U
+      , typename boost::enable_if<
+            boost::is_reference_wrapper<typename util::decay<U>::type>>::type>
+      : qualify_as_impl<
+            T
+          , typename boost::unwrap_reference<typename util::decay<U>::type>::type&
+        >
+    {};
 }}}
 
 #endif
