@@ -10,10 +10,12 @@
 #define HPX_FUNCTION_DETAIL_VTABLE_HPP
 
 #include <hpx/config/forceinline.hpp>
-#include <boost/ref.hpp>
+#include <hpx/util/invoke.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_binary_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 
 #include <typeinfo>
 
@@ -199,7 +201,7 @@ namespace hpx { namespace util { namespace detail {
         template <
             typename Functor
           , typename R
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
           , typename IArchive
           , typename OArchive
         >
@@ -225,68 +227,9 @@ namespace hpx { namespace util { namespace detail {
             }
 
             BOOST_FORCEINLINE static R
-            invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            invoke(void ** f BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, a))
             {
-                return invoke_(f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a), typename boost::is_reference_wrapper<Functor>::type());
-            }
-
-            BOOST_FORCEINLINE static R
-            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::true_)
-            {
-                return (*reinterpret_cast<Functor*>(f)).get()(BOOST_PP_ENUM_PARAMS(N, a));
-            }
-            BOOST_FORCEINLINE static R
-            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::false_)
-            {
-                return (*reinterpret_cast<Functor*>(f))(BOOST_PP_ENUM_PARAMS(N, a));
-            }
-        };
-
-        template <
-            typename Functor
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-          , typename IArchive
-          , typename OArchive
-        >
-        struct type<
-            Functor
-          , void(BOOST_PP_ENUM_PARAMS(N, A))
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
-        {
-            static vtable_ptr_base<
-                void(BOOST_PP_ENUM_PARAMS(N, A))
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(BOOST_PP_ENUM_PARAMS(N, A))
-                    >::template get<IArchive, OArchive>();
-            }
-
-            static
-            BOOST_FORCEINLINE void
-            invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
-            {
-                invoke_(f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a), typename boost::is_reference_wrapper<Functor>::type());
-            }
-
-            static
-            BOOST_FORCEINLINE void
-            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::true_)
-            {
-                (*reinterpret_cast<Functor*>(f)).get()(BOOST_PP_ENUM_PARAMS(N, a));
-            }
-            static
-            BOOST_FORCEINLINE void
-            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::false_)
-            {
-                (*reinterpret_cast<Functor*>(f))(BOOST_PP_ENUM_PARAMS(N, a));
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) BOOST_PP_ENUM_TRAILING_PARAMS(N, a));
             }
         };
 
@@ -297,7 +240,7 @@ namespace hpx { namespace util { namespace detail {
         template <
             typename Functor
           , typename R
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+          BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
           , typename IArchive
           , typename OArchive
         >
@@ -323,68 +266,9 @@ namespace hpx { namespace util { namespace detail {
             }
 
             BOOST_FORCEINLINE static R
-            invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+            invoke(void ** f BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, a))
             {
-                return invoke_(f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a), typename boost::is_reference_wrapper<Functor>::type());
-            }
-
-            BOOST_FORCEINLINE static R
-            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::true_)
-            {
-                return (**reinterpret_cast<Functor**>(f)).get()(BOOST_PP_ENUM_PARAMS(N, a));
-            }
-            BOOST_FORCEINLINE static R
-            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::false_)
-            {
-                return (**reinterpret_cast<Functor**>(f))(BOOST_PP_ENUM_PARAMS(N, a));
-            }
-        };
-
-        template <
-            typename Functor
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-          , typename IArchive
-          , typename OArchive
-        >
-        struct type<
-            Functor
-          , void(BOOST_PP_ENUM_PARAMS(N, A))
-          , IArchive
-          , OArchive
-        >
-            : type_base<Functor>
-        {
-            static vtable_ptr_base<
-                void(BOOST_PP_ENUM_PARAMS(N, A))
-              , IArchive
-              , OArchive
-            > *get_ptr()
-            {
-                return
-                    get_table<
-                        Functor
-                      , void(BOOST_PP_ENUM_PARAMS(N, A))
-                    >::template get<IArchive, OArchive>();
-            }
-
-            static
-            BOOST_FORCEINLINE void
-            invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
-            {
-                invoke_(f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a), typename boost::is_reference_wrapper<Functor>::type());
-            }
-
-            static
-            BOOST_FORCEINLINE void
-            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::true_)
-            {
-                (**reinterpret_cast<Functor**>(f)).get()(BOOST_PP_ENUM_PARAMS(N, a));
-            }
-            static
-            BOOST_FORCEINLINE void
-            invoke_(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a), boost::mpl::false_)
-            {
-                (**reinterpret_cast<Functor**>(f))(BOOST_PP_ENUM_PARAMS(N, a));
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f)) BOOST_PP_ENUM_TRAILING_PARAMS(N, a));
             }
         };
 

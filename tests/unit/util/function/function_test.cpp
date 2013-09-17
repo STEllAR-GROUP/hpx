@@ -581,27 +581,27 @@ struct X {
     int value;
 };
 
-//static void
-//    test_member_functions()
-//{
-//    hpx::util::function_nonser<int (X*)> f1(&X::twice);
-//
-//    X one(1);
-//    X five(5);
-//
-//    HPX_TEST(f1(&one) == 2);
-//    HPX_TEST(f1(&five) == 10);
-//
-//    hpx::util::function_nonser<int (X*)> f1_2;
-//    f1_2 = &X::twice;
-//
-//    HPX_TEST(f1_2(&one) == 2);
-//    HPX_TEST(f1_2(&five) == 10);
-//
-//    hpx::util::function_nonser<int (X&, int)> f2(&X::plus);
-//    HPX_TEST(f2(one, 3) == 4);
-//    HPX_TEST(f2(five, 4) == 9);
-//}
+static void
+    test_member_functions()
+{
+    hpx::util::function_nonser<int (X*)> f1(&X::twice);
+
+    X one(1);
+    X five(5);
+
+    HPX_TEST(f1(&one) == 2);
+    HPX_TEST(f1(&five) == 10);
+
+    hpx::util::function_nonser<int (X*)> f1_2;
+    f1_2 = &X::twice;
+
+    HPX_TEST(f1_2(&one) == 2);
+    HPX_TEST(f1_2(&five) == 10);
+
+    hpx::util::function_nonser<int (X&, int)> f2(&X::plus);
+    HPX_TEST(f2(one, 3) == 4);
+    HPX_TEST(f2(five, 4) == 9);
+}
 
 struct add_with_throw_on_copy {
     int operator()(int x, int y) const { return x+y; }
@@ -788,7 +788,7 @@ int main(int, char* [])
     test_one_arg();
     test_two_args();
     test_emptiness();
-//    test_member_functions();
+    test_member_functions();
     test_ref();
     test_empty_ref();
     test_exception();
