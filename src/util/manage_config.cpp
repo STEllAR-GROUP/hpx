@@ -36,6 +36,9 @@ namespace hpx { namespace util
         {
             std::string::size_type p = s.find_last_of("=");
             std::string key(trim_whitespace(s.substr(0, p)));
+            if (key[key.size()-1] == '!')
+                key.erase(key.size()-1);
+
             std::string value(trim_whitespace(s.substr(p+1)));
             config_.insert(map_type::value_type(key, value));
         }
