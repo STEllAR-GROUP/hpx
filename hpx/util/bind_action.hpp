@@ -21,7 +21,6 @@
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
-#include <boost/fusion/include/fused.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_UTIL_BIND_EVAL(Z, N, D)                                           \

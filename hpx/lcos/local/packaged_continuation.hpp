@@ -133,13 +133,9 @@ namespace hpx { namespace lcos { namespace detail
                 started_ = true;
             }
 
-            //! MSVC needs this or it deduces a free function
-            hpx::threads::thread_state_enum (continuation_base::*mem_fun)(hpx::lcos::future<Result> &) =
-                &continuation_base::async_impl<Result>; 
-
             future_base_type this_(this);
             applier::register_thread_plain(
-                HPX_STD_BIND(mem_fun, this_, f),
+                HPX_STD_BIND(&continuation_base::async_impl<Result>, this_, f),
                 "continuation_base::async");
 
             if (&ec != &throws)
@@ -160,13 +156,9 @@ namespace hpx { namespace lcos { namespace detail
                 started_ = true;
             }
 
-            //! MSVC needs this or it deduces a free function
-            hpx::threads::thread_state_enum (continuation_base::*mem_fun)(hpx::lcos::future<Result> &) =
-                &continuation_base::async_impl<Result>; 
-
             future_base_type this_(this);
             sched.add(
-                HPX_STD_BIND(mem_fun, this_, f),
+                HPX_STD_BIND(&continuation_base::async_impl<Result>, this_, f),
                 "continuation_base::async");
 
             if (&ec != &throws)

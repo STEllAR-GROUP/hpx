@@ -16,7 +16,6 @@ set(tests
    )
 
 set(subdirs
-    bind
     function
    )
 
