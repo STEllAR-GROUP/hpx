@@ -225,16 +225,18 @@ class process_group(object):
               self._poller.control([select.kevent(fd,select.KQ_FILTER_READ,
                                                   select.KQ_EV_DELETE)],0)
               not_done.pop(fd)
+            
+            if callable(callback):
+              callback(fd, self._members[fd])
 
           if OS_LIN:
             for fd, flags in ready:
               self._poller.unregister(fd)
               not_done.pop(fd)
-          
+            
+            if callable(callback):
+              callback(fd, self._members[fd])
 
-          if callable(callback):
-            callback(fd, self._members[fd])
-  
           if 0 == len(not_done):
             return
 
