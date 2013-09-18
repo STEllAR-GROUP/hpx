@@ -32,6 +32,8 @@ namespace hpx { namespace components
         struct make_stub
         {
             typedef components::stub_base<Stub> type;
+            typedef typename components::stub_base<Stub>::server_component_type
+                server_component_type;
         };
 
         template <typename Stub>
@@ -39,6 +41,7 @@ namespace hpx { namespace components
             typename boost::enable_if<has_server_component_type<Stub> >::type>
         {
             typedef Stub type;
+            typedef Stub server_component_type;
         };
     }
 
@@ -54,6 +57,9 @@ namespace hpx { namespace components
         typedef future<naming::id_type> future_type;
 
     public:
+        typedef typename detail::make_stub<Stub>::server_component_type
+            server_component_type;
+
         client_base()
           : gid_()
         {}
