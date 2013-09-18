@@ -78,6 +78,11 @@ namespace hpx { namespace components
 
 }}
 
+namespace hpx
+{
+    using hpx::components::new_;
+}
+
 #endif // HPX_NEW_OCT_10_2012_1256PM
 
 #else  // BOOST_PP_IS_ITERATING
