@@ -36,5 +36,7 @@
 
 #include <hpx/runtime/components/new.hpp>
 
+#include <hpx/runtime/get_ptr.hpp>
+
 #endif
 

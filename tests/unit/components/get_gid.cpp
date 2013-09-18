@@ -8,6 +8,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 using hpx::components::stub_base;
 using hpx::components::client_base;
@@ -22,7 +23,7 @@ struct test_server : managed_component_base<test_server>
     void check_gid() const
     {
         hpx::id_type id = get_gid();
-        BOOST_ASSERT(hpx::invalid_id != id);
+        HPX_TEST_NEQ(hpx::invalid_id, id);
     }
 
     HPX_DEFINE_COMPONENT_CONST_ACTION(test_server, check_gid, check_gid_action);
@@ -46,9 +47,10 @@ int main()
     test_client t;
 
     t.create(find_here());
+    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_gid());
 
     t.check_gid();
 
-    return 0;
+    return hpx::util::report_errors();
 }
 

@@ -4,13 +4,18 @@
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    remote_object
     get_gid
+    get_ptr
+    remote_object
    )
 
 set(remote_object_FLAGS
     DEPENDENCIES iostreams_component remote_object_component)
 set(remote_object_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 2)
+
+set(get_ptr_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
 
@@ -38,5 +43,6 @@ foreach(test ${tests})
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.components.${test}
                               ${test}_test_exe)
+
 endforeach()
 

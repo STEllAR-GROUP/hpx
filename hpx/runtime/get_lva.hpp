@@ -7,13 +7,13 @@
 #if !defined(HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM)
 #define HPX_RUNTIME_GET_LVA_JUN_22_2008_0451PM
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/address.hpp>
+
 #include <boost/mpl/or.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
 #include <boost/type_traits/add_const.hpp>
-
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/naming/address.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -47,15 +47,17 @@ namespace hpx
             >
         {};
 
+        template <typename Address>
         static Component*
-        call(naming::address::address_type lva, boost::mpl::false_)
+        call(Address lva, boost::mpl::false_)
         {
             typedef typename Component::wrapping_type wrapping_type;
             return reinterpret_cast<wrapping_type*>(lva)->get_checked();
         }
 
+        template <typename Address>
         static Component*
-        call(naming::address::address_type lva, boost::mpl::true_)
+        call(Address lva, boost::mpl::true_)
         {
             return reinterpret_cast<Component*>(lva);
         }

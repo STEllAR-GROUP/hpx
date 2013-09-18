@@ -86,11 +86,7 @@ namespace hpx { namespace components
         return capability();
     }
 #endif
-}}
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components
-{
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     inline component_type get_component_type()
