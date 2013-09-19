@@ -130,7 +130,7 @@ namespace hpx { namespace traits
                 BOOST_PP_ENUM_TRAILING_PARAMS(n, P)) const volatile;            \
             R operator()(C&                                                     \
                 BOOST_PP_ENUM_TRAILING_PARAMS(n, P)) const volatile;            \
-            R operator()(boost::reference_wrapper<C>                            \
+            R operator()(BOOST_RV_REF(C)                                        \
                 BOOST_PP_ENUM_TRAILING_PARAMS(n, P)) const volatile;            \
         };                                                                      \
                                                                                 \
@@ -148,7 +148,7 @@ namespace hpx { namespace traits
                 BOOST_PP_ENUM_TRAILING_PARAMS(n, P)) const volatile;            \
             R operator()(C const&                                               \
                 BOOST_PP_ENUM_TRAILING_PARAMS(n, P)) const volatile;            \
-            R operator()(boost::reference_wrapper<C const>                      \
+            R operator()(BOOST_RV_REF(C const)                                  \
                 BOOST_PP_ENUM_TRAILING_PARAMS(n, P)) const volatile;            \
         };                                                                      \
         /**/
@@ -213,9 +213,11 @@ namespace hpx { namespace traits
     {};
 }}
 
-#elif BOOST_VERSION < 105200 // C++11
+#else // C++11
 
 #include <hpx/util/always_void.hpp>
+
+#include <boost/mem_fn.hpp>
 
 #include <boost/mpl/bool.hpp>
 
@@ -238,88 +240,10 @@ namespace hpx { namespace traits
         > : boost::mpl::true_
         {};
 
-        template <typename T, typename C>
-        struct is_callable_impl<T, void(C)
-            , typename util::always_void<
-                  decltype((boost::declval<C>().*boost::declval<T>()))
-              >::type
-        > : boost::mpl::true_
-        {};
-        template <typename T, typename C>
-        struct is_callable_impl<T, void(C)
-            , typename util::always_void<
-                  decltype((boost::declval<C>()->*boost::declval<T>()))
-              >::type
-        > : boost::mpl::true_
-        {};
-
-        template <typename T, typename C, typename... A>
-        struct is_callable_impl<T, void(C, A...)
-            , typename util::always_void<
-                  decltype((boost::declval<C>()
-                              .*boost::declval<T>())(boost::declval<A>()...))
-              >::type
-        > : boost::mpl::true_
-        {};
-        template <typename T, typename C, typename... A>
-        struct is_callable_impl<T, void(C, A...)
-            , typename util::always_void<
-                  decltype((boost::declval<C>()
-                              ->*boost::declval<T>())(boost::declval<A>()...))
-              >::type
-        > : boost::mpl::true_
-        {};
-    }
-
-    template <typename T, typename... A>
-    struct is_callable
-      : detail::is_callable_impl<T, void(A...)>
-    {};
-}}
-
-#else // C++14
-
-#include <hpx/util/always_void.hpp>
-
-#include <boost/mpl/bool.hpp>
-
-#include <boost/type_traits/add_rvalue_reference.hpp>
-
-#include <boost/utility/declval.hpp>
-#include <boost/utility/result_of.hpp>
-
-namespace hpx { namespace traits
-{
-    namespace detail
-    {
-        template <typename T, typename Args, typename Enable = void>
-        struct is_callable_impl
-          : boost::mpl::false_
-        {};
-
         template <typename T, typename... A>
         struct is_callable_impl<T, void(A...)
-          , typename util::always_void<
-                typename boost::result_of<
-                    typename boost::add_rvalue_reference<T>::type(A...)
-                >::type
-            >::type
-        > : boost::mpl::true_
-        {};
-
-        // Note: boost::result_of differs form std::result_of,
-        // ignoring member-object-ptrs
-        template <typename T, typename C>
-        struct is_callable_impl<T, void(C)
             , typename util::always_void<
-                  decltype((boost::declval<C>().*boost::declval<T>()))
-              >::type
-        > : boost::mpl::true_
-        {};
-        template <typename T, typename C>
-        struct is_callable_impl<T, void(C)
-            , typename util::always_void<
-                  decltype((boost::declval<C>()->*boost::declval<T>()))
+                  decltype(boost::mem_fn(boost::declval<T>())(boost::declval<A>()...))
               >::type
         > : boost::mpl::true_
         {};
