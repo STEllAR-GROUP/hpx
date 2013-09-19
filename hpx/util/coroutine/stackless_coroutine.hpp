@@ -203,6 +203,7 @@ namespace hpx { namespace util { namespace coroutines
         BOOST_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
         {
             reset_on_exit on_exit = reset_on_exit(*this);
+            (void)on_exit;
 
             result_type result = f_(arg0);   // invoke wrapped function
 
