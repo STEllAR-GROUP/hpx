@@ -51,6 +51,30 @@ HPX_THROWS_IF                         "" "HPX_THROWS_IF"
 error_code                            "" "hpx\.error_code"
 exception                             "" "hpx\.exception"
 
+throwmode                             "" "header\.hpx\.exception_hpp"
+throws                                "" "header\.hpx\.exception_hpp"
+
+make_error_code                       "" "header\.hpx\.exception_hpp"
+make_success_code                     "" "header\.hpx\.exception_hpp"
+
+diagnostic_information                "" "hpx\.diagnostic_information.*"
+get_error_locality_id                 "" "hpx\.get_error_locality_id.*"
+get_error_error                       "" "hpx\.get_error_error.*"
+get_error_host_name                   "" "hpx\.get_error_host_name.*"
+get_error_process_id                  "" "hpx\.get_error_process_id.*"
+get_error_function_name               "" "hpx\.get_error_function_name.*"
+get_error_file_name                   "" "hpx\.get_error_file_name.*"
+get_error_line_number                 "" "hpx\.get_error_line_number.*"
+get_error_os_thread                   "" "hpx\.get_error_os_thread.*"
+get_error_thread_id                   "" "hpx\.get_error_thread_id.*"
+get_error_thread_description          "" "hpx\.get_error_thread_description.*"
+get_error_backtrace                   "" "hpx\.get_error_backtrace.*"
+get_error_what                        "" "hpx\.get_error_what.*"
+get_error_env                         "" "hpx\.get_error_env.*"
+get_error_config                      "" "hpx\.get_error_config.*"
+
+
+# hpx/error.hpp
 error                                 "" "hpx\.error"
 success                               "" "hpx\.error"
 no_success                            "" "hpx\.error"
@@ -103,28 +127,11 @@ duplicate_component_id                "" "hpx\.error"
 unknown_error                         "" "hpx\.error"
 bad_plugin_type                       "" "hpx\.error"
 filesystem_error                      "" "hpx\.error"
+bad_function_call                     "" "hpx\.error"
+security_error                        "" "hpx\.error"
 
-throwmode                             "" "header\.hpx\.exception_hpp"
-throws                                "" "header\.hpx\.exception_hpp"
-
-make_error_code                       "" "header\.hpx\.exception_hpp"
-make_success_code                     "" "header\.hpx\.exception_hpp"
-
-diagnostic_information                "" "hpx\.diagnostic_information.*"
-get_error_locality_id                 "" "hpx\.get_error_locality_id.*"
-get_error_error                       "" "hpx\.get_error_error.*"
-get_error_host_name                   "" "hpx\.get_error_host_name.*"
-get_error_process_id                  "" "hpx\.get_error_process_id.*"
-get_error_function_name               "" "hpx\.get_error_function_name.*"
-get_error_file_name                   "" "hpx\.get_error_file_name.*"
-get_error_line_number                 "" "hpx\.get_error_line_number.*"
-get_error_os_thread                   "" "hpx\.get_error_os_thread.*"
-get_error_thread_id                   "" "hpx\.get_error_thread_id.*"
-get_error_thread_description          "" "hpx\.get_error_thread_description.*"
-get_error_backtrace                   "" "hpx\.get_error_backtrace.*"
-get_error_what                        "" "hpx\.get_error_what.*"
-get_error_env                         "" "hpx\.get_error_env.*"
-get_error_config                      "" "hpx\.get_error_config.*"
+# hpx/runtime/get_ptr.hpp
+get_ptr                               "" "hpx\.get_ptr.*"
 
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"

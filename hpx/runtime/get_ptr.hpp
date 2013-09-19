@@ -3,6 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file get_ptr.hpp
+
 #if !defined(HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM)
 #define HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM
 
@@ -19,6 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    /// \cond NOINTERNAL
     namespace detail
     {
         struct get_ptr_deleter
@@ -34,7 +37,35 @@ namespace hpx
             naming::id_type id_;                // hold component alive
         };
     }
+    /// \endcond
 
+    /// \brief Returns the pointer to the underlying memory of a component
+    ///
+    /// The function hpx::get_ptr can be used to extract the pointer to the
+    /// underlying memory of a given component.
+    ///
+    /// \param id  [in] The global id of the component for which the pointer
+    ///            to the underlying memory should be retrieved.
+    /// \param ec  [in,out] this represents the error status on exit, if this
+    ///            is pre-initialized to \a hpx#throws the function will throw
+    ///            on error instead.
+    ///
+    /// \tparam    The onlye template parameter has to be the type of the
+    ///            server side component.
+    ///
+    /// \returns   This function returns the pointer to the underlying memory
+    ///            for the component instance with the given \a id.
+    ///
+    /// \note      This function will successfully return the requested result
+    ///            only if the given component is currently located on the the
+    ///            requesting locality. Otherwise the function will raise and
+    ///            error.
+    ///
+    /// \note      As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///            function doesn't throw but returns the result code using the
+    ///            parameter \a ec. Otherwise it throws an instance of
+    ///            hpx::exception.
+    ///
     template <typename Component>
     boost::shared_ptr<Component> get_ptr(naming::id_type id, error_code& ec = throws)
     {

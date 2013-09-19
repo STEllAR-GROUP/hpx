@@ -36,7 +36,9 @@ set(doxygen_dependencies
     ${hpx_SOURCE_DIR}/hpx/hpx_init.hpp
     ${hpx_SOURCE_DIR}/hpx/hpx_start.hpp
     ${hpx_SOURCE_DIR}/hpx/hpx_finalize.hpp
+    ${hpx_SOURCE_DIR}/hpx/error.hpp
     ${hpx_SOURCE_DIR}/hpx/exception.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/get_ptr.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_non_const_action.hpp
