@@ -45,13 +45,13 @@ std::size_t hello_world_worker(std::size_t desired)
     {
         // The HPX-thread has been run on the desired OS-thread.
 #ifdef HPX_NATIVE_MIC
-        char const* msg = "hello world from OS-thread %1% on locality %2% on the Xeon Phi\n";
+        char const* msg = "hello world from OS-thread %1% on locality %2% on the Xeon Phi";
 #else
-        char const* msg = "hello world from OS-thread %1% on locality %2%\n";
+        char const* msg = "hello world from OS-thread %1% on locality %2%";
 #endif
 
         hpx::cout << (boost::format(msg) % desired % hpx::get_locality_id())
-                  << hpx::flush;
+                  << hpx::endl;
 
         return desired;
     }

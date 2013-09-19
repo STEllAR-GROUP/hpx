@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -38,19 +39,19 @@ inline std::ostream& operator<< (std::ostream& os, sync_flush_type const&)
 { return os << std::flush; }
 
 inline std::ostream& operator<< (std::ostream& os, sync_endl_type const&)
-{ return os << std::endl; }
+{ return os << std::endl << std::flush; }
 
 inline std::ostream& operator<< (std::ostream& os, async_flush_type const&)
 { return os << std::flush; }
 
 inline std::ostream& operator<< (std::ostream& os, async_endl_type const&)
-{ return os << std::endl; }
+{ return os << std::endl << std::flush; }
 
 inline std::ostream& operator<< (std::ostream& os, local_flush_type const&)
 { return os << std::flush; }
 
 inline std::ostream& operator<< (std::ostream& os, local_endl_type const&)
-{ return os << std::endl; }
+{ return os << std::endl << std::flush; }
 
 }
 
