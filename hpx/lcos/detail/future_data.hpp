@@ -14,8 +14,8 @@
 #include <hpx/lcos/detail/full_empty_memory.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
-#include <hpx/util/value_or_error.hpp>
 #include <hpx/util/scoped_unlock.hpp>
+#include <hpx/util/detail/value_or_error.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/mpl/if.hpp>
@@ -257,7 +257,7 @@ namespace detail
         typedef typename base_type::result_type result_type;
         typedef typename base_type::mutex_type mutex_type;
         typedef boost::exception_ptr error_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
 
         typedef typename base_type::completed_callback_type
             completed_callback_type;
@@ -315,10 +315,11 @@ namespace detail
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
             // and promise::set_exception).
-            if (!d.stores_value())
+            if (d.stores_error())
                 return handle_error(d, ec);
 
             // no error has been reported, return the result
+            BOOST_ASSERT(d.stores_value()); // This should never be empty
             return boost::move(d.get_value());
         }
 
@@ -332,10 +333,11 @@ namespace detail
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
             // and promise::set_exception).
-            if (!d.stores_value())
+            if (d.stores_error())
                 return handle_error(d, ec);
 
             // no error has been reported, return the result
+            BOOST_ASSERT(d.stores_value()); // This should never be empty
             return boost::move(d.get_value());
         }
 

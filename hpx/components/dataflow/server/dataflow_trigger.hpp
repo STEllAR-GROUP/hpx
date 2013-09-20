@@ -36,7 +36,7 @@ namespace hpx { namespace lcos { namespace server
             base_type;
         typedef hpx::components::managed_component<dataflow_trigger> component_type;
 
-        typedef util::value_or_error<util::unused_type> data_type;
+        typedef util::detail::value_or_error<util::unused_type> data_type;
 
         // disambiguate base classes
         typedef base_lco base_type_holder;

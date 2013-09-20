@@ -28,7 +28,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -88,13 +88,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -155,13 +156,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -229,7 +231,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -294,13 +296,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -367,13 +370,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -528,7 +532,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -593,13 +597,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -666,13 +671,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -827,7 +833,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -892,13 +898,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -965,13 +972,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -1126,7 +1134,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -1191,13 +1199,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -1264,13 +1273,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -1425,7 +1435,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -1490,13 +1500,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -1563,13 +1574,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -1724,7 +1736,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -1789,13 +1801,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -1862,13 +1875,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2023,7 +2037,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -2088,13 +2102,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -2161,13 +2176,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2322,7 +2338,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -2387,13 +2403,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -2460,13 +2477,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2621,7 +2639,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -2686,13 +2704,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -2759,13 +2778,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2920,7 +2940,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -2985,13 +3005,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3058,13 +3079,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -3219,7 +3241,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -3284,13 +3306,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3357,13 +3380,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -3518,7 +3542,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -3583,13 +3607,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3656,13 +3681,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -3817,7 +3843,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -3882,13 +3908,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3955,13 +3982,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -4116,7 +4144,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -4181,13 +4209,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -4254,13 +4283,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -4415,7 +4445,7 @@
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
-        typedef util::value_or_error<result_type> data_type;
+        typedef util::detail::value_or_error<result_type> data_type;
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -4480,13 +4510,14 @@
             }
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -4553,13 +4584,14 @@
                 data_type d;
                 result.read(d);
                 l.unlock();
-                if(!d.stores_value())
+                if(d.stores_error())
                 {
                     typedef typename lco_type::set_exception_action action_type;
                     hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
+                    BOOST_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));

@@ -1,10 +1,11 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_VALUE_OR_ERROR_FEB_28_2012_1220PM)
-#define HPX_UTIL_VALUE_OR_ERROR_FEB_28_2012_1220PM
+#if !defined(HPX_UTIL_DETAIL_VALUE_OR_ERROR_FEB_28_2012_1220PM)
+#define HPX_UTIL_DETAIL_VALUE_OR_ERROR_FEB_28_2012_1220PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
@@ -24,30 +25,26 @@
 #include <boost/aligned_storage.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
+namespace hpx { namespace util { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
+    struct max_alignment
     {
-        struct max_alignment
-        {
-            template <typename State, typename Item>
-            struct apply : boost::mpl::size_t<
-                boost::math::static_lcm<
-                    State::value, boost::alignment_of<Item>::value
-                >::value>
-            {};
-        };
+        template <typename State, typename Item>
+        struct apply : boost::mpl::size_t<
+            boost::math::static_lcm<
+                State::value, boost::alignment_of<Item>::value
+            >::value>
+        {};
+    };
 
-        template <typename Sequence, typename F>
-        struct max_value
-        {
-            typedef typename boost::mpl::transform1<Sequence, F>::type transformed_;
-            typedef typename boost::mpl::max_element<transformed_>::type max_it;
+    template <typename Sequence, typename F>
+    struct max_value
+    {
+        typedef typename boost::mpl::transform1<Sequence, F>::type transformed_;
+        typedef typename boost::mpl::max_element<transformed_>::type max_it;
 
-            typedef typename boost::mpl::deref<max_it>::type type;
-        };
-    }
+        typedef typename boost::mpl::deref<max_it>::type type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
@@ -58,78 +55,98 @@ namespace hpx { namespace util
         typedef boost::exception_ptr error_type;
         typedef boost::mpl::vector2<value_type, error_type> types;
 
-        enum { has_value = true, has_error = false };
+        enum state { has_none, has_value, has_error };
 
     public:
         // constructors
         value_or_error()
-          : has_value_(has_value)
-        {
-            ::new (get_value_address()) value_type;
-        }
+          : state_(has_none)
+        {}
 
         value_or_error(value_or_error const& rhs)
-          : has_value_(rhs.has_value_)
+          : state_(rhs.state_)
         {
-            if (rhs.stores_value()) {
-                construct_value(rhs.get_value());
-            }
-            else {
-                construct_error(rhs.get_error());
+            switch (rhs.state_)
+            {
+            case has_none:
+                {
+                    break;
+                }
+            case has_value:
+                {
+                    construct_value(rhs.get_value());
+                    break;
+                }
+            case has_error:
+                {
+                    construct_error(rhs.get_error());
+                    break;
+                }
             }
         }
 
         value_or_error(BOOST_RV_REF(value_or_error) rhs)
-          : has_value_(rhs.has_value_)
+          : state_(rhs.state_)
         {
-            if (rhs.stores_value()) {
-                construct_value(rhs.move_value());
-            }
-            else {
-                construct_error(rhs.get_error());
+            switch (rhs.state_)
+            {
+            case has_none:
+                {
+                    break;
+                }
+            case has_value:
+                {
+                    construct_value(rhs.move_value());
+                    break;
+                }
+            case has_error:
+                {
+                    construct_error(rhs.get_error());
+                    break;
+                }
             }
         }
 
         explicit value_or_error(BOOST_RV_REF(value_type) t)
-          : has_value_(has_value)
+          : state_(has_value)
         {
             construct_value(boost::move(t));
         }
 
         explicit value_or_error(error_type const& e)
-          : has_value_(has_error)
+          : state_(has_error)
         {
             construct_error(e);
         }
 
         ~value_or_error()
         {
-            if (stores_value())
-                destruct_value();
-            else
-                destruct_error();
+            destruct();
         }
 
         // assignment from another value_or_error instance
         value_or_error& operator=(BOOST_COPY_ASSIGN_REF(value_or_error) rhs)
         {
             if (this != &rhs) {
-                if (rhs.stores_value() != stores_value()) {
-                    if (stores_value()) {
-                        destruct_value();
-                        construct_error(rhs.get_error());
+                destruct();
+
+                state_ = rhs.state_;
+                switch (rhs.state_)
+                {
+                case has_none:
+                    {
+                        break;
                     }
-                    else {
-                        destruct_error();
+                case has_value:
+                    {
                         construct_value(rhs.get_value());
+                        break;
                     }
-                    has_value_ = rhs.stores_value();
-                }
-                else if (rhs.stores_value()) {
-                    assign_value(rhs.get_value());
-                }
-                else {
-                    assign_error(rhs.get_error());
+                case has_error:
+                    {
+                        construct_error(rhs.get_error());
+                        break;
+                    }
                 }
             }
             return *this;
@@ -137,22 +154,25 @@ namespace hpx { namespace util
         value_or_error& operator=(BOOST_RV_REF(value_or_error) rhs)
         {
             if (this != &rhs) {
-                if (rhs.stores_value() != stores_value()) {
-                    if (stores_value()) {
-                        destruct_value();
-                        construct_error(rhs.get_error());
+                destruct();
+                
+                state_ = rhs.state_;
+                switch (rhs.state_)
+                {
+                case has_none:
+                    {
+                        break;
                     }
-                    else {
-                        destruct_error();
+                case has_value:
+                    {
                         construct_value(rhs.move_value());
+                        break;
                     }
-                    has_value_ = rhs.stores_value();
-                }
-                else if (rhs.stores_value()) {
-                    assign_value(rhs.move_value());
-                }
-                else {
-                    assign_error(rhs.get_error());
+                case has_error:
+                    {
+                        construct_error(rhs.get_error());
+                        break;
+                    }
                 }
             }
             return *this;
@@ -161,46 +181,41 @@ namespace hpx { namespace util
         // assign from value or error type
         value_or_error& operator=(BOOST_COPY_ASSIGN_REF(value_type) t)
         {
-            if (!stores_value()) {
-                destruct_error();
-                construct_value(t);
-                has_value_ = has_value;
-            }
-            else {
-                assign_value(t);
-            }
+            destruct();
+            
+            state_ = has_value;
+            construct_value(t);
+
             return *this;
         }
         value_or_error& operator=(BOOST_RV_REF(value_type) t)
         {
-            if (!stores_value()) {
-                destruct_error();
-                construct_value(boost::move(t));
-                has_value_ = has_value;
-            }
-            else {
-                assign_value(boost::move(t));
-            }
+            destruct();
+            
+            state_ = has_value;
+            construct_value(boost::move(t));
+
             return *this;
         }
 
         value_or_error& operator=(error_type const& e)
         {
-            if (stores_value()) {
-                destruct_value();
-                construct_error(e);
-                has_value_ = has_error;
-            }
-            else {
-                assign_error(e);
-            }
+            destruct();
+            
+            state_ = has_error;
+            construct_error(e);
+
             return *this;
         }
 
         // what is currently stored
         bool stores_value() const
         {
-            return has_value_;
+            return state_ == has_value;
+        }
+        bool stores_error() const
+        {
+            return state_ == has_error;
         }
 
         // access stored data
@@ -248,7 +263,7 @@ namespace hpx { namespace util
 
         error_type& get_error()
         {
-            if (stores_value()) {
+            if (!stores_error()) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "value_or_error::get_error",
                     "unexpected retrieval of error value")
@@ -258,7 +273,7 @@ namespace hpx { namespace util
 
         error_type const& get_error() const
         {
-            if (stores_value()) {
+            if (!stores_error()) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "value_or_error::get_error",
                     "unexpected retrieval of error value")
@@ -284,22 +299,6 @@ namespace hpx { namespace util
         }
 
         //
-        void assign_value(value_type const& v)
-        {
-            *get_value_address() = v;
-        }
-
-        void assign_value(BOOST_RV_REF(value_type) v) //-V659
-        {
-            *get_value_address() = boost::move(v);
-        }
-
-        void assign_error(error_type const& e)
-        {
-            *get_error_address() = e;
-        }
-
-        //
         void destruct_value()
         {
             get_value_address()->~value_type();
@@ -308,6 +307,28 @@ namespace hpx { namespace util
         void destruct_error()
         {
             get_error_address()->~error_type();
+        }
+
+        void destruct()
+        {
+            switch (state_)
+            {
+            case has_none:
+                {
+                    break;
+                }
+            case has_value:
+                {
+                    destruct_value();
+                    break;
+                }
+            case has_error:
+                {
+                    destruct_error();
+                    break;
+                }
+            }
+            state_ = has_none;
         }
 
         // determine the required alignment, define aligned storage of proper
@@ -352,10 +373,10 @@ namespace hpx { namespace util
 
         // member data
         storage_type data_;         // protected data
-        bool has_value_;            // true if T, false if error
+        state state_;            // none, value, or error
 
         BOOST_COPYABLE_AND_MOVABLE(value_or_error)
     };
-}}
+}}}
 
 #endif
