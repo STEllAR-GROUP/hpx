@@ -16,7 +16,6 @@
 #include <hpx/traits/is_action.hpp>
 
 #include <hpx/util/decay.hpp>
-#include <hpx/util/unused.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
@@ -56,6 +55,11 @@ namespace hpx { namespace traits
 {
     namespace detail
     {
+        struct fallback_argument
+        {
+            template <typename T> fallback_argument(T const&){}
+        };
+
         struct fallback_call
         {
             fallback_call const& operator,(int) const volatile;
@@ -73,7 +77,7 @@ namespace hpx { namespace traits
         struct callable_wrapper_fallback<T, n>                                  \
         {                                                                       \
             typedef fallback_call const& (*pointer_to_function)(                \
-                    BOOST_PP_ENUM_PARAMS(n, util::unused_type BOOST_PP_INTERCEPT)\
+                    BOOST_PP_ENUM_PARAMS(n, fallback_argument BOOST_PP_INTERCEPT)\
                 );                                                              \
             operator pointer_to_function() const volatile;                      \
         };                                                                      \
