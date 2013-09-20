@@ -211,7 +211,7 @@ namespace hpx { namespace util { namespace detail
         // what is currently stored
         bool is_empty() const
         {
-            return states_ == has_none;
+            return state_ == has_none;
         }
         bool stores_value() const
         {
