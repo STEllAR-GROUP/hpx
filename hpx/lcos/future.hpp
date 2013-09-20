@@ -246,7 +246,7 @@ namespace hpx { namespace lcos
                     "future<Result>::get",
                     "this future has not been initialized");
             }
-            return future_data_->get_data(ec);
+            return future_data_->get_data();
         }
 
         Result get(error_code& ec) const
