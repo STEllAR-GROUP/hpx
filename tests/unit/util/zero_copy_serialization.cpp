@@ -24,7 +24,7 @@ HPX_PLAIN_ACTION(test_function2, test_action2)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_parcel_serialization(hpx::parcelset::parcel outp,
-    int in_archive_flags, int out_archive_flags)
+    int in_archive_flags, int out_archive_flags, bool zero_copy)
 {
     std::size_t arg_size = hpx::traits::get_type_size(outp);
     std::vector<char> out_buffer;
@@ -35,12 +35,13 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     {
         // create an output archive and serialize the parcel
         hpx::util::portable_binary_oarchive archive(
-            out_buffer, &out_chunks, 0, out_archive_flags);
+            out_buffer, zero_copy ? &out_chunks : 0, 0, out_archive_flags);
         archive << outp;
 
         arg_size = archive.bytes_written();
     }
 
+    out_buffer.resize(arg_size);
     hpx::parcelset::parcel inp;
 
     {
@@ -111,10 +112,7 @@ void test_normal_serialization(T& arg)
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here_id);
 
-    std::size_t arg_size = hpx::traits::get_type_size(outp);
-    std::vector<char> out_buffer;
-
-    test_parcel_serialization(outp, in_archive_flags, out_archive_flags);
+    test_parcel_serialization(outp, in_archive_flags, out_archive_flags, false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,7 +143,7 @@ void test_zero_copy_serialization(T& arg)
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here_id);
 
-    test_parcel_serialization(outp, in_archive_flags, out_archive_flags);
+    test_parcel_serialization(outp, in_archive_flags, out_archive_flags, true);
 }
 
 template <typename T1, typename T2>
@@ -175,7 +173,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
     outp.set_source(here_id);
 
-    test_parcel_serialization(outp, in_archive_flags, out_archive_flags);
+    test_parcel_serialization(outp, in_archive_flags, out_archive_flags, true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
