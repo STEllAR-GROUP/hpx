@@ -24,21 +24,12 @@ struct HPX_EXPORT component_namespace
     typedef server_type::prefixes_type prefixes_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Result
-    >
+    template <typename Result>
     static lcos::future<Result> service_async(
         naming::id_type const& gid
       , request const& req
       , threads::thread_priority priority = threads::thread_priority_default
-        )
-    {
-        typedef server_type::service_action action_type;
-
-        lcos::packaged_action<action_type, Result> p;
-        p.apply_p(launch::async, gid, priority, req);
-        return p.get_future();
-    }
+        );
 
     /// Fire-and-forget semantics.
     ///
@@ -64,14 +55,7 @@ struct HPX_EXPORT component_namespace
         naming::id_type const& gid
       , std::vector<request> const& reqs
       , threads::thread_priority priority = threads::thread_priority_default
-        )
-    {
-        typedef server_type::bulk_service_action action_type;
-
-        lcos::packaged_action<action_type> p;
-        p.apply_p(launch::async, gid, priority, reqs);
-        return p.get_future();
-    }
+        );
 
     /// Fire-and-forget semantics.
     ///

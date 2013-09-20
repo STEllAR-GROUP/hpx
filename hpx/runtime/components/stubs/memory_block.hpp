@@ -58,14 +58,7 @@ namespace hpx { namespace components { namespace stubs
         /// or a copy of the remote data.
 
         static lcos::future<components::memory_block_data> get_async(
-            naming::id_type const& targetgid)
-        {
-            // Create a future, execute the required action,
-            // we simply return the initialized future, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef server::detail::memory_block::get_action action_type;
-            return hpx::async<action_type>(targetgid);
-        }
+            naming::id_type const& targetgid);
 
         static components::memory_block_data get(
             naming::id_type const& targetgid)
@@ -77,14 +70,7 @@ namespace hpx { namespace components { namespace stubs
 
         static lcos::future<components::memory_block_data> get_async(
             naming::id_type const& targetgid,
-            components::memory_block_data const& cfg)
-        {
-            // Create a future, execute the required action,
-            // we simply return the initialized future, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef server::detail::memory_block::get_config_action action_type;
-            return hpx::async<action_type>(targetgid, cfg);
-        }
+            components::memory_block_data const& cfg);
 
         static components::memory_block_data get(
             naming::id_type const& targetgid,
@@ -97,14 +83,7 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         static lcos::future<components::memory_block_data> checkout_async(
-            naming::id_type const& targetgid)
-        {
-            // Create a future, execute the required action,
-            // we simply return the initialized future, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef server::detail::memory_block::checkout_action action_type;
-            return hpx::async<action_type>(targetgid);
-        }
+            naming::id_type const& targetgid);
 
         static components::memory_block_data checkout(
             naming::id_type const& targetgid)
@@ -116,14 +95,7 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         static lcos::future<naming::id_type>
-        clone_async(naming::id_type const& targetgid)
-        {
-            // Create a future, execute the required action,
-            // we simply return the initialized future, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef server::detail::memory_block::clone_action action_type;
-            return hpx::async<action_type>(targetgid);
-        }
+        clone_async(naming::id_type const& targetgid);
 
         static naming::id_type clone(naming::id_type const& targetgid)
         {

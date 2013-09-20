@@ -20,6 +20,7 @@
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/serialization/vector.hpp>
 
 namespace hpx { namespace agas
 {
