@@ -239,7 +239,17 @@ namespace hpx { namespace lcos
         }
 
         // retrieving the value
-        Result get(error_code& ec = throws) const
+        Result get() const
+        {
+            if (!future_data_) {
+                HPX_THROW_EXCEPTION(future_uninitialized,
+                    "future<Result>::get",
+                    "this future has not been initialized");
+            }
+            return future_data_->get_data(ec);
+        }
+
+        Result get(error_code& ec) const
         {
             if (!future_data_) {
                 HPX_THROWS_IF(ec, future_uninitialized,
