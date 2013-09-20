@@ -57,7 +57,7 @@ namespace hpx { namespace util { namespace detail
             decompressed_size_(inbound_data_size),
             chunks_(0), current_chunk_(std::size_t(-1)), current_chunk_size_(0)
         {
-            if (chunks && get_num_chunks() != 0)
+            if (chunks && chunks->size() != 0)
             {
                 chunks_ = chunks;
                 current_chunk_ = 0;
