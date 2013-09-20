@@ -48,6 +48,15 @@ namespace hpx { namespace components { namespace stubs
         naming::id_type const& gid, components::component_type type,
         std::size_t count)
     {
+        if (!naming::is_locality(gid))
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "stubs::runtime_support::bulk_create_components_async",
+                "The id passed as the first argument is not representing"
+                    " a locality");
+            return make_ready_future(std::vector<naming::id_type>());
+        }
+
         // Create a future, execute the required action,
         // we simply return the initialized future, the caller needs
         // to call get() on the return value to obtain the result
@@ -75,6 +84,15 @@ namespace hpx { namespace components { namespace stubs
         naming::id_type const& id, std::size_t count,
         hpx::actions::manage_object_action<T, Config> const& act)
     {
+        if (!naming::is_locality(id))
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "stubs::runtime_support::create_memory_block_async",
+                "The id passed as the first argument is not representing"
+                    " a locality");
+            return make_ready_future(naming::invalid_id);
+        }
+
         // Create a future, execute the required action,
         // we simply return the initialized future, the caller needs
         // to call get() on the return value to obtain the result
@@ -272,6 +290,15 @@ namespace hpx { namespace components { namespace stubs
     runtime_support::create_performance_counter_async(naming::id_type targetgid,
         performance_counters::counter_info const& info)
     {
+        if (!naming::is_locality(targetgid))
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "stubs::runtime_support::create_performance_counter_async",
+                "The id passed as the first argument is not representing"
+                    " a locality");
+            return make_ready_future(naming::invalid_id);
+        }
+
         typedef server::runtime_support::create_performance_counter_action
             action_type;
         return hpx::async<action_type>(targetgid, info);

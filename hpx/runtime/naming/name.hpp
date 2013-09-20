@@ -303,6 +303,11 @@ namespace hpx { namespace naming
         return get_gid_from_locality_id(get_locality_id_from_gid(id));
     }
 
+    inline bool is_locality(gid_type const& gid)
+    {
+        return get_locality_from_gid(gid) == gid;
+    }
+
     inline boost::uint64_t replace_locality_id(boost::uint64_t msb,
         boost::uint32_t locality_id) HPX_PURE;
 
@@ -693,6 +698,11 @@ namespace hpx { namespace naming
     inline id_type get_locality_from_id(id_type const& id)
     {
         return get_id_from_locality_id(get_locality_id_from_id(id));
+    }
+
+    inline bool is_locality(id_type const& id)
+    {
+        return is_locality(id.get_gid());
     }
 
     ///////////////////////////////////////////////////////////////////////////

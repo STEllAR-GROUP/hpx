@@ -50,6 +50,15 @@ namespace hpx { namespace components { namespace stubs
         static lcos::future<naming::id_type>
         create_component_async(naming::id_type const& gid)
         {
+            if (!naming::is_locality(gid))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "stubs::runtime_support::create_component_async",
+                    "The id passed as the first argument is not representing"
+                        " a locality");
+                return make_ready_future(naming::invalid_id);
+            }
+
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
@@ -77,6 +86,15 @@ namespace hpx { namespace components { namespace stubs
         create_component_async(naming::id_type const& gid,                    \
             HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
         {                                                                     \
+            if (!naming::is_locality(gid))                                    \
+            {                                                                 \
+                HPX_THROW_EXCEPTION(bad_parameter,                            \
+                    "stubs::runtime_support::create_component_async",         \
+                    "The id passed as the first argument is not representing" \
+                        " a locality");                                       \
+                return make_ready_future(naming::invalid_id);                 \
+            }                                                                 \
+                                                                              \
             typedef typename                                                  \
                 server::BOOST_PP_CAT(create_component_action, N)<             \
                     Component, BOOST_PP_ENUM(N,                               \
