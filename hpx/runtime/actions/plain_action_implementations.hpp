@@ -83,6 +83,12 @@ namespace hpx { namespace actions
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
 
+        // Only localities are valid targets for a plain action
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
+
     protected:
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
@@ -273,6 +279,12 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+
+        // Only localities are valid targets for a plain action
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
 
     protected:
         /// The \a thread_function will be registered as the thread

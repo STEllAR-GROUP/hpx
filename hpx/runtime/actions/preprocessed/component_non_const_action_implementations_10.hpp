@@ -30,6 +30,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -219,6 +224,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -424,6 +434,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -613,6 +628,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -818,6 +838,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -1007,6 +1032,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -1212,6 +1242,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -1401,6 +1436,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -1606,6 +1646,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -1795,6 +1840,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -2000,6 +2050,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -2189,6 +2244,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -2394,6 +2454,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -2583,6 +2648,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -2788,6 +2858,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -2977,6 +3052,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -3182,6 +3262,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -3371,6 +3456,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -3576,6 +3666,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         
@@ -3765,6 +3860,11 @@ namespace hpx { namespace actions
             typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type> arguments_type;
         typedef action<Component, remote_result_type, arguments_type, Derived>
             base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return !naming::is_locality(id);
+        }
     protected:
         
         

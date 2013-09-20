@@ -160,6 +160,12 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
+
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -327,6 +333,12 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
+
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {

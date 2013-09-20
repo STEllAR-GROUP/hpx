@@ -53,6 +53,12 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
+
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -125,6 +131,12 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
+
         // Determine whether the gid is local or remote
         if (addr.locality_ == hpx::get_locality()) {
             bool result = applier::detail::apply_l_p<Action>(c, addr, priority);
@@ -141,6 +153,12 @@ namespace hpx
     inline bool apply_p_cb(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
+
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {

@@ -104,6 +104,11 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Arg0) arg0)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -251,6 +256,11 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -452,6 +462,11 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -599,6 +614,11 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -800,6 +820,11 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -947,6 +972,11 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1148,6 +1178,11 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1295,6 +1330,11 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1496,6 +1536,11 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1643,6 +1688,11 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {

@@ -787,6 +787,12 @@ namespace hpx { namespace actions
         typedef void action_tag;
 
         ///////////////////////////////////////////////////////////////////////
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return true;        // by default we don't do any verification
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Func, typename Arguments_>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_continuation_thread_function_void(

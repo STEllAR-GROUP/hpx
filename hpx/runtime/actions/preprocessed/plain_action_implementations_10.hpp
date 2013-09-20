@@ -32,6 +32,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -203,6 +208,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -425,6 +435,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -596,6 +611,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -818,6 +838,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -989,6 +1014,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -1211,6 +1241,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -1382,6 +1417,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -1604,6 +1644,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -1775,6 +1820,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -1997,6 +2047,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -2168,6 +2223,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -2390,6 +2450,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -2561,6 +2626,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -2783,6 +2853,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -2954,6 +3029,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -3176,6 +3256,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -3347,6 +3432,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -3569,6 +3659,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         
@@ -3740,6 +3835,11 @@ namespace hpx { namespace actions
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
+        
+        static bool is_target_valid(naming::id_type const& id)
+        {
+            return naming::is_locality(id);
+        }
     protected:
         
         

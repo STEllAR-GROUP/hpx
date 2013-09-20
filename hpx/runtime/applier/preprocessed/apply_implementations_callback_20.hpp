@@ -49,6 +49,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -127,6 +132,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -146,6 +156,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -318,6 +333,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -396,6 +416,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -415,6 +440,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -587,6 +617,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -665,6 +700,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -684,6 +724,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -856,6 +901,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -934,6 +984,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -953,6 +1008,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1125,6 +1185,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1203,6 +1268,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -1222,6 +1292,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1394,6 +1469,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1472,6 +1552,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -1491,6 +1576,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1663,6 +1753,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1741,6 +1836,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -1760,6 +1860,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -1932,6 +2037,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -2010,6 +2120,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -2029,6 +2144,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -2201,6 +2321,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -2279,6 +2404,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -2298,6 +2428,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -2470,6 +2605,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -2548,6 +2688,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -2567,6 +2712,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -2739,6 +2889,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -2817,6 +2972,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -2836,6 +2996,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -3008,6 +3173,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -3086,6 +3256,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -3105,6 +3280,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -3277,6 +3457,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -3355,6 +3540,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -3374,6 +3564,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -3546,6 +3741,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -3624,6 +3824,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -3643,6 +3848,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -3815,6 +4025,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -3893,6 +4108,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -3912,6 +4132,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -4084,6 +4309,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -4162,6 +4392,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -4181,6 +4416,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -4353,6 +4593,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -4431,6 +4676,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -4450,6 +4700,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -4622,6 +4877,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -4700,6 +4960,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -4719,6 +4984,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -4891,6 +5161,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -4969,6 +5244,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -4988,6 +5268,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -5160,6 +5445,11 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
@@ -5238,6 +5528,11 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         if (addr.locality_ == hpx::get_locality()) {
             
@@ -5257,6 +5552,11 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19)
     {
+        if (!Action::is_target_valid(gid)) {
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
+                "the target (destination) does not match the action type");
+            return false;
+        }
         
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
