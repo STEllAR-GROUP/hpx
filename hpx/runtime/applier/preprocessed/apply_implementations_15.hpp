@@ -106,7 +106,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -258,7 +260,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -464,7 +468,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -616,7 +622,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -822,7 +830,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -974,7 +984,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -1180,7 +1192,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -1332,7 +1346,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -1538,7 +1554,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -1690,7 +1708,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -1896,7 +1916,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -2048,7 +2070,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -2254,7 +2278,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -2406,7 +2432,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -2612,7 +2640,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -2764,7 +2794,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -2970,7 +3002,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -3122,7 +3156,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -3328,7 +3364,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -3480,7 +3518,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -3686,7 +3726,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -3838,7 +3880,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -4044,7 +4088,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -4196,7 +4242,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -4402,7 +4450,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -4554,7 +4604,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -4760,7 +4812,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -4912,7 +4966,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -5118,7 +5174,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
@@ -5270,7 +5328,9 @@ namespace hpx
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
-                "the target (destination) does not match the action type");
+                boost::str(boost::format(
+                    "the target (destination) does not match the action type (%s)"
+                ) % hpx::actions::detail::get_action_name<Action>()));
             return false;
         }
         
