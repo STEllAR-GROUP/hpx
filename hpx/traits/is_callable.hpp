@@ -57,7 +57,7 @@ namespace hpx { namespace traits
     {
         struct fallback_argument
         {
-            template <typename T> fallback_argument(T const&){}
+            template <typename T> fallback_argument(T const&);
         };
 
         struct fallback_call
