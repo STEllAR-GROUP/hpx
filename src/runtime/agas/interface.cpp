@@ -269,6 +269,25 @@ bool is_local_lva_encoded_address(
     return naming::get_agas_client().is_local_lva_encoded_address(gid.get_msb());
 }
 
+///////////////////////////////////////////////////////////////////////////////
+hpx::future<naming::address> resolve_async(
+    naming::id_type const& id
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.resolve_async(id);
+}
+
+naming::address resolve(
+    naming::id_type const& id
+  , error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.resolve(id, ec);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void garbage_collect_non_blocking(
     error_code& ec
     )

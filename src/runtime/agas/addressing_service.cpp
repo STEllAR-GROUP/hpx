@@ -979,7 +979,6 @@ bool addressing_service::resolve_full(
         // special cases
         if (resolve_locally_known_addresses(id, addr))
             return true;
-        if (ec) return false;
 
         request req(primary_ns_resolve_gid, id);
         response rep;
@@ -1095,6 +1094,86 @@ bool addressing_service::resolve_cached(
     return false;
 } // }}}
 
+hpx::future<naming::address> addressing_service::resolve_async(
+    naming::gid_type const& gid
+    )
+{
+    // Try the cache.
+    if (caching_)
+    {
+        naming::address addr;
+        error_code ec;
+        if (resolve_cached(gid, addr, ec))
+            return make_ready_future(addr);
+
+        if (ec)
+        {
+            return make_error_future<naming::address>(
+                hpx::detail::access_exception(ec));
+        }
+    }
+
+    // now try the AGAS service
+    return resolve_full_async(gid);
+}
+
+naming::address addressing_service::resolve_full_postproc(
+    future<response>& f, naming::gid_type const& id
+    )
+{
+    naming::address addr;
+
+    response rep = f.get();
+    if (success != rep.get_status())
+    {
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "addressing_service::resolve_full_postproc",
+            "could no resolve global id");
+        return addr;
+    }
+
+    // Resolve the gva to the real resolved address (which is just a gva
+    // with as fully resolved LVA and an offset of zero).
+    gva const g = rep.get_gva().resolve(id, rep.get_base_gid());
+
+    addr.locality_ = g.endpoint;
+    addr.type_ = g.type;
+    addr.address_ = g.lva();
+
+    if (caching_)
+    {
+        if (range_caching_)
+            // Put the gva range into the cache.
+            update_cache_entry(rep.get_base_gid(), rep.get_gva());
+        else
+            // Put the fully resolved gva into the cache.
+            update_cache_entry(id, g);
+    }
+
+    return addr;
+}
+
+hpx::future<naming::address> addressing_service::resolve_full_async(
+    naming::gid_type const& gid
+    )
+{
+    // handle special cases
+    naming::address addr;
+    if (resolve_locally_known_addresses(gid, addr))
+        return make_ready_future(addr);
+
+    // ask server
+    request req(primary_ns_resolve_gid, gid);
+    naming::id_type target(
+        stubs::primary_namespace::get_service_instance(gid)
+      , naming::id_type::unmanaged);
+
+    using util::placeholders::_1;
+    future<response> f = stubs::primary_namespace::service_async<response>(target, req);
+    return f.then(util::bind(&addressing_service::resolve_full_postproc, this, _1, gid));
+}
+
+///////////////////////////////////////////////////////////////////////////////
 bool addressing_service::resolve_full(
     naming::gid_type const* gids
   , naming::address* addrs

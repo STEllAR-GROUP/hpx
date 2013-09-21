@@ -367,6 +367,11 @@ protected:
 
     void launch_hosted();
 
+    naming::address resolve_full_postproc(
+        future<response>& f
+      , naming::gid_type const& id
+        );
+
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests(
@@ -1079,6 +1084,17 @@ public:
         return addr;
     }
 
+    hpx::future<naming::address> resolve_async(
+        naming::gid_type const& id
+        );
+
+    hpx::future<naming::address> resolve_async(
+        naming::id_type const& id
+        )
+    {
+        return resolve_async(id.get_gid());
+    }
+
     bool resolve_full(
         naming::gid_type const& id
       , naming::address& addr
@@ -1112,6 +1128,17 @@ public:
         naming::address addr;
         resolve_full(id.get_gid(), addr, ec);
         return addr;
+    }
+
+    hpx::future<naming::address> resolve_full_async(
+        naming::gid_type const& id
+        );
+
+    hpx::future<naming::address> resolve_full_async(
+        naming::id_type const& id
+        )
+    {
+        return resolve_full_async(id.get_gid());
     }
 
     bool resolve_cached(

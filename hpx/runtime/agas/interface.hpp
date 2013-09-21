@@ -203,6 +203,16 @@ inline bool is_local_lva_encoded_address(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT hpx::future<naming::address> resolve_async(
+    naming::id_type const& id
+    );
+
+HPX_API_EXPORT naming::address resolve(
+    naming::id_type const& id
+  , error_code& ec = throws
+    );
+
+///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT void garbage_collect_non_blocking(
     error_code& ec = throws
     );

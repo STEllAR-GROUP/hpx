@@ -36,6 +36,31 @@ namespace hpx
 
             naming::id_type id_;                // hold component alive
         };
+
+        template <typename Component>
+        boost::shared_ptr<Component>
+        get_ptr_postproc(future<naming::address>& f, naming::id_type const& id)
+        {
+            naming::address addr = f.get();
+
+            if (get_locality() != addr.locality_)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter, "hpx::get_ptr",
+                    "the given component id does not belong to a local object");
+                return boost::shared_ptr<Component>();
+            }
+
+            if (!components::types_are_compatible(addr.type_,
+                    components::get_component_type<Component>()))
+            {
+                HPX_THROW_EXCEPTION(bad_component_type, "hpx::get_ptr",
+                    "requested component type does not match the given component id");
+                return boost::shared_ptr<Component>();
+            }
+
+            Component* p = get_lva<Component>::call(addr.address_);
+            return boost::shared_ptr<Component>(p, detail::get_ptr_deleter(id));
+        }
     }
     /// \endcond
 
@@ -53,12 +78,13 @@ namespace hpx
     /// \tparam    The onlye template parameter has to be the type of the
     ///            server side component.
     ///
-    /// \returns   This function returns the pointer to the underlying memory
-    ///            for the component instance with the given \a id.
+    /// \returns   This function returns a future representing the pointer to
+    ///            the underlying memory for the component instance with the
+    ///            given \a id.
     ///
     /// \note      This function will successfully return the requested result
     ///            only if the given component is currently located on the the
-    ///            requesting locality. Otherwise the function will raise and
+    ///            calling locality. Otherwise the function will raise an
     ///            error.
     ///
     /// \note      As long as \a ec is not pre-initialized to \a hpx::throws this
@@ -67,34 +93,12 @@ namespace hpx
     ///            hpx::exception.
     ///
     template <typename Component>
-    boost::shared_ptr<Component> get_ptr(naming::id_type id, error_code& ec = throws)
+    hpx::future<boost::shared_ptr<Component> >
+    get_ptr(naming::id_type const& id)
     {
-        naming::resolver_client& agas = naming::get_agas_client();
-        naming::address addr;
-        if (!agas.resolve(id, addr, ec) || ec)
-        {
-            HPX_THROWS_IF(ec, bad_parameter, "hpx::get_ptr",
-                "can't resolve the given component id");
-            return boost::shared_ptr<Component>();
-        }
-
-        if (get_locality() != addr.locality_)
-        {
-            HPX_THROWS_IF(ec, bad_parameter, "hpx::get_ptr",
-                "the given component id does not belong to a local object");
-            return boost::shared_ptr<Component>();
-        }
-
-        if (!components::types_are_compatible(addr.type_,
-                components::get_component_type<Component>()))
-        {
-            HPX_THROWS_IF(ec, bad_component_type, "hpx::get_ptr",
-                "requested component type does not match the given component id");
-            return boost::shared_ptr<Component>();
-        }
-
-        Component* p = get_lva<Component>::call(addr.address_);
-        return boost::shared_ptr<Component>(p, detail::get_ptr_deleter(id));
+        using util::placeholders::_1;
+        future<naming::address> f = agas::resolve_async(id);
+        return f.then(util::bind(&detail::get_ptr_postproc<Component>, _1, id));
     }
 }
 
