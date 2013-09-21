@@ -115,12 +115,6 @@ namespace hpx { namespace actions
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
 
-        // Everything but localities are valid targets for a plain action
-        static bool is_target_valid(naming::id_type const& id)
-        {
-            return !naming::is_locality(id);
-        }
-
     protected:
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
@@ -330,12 +324,6 @@ namespace hpx { namespace actions
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component const, remote_result_type, arguments_type, Derived>
             base_type;
-
-        // Everything but localities are valid targets for a plain action
-        static bool is_target_valid(naming::id_type const& id)
-        {
-            return !naming::is_locality(id);
-        }
 
     protected:
         /// The \a thread_function will be registered as the thread
