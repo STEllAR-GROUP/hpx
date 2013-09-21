@@ -16,8 +16,9 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <boost/fusion/include/at_c.hpp>
 #include <boost/assert.hpp>
+#include <boost/fusion/include/at_c.hpp>
+#include <boost/serialization/vector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components

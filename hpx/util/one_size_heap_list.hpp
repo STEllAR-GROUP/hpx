@@ -111,12 +111,12 @@ namespace hpx { namespace util
                     "cannot allocate 0 objects");
             }
 
-            std::size_t size = 0;
+            //std::size_t size = 0;
             value_type* p = NULL;
             {
                 if (!heap_list_.empty())
                 {
-                    size = heap_list_.size();
+                    //size = heap_list_.size();
                     for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
                     {
                         typename list_type::value_type heap = *it;

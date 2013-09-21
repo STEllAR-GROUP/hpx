@@ -14,6 +14,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/lcos.hpp>
 
+#include <boost/serialization/vector.hpp>
+
 #include <vector>
 
 namespace jacobi
@@ -29,7 +31,7 @@ namespace jacobi
               , hpx::traits::construct_with_back_ptr
             >
         {
-            typedef 
+            typedef
                 hpx::components::managed_component_base<
                     stencil_iterator
                   , hpx::components::detail::this_type
@@ -81,7 +83,7 @@ namespace jacobi
             }
 
             void step();
-            
+
             jacobi::row get(std::size_t idx);
 
             void update(

@@ -10,7 +10,9 @@
 #include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/components/dataflow/stubs/dataflow_trigger.hpp>
 
-namespace hpx { namespace lcos 
+#include <boost/serialization/vector.hpp>
+
+namespace hpx { namespace lcos
 {
     struct dataflow_trigger
         : dataflow_base<void>

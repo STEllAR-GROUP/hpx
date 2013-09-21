@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RUNTIME_RUNTIME_IMPL_HPP)
-#define HPX_RUNTIME_RUNTIME_RUNTIME_IMPL_HPP
+#define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>

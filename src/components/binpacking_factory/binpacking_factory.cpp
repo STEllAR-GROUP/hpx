@@ -10,6 +10,7 @@
 
 #include <hpx/components/binpacking_factory/server/binpacking_factory.hpp>
 
+#include <boost/serialization/vector.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 

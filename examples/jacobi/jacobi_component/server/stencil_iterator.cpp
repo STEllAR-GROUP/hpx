@@ -22,7 +22,7 @@ namespace jacobi
 
             jacobi::row top = top_future[src].get();
             jacobi::row bottom = bottom_future[src].get();
-            
+
             BOOST_ASSERT(top.id);
             BOOST_ASSERT(bottom.id);
             BOOST_ASSERT(top.id != bottom.id);

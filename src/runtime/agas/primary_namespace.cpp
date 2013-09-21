@@ -17,6 +17,8 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <boost/serialization/vector.hpp>
+
 using hpx::components::component_agas_primary_namespace;
 
 using hpx::agas::server::primary_namespace;
