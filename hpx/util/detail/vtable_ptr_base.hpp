@@ -10,13 +10,16 @@
 #define HPX_FUNCTION_DETAIL_VTABLE_PTR_BASE_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/detail/add_rvalue_reference.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/assert.hpp>
 
@@ -126,6 +129,10 @@ namespace boost { namespace serialization {
 
 }}
 
+#define BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF(Z, N, D)               \
+    typename util::detail::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type       \
+    /**/
+
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/vtable_ptr_base.hpp>
 #else
@@ -152,6 +159,8 @@ namespace boost { namespace serialization {
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
+#undef BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF
+
 #endif
 
 #else
@@ -162,7 +171,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
       , typename IArchive
       , typename OArchive
     >
@@ -180,13 +189,14 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
+        R (*invoke)(void ** 
+            BOOST_PP_ENUM_TRAILING(N, BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF, A));
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
     struct vtable_ptr_base<
         R(BOOST_PP_ENUM_PARAMS(N, A))
@@ -202,7 +212,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
+        R (*invoke)(void **
+            BOOST_PP_ENUM_TRAILING(N, BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF, A));
     };
 }}}
 
@@ -210,7 +221,7 @@ namespace boost { namespace serialization {
 
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
       , typename IArchive
       , typename OArchive
     >

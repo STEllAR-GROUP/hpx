@@ -36,9 +36,11 @@
                     >::template get<IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
-            invoke(void ** f )
+            invoke(void ** f
+                )
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) );
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                     );
             }
         };
         template <
@@ -69,9 +71,11 @@
                     >::template get<IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
-            invoke(void ** f , A0 a0)
+            invoke(void ** f
+                , typename util::detail::add_rvalue_reference<A0>::type)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) , a0);
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , BOOST_FWD_REF(A0) a0);
             }
         };
         template <
@@ -102,9 +106,11 @@
                     >::template get<IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
-            invoke(void ** f , A0 a0 , A1 a1)
+            invoke(void ** f
+                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) , a0 , a1);
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1);
             }
         };
         template <
@@ -135,9 +141,11 @@
                     >::template get<IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
-            invoke(void ** f , A0 a0 , A1 a1 , A2 a2)
+            invoke(void ** f
+                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) , a0 , a1 , a2);
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2);
             }
         };
         template <
@@ -168,9 +176,11 @@
                     >::template get<IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
-            invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3)
+            invoke(void ** f
+                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) , a0 , a1 , a2 , a3);
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3);
             }
         };
         template <
@@ -201,9 +211,11 @@
                     >::template get<IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
-            invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
+            invoke(void ** f
+                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) , a0 , a1 , a2 , a3 , a4);
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4);
             }
         };
         template <
@@ -234,9 +246,11 @@
                     >::template get<IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
-            invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
+            invoke(void ** f
+                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) , a0 , a1 , a2 , a3 , a4 , a5);
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5);
             }
         };
         template <
@@ -267,9 +281,11 @@
                     >::template get<IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
-            invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
+            invoke(void ** f
+                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) , a0 , a1 , a2 , a3 , a4 , a5 , a6);
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6);
             }
         };
         template <
@@ -300,8 +316,10 @@
                     >::template get<IArchive, OArchive>();
             }
             BOOST_FORCEINLINE static R
-            invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
+            invoke(void ** f
+                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type)
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7);
             }
         };

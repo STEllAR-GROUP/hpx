@@ -11,7 +11,7 @@
 namespace hpx { namespace util {
     template <
         typename R
-       
+      
       , typename IArchive
       , typename OArchive
     >
@@ -218,11 +218,8 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()() const
-        {
-            return vptr->invoke(&object );
-        }
-        BOOST_FORCEINLINE R operator()()
+        BOOST_FORCEINLINE R operator()(
+            ) const
         {
             return vptr->invoke(&object );
         }
@@ -473,13 +470,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type) const
         {
-            return vptr->invoke(&object , a0);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0)
-        {
-            return vptr->invoke(&object , a0);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -728,13 +722,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type) const
         {
-            return vptr->invoke(&object , a0 , a1);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1)
-        {
-            return vptr->invoke(&object , a0 , a1);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -983,13 +974,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -1238,13 +1226,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -1493,13 +1478,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -1748,13 +1730,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -2003,13 +1982,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -2258,13 +2234,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -2513,13 +2486,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -2768,13 +2738,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -3023,13 +2990,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -3278,13 +3242,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -3533,13 +3494,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -3788,13 +3746,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -4043,13 +3998,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -4298,13 +4250,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -4553,13 +4502,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -4808,13 +4754,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -5063,13 +5006,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type , typename util::detail::add_rvalue_reference<A18>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 , BOOST_FWD_REF(A18) a18);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -5318,13 +5258,10 @@ namespace hpx { namespace util {
                       , OArchive
                     >();
         }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19) const
+        BOOST_FORCEINLINE R operator()(
+            typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type , typename util::detail::add_rvalue_reference<A18>::type , typename util::detail::add_rvalue_reference<A19>::type) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19);
+            return vptr->invoke(&object , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 , BOOST_FWD_REF(A18) a18 , BOOST_FWD_REF(A19) a19);
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {

@@ -110,7 +110,7 @@ namespace detail
         typedef typename boost::mpl::if_<
             boost::is_same<void, Result>, util::unused_type, Result
         >::type result_type;
-        typedef HPX_STD_FUNCTION<void(lcos::future<Result>)>
+        typedef HPX_STD_FUNCTION<void(lcos::future<Result>&)>
             completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
 

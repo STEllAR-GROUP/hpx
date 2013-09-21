@@ -17,7 +17,6 @@
 #include <boost/mem_fn.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/or.hpp>
-#include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
@@ -234,7 +233,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(HPX_ENUM_FWD_ARGS(N, Arg, BOOST_PP_INTERCEPT))
+            F(BOOST_PP_ENUM_PARAMS(N, Arg))
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -249,7 +248,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(HPX_ENUM_FWD_ARGS(N, Arg, BOOST_PP_INTERCEPT))
+            F(BOOST_PP_ENUM_PARAMS(N, Arg))
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -264,7 +263,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(HPX_ENUM_FWD_ARGS(N, Arg, BOOST_PP_INTERCEPT))
+            F(BOOST_PP_ENUM_PARAMS(N, Arg))
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))

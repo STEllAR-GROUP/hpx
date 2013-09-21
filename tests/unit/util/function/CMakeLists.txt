@@ -7,6 +7,7 @@ set(tests
     bind_test
     contains_test
     function_arith
+    function_args
     function_ref
     function_test
     nothrow_swap

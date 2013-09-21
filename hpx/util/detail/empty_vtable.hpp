@@ -10,10 +10,12 @@
 #define HPX_FUNCTION_DETAIL_EMPTY_VTABLE_HPP
 
 #include <hpx/config/forceinline.hpp>
+#include <hpx/util/detail/add_rvalue_reference.hpp>
 #include <boost/ref.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 
 #include <typeinfo>
 
@@ -67,6 +69,11 @@ namespace hpx { namespace util { namespace detail
     struct empty_vtable;
 }}}
 
+#define BOOST_UTIL_DETAIL_EMPTY_VTABLE_ADD_RVALUE_REF(Z, N, D)                  \
+    typename util::detail::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type       \
+    BOOST_PP_CAT(a, N)                                                          \
+    /**/
+
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/empty_vtable.hpp>
 #else
@@ -93,6 +100,8 @@ namespace hpx { namespace util { namespace detail
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
+#undef BOOST_UTIL_DETAIL_EMPTY_VTABLE_ADD_RVALUE_REF
+
 #endif
 
 #else
@@ -103,7 +112,7 @@ namespace hpx { namespace util { namespace detail
 {
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
       , typename IArchive
       , typename OArchive
     >
@@ -129,7 +138,8 @@ namespace hpx { namespace util { namespace detail
         }
 
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+        invoke(void ** f
+            BOOST_PP_ENUM_TRAILING(N, BOOST_UTIL_DETAIL_EMPTY_VTABLE_ADD_RVALUE_REF, A))
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",

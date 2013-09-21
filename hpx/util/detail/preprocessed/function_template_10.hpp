@@ -11,7 +11,7 @@
 namespace hpx { namespace util {
     template <
         typename R
-       
+      
       , typename IArchive
       , typename OArchive
     >
@@ -220,11 +220,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()() const
         {
-            return vptr->invoke(&object );
-        }
-        BOOST_FORCEINLINE R operator()()
-        {
-            return vptr->invoke(&object );
+            return vptr->invoke(&object
+                 );
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -475,11 +472,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0) const
         {
-            return vptr->invoke(&object , a0);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0)
-        {
-            return vptr->invoke(&object , a0);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -730,11 +724,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1) const
         {
-            return vptr->invoke(&object , a0 , a1);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1)
-        {
-            return vptr->invoke(&object , a0 , a1);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -985,11 +976,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -1240,11 +1228,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -1495,11 +1480,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -1750,11 +1732,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -2005,11 +1984,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -2260,11 +2236,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -2515,11 +2488,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -2770,11 +2740,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -3025,11 +2992,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -3280,11 +3244,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {
@@ -3535,11 +3496,8 @@ namespace hpx { namespace util {
         }
         BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12) const
         {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
-        }
-        BOOST_FORCEINLINE R operator()(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
-        {
-            return vptr->invoke(&object , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);
+            return vptr->invoke(&object
+                , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ));
         }
         std::type_info const& target_type() const BOOST_NOEXCEPT
         {

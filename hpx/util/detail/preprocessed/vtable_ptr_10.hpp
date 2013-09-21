@@ -14,7 +14,7 @@ namespace hpx { namespace util { namespace detail {
     struct init_registration;
     template <
         typename R
-       
+      
       , typename IArchive
       , typename OArchive
       , typename Vtable
@@ -79,7 +79,7 @@ namespace hpx { namespace util { namespace detail {
     
     template <
         typename R
-       
+      
       , typename IArchive
       , typename OArchive
       , typename Vtable
@@ -103,7 +103,7 @@ namespace hpx { namespace util { namespace detail {
     };
     template <
         typename R
-       
+      
       , typename IArchive
       , typename OArchive
       , typename Vtable
@@ -134,7 +134,7 @@ namespace hpx { namespace util { namespace detail {
     
     template <
         typename R
-       
+      
       , typename Vtable
     >
     struct vtable_ptr<
@@ -174,7 +174,7 @@ namespace hpx { namespace util { namespace detail {
 namespace boost { namespace serialization {
     template <
         typename R
-       
+      
       , typename IArchive
       , typename OArchive
       , typename Vtable

@@ -11,10 +11,13 @@
 
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/detail/add_rvalue_reference.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
+#include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_binary_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 
 #include <typeinfo>
@@ -75,6 +78,11 @@ namespace hpx { namespace util { namespace detail {
 
         template <typename Functor, typename Sig, typename IArchive, typename OArchive>
         struct type;
+
+#       define BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF(Z, N, D)                 \
+        typename util::detail::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type   \
+        BOOST_PP_CAT(a, N)                                                      \
+        /**/
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/util/detail/preprocessed/vtable.hpp>
@@ -187,6 +195,7 @@ namespace hpx { namespace util { namespace detail {
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
+#       undef BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF
     };
 }}}
 
@@ -227,9 +236,11 @@ namespace hpx { namespace util { namespace detail {
             }
 
             BOOST_FORCEINLINE static R
-            invoke(void ** f BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, a))
+            invoke(void ** f
+                BOOST_PP_ENUM_TRAILING(N, BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF, A))
             {
-                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f)) BOOST_PP_ENUM_TRAILING_PARAMS(N, a));
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a));
             }
         };
 
@@ -266,9 +277,11 @@ namespace hpx { namespace util { namespace detail {
             }
 
             BOOST_FORCEINLINE static R
-            invoke(void ** f BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, a))
+            invoke(void ** f
+                BOOST_PP_ENUM_TRAILING(N, BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF, A))
             {
-                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f)) BOOST_PP_ENUM_TRAILING_PARAMS(N, a));
+                return util::invoke_r<R>((**reinterpret_cast<Functor**>(f))
+                    BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a));
             }
         };
 

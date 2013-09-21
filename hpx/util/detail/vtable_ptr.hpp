@@ -12,6 +12,7 @@
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/mpl/int.hpp>
 
 #include <hpx/runtime/actions/guid_initialization.hpp>
@@ -60,7 +61,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
       , typename IArchive
       , typename OArchive
       , typename Vtable
@@ -133,7 +134,7 @@ namespace hpx { namespace util { namespace detail {
     // registration code for serialization
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
       , typename IArchive
       , typename OArchive
       , typename Vtable
@@ -159,7 +160,7 @@ namespace hpx { namespace util { namespace detail {
 
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
       , typename IArchive
       , typename OArchive
       , typename Vtable
@@ -191,7 +192,7 @@ namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
       , typename Vtable
     >
     struct vtable_ptr<
@@ -235,7 +236,7 @@ namespace boost { namespace serialization {
 
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
       , typename IArchive
       , typename OArchive
       , typename Vtable

@@ -11,16 +11,6 @@
 
 #include <hpx/config/forceinline.hpp>
 
-#include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/version.hpp>
-#include <boost/serialization/tracking.hpp>
-#include <boost/scoped_ptr.hpp>
-
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/detail/remove_reference.hpp>
@@ -32,6 +22,19 @@
 #include <hpx/util/serialize_empty_type.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
+
+#include <boost/preprocessor/iteration/iterate.hpp>
+#include <boost/preprocessor/punctuation/comma_if.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
+
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/version.hpp>
+#include <boost/serialization/tracking.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_pointer.hpp>
@@ -382,7 +385,7 @@ namespace hpx { namespace util {
 
     template <
         typename R
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
       , typename IArchive
       , typename OArchive
     >
@@ -615,12 +618,8 @@ namespace hpx { namespace util {
 
         BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) const
         {
-            return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
-        }
-
-        BOOST_FORCEINLINE R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
-        {
-            return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
+            return vptr->invoke(&object
+                BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a));
         }
 
         std::type_info const& target_type() const BOOST_NOEXCEPT
