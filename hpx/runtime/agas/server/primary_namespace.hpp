@@ -124,6 +124,7 @@ struct HPX_EXPORT primary_namespace
     std::string instance_name_;
     naming::locality locality_;
     naming::gid_type next_id_;      // next available gid
+    boost::uint32_t locality_id_;   // our locality id
 
     struct update_time_on_exit;
 
@@ -209,12 +210,14 @@ struct HPX_EXPORT primary_namespace
   public:
     primary_namespace()
       : base_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB)
+      , locality_id_(naming::invalid_locality_id)
     {}
 
     void finalize();
 
     void set_local_locality(naming::gid_type const& g)
     {
+        locality_id_ = naming::get_locality_id_from_gid(g);
         next_id_ = naming::gid_type(g.get_msb() + 1, 0x1000);
     }
 

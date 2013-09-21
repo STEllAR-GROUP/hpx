@@ -956,8 +956,8 @@ void primary_namespace::kill_non_blocking(
 { // {{{ kill_non_blocking implementation
     using boost::fusion::at_c;
 
-    naming::gid_type const agas_prefix_
-        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
+//    naming::gid_type const agas_prefix_
+//        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     ///////////////////////////////////////////////////////////////////////////
     // Kill the dead objects.
@@ -991,10 +991,8 @@ void primary_namespace::kill_non_blocking(
         components::component_type const type_ =
             components::component_type(at_c<0>(e).type);
 
-        // FIXME: Resolve the locality instead of deducing it from the
-        // target GID, otherwise this will break once we start moving
-        // objects.
-        if (agas_prefix_ == naming::get_locality_from_gid(at_c<1>(e)))
+        BOOST_ASSERT(naming::invalid_locality_id != locality_id_);
+        if (locality_id_ == naming::get_locality_id_from_gid(at_c<1>(e)))
         {
             naming::address rts_addr(at_c<0>(e).endpoint,
                 components::component_runtime_support,
