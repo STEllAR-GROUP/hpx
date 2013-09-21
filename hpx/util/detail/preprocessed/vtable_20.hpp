@@ -72,10 +72,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0);
+                    , boost::forward<A0>( a0 ));
             }
         };
         template <
@@ -107,10 +107,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
             }
         };
         template <
@@ -142,10 +142,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
             }
         };
         template <
@@ -177,10 +177,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
             }
         };
         template <
@@ -212,10 +212,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
             }
         };
         template <
@@ -247,10 +247,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
             }
         };
         template <
@@ -282,10 +282,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
             }
         };
         template <
@@ -317,10 +317,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
             }
         };
         template <
@@ -352,10 +352,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ));
             }
         };
         template <
@@ -387,10 +387,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ));
             }
         };
         template <
@@ -422,10 +422,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ));
             }
         };
         template <
@@ -457,10 +457,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ));
             }
         };
         template <
@@ -492,10 +492,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ));
             }
         };
         template <
@@ -527,10 +527,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ));
             }
         };
         template <
@@ -562,10 +562,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ));
             }
         };
         template <
@@ -597,10 +597,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14 , typename util::detail::add_rvalue_reference<A15>::type a15)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ));
             }
         };
         template <
@@ -632,10 +632,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14 , typename util::detail::add_rvalue_reference<A15>::type a15 , typename util::detail::add_rvalue_reference<A16>::type a16)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ));
             }
         };
         template <
@@ -667,10 +667,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14 , typename util::detail::add_rvalue_reference<A15>::type a15 , typename util::detail::add_rvalue_reference<A16>::type a16 , typename util::detail::add_rvalue_reference<A17>::type a17)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ));
             }
         };
         template <
@@ -702,10 +702,10 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type , typename util::detail::add_rvalue_reference<A18>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14 , typename util::detail::add_rvalue_reference<A15>::type a15 , typename util::detail::add_rvalue_reference<A16>::type a16 , typename util::detail::add_rvalue_reference<A17>::type a17 , typename util::detail::add_rvalue_reference<A18>::type a18)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 , BOOST_FWD_REF(A18) a18);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ) , boost::forward<A18>( a18 ));
             }
         };
         template <
@@ -737,9 +737,9 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type , typename util::detail::add_rvalue_reference<A18>::type , typename util::detail::add_rvalue_reference<A19>::type)
+                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14 , typename util::detail::add_rvalue_reference<A15>::type a15 , typename util::detail::add_rvalue_reference<A16>::type a16 , typename util::detail::add_rvalue_reference<A17>::type a17 , typename util::detail::add_rvalue_reference<A18>::type a18 , typename util::detail::add_rvalue_reference<A19>::type a19)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
-                    , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 , BOOST_FWD_REF(A18) a18 , BOOST_FWD_REF(A19) a19);
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ) , boost::forward<A18>( a18 ) , boost::forward<A19>( a19 ));
             }
         };

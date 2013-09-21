@@ -11,7 +11,7 @@
 namespace hpx { namespace util { namespace detail {
     template <
         typename R
-       
+      
       , typename IArchive
       , typename OArchive
     >
@@ -28,12 +28,13 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** );
+        R (*invoke)(void ** 
+            );
     };
     
     template <
         typename R
-       
+      
     >
     struct vtable_ptr_base<
         R()
@@ -48,13 +49,14 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** );
+        R (*invoke)(void **
+            );
     };
 }}}
 namespace boost { namespace serialization {
     template <
         typename R
-       
+      
       , typename IArchive
       , typename OArchive
     >
@@ -84,7 +86,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type);
     };
     
     template <
@@ -104,7 +107,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -140,7 +144,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type);
     };
     
     template <
@@ -160,7 +165,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -196,7 +202,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type);
     };
     
     template <
@@ -216,7 +223,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -252,7 +260,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type);
     };
     
     template <
@@ -272,7 +281,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -308,7 +318,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type);
     };
     
     template <
@@ -328,7 +339,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -364,7 +376,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type);
     };
     
     template <
@@ -384,7 +397,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -420,7 +434,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type);
     };
     
     template <
@@ -440,7 +455,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -476,7 +492,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type);
     };
     
     template <
@@ -496,7 +513,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -532,7 +550,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type);
     };
     
     template <
@@ -552,7 +571,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -588,7 +608,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type);
     };
     
     template <
@@ -608,7 +629,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -644,7 +666,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type);
     };
     
     template <
@@ -664,7 +687,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -700,7 +724,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type);
     };
     
     template <
@@ -720,7 +745,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -756,7 +782,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type);
     };
     
     template <
@@ -776,7 +803,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -812,7 +840,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type);
     };
     
     template <
@@ -832,7 +861,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -868,7 +898,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type);
     };
     
     template <
@@ -888,7 +919,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -924,7 +956,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type);
     };
     
     template <
@@ -944,7 +977,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -980,7 +1014,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type);
     };
     
     template <
@@ -1000,7 +1035,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -1036,7 +1072,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type);
     };
     
     template <
@@ -1056,7 +1093,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -1092,7 +1130,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type , typename util::detail::add_rvalue_reference<A18>::type);
     };
     
     template <
@@ -1112,7 +1151,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type , typename util::detail::add_rvalue_reference<A18>::type);
     };
 }}}
 namespace boost { namespace serialization {
@@ -1148,7 +1188,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19);
+        R (*invoke)(void ** 
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type , typename util::detail::add_rvalue_reference<A18>::type , typename util::detail::add_rvalue_reference<A19>::type);
     };
     
     template <
@@ -1168,7 +1209,8 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*copy)(void * const*, void **);
-        R (*invoke)(void ** , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19);
+        R (*invoke)(void **
+            , typename util::detail::add_rvalue_reference<A0>::type , typename util::detail::add_rvalue_reference<A1>::type , typename util::detail::add_rvalue_reference<A2>::type , typename util::detail::add_rvalue_reference<A3>::type , typename util::detail::add_rvalue_reference<A4>::type , typename util::detail::add_rvalue_reference<A5>::type , typename util::detail::add_rvalue_reference<A6>::type , typename util::detail::add_rvalue_reference<A7>::type , typename util::detail::add_rvalue_reference<A8>::type , typename util::detail::add_rvalue_reference<A9>::type , typename util::detail::add_rvalue_reference<A10>::type , typename util::detail::add_rvalue_reference<A11>::type , typename util::detail::add_rvalue_reference<A12>::type , typename util::detail::add_rvalue_reference<A13>::type , typename util::detail::add_rvalue_reference<A14>::type , typename util::detail::add_rvalue_reference<A15>::type , typename util::detail::add_rvalue_reference<A16>::type , typename util::detail::add_rvalue_reference<A17>::type , typename util::detail::add_rvalue_reference<A18>::type , typename util::detail::add_rvalue_reference<A19>::type);
     };
 }}}
 namespace boost { namespace serialization {

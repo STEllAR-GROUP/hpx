@@ -12,7 +12,7 @@ namespace hpx { namespace util { namespace detail
 {
     template <
         typename R
-       
+      
       , typename IArchive
       , typename OArchive
     >
@@ -36,7 +36,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f )
+        invoke(void ** f
+            )
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -72,7 +73,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -108,7 +110,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -144,7 +147,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -180,7 +184,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -216,7 +221,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -252,7 +258,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -288,7 +295,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -324,7 +332,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -360,7 +369,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -396,7 +406,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -432,7 +443,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -468,7 +480,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -504,7 +517,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -540,7 +554,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -576,7 +591,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -612,7 +628,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14 , typename util::detail::add_rvalue_reference<A15>::type a15)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -648,7 +665,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14 , typename util::detail::add_rvalue_reference<A15>::type a15 , typename util::detail::add_rvalue_reference<A16>::type a16)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -684,7 +702,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f , A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17)
+        invoke(void ** f
+            , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7 , typename util::detail::add_rvalue_reference<A8>::type a8 , typename util::detail::add_rvalue_reference<A9>::type a9 , typename util::detail::add_rvalue_reference<A10>::type a10 , typename util::detail::add_rvalue_reference<A11>::type a11 , typename util::detail::add_rvalue_reference<A12>::type a12 , typename util::detail::add_rvalue_reference<A13>::type a13 , typename util::detail::add_rvalue_reference<A14>::type a14 , typename util::detail::add_rvalue_reference<A15>::type a15 , typename util::detail::add_rvalue_reference<A16>::type a16 , typename util::detail::add_rvalue_reference<A17>::type a17)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",

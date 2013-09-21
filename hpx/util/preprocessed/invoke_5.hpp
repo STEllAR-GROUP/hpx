@@ -19,7 +19,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0))
+            F(Arg0)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0)
@@ -33,7 +33,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0))
+            F(Arg0)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0)
@@ -47,7 +47,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0))
+            F(Arg0)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0)
@@ -79,7 +79,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1))
+            F(Arg0 , Arg1)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
@@ -93,7 +93,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1))
+            F(Arg0 , Arg1)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
@@ -107,7 +107,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1))
+            F(Arg0 , Arg1)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
@@ -139,7 +139,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2))
+            F(Arg0 , Arg1 , Arg2)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -153,7 +153,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2))
+            F(Arg0 , Arg1 , Arg2)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -167,7 +167,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2))
+            F(Arg0 , Arg1 , Arg2)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -199,7 +199,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3))
+            F(Arg0 , Arg1 , Arg2 , Arg3)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
@@ -213,7 +213,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3))
+            F(Arg0 , Arg1 , Arg2 , Arg3)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
@@ -227,7 +227,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3))
+            F(Arg0 , Arg1 , Arg2 , Arg3)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
@@ -259,7 +259,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -273,7 +273,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -287,7 +287,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -319,7 +319,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
@@ -333,7 +333,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
@@ -347,7 +347,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
@@ -379,7 +379,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
@@ -393,7 +393,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
@@ -407,7 +407,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
@@ -439,7 +439,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
@@ -453,7 +453,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
@@ -467,7 +467,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
@@ -499,7 +499,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
@@ -513,7 +513,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
@@ -527,7 +527,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
@@ -559,7 +559,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
@@ -573,7 +573,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
@@ -587,7 +587,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
@@ -619,7 +619,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10)
@@ -633,7 +633,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10)
@@ -647,7 +647,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10)
@@ -679,7 +679,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11)
@@ -693,7 +693,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11)
@@ -707,7 +707,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11)
@@ -739,7 +739,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11) , BOOST_FWD_REF(Arg12))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12)
@@ -753,7 +753,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11) , BOOST_FWD_REF(Arg12))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12)
@@ -767,7 +767,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11) , BOOST_FWD_REF(Arg12))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12)
@@ -799,7 +799,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11) , BOOST_FWD_REF(Arg12) , BOOST_FWD_REF(Arg13))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13)
@@ -813,7 +813,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11) , BOOST_FWD_REF(Arg12) , BOOST_FWD_REF(Arg13))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13)
@@ -827,7 +827,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11) , BOOST_FWD_REF(Arg12) , BOOST_FWD_REF(Arg13))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13)
@@ -859,7 +859,7 @@ namespace hpx { namespace util
           , boost::is_reference_wrapper<typename util::decay<F>::type>
         >
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11) , BOOST_FWD_REF(Arg12) , BOOST_FWD_REF(Arg13) , BOOST_FWD_REF(Arg14))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14)
@@ -873,7 +873,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_member_pointer<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11) , BOOST_FWD_REF(Arg12) , BOOST_FWD_REF(Arg13) , BOOST_FWD_REF(Arg14))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14)
@@ -887,7 +887,7 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if<
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , invoke_result_of<
-            F(BOOST_FWD_REF(Arg0) , BOOST_FWD_REF(Arg1) , BOOST_FWD_REF(Arg2) , BOOST_FWD_REF(Arg3) , BOOST_FWD_REF(Arg4) , BOOST_FWD_REF(Arg5) , BOOST_FWD_REF(Arg6) , BOOST_FWD_REF(Arg7) , BOOST_FWD_REF(Arg8) , BOOST_FWD_REF(Arg9) , BOOST_FWD_REF(Arg10) , BOOST_FWD_REF(Arg11) , BOOST_FWD_REF(Arg12) , BOOST_FWD_REF(Arg13) , BOOST_FWD_REF(Arg14))
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14)
         >
     >::type
     invoke(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14)
