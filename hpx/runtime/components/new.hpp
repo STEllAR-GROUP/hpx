@@ -53,7 +53,6 @@ namespace hpx { namespace components
     {
         return components::stub_base<Component>::create_async(locality);
     }
-#endif
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/runtime/components/preprocessed/new.hpp>
@@ -73,6 +72,8 @@ namespace hpx { namespace components
 #if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
 #  pragma wave option(output: null)
 #endif
+
+#endif // !defined(DOXYGEN)
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
