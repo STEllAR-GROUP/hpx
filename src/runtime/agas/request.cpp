@@ -594,8 +594,8 @@ namespace hpx { namespace agas
 #define HPX_LOAD_SEQUENCE(z, n, _)                                            \
     case n:                                                                   \
         {                                                                     \
-            typename boost::mpl::at_c<                                        \
-                typename request_data::data_type::types, n                    \
+            boost::mpl::at_c<                                                 \
+                request_data::data_type::types, n                             \
             >::type d;                                                        \
             util::serialize_sequence(ar, d);                                  \
             data->data = d;                                                   \
