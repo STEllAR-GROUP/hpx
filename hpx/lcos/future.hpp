@@ -382,6 +382,15 @@ namespace hpx { namespace lcos
             boost::forward<Result>(init));
     }
 
+    template <typename Result>
+    future<Result>
+    make_error_future(boost::exception_ptr const& e)
+    {
+        local::promise<Result> p;
+        p.set_exception(e);
+        return p.get_future();
+    }
+
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
     template <typename Result>
@@ -953,6 +962,7 @@ namespace hpx { namespace actions
 namespace hpx
 {
     using lcos::make_ready_future;
+    using lcos::make_error_future;
     using lcos::make_ready_future_at;
     using lcos::make_ready_future_after;
 }
