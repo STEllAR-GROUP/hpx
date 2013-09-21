@@ -33,6 +33,24 @@ template lcos::future<response> locality_namespace::service_async<response>(
   , threads::thread_priority priority
     );
 
+template lcos::future<std::vector<naming::locality> > locality_namespace::service_async<std::vector<naming::locality> >(
+    naming::id_type const& gid
+  , request const& req
+  , threads::thread_priority priority
+    );
+
+template lcos::future<std::vector<boost::uint32_t> > locality_namespace::service_async<std::vector<boost::uint32_t> >(
+    naming::id_type const& gid
+  , request const& req
+  , threads::thread_priority priority
+    );
+
+template lcos::future<boost::uint32_t> locality_namespace::service_async<boost::uint32_t>(
+    naming::id_type const& gid
+  , request const& req
+  , threads::thread_priority priority
+    );
+
 void locality_namespace::service_non_blocking(
     naming::id_type const& gid
   , request const& req

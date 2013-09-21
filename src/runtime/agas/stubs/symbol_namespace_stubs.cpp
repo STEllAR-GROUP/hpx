@@ -33,6 +33,18 @@ template lcos::future<response> symbol_namespace::service_async<response>(
   , threads::thread_priority priority
     );
 
+template lcos::future<bool> symbol_namespace::service_async<bool>(
+    naming::id_type const& gid
+  , request const& req
+  , threads::thread_priority priority
+    );
+
+template lcos::future<naming::id_type> symbol_namespace::service_async<naming::id_type>(
+    naming::id_type const& gid
+  , request const& req
+  , threads::thread_priority priority
+    );
+
 void symbol_namespace::service_non_blocking(
     naming::id_type const& gid
   , request const& req

@@ -13,6 +13,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
+#include <boost/serialization/vector.hpp>
 #include "server/allgather.hpp"
 #include "server/allgather_and_gate.hpp"
 

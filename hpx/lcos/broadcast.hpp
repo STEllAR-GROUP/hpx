@@ -16,6 +16,8 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
+#include <boost/serialization/vector.hpp>
+
 #include <vector>
 
 namespace hpx { namespace lcos {
@@ -256,7 +258,7 @@ namespace hpx { namespace lcos {
                 )
             );
         }
-        
+
         template <
             typename Action
           , typename Futures
@@ -570,7 +572,7 @@ namespace hpx { namespace lcos {
               BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
             );
     }
-    
+
     template <
         typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)

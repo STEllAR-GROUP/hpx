@@ -16,6 +16,8 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include <boost/serialization/vector.hpp>
+
 namespace nqueen
 {
     typedef std::vector<std::size_t> list_type;

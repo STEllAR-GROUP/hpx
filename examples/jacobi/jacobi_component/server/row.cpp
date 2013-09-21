@@ -7,6 +7,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include "row.hpp"
 
+#include <boost/serialization/vector.hpp>
+
 namespace jacobi
 {
     namespace server
