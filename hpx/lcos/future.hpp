@@ -382,13 +382,16 @@ namespace hpx { namespace lcos
             boost::forward<Result>(init));
     }
 
+    // extension: create a pre-initialized future object which holds the
+    // given error
     template <typename Result>
     future<Result>
     make_error_future(boost::exception_ptr const& e)
     {
-        local::promise<Result> p;
-        p.set_exception(e);
-        return p.get_future();
+        typedef lcos::detail::future_data<Result> future_data_type;
+        boost::intrusive_ptr<future_data_type> p(new future_data_type());
+        p->set_exception(e);
+        return lcos::detail::make_future_from_data<Result>(boost::move(p));
     }
 
     // extension: create a pre-initialized future object which gets ready at

@@ -34,6 +34,11 @@ namespace hpx { namespace lcos
         ready, timeout, deferred, uninitialized
     };
     BOOST_SCOPED_ENUM_END
+
+    // forward declaration
+    template <typename Result>
+    future<Result>
+    make_error_future(boost::exception_ptr const& e);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,7 +69,7 @@ namespace detail
         get_future_data(lcos::future<Result>&);
 
     template <typename Result>
-    inline detail:: future_data_base<Result> const*
+    inline detail::future_data_base<Result> const*
         get_future_data(lcos::future<Result> const&);
 
     ///////////////////////////////////////////////////////////////////////
@@ -267,6 +272,9 @@ namespace detail
 
         template <typename T>
         friend struct local::channel;
+
+        friend future<Result>
+        lcos::make_error_future<Result>(boost::exception_ptr const& e);
 
     protected:
         future_data() {}
