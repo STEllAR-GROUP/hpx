@@ -134,7 +134,8 @@ namespace hpx
     boost::shared_ptr<Component>
     get_ptr(naming::id_type const& id, error_code& ec = throws)
     {
-        hpx::future<boost::shared_ptr<Component> > ptr = get_ptr_async(id, ec);
+        hpx::future<boost::shared_ptr<Component> > ptr =
+            get_ptr_async<Component>(id, ec);
         if (ec) return boost::shared_ptr<Component>();
 
         return ptr.get(ec);
