@@ -16,6 +16,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 
+#include <boost/ref.hpp>
 #include <boost/shared_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,7 +101,8 @@ namespace hpx
     {
         using util::placeholders::_1;
         future<naming::address> f = agas::resolve_async(id);
-        return f.then(util::bind(&detail::get_ptr_postproc<Component>, _1, id, ec));
+        return f.then(util::bind(
+            &detail::get_ptr_postproc<Component>, _1, id, boost::ref(ec)));
     }
     
     /// \brief Returns the pointer to the underlying memory of a component
