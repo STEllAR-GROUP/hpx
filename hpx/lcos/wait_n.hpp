@@ -10,30 +10,29 @@
 #define HPX_LCOS_WAIT_N_APR_19_2012_0203PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/move.hpp>
-#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
-#include <algorithm>
-#include <vector>
-
 #include <boost/assert.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/repeat.hpp>
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/iterate.hpp>
-
+#include <boost/atomic.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
-
-#include <boost/atomic.hpp>
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/enum.hpp>
+#include <boost/preprocessor/iterate.hpp>
+#include <boost/preprocessor/repeat.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#include <boost/utility/enable_if.hpp>
+
+#include <algorithm>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -60,27 +59,20 @@ namespace hpx
 
             template <typename Sequence>
             void operator()(Sequence& sequence, typename boost::enable_if<
-                boost::fusion::traits::is_sequence<Sequence>>::type* = 0) const
+                boost::fusion::traits::is_sequence<Sequence> >::type* = 0) const
             {
                 boost::fusion::for_each(sequence, *this);
             }
 
             template <typename Sequence>
             void operator()(Sequence& sequence, typename boost::disable_if<
-                boost::fusion::traits::is_sequence<Sequence>>::type* = 0) const
+                boost::fusion::traits::is_sequence<Sequence> >::type* = 0) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
 
             Callback const& callback_;
         };
-
-        template <typename Sequence, typename Callback>
-        void set_on_completed_callback(Sequence& sequence, Callback const& callback)
-        {
-            set_on_completed_callback_impl<Callback> set_on_completed_callback_helper(callback);
-            set_on_completed_callback_helper(sequence);
-        }
 
         template <typename Sequence>
         struct when_n : boost::enable_shared_from_this<when_n<Sequence> >
@@ -103,25 +95,25 @@ namespace hpx
             typedef Sequence result_type;
 
             when_n(argument_type const& lazy_values, std::size_t n)
-              : lazy_values_(lazy_values),
-                count_(0),
-                needed_count_(n)
+              : lazy_values_(lazy_values)
+              , count_(0)
+              , needed_count_(n)
             {}
 
             when_n(BOOST_RV_REF(argument_type) lazy_values, std::size_t n)
-              : lazy_values_(boost::move(lazy_values)),
-                count_(0),
-                needed_count_(n)
+              : lazy_values_(boost::move(lazy_values))
+              , count_(0)
+              , needed_count_(n)
             {}
 
             when_n(BOOST_RV_REF(when_n) rhs)
-              : lazy_values_(boost::move(rhs.lazy_values_)),
-                needed_count_(rhs.needed_count_)
+              : lazy_values_(boost::move(rhs.lazy_values_))
+              , needed_count_(rhs.needed_count_)
             {
                 rhs.needed_count_ = 0;
             }
 
-            when_n& operator= (BOOST_RV_REF(when_n) rhs)
+            when_n& operator=(BOOST_RV_REF(when_n) rhs)
             {
                 if (this != &rhs) {
                     lazy_values_ = boost::move(rhs.lazy_values_);
@@ -136,7 +128,9 @@ namespace hpx
             {
                 // set callback functions to executed when future is ready
                 threads::thread_id_type id = threads::get_self_id();
-                set_on_completed_callback(lazy_values_, util::bind(
+
+                set_on_completed_callback_impl<Callback> set_on_completed_callback_helper(callback);
+                set_on_completed_callback_helper(lazy_values_, util::bind(
                         &when_n::on_future_ready, this->shared_from_this(), id));
 
                 // if all of the requested futures are already set, our
@@ -161,7 +155,7 @@ namespace hpx
     }
 
     /// The function \a when_n is a operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects stored in the
+    /// of n given futures. It AND-composes all future objects stored in the
     /// given vector and returns a new future object representing the same
     /// list of futures after they finished executing.
     ///
@@ -226,7 +220,7 @@ namespace hpx
         return when_n(n, boost::move(lazy_values_), ec);
     }
 
-    inline lcos::future<HPX_STD_TUPLE<>>
+    inline lcos::future<HPX_STD_TUPLE<> >
     when_n(std::size_t n, error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<> result_type;
@@ -353,7 +347,7 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename R)>
-    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_TYPE, _)>>
+    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_TYPE, _)> >
     when_n(std::size_t n, BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_ARG, _),
         error_code& ec = throws)
     {
