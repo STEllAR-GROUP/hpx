@@ -41,7 +41,7 @@ namespace hpx { namespace components
             typename boost::enable_if<has_server_component_type<Stub> >::type>
         {
             typedef Stub type;
-            typedef Stub server_component_type;
+            typedef typename Stub::server_component_type server_component_type;
         };
     }
 
