@@ -16,8 +16,6 @@ namespace hpx
     when_all(lcos::future<R0> f0,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<lcos::future<R0> >
-            result_type;
         return when_n(1, f0, ec);
     }
     template <typename R0>
@@ -45,8 +43,6 @@ namespace hpx
     when_all(lcos::future<R0> f0 , lcos::future<R1> f1,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> >
-            result_type;
         return when_n(2, f0 , f1, ec);
     }
     template <typename R0 , typename R1>
@@ -74,8 +70,6 @@ namespace hpx
     when_all(lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> >
-            result_type;
         return when_n(3, f0 , f1 , f2, ec);
     }
     template <typename R0 , typename R1 , typename R2>
@@ -103,8 +97,6 @@ namespace hpx
     when_all(lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> >
-            result_type;
         return when_n(4, f0 , f1 , f2 , f3, ec);
     }
     template <typename R0 , typename R1 , typename R2 , typename R3>
@@ -132,8 +124,6 @@ namespace hpx
     when_all(lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3 , lcos::future<R4> f4,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> >
-            result_type;
         return when_n(5, f0 , f1 , f2 , f3 , f4, ec);
     }
     template <typename R0 , typename R1 , typename R2 , typename R3 , typename R4>
@@ -161,8 +151,6 @@ namespace hpx
     when_all(lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3 , lcos::future<R4> f4 , lcos::future<R5> f5,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> >
-            result_type;
         return when_n(6, f0 , f1 , f2 , f3 , f4 , f5, ec);
     }
     template <typename R0 , typename R1 , typename R2 , typename R3 , typename R4 , typename R5>
@@ -190,8 +178,6 @@ namespace hpx
     when_all(lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3 , lcos::future<R4> f4 , lcos::future<R5> f5 , lcos::future<R6> f6,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> , lcos::future<R6> >
-            result_type;
         return when_n(7, f0 , f1 , f2 , f3 , f4 , f5 , f6, ec);
     }
     template <typename R0 , typename R1 , typename R2 , typename R3 , typename R4 , typename R5 , typename R6>
@@ -219,8 +205,6 @@ namespace hpx
     when_all(lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3 , lcos::future<R4> f4 , lcos::future<R5> f5 , lcos::future<R6> f6 , lcos::future<R7> f7,
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> , lcos::future<R6> , lcos::future<R7> >
-            result_type;
         return when_n(8, f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7, ec);
     }
     template <typename R0 , typename R1 , typename R2 , typename R3 , typename R4 , typename R5 , typename R6 , typename R7>

@@ -39,10 +39,10 @@ namespace hpx
         std::vector<lcos::future<R> >))) lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<R> > return_type;
+        typedef std::vector<lcos::future<R> > result_type;
 
         if (lazy_values.empty())
-            return lcos::make_ready_future(return_type());
+            return lcos::make_ready_future(result_type());
 
         return when_n(lazy_values.size(), lazy_values, ec);
     }
@@ -189,9 +189,6 @@ namespace hpx
     when_all(BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_ARG, _),
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_TYPE, _)>
-            result_type;
-
         return when_n(N, BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_VAR, _), ec);
     }
 
