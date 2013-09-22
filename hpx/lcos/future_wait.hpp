@@ -32,7 +32,7 @@ namespace hpx { namespace lcos
     namespace detail
     {
         //////////////////////////////////////////////////////////////////////
-        // This version has a callback to be invoked for each future when it 
+        // This version has a callback to be invoked for each future when it
         // gets ready.
         template <typename T, typename F>
         struct when_all
@@ -212,7 +212,7 @@ namespace hpx { namespace lcos
         boost::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                hpx::detail::when_all<T1, F>(
+                detail::when_all<T1, F>(
                     lazy_values, boost::forward<F>(f), &success_counter));
 
         p.apply();
@@ -234,7 +234,7 @@ namespace hpx { namespace lcos
         boost::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                hpx::detail::when_all<void, F>(
+                detail::when_all<void, F>(
                     lazy_values, boost::forward<F>(f), &success_counter));
 
         p.apply();

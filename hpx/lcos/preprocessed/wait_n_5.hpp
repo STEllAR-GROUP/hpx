@@ -12,7 +12,7 @@ namespace hpx
 {
     
     template <typename R0>
-    lcos::future<HPX_STD_TUPLE<lcos::future<R0>>>
+    lcos::future<HPX_STD_TUPLE<lcos::future<R0> > >
     when_n(std::size_t n, lcos::future<R0> f0,
         error_code& ec = throws)
     {
@@ -25,8 +25,8 @@ namespace hpx
         }
         if (n > 1)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -45,10 +45,10 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<lcos::future<R0> >
             result_type;
-        lcos::future<result_type> f = when_n(n, 
+        lcos::future<result_type> f = when_n(n,
             f0, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
@@ -59,7 +59,7 @@ namespace hpx
 {
     
     template <typename R0 , typename R1>
-    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1>>>
+    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> > >
     when_n(std::size_t n, lcos::future<R0> f0 , lcos::future<R1> f1,
         error_code& ec = throws)
     {
@@ -72,8 +72,8 @@ namespace hpx
         }
         if (n > 2)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -92,10 +92,10 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> >
             result_type;
-        lcos::future<result_type> f = when_n(n, 
+        lcos::future<result_type> f = when_n(n,
             f0 , f1, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
@@ -106,7 +106,7 @@ namespace hpx
 {
     
     template <typename R0 , typename R1 , typename R2>
-    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2>>>
+    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> > >
     when_n(std::size_t n, lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2,
         error_code& ec = throws)
     {
@@ -119,8 +119,8 @@ namespace hpx
         }
         if (n > 3)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -139,10 +139,10 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> >
             result_type;
-        lcos::future<result_type> f = when_n(n, 
+        lcos::future<result_type> f = when_n(n,
             f0 , f1 , f2, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
@@ -153,7 +153,7 @@ namespace hpx
 {
     
     template <typename R0 , typename R1 , typename R2 , typename R3>
-    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3>>>
+    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> > >
     when_n(std::size_t n, lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3,
         error_code& ec = throws)
     {
@@ -166,8 +166,8 @@ namespace hpx
         }
         if (n > 4)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -186,10 +186,10 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> >
             result_type;
-        lcos::future<result_type> f = when_n(n, 
+        lcos::future<result_type> f = when_n(n,
             f0 , f1 , f2 , f3, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
@@ -200,7 +200,7 @@ namespace hpx
 {
     
     template <typename R0 , typename R1 , typename R2 , typename R3 , typename R4>
-    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4>>>
+    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> > >
     when_n(std::size_t n, lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3 , lcos::future<R4> f4,
         error_code& ec = throws)
     {
@@ -213,8 +213,8 @@ namespace hpx
         }
         if (n > 5)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -233,10 +233,10 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> >
             result_type;
-        lcos::future<result_type> f = when_n(n, 
+        lcos::future<result_type> f = when_n(n,
             f0 , f1 , f2 , f3 , f4, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
@@ -247,7 +247,7 @@ namespace hpx
 {
     
     template <typename R0 , typename R1 , typename R2 , typename R3 , typename R4 , typename R5>
-    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5>>>
+    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> > >
     when_n(std::size_t n, lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3 , lcos::future<R4> f4 , lcos::future<R5> f5,
         error_code& ec = throws)
     {
@@ -260,8 +260,8 @@ namespace hpx
         }
         if (n > 6)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -280,10 +280,10 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> >
             result_type;
-        lcos::future<result_type> f = when_n(n, 
+        lcos::future<result_type> f = when_n(n,
             f0 , f1 , f2 , f3 , f4 , f5, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
@@ -294,7 +294,7 @@ namespace hpx
 {
     
     template <typename R0 , typename R1 , typename R2 , typename R3 , typename R4 , typename R5 , typename R6>
-    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> , lcos::future<R6>>>
+    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> , lcos::future<R6> > >
     when_n(std::size_t n, lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3 , lcos::future<R4> f4 , lcos::future<R5> f5 , lcos::future<R6> f6,
         error_code& ec = throws)
     {
@@ -307,8 +307,8 @@ namespace hpx
         }
         if (n > 7)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -327,10 +327,10 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> , lcos::future<R6> >
             result_type;
-        lcos::future<result_type> f = when_n(n, 
+        lcos::future<result_type> f = when_n(n,
             f0 , f1 , f2 , f3 , f4 , f5 , f6, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
@@ -341,7 +341,7 @@ namespace hpx
 {
     
     template <typename R0 , typename R1 , typename R2 , typename R3 , typename R4 , typename R5 , typename R6 , typename R7>
-    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> , lcos::future<R6> , lcos::future<R7>>>
+    lcos::future<HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> , lcos::future<R6> , lcos::future<R7> > >
     when_n(std::size_t n, lcos::future<R0> f0 , lcos::future<R1> f1 , lcos::future<R2> f2 , lcos::future<R3> f3 , lcos::future<R4> f4 , lcos::future<R5> f5 , lcos::future<R6> f6 , lcos::future<R7> f7,
         error_code& ec = throws)
     {
@@ -354,8 +354,8 @@ namespace hpx
         }
         if (n > 8)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -374,10 +374,10 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<lcos::future<R0> , lcos::future<R1> , lcos::future<R2> , lcos::future<R3> , lcos::future<R4> , lcos::future<R5> , lcos::future<R6> , lcos::future<R7> >
             result_type;
-        lcos::future<result_type> f = when_n(n, 
+        lcos::future<result_type> f = when_n(n,
             f0 , f1 , f2 , f3 , f4 , f5 , f6 , f7, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }

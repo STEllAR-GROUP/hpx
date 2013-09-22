@@ -53,7 +53,7 @@ namespace hpx
         error_code& ec = throws)
     {
         typedef std::vector<lcos::future<R> > result_type;
-        
+
         result_type lazy_values_(lazy_values);
         return when_all(boost::move(lazy_values_), ec);
     }
@@ -97,7 +97,7 @@ namespace hpx
 
         lcos::future<result_type> f = when_all(lazy_values, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all",
                 "lcos::when_all didn't return a valid future");
             return result_type();
         }
@@ -125,7 +125,7 @@ namespace hpx
         typedef std::vector<lcos::future<
             typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
         > > result_type;
-        
+
         result_type lazy_values_(begin, end);
         return wait_all(boost::move(lazy_values_), ec);
     }
@@ -137,7 +137,7 @@ namespace hpx
 
         lcos::future<result_type> f = when_all(ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all",
                 "lcos::when_all didn't return a valid future");
             return result_type();
         }
@@ -194,7 +194,7 @@ namespace hpx
 
         return when_n(N, BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_VAR, _), ec);
     }
-    
+
     template <BOOST_PP_ENUM_PARAMS(N, typename R)>
     HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_TYPE, _)>
     wait_all(BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_ARG, _),
@@ -206,7 +206,7 @@ namespace hpx
         lcos::future<result_type> f = when_all(
             BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_VAR, _), ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all",
                 "lcos::when_all didn't return a valid future");
             return result_type();
         }

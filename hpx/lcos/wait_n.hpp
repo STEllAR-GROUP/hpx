@@ -74,6 +74,13 @@ namespace hpx
             Callback const& callback_;
         };
 
+        template <typename Sequence, typename Callback>
+        void set_on_completed_callback(Sequence& sequence, Callback const& callback)
+        {
+            set_on_completed_callback_impl<Callback> set_on_completed_callback_helper(callback);
+            set_on_completed_callback_helper(sequence);
+        }
+
         template <typename Sequence>
         struct when_n : boost::enable_shared_from_this<when_n<Sequence> >
         {
@@ -128,9 +135,7 @@ namespace hpx
             {
                 // set callback functions to executed when future is ready
                 threads::thread_id_type id = threads::get_self_id();
-
-                set_on_completed_callback_impl<Callback> set_on_completed_callback_helper(callback);
-                set_on_completed_callback_helper(lazy_values_, util::bind(
+                set_on_completed_callback(lazy_values_, util::bind(
                         &when_n::on_future_ready, this->shared_from_this(), id));
 
                 // if all of the requested futures are already set, our
@@ -177,8 +182,8 @@ namespace hpx
 
         if (n > lazy_values.size())
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -200,7 +205,7 @@ namespace hpx
         error_code& ec = throws)
     {
         typedef std::vector<lcos::future<R> > result_type;
-        
+
         result_type lazy_values_(lazy_values);
         return when_n(n, boost::move(lazy_values_), ec);
     }
@@ -234,8 +239,8 @@ namespace hpx
 
         //if (n > 0)
         //{
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         //}
@@ -259,7 +264,7 @@ namespace hpx
 
         lcos::future<result_type> f = when_n(n, lazy_values, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
@@ -287,7 +292,7 @@ namespace hpx
         typedef std::vector<lcos::future<
             typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
         > > result_type;
-        
+
         result_type lazy_values_(begin, end);
         return wait_n(n, boost::move(lazy_values_), ec);
     }
@@ -299,7 +304,7 @@ namespace hpx
 
         lcos::future<result_type> f = when_n(n, ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
@@ -363,8 +368,8 @@ namespace hpx
 
         if (n > N)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
-                "hpx::lcos::when_n", 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::when_n",
                 "number of results to wait for is out of bounds");
             return lcos::make_ready_future(result_type());
         }
@@ -388,10 +393,10 @@ namespace hpx
         typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_TYPE, _)>
             result_type;
 
-        lcos::future<result_type> f = when_n(n, 
+        lcos::future<result_type> f = when_n(n,
             BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_VAR, _), ec);
         if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n", 
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
             return result_type();
         }
