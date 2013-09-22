@@ -66,14 +66,14 @@ void functions_byrvref_params()
 
 #   ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     HPX_TEST_MSG((is_callable<void(int&&), int>::value == true), "fun-rvref/value");
-#   if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))
+#   if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
     HPX_TEST_MSG((is_callable<void(int&&), int&>::value == false), "fun-rvref/lvref");
 #   endif
     HPX_TEST_MSG((is_callable<void(int&&), int const&>::value == false), "fun-rvref/const-lvref");
     HPX_TEST_MSG((is_callable<void(int&&), BOOST_RV_REF(int)>::value == true), "fun-rvref/rvref");
     HPX_TEST_MSG((is_callable<void(int&&), BOOST_RV_REF(int const)>::value == false), "fun-rvref/const-rvref");
     HPX_TEST_MSG((is_callable<void(int const&&), int>::value == true), "fun-const-rvref/value");
-#   if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)) 
+#   if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)) 
     HPX_TEST_MSG((is_callable<void(int const&&), int&>::value == false), "fun-const-rvref/lvref");
     HPX_TEST_MSG((is_callable<void(int const&&), int const&>::value == false), "fun-const-rvref/const-lvref");
 #   endif
