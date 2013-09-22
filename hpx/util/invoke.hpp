@@ -186,7 +186,7 @@ namespace hpx { namespace util
     invoke(BOOST_FWD_REF(F) f)
     {
         typedef
-            typename invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
+            typename invoke_result_of<F()>::type
             result_type;
 
         return util::invoke_r<result_type>(boost::forward<F>(f));
