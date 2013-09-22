@@ -13,12 +13,6 @@
 
 namespace hpx { namespace components { namespace server
 {
-    template <typename Component>
-    naming::gid_type copy_component(Component const& comp)
-    {
-        return runtime_support::create_component1(comp);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Copy given component to the specified target locality
     namespace detail
@@ -29,7 +23,7 @@ namespace hpx { namespace components { namespace server
             naming::id_type const& target_locality)
         {
             boost::shared_ptr<Component> ptr = f.get();
-            return copy_component_1(target_locality, *ptr);
+            return new_<Component>(target_locality, *ptr);
         }
     }
 
@@ -38,9 +32,9 @@ namespace hpx { namespace components { namespace server
         naming::id_type const& target_locality)
     {
         using util::placeholders::_1;
-        future<boost::shared_ptr<Component> > f = get_ptr<Component>(to_copy);
-        return f.then(util::bind(&detail::copy_component_postproc<Component>,
-            _1, target_locality);
+        future<boost::shared_ptr<Component> > f = get_ptr_async<Component>(to_copy);
+        return f.then(util::bind(&detail::copy_component_postproc<Component>, 
+            _1, target_locality));
     }
 
     template <typename Component>

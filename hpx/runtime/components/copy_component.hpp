@@ -41,17 +41,22 @@ namespace hpx { namespace components
 
     /// \brief Copy given component to the specified target locality
     ///
-    /// The action \a copy_component will create a copy of the component
+    /// The action \a copy_component_async will create a copy of the component
     /// referenced by \a to_copy on the locality specified with
-    /// \a target_locality.
+    /// \a target_locality. It returns a future referring to the newly created
+    /// component instance.
     ///
     /// \param to_copy         [in] The global id of the component to copy
-    /// \param target_locality [in] The locality to create the copy on.
+    /// \param target_locality [in, optional] The locality to create the copy 
+    ///                        to (default is same locality as source).
+    ///
+    /// \tparam  The only template argument specifies the component type to 
+    ///          create.
     ///
     /// \returns A future representing the global id of the newly (copied)
     ///          component instance.
     ///
-    /// \note If the second argument is ommitted (or is invalid_id) the
+    /// \note If the second argument is omitted (or is invalid_id) the
     ///       new component instance is created on the locality of the
     ///       component instance which is to be copied.
     ///
@@ -59,8 +64,8 @@ namespace hpx { namespace components
     inline typename boost::enable_if<
         traits::is_component<Component>, lcos::future<naming::id_type>
     >::type
-    copy_component(naming::id_type const& to_copy,
-        naming:id_type target_locality = naming::invalid_id)
+    copy_component_async(naming::id_type const& to_copy,
+        naming:id_type const& target_locality = naming::invalid_id)
     {
         if (!target_locality) {
             future<naming:id_type> f = get_colocation_id_async(to_copy);
@@ -68,6 +73,57 @@ namespace hpx { namespace components
                 to_copy, util::placeholders::_1));
         }
         return detail::copy_component<Component>(to_copy, target_locality);
+    }
+
+    /// \brief Copy given component to the specified target locality
+    ///
+    /// The action \a copy_component will create a copy of the component
+    /// referenced by \a to_copy on the locality specified with
+    /// \a target_locality. It returns the global id of the newly created
+    /// component instance.
+    ///
+    /// \param to_copy         [in] The global id of the component to copy
+    /// \param target_locality [in, optional] The locality to create the copy 
+    ///                        to (default is same locality as source).
+    /// \param ec  [in,out] this represents the error status on exit, if this
+    ///            is pre-initialized to \a hpx#throws the function will throw
+    ///            on error instead.
+    ///
+    /// \tparam  The only template argument specifies the component type to 
+    ///          create.
+    ///
+    /// \returns A the global id of the newly (copied) component instance.
+    ///
+    /// \note If the second argument is omitted (or is invalid_id) the
+    ///       new component instance is created on the locality of the
+    ///       component instance which is to be copied.
+    ///
+    /// \note As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///       function doesn't throw but returns the result code using the
+    ///       parameter \a ec. Otherwise it throws an instance of
+    ///       hpx::exception.
+    ///
+    template <typename Component>
+    inline typename boost::enable_if<
+        traits::is_component<Component>, naming::id_type
+    >::type
+    copy_component(naming::id_type const& to_copy,
+        naming:id_type const& target_locality = naming::invalid_id, 
+        error_code& ec = throws)
+    {
+        return detail::copy_component_async<Component>(
+            to_copy, target_locality).get(ec);
+    }
+
+    /// \copydoc copy_component(naming::id_type const& to_copy, naming:id_type const& target_locality = naming::invalid_id, error_code& ec = throws)
+    ///
+    template <typename Component>
+    inline typename boost::enable_if<
+        traits::is_component<Component>, naming::id_type
+    >::type
+    copy_component(naming::id_type const& to_copy, error_code& ec)
+    {
+        return detail::copy_component_async<Component>(to_copy).get(ec);
     }
 }}
 
