@@ -42,7 +42,7 @@ bool test_get_ptr1(hpx::id_type id)
 
     try {
         hpx::future<boost::shared_ptr<test_server> > f =
-            hpx::get_ptr<test_server>(t.get_gid());
+            hpx::get_ptr_async<test_server>(t.get_gid());
 
         boost::shared_ptr<test_server> ptr = f.get();
 
@@ -63,7 +63,7 @@ bool test_get_ptr2(hpx::id_type id)
     HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_gid());
 
     hpx::future<boost::shared_ptr<test_server> > f =
-        hpx::get_ptr<test_server>(t.get_gid());
+        hpx::get_ptr_async<test_server>(t.get_gid());
 
     hpx::error_code ec;
     boost::shared_ptr<test_server> ptr = f.get(ec);
