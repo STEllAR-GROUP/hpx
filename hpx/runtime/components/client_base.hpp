@@ -27,7 +27,10 @@ namespace hpx { namespace components
     {
         BOOST_MPL_HAS_XXX_TRAIT_DEF(server_component_type)
 
-        // wrap a give type such that it is usable as a stub_base
+        // Wrap a give type such that it is usable as a stub_base.
+        // The main template is chosen whenever the argument Stub is not a (or 
+        // not derived from) a stub_base. In this case Stub should be a server 
+        // side component implementation type.
         template <typename Stub, typename Enable = void>
         struct make_stub
         {
@@ -36,6 +39,8 @@ namespace hpx { namespace components
                 server_component_type;
         };
 
+        // This specialization is chosen whenever the argument Stub is a (or 
+        // derived from a) stub_base.
         template <typename Stub>
         struct make_stub<Stub, 
             typename boost::enable_if<has_server_component_type<Stub> >::type>
