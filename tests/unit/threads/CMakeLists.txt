@@ -5,7 +5,7 @@
 
 set(tests
     set_thread_state
-    thread
+#    thread
     thread_affinity
     thread_id
     thread_launching

@@ -6,7 +6,7 @@
 set(tests
     any
     any_serialization
-    boost_any
+#    boost_any
     bind_action
     function
     merging_map
