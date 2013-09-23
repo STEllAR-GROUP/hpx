@@ -12,6 +12,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
+#include <hpx/util/always_void.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/future.hpp>
 
@@ -42,8 +43,8 @@ namespace hpx { namespace components
         // This specialization is chosen whenever the argument Stub is a (or 
         // derived from a) stub_base.
         template <typename Stub>
-        struct make_stub<Stub, 
-            typename boost::enable_if<has_server_component_type<Stub> >::type>
+        struct make_stub<Stub, typename util::always_void<
+            typename Stub::server_component_type>::type>
         {
             typedef Stub type;
             typedef typename Stub::server_component_type server_component_type;
