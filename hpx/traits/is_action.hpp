@@ -9,18 +9,18 @@
 #include <hpx/traits.hpp>
 #include <hpx/util/always_void.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/mpl/has_xxx.hpp>
 
 namespace hpx { namespace traits
 {
-    namespace detail
-    {
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(action_tag)
-    }
-
     template <typename Action, typename Enable>
     struct is_action
-      : detail::has_action_tag<Action>
+      : boost::mpl::false_
+    {};
+
+    template <typename Action>
+    struct is_action<Action
+      , typename util::always_void<typename Action::action_tag>::type>
+      : boost::mpl::true_
     {};
 
     template <typename Action>
