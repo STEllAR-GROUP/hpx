@@ -514,7 +514,7 @@ namespace hpx {
         char const* name = runtime::thread_name_.get()->c_str();
 
         // initialize thread mapping for external libraries (i.e. PAPI)
-        thread_support_.register_thread(name);
+        thread_support_->register_thread(name);
 
         // initialize coroutines context switcher
         hpx::util::coroutines::thread_startup(name);
@@ -549,7 +549,7 @@ namespace hpx {
         this->runtime::deinit_tss();
 
         // reset PAPI support
-        thread_support_.unregister_thread();
+        thread_support_->unregister_thread();
 
         // reset thread local storage
         runtime::thread_name_.reset();

@@ -7,6 +7,7 @@
 
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/agas/stubs/component_namespace.hpp>
+#include <hpx/runtime/agas/server/component_namespace.hpp>
 
 #include <boost/serialization/vector.hpp>
 

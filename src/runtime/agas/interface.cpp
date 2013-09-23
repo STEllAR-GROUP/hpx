@@ -7,6 +7,7 @@
 
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
@@ -149,7 +150,7 @@ naming::id_type resolve_name(
 //     naming::resolver_client& agas_ = naming::get_agas_client();
 //     return agas_.get_localities_async();
 // }
-// 
+//
 // std::vector<naming::id_type> get_localities(
 //     components::component_type type
 //   , error_code& ec

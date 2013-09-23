@@ -17,6 +17,7 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/util/thread_mapper.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/parcel_suffix.hpp>
@@ -433,6 +434,7 @@ namespace hpx
     runtime::runtime(util::runtime_configuration const& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
+        thread_support_(new util::thread_mapper),
         topology_(threads::create_topology()),
         state_(state_invalid)
 #if defined(HPX_HAVE_SECURITY)
@@ -492,6 +494,11 @@ namespace hpx
     {
         boost::int64_t diff = util::high_resolution_clock::now() - *runtime::uptime_.get();
         return diff < 0LL ? 0ULL : static_cast<boost::uint64_t>(diff);
+    }
+
+    util::thread_mapper& runtime::get_thread_mapper()
+    {
+        return *thread_support_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
