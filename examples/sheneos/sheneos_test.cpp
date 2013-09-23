@@ -306,12 +306,6 @@ void wait_for_bulk_one_task(std::size_t i, hpx::util::high_resolution_timer& t)
         << " [s]" << std::endl;
 }
 
-void wait_for_bulk_task(std::size_t i, hpx::util::high_resolution_timer& t)
-{
-    std::cout << "Finished bulk task " << i << ": " << t.elapsed()
-        << " [s]" << std::endl;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
@@ -403,16 +397,6 @@ int hpx_main(boost::program_options::variables_map& vm)
                     num_ye_points, num_temp_points, num_rho_points, seed));
             }
         }
-
-        /*
-        std::size_t i = 0;
-        while (!bulk_tests.empty())
-        {
-            std::vector<hpx::future<void> > r = hpx::wait_any(bulk_tests);
-            bulk_tests.erase(bulk_tests.begin() + HPX_STD_GET(0, r));
-            wait_for_bulk_task(i++, t);
-        }
-        */
         hpx::wait_all(bulk_tests);
 
         std::cout << "Completed bulk tests: " << t.elapsed() << " [s]"
