@@ -56,7 +56,7 @@ void test_return_int()
     try {
         HPX_TEST(f2.get()==2);
     }
-    catch (hpx::exception const& ex) {
+    catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
     }
     catch (...) {
@@ -74,7 +74,7 @@ void test_return_void()
     try {
         f2.wait();
     }
-    catch (hpx::exception const& ex) {
+    catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
     }
     catch (...) {
@@ -92,7 +92,7 @@ void test_implicit_unwrapping()
     try {
         HPX_TEST(f2.get()==2);
     }
-    catch (hpx::exception const& ex) {
+    catch (hpx::exception const& /*ex*/) {
         HPX_TEST(false);
     }
     catch (...) {
