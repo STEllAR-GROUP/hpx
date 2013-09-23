@@ -13,7 +13,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
-//#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/result_of.hpp>

@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/server/wrapper_heap_list.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/stringstream.hpp>
 
@@ -417,9 +418,9 @@ namespace hpx { namespace components { namespace server { namespace detail
         HPX_DEFINE_COMPONENT_ACTION(memory_block, checkin);
         HPX_DEFINE_COMPONENT_ACTION(memory_block, clone);
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
@@ -701,7 +702,6 @@ HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::detail::memory_block::clone_action,
     memory_block_clone_action)
 
-typedef hpx::components::memory_block_data memory_data_type;
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::components::memory_block_data,
     memory_data_type)
