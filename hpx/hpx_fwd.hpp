@@ -1199,7 +1199,7 @@ namespace hpx
     HPX_API_EXPORT naming::id_type get_colocation_id(naming::id_type id,
         error_code& ec = throws);
 
-    /// \brief Asynchronously return the id of the locality where the object 
+    /// \brief Asynchronously return the id of the locality where the object
     ///        referenced by the given id is currently located on
     ///
     /// \see    \a hpx::get_colocation_id()

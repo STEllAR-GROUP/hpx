@@ -178,11 +178,9 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /*
     template HPX_EXPORT boost::exception_ptr
         get_exception(hpx::exception const&, std::string const&,
         std::string const&, long);
-    */
 
     template BOOST_ATTRIBUTE_NORETURN HPX_EXPORT void
         throw_exception(hpx::exception const&,

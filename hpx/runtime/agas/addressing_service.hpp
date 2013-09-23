@@ -25,9 +25,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/include/async.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
