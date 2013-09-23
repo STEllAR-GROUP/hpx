@@ -169,6 +169,12 @@ namespace hpx { namespace util
     template <typename Tuple, typename Enable = void>
     struct tuple_size;
 
+    template <>
+    struct tuple_size<tuple<> >
+    {
+        static const std::size_t value = 0;
+    };
+
     template <typename Tuple>
     struct tuple_size<Tuple const>
       : tuple_size<Tuple>
