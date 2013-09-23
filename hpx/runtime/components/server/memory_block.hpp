@@ -700,6 +700,8 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::detail::memory_block::clone_action,
     memory_block_clone_action)
+
+typedef hpx::components::memory_block_data memory_data_type;
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::components::memory_block_data,
     memory_data_type)
