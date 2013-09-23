@@ -315,7 +315,7 @@ namespace hpx
 
         /// Assignment operator for error_code
         ///
-        /// \note This function maintains the error category of the left hand 
+        /// \note This function maintains the error category of the left hand
         ///       side if the right hand side is a success code.
         inline error_code& operator=(error_code const& rhs);
 

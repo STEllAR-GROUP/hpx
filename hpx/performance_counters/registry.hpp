@@ -8,7 +8,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/performance_counters/counters.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

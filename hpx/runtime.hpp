@@ -9,14 +9,12 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/static_reinit.hpp>
-#include <hpx/util/query_counters.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -24,6 +22,16 @@ namespace hpx
     namespace util
     {
         class thread_mapper;
+        class query_counters;
+        class unique_id_ranges;
+    }
+    namespace components { namespace server {
+        class runtime_support;
+        class memory;
+    }}
+
+    namespace performance_counters {
+        class registry;
     }
 
     bool pre_main(runtime_mode);
@@ -129,17 +137,21 @@ namespace hpx
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
-        performance_counters::registry& get_counter_registry()
+        performance_counters::registry& get_counter_registry();
+        /*
         {
             return *counters_;
         }
+        */
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
-        performance_counters::registry const& get_counter_registry() const
+        performance_counters::registry const& get_counter_registry() const;
+        /*
         {
             return *counters_;
         }
+        */
 
         /// \brief Return a reference to the internal PAPI thread manager
         util::thread_mapper& get_thread_mapper();
@@ -262,10 +274,12 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
-            boost::shared_ptr<util::query_counters> const& active_counters)
+            boost::shared_ptr<util::query_counters> const& active_counters);
+        /*
         {
             active_counters_ = active_counters;
         }
+        */
 
         void start_active_counters(error_code& ec = throws);
         void stop_active_counters(error_code& ec = throws);
@@ -350,8 +364,8 @@ namespace hpx
 
         state state_;
 
-        components::server::memory memory_;
-        components::server::runtime_support runtime_support_;
+        boost::scoped_ptr<components::server::memory> memory_;
+        boost::scoped_ptr<components::server::runtime_support> runtime_support_;
 
 #if defined(HPX_HAVE_SECURITY)
         // allocate dynamically to reduce dependencies

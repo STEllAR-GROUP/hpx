@@ -9,11 +9,14 @@
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/include/performance_counters.hpp>
-#include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
@@ -436,7 +439,9 @@ namespace hpx
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
         topology_(threads::create_topology()),
-        state_(state_invalid)
+        state_(state_invalid),
+        memory_(new components::server::memory),
+        runtime_support_(new components::server::runtime_support)
 #if defined(HPX_HAVE_SECURITY)
       , security_data_(new detail::manage_security_data)
 #endif
@@ -496,12 +501,28 @@ namespace hpx
         return diff < 0LL ? 0ULL : static_cast<boost::uint64_t>(diff);
     }
 
+    performance_counters::registry& runtime::get_counter_registry()
+    {
+        return *counters_;
+    }
+
+    performance_counters::registry const& runtime::get_counter_registry() const
+    {
+        return *counters_;
+    }
+
     util::thread_mapper& runtime::get_thread_mapper()
     {
         return *thread_support_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void runtime::register_query_counters(
+        boost::shared_ptr<util::query_counters> const& active_counters)
+    {
+        active_counters_ = active_counters;
+    }
+
     void runtime::start_active_counters(error_code& ec)
     {
         if (active_counters_.get())
@@ -532,7 +553,7 @@ namespace hpx
         parcelset::parcelport* pp, std::size_t num_messages,
         std::size_t interval, error_code& ec)
     {
-        return runtime_support_.create_message_handler(message_handler_type,
+        return runtime_support_->create_message_handler(message_handler_type,
             action, pp, num_messages, interval, ec);
     }
 
@@ -540,7 +561,7 @@ namespace hpx
         char const* binary_filter_type, bool compress,
         util::binary_filter* next_filter, error_code& ec)
     {
-        return runtime_support_.create_binary_filter(binary_filter_type,
+        return runtime_support_->create_binary_filter(binary_filter_type,
             compress, next_filter, ec);
     }
 

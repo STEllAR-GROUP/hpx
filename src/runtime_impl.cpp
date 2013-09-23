@@ -21,6 +21,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/set_thread_name.hpp>
+#include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/apex.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
@@ -129,7 +130,7 @@ namespace hpx {
             new parcelset::policies::global_parcelhandler_queue),
         init_logging_(ini_, mode_ == runtime_mode_console, agas_client_),
         applier_(parcel_handler_, *thread_manager_,
-            boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
+            boost::uint64_t(runtime_support_.get()), boost::uint64_t(memory_.get())),
         action_manager_(applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
@@ -181,7 +182,7 @@ namespace hpx {
         io_pool_.stop();
 
         // unload libraries
-        //runtime_support_.tidy();
+        //runtime_support_->tidy();
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
         util::mpi_environment::finalize();
@@ -247,7 +248,7 @@ namespace hpx {
                    << ((num_threads_ == 1) ? "" : "s");
 
         // start runtime_support services
-        runtime_support_.run();
+        runtime_support_->run();
         LBT_(info) << "(1st stage) runtime_impl::start: started "
                       "runtime_support component";
 
@@ -311,7 +312,7 @@ namespace hpx {
         util::set_thread_name("main-thread#wait_helper");
 
         // wait for termination
-        runtime_support_.wait();
+        runtime_support_->wait();
 
         // stop main thread pool
         main_pool_.stop();
@@ -395,7 +396,7 @@ namespace hpx {
         bool blocking, boost::condition& cond, boost::mutex& mtx)
     {
         // wait for thread manager to exit
-        runtime_support_.stopped();         // re-activate shutdown PX-thread
+        runtime_support_->stopped();         // re-activate shutdown PX-thread
         thread_manager_->stop(blocking);     // wait for thread manager
 
         // this disables all logging from the main thread
@@ -566,35 +567,35 @@ namespace hpx {
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
         add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f)
     {
-        runtime_support_.add_pre_startup_function(f);
+        runtime_support_->add_pre_startup_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
         add_startup_function(HPX_STD_FUNCTION<void()> const& f)
     {
-        runtime_support_.add_startup_function(f);
+        runtime_support_->add_startup_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
         add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
     {
-        runtime_support_.add_pre_shutdown_function(f);
+        runtime_support_->add_pre_shutdown_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
         add_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
     {
-        runtime_support_.add_shutdown_function(f);
+        runtime_support_->add_shutdown_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool runtime_impl<SchedulingPolicy, NotificationPolicy>::
         keep_factory_alive(components::component_type type)
     {
-        return runtime_support_.keep_factory_alive(type);
+        return runtime_support_->keep_factory_alive(type);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>

@@ -118,7 +118,7 @@ namespace hpx { namespace performance_counters { namespace server
 
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
-        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter, 
+        HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
             get_counter_value_nonvirt, get_counter_value_action);
 
         /// The \a set_counter_value_action
