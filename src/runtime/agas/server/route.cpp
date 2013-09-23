@@ -83,7 +83,7 @@ namespace hpx { namespace agas { namespace server
         }
 
         // asynchronously update cache on source locality
-        naming::id_type source = get_colocation_id(p.get_source());
+        naming::id_type source = get_colocation_id_sync(p.get_source());
         for (std::size_t i = 0; i != size; ++i)
         {
             boost::fusion::vector2<naming::gid_type, gva> const& r =

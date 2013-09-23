@@ -61,7 +61,7 @@ namespace examples
 
             // request gid;
             *this = hpx::components::new_<examples::server::simple_central_tuplespace>(locality);
-            bool rc = hpx::agas::register_name(symbol_name, this->get_gid());
+            bool rc = hpx::agas::register_name(symbol_name, this->get_gid()).get();
 
             if(rc)
             {
@@ -79,16 +79,11 @@ namespace examples
                 return false;
             }
 
-            hpx::naming::id_type ts_gid;                                     
-            bool rc = hpx::agas::resolve_name(symbol_name, ts_gid);  
+            *this = hpx::agas::resolve_name(symbol_name).get();
 
-            if(rc)
-            {
-                *this = ts_gid;
-                symbol_name_ = symbol_name;
-            }
+            symbol_name_ = symbol_name;
 
-            return rc;
+            return true;
         }
 
 

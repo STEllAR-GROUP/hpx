@@ -9,73 +9,76 @@
 #define HPX_85B78E29_DD30_4603_8EF5_29EFB32FD10D
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/agas/server/component_namespace.hpp>
+//#include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/lcos/async.hpp>
 
-namespace hpx { namespace agas { namespace stubs
+namespace hpx { namespace agas {
+    struct request;
+    struct response;
+namespace server
 {
-
-struct HPX_EXPORT component_namespace
+    struct component_namespace;
+}
+namespace stubs
 {
-    typedef server::component_namespace server_type;
-    typedef server::component_namespace server_component_type;
-
-    typedef server_type::component_id_type component_id_type;
-    typedef server_type::prefixes_type prefixes_type;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
-    static lcos::future<Result> service_async(
-        naming::id_type const& gid
-      , request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-        );
-
-    /// Fire-and-forget semantics.
-    ///
-    /// \note This is placed out of line to avoid including applier headers.
-    static void service_non_blocking(
-        naming::id_type const& gid
-      , request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-        );
-
-    static response service(
-        naming::id_type const& gid
-      , request const& req
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
+    struct HPX_EXPORT component_namespace
     {
-        return service_async<response>(gid, req, priority).get(ec);
-    }
+        typedef server::component_namespace server_type;
+        typedef server::component_namespace server_component_type;
 
-    ///////////////////////////////////////////////////////////////////////////
-    static lcos::future<std::vector<response> > bulk_service_async(
-        naming::id_type const& gid
-      , std::vector<request> const& reqs
-      , threads::thread_priority priority = threads::thread_priority_default
-        );
+        ///////////////////////////////////////////////////////////////////////////
+        template <typename Result>
+        static lcos::future<Result> service_async(
+            naming::id_type const& gid
+          , request const& req
+          , threads::thread_priority priority = threads::thread_priority_default
+            );
 
-    /// Fire-and-forget semantics.
-    ///
-    /// \note This is placed out of line to avoid including applier headers.
-    static void bulk_service_non_blocking(
-        naming::id_type const& gid
-      , std::vector<request> const& reqs
-      , threads::thread_priority priority = threads::thread_priority_default
-        );
+        /// Fire-and-forget semantics.
+        ///
+        /// \note This is placed out of line to avoid including applier headers.
+        static void service_non_blocking(
+            naming::id_type const& gid
+          , request const& req
+          , threads::thread_priority priority = threads::thread_priority_default
+            );
 
-    static std::vector<response> bulk_service(
-        naming::id_type const& gid
-      , std::vector<request> const& reqs
-      , threads::thread_priority priority = threads::thread_priority_default
-      , error_code& ec = throws
-        )
-    {
-        return bulk_service_async(gid, reqs, priority).get(ec);
-    }
-};
+        static response service(
+            naming::id_type const& gid
+          , request const& req
+          , threads::thread_priority priority = threads::thread_priority_default
+          , error_code& ec = throws
+            )
+        {
+            return service_async<response>(gid, req, priority).get(ec);
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        static lcos::future<std::vector<response> > bulk_service_async(
+            naming::id_type const& gid
+          , std::vector<request> const& reqs
+          , threads::thread_priority priority = threads::thread_priority_default
+            );
+
+        /// Fire-and-forget semantics.
+        ///
+        /// \note This is placed out of line to avoid including applier headers.
+        static void bulk_service_non_blocking(
+            naming::id_type const& gid
+          , std::vector<request> const& reqs
+          , threads::thread_priority priority = threads::thread_priority_default
+            );
+
+        static std::vector<response> bulk_service(
+            naming::id_type const& gid
+          , std::vector<request> const& reqs
+          , threads::thread_priority priority = threads::thread_priority_default
+          , error_code& ec = throws
+            )
+        {
+            return bulk_service_async(gid, reqs, priority).get(ec);
+        }
+    };
 
 }}}
 

@@ -7,6 +7,7 @@
 
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
@@ -15,7 +16,7 @@
 namespace hpx { namespace agas
 {
 ///////////////////////////////////////////////////////////////////////////////
-bool register_name(
+bool register_name_sync(
     std::string const& name
   , naming::gid_type const& gid
   , error_code& ec
@@ -25,7 +26,7 @@ bool register_name(
     return agas_.register_name(name, gid);
 }
 
-bool register_name(
+bool register_name_sync(
     std::string const& name
   , naming::id_type const& id
   , error_code& ec
@@ -35,7 +36,7 @@ bool register_name(
     return agas_.register_name(name, id);
 }
 
-lcos::future<bool> register_name_async(
+lcos::future<bool> register_name(
     std::string const& name
   , naming::id_type const& id
     )
@@ -45,7 +46,7 @@ lcos::future<bool> register_name_async(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool unregister_name(
+bool unregister_name_sync(
     std::string const& name
   , naming::id_type& gid
   , error_code& ec
@@ -68,7 +69,7 @@ bool unregister_name(
     return false;
 }
 
-naming::id_type unregister_name(
+naming::id_type unregister_name_sync(
     std::string const& name
   , error_code& ec
     )
@@ -77,7 +78,7 @@ naming::id_type unregister_name(
     return agas_.unregister_name(name);
 }
 
-lcos::future<naming::id_type> unregister_name_async(
+lcos::future<naming::id_type> unregister_name(
     std::string const& name
     )
 {
@@ -86,7 +87,7 @@ lcos::future<naming::id_type> unregister_name_async(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool resolve_name(
+bool resolve_name_sync(
     std::string const& name
   , naming::gid_type& gid
   , error_code& ec
@@ -101,7 +102,7 @@ bool resolve_name(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool resolve_name(
+bool resolve_name_sync(
     std::string const& name
   , naming::id_type& gid
   , error_code& ec
@@ -124,7 +125,7 @@ bool resolve_name(
     return false;
 }
 
-lcos::future<naming::id_type> resolve_name_async(
+lcos::future<naming::id_type> resolve_name(
     std::string const& name
     )
 {
@@ -132,7 +133,7 @@ lcos::future<naming::id_type> resolve_name_async(
     return agas_.resolve_name_async(name);
 }
 
-naming::id_type resolve_name(
+naming::id_type resolve_name_sync(
     std::string const& name
   , error_code& ec
     )
@@ -142,15 +143,15 @@ naming::id_type resolve_name(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// lcos::future<std::vector<naming::id_type> > get_localities_async(
+// lcos::future<std::vector<naming::id_type> > get_localities(
 //     components::component_type type
 //     )
 // {
 //     naming::resolver_client& agas_ = naming::get_agas_client();
 //     return agas_.get_localities_async();
 // }
-// 
-// std::vector<naming::id_type> get_localities(
+//
+// std::vector<naming::id_type> get_localities_sync(
 //     components::component_type type
 //   , error_code& ec
 //     )
@@ -159,7 +160,7 @@ naming::id_type resolve_name(
 //     return agas_.get_localities(type, ec);
 // }
 
-lcos::future<boost::uint32_t> get_num_localities_async(
+lcos::future<boost::uint32_t> get_num_localities(
     components::component_type type
     )
 {
@@ -167,7 +168,7 @@ lcos::future<boost::uint32_t> get_num_localities_async(
     return agas_.get_num_localities_async();
 }
 
-boost::uint32_t get_num_localities(
+boost::uint32_t get_num_localities_sync(
     components::component_type type
   , error_code& ec
     )
@@ -176,13 +177,13 @@ boost::uint32_t get_num_localities(
     return agas_.get_num_localities(type, ec);
 }
 
-lcos::future<std::vector<boost::uint32_t> > get_num_threads_async()
+lcos::future<std::vector<boost::uint32_t> > get_num_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_threads_async();
 }
 
-std::vector<boost::uint32_t> get_num_threads(
+std::vector<boost::uint32_t> get_num_threads_sync(
     error_code& ec
     )
 {
@@ -190,13 +191,13 @@ std::vector<boost::uint32_t> get_num_threads(
     return agas_.get_num_threads(ec);
 }
 
-lcos::future<boost::uint32_t> get_num_overall_threads_async()
+lcos::future<boost::uint32_t> get_num_overall_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_overall_threads_async();
 }
 
-boost::uint32_t get_num_overall_threads(
+boost::uint32_t get_num_overall_threads_sync(
     error_code& ec
     )
 {
@@ -270,7 +271,7 @@ bool is_local_lva_encoded_address(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<naming::address> resolve_async(
+hpx::future<naming::address> resolve(
     naming::id_type const& id
     )
 {
@@ -278,7 +279,7 @@ hpx::future<naming::address> resolve_async(
     return agas_.resolve_async(id);
 }
 
-naming::address resolve(
+naming::address resolve_sync(
     naming::id_type const& id
   , error_code& ec
     )

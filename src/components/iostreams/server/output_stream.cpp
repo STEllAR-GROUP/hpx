@@ -15,6 +15,8 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
 
+#include <hpx/util/io_service_pool.hpp>
+
 #include <iostream>
 
 namespace hpx { namespace iostreams { namespace server

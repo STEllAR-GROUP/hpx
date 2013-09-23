@@ -7,7 +7,7 @@ set(HPX_ADDPSEUDODEPENDENCIES_LOADED TRUE)
 
 macro(add_hpx_pseudo_dependencies)
   # Windows is evil
-  if(NOT MSVC)
+  if(NOT MSVC AND NOT MINGW)
     add_dependencies(${ARGV})
   endif()
 endmacro()

@@ -9,18 +9,31 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/performance_counters/registry.hpp>
-#include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/static_reinit.hpp>
-#include <hpx/util/query_counters.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    namespace util
+    {
+        class thread_mapper;
+        class query_counters;
+        class unique_id_ranges;
+    }
+    namespace components { namespace server {
+        class runtime_support;
+        class memory;
+    }}
+
+    namespace performance_counters {
+        class registry;
+    }
+
     bool pre_main(runtime_mode);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -124,23 +137,24 @@ namespace hpx
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
-        performance_counters::registry& get_counter_registry()
+        performance_counters::registry& get_counter_registry();
+        /*
         {
             return *counters_;
         }
+        */
 
         /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
-        performance_counters::registry const& get_counter_registry() const
+        performance_counters::registry const& get_counter_registry() const;
+        /*
         {
             return *counters_;
         }
+        */
 
         /// \brief Return a reference to the internal PAPI thread manager
-        util::thread_mapper& get_thread_mapper()
-        {
-            return thread_support_;
-        }
+        util::thread_mapper& get_thread_mapper();
 
         threads::topology const& get_topology() const
         {
@@ -217,7 +231,7 @@ namespace hpx
         /// such as setting a value on a promise or similar.
         ///
         /// \param name             [in] The name to use for thread registration.
-        /// \param num              [in] The sequence number to use for thread 
+        /// \param num              [in] The sequence number to use for thread
         ///                         registration. The default for this parameter
         ///                         is zero.
         /// \param service_thread   [in] The thread should be registered as a
@@ -226,9 +240,9 @@ namespace hpx
         ///                         to cores not currently used by any of the HPX
         ///                         worker threads.
         ///
-        /// \note The function will compose a thread name of the form 
+        /// \note The function will compose a thread name of the form
         ///       '<name>-thread#<num>' which is used to register the thread. It
-        ///       is the user's responsibility to ensure that each (composed) 
+        ///       is the user's responsibility to ensure that each (composed)
         ///       thread name is unique. HPX internally uses the following names
         ///       for the threads it creates, do not reuse those:
         ///
@@ -249,7 +263,7 @@ namespace hpx
         ///
         /// \note This function should be called for each thread exactly once. It
         ///       will fail if it is called more than once. It will fail as well
-        ///       if the thread has not been registered before (see 
+        ///       if the thread has not been registered before (see
         ///       \a register_thread).
         ///
         /// \returns This function will return whether th erequested operation
@@ -260,10 +274,12 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
-            boost::shared_ptr<util::query_counters> const& active_counters)
+            boost::shared_ptr<util::query_counters> const& active_counters);
+        /*
         {
             active_counters_ = active_counters;
         }
+        */
 
         void start_active_counters(error_code& ec = throws);
         void stop_active_counters(error_code& ec = throws);
@@ -342,14 +358,14 @@ namespace hpx
 
         // certain components (such as PAPI) require all threads to be
         // registered with the library
-        util::thread_mapper thread_support_;
+        boost::scoped_ptr<util::thread_mapper> thread_support_;
 
         boost::scoped_ptr<threads::topology> topology_;
 
         state state_;
 
-        components::server::memory memory_;
-        components::server::runtime_support runtime_support_;
+        boost::scoped_ptr<components::server::memory> memory_;
+        boost::scoped_ptr<components::server::runtime_support> runtime_support_;
 
 #if defined(HPX_HAVE_SECURITY)
         // allocate dynamically to reduce dependencies

@@ -13,6 +13,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/util/parse_command_line.hpp>
+#include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/papi/util/papi.hpp>
 
 #define NS_STR "hpx::performance_counters::papi::util::"

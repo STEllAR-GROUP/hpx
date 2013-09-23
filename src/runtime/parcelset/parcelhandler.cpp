@@ -10,6 +10,7 @@
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>

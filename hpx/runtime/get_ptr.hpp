@@ -66,7 +66,7 @@ namespace hpx
 
     /// \brief Returns a future referring to a the pointer to the underlying memory of a component
     ///
-    /// The function hpx::get_ptr_async can be used to extract a future
+    /// The function hpx::get_ptr can be used to extract a future
     /// referring to the pointer to the underlying memory of a given component.
     ///
     /// \param id  [in] The global id of the component for which the pointer
@@ -86,17 +86,17 @@ namespace hpx
     ///
     template <typename Component>
     hpx::future<boost::shared_ptr<Component> >
-    get_ptr_async(naming::id_type const& id)
+    get_ptr(naming::id_type const& id)
     {
         using util::placeholders::_1;
-        future<naming::address> f = agas::resolve_async(id);
+        future<naming::address> f = agas::resolve(id);
         return f.then(util::bind(&detail::get_ptr_postproc<Component>, _1, id));
     }
     
     /// \brief Returns the pointer to the underlying memory of a component
     ///
-    /// The function hpx::get_ptr can be used to extract the pointer to the
-    /// underlying memory of a given component.
+    /// The function hpx::get_ptr_sync can be used to extract the pointer to
+    /// the underlying memory of a given component.
     ///
     /// \param id  [in] The global id of the component for which the pointer
     ///            to the underlying memory should be retrieved.
@@ -122,10 +122,10 @@ namespace hpx
     ///
     template <typename Component>
     boost::shared_ptr<Component>
-    get_ptr(naming::id_type const& id, error_code& ec = throws)
+    get_ptr_sync(naming::id_type const& id, error_code& ec = throws)
     {
         hpx::future<boost::shared_ptr<Component> > ptr =
-            get_ptr_async<Component>(id);
+            get_ptr<Component>(id);
         return ptr.get(ec);
     }
 }

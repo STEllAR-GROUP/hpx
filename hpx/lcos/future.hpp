@@ -57,7 +57,7 @@ namespace hpx { namespace lcos
         {
             typedef T type;
         };
-        
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct then_future_result
@@ -209,7 +209,7 @@ namespace hpx { namespace lcos
           : future_data_(new lcos::detail::timed_future_data<Result>(
                 d, boost::move(init)))
         {}
-        
+
 #       ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this... defined at promise.hpp
         explicit future(promise_type& promise);
@@ -525,7 +525,7 @@ namespace hpx { namespace lcos
           : future_data_(new lcos::detail::timed_future_data<void>(
                 d, util::unused))
         {}
-        
+
 #       ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this... defined at promise.hpp
         explicit future(promise_type& promise);
@@ -846,7 +846,7 @@ namespace hpx { namespace actions
         util::function<void(naming::id_type, Result)> f_;
         mutable lcos::future<void> deferred_result_;
     };
-    
+
     // special handling of actions returning a future
     template <>
     struct typed_continuation<lcos::future<void> > : continuation

@@ -9,11 +9,9 @@
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/agas/server/component_namespace.hpp>
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/backtrace.hpp>
 
@@ -102,7 +100,7 @@ namespace hpx { namespace detail
         std::string const& file, long line, std::string const& back_trace,
         boost::uint32_t node, std::string const& hostname_, boost::int64_t pid_,
         std::size_t shepherd, std::size_t thread_id,
-        std::string const& thread_name, std::string const& env, 
+        std::string const& thread_name, std::string const& env,
         std::string const& config)
     {
         // create a boost::exception_ptr object encapsulating the Exception to
@@ -139,7 +137,7 @@ namespace hpx { namespace detail
 
         std::string hostname_;
         hpx::runtime* rt = get_runtime_ptr();
-        if (rt && rt->get_state() >= runtime::state_initialized && 
+        if (rt && rt->get_state() >= runtime::state_initialized &&
                   rt->get_state() < runtime::state_stopped)
         {
             util::osstream strm;
@@ -393,7 +391,7 @@ namespace hpx
         if (thread_name) {
             if (!thread_info)
                 strm << thread_prefix;
-            else 
+            else
                 strm << ", ";
             strm << *thread_name;
             thread_info = true;
@@ -701,7 +699,7 @@ namespace hpx
         return get_error_backtrace(detail::access_exception(e));
     }
 
-    /// Return the environment of the OS-process at the point the exception 
+    /// Return the environment of the OS-process at the point the exception
     /// was thrown.
     std::string get_error_env(boost::exception const& e)
     {

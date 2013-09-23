@@ -154,14 +154,14 @@ namespace hpx { namespace util
 
     template <int N, typename Tuple>
     struct tuple_element<N, Tuple
-      , typename boost::enable_if<is_tuple<Tuple>>::type>
+      , typename boost::enable_if<is_tuple<Tuple> >::type>
     {
         typedef typename detail::tuple_element<N, Tuple>::type type;
     };
 
     template <int N, typename Tuple>
     struct tuple_element<N, Tuple const
-      , typename boost::enable_if<is_tuple<Tuple>>::type>
+      , typename boost::enable_if<is_tuple<Tuple> >::type>
       : boost::add_const<typename tuple_element<N, Tuple>::type>
     {};
 
@@ -169,11 +169,10 @@ namespace hpx { namespace util
     template <typename Tuple, typename Enable = void>
     struct tuple_size;
 
-    template <typename Tuple>
-    struct tuple_size<Tuple
-      , typename boost::enable_if<is_tuple<Tuple>>::type>
+    template <>
+    struct tuple_size<tuple<> >
     {
-        static const std::size_t value = Tuple::size_value;
+        static const std::size_t value = 0;
     };
 
     template <typename Tuple>
@@ -508,7 +507,7 @@ namespace hpx { namespace util
 #       if N == 1
         template <typename Arg0>
         tuple(BOOST_FWD_REF(Arg0) arg0
-          , typename boost::disable_if<is_tuple<Arg0>>::type* = 0)
+          , typename boost::disable_if<is_tuple<Arg0> >::type* = 0)
           : a0(boost::forward<Arg0>(arg0))
         {}
 
@@ -621,6 +620,12 @@ namespace hpx { namespace util
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
+    };
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename A)>
+    struct tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, A)> >
+    {
+        static const std::size_t value = N;
     };
 
 #define HPX_UTIL_MAKE_TUPLE_ARG(Z, N, D)                                      \

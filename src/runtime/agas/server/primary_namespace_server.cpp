@@ -8,11 +8,14 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/lcos/promise.hpp>
 
 #include <list>
 
@@ -237,14 +240,14 @@ void primary_namespace::register_server_instance(
 
     // register a gid (not the id) to avoid AGAS holding a reference to this
     // component
-    agas::register_name(instance_name_, get_gid().get_gid(), ec);
+    agas::register_name_sync(instance_name_, get_gid().get_gid(), ec);
 }
 
 void primary_namespace::unregister_server_instance(
     error_code& ec
     )
 {
-    agas::unregister_name(instance_name_, ec);
+    agas::unregister_name_sync(instance_name_, ec);
     this->base_type::finalize();
 }
 
@@ -253,7 +256,7 @@ void primary_namespace::finalize()
     if (!instance_name_.empty())
     {
         error_code ec(lightweight);
-        agas::unregister_name(instance_name_, ec);
+        agas::unregister_name_sync(instance_name_, ec);
     }
 }
 

@@ -12,6 +12,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/max.hpp>

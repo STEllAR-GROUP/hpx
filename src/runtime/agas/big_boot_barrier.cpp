@@ -22,7 +22,12 @@
 #include <hpx/runtime/parcelset/tcp/parcelport_connection.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/runtime/agas/server/locality_namespace.hpp>
+#include <hpx/runtime/agas/server/component_namespace.hpp>
+#include <hpx/runtime/agas/stubs/primary_namespace.hpp>
+#include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/certificate.hpp>
@@ -356,16 +361,16 @@ void register_worker(registration_header const& header)
 
     naming::address locality_addr(rt.here(),
         server::locality_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->locality_ns_server_));
+            agas_client.get_bootstrap_locality_ns_ptr());
     naming::address primary_addr(rt.here(),
         server::primary_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->primary_ns_server_));
+            agas_client.get_bootstrap_primary_ns_ptr());
     naming::address component_addr(rt.here(),
         server::component_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->component_ns_server_));
+            agas_client.get_bootstrap_component_ns_ptr());
     naming::address symbol_addr(rt.here(),
         server::symbol_namespace::get_component_type(),
-            static_cast<void*>(&agas_client.bootstrap->symbol_ns_server_));
+            agas_client.get_bootstrap_symbol_ns_ptr());
 
     notification_header hdr (prefix, locality_addr, primary_addr
       , component_addr, symbol_addr, rt.get_config().get_num_localities());

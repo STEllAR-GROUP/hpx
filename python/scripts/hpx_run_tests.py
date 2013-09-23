@@ -42,10 +42,9 @@ if __name__ == '__main__':
         options += eval(open(f).read())
 
     cmd = base_cmd + options
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-
-    result, out = p.communicate()
-
-    exit(result)
+    p = subprocess.Popen(cmd, shell=True)
+    
+    p.wait()
+    exit(p.returncode)
   # }}}
 

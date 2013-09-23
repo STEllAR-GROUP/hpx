@@ -21,7 +21,8 @@ int hpx_main(boost::program_options::variables_map&)
     const size_t n = 1000000;
 
     boost::uint32_t const prefix = hpx::get_locality_id();
-    boost::format cnt_name("/papi{locality#%d/worker-thread#0}/PAPI_SR_INS");
+    // use floating point instructions here to avoid measuring runtime side effects
+    boost::format cnt_name("/papi{locality#%d/worker-thread#0}/PAPI_FP_INS");
 
     using hpx::naming::id_type;
     using hpx::performance_counters::get_counter;
@@ -34,26 +35,27 @@ int hpx_main(boost::program_options::variables_map&)
 
     // perform n stores, active counter
     volatile size_t i;
-    for (i = 0; i < n; i++) ;
+    volatile double a = 0.0, b = 0.0, c = 0.0;
+    for (i = 0; i < n; i++) a=b+c;
 
     counter_value value1 = performance_counter::get_value(id);
     // stop the counter w/o resetting
     performance_counter::stop(id);
 
     // perform n stores (should be uncounted)
-    for (i = 0; i < n; i++) ;
+    for (i = 0; i < n; i++) a=b+c;
     // get value and reset, and start again
     counter_value value2 = performance_counter::get_value(id, true);
     performance_counter::start(id);
 
     // perform 2*n stores, counted from 0 (or close to it)
-    for (i = 0; i < 2*n; i++) ;
+    for (i = 0; i < 2*n; i++) a=b+c;
     counter_value value3 = performance_counter::get_value(id);
     // reset counter using reset-only interface
     performance_counter::reset(id);
 
     // perform n stores, counted from 0 (or close to it)
-    for (i = 0; i < n; i++) ;
+    for (i = 0; i < n; i++) a=b+c;
     counter_value value4 = performance_counter::get_value(id);
 
     bool pass = status_is_valid(value1.status_) &&
@@ -67,10 +69,10 @@ int hpx_main(boost::program_options::variables_map&)
         boost::uint64_t cnt3 = value3.get_value<boost::uint64_t>();
         boost::uint64_t cnt4 = value4.get_value<boost::uint64_t>();
 
-        std::cout << n << " counted store instructions, result: " << cnt1 << std::endl
-                  << n << " uncounted store instructions, result: " << cnt2-cnt1 << std::endl
-                  << 2*n << " store instructions, count after reset: " << cnt3 << std::endl
-		  << n << " store instructions, count after explicit reset: " << cnt4 << std::endl;
+        std::cout << n << " counted fp instructions, result: " << cnt1 << std::endl
+                  << n << " uncounted fp instructions, result: " << cnt2-cnt1 << std::endl
+                  << 2*n << " fp instructions, count after reset: " << cnt3 << std::endl
+		  << n << " fp instructions, count after explicit reset: " << cnt4 << std::endl;
 
         pass = pass && close_enough(cnt1, n, 1.0) &&
 	       (cnt2 >= cnt1) && close_enough(cnt1, cnt2, 1.0) &&

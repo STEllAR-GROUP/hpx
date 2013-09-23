@@ -23,7 +23,6 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/util/thread_mapper.hpp>
 #include <hpx/util/init_logging.hpp>
 
 #include <boost/foreach.hpp>
@@ -265,12 +264,12 @@ namespace hpx {
 
         boost::uint64_t get_runtime_support_lva() const
         {
-            return reinterpret_cast<boost::uint64_t>(&runtime_support_);
+            return reinterpret_cast<boost::uint64_t>(runtime_support_.get());
         }
 
         boost::uint64_t get_memory_lva() const
         {
-            return reinterpret_cast<boost::uint64_t>(&memory_);
+            return reinterpret_cast<boost::uint64_t>(memory_.get());
         }
 
         naming::gid_type get_next_id(std::size_t count = 1);

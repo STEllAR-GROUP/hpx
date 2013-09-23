@@ -931,8 +931,8 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     ///
-    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities_async
-    HPX_API_EXPORT boost::uint32_t get_num_localities(error_code& ec = throws);
+    /// \see      \a hpx::find_all_localities_sync, \a hpx::get_num_localities
+    HPX_API_EXPORT boost::uint32_t get_num_localities_sync(error_code& ec = throws);
 
     /// \brief Return the number of localities which were registered at startup
     ///        for the running application.
@@ -952,7 +952,7 @@ namespace hpx
     /// \brief Asynchronously return the number of localities which are
     ///        currently registered for the running application.
     ///
-    /// The function \a get_num_localities_async asynchronously returns the
+    /// The function \a get_num_localities asynchronously returns the
     /// number of localities currently connected to the console. The returned
     /// future represents the actual result.
     ///
@@ -960,7 +960,7 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async();
+    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities();
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
@@ -983,14 +983,14 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     ///
-    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities_async
-    HPX_API_EXPORT boost::uint32_t get_num_localities(
+    /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
+    HPX_API_EXPORT boost::uint32_t get_num_localities_sync(
         components::component_type t, error_code& ec = throws);
 
     /// \brief Asynchronously return the number of localities which are
     ///        currently registered for the running application.
     ///
-    /// The function \a get_num_localities_async asynchronously returns the
+    /// The function \a get_num_localities asynchronously returns the
     /// number of localities currently connected to the console which support
     /// the creation of the given component type. The returned future represents
     /// the actual result.
@@ -1002,7 +1002,7 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities_async(
+    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities(
         components::component_type t);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1195,15 +1195,15 @@ namespace hpx
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
     ///
-    /// \see    \a hpx::get_colocation_id_async()
-    HPX_API_EXPORT naming::id_type get_colocation_id(naming::id_type id,
+    /// \see    \a hpx::get_colocation_id()
+    HPX_API_EXPORT naming::id_type get_colocation_id_sync(naming::id_type id,
         error_code& ec = throws);
 
-    /// \brief Asynchronously return the id of the locality where the object 
+    /// \brief Asynchronously return the id of the locality where the object
     ///        referenced by the given id is currently located on
     ///
-    /// \see    \a hpx::get_colocation_id()
-    HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id_async(
+    /// \see    \a hpx::get_colocation_id_sync()
+    HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id(
         naming::id_type id);
 
     ///////////////////////////////////////////////////////////////////////////

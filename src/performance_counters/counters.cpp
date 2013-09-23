@@ -7,6 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
@@ -769,7 +770,7 @@ namespace hpx { namespace performance_counters
                 expand_threads = true;
             }
 
-            boost::uint32_t last_locality = get_num_localities();
+            boost::uint32_t last_locality = get_num_localities_sync();
             for (boost::uint32_t l = 0; l != last_locality; ++l)
             {
                 p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
@@ -846,7 +847,7 @@ namespace hpx { namespace performance_counters
     {
         // register the canonical name with AGAS
         naming::id_type id = f.get();
-        agas::register_name(fullname, id);
+        agas::register_name_sync(fullname, id);
         return id;
     }
 
@@ -865,7 +866,7 @@ namespace hpx { namespace performance_counters
 
         // ask AGAS for the id of the given counter
         naming::id_type id;
-        bool result = agas::resolve_name(complemented_info.fullname_, id, ec);
+        bool result = agas::resolve_name_sync(complemented_info.fullname_, id, ec);
         if (!result) {
             try {
                 // figure out target locality
@@ -883,7 +884,7 @@ namespace hpx { namespace performance_counters
 
                 if (p.parentinstancename_ == "locality" &&
                         (   p.parentinstanceindex_ < 0 ||
-                            p.parentinstanceindex_ >= static_cast<boost::int32_t>(get_num_localities())
+                            p.parentinstanceindex_ >= static_cast<boost::int32_t>(get_num_localities_sync())
                         )
                     )
                 {

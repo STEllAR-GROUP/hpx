@@ -39,7 +39,7 @@ namespace hpx { namespace util
         {}
         template <typename Arg0>
         tuple(BOOST_FWD_REF(Arg0) arg0
-          , typename boost::disable_if<is_tuple<Arg0>>::type* = 0)
+          , typename boost::disable_if<is_tuple<Arg0> >::type* = 0)
           : a0(boost::forward<Arg0>(arg0))
         {}
         template <typename Arg0>
@@ -98,6 +98,11 @@ namespace hpx { namespace util
         static const int size_value = 1;
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
+    };
+    template <typename A0>
+    struct tuple_size<tuple<A0> >
+    {
+        static const std::size_t value = 1;
     };
     
     template <typename Arg0>
@@ -262,6 +267,11 @@ namespace hpx { namespace util
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
     };
+    template <typename A0 , typename A1>
+    struct tuple_size<tuple<A0 , A1> >
+    {
+        static const std::size_t value = 2;
+    };
     
     template <typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
@@ -393,6 +403,11 @@ namespace hpx { namespace util
         static const int size_value = 3;
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
+    };
+    template <typename A0 , typename A1 , typename A2>
+    struct tuple_size<tuple<A0 , A1 , A2> >
+    {
+        static const std::size_t value = 3;
     };
     
     template <typename Arg0 , typename Arg1 , typename Arg2>
@@ -542,6 +557,11 @@ namespace hpx { namespace util
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
     };
+    template <typename A0 , typename A1 , typename A2 , typename A3>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3> >
+    {
+        static const std::size_t value = 4;
+    };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
@@ -689,6 +709,11 @@ namespace hpx { namespace util
         static const int size_value = 5;
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
+    };
+    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3 , A4> >
+    {
+        static const std::size_t value = 5;
     };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -838,6 +863,11 @@ namespace hpx { namespace util
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
     };
+    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3 , A4 , A5> >
+    {
+        static const std::size_t value = 6;
+    };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
@@ -985,6 +1015,11 @@ namespace hpx { namespace util
         static const int size_value = 7;
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
+    };
+    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3 , A4 , A5 , A6> >
+    {
+        static const std::size_t value = 7;
     };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
@@ -1134,6 +1169,11 @@ namespace hpx { namespace util
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
     };
+    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7> >
+    {
+        static const std::size_t value = 8;
+    };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
@@ -1281,6 +1321,11 @@ namespace hpx { namespace util
         static const int size_value = 9;
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
+    };
+    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8> >
+    {
+        static const std::size_t value = 9;
     };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
@@ -1430,6 +1475,11 @@ namespace hpx { namespace util
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
     };
+    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9> >
+    {
+        static const std::size_t value = 10;
+    };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     BOOST_FORCEINLINE
@@ -1577,6 +1627,11 @@ namespace hpx { namespace util
         static const int size_value = 11;
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
+    };
+    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10> >
+    {
+        static const std::size_t value = 11;
     };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
@@ -1726,6 +1781,11 @@ namespace hpx { namespace util
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
     };
+    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11> >
+    {
+        static const std::size_t value = 12;
+    };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     BOOST_FORCEINLINE
@@ -1873,6 +1933,11 @@ namespace hpx { namespace util
         static const int size_value = 13;
     private:
         BOOST_COPYABLE_AND_MOVABLE(tuple);
+    };
+    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
+    struct tuple_size<tuple<A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12> >
+    {
+        static const std::size_t value = 13;
     };
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>

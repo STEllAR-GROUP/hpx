@@ -8,10 +8,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx

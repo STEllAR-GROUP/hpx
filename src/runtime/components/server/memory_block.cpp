@@ -50,7 +50,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::memory_block,
     hpx::components::component_memory_block)
 
-typedef hpx::components::memory_block_data memory_data_type;
 HPX_REGISTER_BASE_LCO_WITH_VALUE(
     hpx::components::memory_block_data,
     memory_data_type)

@@ -10,8 +10,18 @@
 #include <hpx/exception.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/runtime/agas/component_namespace.hpp>
+#include <hpx/runtime/agas/locality_namespace.hpp>
+#include <hpx/runtime/agas/primary_namespace.hpp>
+#include <hpx/runtime/agas/symbol_namespace.hpp>
+#include <hpx/runtime/agas/server/component_namespace.hpp>
+#include <hpx/runtime/agas/server/locality_namespace.hpp>
+#include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
@@ -19,18 +29,176 @@
 #endif
 
 #include <boost/format.hpp>
+#include <boost/icl/closed_interval.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/serialization/vector.hpp>
 
 namespace hpx { namespace agas
 {
 
+struct addressing_service::bootstrap_data_type
+{ // {{{
+    bootstrap_data_type()
+      : primary_ns_server_()
+      , locality_ns_server_(&primary_ns_server_)
+      , component_ns_server_()
+      , symbol_ns_server_()
+    {}
+
+    void register_counter_types()
+    {
+        server::locality_namespace::register_counter_types();
+        server::primary_namespace::register_counter_types();
+        server::component_namespace::register_counter_types();
+        server::symbol_namespace::register_counter_types();
+    }
+
+    void register_server_instance(char const* servicename)
+    {
+        locality_ns_server_.register_server_instance(servicename);
+        primary_ns_server_.register_server_instance(servicename);
+        component_ns_server_.register_server_instance(servicename);
+        symbol_ns_server_.register_server_instance(servicename);
+    }
+
+    void unregister_server_instance(error_code& ec)
+    {
+        locality_ns_server_.unregister_server_instance(ec);
+        if (!ec) primary_ns_server_.unregister_server_instance(ec);
+        if (!ec) component_ns_server_.unregister_server_instance(ec);
+        if (!ec) symbol_ns_server_.unregister_server_instance(ec);
+    }
+
+    server::primary_namespace primary_ns_server_;
+    server::locality_namespace locality_ns_server_;
+    server::component_namespace component_ns_server_;
+    server::symbol_namespace symbol_ns_server_;
+}; // }}}
+
+struct addressing_service::hosted_data_type
+{ // {{{
+    hosted_data_type()
+      : primary_ns_server_()
+      , symbol_ns_server_()
+    {}
+
+    void register_counter_types()
+    {
+        server::primary_namespace::register_counter_types();
+        server::symbol_namespace::register_counter_types();
+    }
+
+    void register_server_instance(char const* servicename
+      , boost::uint32_t locality_id)
+    {
+        primary_ns_server_.register_server_instance(servicename, locality_id);
+        symbol_ns_server_.register_server_instance(servicename, locality_id);
+    }
+
+    void unregister_server_instance(error_code& ec)
+    {
+        primary_ns_server_.unregister_server_instance(ec);
+        if (!ec) symbol_ns_server_.unregister_server_instance(ec);
+    }
+
+    locality_namespace locality_ns_;
+    component_namespace component_ns_;
+
+    server::primary_namespace primary_ns_server_;
+    server::symbol_namespace symbol_ns_server_;
+}; // }}}
+
+struct addressing_service::gva_cache_key
+{ // {{{ gva_cache_key implementation
+  private:
+    typedef boost::icl::closed_interval<naming::gid_type, std::less>
+        key_type;
+
+    key_type key_;
+
+  public:
+    gva_cache_key()
+      : key_()
+    {}
+
+    explicit gva_cache_key(
+        naming::gid_type const& id_
+      , boost::uint64_t count_ = 1
+        )
+      : key_(naming::detail::get_stripped_gid(id_)
+           , naming::detail::get_stripped_gid(id_) + (count_ - 1))
+    {
+        BOOST_ASSERT(count_);
+    }
+
+    naming::gid_type get_gid() const
+    {
+        return boost::icl::lower(key_);
+    }
+
+    boost::uint64_t get_count() const
+    {
+        naming::gid_type const size = boost::icl::length(key_);
+        BOOST_ASSERT(size.get_msb() == 0);
+        return size.get_lsb();
+    }
+
+    friend bool operator<(
+        gva_cache_key const& lhs
+      , gva_cache_key const& rhs
+        )
+    {
+        return boost::icl::exclusive_less(lhs.key_, rhs.key_);
+    }
+
+    friend bool operator==(
+        gva_cache_key const& lhs
+      , gva_cache_key const& rhs
+        )
+    {
+        // Is lhs in rhs?
+        if (1 == lhs.get_count() && 1 != rhs.get_count())
+            return boost::icl::contains(rhs.key_, lhs.key_);
+
+        // Is rhs in lhs?
+        else if (1 != lhs.get_count() && 1 == rhs.get_count())
+            return boost::icl::contains(lhs.key_, lhs.key_);
+
+        // Direct hit
+        return lhs.key_ == rhs.key_;
+    }
+}; // }}}
+
+struct addressing_service::gva_erase_policy
+{ // {{{ gva_erase_policy implementation
+    gva_erase_policy(
+        naming::gid_type const& id
+      , boost::uint64_t count
+        )
+      : entry(id, count)
+    {}
+
+    typedef std::pair<
+        gva_cache_key, boost::cache::entries::lfu_entry<gva>
+    > entry_type;
+
+    bool operator()(
+        entry_type const& p
+        ) const
+    {
+        return p.first == entry;
+    }
+
+    gva_cache_key entry;
+}; // }}}
+
 addressing_service::addressing_service(
     parcelset::parcelport& pp
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
     )
-  : console_cache_(0)
+  : gva_cache_(new gva_cache_type)
+  , console_cache_(0)
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
   , refcnt_requests_(new refcnt_requests_type)
@@ -48,7 +216,7 @@ addressing_service::addressing_service(
     create_big_boot_barrier(pp, ini_, runtime_type_);
 
     if (caching_)
-        gva_cache_.reserve(ini_.get_agas_local_cache_size());
+        gva_cache_->reserve(ini_.get_agas_local_cache_size());
 
     if (service_type == service_mode_bootstrap)
         launch_bootstrap(ini_);
@@ -84,6 +252,43 @@ naming::locality const& addressing_service::get_here() const
     }
     return here_;
 }
+
+void* addressing_service::get_hosted_primary_ns_ptr() const
+{
+    BOOST_ASSERT(0 != hosted.get());
+    return &hosted->primary_ns_server_;
+}
+
+void* addressing_service::get_hosted_symbol_ns_ptr() const
+{
+    BOOST_ASSERT(0 != hosted.get());
+    return &hosted->symbol_ns_server_;
+}
+
+void* addressing_service::get_bootstrap_locality_ns_ptr() const
+{
+    BOOST_ASSERT(0 != bootstrap.get());
+    return &bootstrap->locality_ns_server_;
+}
+
+void* addressing_service::get_bootstrap_primary_ns_ptr() const
+{
+    BOOST_ASSERT(0 != bootstrap.get());
+    return &bootstrap->primary_ns_server_;
+}
+
+void* addressing_service::get_bootstrap_component_ns_ptr() const
+{
+    BOOST_ASSERT(0 != bootstrap.get());
+    return &bootstrap->component_ns_server_;
+}
+
+void* addressing_service::get_bootstrap_symbol_ns_ptr() const
+{
+    BOOST_ASSERT(0 != bootstrap.get());
+    return &bootstrap->symbol_ns_server_;
+}
+
 
 void addressing_service::launch_bootstrap(
     util::runtime_configuration const& ini_
@@ -194,8 +399,8 @@ void addressing_service::adjust_local_cache_size()
 
         std::size_t cache_size = (std::max)(local_cache_size,
                 local_cache_size_per_thread * std::size_t(get_num_overall_threads()));
-        if (cache_size > gva_cache_.capacity())
-            gva_cache_.reserve(cache_size);
+        if (cache_size > gva_cache_->capacity())
+            gva_cache_->reserve(cache_size);
 
         LAGAS_(info) << (boost::format(
             "addressing_service::adjust_local_cache_size, local_cache_size(%1%), "
@@ -825,7 +1030,7 @@ bool addressing_service::unbind_range(
         // so it's commented out for now.
         //cache_mutex_type::scoped_lock lock(hosted->gva_cache_mtx_);
         //gva_erase_policy ep(lower_id, count);
-        //hosted->gva_cache_.erase(ep);
+        //hosted->gva_cache_->erase(ep);
 
         gva const& gaddr = rep.get_gva();
         addr.locality_ = gaddr.endpoint;
@@ -1051,7 +1256,7 @@ bool addressing_service::resolve_cached(
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
     // Check if the entry is currently in the cache
-    if (gva_cache_.get_entry(k, idbase, e))
+    if (gva_cache_->get_entry(k, idbase, e))
     {
         const boost::uint64_t id_msb
             = naming::detail::strip_credit_from_gid(id.get_msb());
@@ -1668,13 +1873,13 @@ void addressing_service::insert_cache_entry(
 
         const gva_cache_key key(gid, count);
 
-        if (!gva_cache_.insert(key, g))
+        if (!gva_cache_->insert(key, g))
         {
             // Figure out who we collided with.
             gva_cache_key idbase;
             gva_cache_type::entry_type e;
 
-            if (!gva_cache_.get_entry(key, idbase, e))
+            if (!gva_cache_->get_entry(key, idbase, e))
                 // This is impossible under sane conditions.
                 HPX_THROWS_IF(ec, invalid_data
                   , "addressing_service::insert_cache_entry"
@@ -1730,13 +1935,13 @@ void addressing_service::update_cache_entry(
 
         const gva_cache_key key(gid, count);
 
-        if (!gva_cache_.update_if(key, g, check_for_collisions))
+        if (!gva_cache_->update_if(key, g, check_for_collisions))
         {
             // Figure out who we collided with.
             gva_cache_key idbase;
             gva_cache_type::entry_type e;
 
-            if (!gva_cache_.get_entry(key, idbase, e))
+            if (!gva_cache_->get_entry(key, idbase, e))
             {
                 // This is impossible under sane conditions.
                 HPX_THROWS_IF(ec, invalid_data
@@ -1775,7 +1980,7 @@ void addressing_service::clear_cache(
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
-        gva_cache_.clear();
+        gva_cache_->clear();
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -1944,25 +2149,25 @@ bool addressing_service::retrieve_statistics_counter(
 std::size_t addressing_service::get_cache_hits(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
-    return gva_cache_.get_statistics().hits(reset);
+    return gva_cache_->get_statistics().hits(reset);
 }
 
 std::size_t addressing_service::get_cache_misses(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
-    return gva_cache_.get_statistics().misses(reset);
+    return gva_cache_->get_statistics().misses(reset);
 }
 
 std::size_t addressing_service::get_cache_evictions(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
-    return gva_cache_.get_statistics().evictions(reset);
+    return gva_cache_->get_statistics().evictions(reset);
 }
 
 std::size_t addressing_service::get_cache_insertions(bool reset)
 {
     cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
-    return gva_cache_.get_statistics().insertions(reset);
+    return gva_cache_->get_statistics().insertions(reset);
 }
 
 /// Install performance counter types exposing properties from the local cache.

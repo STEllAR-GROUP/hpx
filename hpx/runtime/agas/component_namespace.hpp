@@ -14,6 +14,9 @@
 namespace hpx { namespace agas
 {
 
+HPX_EXPORT naming::gid_type bootstrap_component_namespace_gid();
+HPX_EXPORT naming::id_type bootstrap_component_namespace_id();
+
 struct component_namespace
   : components::client_base<component_namespace, stubs::component_namespace>
 {
@@ -23,13 +26,6 @@ struct component_namespace
     > base_type;
 
     typedef server::component_namespace server_type;
-
-    typedef server_type::component_id_type component_id_type;
-    typedef server_type::prefixes_type prefixes_type;
-
-    typedef server_type::iterate_types_function_type
-        iterate_types_function_type;
-    // }}}
 
     component_namespace()
       : base_type(bootstrap_component_namespace_id())

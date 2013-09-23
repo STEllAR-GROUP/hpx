@@ -18,8 +18,6 @@
 #include <boost/cache/local_cache.hpp>
 #include <boost/cache/statistics/local_statistics.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/fusion/include/vector.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/dynamic_bitset.hpp>
 
@@ -27,128 +25,49 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/runtime/agas/big_boot_barrier.hpp>
-#include <hpx/runtime/agas/component_namespace.hpp>
-#include <hpx/runtime/agas/locality_namespace.hpp>
-#include <hpx/runtime/agas/primary_namespace.hpp>
-#include <hpx/runtime/agas/symbol_namespace.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/util/runtime_configuration.hpp>
-#include <hpx/util/lockfree/fifo.hpp>
+#include <hpx/util/merging_map.hpp>
+
 
 // TODO: split into a base class and two implementations (one for bootstrap,
 // one for hosted).
 // TODO: Use \copydoc.
 
+namespace hpx { namespace util {
+    class runtime_configuration;
+}}
+
 namespace hpx { namespace agas
 {
+struct request;
+struct response;
+HPX_EXPORT void destroy_big_boot_barrier();
 
 struct HPX_EXPORT addressing_service : boost::noncopyable
 {
     // {{{ types
-    typedef component_namespace::component_id_type component_id_type;
+    typedef components::component_type component_id_type;
 
-    typedef symbol_namespace::iterate_names_function_type
-        iterate_names_function_type;
+    typedef hpx::util::function<
+        void(std::string const&, naming::gid_type const&)
+    > iterate_names_function_type;
 
-    typedef component_namespace::iterate_types_function_type
-        iterate_types_function_type;
+    typedef hpx::util::function<
+        void(std::string const&, components::component_type)
+    > iterate_types_function_type;
 
     typedef hpx::lcos::local::spinlock cache_mutex_type;
     typedef hpx::lcos::local::mutex mutex_type;
     // }}}
 
     // {{{ gva cache
-    struct gva_cache_key
-    { // {{{ gva_cache_key implementation
-      private:
-        typedef boost::icl::closed_interval<naming::gid_type, std::less>
-            key_type;
-
-        key_type key_;
-
-      public:
-        gva_cache_key()
-          : key_()
-        {}
-
-        explicit gva_cache_key(
-            naming::gid_type const& id_
-          , boost::uint64_t count_ = 1
-            )
-          : key_(naming::detail::get_stripped_gid(id_)
-               , naming::detail::get_stripped_gid(id_) + (count_ - 1))
-        {
-            BOOST_ASSERT(count_);
-        }
-
-        naming::gid_type get_gid() const
-        {
-            return boost::icl::lower(key_);
-        }
-
-        boost::uint64_t get_count() const
-        {
-            naming::gid_type const size = boost::icl::length(key_);
-            BOOST_ASSERT(size.get_msb() == 0);
-            return size.get_lsb();
-        }
-
-        friend bool operator<(
-            gva_cache_key const& lhs
-          , gva_cache_key const& rhs
-            )
-        {
-            return boost::icl::exclusive_less(lhs.key_, rhs.key_);
-        }
-
-        friend bool operator==(
-            gva_cache_key const& lhs
-          , gva_cache_key const& rhs
-            )
-        {
-            // Is lhs in rhs?
-            if (1 == lhs.get_count() && 1 != rhs.get_count())
-                return boost::icl::contains(rhs.key_, lhs.key_);
-
-            // Is rhs in lhs?
-            else if (1 != lhs.get_count() && 1 == rhs.get_count())
-                return boost::icl::contains(lhs.key_, lhs.key_);
-
-            // Direct hit
-            return lhs.key_ == rhs.key_;
-        }
-    }; // }}}
-
-    struct gva_erase_policy
-    { // {{{ gva_erase_policy implementation
-        gva_erase_policy(
-            naming::gid_type const& id
-          , boost::uint64_t count
-            )
-          : entry(id, count)
-        {}
-
-        typedef std::pair<
-            gva_cache_key, boost::cache::entries::lfu_entry<gva>
-        > entry_type;
-
-        bool operator()(
-            entry_type const& p
-            ) const
-        {
-            return p.first == entry;
-        }
-
-        gva_cache_key entry;
-    }; // }}}
-
+    struct gva_cache_key;
+    struct gva_erase_policy;
     typedef boost::cache::entries::lfu_entry<gva> gva_entry_type;
 
     typedef boost::cache::local_cache<
@@ -163,80 +82,11 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;
 
-    struct bootstrap_data_type
-    { // {{{
-        bootstrap_data_type()
-          : primary_ns_server_()
-          , locality_ns_server_(&primary_ns_server_)
-          , component_ns_server_()
-          , symbol_ns_server_()
-        {}
-
-        void register_counter_types()
-        {
-            server::locality_namespace::register_counter_types();
-            server::primary_namespace::register_counter_types();
-            server::component_namespace::register_counter_types();
-            server::symbol_namespace::register_counter_types();
-        }
-
-        void register_server_instance(char const* servicename)
-        {
-            locality_ns_server_.register_server_instance(servicename);
-            primary_ns_server_.register_server_instance(servicename);
-            component_ns_server_.register_server_instance(servicename);
-            symbol_ns_server_.register_server_instance(servicename);
-        }
-
-        void unregister_server_instance(error_code& ec)
-        {
-            locality_ns_server_.unregister_server_instance(ec);
-            if (!ec) primary_ns_server_.unregister_server_instance(ec);
-            if (!ec) component_ns_server_.unregister_server_instance(ec);
-            if (!ec) symbol_ns_server_.unregister_server_instance(ec);
-        }
-
-        server::primary_namespace primary_ns_server_;
-        server::locality_namespace locality_ns_server_;
-        server::component_namespace component_ns_server_;
-        server::symbol_namespace symbol_ns_server_;
-    }; // }}}
-
-    struct hosted_data_type
-    { // {{{
-        hosted_data_type()
-          : primary_ns_server_()
-          , symbol_ns_server_()
-        {}
-
-        void register_counter_types()
-        {
-            server::primary_namespace::register_counter_types();
-            server::symbol_namespace::register_counter_types();
-        }
-
-        void register_server_instance(char const* servicename
-          , boost::uint32_t locality_id)
-        {
-            primary_ns_server_.register_server_instance(servicename, locality_id);
-            symbol_ns_server_.register_server_instance(servicename, locality_id);
-        }
-
-        void unregister_server_instance(error_code& ec)
-        {
-            primary_ns_server_.unregister_server_instance(ec);
-            if (!ec) symbol_ns_server_.unregister_server_instance(ec);
-        }
-
-        locality_namespace locality_ns_;
-        component_namespace component_ns_;
-
-        server::primary_namespace primary_ns_server_;
-        server::symbol_namespace symbol_ns_server_;
-    }; // }}}
+    struct bootstrap_data_type;
+    struct hosted_data_type;
 
     mutable cache_mutex_type gva_cache_mtx_;
-    gva_cache_type gva_cache_;
+    boost::shared_ptr<gva_cache_type> gva_cache_;
 
     mutable mutex_type console_cache_mtx_;
     boost::uint32_t console_cache_;
@@ -348,17 +198,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     naming::locality const& get_here() const;
 
-    void* get_hosted_primary_ns_ptr() const
-    {
-        BOOST_ASSERT(0 != hosted.get());
-        return &hosted->primary_ns_server_;
-    }
+    void* get_hosted_primary_ns_ptr() const;
+    void* get_hosted_symbol_ns_ptr() const;
 
-    void* get_hosted_symbol_ns_ptr() const
-    {
-        BOOST_ASSERT(0 != hosted.get());
-        return &hosted->symbol_ns_server_;
-    }
+    void* get_bootstrap_locality_ns_ptr() const;
+    void* get_bootstrap_primary_ns_ptr() const;
+    void* get_bootstrap_component_ns_ptr() const;
+    void* get_bootstrap_symbol_ns_ptr() const;
 
 protected:
     void launch_bootstrap(

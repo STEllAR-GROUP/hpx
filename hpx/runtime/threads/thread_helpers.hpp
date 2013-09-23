@@ -770,10 +770,10 @@ namespace hpx { namespace applier
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a create_async function initiates the creation of a new
+    /// The \a create function initiates the creation of a new
     /// component instance using the runtime_support as given by targetgid.
     /// This function is non-blocking as it returns a \a lcos#future. The
-    /// caller of this create_async is responsible to call
+    /// caller of this create is responsible to call
     /// \a lcos#future#get to obtain the result.
     ///
     /// \param targetgid
@@ -785,13 +785,13 @@ namespace hpx { namespace applier
     ///             component when used to call get.
     ///
     /// \note       For synchronous operation use the function
-    ///             \a threads#create_async.
+    ///             \a threads#create_sync.
     HPX_API_EXPORT lcos::future<naming::id_type>
-        create_async(naming::id_type const& targetgid,
+        create(naming::id_type const& targetgid,
             components::component_type type, std::size_t count = 1);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a create function creates a new component instance using the
+    /// The \a create_sync function creates a new component instance using the
     /// \a runtime_support as given by targetgid. This function is blocking
     /// for the component to be created and until the global id of the new
     /// component has been returned.
@@ -804,8 +804,8 @@ namespace hpx { namespace applier
     ///             component.
     ///
     /// \note       For asynchronous operation use the function
-    ///             \a threads#create_async.
-    HPX_API_EXPORT naming::id_type create(naming::id_type const& targetgid,
+    ///             \a threads#create.
+    HPX_API_EXPORT naming::id_type create_sync(naming::id_type const& targetgid,
         components::component_type type, std::size_t count = 1);
 }}
 

@@ -9,14 +9,18 @@
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 #include <hpx/include/performance_counters.hpp>
-#include <hpx/runtime/agas/big_boot_barrier.hpp>
+#include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/query_counters.hpp>
+#include <hpx/util/thread_mapper.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/parcel_suffix.hpp>
@@ -433,8 +437,11 @@ namespace hpx
     runtime::runtime(util::runtime_configuration const& rtcfg)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
+        thread_support_(new util::thread_mapper),
         topology_(threads::create_topology()),
-        state_(state_invalid)
+        state_(state_invalid),
+        memory_(new components::server::memory),
+        runtime_support_(new components::server::runtime_support)
 #if defined(HPX_HAVE_SECURITY)
       , security_data_(new detail::manage_security_data)
 #endif
@@ -494,7 +501,28 @@ namespace hpx
         return diff < 0LL ? 0ULL : static_cast<boost::uint64_t>(diff);
     }
 
+    performance_counters::registry& runtime::get_counter_registry()
+    {
+        return *counters_;
+    }
+
+    performance_counters::registry const& runtime::get_counter_registry() const
+    {
+        return *counters_;
+    }
+
+    util::thread_mapper& runtime::get_thread_mapper()
+    {
+        return *thread_support_;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
+    void runtime::register_query_counters(
+        boost::shared_ptr<util::query_counters> const& active_counters)
+    {
+        active_counters_ = active_counters;
+    }
+
     void runtime::start_active_counters(error_code& ec)
     {
         if (active_counters_.get())
@@ -525,7 +553,7 @@ namespace hpx
         parcelset::parcelport* pp, std::size_t num_messages,
         std::size_t interval, error_code& ec)
     {
-        return runtime_support_.create_message_handler(message_handler_type,
+        return runtime_support_->create_message_handler(message_handler_type,
             action, pp, num_messages, interval, ec);
     }
 
@@ -533,7 +561,7 @@ namespace hpx
         char const* binary_filter_type, bool compress,
         util::binary_filter* next_filter, error_code& ec)
     {
-        return runtime_support_.create_binary_filter(binary_filter_type,
+        return runtime_support_->create_binary_filter(binary_filter_type,
             compress, next_filter, ec);
     }
 
@@ -875,7 +903,7 @@ namespace hpx
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
-    boost::uint32_t get_num_localities(error_code& ec)
+    boost::uint32_t get_num_localities_sync(error_code& ec)
     {
         if (NULL == hpx::get_runtime_ptr())
             return 0;
@@ -891,7 +919,7 @@ namespace hpx
         return get_runtime().get_config().get_num_localities();
     }
 
-    boost::uint32_t get_num_localities(components::component_type type,
+    boost::uint32_t get_num_localities_sync(components::component_type type,
         error_code& ec)
     {
         if (NULL == hpx::get_runtime_ptr())
@@ -900,7 +928,7 @@ namespace hpx
         return get_runtime().get_agas_client().get_num_localities(type, ec);
     }
 
-    lcos::future<boost::uint32_t> get_num_localities_async()
+    lcos::future<boost::uint32_t> get_num_localities()
     {
         if (NULL == hpx::get_runtime_ptr())
             return lcos::make_ready_future<boost::uint32_t>(0);
@@ -908,7 +936,7 @@ namespace hpx
         return get_runtime().get_agas_client().get_num_localities_async();
     }
 
-    lcos::future<boost::uint32_t> get_num_localities_async(
+    lcos::future<boost::uint32_t> get_num_localities(
         components::component_type type)
     {
         if (NULL == hpx::get_runtime_ptr())
