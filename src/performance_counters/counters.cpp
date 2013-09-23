@@ -847,7 +847,7 @@ namespace hpx { namespace performance_counters
     {
         // register the canonical name with AGAS
         naming::id_type id = f.get();
-        agas::register_name(fullname, id);
+        agas::register_name_sync(fullname, id);
         return id;
     }
 

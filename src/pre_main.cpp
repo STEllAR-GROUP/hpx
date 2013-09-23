@@ -38,7 +38,7 @@ create_barrier(std::size_t num_localities, char const* symname)
     lcos::barrier b;
     b.create(find_here(), num_localities);
 
-    agas::register_name(symname, b.get_gid());
+    agas::register_name_sync(symname, b.get_gid());
     return b;
 }
 
@@ -195,7 +195,7 @@ bool pre_main(runtime_mode mode)
 
         // Tear down the second stage barrier.
         if (agas_client.is_bootstrap())
-            agas::unregister_name(second_barrier);
+            agas::unregister_name_sync(second_barrier);
 
         rt.set_state(runtime::state_pre_startup);
         runtime_support::call_startup_functions(find_here(), true);
@@ -207,7 +207,7 @@ bool pre_main(runtime_mode mode)
 
         // Tear down the third stage barrier.
         if (agas_client.is_bootstrap())
-            agas::unregister_name(third_barrier);
+            agas::unregister_name_sync(third_barrier);
 
         rt.set_state(runtime::state_startup);
         runtime_support::call_startup_functions(find_here(), false);
@@ -222,7 +222,7 @@ bool pre_main(runtime_mode mode)
 
         // Tear down the fourth stage barrier.
         if (agas_client.is_bootstrap())
-            agas::unregister_name(fourth_barrier);
+            agas::unregister_name_sync(fourth_barrier);
     }
 
     // Enable logging. Even if we terminate at this point we will see all
