@@ -9,8 +9,7 @@
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-//#include <hpx/runtime/naming/resolver_client.hpp>
-#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/naming/resolver_client.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
@@ -34,15 +33,12 @@ namespace hpx
         // return whether resolver client is in state described by 'mask'
         bool router_is(boost::uint8_t mask)
         {
-            /*
             runtime* rt = get_runtime_ptr();
             if (NULL == rt) {
                 // we're probably either starting or stopping
                 return (mask & (starting | stopping)) ? true : false;
             }
             return (rt->get_agas_client().get_status() & mask) ? true : false;
-            */
-            return false;
         }
     }
 }
