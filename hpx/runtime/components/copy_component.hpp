@@ -23,8 +23,8 @@ namespace hpx { namespace components
     namespace detail
     {
         template <typename Component>
-        future<naming::id_type> copy_component(
-            naming::id_type const& to_copy, naming:id_type target_locality)
+        future<naming::id_type> copy_component(naming::id_type const& to_copy,
+            naming:id_type const& target_locality)
         {
             typedef typename server::copy_component_action<Component> action_type;
             return async<actions_type>(to_copy, target_locality);

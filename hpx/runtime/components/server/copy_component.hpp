@@ -23,7 +23,8 @@ namespace hpx { namespace components { namespace server
             naming::id_type const& target_locality)
         {
             boost::shared_ptr<Component> ptr = f.get();
-            return new_<Component>(target_locality, *ptr);
+            return components::stub_base<Component>::create(
+                target_locality, *ptr);
         }
     }
 
@@ -32,7 +33,7 @@ namespace hpx { namespace components { namespace server
         naming::id_type const& target_locality)
     {
         using util::placeholders::_1;
-        future<boost::shared_ptr<Component> > f = get_ptr_async<Component>(to_copy);
+        future<boost::shared_ptr<Component> > f = get_ptr<Component>(to_copy);
         return f.then(util::bind(&detail::copy_component_postproc<Component>, 
             _1, target_locality));
     }
