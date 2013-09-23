@@ -120,8 +120,7 @@ namespace sheneos
     void interpolator::connect(std::string symbolic_name_base)
     {
         // Connect to the config object.
-        hpx::naming::id_type cfg_gid;
-        hpx::agas::resolve_name(symbolic_name_base, cfg_gid);
+        hpx::naming::id_type cfg_gid = hpx::agas::resolve_name(symbolic_name_base).get();
         cfg_ = configuration(cfg_gid);
         config_data data = cfg_.get();
 
@@ -134,9 +133,8 @@ namespace sheneos
         {
             using boost::lexical_cast;
             partitions_.push_back(hpx::naming::id_type());
-            hpx::agas::resolve_name(
-                data.symbolic_name_ + lexical_cast<std::string>(i),
-                partitions_.back());
+            hpx::naming::id_type id = hpx::agas::resolve_name(
+                    data.symbolic_name_ + lexical_cast<std::string>(i)).get();
         }
 
         // Read required data from given file.
