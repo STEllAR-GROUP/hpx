@@ -292,7 +292,7 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline naming::id_type get_colocation_id(naming::id_type id, error_code& ec)
+    inline naming::id_type get_colocation_id_sync(naming::id_type id, error_code& ec)
     {
         // FIXME: Resolve the locality instead of deducing it from the target 
         //        GID, otherwise this will break once we start moving objects.
@@ -300,22 +300,22 @@ namespace hpx { namespace naming
         return get_id_from_locality_id(locality_id);
     }
 
-    inline lcos::future<naming::id_type> get_colocation_id_async(naming::id_type id)
+    inline lcos::future<naming::id_type> get_colocation_id(naming::id_type id)
     {
-        return lcos::make_ready_future(naming::get_colocation_id(id, throws));
+        return lcos::make_ready_future(naming::get_colocation_id_sync(id, throws));
     }
 }}
 
 namespace hpx
 {
-    naming::id_type get_colocation_id(naming::id_type id, error_code& ec)
+    naming::id_type get_colocation_id_sync(naming::id_type id, error_code& ec)
     {
-        return naming::get_colocation_id_async(id).get(ec);
+        return naming::get_colocation_id(id).get(ec);
     }
 
-    lcos::future<naming::id_type> get_colocation_id_async(naming::id_type id)
+    lcos::future<naming::id_type> get_colocation_id(naming::id_type id)
     {
-        return naming::get_colocation_id_async(id);
+        return naming::get_colocation_id(id);
     }
 }
 

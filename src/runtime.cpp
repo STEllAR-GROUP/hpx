@@ -903,7 +903,7 @@ namespace hpx
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
-    boost::uint32_t get_num_localities(error_code& ec)
+    boost::uint32_t get_num_localities_sync(error_code& ec)
     {
         if (NULL == hpx::get_runtime_ptr())
             return 0;
@@ -919,7 +919,7 @@ namespace hpx
         return get_runtime().get_config().get_num_localities();
     }
 
-    boost::uint32_t get_num_localities(components::component_type type,
+    boost::uint32_t get_num_localities_sync(components::component_type type,
         error_code& ec)
     {
         if (NULL == hpx::get_runtime_ptr())
@@ -928,7 +928,7 @@ namespace hpx
         return get_runtime().get_agas_client().get_num_localities(type, ec);
     }
 
-    lcos::future<boost::uint32_t> get_num_localities_async()
+    lcos::future<boost::uint32_t> get_num_localities()
     {
         if (NULL == hpx::get_runtime_ptr())
             return lcos::make_ready_future<boost::uint32_t>(0);
@@ -936,7 +936,7 @@ namespace hpx
         return get_runtime().get_agas_client().get_num_localities_async();
     }
 
-    lcos::future<boost::uint32_t> get_num_localities_async(
+    lcos::future<boost::uint32_t> get_num_localities(
         components::component_type type)
     {
         if (NULL == hpx::get_runtime_ptr())

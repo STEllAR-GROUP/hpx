@@ -346,7 +346,7 @@ namespace hpx { namespace lcos {
 
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
@@ -361,7 +361,7 @@ namespace hpx { namespace lcos {
 
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
@@ -431,7 +431,7 @@ namespace hpx { namespace lcos {
 
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
@@ -446,7 +446,7 @@ namespace hpx { namespace lcos {
 
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
@@ -530,7 +530,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
 
         typedef
             typename detail::make_broadcast_action<Action>::type

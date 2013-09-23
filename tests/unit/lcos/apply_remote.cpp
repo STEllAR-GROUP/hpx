@@ -56,7 +56,7 @@ int hpx_main()
 {
     hpx::id_type here = hpx::find_here();
     hpx::id_type there = here;
-    if (hpx::get_num_localities() > 1)
+    if (hpx::get_num_localities_sync() > 1)
     {
         std::vector<hpx::id_type> localities = hpx::find_remote_localities();
         there = localities[0];

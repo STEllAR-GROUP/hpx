@@ -166,7 +166,7 @@ namespace hpx { namespace components { namespace stubs
         }
         else {
             // apply remotely
-            naming::id_type id = get_colocation_id(
+            naming::id_type id = get_colocation_id_sync(
                 naming::id_type(gid, naming::id_type::unmanaged));
 
             lcos::packaged_action<action_type, void> p;

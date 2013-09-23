@@ -27,8 +27,8 @@ using boost::posix_time::milliseconds;
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
 
-using hpx::agas::register_name;
-using hpx::agas::unregister_name;
+using hpx::agas::register_name_sync;
+using hpx::agas::unregister_name_sync;
 
 using hpx::test::simple_refcnt_monitor;
 using hpx::test::managed_refcnt_monitor;
@@ -67,7 +67,7 @@ void hpx_test_main(
              << flush;
 
         // Associate a symbolic name with the object.
-        HPX_TEST_EQ(true, register_name(name, monitor.get_gid()));
+        HPX_TEST_EQ(true, register_name_sync(name, monitor.get_gid()));
 
         hpx::naming::gid_type gid;
 
@@ -89,7 +89,7 @@ void hpx_test_main(
 
         // Remove the symbolic name. This should return the final credits
         // to AGAS.
-        HPX_TEST_EQ(gid, unregister_name(name).get_gid());
+        HPX_TEST_EQ(gid, unregister_name_sync(name).get_gid());
 
         // The component should be destroyed.
         HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));

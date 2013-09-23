@@ -289,7 +289,7 @@ namespace hpx { namespace performance_counters
             service += boost::lexical_cast<std::string>(paths.parentinstanceindex_);
 
             naming::id_type id;
-            bool result = agas::resolve_name(service, id, ec);
+            bool result = agas::resolve_name_sync(service, id, ec);
             if (!result) {
                 HPX_THROWS_IF(ec, not_implemented,
                     "agas_raw_counter_creator",
