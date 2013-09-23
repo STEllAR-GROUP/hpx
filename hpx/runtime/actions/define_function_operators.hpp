@@ -48,7 +48,7 @@
     BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
-                arguments_type::size_value == N>,
+                util::tuple_size<arguments_type>::value == N>,
             boost::is_same<IdType, naming::id_type>,
             boost::is_same<local_result_type, void> >
     >::type
@@ -63,7 +63,7 @@
     BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
-                arguments_type::size_value == N>,
+                util::tuple_size<arguments_type>::value == N>,
             boost::is_same<IdType, naming::id_type>,
             boost::is_same<local_result_type, void> >
     >::type
@@ -103,7 +103,7 @@
     BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
-                arguments_type::size_value == N>,
+                util::tuple_size<arguments_type>::value == N>,
             boost::is_same<IdType, naming::id_type>,
             boost::mpl::not_<boost::is_same<local_result_type, void> > >,
         local_result_type
@@ -119,7 +119,7 @@
     BOOST_FORCEINLINE typename boost::enable_if<
         boost::mpl::and_<
             boost::mpl::bool_<
-                arguments_type::size_value == N>,
+                util::tuple_size<arguments_type>::value == N>,
             boost::is_same<IdType, naming::id_type>,
             boost::mpl::not_<boost::is_same<local_result_type, void> > >,
         local_result_type
