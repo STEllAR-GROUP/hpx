@@ -177,26 +177,26 @@ namespace hpx { namespace components
             return g;
         }
 
-    private:
-        friend class boost::serialization::access;
-        
-        template <typename Archive>
-        void load(Archive & ar, unsigned)
-        {
-            naming::id_type id;
-            ar & id;
-
-            gid_ = lcos::make_ready_future(id);
-        }
-
-        template <typename Archive>
-        void save(Archive & ar, unsigned) const
-        {
-            naming::id_type id = gid_.get();
-            ar & id;
-        }
-
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
+//    private:
+//        friend class boost::serialization::access;
+//        
+//        template <typename Archive>
+//        void load(Archive & ar, unsigned)
+//        {
+//            naming::id_type id;
+//            ar & id;
+//
+//            gid_ = lcos::make_ready_future(id);
+//        }
+//
+//        template <typename Archive>
+//        void save(Archive & ar, unsigned) const
+//        {
+//            naming::id_type id = gid_.get();
+//            ar & id;
+//        }
+//
+//        BOOST_SERIALIZATION_SPLIT_MEMBER()
 
         future_type gid_;
     };
