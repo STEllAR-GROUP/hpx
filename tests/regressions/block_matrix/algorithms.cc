@@ -309,7 +309,7 @@ void gemv(bool trans, double alpha,
     }
   } else {
     // TODO
-    __builtin_unreachable();
+    assert(0);
 #if 0
     assert(a.jstr == x.str);
     assert(a.istr == y.str);
@@ -543,10 +543,10 @@ void gemm(bool transa, bool transb,
       }
     } else {
       // TODO
-      __builtin_unreachable();
+      assert(0);
     }
   } else {
     // TODO
-    __builtin_unreachable();
+    assert(0);
   }
 }
