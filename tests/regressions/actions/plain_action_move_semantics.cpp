@@ -261,7 +261,7 @@ int hpx_main(variables_map&)
                     pass_non_movable_object_void_action, non_movable_object
                 >()
             ), 2u);
-            
+
             HPX_TEST_EQ((
                 pass_object_void<
                     pass_non_movable_object_void_direct_action, non_movable_object
@@ -419,7 +419,7 @@ int hpx_main(variables_map&)
                 move_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
             ), is_local ? 2u : 5u);
         }
-            
+
         HPX_TEST_EQ((
             return_object<
                 return_movable_object_action, movable_object
@@ -442,8 +442,8 @@ int hpx_main(variables_map&)
             return_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 7u);
-            
+        ), is_local ? 3u : 7u);
+
         HPX_TEST_EQ((
             return_move_object<
                 return_movable_object_action, movable_object
@@ -461,15 +461,15 @@ int hpx_main(variables_map&)
             return_move_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), 
+        ),
         is_local ? 6u : 8u);      // gcc V4.4 is special
 #else
         HPX_TEST_EQ((
             return_move_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), 
-        is_local ? 5u : 7u);
+        ),
+        is_local ? 6u : 8u);
 #endif
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 40500)
@@ -477,15 +477,15 @@ int hpx_main(variables_map&)
             return_move_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), 
+        ),
         is_local ? 3u : 8u);      // gcc V4.4 is special
 #else
         HPX_TEST_EQ((
             return_move_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), 
-        is_local ? 2u : 7u);
+        ),
+        is_local ? 4u : 8u);
 #endif
     }
 
