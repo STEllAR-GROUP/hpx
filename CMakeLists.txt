@@ -1125,7 +1125,7 @@ else()
       hpx_info("C++11" "HPX_UTIL_FUNCTION is enabled: even if std::function is available it will not be used.")
     endif()
 
-    hpx_check_for_cxx11_std_initializer_list(HPX_HAVE_CXX11_STD_INITIALIZER_list
+    hpx_check_for_cxx11_std_initializer_list(HPX_HAVE_CXX11_STD_INITIALIZER_LIST
       DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
   endif()
 
