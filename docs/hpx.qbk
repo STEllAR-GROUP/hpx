@@ -41,6 +41,7 @@
 [def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #ste||ar at Freenode]]
 [def __stellar_hpx_download__   [@http://stellar.cct.lsu.edu/downloads/ __hpx__ Downloads]]
 [def __stellar_hpx_github__     [@http://github.com/STEllAR-GROUP/hpx/ Github]]
+[def __stellar_hpx_github_issues__     [@http://github.com/STEllAR-GROUP/hpx/issues __hpx__ Issues]]
 [def __stellar_hpx_buildbot__     [@http://hermione.cct.lsu.edu/ HPX Buildbot Website]]
 
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
@@ -74,6 +75,8 @@
 
 [/ External dependencies]
 [def __cmake__                  [@http://www.cmake.org CMake]]
+[def __ctest__                  [@http://cmake.org/Wiki/CMake/Testing_With_CTest CTest]]
+[def __ctest_doc__              [@http://www.cmake.org/cmake/help/v2.8.11/ctest.html CTest Documentation]]
 [def __cmake_download__         [@http://www.cmake.org/cmake/resources/software.html CMake Downloads]]
 [def __gcc__                    [@http://gcc.gnu.org GNU Compiler Collection (g++)]]
 [def __icpc__                   [@http://software.intel.com/en-us/intel-composer-xe/ Intel Composer XE Suites]]
@@ -268,6 +271,7 @@ __boost_auto_index__ can be found in the collection of __boost_tools__.
 [section:manual Manual]
 
 [include manual/cmake.qbk]
+[include manual/testing.qbk]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:init Launching __hpx__]
