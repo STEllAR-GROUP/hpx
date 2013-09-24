@@ -8,6 +8,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <iostream>
 
@@ -80,7 +81,8 @@ int hpx_main(boost::program_options::variables_map&)
   
   std::cout << "Done." << std::endl;
   
-  return hpx::finalize();
+  hpx::finalize();
+  return hpx::util::report_errors();
 }
 
 
