@@ -8,5 +8,6 @@
 
 void test_dense();
 void test_blocked();
+int report_errors();
 
 #endif  // #ifndef TESTS_HH

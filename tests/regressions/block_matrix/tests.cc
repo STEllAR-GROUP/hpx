@@ -216,3 +216,10 @@ void test_blocked()
   
   std::cout << std::endl;
 }
+
+
+
+int report_errors()
+{
+  return hpx::util::report_errors();
+}
