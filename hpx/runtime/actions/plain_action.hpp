@@ -488,7 +488,7 @@ namespace hpx { namespace traits
 ///       // enabling the remote invocation of the function `app::some_global_function`.
 ///       //
 ///       // Please note the extra parenthesis around both macro arguments.
-///       HPX_REGISTER_PLAIN_ACTION_TEMPLATE((<typename T>), (app::some_global_action<T>));
+///       HPX_REGISTER_PLAIN_ACTION_TEMPLATE((template <typename T>), (app::some_global_action<T>));
 /// \endcode
 ///
 #define HPX_REGISTER_PLAIN_ACTION_TEMPLATE(template_, action_type)            \

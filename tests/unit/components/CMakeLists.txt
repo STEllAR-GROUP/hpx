@@ -4,18 +4,23 @@
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    copy_component
     get_gid
     get_ptr
     remote_object
    )
 
-set(remote_object_FLAGS
-    DEPENDENCIES iostreams_component remote_object_component)
-set(remote_object_PARAMETERS
+set(copy_component_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
 
 set(get_ptr_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 2)
+
+set(remote_object_FLAGS
+    DEPENDENCIES iostreams_component remote_object_component)
+set(remote_object_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
 

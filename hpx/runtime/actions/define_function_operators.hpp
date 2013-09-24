@@ -112,7 +112,8 @@
         HPX_ENUM_FWD_ARGS(N, Arg, arg), error_code& ec = throws) const
     {
         return BOOST_PP_CAT(sync_invoke_, N)<local_result_type>::call(
-            is_future_pred(), policy, id, HPX_ENUM_FORWARD_ARGS(N, Arg, arg), ec);
+            is_future_pred(), policy, id,
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg), ec);
     }
 
     template <typename IdType, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -128,7 +129,8 @@
         error_code& ec = throws) const
     {
         return BOOST_PP_CAT(sync_invoke_, N)<local_result_type>::call(
-            is_future_pred(), launch::sync, id, HPX_ENUM_FORWARD_ARGS(N, Arg, arg), ec);
+            is_future_pred(), launch::sync, id,
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg), ec);
     }
 
 #undef N
