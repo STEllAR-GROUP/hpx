@@ -1,0 +1,31 @@
+[/==============================================================================
+    Copyright (C)      2013 Thomas Heller
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:testing Testing __hpx__]
+
+To ensure correcteness of __hpx__, we ship a large variety of unit and regression tests.
+The tests are driven by the __ctest__ tool and ran automatically by buildbot on each commit.
+In addition, it is encouraged to run the test suite manually to ensure proper operation on
+your target system. If a test fails for your platform, we highly recommend to submit an issue
+on our bug tracker with detailed information about the target system.
+
+[section:running_tests Running tests manually]
+
+Running the tests manually is as easy as typing ``make tests``. This will build all tests and
+run them once the tests are build successfully. After the tests have been built, you can
+invoke seperate tests with the help of the ``ctest`` command. Please see the __ctest_doc__ for
+further details.
+
+[section:issues Issue Tracker]
+
+If you stumble over a bug or missing feature missing feature in __hpx__ please submit an issue
+to our __stellar_hpx_github_issues__.
+
+[section:buildbot Buildbot]
+
+In addition to manual testing, we run automated tests on various platforms. You can see the
+status of the current master head by visiting the __stellar_hpx_buildbot__.
