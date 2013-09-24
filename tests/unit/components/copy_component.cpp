@@ -67,8 +67,8 @@ bool test_copy_component(hpx::id_type id)
 
         return true;
     }
-    catch (hpx::exception const& e) {
-        HPX_TEST_EQ(e.get_error(), hpx::bad_parameter);
+    catch (hpx::exception const&) {
+        HPX_TEST(false);
     }
 
     return false;
@@ -92,8 +92,8 @@ bool test_copy_component_here(hpx::id_type id)
 
         return true;
     }
-    catch (hpx::exception const& e) {
-        HPX_TEST_EQ(e.get_error(), hpx::bad_parameter);
+    catch (hpx::exception const&) {
+        HPX_TEST(false);
     }
 
     return false;
@@ -117,8 +117,8 @@ bool test_copy_component_there(hpx::id_type id)
 
         return true;
     }
-    catch (hpx::exception const& e) {
-        HPX_TEST_EQ(e.get_error(), hpx::bad_parameter);
+    catch (hpx::exception const&) {
+        HPX_TEST(false);
     }
 
     return false;
