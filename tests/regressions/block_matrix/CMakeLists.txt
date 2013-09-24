@@ -3,7 +3,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_HAVE_CXX11)
+if(HPX_HAVE_CXX11_AUTO AND HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
 
   set(tests block_matrix)
 
