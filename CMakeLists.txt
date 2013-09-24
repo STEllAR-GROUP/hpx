@@ -391,8 +391,8 @@ if(HPX_HAVE_PARCELPORT_MPI)
     # is enabled by default
     # PMI_RANK: Intel MPI and MVAPICH2
     # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
-    hpx_option(HPX_PARCELPORT_MPI_ENV STRING 
-      "List of environment variables checked to detect MPI (default: PMI_RANK;OMPI_COMM_WORLD_SIZE)." 
+    hpx_option(HPX_PARCELPORT_MPI_ENV STRING
+      "List of environment variables checked to detect MPI (default: PMI_RANK;OMPI_COMM_WORLD_SIZE)."
       "PMI_RANK;OMPI_COMM_WORLD_SIZE" ADVANCED)
     if(HPX_PARCELPORT_MPI_ENV)
       string(REPLACE ";" "," hpx_parcelport_mpi_env_ "${HPX_PARCELPORT_MPI_ENV}")
@@ -1385,7 +1385,7 @@ if(HPX_BUILD_TESTS)
   include(CTest)
 
   add_custom_command(TARGET tests POST_BUILD
-    COMMAND ctest)
+    COMMAND ctest --output-on-failure)
 
   include_directories(tests)
   add_subdirectory(tests)
