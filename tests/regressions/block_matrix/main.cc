@@ -1,5 +1,7 @@
-// Block-structured DGEMM with HPX
-// 2013-09-11 Erik Schnetter <eschnetter@perimeterinstitute.ca>
+// Copyright (c) 2013 Erik Schnetter
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "defs.hh"
 #include "tests.hh"

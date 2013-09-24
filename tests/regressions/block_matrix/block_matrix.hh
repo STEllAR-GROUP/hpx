@@ -1,3 +1,8 @@
+// Copyright (c) 2013 Erik Schnetter
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef BLOCK_MATRIX_HH
 #define BLOCK_MATRIX_HH
 
