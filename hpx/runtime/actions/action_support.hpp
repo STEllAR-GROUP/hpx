@@ -859,16 +859,18 @@ namespace hpx { namespace actions
         template <typename LocalResult>
         struct sync_invoke_0
         {
+            template <typename IdType>
             BOOST_FORCEINLINE static LocalResult call(
                 boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
-                naming::id_type const& id, error_code& ec)
+                IdType const& id, error_code& ec)
             {
                 return hpx::async<action>(policy, id).move(ec);
             }
 
+            template <typename IdType>
             BOOST_FORCEINLINE static LocalResult call(
                 boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
-                naming::id_type const& id, error_code& ec)
+                IdType const& id, error_code& ec)
             {
                 return hpx::async<action>(policy, id);
             }

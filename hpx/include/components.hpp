@@ -35,6 +35,7 @@
 #include <hpx/runtime/components/server/abstract_component_base.hpp>
 
 #include <hpx/runtime/components/new.hpp>
+#include <hpx/runtime/components/copy_component.hpp>
 
 #include <hpx/runtime/get_ptr.hpp>
 

@@ -51,7 +51,7 @@ namespace hpx { namespace components
         /// \brief Destruct a simple_component
         ~simple_component_base()
         {
-            applier::unbind_gid(gid_);
+            if (gid_) applier::unbind_gid(gid_);
         }
 
         /// \brief finalize() will be called just before the instance gets
