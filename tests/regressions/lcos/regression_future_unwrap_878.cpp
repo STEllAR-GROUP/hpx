@@ -10,8 +10,6 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/future.hpp>
 
-int continuation(hpx::future<int>&){ return 0; }
-
 int main()
 {
     hpx::promise<hpx::future<int> > promise;
