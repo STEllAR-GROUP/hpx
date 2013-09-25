@@ -680,7 +680,9 @@ namespace hpx { namespace lcos
         try {
             // if we get here, this future is ready
             using util::placeholders::_1;
-            get().then(util::bind(inner_ready, *this, _1, boost::move(p)));
+            
+            Result inner = get();
+            inner.then(util::bind(inner_ready, *this, _1, boost::move(p)));
         }
         catch(...) {
             p->set_exception(boost::current_exception());
