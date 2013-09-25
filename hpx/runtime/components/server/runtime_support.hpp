@@ -509,6 +509,16 @@ HPX_REGISTER_ACTION_DECLARATION(
 
 namespace hpx { namespace components { namespace server
 {
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+    template <typename Component>
+    struct copy_create_component_action
+      : ::hpx::actions::result_action2<
+            runtime_support, naming::gid_type
+          , boost::shared_ptr<Component> const&, bool
+          , &runtime_support::copy_create_component<Component>
+          , copy_create_component_action<Component> >
+    {};
+#else
     template <typename Component>
     struct copy_create_component_action
       : ::hpx::actions::result_action2<
@@ -516,6 +526,7 @@ namespace hpx { namespace components { namespace server
           , &runtime_support::copy_create_component<Component>
           , copy_create_component_action<Component> >
     {};
+#endif
 }}}
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
