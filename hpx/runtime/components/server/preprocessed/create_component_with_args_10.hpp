@@ -50,8 +50,8 @@
                 new (p) typename Component::derived_type(boost::move(a0));
             }
             typename util::decay<A0>::type a0;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor1)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor1)
         };
         template <typename Component, typename A0>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0)
@@ -97,8 +97,8 @@
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1));
             }
             typename util::decay<A0>::type a0; typename util::decay<A1>::type a1;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor2)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor2)
         };
         template <typename Component, typename A0 , typename A1>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
@@ -144,8 +144,8 @@
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2));
             }
             typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor3)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor3)
         };
         template <typename Component, typename A0 , typename A1 , typename A2>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
@@ -191,8 +191,8 @@
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3));
             }
             typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor4)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor4)
         };
         template <typename Component, typename A0 , typename A1 , typename A2 , typename A3>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
@@ -238,8 +238,8 @@
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4));
             }
             typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor5)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor5)
         };
         template <typename Component, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
@@ -285,8 +285,8 @@
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5));
             }
             typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor6)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor6)
         };
         template <typename Component, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
@@ -332,8 +332,8 @@
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6));
             }
             typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor7)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor7)
         };
         template <typename Component, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
@@ -379,8 +379,8 @@
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7));
             }
             typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor8)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor8)
         };
         template <typename Component, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
@@ -426,8 +426,8 @@
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7) , boost::move(a8));
             }
             typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7; typename util::decay<A8>::type a8;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor9)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor9)
         };
         template <typename Component, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
@@ -473,8 +473,8 @@
                 new (p) typename Component::derived_type(boost::move(a0) , boost::move(a1) , boost::move(a2) , boost::move(a3) , boost::move(a4) , boost::move(a5) , boost::move(a6) , boost::move(a7) , boost::move(a8) , boost::move(a9));
             }
             typename util::decay<A0>::type a0; typename util::decay<A1>::type a1; typename util::decay<A2>::type a2; typename util::decay<A3>::type a3; typename util::decay<A4>::type a4; typename util::decay<A5>::type a5; typename util::decay<A6>::type a6; typename util::decay<A7>::type a7; typename util::decay<A8>::type a8; typename util::decay<A9>::type a9;
-            private:
-                BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor10)
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(component_constructor_functor10)
         };
         template <typename Component, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
         naming::gid_type create_with_args(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)

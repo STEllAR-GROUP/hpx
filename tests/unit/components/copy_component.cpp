@@ -21,13 +21,19 @@ struct test_server
     }
 
     // components which should be copied using hpx::copy<> need to
-    // be Serializable and need to have a special constructor
-    test_server(boost::shared_ptr<test_server> rhs) {}
+    // be Serializable and CopyConstructable. In the remote case
+    // it can be MoveConstructable in which case the serialized data
+    // is moved into the components constructor.
+    test_server(test_server const& rhs) {}
+    test_server(BOOST_RV_REF(test_server) rhs) {}
+
+    HPX_DEFINE_COMPONENT_CONST_ACTION(test_server, call, call_action);
 
     template <typename Archive>
     void serialize(Archive&ar, unsigned version) {}
 
-    HPX_DEFINE_COMPONENT_CONST_ACTION(test_server, call, call_action);
+private:
+    BOOST_COPYABLE_AND_MOVABLE(test_server);
 };
 
 typedef hpx::components::simple_component<test_server> server_type;

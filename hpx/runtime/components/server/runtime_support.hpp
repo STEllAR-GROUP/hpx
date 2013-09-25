@@ -128,6 +128,10 @@ namespace hpx { namespace components { namespace server
         // bring in all overloads for create_componentN(...)
         #include <hpx/runtime/components/server/runtime_support_create_component_decl.hpp>
 
+        template <typename Component>
+        naming::gid_type copy_create_component(
+            boost::shared_ptr<Component> const& p, bool);
+
         /// \brief Action to create new memory block
         naming::gid_type create_memory_block(std::size_t count,
             hpx::actions::manage_object_action_base const& act);
@@ -381,6 +385,64 @@ namespace hpx { namespace components { namespace server
 
         return id;
     }
+
+    template <typename Component>
+    naming::gid_type runtime_support::copy_create_component(
+        boost::shared_ptr<Component> const& p, bool local_op)
+    {
+        components::component_type const type =
+            components::get_component_type<
+                typename Component::wrapped_type>();
+
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end()) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (component type not found in map)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::copy_create_component",
+                hpx::util::osstream_get_string(strm));
+            return naming::invalid_gid;
+        }
+
+        if (!(*it).second.first) {
+            hpx::util::osstream strm;
+            strm << "attempt to create component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (map entry is NULL)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::copy_create_component",
+                hpx::util::osstream_get_string(strm));
+            return naming::invalid_gid;
+        }
+
+        naming::gid_type id;
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+
+            typedef typename Component::wrapping_type wrapping_type;
+            if (!local_op) {
+                id = factory->create_with_args(
+                    component_constructor_functor1<wrapping_type, Component>(
+                        boost::move(*p))
+                );
+            }
+            else {
+                id = factory->create_with_args(
+                    component_constructor_functor1<wrapping_type, Component>(*p)
+                );
+            }
+        }
+        LRT_(info) << "successfully created component " << id
+            << " of type: " << components::get_component_type_name(type);
+
+        return id;
+    }
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>
@@ -444,6 +506,17 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action)
+
+namespace hpx { namespace components { namespace server
+{
+    template <typename Component>
+    struct copy_create_component_action
+      : ::hpx::actions::result_action2<
+            naming::gid_type (runtime_support::*)(boost::shared_ptr<Component> const&, bool)
+          , &runtime_support::copy_create_component<Component>
+          , copy_create_component_action<Component> >
+    {};
+}}}
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
 #  include <hpx/runtime/components/server/gcc44/runtime_support_implementations.hpp>
