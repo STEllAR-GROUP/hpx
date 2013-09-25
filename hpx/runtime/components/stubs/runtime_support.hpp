@@ -124,6 +124,36 @@ namespace hpx { namespace components { namespace stubs
 #undef HPX_RUNTIME_SUPPORT_STUB_REMOVE_REFERENCE
 
         ///////////////////////////////////////////////////////////////////////
+        // copy construct a component 
+        template <typename Component>
+        static lcos::future<naming::id_type>
+        copy_create_component_async(naming::id_type const& gid,
+            boost::shared_ptr<Component> const& p, bool local_op)
+        {
+            if (!naming::is_locality(gid))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "stubs::runtime_support::copy_create_component_async",
+                    "The id passed as the first argument is not representing"
+                        " a locality");
+                return make_ready_future(naming::invalid_id);
+            }
+
+            typedef typename server::copy_create_component_action<Component>
+                action_type;
+            return hpx::async<action_type>(gid, p, local_op);
+        }
+
+        template <typename Component>
+        static naming::id_type copy_create_component(naming::id_type const& gid,
+            boost::shared_ptr<Component> const& p, bool local_op)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the future
+            return copy_create_component_async<Component>(gid, p, local_op).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         static lcos::future<std::vector<naming::id_type> >
         bulk_create_components_async(
             naming::id_type const& gid, components::component_type type,

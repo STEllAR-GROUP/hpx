@@ -26,8 +26,8 @@ namespace hpx { namespace components { namespace server
             naming::id_type const& target_locality)
         {
             boost::shared_ptr<Component> ptr = f.get();
-            return stubs::runtime_support::create_component<Component>(
-                target_locality, ptr);
+            return stubs::runtime_support::copy_create_component<Component>(
+                target_locality, ptr, target_locality == find_here());
         }
     }
 

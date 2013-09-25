@@ -138,9 +138,8 @@ namespace hpx { namespace components { namespace server
             }
             BOOST_PP_REPEAT(N, HPX_RUNTIME_SUPPORT_CTOR_M1, _)
 
-            private:
-
-                BOOST_COPYABLE_AND_MOVABLE(BOOST_PP_CAT(component_constructor_functor, N))
+        private:
+            BOOST_COPYABLE_AND_MOVABLE(BOOST_PP_CAT(component_constructor_functor, N))
         };
 
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>
