@@ -925,6 +925,21 @@ if(MSVC)
     endif()
 
     if(MSVC12)
+      hpx_option(HPX_HAVE_CXX11_ALIAS_TEMPLATES BOOL "Compiler supports C++11 alias templates (default: ON)." ON ADVANCED)
+    else()
+      hpx_option(HPX_HAVE_CXX11_ALIAS_TEMPLATES BOOL "Compiler supports C++11 alias templates (default: OFF)." OFF ADVANCED)
+    endif()
+
+    if(HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+      hpx_add_config_define(HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+    endif()
+
+    hpx_option(HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS BOOL "Compiler supports C++11 defaulted/deleted functions (default: OFF)." OFF ADVANCED)
+    if(HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
+      hpx_add_config_define(HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
+    endif()
+
+    if(MSVC12)
       hpx_option(HPX_HAVE_CXX11_VARIADIC_TEMPLATES BOOL "Compiler supports C++11 variadic templates (default: ON)." ON ADVANCED)
     else()
       hpx_option(HPX_HAVE_CXX11_VARIADIC_TEMPLATES BOOL "Compiler supports C++11 variadic templates (default: OFF)." OFF ADVANCED)
@@ -1104,6 +1119,12 @@ else()
 
     hpx_check_for_cxx11_decltype(HPX_HAVE_CXX11_DECLTYPE
       DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
+
+	hpx_check_for_cxx11_alias_templates(HPX_HAVE_CXX11_ALIAS_TEMPLATES
+	  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+
+	hpx_check_for_cxx11_defaulted_deleted_functions(HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS
+	  DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
 
     hpx_check_for_cxx11_std_unique_ptr(HPX_HAVE_CXX11_STD_UNIQUE_PTR
       DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
