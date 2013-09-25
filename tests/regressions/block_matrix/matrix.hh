@@ -39,7 +39,7 @@ struct vector_t {
   // We don't really want these
   vector_t() = default;
   vector_t(const vector_t&) = default;
-  vector_t& operator=(const vector_t&) { assert(0); }
+  vector_t& operator=(const vector_t&) { assert(0); return *this; }
   
   operator std::string() const { return mkstr(*this); }
   const double& operator()(std::ptrdiff_t i) const
