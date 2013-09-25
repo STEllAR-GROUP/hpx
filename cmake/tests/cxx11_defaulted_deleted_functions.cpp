@@ -34,6 +34,6 @@ struct moveonly {
 int main()
 {
     moveonly p;
-    moveonly q(p); // error, deleted copy constructor
+    //moveonly q(p); // error, deleted copy constructor
     moveonly r(std::move(p)); // ok, defaulted move constructor
 }
