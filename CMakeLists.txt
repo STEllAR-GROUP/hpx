@@ -963,6 +963,11 @@ if(MSVC)
       set(HPX_HAVE_CXX11_STD_FUNCTION OFF CACHE BOOL "Compiler supports C++11 (movable) std::function." FORCE)
       hpx_info("C++11" "HPX_UTIL_FUNCTION is enabled: even while std::function is available it will not be used.")
     endif()
+
+    hpx_option(HPX_HAVE_CXX11_STD_INITIALIZER_LIST BOOL "Compiler supports C++11 std::initializer_list (default: ON)." ON ADVANCED)
+    if(HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
+      hpx_add_config_define(HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
+    endif()
   endif()
 
   ##############################################################################
@@ -1119,6 +1124,9 @@ else()
     else()
       hpx_info("C++11" "HPX_UTIL_FUNCTION is enabled: even if std::function is available it will not be used.")
     endif()
+
+    hpx_check_for_cxx11_std_initializer_list(HPX_HAVE_CXX11_STD_INITIALIZER_LIST
+      DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
   endif()
 
   ##############################################################################
