@@ -9,6 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 int main()
 {
@@ -21,9 +22,10 @@ int main()
     } catch(...) {
         promise.set_exception(boost::current_exception());
     }
+    HPX_TEST(future.has_exception());
+
     hpx::future<int> inner = future.unwrap();
+    HPX_TEST(inner.has_exception());
 
-    inner.has_exception();
-
-    return 0;
+    return hpx::util::report_errors();
 }
