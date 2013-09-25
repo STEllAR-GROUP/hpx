@@ -98,6 +98,9 @@ add_hpx_library_sources(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/hpx_*.cpp"
   EXCLUDE "hpx_init[.]cpp")
 add_hpx_library_sources(hpx_init
+  GLOB GLOBS "${hpx_SOURCE_DIR}/src/util/lightweight_test.cpp"
+  APPEND)
+add_hpx_library_sources(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/main.cpp" APPEND)
 
 set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
