@@ -16,8 +16,8 @@ int main()
     hpx::future<hpx::future<int> > future = promise.get_future();
     try
     {
-        //throw hpx::bad_parameter;
-        promise.set_value(42);
+        throw hpx::bad_parameter;
+        //promise.set_value(42);
     } catch(...) {
         promise.set_exception(boost::current_exception());
     }
