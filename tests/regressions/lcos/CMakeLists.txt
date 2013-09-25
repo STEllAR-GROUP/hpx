@@ -9,6 +9,7 @@ set(tests
     future_hang_on_get
     dataflow_launch
     regression_future_790
+    regression_future_unwrap_878
     regression_set_hpx_limit_771
     regression_set_hpx_limit_798
    )

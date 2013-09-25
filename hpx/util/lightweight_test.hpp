@@ -172,7 +172,7 @@ struct fixture
     }
 };
 
-fixture global_fixture = fixture(std::cerr);
+extern fixture global_fixture;
 
 } // hpx::util::detail
 
