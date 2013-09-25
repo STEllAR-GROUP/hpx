@@ -21,7 +21,9 @@ int main()
     } catch(...) {
         promise.set_exception(boost::current_exception());
     }
-    future.unwrap();
+    hpx::future<int> inner = future.unwrap();
+
+    inner.has_exception();
 
     return 0;
 }
