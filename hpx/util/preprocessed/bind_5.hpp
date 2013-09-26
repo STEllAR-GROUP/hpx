@@ -32,20 +32,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0))
             {}
-            bound_function1 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_function1) other)
-            {
-                f = other.f;
-                arg0 = other.arg0;
-                return *this;
-            }
-            bound_function1 & operator=(
-                BOOST_RV_REF(bound_function1) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0);
-                return *this;
-            }
             template <typename A0>
             bound_function1(
                 function_pointer_type f
@@ -176,20 +162,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0))
             {}
-            bound_member_function1 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function1) other)
-            {
-                f = other.f;
-                arg0 = other.arg0;
-                return *this;
-            }
-            bound_member_function1 & operator=(
-                BOOST_RV_REF(bound_member_function1) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -469,20 +441,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0))
             {}
-            bound_member_function1 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function1) other)
-            {
-                f = other.f;
-                arg0 = other.arg0;
-                return *this;
-            }
-            bound_member_function1 & operator=(
-                BOOST_RV_REF(bound_member_function1) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -721,20 +679,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0))
             {}
-            bound_functor1 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_functor1) other)
-            {
-                f = other.f;
-                arg0 = other.arg0;
-                return *this;
-            }
-            bound_functor1 & operator=(
-                BOOST_RV_REF(bound_functor1) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0);
-                return *this;
-            }
             BOOST_FORCEINLINE
             typename result_of::bound_functor1<
                 F()
@@ -955,20 +899,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1))
             {}
-            bound_function2 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_function2) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1;
-                return *this;
-            }
-            bound_function2 & operator=(
-                BOOST_RV_REF(bound_function2) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1);
-                return *this;
-            }
             template <typename A0 , typename A1>
             bound_function2(
                 function_pointer_type f
@@ -1099,20 +1029,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1))
             {}
-            bound_member_function2 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function2) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1;
-                return *this;
-            }
-            bound_member_function2 & operator=(
-                BOOST_RV_REF(bound_member_function2) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -1392,20 +1308,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1))
             {}
-            bound_member_function2 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function2) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1;
-                return *this;
-            }
-            bound_member_function2 & operator=(
-                BOOST_RV_REF(bound_member_function2) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -1644,20 +1546,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1))
             {}
-            bound_functor2 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_functor2) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1;
-                return *this;
-            }
-            bound_functor2 & operator=(
-                BOOST_RV_REF(bound_functor2) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1);
-                return *this;
-            }
             BOOST_FORCEINLINE
             typename result_of::bound_functor2<
                 F()
@@ -1878,20 +1766,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2))
             {}
-            bound_function3 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_function3) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2;
-                return *this;
-            }
-            bound_function3 & operator=(
-                BOOST_RV_REF(bound_function3) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2);
-                return *this;
-            }
             template <typename A0 , typename A1 , typename A2>
             bound_function3(
                 function_pointer_type f
@@ -2022,20 +1896,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2))
             {}
-            bound_member_function3 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function3) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2;
-                return *this;
-            }
-            bound_member_function3 & operator=(
-                BOOST_RV_REF(bound_member_function3) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -2315,20 +2175,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2))
             {}
-            bound_member_function3 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function3) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2;
-                return *this;
-            }
-            bound_member_function3 & operator=(
-                BOOST_RV_REF(bound_member_function3) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -2567,20 +2413,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2))
             {}
-            bound_functor3 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_functor3) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2;
-                return *this;
-            }
-            bound_functor3 & operator=(
-                BOOST_RV_REF(bound_functor3) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2);
-                return *this;
-            }
             BOOST_FORCEINLINE
             typename result_of::bound_functor3<
                 F()
@@ -2801,20 +2633,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3))
             {}
-            bound_function4 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_function4) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3;
-                return *this;
-            }
-            bound_function4 & operator=(
-                BOOST_RV_REF(bound_function4) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3);
-                return *this;
-            }
             template <typename A0 , typename A1 , typename A2 , typename A3>
             bound_function4(
                 function_pointer_type f
@@ -2945,20 +2763,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3))
             {}
-            bound_member_function4 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function4) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3;
-                return *this;
-            }
-            bound_member_function4 & operator=(
-                BOOST_RV_REF(bound_member_function4) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -3238,20 +3042,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3))
             {}
-            bound_member_function4 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function4) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3;
-                return *this;
-            }
-            bound_member_function4 & operator=(
-                BOOST_RV_REF(bound_member_function4) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -3490,20 +3280,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3))
             {}
-            bound_functor4 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_functor4) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3;
-                return *this;
-            }
-            bound_functor4 & operator=(
-                BOOST_RV_REF(bound_functor4) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3);
-                return *this;
-            }
             BOOST_FORCEINLINE
             typename result_of::bound_functor4<
                 F()
@@ -3724,20 +3500,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4))
             {}
-            bound_function5 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_function5) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4;
-                return *this;
-            }
-            bound_function5 & operator=(
-                BOOST_RV_REF(bound_function5) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4);
-                return *this;
-            }
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
             bound_function5(
                 function_pointer_type f
@@ -3868,20 +3630,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4))
             {}
-            bound_member_function5 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function5) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4;
-                return *this;
-            }
-            bound_member_function5 & operator=(
-                BOOST_RV_REF(bound_member_function5) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -4161,20 +3909,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4))
             {}
-            bound_member_function5 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function5) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4;
-                return *this;
-            }
-            bound_member_function5 & operator=(
-                BOOST_RV_REF(bound_member_function5) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -4413,20 +4147,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4))
             {}
-            bound_functor5 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_functor5) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4;
-                return *this;
-            }
-            bound_functor5 & operator=(
-                BOOST_RV_REF(bound_functor5) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4);
-                return *this;
-            }
             BOOST_FORCEINLINE
             typename result_of::bound_functor5<
                 F()
@@ -4647,20 +4367,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5))
             {}
-            bound_function6 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_function6) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5;
-                return *this;
-            }
-            bound_function6 & operator=(
-                BOOST_RV_REF(bound_function6) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5);
-                return *this;
-            }
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
             bound_function6(
                 function_pointer_type f
@@ -4791,20 +4497,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5))
             {}
-            bound_member_function6 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function6) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5;
-                return *this;
-            }
-            bound_member_function6 & operator=(
-                BOOST_RV_REF(bound_member_function6) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -5084,20 +4776,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5))
             {}
-            bound_member_function6 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function6) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5;
-                return *this;
-            }
-            bound_member_function6 & operator=(
-                BOOST_RV_REF(bound_member_function6) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -5336,20 +5014,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5))
             {}
-            bound_functor6 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_functor6) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5;
-                return *this;
-            }
-            bound_functor6 & operator=(
-                BOOST_RV_REF(bound_functor6) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5);
-                return *this;
-            }
             BOOST_FORCEINLINE
             typename result_of::bound_functor6<
                 F()
@@ -5570,20 +5234,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6))
             {}
-            bound_function7 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_function7) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5; arg6 = other.arg6;
-                return *this;
-            }
-            bound_function7 & operator=(
-                BOOST_RV_REF(bound_function7) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5); arg6 = boost::move(other.arg6);
-                return *this;
-            }
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
             bound_function7(
                 function_pointer_type f
@@ -5714,20 +5364,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6))
             {}
-            bound_member_function7 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function7) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5; arg6 = other.arg6;
-                return *this;
-            }
-            bound_member_function7 & operator=(
-                BOOST_RV_REF(bound_member_function7) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5); arg6 = boost::move(other.arg6);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -6007,20 +5643,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6))
             {}
-            bound_member_function7 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function7) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5; arg6 = other.arg6;
-                return *this;
-            }
-            bound_member_function7 & operator=(
-                BOOST_RV_REF(bound_member_function7) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5); arg6 = boost::move(other.arg6);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -6259,20 +5881,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6))
             {}
-            bound_functor7 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_functor7) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5; arg6 = other.arg6;
-                return *this;
-            }
-            bound_functor7 & operator=(
-                BOOST_RV_REF(bound_functor7) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5); arg6 = boost::move(other.arg6);
-                return *this;
-            }
             BOOST_FORCEINLINE
             typename result_of::bound_functor7<
                 F()
@@ -6493,20 +6101,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6)) , arg7(boost::move(other.arg7))
             {}
-            bound_function8 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_function8) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5; arg6 = other.arg6; arg7 = other.arg7;
-                return *this;
-            }
-            bound_function8 & operator=(
-                BOOST_RV_REF(bound_function8) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5); arg6 = boost::move(other.arg6); arg7 = boost::move(other.arg7);
-                return *this;
-            }
             template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
             bound_function8(
                 function_pointer_type f
@@ -6637,20 +6231,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6)) , arg7(boost::move(other.arg7))
             {}
-            bound_member_function8 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function8) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5; arg6 = other.arg6; arg7 = other.arg7;
-                return *this;
-            }
-            bound_member_function8 & operator=(
-                BOOST_RV_REF(bound_member_function8) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5); arg6 = boost::move(other.arg6); arg7 = boost::move(other.arg7);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -6930,20 +6510,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6)) , arg7(boost::move(other.arg7))
             {}
-            bound_member_function8 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_member_function8) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5; arg6 = other.arg6; arg7 = other.arg7;
-                return *this;
-            }
-            bound_member_function8 & operator=(
-                BOOST_RV_REF(bound_member_function8) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5); arg6 = boost::move(other.arg6); arg7 = boost::move(other.arg7);
-                return *this;
-            }
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -7182,20 +6748,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6)) , arg7(boost::move(other.arg7))
             {}
-            bound_functor8 & operator=(
-                BOOST_COPY_ASSIGN_REF(bound_functor8) other)
-            {
-                f = other.f;
-                arg0 = other.arg0; arg1 = other.arg1; arg2 = other.arg2; arg3 = other.arg3; arg4 = other.arg4; arg5 = other.arg5; arg6 = other.arg6; arg7 = other.arg7;
-                return *this;
-            }
-            bound_functor8 & operator=(
-                BOOST_RV_REF(bound_functor8) other)
-            {
-                f = boost::move(other.f);
-                arg0 = boost::move(other.arg0); arg1 = boost::move(other.arg1); arg2 = boost::move(other.arg2); arg3 = boost::move(other.arg3); arg4 = boost::move(other.arg4); arg5 = boost::move(other.arg5); arg6 = boost::move(other.arg6); arg7 = boost::move(other.arg7);
-                return *this;
-            }
             BOOST_FORCEINLINE
             typename result_of::bound_functor8<
                 F()
