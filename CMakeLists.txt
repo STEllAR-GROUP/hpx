@@ -1449,6 +1449,8 @@ endif()
 
 if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
+  add_custom_target(git_docs COMMAND cmake -DHPX_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake)
+  add_dependencies(git_docs docs)
 endif()
 
 if(${BOOST_MINOR_VERSION} GREATER 50)
