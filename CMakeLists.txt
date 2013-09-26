@@ -207,7 +207,6 @@ if(HPX_NATIVE_MIC)
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
   hpx_add_config_define(HPX_NATIVE_MIC)
-  set(HPX_MALLOC "tbbmalloc")
 else()
   hpx_option(HPX_MAX_CPU_COUNT STRING
     "HPX applications will not use more than this amount of OS-threads (default: 64)."
@@ -836,12 +835,17 @@ if(HPX_GOOGLE_PERFTOOLS)
   endif()
 endif()
 
-if(NOT HPX_MALLOC)
-  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-    set(HPX_MALLOC "TCMalloc")
+# On Linux, the system allocator has a bad performance for multi-threaded applications. We thus use tcmalloc by default.
+# If tcmalloc is not present, this will fail. It is intentional that overriding this default requires an explicit
+# "-DHPX_MALLOC=system"
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+  if(HPX_NATIVE_MIC)
+      set(HPX_MALLOC_DEFAULT "tbbmalloc")
   else()
-    set(HPX_MALLOC "system")
+    set(HPX_MALLOC_DEFAULT "TCMalloc")
   endif()
+else()
+  set(HPX_MALLOC_DEFAULT "system")
 endif()
 set(hpx_MALLOC_LIBRARY "")
 hpx_include(SetAllocator)

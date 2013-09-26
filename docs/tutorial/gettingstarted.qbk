@@ -39,7 +39,7 @@ work, but we do not test __hpx__ with other platforms, so please be warned.
 
 [table Supported Platforms for __hpx__
     [[Name   ][Recommended Version][Minimum Version][Architectures ]]
-    [[Linux  ][3.2                ][2.6            ][x86-32, x86-64]]
+    [[Linux  ][3.2                ][2.6            ][x86-32, x86-64, k1om]]
     [[Windows][7, Server 2008 R2  ][Any NT system  ][x86-64]        ]
 ]
 
