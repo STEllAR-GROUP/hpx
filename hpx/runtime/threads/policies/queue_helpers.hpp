@@ -48,9 +48,9 @@ namespace detail
         Map& tm, boost::int64_t& idle_loop_count, bool running)
     {
 #if !HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
-        (void)tm;
-        (void)idle_loop_count;
-        (void)running;
+        HPX_UNUSED(tm);
+        HPX_UNUSED(idle_loop_count);
+        HPX_UNUSED(running);
         return false;
 #else
         if (!minimal_deadlock_detection)

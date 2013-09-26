@@ -186,7 +186,7 @@ namespace hpx { namespace util { namespace coroutines {
                    default_hint)
       {
           int  error = HPX_COROUTINE_SWAP_CONTEXT(&from.m_ctx, &to.m_ctx);
-          (void)error;
+          HPX_UNUSED(error);
           BOOST_ASSERT(error == 0);
       }
 
@@ -217,7 +217,7 @@ namespace hpx { namespace util { namespace coroutines {
             cb_type * cb_ptr = &trampoline<Functor>;
             int error = HPX_COROUTINE_MAKE_CONTEXT(
                 &m_ctx, m_stack, m_stack_size, (void (*)(void*))(cb_ptr), &cb, NULL);
-            (void)error;
+            HPX_UNUSED(error);
             BOOST_ASSERT(error == 0);
         }
 

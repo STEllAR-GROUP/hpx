@@ -131,7 +131,7 @@ namespace hpx { namespace components { namespace detail
             heap_alloc_function_("wrapper_heap::alloc", "<unknown>"),
             heap_free_function_("wrapper_heap::free", "<unknown>")
         {
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
 
             BOOST_ASSERT(sizeof(storage_type) == heap_size);
             if (!init_pool())
@@ -140,28 +140,28 @@ namespace hpx { namespace components { namespace detail
 
         ~wrapper_heap()
         {
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
             tidy();
         }
 
         std::size_t size() const
         {
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
             return size_ - free_size_;
         }
         std::size_t free_size() const
         {
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
             return free_size_;
         }
         bool is_empty() const
         {
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
             return NULL == pool_;
         }
         bool has_allocatable_slots() const
         {
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
             return first_free_ < pool_+size_;
         }
 
@@ -220,7 +220,7 @@ namespace hpx { namespace components { namespace detail
             // give memory back to pool
             debug::fill_bytes(p1->address(), freed_value, sizeof(storage_type));
 #else
-            (void)p;
+            HPX_UNUSED(p);
 #endif
 
 #if defined(HPX_DEBUG)
@@ -234,7 +234,7 @@ namespace hpx { namespace components { namespace detail
         bool did_alloc (void *p) const
         {
             // no lock is necessary here as all involved variables are immutable
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
             return NULL != pool_ && NULL != p && pool_ <= p && p < pool_ + size_;
         }
 
@@ -246,7 +246,7 @@ namespace hpx { namespace components { namespace detail
         ///        allocated by this instance of a \a wrapper_heap
         naming::gid_type get_gid(util::unique_id_ranges& ids, void* p)
         {
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
 
             BOOST_ASSERT(did_alloc(p));
 
@@ -294,7 +294,7 @@ namespace hpx { namespace components { namespace detail
 
         void set_gid(naming::gid_type const& g)
         {
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
 
             scoped_lock l(mtx_);
             base_gid_ = g;
@@ -302,7 +302,7 @@ namespace hpx { namespace components { namespace detail
 
         naming::address get_address()
         {
-            util::itt::heap_internal_access hia; (void)hia;
+            util::itt::heap_internal_access hia; HPX_UNUSED(hia);
 
             value_type* addr = static_cast<value_type*>(pool_->address());
             return naming::address(get_locality(),
