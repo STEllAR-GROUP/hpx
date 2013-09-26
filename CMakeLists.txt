@@ -544,14 +544,12 @@ find_package(HPX_APEX)
 ################################################################################
 # hwloc
 ################################################################################
-if(NOT HPX_DISABLE_HWLOC)
-  find_package(HPX_Hwloc)
-  if(HWLOC_FOUND)
-    hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
-    hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
-    hpx_add_config_define(HPX_HAVE_HWLOC)
-    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
-  endif()
+find_package(HPX_Hwloc)
+if(HWLOC_FOUND)
+  hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
+  hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
+  hpx_add_definitions(-DHPX_HAVE_HWLOC)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
 endif()
 
 ################################################################################
