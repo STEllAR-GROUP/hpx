@@ -48,13 +48,14 @@ namespace hpx { namespace util
     {
         using namespace boost::assign;
 
-        bool enable_mpi
+        enabled_
             = boost::lexical_cast<int>(
                 cfg.rtcfg_.get_entry("hpx.parcel.mpi.enable", "1")
             );
 
-        enabled_ = enable_mpi && detail::detect_mpi_environment(cfg.rtcfg_);
         if(!enabled_) return -1;
+        
+        enabled_ = enabled_ || detail::detect_mpi_environment(cfg.rtcfg_);
 
         cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
 
