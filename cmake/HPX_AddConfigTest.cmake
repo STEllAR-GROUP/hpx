@@ -169,6 +169,26 @@ macro(hpx_check_for_cxx11_decltype variable)
 endmacro()
 
 ###############################################################################
+macro(hpx_check_for_cxx11_alias_templates variable)
+  hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
+
+  add_hpx_config_test("cxx11_alias_templates" ${variable} LANGUAGE CXX
+    SOURCE cmake/tests/cxx11_alias_templates.cpp
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_defaulted_deleted_functions variable)
+  hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
+
+  add_hpx_config_test("cxx11_defaulted_deleted_functions" ${variable} LANGUAGE CXX
+    SOURCE cmake/tests/cxx11_defaulted_deleted_functions.cpp
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
+###############################################################################
 macro(hpx_check_for_cxx11_std_unique_ptr variable)
   hpx_get_include_directory(include_dir)
   hpx_get_boost_include_directory(boost_include_dir)
