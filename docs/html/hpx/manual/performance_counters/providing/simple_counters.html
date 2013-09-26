@@ -1,0 +1,134 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Exposing Performance Counter Data using a Simple Function</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../providing.html" title="Providing Performance Counter Data">
+<link rel="prev" href="../providing.html" title="Providing Performance Counter Data">
+<link rel="next" href="full_counters.html" title="Implementing a Full Performance Counter">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../providing.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../providing.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="full_counters.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_performance_counters_providing_simple_counters">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.performance_counters.providing.simple_counters"></a><a class="link" href="simple_counters.html" title="Exposing Performance Counter Data using a Simple Function">Exposing
+          Performance Counter Data using a Simple Function</a>
+</h5></div></div></div>
+<p>
+            The simplest way to expose arbitrary numeric data is to write a function
+            which will then be called whenever a consumer queries this counter. Currently,
+            this type of Performance Counter can only be used to expose integer values.
+            The expected signature of this function is:
+          </p>
+<pre class="programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">int64_t</span> <span class="identifier">some_performance_data</span><span class="special">(</span><span class="keyword">bool</span> <span class="identifier">reset</span><span class="special">);</span>
+</pre>
+<p>
+            The argument <code class="computeroutput"><span class="keyword">bool</span> <span class="identifier">reset</span></code>
+            (which is supplied by the runtime system when the function is invoked)
+            specifies whether the counter value should be reset after evaluating
+            the current value (if applicable).
+          </p>
+<p>
+            For instance, here is such a function returning how often it was invoked:
+          </p>
+<pre class="programlisting"><span class="comment">// The atomic variable 'counter' ensures the thread safety of the counter.</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">atomic</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">int64_t</span><span class="special">&gt;</span> <span class="identifier">counter</span><span class="special">(</span><span class="number">0</span><span class="special">);</span>
+
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">int64_t</span> <span class="identifier">some_performance_data</span><span class="special">(</span><span class="keyword">bool</span> <span class="identifier">reset</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">int64_t</span> <span class="identifier">result</span> <span class="special">=</span> <span class="special">++</span><span class="identifier">counter</span><span class="special">;</span>
+    <span class="keyword">if</span> <span class="special">(</span><span class="identifier">reset</span><span class="special">)</span>
+        <span class="identifier">counter</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+    <span class="keyword">return</span> <span class="identifier">result</span><span class="special">;</span>
+<span class="special">}</span>
+</pre>
+<p>
+            This example function exposes a linearly increasing value as our performance
+            data. The value is incrememnted on each invocation, e.g. each time a
+            consumer requests the counter data of this Performance Counter.
+          </p>
+<p>
+            The next step in exposing this counter to the runtime system is to register
+            the function as a new raw counter type using the <span class="emphasis"><em>HPX</em></span>
+            API function <code class="computeroutput"><a class="link" href="../../../performance_counters/install_counter_type_idp16220384.html" title="Function install_counter_type">hpx::performance_counters::install_counter_type</a></code>.
+            A counter type represents certain common characteristics of counters,
+            like their counter type name, and any associated description information.
+            The following snippet shows an example of how to register the function
+            <code class="computeroutput"><span class="identifier">some_performance_data</span></code>
+            which is shown above for a counter type named <code class="computeroutput"><span class="string">"/test/data"</span></code>.
+            This registration has to be executed before any consumer instantiates
+            and queries an instance of this counter type.
+          </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">include</span><span class="special">/</span><span class="identifier">performance_counters</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">void</span> <span class="identifier">register_counter_type</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="comment">// Call the HPX API function to register the counter type.</span>
+    <code class="computeroutput"><a class="link" href="../../../performance_counters/install_counter_type_idp16220384.html" title="Function install_counter_type">hpx::performance_counters::install_counter_type</a></code><span class="special">(</span>
+        <span class="string">"/test/data"</span><span class="special">,</span>                                   <span class="comment">// counter type name</span>
+        <span class="special">&amp;</span><span class="identifier">some_performance_data</span><span class="special">,</span>                         <span class="comment">// function providing counter data</span>
+        <span class="string">"returns a linearly increasing counter value"</span>   <span class="comment">// description text (optional)</span>
+        <span class="string">""</span>                                              <span class="comment">// unit of measure (optional)</span>
+    <span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+            Now it is possible to instantiate a new counter instance based on the
+            naming scheme <code class="computeroutput"><span class="string">"/test{locality#*/total}/data"</span></code>,
+            where '<code class="computeroutput"><span class="special">*</span></code>' is a zero based
+            integer index indentifying the locality for which the counter instance
+            should be accessed. The function <code class="computeroutput"><a class="link" href="../../../performance_counters/install_counter_type_idp16220384.html" title="Function install_counter_type">install_counter_type</a></code>
+            enables to instantiate exactly one counter instance for each locality.
+            Repeated requests to instantiate such a counter will return the same
+            instance, e.g. the instance created for the first request.
+          </p>
+<p>
+            If this counter needs to be accessed using the standard <span class="emphasis"><em>HPX</em></span>
+            command line options, the registration has to be performed during application
+            startup, before <code class="computeroutput"><span class="identifier">hpx_main</span></code>
+            is executed. The best way to achieve this is to register an <span class="emphasis"><em>HPX</em></span>
+            startup function using the API function <code class="computeroutput"><a class="link" href="../../../register_startup_function.html" title="Function register_startup_function">hpx::register_startup_function</a></code>
+            before calling <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">init</span></code> to initialize the runtime system:
+          </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
+<span class="special">{</span>
+    <span class="comment">// By registering the counter type we make it available to any consumer</span>
+    <span class="comment">// who creates and queries an instance of the type "/test/data".</span>
+    <span class="comment">//</span>
+    <span class="comment">// This registration should be performed during startup. The</span>
+    <span class="comment">// function 'register_counter_type' should be executed as an HPX thread right</span>
+    <span class="comment">// before hpx_main is executed.</span>
+    <code class="computeroutput"><a class="link" href="../../../register_startup_function.html" title="Function register_startup_function">hpx::register_startup_function</a></code><span class="special">(&amp;</span><span class="identifier">register_counter_type</span><span class="special">);</span>
+
+    <span class="comment">// Initialize and run HPX.</span>
+    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../../../init_idp15953296.html" title="Function init">hpx::init</a></code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+            Please see the code in <a href="file:////home/heller/programming/hpx/examples/performance_counters/simplest_performance_counter.cpp" target="_top">simplest_performance_counter.cpp</a>
+for
+            a full example demonstrating this functionality.
+          </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../providing.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../providing.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="full_counters.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

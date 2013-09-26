@@ -1,0 +1,138 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Comparing Actions with C++ Functions</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../action_invocation.html" title="Action Invocation">
+<link rel="prev" href="apply_continue.html" title="Applying an Action with a Continuation and with Synchronization">
+<link rel="next" href="../action_error_handling.html" title="Action Error Handling">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="apply_continue.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../action_invocation.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="../action_error_handling.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_applying_actions_action_invocation_compare">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.applying_actions.action_invocation.compare"></a><a class="link" href="compare.html" title="Comparing Actions with C++ Functions">Comparing
+          Actions with C++ Functions</a>
+</h5></div></div></div>
+<p>
+            As mentioned above, <span class="emphasis"><em>HPX</em></span> actions are very similar
+            to 'normal' C++ functions except that actions can be invoked remotely.
+            The following table compares the way C++ functions can be invoked with
+            the syntax used to apply an <span class="emphasis"><em>HPX</em></span> action. This table
+            assumes that <code class="computeroutput"><span class="identifier">func</span></code> is
+            an arbitrary C++ function or function object and <code class="computeroutput"><span class="identifier">act</span></code>
+            is an instance of an <span class="emphasis"><em>HPX</em></span> action. <code class="computeroutput"><span class="identifier">R</span></code>
+            stands for an arbitrary result type.
+          </p>
+<div class="table">
+<a name="hpx.manual.applying_actions.action_invocation.compare.comparing_c_functions_and_hpx_ac"></a><p class="title"><b>Table&#160;15.&#160;Comparing C++ Functions and <span class="emphasis"><em>HPX</em></span> Actions</b></p>
+<div class="table-contents"><table class="table" summary="Comparing C++ Functions and HPX Actions">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Invocation
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      C++ Function
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      <span class="emphasis"><em>HPX</em></span> Action
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      Apply (fire &amp; forget)
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">apply</span><span class="special">(</span><span class="identifier">func</span><span class="special">,</span>
+                      <span class="special">...);</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">apply</span><span class="special">(</span><span class="identifier">act</span><span class="special">,</span>
+                      <span class="identifier">id</span><span class="special">,</span>
+                      <span class="special">...);</span></code>
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      Asynchronous
+                    </p>
+                  </td>
+<td>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">R</span><span class="special">&gt;</span> <span class="identifier">f</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">async</span><span class="special">(</span><span class="identifier">func</span><span class="special">,</span> <span class="special">...);</span>
+<span class="identifier">R</span> <span class="identifier">r</span> <span class="special">=</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">();</span>
+
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">R</span><span class="special">&gt;</span> <span class="identifier">f</span> <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span><span class="special">(</span><span class="identifier">func</span><span class="special">,</span> <span class="special">...);</span>
+<span class="identifier">R</span> <span class="identifier">r</span> <span class="special">=</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">();</span>
+</pre>
+                  </td>
+<td>
+<pre class="programlisting"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">R</span><span class="special">&gt;</span> <span class="identifier">f</span> <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span><span class="special">(</span><span class="identifier">act</span><span class="special">,</span> <span class="identifier">id</span><span class="special">,</span> <span class="special">...);</span>
+<span class="identifier">R</span> <span class="identifier">r</span> <span class="special">=</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">();</span>
+</pre>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      Synchronous
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">R</span> <span class="identifier">r</span>
+                      <span class="special">=</span> <span class="identifier">f</span><span class="special">(...)</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">R</span> <span class="identifier">r</span>
+                      <span class="special">=</span> <span class="identifier">act</span><span class="special">(</span><span class="identifier">id</span><span class="special">,</span> <span class="special">...)</span></code>
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break">
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="apply_continue.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../action_invocation.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="../action_error_handling.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

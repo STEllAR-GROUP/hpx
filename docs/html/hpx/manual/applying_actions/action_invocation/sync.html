@@ -1,0 +1,102 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Applying an Action Synchronously</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../action_invocation.html" title="Action Invocation">
+<link rel="prev" href="async.html" title="Applying an Action Asynchronously with Synchronization">
+<link rel="next" href="async_continue.html" title="Applying an Action with a Continuation but without any Synchronization">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../action_invocation.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="async_continue.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_applying_actions_action_invocation_sync">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.applying_actions.action_invocation.sync"></a><a class="link" href="sync.html" title="Applying an Action Synchronously">Applying
+          an Action Synchronously</a>
+</h5></div></div></div>
+<p>
+            This method will schedule the function wrapped in the specified action
+            on the target locality. While the invocation appears to be synchronous
+            (as we will see), the calling thread will be suspended while waiting
+            for the function to return. Invoking a plain action (e.g. a global function)
+            synchronously is straightforward:
+          </p>
+<pre class="programlisting"><span class="identifier">some_global_action</span> <span class="identifier">act</span><span class="special">;</span>     <span class="comment">// define an instance of some_global_action</span>
+<span class="identifier">act</span><span class="special">(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">(),</span> <span class="number">2.0</span><span class="special">);</span>
+</pre>
+<p>
+            While this call looks just like a normal synchronous function invocation,
+            the function wrapped by the action will be scheduled to run on a new
+            thread and the calling thread will be suspended. After the new thread
+            has executed the wrapped global function, the waiting thread will resume
+            and return from the synchronous call.
+          </p>
+<p>
+            Equivalently, any action wrapping a component member function can be
+            invoked synchronously as follows:
+          </p>
+<pre class="programlisting"><span class="identifier">some_component_action</span> <span class="identifier">act</span><span class="special">;</span>     <span class="comment">// define an instance of some_component_action</span>
+<span class="keyword">int</span> <span class="identifier">result</span> <span class="special">=</span> <span class="identifier">act</span><span class="special">(</span><span class="identifier">id</span><span class="special">,</span> <span class="string">"42"</span><span class="special">);</span>
+</pre>
+<p>
+            The action invocation will either schedule a new thread locally to execute
+            the wrapped member function (as before, <code class="computeroutput"><span class="identifier">id</span></code>
+            is the global address of the component instance the member function should
+            be invoked on), or it will send a parcel to the remote locality of the
+            component causing a new thread to be scheduled there. The calling thread
+            will be suspended until the function returns its result. This result
+            will be returned from the synchronous action invocation.
+          </p>
+<p>
+            It is very important to understand that this 'synchronous' invocation
+            syntax in fact conceals an asynchronous function call. This is beneficial
+            as the calling thread is suspended while waiting for the outcome of a
+            potentially remote operation. The <span class="emphasis"><em>HPX</em></span> thread scheduler
+            will schedule other work in the mean time, allowing the application to
+            make further progress while the remote result is computed. This helps
+            overlapping computation with communication and hiding communication latencies.
+          </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              The syntax of applying an action is always the same, regardless whether
+              the target locality is remote to the invocation locality or not. This
+              is a very important feature of <span class="emphasis"><em>HPX</em></span> as it frees
+              the user from the task of keeping track what actions have to be applied
+              locally and which actions are remote. If the target for applying an
+              action is local, a new thread is automatically created and scheduled.
+              Once this thread is scheduled and run, it will execute the function
+              encapsulated by that action. If the target is remote, <span class="emphasis"><em>HPX</em></span>
+              will send a parcel to the remote locality which encapsulates the action
+              and its parameters. Once the parcel is received on the remote locality
+              <span class="emphasis"><em>HPX</em></span> will create and schedule a new thread there.
+              Once this thread runs on the remote locality, it will execute the function
+              encapsulated by the action.
+            </p></td></tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../action_invocation.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="async_continue.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

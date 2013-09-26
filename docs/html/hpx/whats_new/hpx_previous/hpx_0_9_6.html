@@ -1,0 +1,565 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>HPX V0.9.6</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../hpx_previous.html" title="Previous HPX Releases">
+<link rel="prev" href="../hpx_previous.html" title="Previous HPX Releases">
+<link rel="next" href="hpx_0_9_5.html" title="HPX V0.9.5">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../hpx_previous.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_previous.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hpx_0_9_5.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_whats_new_hpx_previous_hpx_0_9_6">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.whats_new.hpx_previous.hpx_0_9_6"></a><a class="link" href="hpx_0_9_6.html" title="HPX V0.9.6"><span class="emphasis"><em>HPX</em></span>
+        V0.9.6</a>
+</h4></div></div></div>
+<p>
+          We have had over 1200 commits since the last release and we have closed
+          roughly 140 tickets (bugs, feature requests, etc.).
+        </p>
+<h6>
+<a name="hpx.whats_new.hpx_previous.hpx_0_9_6.h0"></a>
+          <span class="phrase"><a name="hpx.whats_new.hpx_previous.hpx_0_9_6.general_changes"></a></span><a class="link" href="hpx_0_9_6.html#hpx.whats_new.hpx_previous.hpx_0_9_6.general_changes">General
+          Changes</a>
+        </h6>
+<p>
+          The major new fetures in this release are:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              We further consolidated the API exposed by <span class="emphasis"><em>HPX</em></span>.
+              We aligned our APIs as much as possible with the existing C++11 Standard
+              and related proposals to the C++ standardization committee (such as
+              <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html" target="_top">N3632</a>
+              and <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3634.pdf" target="_top">N3634</a>).
+            </li>
+<li class="listitem">
+              We implemented a first version of a distributed AGAS service which
+              essentially eliminates all explicit AGAS network traffic.
+            </li>
+<li class="listitem">
+              We created a native ibverbs parcelport allowing to take advantage of
+              the superior latency and bandwidth characteristics of Infiniband networks.
+            </li>
+<li class="listitem">
+              We successfully ported <span class="emphasis"><em>HPX</em></span> to the Xeon Phi platform.
+            </li>
+<li class="listitem">
+              Support for the SLURM scheduling system was implemented.
+            </li>
+<li class="listitem">
+              Major efforts have been dedicated to improving the performance counter
+              framework, numerous new counters were implemented and new APIs were
+              added.
+            </li>
+<li class="listitem">
+              We added a modular parcel compression system allowing to improve bandwidth
+              utilization (by reducing the overall size of the tranferred data).
+            </li>
+<li class="listitem">
+              We added a modular parcel coalescing system allowing to combine several
+              parcels into larger messages. This reduces latencies introduced by
+              the communication layer.
+            </li>
+<li class="listitem">
+              Added an experimental executors API allowing to use different scheduling
+              policies for different parts of the code. This API has been modelled
+              after the Standards proposal <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf" target="_top">N3562</a>.
+              This API is bound to change in the future, though.
+            </li>
+<li class="listitem">
+              Added minimal security support for localities which is enforced on
+              the parcelport level. This support is preliminary and experimental
+              and might change in the future.
+            </li>
+<li class="listitem">
+              We created a parcelport using low level MPI functions. This is in support
+              of legacy applications which are to be gradually ported and to support
+              platforms where MPI is the only available portable networking layer.
+            </li>
+<li class="listitem">
+              We added a preliminary and experimental implementation of a tuple-space
+              object which exposes an interface similar to such systems described
+              in the literature (see for instance <a href="http://en.wikipedia.org/wiki/Linda_(coordination_language)" target="_top">The
+              Linda Coordination Language</a>).
+            </li>
+</ul></div>
+<h6>
+<a name="hpx.whats_new.hpx_previous.hpx_0_9_6.h1"></a>
+          <span class="phrase"><a name="hpx.whats_new.hpx_previous.hpx_0_9_6.bug_fixes_closed_tickets"></a></span><a class="link" href="hpx_0_9_6.html#hpx.whats_new.hpx_previous.hpx_0_9_6.bug_fixes_closed_tickets">Bug
+          Fixes (Closed Tickets)</a>
+        </h6>
+<p>
+          Here is a list of the important tickets we closed for this release. This
+          is again a very long list of newly implemented features and fixed issues.
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/806" target="_top">#806</a> - make (all) in examples folder does nothing
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/805" target="_top">#805</a> - Adding the introduction and fixing DOCBOOK dependencies for
+              Windows use
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/804" target="_top">#804</a> - Add stackless (non-suspendable) thread type
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/803" target="_top">#803</a> - Create proper serialization support functions for util::tuple
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/800" target="_top">#800</a> - Add possibility to disable array optimizations during serialization
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/798" target="_top">#798</a> - HPX_LIMIT does not work for local dataflow
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/797" target="_top">#797</a> - Create a parcelport which uses MPI
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/796" target="_top">#796</a> - Problem with Large Numbers of Threads
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/793" target="_top">#793</a> - Changing dataflow test case to hang consistently
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/792" target="_top">#792</a> - CMake Error
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/791" target="_top">#791</a> - Problems with local::dataflow
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/790" target="_top">#790</a> - wait_for() doesn't compile
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/789" target="_top">#789</a> - HPX with Intel compiler segfaults
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/788" target="_top">#788</a> - Intel compiler support
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/787" target="_top">#787</a> - Fixed SFINAEd specializations
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/786" target="_top">#786</a> - Memory issues during benchmarking.
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/785" target="_top">#785</a> - Create an API allowing to register external threads with HPX
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/784" target="_top">#784</a> - util::plugin is throwing an error when a symbol is not found
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/783" target="_top">#783</a> - How does hpx:bind work?
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/782" target="_top">#782</a> - Added quotes around STRING REPLACE potentially empty arguments
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/781" target="_top">#781</a> - Make sure no exceptions propagate into the thread manager
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/780" target="_top">#780</a> - Allow arithmetics performance counters to expand its parameters
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/779" target="_top">#779</a> - Test case for 778
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/778" target="_top">#778</a> - Swapping futures segfaults
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/777" target="_top">#777</a> - hpx::lcos::details::when_xxx don't restore completion handlers
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/776" target="_top">#776</a> - Compiler chokes on dataflow overload with launch policy
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/775" target="_top">#775</a> - Runtime error with local dataflow (copying futures?)
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/774" target="_top">#774</a> - Using local dataflow without explicit namespace
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/773" target="_top">#773</a> - Local dataflow with unwrap: functor operators need to be const
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/772" target="_top">#772</a> - Allow (remote) actions to return a future
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/771" target="_top">#771</a> - Setting HPX_LIMIT gives huge boost MPL errors
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/770" target="_top">#770</a> - Add launch policy to (local) dataflow
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/769" target="_top">#769</a> - Make compile time configuration information available
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/768" target="_top">#768</a> - Const correctness problem in local dataflow
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/767" target="_top">#767</a> - Add launch policies to async
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/766" target="_top">#766</a> - Mark data structures for optimized (array based) serialization
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/765" target="_top">#765</a> - Align hpx::any with N3508: Any Library Proposal (Revision
+              2)
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/764" target="_top">#764</a> - Align hpx::future with newest N3558: A Standardized Representation
+              of Asynchronous Operations
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/762" target="_top">#762</a> - added a human readable output for the ping pong example
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/761" target="_top">#761</a> - Ambiguous typename when constructing derived component
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/760" target="_top">#760</a> - Simple components can not be derived
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/759" target="_top">#759</a> - make install doesn't give a complete install
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/758" target="_top">#758</a> - Stack overflow when using locking_hook&lt;&gt;
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/757" target="_top">#757</a> - copy paste error; unsupported function overloading
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/756" target="_top">#756</a> - GTCX runtime issue in Gordon
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/755" target="_top">#755</a> - Papi counters don't work with reset and evaluate API's
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/753" target="_top">#753</a> - cmake bugfix and improved component action docs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/752" target="_top">#752</a> - hpx simple component docs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/750" target="_top">#750</a> - Add hpx::util::any
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/749" target="_top">#749</a> - Thread phase counter is not reset
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/748" target="_top">#748</a> - Memory performance counter are not registered
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/747" target="_top">#747</a> - Create performance counters exposing arithmetic operations
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/745" target="_top">#745</a> - apply_callback needs to invoke callback when applied locally
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/744" target="_top">#744</a> - CMake fixes
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/743" target="_top">#743</a> - Problem Building github version of HPX
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/742" target="_top">#742</a> - Remove HPX_STD_BIND
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/741" target="_top">#741</a> - assertion 'px != 0' failed: HPX(assertion_failure) for low
+              numbers of OS threads
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/739" target="_top">#739</a> - Performance counters do not count to the end of the program
+              or evalution
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/738" target="_top">#738</a> - Dedicated AGAS server runs don't work; console ignores -a
+              option.
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/737" target="_top">#737</a> - Missing bind overloads
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/736" target="_top">#736</a> - Performance counter wildcards do not always work
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/735" target="_top">#735</a> - Create native ibverbs parcelport based on rdma operations
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/734" target="_top">#734</a> - Threads stolen performance counter total is incorrect
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/733" target="_top">#733</a> - Test benchmarks need to be checked and fixed
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/732" target="_top">#732</a> - Build fails with Mac, using mac ports clang-3.3 on latest
+              git branch
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/731" target="_top">#731</a> - Add global start/stop API for performance counters
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/730" target="_top">#730</a> - Performance counter values are apparently incorrect
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/729" target="_top">#729</a> - Unhandled switch
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/728" target="_top">#728</a> - Serialization of hpx::util::function between two localities
+              causes seg faults
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/727" target="_top">#727</a> - Memory counters on Mac OS X
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/725" target="_top">#725</a> - Restore original thread priority on resume
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/724" target="_top">#724</a> - Performance benchmarks do not depend on main HPX libraries
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/723" target="_top">#723</a> - --hpx:nodes=<code class="computeroutput">cat $PBS_NODEFILE</code> works; --hpx:nodefile=$PBS_NODEFILE
+              does not.
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/722" target="_top">#722</a> - Fix binding const member functions as actions
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/719" target="_top">#719</a> - Create performance counter exposing compression ratio
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/718" target="_top">#718</a> - Add possibility to compress parcel data
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/717" target="_top">#717</a> - strip_credit_from_gid has misleading semantics
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/716" target="_top">#716</a> - Non-option arguments to programs run using <code class="computeroutput"><span class="identifier">pbsdsh</span></code>
+              must be before <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">nodes</span></code>,
+              contrary to directions
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/715" target="_top">#715</a> - Re-thrown exceptions should retain the original call site
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/714" target="_top">#714</a> - failed assertion in debug mode
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/713" target="_top">#713</a> - Add performance counters monitoring connection caches
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/712" target="_top">#712</a> - Adjust parcel related performance counters to be connection
+              type specific
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/711" target="_top">#711</a> - configuration failure
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/710" target="_top">#710</a> - Error "timed out while trying to find room in the connection
+              cache" when trying to start multiple localities on a single computer
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/709" target="_top">#709</a> - Add new thread state 'staged' referring to task descriptions
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/708" target="_top">#708</a> - Detect/mitigate bad non-system installs of GCC on Redhat systems
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/707" target="_top">#707</a> - Many examples do not link with Git HEAD version
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/706" target="_top">#706</a> - <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">init</span></code> removes portions of non-option
+              command line arguments before last <code class="computeroutput"><span class="special">=</span></code>
+              sign
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/705" target="_top">#705</a> - Create rolling average and median aggregating performance
+              counters
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/704" target="_top">#704</a> - Create performance counter to expose thread queue waiting
+              time
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/703" target="_top">#703</a> - Add support to HPX build system to find librcrtool.a and related
+              headers
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/699" target="_top">#699</a> - Generalize instrumentation support
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/698" target="_top">#698</a> - compilation failure with hwloc absent
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/697" target="_top">#697</a> - Performance counter counts should be zero indexed
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/696" target="_top">#696</a> - Distributed problem
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/695" target="_top">#695</a> - Bad perf counter time printed
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/693" target="_top">#693</a> - <code class="computeroutput"><span class="special">--</span><span class="identifier">help</span></code>
+              doesn't print component specific command line options
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/692" target="_top">#692</a> - SLURM support broken
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/691" target="_top">#691</a> - exception while executing any application linked with hwloc
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/690" target="_top">#690</a> - thread_id_test and thread_launcher_test failing
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/689" target="_top">#689</a> - Make the buildbots use hwloc
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/687" target="_top">#687</a> - compilation error fix (hwloc_topology)
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/686" target="_top">#686</a> - Linker Error for Applications
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/684" target="_top">#684</a> - Pinning of service thread fails when number of worker threads
+              equals the number of cores
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/682" target="_top">#682</a> - Add performance counters exposing number of stolen threads
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/681" target="_top">#681</a> - Add apply_continue for asynchronous chaining of actions
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/679" target="_top">#679</a> - Remove obsolete async_callback API functions
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/678" target="_top">#678</a> - Add new API for setting/triggering LCOs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/677" target="_top">#677</a> - Add async_continue for true continuation style actions
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/676" target="_top">#676</a> - Buildbot for gcc 4.4 broken
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/675" target="_top">#675</a> - Partial preprocessing broken
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/674" target="_top">#674</a> - HPX segfaults when built with gcc 4.7
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/673" target="_top">#673</a> - <code class="computeroutput"><span class="identifier">use_guard_pages</span></code>
+              has inconsistent preprocessor guards
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/672" target="_top">#672</a> - External build breaks if library path has spaces
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/671" target="_top">#671</a> - release tarballs are tarbombs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/670" target="_top">#670</a> - CMake won't find Boost headers in layout=versioned install
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/669" target="_top">#669</a> - Links in docs to source files broken if not installed
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/667" target="_top">#667</a> - Not reading ini file properly
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/664" target="_top">#664</a> - Adapt new meanings of 'const' and 'mutable'
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/661" target="_top">#661</a> - Implement BTL Parcel port
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/655" target="_top">#655</a> - Make HPX work with the "decltype" result_of
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/647" target="_top">#647</a> - documentation for specifying the number of high priority threads
+              <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">high</span><span class="special">-</span><span class="identifier">priority</span><span class="special">-</span><span class="identifier">threads</span></code>
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/643" target="_top">#643</a> - Error parsing host file
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/642" target="_top">#642</a> - HWLoc issue with TAU
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/639" target="_top">#639</a> - Logging potentially suspends a running thread
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/634" target="_top">#634</a> - Improve error reporting from parcel layer
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/627" target="_top">#627</a> - Add tests for async and apply overloads that accept regular
+              C++ functions
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/626" target="_top">#626</a> - hpx/future.hpp header
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/601" target="_top">#601</a> - Intel support
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/557" target="_top">#557</a> - Remove action codes
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/531" target="_top">#531</a> - AGAS request and response classes should use switch statements
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/529" target="_top">#529</a> - Investigate the state of hwloc support
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/526" target="_top">#526</a> - Make HPX aware of hyper-threading
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/518" target="_top">#518</a> - Create facilities allowing to use plain arrays as action arguments
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/473" target="_top">#473</a> - hwloc thread binding is broken on CPUs with hyperthreading
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/383" target="_top">#383</a> - Change result type detection for hpx::util::bind to use result_of
+              protocol
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/341" target="_top">#341</a> - Consolidate route code
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/219" target="_top">#219</a> - Only copy arguments into actions once
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/177" target="_top">#177</a> - Implement distributed AGAS
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/43" target="_top">#43</a>  - Support for Darwin (Xcode + Clang)
+            </li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../hpx_previous.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_previous.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hpx_0_9_5.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Preface</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 1.0.0">
+<link rel="up" href="../index.html" title="HPX 1.0.0">
+<link rel="prev" href="../index.html" title="HPX 1.0.0">
+<link rel="next" href="whats_new.html" title="What's New">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="whats_new.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_preface">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="hpx.preface"></a><a class="link" href="preface.html" title="Preface">Preface</a>
+</h2></div></div></div>
+<h4>
+<a name="hpx.preface.h0"></a>
+      <span class="phrase"><a name="hpx.preface.history"></a></span><a class="link" href="preface.html#hpx.preface.history">History</a>
+    </h4>
+<p>
+      The development of High Performance ParalleX (<span class="emphasis"><em>HPX</em></span>) started
+      back in 2007. At that point, Hartmut Kaiser became interested in the work done
+      by the ParalleX group at the <a href="http://www.cct.lsu.edu" target="_top">Center for
+      Computation and Technology (CCT)</a>, a multi-disciplinary research institute
+      at <a href="http://www.lsu.edu" target="_top">Louisiana State University (LSU)</a>.
+      The ParalleX group was developing a new and experimental execution model for
+      future high performance computing architectures called ParalleX. The first
+      implementations were crude at best, and we had to dismiss those designs entirely.
+      However, over time we learned quite a bit about how to design a parallel distributed
+      runtime system which implements the ideas of ParalleX.
+    </p>
+<p>
+      Our goal is to create a high quality, freely available, open source implementation
+      of the ParalleX model for conventional systems, such as classic Linux based
+      Beowulf clusters or multi-socket highly parallel SMP nodes. At the same time,
+      we want to have a very modular and well designed runtime system architecture
+      which would allow us to port our implementation onto new computer system architectures.
+      We want to use real world applications to drive the development of the runtime
+      system, coining out required functionalities and converging onto an stable
+      API which will provide a smooth migration path for developers. The API exposed
+      by <span class="emphasis"><em>HPX</em></span> is modelled after the interfaces defined by the
+      C++11 ISO standard and adheres to the programming guidelines used by the <a href="http://www.boost.org/" target="_top">Boost</a> collection of C++ libraries.
+    </p>
+<p>
+      From the very beginning, this endeavour has been a group effort. In addition
+      to a handful of interested researchers, there have always been graduate and
+      undergraduate students participating in the discussions, design, and implementation
+      of <span class="emphasis"><em>HPX</em></span>. In 2011 we decided to formalize our collective
+      research efforts by creating the <a href="http://stellar.cct.lsu.edu" target="_top">STE||AR</a>
+      group. <a href="http://stellar.cct.lsu.edu" target="_top">STE||AR</a> stands for
+      <span class="bold"><strong>S</strong></span>ystems <span class="bold"><strong>T</strong></span>echnologies,
+      <span class="bold"><strong>E</strong></span>mergent Para<span class="bold"><strong>ll</strong></span>elism,
+      and <span class="bold"><strong>A</strong></span>lgorithms <span class="bold"><strong>R</strong></span>esearch,
+      which describes the three main focal points we center our work around.
+    </p>
+<p>
+      To learn more about <a href="http://stellar.cct.lsu.edu" target="_top">STE||AR</a>
+      and ParalleX, see <a class="link" href="people.html" title="People">People</a> and <a class="link" href="tutorial/intro.html" title="Introduction">Introduction</a>.
+    </p>
+<h4>
+<a name="hpx.preface.h1"></a>
+      <span class="phrase"><a name="hpx.preface.how_to_use_this_manual"></a></span><a class="link" href="preface.html#hpx.preface.how_to_use_this_manual">How
+      to use this manual</a>
+    </h4>
+<p>
+      Some icons are used to mark certain topics indicative of their relevance. These
+      icons precede some text to indicate:
+    </p>
+<div class="table">
+<a name="hpx.preface.icons"></a><p class="title"><b>Table&#160;1.&#160;Icons</b></p>
+<div class="table-contents"><table class="table" summary="Icons">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Icon
+              </p>
+            </th>
+<th>
+              <p>
+                Name
+              </p>
+            </th>
+<th>
+              <p>
+                Meaning
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/note.png"></span>
+              </p>
+            </td>
+<td>
+              <p>
+                Note
+              </p>
+            </td>
+<td>
+              <p>
+                Generally useful information (an aside that doesn't fit in the flow
+                of the text)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/tip.png"></span>
+              </p>
+            </td>
+<td>
+              <p>
+                Tip
+              </p>
+            </td>
+<td>
+              <p>
+                Suggestion on how to do something (especially something that is not
+                obvious)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/important.png"></span>
+              </p>
+            </td>
+<td>
+              <p>
+                Important
+              </p>
+            </td>
+<td>
+              <p>
+                Important note on something to take particular notice of
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/caution.png"></span>
+              </p>
+            </td>
+<td>
+              <p>
+                Caution
+              </p>
+            </td>
+<td>
+              <p>
+                Take special care with this - it may not be what you expect and may
+                cause bad results
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/alert.png"></span>
+              </p>
+            </td>
+<td>
+              <p>
+                Danger
+              </p>
+            </td>
+<td>
+              <p>
+                This is likely to cause serious trouble if ignored
+              </p>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+      The following table describes the syntax that will be used to refer to functions
+      and classes throughout the manual:
+    </p>
+<div class="table">
+<a name="hpx.preface.syntax_for_code_references"></a><p class="title"><b>Table&#160;2.&#160;Syntax for Code References</b></p>
+<div class="table-contents"><table class="table" summary="Syntax for Code References">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Syntax
+              </p>
+            </th>
+<th>
+              <p>
+                Meaning
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">foo</span><span class="special">()</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                The function foo
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">foo</span><span class="special">&lt;&gt;()</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                The template function foo (used only for template functions that
+                require explicit parameters)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">foo</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                The class foo
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">foo</span><span class="special">&lt;&gt;</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                The class template foo
+              </p>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><h4>
+<a name="hpx.preface.h2"></a>
+      <span class="phrase"><a name="hpx.preface.support"></a></span><a class="link" href="preface.html#hpx.preface.support">Support</a>
+    </h4>
+<p>
+      Please feel free to direct questions to <span class="emphasis"><em>HPX</em></span>'s mailing
+      list: <a href="email:hpx-users@stellar.cct.lsu.edu" target="_top">hpx-users@stellar.cct.lsu.edu</a>
+      or log onto our IRC channel which can be found at <a href="irc://irc.freenode.net:6667/#ste%7C%7Car" target="_top">#ste||ar
+      at Freenode</a>.
+    </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="whats_new.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

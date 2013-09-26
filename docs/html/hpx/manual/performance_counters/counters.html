@@ -1,0 +1,1852 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Existing HPX Performance Counters</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../performance_counters.html" title="Performance Counters">
+<link rel="prev" href="providing/full_counters.html" title="Implementing a Full Performance Counter">
+<link rel="next" href="../schedulers.html" title="HPX Thread Scheduling Policies">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="providing/full_counters.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../performance_counters.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../schedulers.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_performance_counters_counters">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.performance_counters.counters"></a><a class="link" href="counters.html" title="Existing HPX Performance Counters">Existing
+        <span class="emphasis"><em>HPX</em></span> Performance Counters</a>
+</h4></div></div></div>
+<p>
+          The <span class="emphasis"><em>HPX</em></span> runtime system exposes a wide variety of predefined
+          Performance Counters. These counters expose critical information about
+          different modules of the runtime system. They can help determine system
+          bottlenecks and fine-tune system and application performance.
+        </p>
+<div class="table">
+<a name="hpx.manual.performance_counters.counters.agas_performance_counters"></a><p class="title"><b>Table&#160;19.&#160;AGAS Performance Counters</b></p>
+<div class="table-contents"><table class="table" summary="AGAS Performance Counters">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Counter Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Counter Instance Formatting
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/agas/count/&lt;agas_service&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;agas_service&gt;</code> is one of the
+                    following: <code class="computeroutput">allocate</code>, <code class="computeroutput">bind</code>, <code class="computeroutput">bind_gid</code>,
+                    <code class="computeroutput">bind_name</code>, <code class="computeroutput">bind_prefix</code>, <code class="computeroutput">change_credit</code>,
+                    <code class="computeroutput">free</code>, <code class="computeroutput">get_component_typename</code>, <code class="computeroutput">iterate_names</code>,
+                    <code class="computeroutput">iterate_types</code>, <code class="computeroutput">localities</code>, <code class="computeroutput">num_localities</code>,
+                    <code class="computeroutput">num_localities_type</code>, <code class="computeroutput">num_threads</code>,
+                    <code class="computeroutput">resolve</code>, <code class="computeroutput">resolve_gid</code>, <code class="computeroutput">resolve_id</code>,
+                    <code class="computeroutput">resolve_locality</code>, <code class="computeroutput">resolved_localities</code>,
+                    <code class="computeroutput">route</code>, <code class="computeroutput">unbind</code>, <code class="computeroutput">unbind_gid</code>,
+                    <code class="computeroutput">unbind_name</code>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">&lt;agas_instance&gt;/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;agas_instance&gt;</code> is the name of
+                    the AGAS service to query. Currently, this value will be <code class="computeroutput">locality#0</code>,
+                    where <code class="computeroutput">0</code> is the root locality (the id of the locality
+                    hosting the AGAS service). Except for <code class="computeroutput">&lt;agas_service&gt;</code>
+                    <code class="computeroutput">route</code>, <code class="computeroutput">bind_gid</code>, <code class="computeroutput">resolve_gid</code>,
+                    <code class="computeroutput">unbind_gid</code>, <code class="computeroutput">change_credit</code>, <code class="computeroutput">bind</code>,
+                    <code class="computeroutput">resolve</code>, <code class="computeroutput">unbind</code>, and <code class="computeroutput">iterate_names</code>
+                    for which the value for <code class="computeroutput">*</code> can be any locality id
+                    (only the primary and symbol AGAS service components live on
+                    all localities, whereas all other AGAS services are available
+                    on <code class="computeroutput">locality#0</code> only).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of invocations of the specified AGAS
+                    service since its creation.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/agas/&lt;agas_service_category&gt;/count</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;agas_service_category&gt;</code> is one
+                    of the following: <code class="computeroutput">primary</code>, <code class="computeroutput">locality</code>,
+                    <code class="computeroutput">component</code>, or <code class="computeroutput">symbol</code>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">&lt;agas_instance&gt;/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;agas_instance&gt;</code> is the name of
+                    the AGAS service to query. Currently, this value will be <code class="computeroutput">locality#0</code>,
+                    where <code class="computeroutput">0</code> is the root locality (the id of the locality
+                    hosting the AGAS service). Except for <code class="computeroutput">&lt;agas_service_category&gt;</code>
+                    <code class="computeroutput">primary</code> or <code class="computeroutput">symbol</code> for which the value
+                    for <code class="computeroutput">*</code> can be any locality id (only the primary and
+                    symbol AGAS service components live on all localities, whereas
+                    all other AGAS services are available on <code class="computeroutput">locality#0</code>
+                    only).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall total number of invocations of all AGAS services
+                    provided by the given AGAS service category since its creation.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/agas/time/&lt;agas_service&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;agas_service&gt;</code> is one of the
+                    following: <code class="computeroutput">allocate</code>, <code class="computeroutput">bind</code>, <code class="computeroutput">bind_gid</code>,
+                    <code class="computeroutput">bind_name</code>, <code class="computeroutput">bind_prefix</code>, <code class="computeroutput">change_credit</code>,
+                    <code class="computeroutput">free</code>, <code class="computeroutput">get_component_typename</code>, <code class="computeroutput">iterate_names</code>,
+                    <code class="computeroutput">iterate_types</code>, <code class="computeroutput">localities</code>, <code class="computeroutput">num_localities</code>,
+                    <code class="computeroutput">num_localities_type</code>, <code class="computeroutput">num_threads</code>,
+                    <code class="computeroutput">resolve</code>, <code class="computeroutput">resolve_gid</code>, <code class="computeroutput">resolve_id</code>,
+                    <code class="computeroutput">resolve_locality</code>, <code class="computeroutput">resolved_localities</code>,
+                    <code class="computeroutput">route</code>, <code class="computeroutput">unbind</code>, <code class="computeroutput">unbind_gid</code>,
+                    <code class="computeroutput">unbind_name</code>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">&lt;agas_instance&gt;/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;agas_instance&gt;</code> is the name of
+                    the AGAS service to query. Currently, this value will be <code class="computeroutput">locality#0</code>,
+                    where <code class="computeroutput">0</code> is the root locality (the id of the locality
+                    hosting the AGAS service). Except for <code class="computeroutput">&lt;agas_service&gt;</code>
+                    <code class="computeroutput">route</code>, <code class="computeroutput">bind_gid</code>, <code class="computeroutput">resolve_gid</code>,
+                    <code class="computeroutput">unbind_gid</code>, , <code class="computeroutput">change_credit</code>, <code class="computeroutput">bind</code>,
+                    <code class="computeroutput">resolve</code>, <code class="computeroutput">unbind</code>, and <code class="computeroutput">iterate_names</code>
+                    for which the value for <code class="computeroutput">*</code> can be any locality id
+                    (only the primary and symbol AGAS service components live on
+                    all localities, whereas all other AGAS services are available
+                    on <code class="computeroutput">locality#0</code> only).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall execution time of the specified AGAS service
+                    since its creation (in nanoseconds).
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/agas/&lt;agas_service_category&gt;/time</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;agas_service_category&gt;</code> is one
+                    of the following: <code class="computeroutput">primary</code>, <code class="computeroutput">locality</code>,
+                    <code class="computeroutput">component</code>, or <code class="computeroutput">symbol</code>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">&lt;agas_instance&gt;/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;agas_instance&gt;</code> is the name of
+                    the AGAS service to query. Currently, this value will be <code class="computeroutput">locality#0</code>,
+                    where <code class="computeroutput">0</code> is the root locality (the id of the locality
+                    hosting the AGAS service). Except for <code class="computeroutput">&lt;agas_service_category&gt;</code>
+                    <code class="computeroutput">primary</code> or <code class="computeroutput">symbol</code> for which the value
+                    for <code class="computeroutput">*</code> can be any locality id (only the primary and
+                    symbol AGAS service components live on all localities, whereas
+                    all other AGAS services are available on <code class="computeroutput">locality#0</code>
+                    only).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall execution time of all AGAS services provided
+                    by the given AGAS service category since its creation (in nanoseconds).
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/agas/count/&lt;cache_statistics&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;cache_statistics&gt;</code> is one of
+                    the following: <code class="computeroutput">cache-evictions</code>, <code class="computeroutput">cache-hits</code>,
+                    <code class="computeroutput">cache-inserts</code>, <code class="computeroutput">cache-misses</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the AGAS cache should be queried. The locality id is a (zero
+                    based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the number of cache events (evictions, hits, inserts,
+                    and misses) in the AGAS cache of the specified locality (see
+                    <code class="computeroutput">&lt;cache_statistics&gt;</code>.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.manual.performance_counters.counters.parcel_layer_performance_counter"></a><p class="title"><b>Table&#160;20.&#160;Parcel Layer Performance Counters</b></p>
+<div class="table-contents"><table class="table" summary="Parcel Layer Performance Counters">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Counter Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Counter Instance Formatting
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/data/count/&lt;connection_type&gt;/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
+                    <code class="computeroutput">ibverbs</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the overall number of transmitted bytes should be queried for.
+                    The locality id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of raw (uncompressed) bytes sent or
+                    received (see <code class="computeroutput">&lt;operation&gt;</code>, e.g. <code class="computeroutput">sent</code>
+                    or <code class="computeroutput">received</code>) for the specified <code class="computeroutput">&lt;connection_type&gt;</code>.
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">shmem</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">ibverbs</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    Please see <a class="link" href="../cmake/options.html" title="Options and Variables">Options and
+                    Variables</a> for more details.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/data/time/&lt;connection_type&gt;/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
+                    <code class="computeroutput">ibverbs</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the total transmission time should be queried for. The locality
+                    id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total time (in nanoseconds) between the start of
+                    each asynchronous transmission operation and the end of the corresponding
+                    operation for the specified <code class="computeroutput">&lt;connection_type&gt;</code>
+                    the given locality (see <code class="computeroutput">&lt;operation&gt;</code>, e.g.
+                    <code class="computeroutput">sent</code> or <code class="computeroutput">received</code>).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">shmem</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">ibverbs</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    Please see <a class="link" href="../cmake/options.html" title="Options and Variables">Options and
+                    Variables</a> for more details.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/serialize/count/&lt;connection_type&gt;/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
+                    <code class="computeroutput">ibverbs</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the overall number of transmitted bytes should be queried for.
+                    The locality id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of bytes transferred (see <code class="computeroutput">&lt;operation&gt;</code>,
+                    e.g. <code class="computeroutput">sent</code> or <code class="computeroutput">received</code>, possibly compressed)
+                    for the specified <code class="computeroutput">&lt;connection_type&gt;</code> by the
+                    given locality.
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">shmem</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">ibverbs</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    Please see <a class="link" href="../cmake/options.html" title="Options and Variables">Options and
+                    Variables</a> for more details.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/serialize/time/&lt;connection_type&gt;/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
+                    <code class="computeroutput">ibverbs</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the serialization time should be queried for. The locality id
+                    is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall time spent performing outgoing data serialization
+                    for the specified <code class="computeroutput">&lt;connection_type&gt;</code>on the
+                    given locality (see <code class="computeroutput">&lt;operation&gt;</code>, e.g. <code class="computeroutput">sent</code>
+                    or <code class="computeroutput">received</code>).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">shmem</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">ibverbs</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    Please see <a class="link" href="../cmake/options.html" title="Options and Variables">Options and
+                    Variables</a> for more details.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/security/time/&lt;connection_type&gt;/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
+                    <code class="computeroutput">ibverbs</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the time spent for security related operation should be queried
+                    for. The locality id is a (zero based) number identifying the
+                    locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall time spent performing outgoing security operations
+                    for the specified <code class="computeroutput">&lt;connection_type&gt;</code>on the
+                    given locality (see <code class="computeroutput">&lt;operation&gt;</code>, e.g. <code class="computeroutput">sent</code>
+                    or <code class="computeroutput">received</code>).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">shmem</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">ibverbs</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    These performance counters are available only if the compile
+                    time constant <code class="computeroutput">HPX_HAVE_SECURITY</code> was defined while
+                    compiling the <span class="emphasis"><em>HPX</em></span> core library (which is
+                    not defined by default).
+                  </p>
+                  <p>
+                    Please see <a class="link" href="../cmake/options.html" title="Options and Variables">Options and
+                    Variables</a> for more details.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/parcels/count/routed</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the number of routed parcels should be queried for. The locality
+                    id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of routed (outbound) parcels transferred
+                    by the given locality.
+                  </p>
+                  <p>
+                    Routed parcels are those which cannot directly be delivered to
+                    its destination as the local AGAS is not able to resolve the
+                    destination address. In this case a parcel is sent to the AGAS
+                    service component which is responsible for creating the destination
+                    GID (and is responsible for resolving the destination address).
+                    This AGAS service component will deliver the parcel to its final
+                    target.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/parcels/count/&lt;connection_type&gt;/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
+                    <code class="computeroutput">ibverbs</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the number of parcels should be queried for. The locality id
+                    is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of parcels transferred using the specified
+                    <code class="computeroutput">&lt;connection_type&gt;</code> by the given locality (see
+                    <code class="computeroutput">&lt;operation&gt;</code>, e.g. <code class="computeroutput">sent</code> or <code class="computeroutput">received</code>).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">shmem</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">ibverbs</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    Please see <a class="link" href="../cmake/options.html" title="Options and Variables">Options and
+                    Variables</a> for more details.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/messages/count/&lt;connection_type&gt;/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
+                    <code class="computeroutput">ibverbs</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the number of messages should be queried for. The locality id
+                    is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of messages <a href="#ftn.hpx.manual.performance_counters.counters.f0" class="footnote" name="hpx.manual.performance_counters.counters.f0"><sup class="footnote">[a]</sup></a> transferred using the specified <code class="computeroutput">&lt;connection_type&gt;</code>
+                    by the given locality (see <code class="computeroutput">&lt;operation&gt;</code>, e.g.
+                    <code class="computeroutput">sent</code> or <code class="computeroutput">received</code>).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">shmem</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">ibverbs</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    Please see <a class="link" href="../cmake/options.html" title="Options and Variables">Options and
+                    Variables</a> for more details.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/parcelport/count/&lt;connection_type&gt;/&lt;cache_statistics&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;cache_statistics&gt;</code> is one of
+                    the following: <code class="computeroutput">cache-insertions</code>, <code class="computeroutput">cache-evictions</code>,
+                    <code class="computeroutput">cache-hits</code>, <code class="computeroutput">cache-misses</code>, <code class="computeroutput">cache-misses</code><br>
+                    <code class="computeroutput">&lt;connection_type&gt;</code> is one of the following:
+                    <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>, <code class="computeroutput">ibverbs</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the number of messages should be queried for. The locality id
+                    is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number cache events (evictions, hits, inserts,
+                    misses, and reclaims) for the connection cache of the given connection
+                    type on the given locality (see <code class="computeroutput">&lt;cache_statistics&gt;</code>,
+                    e.g. <code class="computeroutput">cache-insertions</code>, <code class="computeroutput">cache-evictions</code>,
+                    <code class="computeroutput">cache-hits</code>, <code class="computeroutput">cache-misses</code>, or <code class="computeroutput">cache-reclaims</code>).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">shmem</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">ibverbs</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    Please see <a class="link" href="../cmake/options.html" title="Options and Variables">Options and
+                    Variables</a> for more details.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/parcelqueue/length/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">send</code>, <code class="computeroutput">receive</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the parcel queue should be queried. The locality id is a (zero
+                    based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the current number of parcels stored in the parcel queue
+                    (see <code class="computeroutput">&lt;operation&gt;</code> for which queue to query,
+                    e.g. <code class="computeroutput">send</code> or <code class="computeroutput">receive</code>).
+                  </p>
+                </td>
+</tr>
+</tbody>
+<tbody class="footnotes"><tr><td colspan="4"><div id="ftn.hpx.manual.performance_counters.counters.f0" class="footnote"><p><a href="#hpx.manual.performance_counters.counters.f0" class="para"><sup class="para">[a] </sup></a>
+                      A message can potentially consist of more than one parcel.
+                    </p></div></td></tr></tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.manual.performance_counters.counters.thread_manager_performance_count"></a><p class="title"><b>Table&#160;21.&#160;Thread Manager Performance Counters</b></p>
+<div class="table-contents"><table class="table" summary="Thread Manager Performance Counters">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Counter Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Counter Instance Formatting
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/cumulative</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
+                    should be queried for. The worker thread number (given by the
+                    <code class="computeroutput">*</code>) is a (zero based) number identifying the worker
+                    thread. The number of available worker threads is usually specified
+                    on the command line for the application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of executed (retired) <span class="emphasis"><em>HPX</em></span>-threads
+                    on the given locality since application start. If the instance
+                    name is <code class="computeroutput">total</code> the counter returns the accumulated
+                    number of retired <span class="emphasis"><em>HPX</em></span>-threads for all worker
+                    threads (cores) on that locality. If the instance name is <code class="computeroutput">worker-thread#*</code>
+                    the counter will return the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
+                    for the specified worker thread.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/instantaneous/&lt;thread-state&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;thread-state&gt;</code> is one of the
+                    following: <code class="computeroutput">all</code>, <code class="computeroutput">active</code>, <code class="computeroutput">pending</code>,
+                    <code class="computeroutput">suspended</code>, <code class="computeroutput">terminated</code>, <code class="computeroutput">staged</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
+                    should be queried for. The worker thread number (given by the
+                    <code class="computeroutput">*</code>) is a (zero based) number identifying the worker
+                    thread. The number of available worker threads is usually specified
+                    on the command line for the application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                  <p>
+                    The <code class="computeroutput">staged</code> thread state refers to registered tasks
+                    before they are converted to thread objects.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the current number of <span class="emphasis"><em>HPX</em></span>-threads
+                    having the given thread state on the given locality. If the instance
+                    name is <code class="computeroutput">total</code> the counter returns the current number
+                    of <span class="emphasis"><em>HPX</em></span>-threads of the given state for all
+                    worker threads (cores) on that locality. If the instance name
+                    is <code class="computeroutput">worker-thread#*</code> the counter will return the current
+                    number of <span class="emphasis"><em>HPX</em></span>-threads in the given state
+                    for the specified worker thread.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/wait-time/&lt;thread-state&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;thread-state&gt;</code> is one of the
+                    following: <code class="computeroutput">pending</code>, <code class="computeroutput">staged</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
+                    should be queried for. The worker thread number (given by the
+                    <code class="computeroutput">*</code>) is a (zero based) number identifying the worker
+                    thread. The number of available worker threads is usually specified
+                    on the command line for the application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                  <p>
+                    The <code class="computeroutput">staged</code> thread state refers to the wait time
+                    of registered tasks before they are converted into thread objects,
+                    while the <code class="computeroutput">pending</code> thread state refers to the wait
+                    time of threads in any of the scheduling queues.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the average wait time of <span class="emphasis"><em>HPX</em></span>-threads
+                    (if the thread state is <code class="computeroutput">pending</code>) or of task descriptions
+                    (if the thread state is <code class="computeroutput">staged</code>) on the given locality
+                    since application start. If the instance name is <code class="computeroutput">total</code>
+                    the counter returns the wait time of <span class="emphasis"><em>HPX</em></span>-threads
+                    of the given state for all worker threads (cores) on that locality.
+                    If the instance name is <code class="computeroutput">worker-thread#*</code> the counter
+                    will return the wait time of <span class="emphasis"><em>HPX</em></span>-threads
+                    in the given state for the specified worker thread.
+                  </p>
+                  <p>
+                    These counters are available only if the compile time constant
+                    <code class="computeroutput">HPX_THREAD_MAINTAIN_QUEUE_WAITTIME</code> was defined while
+                    compiling the <span class="emphasis"><em>HPX</em></span> core library (which is
+                    defined by default).
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/idle-rate</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the average idle rate of all (or one) worker threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the averaged idle rate should be queried for. The worker
+                    thread number (given by the <code class="computeroutput">*</code>) is a (zero based)
+                    number identifying the worker thread. The number of available
+                    worker threads is usually specified on the command line for the
+                    application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the average idle rate for the given worker thread(s)
+                    on the given locality. The idle rate is defined as the ratio
+                    of the time spent on scheduling and management tasks and the
+                    overall time spent executing work since the application started.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threadqueue/length</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the current length of all thread queues in the scheduler
+                    for all (or one) worker threads should be queried for. The locality
+                    id (given by <code class="computeroutput">*</code>) is a (zero based) number identifying
+                    the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the current length of all thread queues in the scheduler
+                    should be queried for. The worker thread number (given by the
+                    <code class="computeroutput">*</code>) is a (zero based) number identifying the worker
+                    thread. The number of available worker threads is usually specified
+                    on the command line for the application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall length of all queues for the given worker
+                    thread(s) on the given locality.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/stack-unbinds</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the unbind (madvise) operations should be queried for. The locality
+                    id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of <span class="emphasis"><em>HPX</em></span>-thread unbind
+                    (madvise) operations performed for the referenced locality. Note
+                    that this counter is not available on Windows based platforms.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/stack-recycles</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the unbind (madvise) operations should be queried for. The locality
+                    id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of <span class="emphasis"><em>HPX</em></span>-thread recycling
+                    operations performed.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/stolen</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the number of 'stole' threads should be queried for. The locality
+                    id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of <span class="emphasis"><em>HPX</em></span>-threads
+                    'stolen' from a neighboring worker thread (these threads are
+                    executed by a different worker thread than they were initially
+                    scheduled on).
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/objects</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/allocator#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the current (cumulative) number of all created <span class="emphasis"><em>HPX</em></span>-thread
+                    objects should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality.
+                  </p>
+                  <p>
+                    <code class="computeroutput">allocator#*</code> is defining the number of the allocator
+                    instance using which the threads have been created. <span class="emphasis"><em>HPX</em></span>
+                    uses a varying number of allocators to create (and recycle)
+                    <span class="emphasis"><em>HPX</em></span>-thread objects, most likely these counters
+                    are of use for debugging purposes only. The allocator id (given
+                    by <code class="computeroutput">*</code>) is a (zero based) number identifying the allocator
+                    to query.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of <span class="emphasis"><em>HPX</em></span>-thread objects
+                    created. Note that thread objects are reused to improve system
+                    performance, thus this number does not reflect the number of
+                    actually executed (retired) <span class="emphasis"><em>HPX</em></span>-threads.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.manual.performance_counters.counters.performance_counters_related_to_"></a><p class="title"><b>Table&#160;22.&#160;Performance Counters related to LCOs</b></p>
+<div class="table-contents"><table class="table" summary="Performance Counters related to LCOs">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Counter Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Counter Instance Formatting
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/full_empty/count/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">constructed</code>, <code class="computeroutput">destructed</code>, <code class="computeroutput">read_enqueued</code>,
+                    <code class="computeroutput">read_dequeued</code>, <code class="computeroutput">fired</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the number of invocations of the specified operation should be
+                    queried for (see <code class="computeroutput">&lt;operation&gt;</code>, e.g. <code class="computeroutput">constructed</code>,
+                    <code class="computeroutput">destructed</code>, <code class="computeroutput">read_enqueued</code>, <code class="computeroutput">read_dequeued</code>,
+                    <code class="computeroutput">fired</code>). The locality id is a (zero based) number
+                    identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of operations performed on full-empty
+                    bit data structures on the specified locality.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/dataflow/count/&lt;operation&gt;</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
+                    <code class="computeroutput">constructed</code>, <code class="computeroutput">destructed</code>, <code class="computeroutput">initialized</code>,
+                    <code class="computeroutput">fired</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the number of invocations of the specified operation should be
+                    queried for (see <code class="computeroutput">&lt;operation&gt;</code>, e.g. <code class="computeroutput">constructed</code>,
+                    <code class="computeroutput">destructed</code>, <code class="computeroutput">initialized</code>, <code class="computeroutput">fired</code>).
+                    The locality id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of operations performed on dataflow
+                    components on the specified locality.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.manual.performance_counters.counters.general_performance_counters_exp"></a><p class="title"><b>Table&#160;23.&#160;General Performance Counters exposing Characteristics of Localities</b></p>
+<div class="table-contents"><table class="table" summary="General Performance Counters exposing Characteristics of Localities">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Counter Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Counter Instance Formatting
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/runtime/count/component</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the number of components should be queried. The locality id is
+                    a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The type of the component. This is the string which has been
+                    used while registering the component with <span class="emphasis"><em>HPX</em></span>,
+                    e.g. which has been passed as the second parameter to the macro
+                    <code class="computeroutput">HPX_REGISTER_MINIMAL_COMPONENT_FACTORY</code>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of currently active components of
+                    the specified type on the given locality.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/runtime/uptime</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the system uptime should be queried. The locality id is a (zero
+                    based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall time since application start on the given
+                    locality in nanoseconds.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/runtime/memory/virtual</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the allocated virtual memory should be queried. The locality
+                    id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the amount of virtual memory currently allocated by the
+                    referenced locality (in bytes).
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/runtime/memory/resident</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">*</code> is the locality id of the locality
+                    the the allocated resident memory should be queried. The locality
+                    id is a (zero based) number identifying the locality.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the amount of resident memory currently allocated by
+                    the referenced locality (in bytes).
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.manual.performance_counters.counters.performance_counters_for_general"></a><p class="title"><b>Table&#160;24.&#160;Performance Counters for General Statistics</b></p>
+<div class="table-contents"><table class="table" summary="Performance Counters for General Statistics">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Counter Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Counter Instance Formatting
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/statistics/average</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any full performance counter name. The referenced performance
+                    counter is queried at fixed time intervals as specified by the
+                    first parameter.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the current average (mean) value calculated based on
+                    the values queried from the underlying counter (the one specified
+                    as the instance name).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any parameter will be interpreted as the time interval (in milliseconds)
+                    at which the underlying counter should be queried. If no value
+                    is specified, the counter will assume <code class="computeroutput">1000</code> [ms]
+                    as the default.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/statistics/stddev</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any full performance counter name. The referenced performance
+                    counter is queried at fixed time intervals as specified by the
+                    first parameter.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the current standard deviation (stddev) value calculated
+                    based on the values queried from the underlying counter (the
+                    one specified as the instance name).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any parameter will be interpreted as the time interval (in milliseconds)
+                    at which the underlying counter should be queried. If no value
+                    is specified, the counter will assume <code class="computeroutput">1000</code> [ms]
+                    as the default.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/statistics/rolling_average</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any full performance counter name. The referenced performance
+                    counter is queried at fixed time intervals as specified by the
+                    first parameter.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the current rolling average (mean) value calculated based
+                    on the values queried from the underlying counter (the one specified
+                    as the instance name).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any parameter will be interpreted as a list of two comma separated
+                    (integer) values, where the first is the time interval (in milliseconds)
+                    at which the underlying counter should be queried. If no value
+                    is specified, the counter will assume <code class="computeroutput">1000</code> [ms]
+                    as the default. The second value will be interpreted as the size
+                    of the rolling window (the number of latest values to use to
+                    calculate the rolling average). The default value for this is
+                    <code class="computeroutput">10</code>.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/statistics/median</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any full performance counter name. The referenced performance
+                    counter is queried at fixed time intervals as specified by the
+                    first parameter.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the current (statistically estimated) median value calculated
+                    based on the values queried from the underlying counter (the
+                    one specified as the instance name).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any parameter will be interpreted as the time interval (in milliseconds)
+                    at which the underlying counter should be queried. If no value
+                    is specified, the counter will assume <code class="computeroutput">1000</code> [ms]
+                    as the default.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/statistics/max</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any full performance counter name. The referenced performance
+                    counter is queried at fixed time intervals as specified by the
+                    first parameter.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the current maximum value calculated based on the values
+                    queried from the underlying counter (the one specified as the
+                    instance name).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any parameter will be interpreted as the time interval (in milliseconds)
+                    at which the underlying counter should be queried. If no value
+                    is specified, the counter will assume <code class="computeroutput">1000</code> [ms]
+                    as the default.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/statistics/min</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any full performance counter name. The referenced performance
+                    counter is queried at fixed time intervals as specified by the
+                    first parameter.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the current minimum value calculated based on the values
+                    queried from the underlying counter (the one specified as the
+                    instance name).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any parameter will be interpreted as the time interval (in milliseconds)
+                    at which the underlying counter should be queried. If no value
+                    is specified, the counter will assume <code class="computeroutput">1000</code> [ms]
+                    as the default.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.manual.performance_counters.counters.performance_counters_for_element"></a><p class="title"><b>Table&#160;25.&#160;Performance Counters for Elementary Arithmetic Operations</b></p>
+<div class="table-contents"><table class="table" summary="Performance Counters for Elementary Arithmetic Operations">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Counter Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Counter Instance Formatting
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Parameters
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/arithmetics/add</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the sum calculated based on the values queried from the
+                    underlying counters (the ones specified as the parameters).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The parameter will be interpreted as a comma separated list of
+                    full performance counter names which are queried whenever this
+                    counter is accessed. Any wildcards in the counter names will
+                    be expanded.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/arithmetics/subtract</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the difference calculated based on the values queried
+                    from the underlying counters (the ones specified as the parameters).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The parameter will be interpreted as a comma separated list of
+                    full performance counter names which are queried whenever this
+                    counter is accessed. Any wildcards in the counter names will
+                    be expanded.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/arithmetics/multiply</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the product calculated based on the values queried from
+                    the underlying counters (the ones specified as the parameters).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The parameter will be interpreted as a comma separated list of
+                    full performance counter names which are queried whenever this
+                    counter is accessed. Any wildcards in the counter names will
+                    be expanded.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/arithmetics/divide</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the result of division of the values queried from the
+                    underlying counters (the ones specified as the parameters).
+                  </p>
+                </td>
+<td>
+                  <p>
+                    The parameter will be interpreted as a comma separated list of
+                    full performance counter names which are queried whenever this
+                    counter is accessed. Any wildcards in the counter names will
+                    be expanded.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+            The /arithmetics counters can consume an arbitrary number of other counters.
+            For this reason those have to be specified as parameters (a comma separated
+            list of counters appended after a <code class="computeroutput">'@'</code>). For instance:
+          </p>
+<pre class="programlisting">./bin/hello_world -t2 \
+    --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative \
+    --hpx:print-counter=/arithmetics/add@/threads{locality#0/worker-thread#*}/count/cumulative
+hello world from OS-thread 0 on locality 0
+hello world from OS-thread 1 on locality 0
+/threads{locality#0/worker-thread#0}/count/cumulative,1,0.515640,[s],25
+/threads{locality#0/worker-thread#1}/count/cumulative,1,0.515520,[s],36
+/arithmetics/add@/threads{locality#0/worker-thread#*}/count/cumulative,1,0.516445,[s],64
+</pre>
+<p>
+            Since all wildcards in the parameters are expanded, this example is fully
+            equivalent to specifying both counters separately to <code class="computeroutput">/arithmetics/add</code>:
+          </p>
+<pre class="programlisting">./bin/hello_world -t2 \
+    --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative \
+    --hpx:print-counter=/arithmetics/add@\
+        /threads{locality#0/worker-thread#0}/count/cumulative,\
+        /threads{locality#0/worker-thread#1}/count/cumulative
+</pre>
+</td></tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="providing/full_counters.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../performance_counters.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../schedulers.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

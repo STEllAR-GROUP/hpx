@@ -1,0 +1,114 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Applying an Action Asynchronously with Synchronization</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../action_invocation.html" title="Action Invocation">
+<link rel="prev" href="apply.html" title="Applying an Action Asynchronously without any Synchronization">
+<link rel="next" href="sync.html" title="Applying an Action Synchronously">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="apply.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../action_invocation.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="sync.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_applying_actions_action_invocation_async">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.applying_actions.action_invocation.async"></a><a class="link" href="async.html" title="Applying an Action Asynchronously with Synchronization">Applying
+          an Action Asynchronously with Synchronization</a>
+</h5></div></div></div>
+<p>
+            This method will make sure the action is scheduled to run on the target
+            locality. Applying the action itself does not wait for the function to
+            start running or to complete, instead this is a fully asynchronous operation
+            similar to using <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">apply</span></code>
+            as described above. The difference is that this method will return an
+            instance of a <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;&gt;</span></code>
+            encapsulating the result of the (possibly remote) execution. The future
+            can be used to synchronize with the asynchronous operation. The following
+            example shows how to apply the action from above on the local locality:
+          </p>
+<pre class="programlisting"><span class="identifier">some_global_action</span> <span class="identifier">act</span><span class="special">;</span>     <span class="comment">// define an instance of some_global_action</span>
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">void</span><span class="special">&gt;</span> <span class="identifier">f</span> <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span><span class="special">(</span><span class="identifier">act</span><span class="special">,</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">(),</span> <span class="number">2.0</span><span class="special">);</span>
+<span class="comment">//</span>
+<span class="comment">// ... other code can be executed here</span>
+<span class="comment">//</span>
+<span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">();</span>    <span class="comment">// this will possibly wait for the asyncronous operation to 'return'</span>
+</pre>
+<p>
+            (as before, the function <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">()</span></code> returns the id of the local locality
+            (the locality this code is executed on).
+          </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              The use of a <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">void</span><span class="special">&gt;</span></code>
+              allows the current thread to synchronize with any remote operation
+              not returning any value.
+            </p></td></tr>
+</table></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              Any <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;&gt;</span></code>
+              returned from <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">async</span><span class="special">()</span></code>
+              is required to block in its destructor if the value has not been set
+              for this future yet. This is not true for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;&gt;</span></code> which will never block in its
+              destriuctor, even if the value has not been returned to the future
+              yet. We believe that consistency in the behavior of futures is more
+              important than standards conformance in this case.
+            </p></td></tr>
+</table></div>
+<p>
+            Any component member function can be invoked using the same syntactic
+            construct. Given that <code class="computeroutput"><span class="identifier">id</span></code>
+            is the global address for a component instance created earlier, this
+            invocation looks like:
+          </p>
+<pre class="programlisting"><span class="identifier">some_component_action</span> <span class="identifier">act</span><span class="special">;</span>     <span class="comment">// define an instance of some_component_action</span>
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">f</span> <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span><span class="special">(</span><span class="identifier">act</span><span class="special">,</span> <span class="identifier">id</span><span class="special">,</span> <span class="string">"42"</span><span class="special">);</span>
+<span class="comment">//</span>
+<span class="comment">// ... other code can be executed here</span>
+<span class="comment">//</span>
+<span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">();</span>    <span class="comment">// this will possibly wait for the asyncronous operation to 'return' 42</span>
+</pre>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              The invocation of <code class="computeroutput"><span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span></code> will return the result immediately
+              (without suspending the calling thread) if the result from the asynchronous
+              operation has already been returned. Otherwise, the invocation of
+              <code class="computeroutput"><span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span></code>
+              will suspend the execution of the calling thread until the asynchronous
+              operation returns its result.
+            </p></td></tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="apply.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../action_invocation.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="sync.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

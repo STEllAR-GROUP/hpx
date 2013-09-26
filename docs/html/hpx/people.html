@@ -1,0 +1,607 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>People</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 1.0.0">
+<link rel="up" href="../index.html" title="HPX 1.0.0">
+<link rel="prev" href="terminology.html" title="Terminology">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="terminology.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a>
+</div>
+<div class="section hpx_people">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="hpx.people"></a><a class="link" href="people.html" title="People">People</a>
+</h2></div></div></div>
+<p>
+      The STE||AR Group (pronounced as stellar) stands for "<span class="bold"><strong>S</strong></span>ystems
+      <span class="bold"><strong>T</strong></span>echnologies, <span class="bold"><strong>E</strong></span>mergent
+      Para<span class="bold"><strong>ll</strong></span>elism, and <span class="bold"><strong>A</strong></span>lgorithms
+      <span class="bold"><strong>R</strong></span>esearch". We are a group of faculty,
+      researchers, and students working at the <a href="http://www.cct.lsu.edu" target="_top">Center
+      for Computation and Technology (CCT)</a> at <a href="http://www.lsu.edu" target="_top">Louisiana
+      State University (LSU)</a>. Everything we do is centered around the ParalleX
+      execution model and its implementation in our experimental runtime system
+      <span class="emphasis"><em>HPX</em></span> (High Performance ParalleX). We use <span class="emphasis"><em>HPX</em></span>
+      for a broad range of scientific applications, helping scientists and developers
+      to write code which scales better and shows better performance if compared
+      to more conventional programming models such as MPI.
+    </p>
+<p>
+      <span class="emphasis"><em>ParalleX</em></span> is a new (and still experimental) parallel execution
+      model aiming to overcome the limitations imposed by the current hardware and
+      the way we write applications today. Our group focuses on two types of applications
+      - those requiring excellent strong scaling, allowing for a dramatic reduction
+      of execution time for fixed workloads and those needing highest level of sustained
+      performance through massive parallelism. These applications are either presently
+      unable (through conventional practices) to effectively exploit a relatively
+      small number of cores in a multi-core system. At the same time more often than
+      not these application will not be able to exploit high-end computing systems
+      likely to employ hundreds of millions of such cores by the end of this decade.
+    </p>
+<p>
+      Critical bottlenecks to the effective use of new generation high performance
+      computing (HPC) systems include:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+          <span class="emphasis"><em>Starvation</em></span>: due to lack of usable application parallelism
+          and means of managing it,
+        </li>
+<li class="listitem">
+          <span class="emphasis"><em>Overhead</em></span>: reduction to permit strong scalability,
+          improve efficiency, and enable dynamic resource management,
+        </li>
+<li class="listitem">
+          <span class="emphasis"><em>Latency</em></span>: from remote access across system or to local
+          memories,
+        </li>
+<li class="listitem">
+          <span class="emphasis"><em>Contention</em></span>: due to multicore chip I/O pins, memory
+          banks, and system interconnects.
+        </li>
+</ul></div>
+<p>
+      The ParalleX model has been devised to address these challenges by enabling
+      a new computing dynamic through the application of message-driven computation
+      in a global address space context with lightweight synchronization. The work
+      of our group is centered around implementing the concepts as defined by ParalleX.
+      We develop <span class="emphasis"><em>HPX</em></span> - a parallel runtime system currently targetted
+      at conventional machines, such as classical Linux based Beowulf clusters and
+      SMP nodes.
+    </p>
+<p>
+      We fully understand that the success of <span class="emphasis"><em>HPX</em></span> (and ParalleX)
+      is very much the result of the work of many people. To see a list of who is
+      contributing see our tables below.
+    </p>
+<h4>
+<a name="hpx.people.h0"></a>
+      <span class="phrase"><a name="hpx.people.the_ste_ar_group"></a></span><a class="link" href="people.html#hpx.people.the_ste_ar_group">The
+      STE||AR Group</a>
+    </h4>
+<div class="table">
+<a name="hpx.people.contributors"></a><p class="title"><b>Table&#160;26.&#160;Contributors</b></p>
+<div class="table-contents"><table class="table" summary="Contributors">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Name
+              </p>
+            </th>
+<th>
+              <p>
+                Institution
+              </p>
+            </th>
+<th>
+              <p>
+                email
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                Hartmut Kaiser
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/hkaiser.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Thomas Heller
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www3.cs.fau.de" target="_top">Chair of Computer Science 3 -
+                Computer Architecture</a>, <a href="http://www.fau.de" target="_top">Friedrich-Alexander
+                University Erlangen-Nuremberg (FAU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/theller.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Agustin Berge
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/aberge.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Bryce Adelstein-Lelbach
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/blelbach.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Vinay C Amatya
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/vamatya.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Shuangyang Yang
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/syang16.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Jeroen Habraken
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.tui.nl" target="_top">Technische Universiteit Eindhoven</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/vexocide.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Steven Brandt
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/sbrandt.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Andrew Kemp
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/akemp.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Adrian Serio
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/aserio.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Maciej Brodowicz
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://pti.iu.edu" target="_top">Center for Research in Extreme Scale
+                Technologies (CREST)</a>, <a href="http://www.iu.edu" target="_top">Indiana
+                University (IU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/mbrodowicz.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Matthew Anderson
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://pti.iu.edu" target="_top">Center for Research in Extreme Scale
+                Technologies (CREST)</a>, <a href="http://www.iu.edu" target="_top">Indiana
+                University (IU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/manderson.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Alex Nagelberg
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/anagelberg.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Dylan Stark
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.sandia.gov" target="_top">Sandia National Labs (Albuquerque)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/dstark.png"></span>
+              </p>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><h4>
+<a name="hpx.people.h1"></a>
+      <span class="phrase"><a name="hpx.people.contributors_to_this_document"></a></span><a class="link" href="people.html#hpx.people.contributors_to_this_document">Contributors
+      to this Document</a>
+    </h4>
+<div class="table">
+<a name="hpx.people.authors"></a><p class="title"><b>Table&#160;27.&#160;Documentation Authors</b></p>
+<div class="table-contents"><table class="table" summary="Documentation Authors">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Name
+              </p>
+            </th>
+<th>
+              <p>
+                Institution
+              </p>
+            </th>
+<th>
+              <p>
+                email
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                Hartmut Kaiser
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/hkaiser.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Thomas Heller
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www3.cs.fau.de" target="_top">Chair of Computer Science 3 -
+                Computer Architecture</a>, <a href="http://www.fau.de" target="_top">Friedrich-Alexander
+                University Erlangen-Nuremberg (FAU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/theller.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Bryce Adelstein-Lelbach
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/blelbach.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Vinay C Amatya
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/vamatya.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Steven Brandt
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/sbrandt.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Maciej Brodowicz
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://pti.iu.edu" target="_top">Center for Research in Extreme Scale
+                Technologies (CREST)</a>, <a href="http://www.iu.edu" target="_top">Indiana
+                University (IU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/mbrodowicz.png"></span>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                Adrian Serio
+              </p>
+            </td>
+<td>
+              <p>
+                <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+                (CCT)</a>, <a href="http://www.lsu.edu" target="_top">Louisiana State University
+                (LSU)</a>
+              </p>
+            </td>
+<td>
+              <p>
+                <span class="inlinemediaobject"><img src=".././images/emails/aserio.png"></span>
+              </p>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><h4>
+<a name="hpx.people.h2"></a>
+      <span class="phrase"><a name="hpx.people.acknowledgements"></a></span><a class="link" href="people.html#hpx.people.acknowledgements">Acknowledgements</a>
+    </h4>
+<p>
+      Thanks also to the following people who contributed directly or indirectly
+      to the project through discussions, pull requests, documentation patches, etc.
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+          Pyry Jahkola, who contributed the Mac OS build system and build documentation
+          on how to build HPX using Clang and libc++.
+        </li>
+<li class="listitem">
+          Patricia Grubel (New Mexico State University), who contributed the desciption
+          of the different <span class="emphasis"><em>HPX</em></span> thread scheduler policies.
+        </li>
+<li class="listitem">
+          Lars Viklund, who contributed platform specific patches for FreeBSD and
+          MSVC12.
+        </li>
+<li class="listitem">
+          Agustin Berge, who contributed patches fixing some very nasty hidden template
+          meta-programming issues.
+        </li>
+<li class="listitem">
+          Mario Mulansky, who created an <span class="emphasis"><em>HPX</em></span> backend for his
+          Boost.Odeint library, and who submitted several test cases allowing us
+          to reproduce and fix problems in <span class="emphasis"><em>HPX</em></span>.
+        </li>
+<li class="listitem">
+          Rekha Raj, who contributed changes to the description of the Windows build
+          instructions.
+        </li>
+<li class="listitem">
+          Alex Nagelberg for his work on implementing a C wrapper API for HPX.
+        </li>
+</ul></div>
+<p>
+      In addition to the people who worked directly with <span class="emphasis"><em>HPX</em></span>
+      development we would like to acknowledge the NSF, DoE, DARPA, <a href="http://www.cct.lsu.edu" target="_top">Center
+      for Computation and Technology (CCT)</a>, and <a href="http://www3.cs.fau.de" target="_top">Chair
+      of Computer Science 3 - Computer Architecture</a> who fund and support
+      our work.
+    </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="terminology.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a>
+</div>
+</body>
+</html>

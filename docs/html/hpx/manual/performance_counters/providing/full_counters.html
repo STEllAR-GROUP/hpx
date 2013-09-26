@@ -1,0 +1,145 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Implementing a Full Performance Counter</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../providing.html" title="Providing Performance Counter Data">
+<link rel="prev" href="simple_counters.html" title="Exposing Performance Counter Data using a Simple Function">
+<link rel="next" href="../counters.html" title="Existing HPX Performance Counters">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="simple_counters.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../providing.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="../counters.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_performance_counters_providing_full_counters">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.performance_counters.providing.full_counters"></a><a class="link" href="full_counters.html" title="Implementing a Full Performance Counter">Implementing
+          a Full Performance Counter</a>
+</h5></div></div></div>
+<p>
+            Somtimes, the simple way of exposing a single value as a Performance
+            Counter is not sufficient. For that reason, <span class="emphasis"><em>HPX</em></span>
+            provides a means of implementing full Performance Counters which support:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                Retrieving the descriptive information about the Performance Counter
+              </li>
+<li class="listitem">
+                Retrieving the current counter value
+              </li>
+<li class="listitem">
+                Resetting the Performance Counter (value)
+              </li>
+<li class="listitem">
+                Starting the Performance Counter
+              </li>
+<li class="listitem">
+                Stopping the Performance Counter
+              </li>
+<li class="listitem">
+                Setting the (initial) value of the Performance Counter
+              </li>
+</ul></div>
+<p>
+            Every full Performance Counter will implement a predefined interface:
+          </p>
+<pre class="programlisting"><span class="comment">// Abstract base interface for all Performance Counters.</span>
+<span class="keyword">struct</span> <span class="identifier">performance_counter</span>
+<span class="special">{</span>
+    <span class="comment">// Retrieve the descriptive information about the Performance Counter.</span>
+    <span class="keyword">virtual</span> <span class="identifier">counter_info</span> <span class="identifier">get_counter_info</span><span class="special">()</span> <span class="keyword">const</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+
+    <span class="comment">// Retrieve the current Performance Counter value.</span>
+    <span class="keyword">virtual</span> <span class="identifier">counter_value</span> <span class="identifier">get_counter_value</span><span class="special">(</span><span class="keyword">bool</span> <span class="identifier">reset</span> <span class="special">=</span> <span class="keyword">false</span><span class="special">)</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+
+    <span class="comment">// Reset the Performance Counter (value).</span>
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="identifier">reset_counter_value</span><span class="special">()</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+
+    <span class="comment">// Set the (initial) value of the Performance Counter.</span>
+    <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="identifier">set_counter_value</span><span class="special">(</span><span class="identifier">counter_value</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="comment">/*value*/</span><span class="special">)</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+
+    <span class="comment">// Start the Performance Counter.</span>
+    <span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="identifier">start</span><span class="special">()</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+
+    <span class="comment">// Stop the Performance Counter.</span>
+    <span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="identifier">stop</span><span class="special">()</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+<span class="special">};</span>
+</pre>
+<p>
+            In order to implement a full Performance Counter you have to create an
+            <span class="emphasis"><em>HPX</em></span> component exposing this interface. To simplify
+            this task, <span class="emphasis"><em>HPX</em></span> provides a ready made base class
+            which handles all the boiler plate of creating a component for you. The
+            remainder of this section will explain the process of creating a full
+            Performance Counter based on the Sine example which you can find in the
+            directory <code class="computeroutput"><span class="identifier">examples</span><span class="special">/</span><span class="identifier">performance_counters</span><span class="special">/</span><span class="identifier">sine</span><span class="special">/</span></code>.
+          </p>
+<p>
+            The base class is defined in the header file <a href="file:////home/heller/programming/hpx/hpx/performance_counters/base_performance_counter.hpp" target="_top">hpx/performance_counters/base_performance_counter.hpp</a>
+as:
+          </p>
+<p>
+            [base_performance_counter_class]
+          </p>
+<p>
+            The single template parameter is expected to receive the type of the
+            derived class implementing the Performance Counter. In the Sine example
+            this looks like:
+          </p>
+<pre class="programlisting"><span class="keyword">class</span> <span class="identifier">sine_counter</span>
+  <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">performance_counters</span><span class="special">::</span><span class="identifier">base_performance_counter</span><span class="special">&lt;</span><span class="identifier">sine_counter</span><span class="special">&gt;</span>
+</pre>
+<p>
+            i.e. the type <code class="computeroutput"><span class="identifier">sine_counter</span></code>
+            is derived from the base class passing the type as a template argument
+            (please see <a href="file:////home/heller/programming/hpx/examples/performance_counters/sine/server/sine.hpp" target="_top">sine.hpp</a>
+for
+            the full source code of the counter definition). For more information
+            about this technique (called Curiously Recurring Template Pattern - CRTP),
+            please see for instance the corresponding <a href="http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern" target="_top">Wikipedia
+            article</a>. This base class itself is derived from the <code class="computeroutput"><span class="identifier">performance_counter</span></code> interface described
+            above.
+          </p>
+<p>
+            Additionally, full Performance Counter implementation not only exposes
+            the actual value but also provides information about
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                The point in time a particular value was retrieved
+              </li>
+<li class="listitem">
+                A (sequential) invocation count
+              </li>
+<li class="listitem">
+                The actual counter value
+              </li>
+<li class="listitem">
+                An optional scaling coefficient
+              </li>
+<li class="listitem">
+                Information about the counter status
+              </li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="simple_counters.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../providing.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="../counters.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

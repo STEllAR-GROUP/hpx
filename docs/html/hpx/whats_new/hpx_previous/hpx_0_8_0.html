@@ -1,0 +1,394 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>HPX V0.8.0</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../hpx_previous.html" title="Previous HPX Releases">
+<link rel="prev" href="hpx_0_8_1.html" title="HPX V0.8.1">
+<link rel="next" href="hpx_0_7_0.html" title="HPX V0.7.0">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="hpx_0_8_1.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_previous.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hpx_0_7_0.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_whats_new_hpx_previous_hpx_0_8_0">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.whats_new.hpx_previous.hpx_0_8_0"></a><a class="link" href="hpx_0_8_0.html" title="HPX V0.8.0"><span class="emphasis"><em>HPX</em></span>
+        V0.8.0</a>
+</h4></div></div></div>
+<p>
+          We have had roughly 1000 commits since the last release and we have closed
+          approximately 70 tickets (bugs, feature requests, etc.).
+        </p>
+<h6>
+<a name="hpx.whats_new.hpx_previous.hpx_0_8_0.h0"></a>
+          <span class="phrase"><a name="hpx.whats_new.hpx_previous.hpx_0_8_0.general_changes"></a></span><a class="link" href="hpx_0_8_0.html#hpx.whats_new.hpx_previous.hpx_0_8_0.general_changes">General
+          Changes</a>
+        </h6>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Improved PBS support, allowing for arbitrary naming schemes of node-hostnames.
+            </li>
+<li class="listitem">
+              Finished verification of the reference counting framework.
+            </li>
+<li class="listitem">
+              Implemented decrement merging logic to optimize the distributed reference
+              counting system.
+            </li>
+<li class="listitem">
+              Restructured the LCO framework. Renamed <code class="literal">hpx::lcos::eager_future&lt;&gt;</code>
+              and <code class="literal">hpx::lcos::lazy_future&lt;&gt;</code> into <code class="computeroutput">hpx::lcos::packaged_task</code><code class="computeroutput"><span class="special">&lt;&gt;</span></code> and <code class="computeroutput">hpx::lcos::deferred_packaged_task</code><code class="computeroutput"><span class="special">&lt;&gt;</span></code>. Split <code class="computeroutput">hpx::lcos::promise</code><code class="computeroutput"><span class="special">&lt;&gt;</span></code> into <code class="computeroutput">hpx::lcos::packaged_task</code><code class="computeroutput"><span class="special">&lt;&gt;</span></code> and <code class="computeroutput">hpx::lcos::future</code><code class="computeroutput"><span class="special">&lt;&gt;</span></code>. Added 'local' futures (in
+              namespace <code class="literal">hpx::lcos::local</code>).
+            </li>
+<li class="listitem">
+              Improved the general performance of local and remote action invocations.
+              This (under certain circumstances) drastically reduces the number of
+              copies created for each of the parameters and return values.
+            </li>
+<li class="listitem">
+              Reworked the performance counter framework. Performance counters are
+              now created only when needed, which reduces the overall resource requirements.
+              The new framework allows for much more flexible creation and management
+              of performance counters. The new sine example application demonstrates
+              some of the capabilities of the new infrastructure.
+            </li>
+<li class="listitem">
+              Added a buildbot-based continuous build system which gives instant,
+              automated feedback on each commit to SVN.
+            </li>
+<li class="listitem">
+              Added more automated tests to verify proper functioning of <span class="emphasis"><em>HPX</em></span>.
+            </li>
+<li class="listitem">
+              Started to create documentation for <span class="emphasis"><em>HPX</em></span> and its
+              API.
+            </li>
+<li class="listitem">
+              Added documentation toolchain to the build system.
+            </li>
+<li class="listitem">
+              Added dataflow LCO.
+            </li>
+<li class="listitem">
+              Changed default <span class="emphasis"><em>HPX</em></span> command line options to have
+              <code class="literal">hpx:</code> prefix. For instance, the former option <code class="literal">--threads</code>
+              is now <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options"><code class="literal">--hpx:threads</code></a>.
+              This has been done to make ambiguities with possible application specific
+              command line options as unlikely as possible. See the section <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options"><span class="emphasis"><em>HPX</em></span> Command
+              Line Options</a> for a full list of available options.
+            </li>
+<li class="listitem">
+              Added the possibility to define command line aliases. The former short
+              (one-letter) command line options have been predefined as aliases for
+              backwards compatibility. See the section <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options"><span class="emphasis"><em>HPX</em></span>
+              Command Line Options</a> for a detailed description of command line
+              option aliasing.
+            </li>
+<li class="listitem">
+              Network connections are now cached based on the connected host. The
+              number of simultaneous connections to a particular host is now limited.
+              Parcels are buffered and bundled if all connections are in use.
+            </li>
+<li class="listitem">
+              Added more refined thread affinity control. This is based on the external
+              library <a href="http://www.open-mpi.org/projects/hwloc/" target="_top">Portable
+              Hardware Locality (HWLOC)</a>.
+            </li>
+<li class="listitem">
+              Improved support for Windows builds with CMake.
+            </li>
+<li class="listitem">
+              Added support for components to register their own command line options.
+            </li>
+<li class="listitem">
+              Added the possibility to register custom startup/shutdown functions
+              for any component. These functions are guaranteed to be executed by
+              an <span class="emphasis"><em>HPX</em></span> thread.
+            </li>
+<li class="listitem">
+              Added two new experimental thread schedulers: hierarchy_scheduler and
+              periodic_priority_scheduler. These can be activated by using the command
+              line options <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options"><code class="literal">--hpx:queueing=hierarchy</code></a>
+              or <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options"><code class="literal">--hpx:queueing=periodic</code></a>.
+            </li>
+</ul></div>
+<h6>
+<a name="hpx.whats_new.hpx_previous.hpx_0_8_0.h1"></a>
+          <span class="phrase"><a name="hpx.whats_new.hpx_previous.hpx_0_8_0.example_applications"></a></span><a class="link" href="hpx_0_8_0.html#hpx.whats_new.hpx_previous.hpx_0_8_0.example_applications">Example
+          Applications</a>
+        </h6>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <a href="http://www.graph500.org/" target="_top">Graph500 performance benchmark</a>
+              (thanks to Matthew Anderson for contributing this application).
+            </li>
+<li class="listitem">
+              <a href="http://www.nersc.gov/research-and-development/benchmarking-and-workload-characterization/nersc-6-benchmarks/gtc/" target="_top">GTC
+              (Gyrokinetic Toroidal Code)</a>: a skeleton for particle in cell
+              type codes.
+            </li>
+<li class="listitem">
+              Random Memory Access: an example demonstrating random memory accesses
+              in a large array
+            </li>
+<li class="listitem">
+              <a href="http://stellarcollapse.org/equationofstate" target="_top">ShenEOS example</a>,
+              demonstrating partitioning of large read-only data structures and exposing
+              an interpolation API.
+            </li>
+<li class="listitem">
+              Sine performance counter demo.
+            </li>
+<li class="listitem">
+              Accumulator examples demonstrating how to write and use <span class="emphasis"><em>HPX</em></span>
+              components.
+            </li>
+<li class="listitem">
+              Quickstart examples (like hello_world, fibonacci, quicksort, factorial,
+              etc.) demonstrating simple <span class="emphasis"><em>HPX</em></span> concepts which
+              introduce some of the concepts in <span class="emphasis"><em>HPX</em></span>.
+            </li>
+<li class="listitem">
+              Load balancing and work stealing demos.
+            </li>
+</ul></div>
+<h6>
+<a name="hpx.whats_new.hpx_previous.hpx_0_8_0.h2"></a>
+          <span class="phrase"><a name="hpx.whats_new.hpx_previous.hpx_0_8_0.api_changes"></a></span><a class="link" href="hpx_0_8_0.html#hpx.whats_new.hpx_previous.hpx_0_8_0.api_changes">API
+          Changes</a>
+        </h6>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Moved all local LCOs into a separate namespace <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">lcos</span><span class="special">::</span><span class="identifier">local</span></code>
+              (for instance, <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">lcos</span><span class="special">::</span><span class="identifier">local_mutex</span></code>
+              is now <code class="computeroutput">hpx::lcos::local::mutex</code>).
+            </li>
+<li class="listitem">
+              Replaced <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">actions</span><span class="special">::</span><span class="identifier">function</span></code> with <code class="computeroutput">hpx::util::function</code>.
+              Cleaned up related code.
+            </li>
+<li class="listitem">
+              Removed <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">traits</span><span class="special">::</span><span class="identifier">handle_gid</span></code> and moved handling of
+              global reference counts into the corresponding serialization code.
+            </li>
+<li class="listitem">
+              Changed terminology: <code class="computeroutput"><span class="identifier">prefix</span></code>
+              is now called <code class="computeroutput"><span class="identifier">locality_id</span></code>,
+              renamed the corresponding API functions (such as <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">get_prefix</span></code>,
+              which is now called <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">get_locality_id</span></code>).
+            </li>
+<li class="listitem">
+              Adding <code class="computeroutput"><a class="link" href="../../find_remote_localities_idp15754192.html" title="Function find_remote_localities">hpx::find_remote_localities</a></code><code class="computeroutput"><span class="special">()</span></code>, and <code class="computeroutput"><a class="link" href="../../get_num_localities_idp15805296.html" title="Function get_num_localities">hpx::get_num_localities</a></code><code class="computeroutput"><span class="special">()</span></code>.
+            </li>
+<li class="listitem">
+              Changed performance counter naming scheme to make it more bash friendly.
+              The new performance counter naming scheme is now
+            </li>
+</ul></div>
+<pre class="programlisting">/object{parentname#parentindex/instance#index}/counter#parameters
+</pre>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Added <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">get_worker_thread_num</span></code> replacing
+              <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">threadmanager_base</span><span class="special">::</span><span class="identifier">get_thread_num</span></code>.
+            </li>
+<li class="listitem">
+              Renamed <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">get_num_os_threads</span></code> to <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">get_os_threads_count</span></code>.
+            </li>
+<li class="listitem">
+              Added <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">threads</span><span class="special">::</span><span class="identifier">get_thread_count</span></code>.
+            </li>
+<li class="listitem">
+              Restructured the Futures sub-system, renaming types in accordance with
+              the terminology used by the C++11 ISO standard.
+            </li>
+</ul></div>
+<h6>
+<a name="hpx.whats_new.hpx_previous.hpx_0_8_0.h3"></a>
+          <span class="phrase"><a name="hpx.whats_new.hpx_previous.hpx_0_8_0.bug_fixes_closed_tickets"></a></span><a class="link" href="hpx_0_8_0.html#hpx.whats_new.hpx_previous.hpx_0_8_0.bug_fixes_closed_tickets">Bug
+          Fixes (Closed Tickets)</a>
+        </h6>
+<p>
+          Here is a list of the important tickets we closed for this release:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/31" target="_top">#31</a>  - Specialize handle_gid&lt;&gt; for examples and tests
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/72" target="_top">#72</a>  - Fix AGAS reference counting
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/104" target="_top">#104</a> - heartbeat throws an exception when decrefing the performance
+              counter it's watching
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/111" target="_top">#111</a> - throttle causes an exception on the target application
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/142" target="_top">#142</a> - One failed component loading causes an unrelated component
+              to fail
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/165" target="_top">#165</a> - Remote exception propagation bug in AGAS reference counting
+              test
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/186" target="_top">#186</a> - Test credit exhaustion/splitting (e.g. prepare_gid and symbol
+              NS)
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/188" target="_top">#188</a> - Implement remaining AGAS reference counting test cases
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/258" target="_top">#258</a> - No type checking of GIDs in stubs classes
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/271" target="_top">#271</a> - Seg fault/shared pointer assertion in distributed code
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/281" target="_top">#281</a> - CMake options need descriptive text
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/283" target="_top">#283</a> - AGAS caching broken (gva_cache needs to be rewritten with
+              ICL)
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/285" target="_top">#285</a> - HPX_INSTALL root directory not the same as CMAKE_INSTALL_PREFIX
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/286" target="_top">#286</a> - New segfault in dataflow applications
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/289" target="_top">#289</a> - Exceptions should only be logged if not handled
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/290" target="_top">#290</a> - c++11 tests failure
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/293" target="_top">#293</a> - Build target for component libraries
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/296" target="_top">#296</a> - Compilation error with Boost V1.49rc1
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/298" target="_top">#298</a> - Illegal instructions on termination
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/299" target="_top">#299</a> - gravity aborts with multiple threads
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/301" target="_top">#301</a> - Build error with Boost trunk
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/303" target="_top">#303</a> - Logging assertion failure in distributed runs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/304" target="_top">#304</a> - Exception 'what' strings are lost when exceptions from decode_parcel
+              are reported
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/306" target="_top">#306</a> - Performance counter user interface issues
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/307" target="_top">#307</a> - Logging exception in distributed runs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/308" target="_top">#308</a> - Logging deadlocks in distributed
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/309" target="_top">#309</a> - Reference counting test failures and exceptions
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/311" target="_top">#311</a> - Merge AGAS remote_interface with the runtime_support object
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/314" target="_top">#314</a> - Object tracking for id_types
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/315" target="_top">#315</a> - Remove handle_gid and handle credit splitting in id_type serialization
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/320" target="_top">#320</a> - applier::get_locality_id() should return an error value (or
+              throw an exception)
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/321" target="_top">#321</a> - Optimization for id_types which are never split should be
+              restored
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/322" target="_top">#322</a> - Command line processing ignored with Boost 1.47.0
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/323" target="_top">#323</a> - Credit exhaustion causes object to stay alive
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/324" target="_top">#324</a> - Duplicate exception messages
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/326" target="_top">#326</a> - Integrate Quickbook with CMake
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/329" target="_top">#329</a> - --help and --version should still work
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/330" target="_top">#330</a> - Create pkg-config files
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/337" target="_top">#337</a> - Improve usability of performance counter timestamps
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/338" target="_top">#338</a> - Non-std exceptions deriving from std::exceptions in tfunc
+              may be sliced
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/339" target="_top">#339</a> - Decrease the number of send_pending_parcels threads
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/343" target="_top">#343</a> - Dynamically setting the stack size doesn't work
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/351" target="_top">#351</a> - 'make install' does not update documents
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/353" target="_top">#353</a> - Disable FIXMEs in the docs by default; add a doc developer
+              CMake option to enable FIXMEs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/355" target="_top">#355</a> - 'make' doesn't do anything after correct configuration
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/356" target="_top">#356</a> - Don't use hpx::util::static_ in topology code
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/359" target="_top">#359</a> - Infinite recursion in hpx::tuple serialization
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/361" target="_top">#361</a> - Add compile time option to disable logging completely
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/364" target="_top">#364</a> - Installation seriously broken in r7443
+            </li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="hpx_0_8_1.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_previous.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hpx_0_7_0.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

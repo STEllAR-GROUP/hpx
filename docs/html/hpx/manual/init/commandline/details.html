@@ -1,0 +1,181 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>More Details about HPX Command Line Options</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../commandline.html" title="HPX Command Line Options">
+<link rel="prev" href="../commandline.html" title="HPX Command Line Options">
+<link rel="next" href="../../applications.html" title="Writing HPX applications">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../commandline.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../commandline.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="../../applications.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_init_commandline_details">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.init.commandline.details"></a><a class="link" href="details.html" title="More Details about HPX Command Line Options">More Details
+          about <span class="emphasis"><em>HPX</em></span> Command Line Options</a>
+</h5></div></div></div>
+<p>
+            This section documents the following list of the command line options
+            in more detail:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+                <a class="link" href="details.html#hpx.manual.init.commandline.details.bind"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">bind</span></code></a>
+              </li></ul></div>
+<h6>
+<a name="hpx.manual.init.commandline.details.h0"></a>
+            <span class="phrase"><a name="hpx.manual.init.commandline.details.bind"></a></span><a class="link" href="details.html#hpx.manual.init.commandline.details.bind">The
+            Command Line Option <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">bind</span></code></a>
+          </h6>
+<p>
+            This command line option allows one to specify the required affinity
+            of the <span class="emphasis"><em>HPX</em></span> worker threads to the underlying processing
+            units. As a result the worker threads will run only on the processing
+            units identified by the corresponding bind specification.
+          </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              This command line option is only available if <span class="emphasis"><em>HPX</em></span>
+              was built with support for HWLOC (<a href="http://www.open-mpi.org/projects/hwloc/" target="_top">Portable
+              Hardware Locality (HWLOC)</a>) enabled. Please see <a class="link" href="../../cmake/options.html" title="Options and Variables">Options
+              and Variables</a> for more details on how to enable support for
+              HWLOC in <span class="emphasis"><em>HPX</em></span>.
+            </p></td></tr>
+</table></div>
+<p>
+            The specified affinities refer to specific regions within a machine hardware
+            topology. In order to understand the hardware topology of a particular
+            machine it may be useful to run the lstopo tool which is part of <a href="http://www.open-mpi.org/projects/hwloc/" target="_top">Portable Hardware Locality
+            (HWLOC)</a> to see the reported topology tree. Seeing and understanding
+            a topology tree will definitely help in understanding the concepts that
+            are discussed below.
+          </p>
+<p>
+            Affinities can be specified using HWLOC (<a href="http://www.open-mpi.org/projects/hwloc/" target="_top">Portable
+            Hardware Locality (HWLOC)</a>) tuples. Tuples of HWLOC <span class="emphasis"><em>objects</em></span>
+            and associated <span class="emphasis"><em>indexes</em></span> can be specified in the form
+            <code class="computeroutput"><span class="identifier">object</span><span class="special">:</span><span class="identifier">index</span></code>, <code class="computeroutput"><span class="identifier">object</span><span class="special">:</span><span class="identifier">index</span><span class="special">-</span><span class="identifier">index</span></code>,
+            or <code class="computeroutput"><span class="identifier">object</span><span class="special">:</span><span class="identifier">index</span><span class="special">,...,</span><span class="identifier">index</span></code>. HWLOC objects represent types
+            of mapped items in a topology tree. Possible values for objects are
+            <code class="computeroutput"><span class="identifier">socket</span></code>, <code class="computeroutput"><span class="identifier">numanode</span></code>, <code class="computeroutput"><span class="identifier">core</span></code>,
+            and <code class="computeroutput"><span class="identifier">pu</span></code> (processing unit).
+            Indexes are non-negative integers that specify a unique physical object
+            in a topology tree using its logical sequence number.
+          </p>
+<p>
+            Chaining multiple tuples together in the more general form <code class="computeroutput"><span class="identifier">object1</span><span class="special">:</span><span class="identifier">index1</span><span class="special">[.</span><span class="identifier">object2</span><span class="special">:</span><span class="identifier">index2</span><span class="special">[...]]</span></code>
+            is permissible. While the first tuple's object may appear anywhere in
+            the topology, the Nth tuple's object must have a shallower topology depth
+            than the (N+1)th tuple's object. Put simply: as you move right in a tuple
+            chain, objects must go deeper in the topology tree. Indexes specified
+            in chained tuples are relative to the scope of the parent object. For
+            example, <code class="computeroutput"><span class="identifier">socket</span><span class="special">:</span><span class="number">0.</span><span class="identifier">core</span><span class="special">:</span><span class="number">1</span></code> refers
+            to the second core in the first socket (all indices are zero based).
+          </p>
+<p>
+            Multiple affinities can be specified using several <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">bind</span></code> command line options or by appending
+            several affinities separated by a <code class="computeroutput"><span class="char">';'</span></code>.
+            By default, if multiple affinities are specified, they are added.
+          </p>
+<p>
+            <code class="computeroutput">"all"</code> is a special affinity consisting in the
+            entire current topology.
+          </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              All 'names' in an affinity specification, such as <code class="computeroutput">thread</code>,
+              <code class="computeroutput">socket</code>, <code class="computeroutput">numanode</code>, <code class="computeroutput">pu</code>, or <code class="computeroutput">all</code>
+              can be abbreviated. Thus the affinity specification <code class="computeroutput">threads:0-3=socket:0.core:1.pu:1</code>
+              is fully equivalent to its shortened form <code class="computeroutput">t:0-3=s:0.c:1.p:1</code>.
+            </p></td></tr>
+</table></div>
+<p>
+            Here is a full grammar describing the possible format of mappings:
+          </p>
+<pre class="programlisting">mappings:
+    mapping(;mapping)*
+
+mapping:
+    thread-spec=pu-specs
+
+thread-spec:
+    'thread':range-specs
+
+pu-specs:
+    pu-spec(.pu-spec)*
+
+pu-spec:
+    type:range-specs
+    ~pu-spec
+
+range-specs:
+    range-spec(,range-spec)*
+
+range-spec:
+    int
+    int-int
+    'all'
+
+type:
+    'socket' | 'numanode'
+    'core'
+    'pu'
+</pre>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+              The command line option <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">print</span><span class="special">-</span><span class="identifier">bind</span></code> can be used to print the bitmasks
+              generated from the affinity mappings as specified with <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">bind</span></code>.
+              For instance, on a system with hyperthreading enabled (i.e. 2 processing
+              units per core), the command line:
+            </p>
+<pre class="programlisting">hello_world -t4 --hpx:bind=thread:0-3=core:0-3.pu:0 --hpx:print-bind
+</pre>
+<p>
+              will cause this output to be printed:
+            </p>
+<pre class="programlisting">0: 0x0000000000000001
+1: 0x0000000000000004
+2: 0x0000000000000010
+3: 0x0000000000000040
+</pre>
+<p>
+              where each bit in the bitmasks corresponds to a processing unit the
+              listed worker thread will be bound to run on.
+            </p>
+</td></tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../commandline.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../commandline.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="../../applications.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

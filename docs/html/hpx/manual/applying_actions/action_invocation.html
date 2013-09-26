@@ -1,0 +1,93 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Action Invocation</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../applying_actions.html" title="Applying Actions">
+<link rel="prev" href="action_type_definition.html" title="Action Type Definition">
+<link rel="next" href="action_invocation/apply.html" title="Applying an Action Asynchronously without any Synchronization">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="action_type_definition.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../applying_actions.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="action_invocation/apply.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_applying_actions_action_invocation">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.applying_actions.action_invocation"></a><a class="link" href="action_invocation.html" title="Action Invocation">Action
+        Invocation</a>
+</h4></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="action_invocation/apply.html">Applying
+          an Action Asynchronously without any Synchronization</a></span></dt>
+<dt><span class="section"><a href="action_invocation/async.html">Applying
+          an Action Asynchronously with Synchronization</a></span></dt>
+<dt><span class="section"><a href="action_invocation/sync.html">Applying
+          an Action Synchronously</a></span></dt>
+<dt><span class="section"><a href="action_invocation/async_continue.html">Applying
+          an Action with a Continuation but without any Synchronization</a></span></dt>
+<dt><span class="section"><a href="action_invocation/apply_continue.html">Applying
+          an Action with a Continuation and with Synchronization</a></span></dt>
+<dt><span class="section"><a href="action_invocation/compare.html">Comparing
+          Actions with C++ Functions</a></span></dt>
+</dl></div>
+<p>
+          The process of invoking a global function (or a member function of an object)
+          with the help of the associated action is called 'applying the action'.
+          Actions can have arguments, which will be supplied while the action is
+          applied. At the minimum, one parameter is required to apply any action
+          - the id of the locality the associated function should be invoked on (for
+          global functions), or the id of the component instance (for member functions).
+          Generally, <span class="emphasis"><em>HPX</em></span> provides several ways to apply an action,
+          all of which are described in the following sections.
+        </p>
+<p>
+          <span class="emphasis"><em>HPX</em></span> allows the user to apply actions with a syntax
+          similar to the C++ standard. In fact, all action types have an overloaded
+          function operator allowing to synchronously apply the action. Further,
+          <span class="emphasis"><em>HPX</em></span> implements <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span></code>,
+          which semantically works similar to the way <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">async</span></code>
+          works for plain C++ function.
+        </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            The similarity of applying an action to conventional function invocations
+            extends even further. <span class="emphasis"><em>HPX</em></span> implements <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">bind</span></code> and <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">function</span></code>:
+            two facilities which are semantically equivalent to the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">bind</span></code> and <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">function</span></code>
+            types as defined by the C++11 Standard. While <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span></code>
+            extends beyond the conventional semantics by supporting actions and conventional
+            C++ functions, the <span class="emphasis"><em>HPX</em></span> facilities <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">bind</span></code> and <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">function</span></code>
+            extend beyond the conventional standard facilities too. The <span class="emphasis"><em>HPX</em></span>
+            facilities not only support conventional functions, but can be used for
+            actions as well.
+          </p></td></tr>
+</table></div>
+<p>
+          Additionally, <span class="emphasis"><em>HPX</em></span> exposes <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">apply</span></code>
+          and <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async_continue</span></code>, both of which refine
+          and extend the standard C++ facilities.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="action_type_definition.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../applying_actions.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="action_invocation/apply.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

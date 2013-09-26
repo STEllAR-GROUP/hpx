@@ -1,0 +1,124 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Global Names</title>
+<link rel="stylesheet" href="../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../manual.html" title="Manual">
+<link rel="prev" href="applications.html" title="Writing HPX applications">
+<link rel="next" href="applying_actions.html" title="Applying Actions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="applications.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manual.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="applying_actions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_names">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="hpx.manual.names"></a><a class="link" href="names.html" title="Global Names">Global Names</a>
+</h3></div></div></div>
+<p>
+        <span class="emphasis"><em>HPX</em></span> implements an Active Global Address Space (AGAS)
+        which is exposing a single uniform address space spanning all localities
+        an application runs on. AGAS is a fundamental component of the ParalleX execution
+        model. Conceptually, there is no rigid demarcation of local or global memory
+        in AGAS; all available memory is a part of the same address space. AGAS enables
+        named objects to be moved (migrated) across localities without having to
+        change the object's name, i.e., no references to migrated objects have to
+        be ever updated. This feature has significance for dynamic load balancing
+        and in applications where the workflow is highly dynamic, allowing work to
+        be migrated from heavily loaded nodes to less loaded nodes. In addition,
+        immutability of names ensures that AGAS does not have to keep extra indirections
+        ("bread crumbs") when objects move, hence minimizing complexity
+        of code management for system developers as well as minimizing overheads
+        in maintaining and managing aliases.
+      </p>
+<p>
+        The AGAS implementation in <span class="emphasis"><em>HPX</em></span> does not automatically
+        expose every local address to the global address space. It is the responsibility
+        of the programmer to explicitly define which of the objects have to be globally
+        visible and which of the objects are purely local.
+      </p>
+<p>
+        In <span class="emphasis"><em>HPX</em></span> global addresses (global names) are represented
+        using the <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">id_type</span></code> data type. This data type is conceptually
+        very similar to <code class="computeroutput"><span class="keyword">void</span><span class="special">*</span></code>
+        pointers as it does not expose any type information of the object it is referring
+        to.
+      </p>
+<p>
+        The only predefined global addresses are assigned to all localities. The
+        following <span class="emphasis"><em>HPX</em></span> API functions allow one to retrieve the
+        global addresses of localities:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            <code class="computeroutput"><a class="link" href="../find_here.html" title="Function find_here">hpx::find_here()</a></code>: retrieve the global
+            address of the locality this function is called on.
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><a class="link" href="../find_all_localities_idp15731424.html" title="Function find_all_localities">hpx::find_all_localities()</a></code>: retrieve the global
+            addresses of all localities available to this application (including
+            the locality the function is being called on).
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><a class="link" href="../find_remote_localities_idp15754192.html" title="Function find_remote_localities">hpx::find_remote_localities()</a></code>: retrieve the global
+            addresses of all remote localities available to this application (not
+            including the locality the function is being called on)
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><a class="link" href="../get_num_localities_idp15805296.html" title="Function get_num_localities">hpx::get_num_localities()</a></code>: retrieve the number
+            of localities available to this application.
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><a class="link" href="../find_locality.html" title="Function find_locality">hpx::find_locality()</a></code>: retrieve the global
+            address of any locality supporting the given component type.
+          </li>
+<li class="listitem">
+            <code class="computeroutput"><a class="link" href="../get_colocation_id.html" title="Function get_colocation_id">hpx::get_colocation_id()</a></code>: retrieve the global
+            address of the locality currently hosting the object with the given global
+            address.
+          </li>
+</ul></div>
+<p>
+        Additionally, the global addresses of localities can be used to create new
+        instances of components using the following <span class="emphasis"><em>HPX</em></span> API
+        function:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+            <code class="computeroutput"><a class="link" href="../components/new_.html" title="Function template new_">hpx::new_&lt;Component&gt;()</a></code>: Create a new instance
+            of the given <code class="computeroutput"><span class="identifier">Component</span></code>
+            type on the specified locality.
+          </li></ul></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          <span class="emphasis"><em>HPX</em></span> does not expose any functionality to delete component
+          instances. All global addresses (as represented using <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">id_type</span></code>)
+          are being automatically garbage collected. When the last (global) reference
+          to a particular component instance goes out of scope the corresponding
+          component instance is automatically deleted.
+        </p></td></tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="applications.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manual.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="applying_actions.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

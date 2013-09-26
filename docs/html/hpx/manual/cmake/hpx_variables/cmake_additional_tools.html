@@ -1,0 +1,112 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Additional Tools and Libraries used by HPX</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../hpx_variables.html" title="HPX specific CMake Variables">
+<link rel="prev" href="cmake_parcelports.html" title="Variables concerning Parcelports">
+<link rel="next" href="../doc_tools.html" title="Setting up the HPX Documentation Tool Chain">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="cmake_parcelports.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_variables.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="../doc_tools.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_cmake_hpx_variables_cmake_additional_tools">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.cmake.hpx_variables.cmake_additional_tools"></a><a class="link" href="cmake_additional_tools.html" title="Additional Tools and Libraries used by HPX">Additional
+          Tools and Libraries used by HPX</a>
+</h5></div></div></div>
+<p>
+            Here is a list of additional libraries and tools which are either optionally
+            supported by the build system or are optionally required for certain
+            examples or tests. These libraries and tools can be detected by the
+            <span class="emphasis"><em>HPX</em></span> build system.
+          </p>
+<p>
+            Each of the tools or libraries listed here will be automatically detected
+            if they are installed in some standard location. If a tool or library
+            is installed in a different location you can specify its base directory
+            by appending <code class="computeroutput"><span class="identifier">_ROOT</span></code> to
+            the variable name as listed below. For instance, to configure a custom
+            directory for <code class="computeroutput"><span class="identifier">BOOST</span></code>,
+            specify <code class="computeroutput"><span class="identifier">BOOST_ROOT</span><span class="special">=/</span><span class="identifier">custom</span><span class="special">/</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">root</span></code>.
+          </p>
+<div class="variablelist">
+<p class="title"><b>Additional Tools and Libraries used by HPX</b></p>
+<dl class="variablelist">
+<dt><span class="term"><code class="computeroutput"><span class="identifier">BOOST_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                  Specifies where to look for the <a href="http://www.boost.org/" target="_top">Boost</a>
+                  installation to be used for compiling <span class="emphasis"><em>HPX</em></span>.
+                  Set this if CMake is not able to locate a suitable version of
+                  <a href="http://www.boost.org/" target="_top">Boost</a>. The directory
+                  specified here can be either the root of a installed Boost distribution
+                  or the directory where you unpacked and built <a href="http://www.boost.org/" target="_top">Boost</a>
+                  without installing it (with staged libraries).
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HWLOC_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                  Specifies where to look for the <a href="http://www.open-mpi.org/projects/hwloc/" target="_top">Portable
+                  Hardware Locality (HWLOC)</a> library. While it is not necessary
+                  to compile <span class="emphasis"><em>HPX</em></span> with HWLOC, we strongly suggest
+                  you do so. HWLOC provides platform independent support for extracting
+                  information about the used hardware architecture (number of cores,
+                  number of NUMA domains, hyperthreading, etc.). <span class="emphasis"><em>HPX</em></span>
+                  utilizes this information if available.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">PAPI_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                  Specifies where to look for the <a href="http://icl.cs.utk.edu/papi/" target="_top">Networking
+                  and Cryptography library (NaCl)</a> library. The PAPI library
+                  is necessary to compile a special component exposing PAPI hardware
+                  events and counters as <span class="emphasis"><em>HPX</em></span> performance counters.
+                  This is not available on the Windows platform.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">BOOSTWAVE_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                  Specifies where to look for a built <a href="http://www.boost.org/doc/libs/release/libs/wave/doc/wave_driver.html" target="_top">Boost
+                  Wave</a> binary. Set this if you want to recreate the preprocessed
+                  header files used by <span class="emphasis"><em>HPX</em></span>. Normally this will
+                  not be necessary, unless you modified the sources those preprocessed
+                  headers depend on.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">AMPLIFIER_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                  Specifies where to look for one of the tools of the Intel Parallel
+                  Studio(tm) product, either Intel Amplifier(tm) or Intel Inspector(tm).
+                  This should be set if the CMake variable <code class="computeroutput"><span class="identifier">HPX_USE_ITT_NOTIFY</span></code>
+                  is set to <code class="computeroutput"><span class="identifier">ON</span></code>. Enabling
+                  ITT support in <span class="emphasis"><em>HPX</em></span> will integrate any application
+                  with the mentioned Intel tools, which customizes the generated
+                  information for your application and improves the generated diagnostics.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">SODIUM_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                  Specifies where to look for the <a href="http://nacl.cr.yp.to/" target="_top">Performance
+                  Application Programming Interface (PAPI)</a> library. The Sodium
+                  library is necessary to enable the security related functionality
+                  (see <code class="computeroutput"><span class="identifier">HPX_HAVE_SECURITY</span></code>).
+                </p></dd>
+</dl>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="cmake_parcelports.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_variables.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="../doc_tools.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

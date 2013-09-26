@@ -1,0 +1,1942 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Built-in Default Configuration Settings</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../configuration.html" title="Configure HPX Applications">
+<link rel="prev" href="ini_format.html" title="The HPX INI File Format">
+<link rel="next" href="loading_ini_files.html" title="Loading INI Files">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="322" height="101" src="../../../../images/hpx_1_0_0.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="ini_format.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../configuration.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="loading_ini_files.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_init_configuration_config_defaults">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.init.configuration.config_defaults"></a><a class="link" href="config_defaults.html" title="Built-in Default Configuration Settings">Built-in
+          Default Configuration Settings</a>
+</h5></div></div></div>
+<p>
+            During startup any <span class="emphasis"><em>HPX</em></span> application applies a predefined
+            search pattern to locate one or more configuration files. All found files
+            will be read and merged in the sequence they are found into one single
+            internal data structure holding all configuration properties.
+          </p>
+<p>
+            As a first step the internal configuration database is filled with a
+            set of default configuration properties. Those settings are described
+            on a section by section basis below.
+          </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              You can print the default configuration settings used for an executable
+              by specifying the command line option <a class="link" href="../commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">dump</span><span class="special">-</span><span class="identifier">config</span></code></a>.
+            </p></td></tr>
+</table></div>
+<p>
+            <span class="emphasis"><em><span class="bold"><strong>The <code class="computeroutput"><span class="identifier">system</span></code>
+            Configuration Section</strong></span></em></span>
+          </p>
+<pre class="programlisting">[system]
+pid = &lt;process-id&gt;
+prefix = &lt;current prefix path of core HPX library&gt;
+executable = &lt;current prefix path of executable&gt;
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_system"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">system</span><span class="special">.</span><span class="identifier">pid</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to store the current OS-process id of the
+                      application instance
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">system</span><span class="special">.</span><span class="identifier">prefix</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the base directory <span class="emphasis"><em>HPX</em></span>
+                      has been loaded from.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">system</span><span class="special">.</span><span class="identifier">executable_prefix</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the base directory the current executable
+                      has been loaded from.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+            <span class="emphasis"><em><span class="bold"><strong>The <code class="computeroutput"><span class="identifier">hpx</span></code>
+            Configuration Section</strong></span></em></span>
+          </p>
+<pre class="programlisting">[hpx]
+location = ${HPX_LOCATION:$[system.prefix]}
+component_path = $[hpx.location]/lib/hpx:$[system.executable_prefix]/lib/hpx:$[system.executable_prefix]/../lib/hpx
+master_ini_path = $[hpx.location]/share/hpx-&lt;version&gt;:$[system.executable_prefix]/share/hpx-&lt;version&gt;:$[system.executable_prefix]/../share/hpx-&lt;version&gt;
+ini_path = $[hpx.master_ini_path]/ini
+os_threads = 1
+localities = 1
+program_name =
+cmd_line =
+lock_detection = 0
+minimal_deadlock_detection = &lt;debug&gt;
+
+[hpx.stacks]
+small_size = ${HPX_SMALL_STACK_SIZE:&lt;hpx_small_stack_size&gt;}
+medium_size = ${HPX_MEDIUM_STACK_SIZE:&lt;hpx_medium_stack_size&gt;}
+large_size = ${HPX_LARGE_STACK_SIZE:&lt;hpx_large_stack_size&gt;}
+huge_size = ${HPX_HUGE_STACK_SIZE:&lt;hpx_huge_stack_size&gt;}
+use_guard_pages = ${HPX_USE_GUARD_PAGES:1}
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx"></a><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">location</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the id of the locality this application
+                      instance is running on.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">component_path</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the list of directories where the <span class="emphasis"><em>HPX</em></span>
+                      runtime library will look for installed components. Duplicates
+                      are discarded.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, this property can refer to a list of directories
+                      separated by <code class="computeroutput"><span class="char">':'</span></code>
+                      (Linux, Android, and MacOS) or using <code class="computeroutput"><span class="char">';'</span></code>
+                      (Windows).
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">master_ini_path</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the list of default paths of the main
+                      hpx.ini configuration files
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, depends on <span class="emphasis"><em>HPX</em></span>'s installation
+                      path, , this property can refer to a list of directories separated
+                      by <code class="computeroutput"><span class="char">':'</span></code> (Linux, Android,
+                      and MacOS) or using <code class="computeroutput"><span class="char">';'</span></code>
+                      (Windows).
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">ini_path</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the default path where <span class="emphasis"><em>HPX</em></span>
+                      will look for more ini configuration files. The value of this
+                      property will be interpreted as a list of directories delited
+                      by <code class="computeroutput"><span class="char">':'</span></code> (on Windows
+                      <code class="computeroutput"><span class="char">';'</span></code>), each of which
+                      will be scanned for ini files.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, depends on <span class="emphasis"><em>HPX</em></span>'s installation
+                      path
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">os_threads</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This setting reflects the number of OS-threads used for running
+                      <span class="emphasis"><em>HPX</em></span>-threads.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, usually depends on command line options
+                      and/or environment setting (for PBS and SLURM), by default
+                      it is set to <code class="computeroutput"><span class="number">1</span></code>
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">localities</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This setting reflects the number of localities the application
+                      is running on.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, usually depends on command line options
+                      and/or environment setting (for PBS and SLURM), by default
+                      it is set to <code class="computeroutput"><span class="number">1</span></code>
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">program_name</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This setting reflects the program name of the application instance.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information, initialized from the command line (arv[0])
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">cmd_line</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This setting reflects the actual command line used to launch
+                      this application instance.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information, initialized from command line (argc/argv)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">lock_detection</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This setting verifies that no locks are being held while a
+                      <span class="emphasis"><em>HPX</em></span> thread is suspended.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information, by default this is set to '0', this setting
+                      is effective only if <code class="computeroutput"><span class="identifier">HPX_VERIFY_LOCKS</span></code>
+                      is set during configuration in cmake.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">minimal_deadlock_detection</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This setting enables support for minimal deadlock detection
+                      for <span class="emphasis"><em>HPX</em></span>-threads..
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information, by default this is set to '1' (for Debug
+                      builds) or to '0' (for Release, RelWithDebInfo, RelMinSize
+                      builds), this setting is effective only if <code class="computeroutput"><span class="identifier">HPX_THREAD_MINIMAL_DEADLOCK_DETECTION</span></code>
+                      is set during configuration in cmake.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">stacks</span><span class="special">.</span><span class="identifier">small_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the small stack size to be used by
+                      <span class="emphasis"><em>HPX</em></span>-threads
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, depends on the compile time preprocessor
+                      constant <code class="computeroutput"><span class="identifier">HPX_SMALL_STACK_SIZE</span></code>
+                      (defaults to <code class="computeroutput"><span class="number">0x8000</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">stacks</span><span class="special">.</span><span class="identifier">medium_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the medium stack size to be used by
+                      <span class="emphasis"><em>HPX</em></span>-threads
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, depends on the compile time preprocessor
+                      constant <code class="computeroutput"><span class="identifier">HPX_MEDIUM_STACK_SIZE</span></code>
+                      (defaults to <code class="computeroutput"><span class="number">0x20000</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">stacks</span><span class="special">.</span><span class="identifier">large_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the large stack size to be used by
+                      <span class="emphasis"><em>HPX</em></span>-threads
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, depends on the compile time preprocessor
+                      constant <code class="computeroutput"><span class="identifier">HPX_LARGE_STACK_SIZE</span></code>
+                      (defaults to <code class="computeroutput"><span class="number">0x200000</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">stacks</span><span class="special">.</span><span class="identifier">huge_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is initialized to the huge stack size to be used by <span class="emphasis"><em>HPX</em></span>-threads
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, depends on the compile time preprocessor
+                      constant <code class="computeroutput"><span class="identifier">HPX_HUGE_STACK_SIZE</span></code>
+                      (defaults to <code class="computeroutput"><span class="number">0x2000000</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">stacks</span><span class="special">.</span><span class="identifier">use_guard_pages</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This entry controls whether the coroutine library will generate
+                      stack guard pages or not. This entry is evaluated on Linux
+                      only and only if the <code class="computeroutput"><span class="identifier">HPX_USE_GENERIC_COROUTINE_CONTEXT</span></code>
+                      option is not enabled while configuring the build system. The
+                      default value for this entry is '1'.
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+            <span class="emphasis"><em><span class="bold"><strong>The <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">threadpools</span></code>
+            Configuration Section</strong></span></em></span>
+          </p>
+<pre class="programlisting">[hpx.threadpools]
+io_pool_size = ${HPX_NUM_IO_POOL_THREADS:2}
+parcel_pool_size = ${HPX_NUM_PARCEL_POOL_THREADS:2}
+timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:2}
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_thread_pools"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">threadpools</span><span class="special">.</span><span class="identifier">io_pool_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      The value of this property defines the number of OS-threads
+                      created for the internal I/O thread pool.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">threadpools</span><span class="special">.</span><span class="identifier">parcel_pool_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      The value of this property defines the number of OS-threads
+                      created for the internal parcel thread pool.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">threadpools</span><span class="special">.</span><span class="identifier">timer_pool_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      The value of this property defines the number of OS-threads
+                      created for the internal timer thread pool.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+            <span class="emphasis"><em><span class="bold"><strong>The <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">components</span></code>
+            Configuration Section</strong></span></em></span>
+          </p>
+<pre class="programlisting">[hpx.components]
+load_external = ${HPX_LOAD_EXTERNAL_COMPONENTS:1}
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_components"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody><tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">components</span><span class="special">.</span><span class="identifier">load_external</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This entry defines whether external components will be loaded
+                      on this locality.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This entry normally is set to <code class="computeroutput"><span class="number">1</span></code>
+                      and usually there is no need to directly change this value.
+                      It is automatically set to <code class="computeroutput"><span class="number">0</span></code>
+                      for a dedicated AGAS server locality.
+                    </p>
+                  </td>
+</tr></tbody>
+</table>
+</div>
+<p>
+            Additionally, the section <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">components</span></code>
+            will be populated with the information gathered from all found components.
+            The information loaded for each of the components will contain at least
+            the following properties:
+          </p>
+<pre class="programlisting">[hpx.components.&lt;component_instance_name&gt;]
+name = &lt;component_name&gt;
+path = &lt;full_path_of_the_component_module&gt;
+enabled = $[hpx.components.load_external]
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_components_custom"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">components</span><span class="special">.&lt;</span><span class="identifier">component_instance_name</span><span class="special">&gt;.</span><span class="identifier">name</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is the name of a component, usually the same as the second
+                      argument to the macro used while registering the component
+                      with <code class="computeroutput">HPX_REGISTER_MINIMAL_COMPONENT_FACTORY</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information, filled by the component
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">components</span><span class="special">.&lt;</span><span class="identifier">component_instance_name</span><span class="special">&gt;.</span><span class="identifier">path</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is either the full path file name of the component module
+                      or the directory the component module is located in. In this
+                      case, the component module name will be derived from the property
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">components</span><span class="special">.&lt;</span><span class="identifier">component_instance_name</span><span class="special">&gt;.</span><span class="identifier">name</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information, filled by the component
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">components</span><span class="special">.&lt;</span><span class="identifier">component_instance_name</span><span class="special">&gt;.</span><span class="identifier">enabled</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This setting explicitly enables or disables the component.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This is an optional property, <span class="emphasis"><em>HPX</em></span> assumed
+                      that the component is enabled if it is not defined.
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+            The value for <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">component_instance_name</span><span class="special">&gt;</span></code> is usually the same as for the corresponding
+            <code class="computeroutput"><span class="identifier">name</span></code> property. However
+            generally it can be defined to any arbitrary instance name. It is used
+            to distinguish between different ini sections, one for each component.
+          </p>
+<p>
+            <span class="emphasis"><em><span class="bold"><strong>The <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span></code>
+            Configuration Section</strong></span></em></span>
+          </p>
+<pre class="programlisting">[hpx.parcel]
+address = ${HPX_PARCEL_SERVER_ADDRESS:&lt;hpx_initial_ip_address&gt;}
+port = ${HPX_PARCEL_SERVER_PORT:&lt;hpx_initial_ip_port&gt;}
+bootstrap = ${HPX_PARCEL_BOOTSTRAP:&lt;hpx_parcel_bootstrap&gt;}
+max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:&lt;hpx_parcel_max_connections&gt;}
+max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:&lt;hpx_parcel_max_connections_per_locality&gt;}
+max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:&lt;hpx_parcel_max_message_size&gt;}
+array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">address</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines the default IP address to be used for
+                      the parcel layer to listen to. This IP address will be used
+                      as long as no other values are specified (for instance using
+                      the <a class="link" href="../commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">hpx</span></code></a>
+                      command line option). The expected format is any valid IP address
+                      or domain name format which can be resolved into an IP address.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_INITIAL_IP_ADDRESS</span></code>
+                      (<code class="computeroutput"><span class="string">"127.0.0.1"</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">port</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines the default IP port to be used for the
+                      parcel layer to listen to. This IP port will be used as long
+                      as no other values are specified (for instance using the <a class="link" href="../commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">hpx</span></code></a> command line option).
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_INITIAL_IP_PORT</span></code>
+                      (<code class="computeroutput"><span class="number">7010</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">bootstrap</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines which parcelport type should be used
+                      during application bootstrap.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_PARCEL_BOOTSTRAP</span></code>
+                      (<code class="computeroutput"><span class="string">"tcpip"</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">max_connections</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines how many network connections between
+                      different localities are overall kept alive by each of locality.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_PARCEL_MAX_CONNECTIONS</span></code>
+                      (<code class="computeroutput"><span class="number">512</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">max_connections_per_locality</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines the maximum number of network connections
+                      that one locality will open to another locality.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY</span></code>
+                      (<code class="computeroutput"><span class="number">4</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">max_message_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines the maximum allowed message size which
+                      will be transferrable through the parcel layer.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_PARCEL_MAX_MESSAGE_SIZE</span></code>
+                      (<code class="computeroutput"><span class="number">1000000000</span></code>) bytes.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">array_optimization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to utilize
+                      array optimizations during serialization of parcel data.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default is <code class="computeroutput"><span class="number">1</span></code>
+                      (on).
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="programlisting">[hpx.parcel.tcpip]
+enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_tcpip"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody><tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcpip</span><span class="special">.</span><span class="identifier">enable</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Enable the use of the default TCPIP parcelport. Note that the
+                      initial bootstrap of the overall <span class="emphasis"><em>HPX</em></span> application
+                      will be performed using the default TCPIP connections.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the connections are enabled by default.
+                      This will be disabled only if MPI is enabled (see below)
+                    </p>
+                  </td>
+</tr></tbody>
+</table>
+</div>
+<p>
+            The following settings relate to the shared memory parcelport (which
+            is usable for communication between two localities on the same node).
+            These settings take effect only if the compile time constant <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_SHMEM</span></code> is set (the
+            equivalent cmake variable is <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_SHMEM</span></code>,
+            and has to be set to <code class="computeroutput"><span class="identifier">ON</span></code>).
+          </p>
+<pre class="programlisting">[hpx.parcel.shmem]
+enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}
+data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_shmem"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">shmem</span><span class="special">.</span><span class="identifier">enable</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Enable the use of the shared memory parcelport for connections
+                      between localities running on the same node. Note that the
+                      initial bootstrap of the overall <span class="emphasis"><em>HPX</em></span> application
+                      will still be performed using the default TCP connections.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the connections are disabled by default.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">shmem</span><span class="special">.</span><span class="identifier">data_buffer_cache_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property specifies the number of cached data buffers used
+                      for interprocess communication between localities on the same
+                      node.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE</span></code>
+                      (<code class="computeroutput"><span class="number">512</span></code>)
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+            The following settings relate to the Infiniband parcelport. These settings
+            take effect only if the compile time constant <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_IBVERBS</span></code>
+            is set (the equivalent cmake variable is <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_IBVERBS</span></code>,
+            and has to be set to <code class="computeroutput"><span class="identifier">ON</span></code>).
+          </p>
+<pre class="programlisting">[hpx.parcel.ibverbs]
+enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}
+buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_ibverbs"></a><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ibverbs</span><span class="special">.</span><span class="identifier">enable</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Enable the use of the ibverbs parcelport for connections between
+                      localities running on a node with infiniband capable hardware.
+                      Note that the initial bootstrap of the overall <span class="emphasis"><em>HPX</em></span>
+                      application will still be performed using the default TCP connections.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the connections are disabled by default.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ibverbs</span><span class="special">.</span><span class="identifier">buffer_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property specifies the size in bytes of the buffers registered
+                      to the infiniband hardware. Parcels which are smaller than
+                      this will be serialized and sent over the network in a zero-copy
+                      fashion. Parcels bigger than this will be transparently copied
+                      to a big enough temporary buffer.
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+            The following settings relate to the MPI parcelport. These settings take
+            effect only if the compile time constant <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_MPI</span></code>
+            is set (the equivalent cmake variable is <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_MPI</span></code>,
+            and has to be set to <code class="computeroutput"><span class="identifier">ON</span></code>).
+          </p>
+<pre class="programlisting">[hpx.parcel.mpi]
+enable = ${HPX_HAVE_PARCELPORT_MPI:1}
+rank = &lt;MPI_rank&gt;
+processor_name = &lt;MPI_processor_name&gt;
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_mpi"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">enable</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      Disable the use of the MPI parcelport. HPX tries to detect
+                      if the application was started within a parallel MPI environment.
+                      If the detection was succesful, the MPI parcelport is enabled
+                      by default. To explicitly disable the MPI parcelport, set to
+                      0. Note that the initial bootstrap of the overall <span class="emphasis"><em>HPX</em></span>
+                      application will be performed using MPI as well.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the connections are disabled by default.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">rank</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property will be initialized to the MPI rank of the locality.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information set by <span class="emphasis"><em>HPX</em></span>
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">processor_name</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property will be initialized to the MPI processor name
+                      of the locality.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information set by <span class="emphasis"><em>HPX</em></span>
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+            <span class="emphasis"><em><span class="bold"><strong>The <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span></code>
+            Configuration Section</strong></span></em></span>
+          </p>
+<pre class="programlisting">[hpx.agas]
+address = ${HPX_AGAS_SERVER_ADDRESS:&lt;hpx_initial_ip_address&gt;}
+port = ${HPX_AGAS_SERVER_PORT:&lt;hpx_initial_ip_port&gt;}
+service_mode = hosted
+dedicated_server = 0
+max_pending_refcnt_requests = ${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:&lt;hpx_initial_agas_max_pending_refcnt_requests&gt;}
+use_caching = ${HPX_AGAS_USE_CACHING:1}
+use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}
+local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:&lt;hpx_initial_agas_local_cache_size&gt;}
+local_cache_size_per_thread = ${HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD:&lt;hpx_initial_agas_local_cache_size_per_thread&gt;}
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_agas"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">address</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines the default IP address to be used for
+                      the AGAS root server. This IP address will be used as long
+                      as no other values are specified (for instance using the <a class="link" href="../commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">agas</span></code></a> command line
+                      option). The expected format is any valid IP address or domain
+                      name format which can be resolved into an IP address.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_INITIAL_IP_ADDRESS</span></code>
+                      (<code class="computeroutput"><span class="string">"127.0.0.1"</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">port</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines the default IP port to be used for the
+                      AGAS root server. This IP port will be used as long as no other
+                      values are specified (for instance using the <a class="link" href="../commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">agas</span></code></a>
+                      command line option).
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_INITIAL_IP_PORT</span></code>
+                      (<code class="computeroutput"><span class="number">7010</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">service_mode</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property specifies what type of AGAS service is running
+                      on this locality. Currently, two modes exist. The locality
+                      that acts as the AGAS server runs in <code class="computeroutput"><span class="identifier">bootstrap</span></code>
+                      mode. All other localities are in <code class="computeroutput"><span class="identifier">hosted</span></code>
+                      mode.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">dedicated_server</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property specifies whether the AGAS server is exclusively
+                      running AGAS services and not hosting any application components.
+                      It is a boolean value.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information, true if <a class="link" href="../commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">-</span><span class="identifier">run</span><span class="special">-</span><span class="identifier">agas</span><span class="special">-</span><span class="identifier">server</span><span class="special">-</span><span class="identifier">only</span></code></a>
+                      is present.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">max_pending_refcnt_requests</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines the number of reference counting requests
+                      (increments or decrements) to buffer.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS</span></code>
+                      (<code class="computeroutput"><span class="number">4096</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">use_caching</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property specifies whether a software address translation
+                      cache is used. It is a boolean value.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, defaults to true.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">use_range_caching</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property specifies whether range-based caching is used
+                      by the software address translation cache. This property is
+                      ignored if <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">use_caching</span></code>
+                      is false. It is a boolean value.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, defaults to true.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">local_cache_size</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines the size of the software address translation
+                      cache for AGAS services. This property is ignored if <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">use_caching</span></code> is false. Note
+                      that if <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">use_range_caching</span></code>
+                      is true, this size will refer to the maximum number of ranges
+                      stored in the cache, not the number of entries spanned by the
+                      cache. Note also, that the size of the cache will be determined
+                      by the larger of the following two numbers: the value of this
+                      key and the value of <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">local_cache_size_per_thread</span></code>
+                      multiplied by the number of threads used systemwide in the
+                      running application.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE</span></code>
+                      (<code class="computeroutput"><span class="number">256</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">local_cache_size_per_thread</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines the size of the software address translation
+                      cache for AGAS services on a per node basis. This property
+                      is ignored if <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">use_caching</span></code>
+                      is false. Note that if <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">use_range_caching</span></code>
+                      is true, this size will refer to the maximum number of ranges
+                      stored in the cache, not the number of entries spanned by the
+                      cache. Note also, that the size of the cache will be determined
+                      by the larger of the following two numbers: the <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">agas</span><span class="special">.</span><span class="identifier">local_cache_size</span></code> and the
+                      value of this key multiplied by the number of threads used
+                      system wide in the running application.
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      static information, the default depends on the compile time
+                      preprocessor constant <code class="computeroutput"><span class="identifier">HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD</span></code>
+                      (<code class="computeroutput"><span class="number">32</span></code>)
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
+            <span class="emphasis"><em><span class="bold"><strong>The <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">commandline</span></code>
+            Configuration Section</strong></span></em></span>
+          </p>
+<p>
+            The following table lists the definition of all pre-defined command line
+            option shortcuts. For more information about commandline options see
+            the section <a class="link" href="../commandline.html" title="HPX Command Line Options"><span class="emphasis"><em>HPX</em></span>
+            Command Line Options</a>.
+          </p>
+<pre class="programlisting">[hpx.commandline]
+-a = --hpx:agas
+-c = --hpx:console
+-h = --hpx:help
+--help = --hpx:help
+-I = --hpx:ini
+-l = --hpx:localities
+-p = --hpx:app-config
+-q = --hpx:queuing",
+-r = --hpx:run-agas-server
+-t = --hpx:threads
+-v = --hpx:version
+--version = --hpx:version
+-w = --hpx:worker
+-x = --hpx:hpx
+-0 = --hpx:node=0
+-1 = --hpx:node=1
+-2 = --hpx:node=2
+-3 = --hpx:node=3
+-4 = --hpx:node=4
+-5 = --hpx:node=5
+-6 = --hpx:node=6
+-7 = --hpx:node=7
+-8 = --hpx:node=8
+-9 = --hpx:node=9
+</pre>
+<div class="informaltable">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_shortuts"></a><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Property
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Remark
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-a</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-a</code> expands to: <code class="computeroutput">--hpx:agas</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-c</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-c</code> expands to: <code class="computeroutput">--hpx:console</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-h</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-h</code> expands to: <code class="computeroutput">--hpx:help</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.--help</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">--help</code> expands to: <code class="computeroutput">--hpx:help</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-I</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-I</code> expands to: <code class="computeroutput">--hpx:ini</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-l</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-l</code> expands to: <code class="computeroutput">--hpx:localities</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-p</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-p</code> expands to: <code class="computeroutput">--hpx:app-config</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-q</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-q</code> expands to: <code class="computeroutput">--hpx:queuing</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-r</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-r</code> expands to: <code class="computeroutput">--hpx:run-agas-server</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-t</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-t</code> expands to: <code class="computeroutput">--hpx:threads</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-v</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-v</code> expands to: <code class="computeroutput">--hpx:version</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.--version</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">--version</code> expands to: <code class="computeroutput">--hpx:version</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-w</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-w</code> expands to: <code class="computeroutput">--hpx:worker</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-x</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-x</code> expands to: <code class="computeroutput">--hpx:hpx</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-0</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-0</code> expands to: <code class="computeroutput">--hpx:node=0</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-1</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-1</code> expands to: <code class="computeroutput">--hpx:node=1</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-2</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-2</code> expands to: <code class="computeroutput">--hpx:node=2</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-3</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-3</code> expands to: <code class="computeroutput">--hpx:node=3</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-4</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-4</code> expands to: <code class="computeroutput">--hpx:node=4</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-5</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-5</code> expands to: <code class="computeroutput">--hpx:node=5</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-6</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-6</code> expands to: <code class="computeroutput">--hpx:node=6</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-7</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-7</code> expands to: <code class="computeroutput">--hpx:node=7</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-8</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-8</code> expands to: <code class="computeroutput">--hpx:node=8</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput">hpx.commandline.-9</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      On the commandline, <code class="computeroutput">-9</code> expands to: <code class="computeroutput">--hpx:node=9</code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      dynamic information
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="ini_format.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../configuration.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="loading_ini_files.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
