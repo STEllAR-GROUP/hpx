@@ -27,10 +27,7 @@ else()
 endif()
 
 # first delete all html files
-execute_process(
-  COMMAND ${GIT_EXECUTABLE} rm *.html
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
-  RESULT_VARIABLE git_rm_result)
+file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/gh-pages/docs/html/hpx)
 
 # copy all documentation files to target branch
 file(
