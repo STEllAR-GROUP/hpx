@@ -775,7 +775,6 @@ namespace hpx { namespace util
                 threads::print_affinity_options(std::cout, num_threads_,
                     affinity_desc);
             }
-            return 1;
         }
 #endif
 
