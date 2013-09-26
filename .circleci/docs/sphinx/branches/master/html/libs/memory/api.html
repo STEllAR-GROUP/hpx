@@ -1,0 +1,653 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>memory &mdash; HPX master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="hashing" href="../hashing/api.html" />
+    <link rel="prev" title="topology" href="../topology/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../naming_base/api.html">naming_base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">memory</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-memory-intrusive-ptr-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/memory/intrusive_ptr.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-memory-serialization-intrusive-ptr-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/memory/serialization/intrusive_ptr.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>memory</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/memory/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="memory">
+<span id="libs-memory-api"></span><h1>memory<a class="headerlink" href="#memory" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-memory-intrusive-ptr-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/memory/intrusive_ptr.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-memory-intrusive-ptr-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv4I0ENSt4hashIN3hpx6memory13intrusive_ptrI1TEEEE">
+<span id="_CPPv3I0ENSt4hashIN3hpx6memory13intrusive_ptrI1TEEEE"></span><span id="_CPPv2I0ENSt4hashIN3hpx6memory13intrusive_ptrI1TEEEE"></span><span class="target" id="structstd_1_1hash_3_01hpx_1_1memory_1_1intrusive__ptr_3_01_t_01_4_01_4"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">hash</code>&lt;<a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx6memoryE" title="hpx::memory">memory</a>::intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0ENSt4hashIN3hpx6memory13intrusive_ptrI1TEEEE" title="std::hash&lt;hpx::memory::intrusive_ptr&lt;T&gt;&gt;::T">T</a>&gt;&gt;<a class="headerlink" href="#_CPPv4I0ENSt4hashIN3hpx6memory13intrusive_ptrI1TEEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4IENSt4hashIN3hpx6memory13intrusive_ptrI1TEEE11result_typeE">
+<span id="_CPPv3IENSt4hashIN3hpx6memory13intrusive_ptrI1TEEE11result_typeE"></span><span id="_CPPv2IENSt4hashIN3hpx6memory13intrusive_ptrI1TEEE11result_typeE"></span>template&lt;&gt;<br /><span class="target" id="structstd_1_1hash_3_01hpx_1_1memory_1_1intrusive__ptr_3_01_t_01_4_01_4_1a93cf24a0ab73e0fa2b876860b926f9a9"></span><em class="property">using </em><code class="sig-name descname">result_type</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t<a class="headerlink" href="#_CPPv4IENSt4hashIN3hpx6memory13intrusive_ptrI1TEEE11result_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4NKSt4hashclERKN3hpx6memory13intrusive_ptrI1TEE">
+<span id="_CPPv3NKSt4hashclERKN3hpx6memory13intrusive_ptrI1TEE"></span><span id="_CPPv2NKSt4hashclERKN3hpx6memory13intrusive_ptrI1TEE"></span><span id="std::hash::call-operator__hpx::memory::intrusive_ptr:T:CRC"></span><span class="target" id="structstd_1_1hash_3_01hpx_1_1memory_1_1intrusive__ptr_3_01_t_01_4_01_4_1a3b5d3640365f87dbe018db2b202f695b"></span>result_type <code class="sig-name descname">operator()</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx6memoryE" title="hpx::memory">memory</a>::intrusive_ptr&lt;T&gt; <em class="property">const</em> &amp;<em>p</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NKSt4hashclERKN3hpx6memory13intrusive_ptrI1TEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6memoryE">
+<span id="_CPPv3N3hpx6memoryE"></span><span id="_CPPv2N3hpx6memoryE"></span><span id="hpx::memory"></span><span class="target" id="namespacehpx_1_1memory"></span><em class="property">namespace </em><code class="sig-name descname">memory</code><a class="headerlink" href="#_CPPv4N3hpx6memoryE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memoryeqERK13intrusive_ptrI1TERK13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memoryeqERK13intrusive_ptrI1TERK13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1af06f2f0bad3f6cf986dbbdcb0cb40878"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator==::T">T</a>&gt; <em class="property">const</em> &amp;<em>a</em>, intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator==::U">U</a>&gt; <em class="property">const</em> &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memoryneERK13intrusive_ptrI1TERK13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memoryneERK13intrusive_ptrI1TERK13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1a958bb41b992ec00302a25b90f86a3f40"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator!=::T">T</a>&gt; <em class="property">const</em> &amp;<em>a</em>, intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator!=::U">U</a>&gt; <em class="property">const</em> &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TEP1U">
+<span id="_CPPv3I00EN3hpx6memoryeqERK13intrusive_ptrI1TEP1U"></span><span id="_CPPv2I00EN3hpx6memoryeqERK13intrusive_ptrI1TEP1U"></span><span class="target" id="intrusive__ptr_8hpp_1a805878f6ae1ca5c0c7cb513535519884"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator==::T">T</a>&gt; <em class="property">const</em> &amp;<em>a</em>, <a class="reference internal" href="#_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator==::U">U</a> *<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TEP1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TEP1U">
+<span id="_CPPv3I00EN3hpx6memoryneERK13intrusive_ptrI1TEP1U"></span><span id="_CPPv2I00EN3hpx6memoryneERK13intrusive_ptrI1TEP1U"></span><span class="target" id="intrusive__ptr_8hpp_1ab5f27bfed61aea8d0faefca3de29036c"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator!=::T">T</a>&gt; <em class="property">const</em> &amp;<em>a</em>, <a class="reference internal" href="#_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator!=::U">U</a> *<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TEP1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memoryeqEbP1TRK13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memoryeqEP1TRK13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memoryeqEP1TRK13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1aa98156c5db75834de2adc202613f2a28"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator==::T">T</a> *<em>a</em>, intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memoryeqEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator==::U">U</a>&gt; <em class="property">const</em> &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memoryeqEbP1TRK13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memoryneEbP1TRK13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memoryneEP1TRK13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memoryneEP1TRK13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1a725fce4bd49763f84211203e89947396"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator!=::T">T</a> *<em>a</em>, intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memoryneEbRK13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::operator!=::U">U</a>&gt; <em class="property">const</em> &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memoryneEbP1TRK13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memoryeqEbRK13intrusive_ptrI1TENSt9nullptr_tE">
+<span id="_CPPv3I0EN3hpx6memoryeqERK13intrusive_ptrI1TENSt9nullptr_tE"></span><span id="_CPPv2I0EN3hpx6memoryeqERK13intrusive_ptrI1TENSt9nullptr_tE"></span><span class="target" id="intrusive__ptr_8hpp_1a9253088059dad00efc6d671659e32d3c"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memoryeqEbRK13intrusive_ptrI1TENSt9nullptr_tE" title="hpx::memory::operator==::T">T</a>&gt; <em class="property">const</em> &amp;<em>p</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memoryeqEbRK13intrusive_ptrI1TENSt9nullptr_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memoryeqEbNSt9nullptr_tERK13intrusive_ptrI1TE">
+<span id="_CPPv3I0EN3hpx6memoryeqENSt9nullptr_tERK13intrusive_ptrI1TE"></span><span id="_CPPv2I0EN3hpx6memoryeqENSt9nullptr_tERK13intrusive_ptrI1TE"></span><span class="target" id="intrusive__ptr_8hpp_1a9a23c37ccd27a664cd195c114fb73a45"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t, intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memoryeqEbRK13intrusive_ptrI1TENSt9nullptr_tE" title="hpx::memory::operator==::T">T</a>&gt; <em class="property">const</em> &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memoryeqEbNSt9nullptr_tERK13intrusive_ptrI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memoryneEbRK13intrusive_ptrI1TENSt9nullptr_tE">
+<span id="_CPPv3I0EN3hpx6memoryneERK13intrusive_ptrI1TENSt9nullptr_tE"></span><span id="_CPPv2I0EN3hpx6memoryneERK13intrusive_ptrI1TENSt9nullptr_tE"></span><span class="target" id="intrusive__ptr_8hpp_1ac6d92692dd056cd3f55452e4f44ecac8"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memoryneEbRK13intrusive_ptrI1TENSt9nullptr_tE" title="hpx::memory::operator!=::T">T</a>&gt; <em class="property">const</em> &amp;<em>p</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memoryneEbRK13intrusive_ptrI1TENSt9nullptr_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memoryneEbNSt9nullptr_tERK13intrusive_ptrI1TE">
+<span id="_CPPv3I0EN3hpx6memoryneENSt9nullptr_tERK13intrusive_ptrI1TE"></span><span id="_CPPv2I0EN3hpx6memoryneENSt9nullptr_tERK13intrusive_ptrI1TE"></span><span class="target" id="intrusive__ptr_8hpp_1a49b7146e8ee3939e62dd1a0b46af7a9b"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t, intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memoryneEbRK13intrusive_ptrI1TENSt9nullptr_tE" title="hpx::memory::operator!=::T">T</a>&gt; <em class="property">const</em> &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memoryneEbNSt9nullptr_tERK13intrusive_ptrI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memoryltEbRK13intrusive_ptrI1TERK13intrusive_ptrI1TE">
+<span id="_CPPv3I0EN3hpx6memoryltERK13intrusive_ptrI1TERK13intrusive_ptrI1TE"></span><span id="_CPPv2I0EN3hpx6memoryltERK13intrusive_ptrI1TERK13intrusive_ptrI1TE"></span><span class="target" id="intrusive__ptr_8hpp_1afbda8fd9ce3867b176d4c4cd5b29acd7"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />bool <code class="sig-name descname">operator&lt;</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memoryltEbRK13intrusive_ptrI1TERK13intrusive_ptrI1TE" title="hpx::memory::operator&lt;::T">T</a>&gt; <em class="property">const</em> &amp;<em>a</em>, intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memoryltEbRK13intrusive_ptrI1TERK13intrusive_ptrI1TE" title="hpx::memory::operator&lt;::T">T</a>&gt; <em class="property">const</em> &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memoryltEbRK13intrusive_ptrI1TERK13intrusive_ptrI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memory4swapEvR13intrusive_ptrI1TER13intrusive_ptrI1TE">
+<span id="_CPPv3I0EN3hpx6memory4swapER13intrusive_ptrI1TER13intrusive_ptrI1TE"></span><span id="_CPPv2I0EN3hpx6memory4swapER13intrusive_ptrI1TER13intrusive_ptrI1TE"></span><span class="target" id="intrusive__ptr_8hpp_1ac422fa0459b1a3edfac3f1f0cefcae99"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />void <code class="sig-name descname">swap</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memory4swapEvR13intrusive_ptrI1TER13intrusive_ptrI1TE" title="hpx::memory::swap::T">T</a>&gt; &amp;<em>lhs</em>, intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memory4swapEvR13intrusive_ptrI1TER13intrusive_ptrI1TE" title="hpx::memory::swap::T">T</a>&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memory4swapEvR13intrusive_ptrI1TER13intrusive_ptrI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memory11get_pointerEP1TRK13intrusive_ptrI1TE">
+<span id="_CPPv3I0EN3hpx6memory11get_pointerERK13intrusive_ptrI1TE"></span><span id="_CPPv2I0EN3hpx6memory11get_pointerERK13intrusive_ptrI1TE"></span><span class="target" id="intrusive__ptr_8hpp_1a589bc0df57033c4b9cc19588db2d2120"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><a class="reference internal" href="#_CPPv4I0EN3hpx6memory11get_pointerEP1TRK13intrusive_ptrI1TE" title="hpx::memory::get_pointer::T">T</a> *<code class="sig-name descname">get_pointer</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memory11get_pointerEP1TRK13intrusive_ptrI1TE" title="hpx::memory::get_pointer::T">T</a>&gt; <em class="property">const</em> &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memory11get_pointerEP1TRK13intrusive_ptrI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memory19static_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memory19static_pointer_castERK13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memory19static_pointer_castERK13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1a036ac696852887da31cb54547be288d7"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory19static_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::static_pointer_cast::T">T</a>&gt; <code class="sig-name descname">static_pointer_cast</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory19static_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::static_pointer_cast::U">U</a>&gt; <em class="property">const</em> &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memory19static_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memory18const_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memory18const_pointer_castERK13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memory18const_pointer_castERK13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1a9aa726c8fce0a6028c58b5cd841e793c"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory18const_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::const_pointer_cast::T">T</a>&gt; <code class="sig-name descname">const_pointer_cast</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory18const_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::const_pointer_cast::U">U</a>&gt; <em class="property">const</em> &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memory18const_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memory20dynamic_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memory20dynamic_pointer_castERK13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memory20dynamic_pointer_castERK13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1adf0790c180e271bbac9ef094efae7458"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory20dynamic_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::dynamic_pointer_cast::T">T</a>&gt; <code class="sig-name descname">dynamic_pointer_cast</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory20dynamic_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::dynamic_pointer_cast::U">U</a>&gt; <em class="property">const</em> &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memory20dynamic_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memory19static_pointer_castE13intrusive_ptrI1TERR13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memory19static_pointer_castERR13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memory19static_pointer_castERR13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1a885376f7ff5ba9863ca3170b0b693bf5"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory19static_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::static_pointer_cast::T">T</a>&gt; <code class="sig-name descname">static_pointer_cast</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory19static_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::static_pointer_cast::U">U</a>&gt; &amp;&amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memory19static_pointer_castE13intrusive_ptrI1TERR13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memory18const_pointer_castE13intrusive_ptrI1TERR13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memory18const_pointer_castERR13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memory18const_pointer_castERR13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1ad557c7f653f646fac79938aa570e18cd"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory18const_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::const_pointer_cast::T">T</a>&gt; <code class="sig-name descname">const_pointer_cast</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory18const_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::const_pointer_cast::U">U</a>&gt; &amp;&amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memory18const_pointer_castE13intrusive_ptrI1TERR13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memory20dynamic_pointer_castE13intrusive_ptrI1TERR13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memory20dynamic_pointer_castERR13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memory20dynamic_pointer_castERR13intrusive_ptrI1UE"></span><span class="target" id="intrusive__ptr_8hpp_1a9cace57bfa7792501ba6527bb9dae619"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory20dynamic_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::dynamic_pointer_cast::T">T</a>&gt; <code class="sig-name descname">dynamic_pointer_cast</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory20dynamic_pointer_castE13intrusive_ptrI1TERK13intrusive_ptrI1UE" title="hpx::memory::dynamic_pointer_cast::U">U</a>&gt; &amp;&amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memory20dynamic_pointer_castE13intrusive_ptrI1TERR13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memorylsERNSt7ostreamERNSt7ostreamERK13intrusive_ptrI1YE">
+<span id="_CPPv3I0EN3hpx6memorylsERNSt7ostreamERK13intrusive_ptrI1YE"></span><span id="_CPPv2I0EN3hpx6memorylsERNSt7ostreamERK13intrusive_ptrI1YE"></span><span class="target" id="intrusive__ptr_8hpp_1aa23cfb7305ca97157c59929049c654c2"></span>template&lt;typename <code class="sig-name descname">Y</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<code class="sig-name descname">operator&lt;&lt;</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<em>os</em>, intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memorylsERNSt7ostreamERNSt7ostreamERK13intrusive_ptrI1YE" title="hpx::memory::operator&lt;&lt;::Y">Y</a>&gt; <em class="property">const</em> &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memorylsERNSt7ostreamERNSt7ostreamERK13intrusive_ptrI1YE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4I0EN3hpx6memory13intrusive_ptrE">
+<span id="_CPPv3I0EN3hpx6memory13intrusive_ptrE"></span><span id="_CPPv2I0EN3hpx6memory13intrusive_ptrE"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">class </em><code class="sig-name descname">intrusive_ptr</code><a class="headerlink" href="#_CPPv4I0EN3hpx6memory13intrusive_ptrE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4IEN3hpx6memory13intrusive_ptrI1TE12element_typeE">
+<span id="_CPPv3IEN3hpx6memory13intrusive_ptrI1TE12element_typeE"></span><span id="_CPPv2IEN3hpx6memory13intrusive_ptrI1TE12element_typeE"></span>template&lt;&gt;<br /><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a08937e223e0f776a93b3321c81d38c17"></span><em class="property">using </em><code class="sig-name descname">element_type</code> = T<a class="headerlink" href="#_CPPv4IEN3hpx6memory13intrusive_ptrI1TE12element_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrEv">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr13intrusive_ptrEv"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr13intrusive_ptrEv"></span><span id="hpx::memory::intrusive_ptr::intrusive_ptrCE"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a6469dbfeefef56829a25ff0d8005ebab"></span><em class="property">constexpr</em> <code class="sig-name descname">intrusive_ptr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrEP1Tb">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr13intrusive_ptrEP1Tb"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr13intrusive_ptrEP1Tb"></span><span id="hpx::memory::intrusive_ptr::intrusive_ptr__TP.b"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a4c6233e7faa060c3c73ad9fbafa6930a"></span><code class="sig-name descname">intrusive_ptr</code><span class="sig-paren">(</span>T *<em>p</em>, bool <em>add_ref</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrEP1Tb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1ad6af6ade48ac0a1afd6b6790c385dda1"></span>template&lt;typename <code class="sig-name descname">U</code>, typename <code class="sig-name descname">Enable</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="#_CPPv4N3hpx6memoryE" title="hpx::memory">memory</a>::detail::sp_convertible&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE" title="hpx::memory::intrusive_ptr::intrusive_ptr::U">U</a>, T&gt;::value&gt;::type&gt;<br /><code class="sig-name descname">intrusive_ptr</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE" title="hpx::memory::intrusive_ptr::intrusive_ptr">intrusive_ptr</a>&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE" title="hpx::memory::intrusive_ptr::intrusive_ptr::U">U</a>&gt; <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptr">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptr"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptr"></span><span id="hpx::memory::intrusive_ptr::intrusive_ptr__intrusive_ptrCR"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1aa2b94bda5a03ec71943b46a6e60b6ac2"></span><code class="sig-name descname">intrusive_ptr</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrEv" title="hpx::memory::intrusive_ptr::intrusive_ptr">intrusive_ptr</a> <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptr" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptrD0Ev">
+<span id="_CPPv3N3hpx6memory13intrusive_ptrD0Ev"></span><span id="_CPPv2N3hpx6memory13intrusive_ptrD0Ev"></span><span id="hpx::memory::intrusive_ptr::~intrusive_ptr"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a3493550c6d80e90123b82d0aa7cd413b"></span><code class="sig-name descname">~intrusive_ptr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptrD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memory13intrusive_ptraSER13intrusive_ptrRK13intrusive_ptrI1UE">
+<span id="_CPPv3I0EN3hpx6memory13intrusive_ptraSERK13intrusive_ptrI1UE"></span><span id="_CPPv2I0EN3hpx6memory13intrusive_ptraSERK13intrusive_ptrI1UE"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a3e30be49ddb5b83fcb27061a2802d6d7"></span>template&lt;typename <code class="sig-name descname">U</code>&gt;<br />intrusive_ptr &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memory13intrusive_ptraSER13intrusive_ptrRK13intrusive_ptrI1UE" title="hpx::memory::intrusive_ptr::operator=::U">U</a>&gt; <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memory13intrusive_ptraSER13intrusive_ptrRK13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrERR13intrusive_ptr">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr13intrusive_ptrERR13intrusive_ptr"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr13intrusive_ptrERR13intrusive_ptr"></span><span id="hpx::memory::intrusive_ptr::intrusive_ptr__intrusive_ptrRR"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a129219fcabb37ff834d79002192cdacf"></span><code class="sig-name descname">intrusive_ptr</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrEv" title="hpx::memory::intrusive_ptr::intrusive_ptr">intrusive_ptr</a> &amp;&amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr13intrusive_ptrERR13intrusive_ptr" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptraSERR13intrusive_ptr">
+<span id="_CPPv3N3hpx6memory13intrusive_ptraSERR13intrusive_ptr"></span><span id="_CPPv2N3hpx6memory13intrusive_ptraSERR13intrusive_ptr"></span><span id="hpx::memory::intrusive_ptr::assign-operator__intrusive_ptrRR"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a4305ec90f22ff659330ec359fe8cc719"></span>intrusive_ptr &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>intrusive_ptr &amp;&amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptraSERR13intrusive_ptr" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERR13intrusive_ptrI1UE">
+<span id="_CPPv3I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERR13intrusive_ptrI1UE"></span><span id="_CPPv2I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERR13intrusive_ptrI1UE"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1ace5895e4bb85e003c4f394b1bf04f208"></span>template&lt;typename <code class="sig-name descname">U</code>, typename <code class="sig-name descname">Enable</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="#_CPPv4N3hpx6memoryE" title="hpx::memory">memory</a>::detail::sp_convertible&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE" title="hpx::memory::intrusive_ptr::intrusive_ptr::U">U</a>, T&gt;::value&gt;::type&gt;<br /><code class="sig-name descname">intrusive_ptr</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE" title="hpx::memory::intrusive_ptr::intrusive_ptr">intrusive_ptr</a>&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERK13intrusive_ptrI1UE" title="hpx::memory::intrusive_ptr::intrusive_ptr::U">U</a>&gt; &amp;&amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx6memory13intrusive_ptr13intrusive_ptrERR13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx6memory13intrusive_ptraSER13intrusive_ptrRR13intrusive_ptrI1UE">
+<span id="_CPPv3I0EN3hpx6memory13intrusive_ptraSERR13intrusive_ptrI1UE"></span><span id="_CPPv2I0EN3hpx6memory13intrusive_ptraSERR13intrusive_ptrI1UE"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a38a64ed1d8e4e5b42df72320bd4fa890"></span>template&lt;typename <code class="sig-name descname">U</code>&gt;<br />intrusive_ptr &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6memory13intrusive_ptraSER13intrusive_ptrRK13intrusive_ptrI1UE" title="hpx::memory::intrusive_ptr::operator=::U">U</a>&gt; &amp;&amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx6memory13intrusive_ptraSER13intrusive_ptrRR13intrusive_ptrI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptraSERK13intrusive_ptr">
+<span id="_CPPv3N3hpx6memory13intrusive_ptraSERK13intrusive_ptr"></span><span id="_CPPv2N3hpx6memory13intrusive_ptraSERK13intrusive_ptr"></span><span id="hpx::memory::intrusive_ptr::assign-operator__intrusive_ptrCR"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1ac42a6067b3bbe1dec92bee36696ed0b1"></span>intrusive_ptr &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>intrusive_ptr <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptraSERK13intrusive_ptr" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptraSEP1T">
+<span id="_CPPv3N3hpx6memory13intrusive_ptraSEP1T"></span><span id="_CPPv2N3hpx6memory13intrusive_ptraSEP1T"></span><span id="hpx::memory::intrusive_ptr::assign-operator__TP"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a126cf6ca742927c994e045f0bc0a95ae"></span>intrusive_ptr &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>T *<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptraSEP1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr5resetEv">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr5resetEv"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr5resetEv"></span><span id="hpx::memory::intrusive_ptr::reset"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a363858289312c4afd50027dbd9784e7b"></span>void <code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr5resetEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr5resetEP1T">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr5resetEP1T"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr5resetEP1T"></span><span id="hpx::memory::intrusive_ptr::reset__TP"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1af41e2a61ff3b08b19f8939d36cf3003c"></span>void <code class="sig-name descname">reset</code><span class="sig-paren">(</span>T *<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr5resetEP1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr5resetEP1Tb">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr5resetEP1Tb"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr5resetEP1Tb"></span><span id="hpx::memory::intrusive_ptr::reset__TP.b"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a81aae2fc2c2c386ebf32e9e5bb304b54"></span>void <code class="sig-name descname">reset</code><span class="sig-paren">(</span>T *<em>rhs</em>, bool <em>add_ref</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr5resetEP1Tb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx6memory13intrusive_ptr3getEv">
+<span id="_CPPv3NK3hpx6memory13intrusive_ptr3getEv"></span><span id="_CPPv2NK3hpx6memory13intrusive_ptr3getEv"></span><span id="hpx::memory::intrusive_ptr::getC"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a58faa1ad31abae03041c97176700be3a"></span>T *<code class="sig-name descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx6memory13intrusive_ptr3getEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr6detachEv">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr6detachEv"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr6detachEv"></span><span id="hpx::memory::intrusive_ptr::detach"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a4cbf8b092f98fc68524b03c34bacea15"></span>T *<code class="sig-name descname">detach</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr6detachEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx6memory13intrusive_ptrmlEv">
+<span id="_CPPv3NK3hpx6memory13intrusive_ptrmlEv"></span><span id="_CPPv2NK3hpx6memory13intrusive_ptrmlEv"></span><span id="hpx::memory::intrusive_ptr::mul-operatorC"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1acbe3949bbf81b98ddc5329d5b4e6437a"></span>T &amp;<code class="sig-name descname">operator*</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx6memory13intrusive_ptrmlEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx6memory13intrusive_ptrptEv">
+<span id="_CPPv3NK3hpx6memory13intrusive_ptrptEv"></span><span id="_CPPv2NK3hpx6memory13intrusive_ptrptEv"></span><span id="hpx::memory::intrusive_ptr::pointer-operatorC"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1ad4edba0a4cdddea709e753ca4c0edd45"></span>T *<code class="sig-name descname">operator-&gt;</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx6memory13intrusive_ptrptEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx6memory13intrusive_ptrcvbEv">
+<span id="_CPPv3NK3hpx6memory13intrusive_ptrcvbEv"></span><span id="_CPPv2NK3hpx6memory13intrusive_ptrcvbEv"></span><span id="hpx::memory::intrusive_ptr::castto-b-operatorC"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a348f3101db04ab68d614e7d01fdd9f6e"></span><code class="sig-name descname">operator bool</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx6memory13intrusive_ptrcvbEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr4swapER13intrusive_ptr">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr4swapER13intrusive_ptr"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr4swapER13intrusive_ptr"></span><span id="hpx::memory::intrusive_ptr::swap__intrusive_ptrR"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a16252037de41f008435af37fdc5a7d75"></span>void <code class="sig-name descname">swap</code><span class="sig-paren">(</span>intrusive_ptr &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr4swapER13intrusive_ptr" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4IEN3hpx6memory13intrusive_ptrI1TE9this_typeE">
+<span id="_CPPv3IEN3hpx6memory13intrusive_ptrI1TE9this_typeE"></span><span id="_CPPv2IEN3hpx6memory13intrusive_ptrI1TE9this_typeE"></span>template&lt;&gt;<br /><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1ae0635974cc4503f36e2d4cc22f9b94f5"></span><em class="property">using </em><code class="sig-name descname">this_type</code> = intrusive_ptr<a class="headerlink" href="#_CPPv4IEN3hpx6memory13intrusive_ptrI1TE9this_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx6memory13intrusive_ptr2pxE">
+<span id="_CPPv3N3hpx6memory13intrusive_ptr2pxE"></span><span id="_CPPv2N3hpx6memory13intrusive_ptr2pxE"></span><span id="hpx::memory::intrusive_ptr::px__TP"></span><span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1a074d2bdae8a050716f51e9bd4b7f6440"></span>T *<code class="sig-name descname">px</code><a class="headerlink" href="#_CPPv4N3hpx6memory13intrusive_ptr2pxE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1memory_1_1intrusive__ptr_1ae0004efc13971afea5b6a3e1b4b58874"></span><em class="property">friend </em><code class="sig-name descname">hpx::memory::intrusive_ptr</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4St">
+<span id="_CPPv3St"></span><span id="_CPPv2St"></span><span id="std"></span><span class="target" id="namespacestd"></span><em class="property">namespace </em><code class="sig-name descname">std</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I0ENSt4hashIN3hpx6memory13intrusive_ptrI1TEEEE">
+<span id="_CPPv3I0ENSt4hashIN3hpx6memory13intrusive_ptrI1TEEEE"></span><span class="target" id="structstd_1_1hash_3_01hpx_1_1memory_1_1intrusive__ptr_3_01_t_01_4_01_4"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">hash</code>&lt;<a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx6memoryE" title="hpx::memory">memory</a>::intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0ENSt4hashIN3hpx6memory13intrusive_ptrI1TEEEE" title="std::hash&lt;hpx::memory::intrusive_ptr&lt;T&gt;&gt;::T">T</a>&gt;&gt;<br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4IENSt4hashIN3hpx6memory13intrusive_ptrI1TEEE11result_typeE">
+<span id="_CPPv3IENSt4hashIN3hpx6memory13intrusive_ptrI1TEEE11result_typeE"></span>template&lt;&gt;<br /><span class="target" id="structstd_1_1hash_3_01hpx_1_1memory_1_1intrusive__ptr_3_01_t_01_4_01_4_1a93cf24a0ab73e0fa2b876860b926f9a9"></span><em class="property">using </em><code class="sig-name descname">result_type</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t<br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4NKSt4hashclERKN3hpx6memory13intrusive_ptrI1TEE">
+<span id="_CPPv3NKSt4hashclERKN3hpx6memory13intrusive_ptrI1TEE"></span><span id="_CPPv2NKSt4hashclERKN3hpx6memory13intrusive_ptrI1TEE"></span><span class="target" id="structstd_1_1hash_3_01hpx_1_1memory_1_1intrusive__ptr_3_01_t_01_4_01_4_1a3b5d3640365f87dbe018db2b202f695b"></span>result_type <code class="sig-name descname">operator()</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx6memoryE" title="hpx::memory">memory</a>::intrusive_ptr&lt;T&gt; <em class="property">const</em> &amp;<em>p</em><span class="sig-paren">)</span> <em class="property">const</em><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-memory-serialization-intrusive-ptr-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/memory/serialization/intrusive_ptr.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-memory-serialization-intrusive-ptr-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx13serializationE">
+<span id="_CPPv3N3hpx13serializationE"></span><span id="_CPPv2N3hpx13serializationE"></span><span id="hpx::serialization"></span><span class="target" id="namespacehpx_1_1serialization"></span><em class="property">namespace </em><code class="sig-name descname">serialization</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx13serialization4loadEvR13input_archiveRN3hpx13intrusive_ptrI1TEEj">
+<span id="_CPPv3I0EN3hpx13serialization4loadER13input_archiveRN3hpx13intrusive_ptrI1TEEj"></span><span id="_CPPv2I0EN3hpx13serialization4loadER13input_archiveRN3hpx13intrusive_ptrI1TEEj"></span><span class="target" id="serialization_2intrusive__ptr_8hpp_1aee2e79ece8dd71e5f7cb0b1158ccaab4"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />void <code class="sig-name descname">load</code><span class="sig-paren">(</span><a class="reference internal" href="../serialization/api.html#_CPPv4N3hpx13serialization13input_archiveE" title="hpx::serialization::input_archive">input_archive</a> &amp;<em>ar</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx13serialization4loadEvR13input_archiveRN3hpx13intrusive_ptrI1TEEj" title="hpx::serialization::load::T">T</a>&gt; &amp;<em>ptr</em>, unsigned<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx13serialization4loadEvR13input_archiveRN3hpx13intrusive_ptrI1TEEj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx13serialization4saveEvR14output_archiveRKN3hpx13intrusive_ptrI1TEEj">
+<span id="_CPPv3I0EN3hpx13serialization4saveER14output_archiveRKN3hpx13intrusive_ptrI1TEEj"></span><span id="_CPPv2I0EN3hpx13serialization4saveER14output_archiveRKN3hpx13intrusive_ptrI1TEEj"></span><span class="target" id="serialization_2intrusive__ptr_8hpp_1a874ec3065327aa9cca4f481aa63de4f4"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />void <code class="sig-name descname">save</code><span class="sig-paren">(</span><a class="reference internal" href="../serialization/api.html#_CPPv4N3hpx13serialization14output_archiveE" title="hpx::serialization::output_archive">output_archive</a> &amp;<em>ar</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::intrusive_ptr&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx13serialization4saveEvR14output_archiveRKN3hpx13intrusive_ptrI1TEEj" title="hpx::serialization::save::T">T</a>&gt; <em class="property">const</em> &amp;<em>ptr</em>, unsigned<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx13serialization4saveEvR14output_archiveRKN3hpx13intrusive_ptrI1TEEj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="serialization_2intrusive__ptr_8hpp_1a4146142b5d69f154f8968db26ed39a9a"></span><code class="sig-name descname">hpx::serialization::HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE((template&lt; typename T &gt;), ( hpx::intrusive_ptr &lt; T &gt;))</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../hashing/api.html" class="btn btn-neutral float-right" title="hashing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../topology/api.html" class="btn btn-neutral float-left" title="topology" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>856afc8</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

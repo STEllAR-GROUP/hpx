@@ -1,0 +1,1444 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Writing single-node HPX applications &mdash; HPX 1.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Writing distributed HPX applications" href="writing_distributed_hpx_applications.html" />
+    <link rel="prev" title="Launching and configuring HPX applications" href="launching_and_configuring_hpx_applications.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../manual.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_hpx.html">Getting <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="building_hpx.html"><em>HPX</em> build system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_hpx_projects.html">Creating <em>HPX</em> projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="starting_the_hpx_runtime.html">Starting the <em>HPX</em> runtime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launching_and_configuring_hpx_applications.html">Launching and configuring <em>HPX</em> applications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Writing single-node <em>HPX</em> applications</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-lcos">Using <span class="xref std std-term">LCO</span>s</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#channels">Channels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#composable-guards">Composable guards</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#extended-facilities-for-futures">Extended facilities for futures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#high-level-parallel-facilities">High level parallel facilities</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#using-parallel-algorithms">Using parallel algorithms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parallel-exceptions">Parallel exceptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Parallel algorithms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#executor-parameters-and-executor-parameter-traits">Executor parameters and executor parameter traits</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#using-task-blocks">Using task blocks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#extensions-for-task-blocks">Extensions for task blocks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="writing_distributed_hpx_applications.html">Writing distributed <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_on_batch_systems.html">Running on batch systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_hpx_applications.html">Debugging <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizing_hpx_applications.html">Optimizing <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hpx_runtime_and_resources.html"><em>HPX</em> runtime and resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miscellaneous.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../manual.html">Manual</a> &raquo;</li>
+        
+      <li>Writing single-node <em>HPX</em> applications</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/manual/writing_single_node_hpx_applications.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="writing-single-node-hpx-applications">
+<span id="id2"></span><h1>Writing single-node <em>HPX</em> applications<a class="headerlink" href="#writing-single-node-hpx-applications" title="Permalink to this headline">¶</a></h1>
+<p><em>HPX</em> is a C++ Standard Library for Concurrency and Parallelism. This means that
+it implements all of the corresponding facilities as defined by the C++
+Standard. Additionally, <em>HPX</em> implements functionalities proposed as part
+of the ongoing C++ standardization process. This section focuses on the features
+available in <em>HPX</em> for parallel and concurrent computation on a single node,
+although many of the features presented here are also implemented to work in the
+distributed case.</p>
+<div class="section" id="using-lcos">
+<span id="lcos"></span><h2>Using <a class="reference internal" href="../terminology.html#term-lco"><span class="xref std std-term">LCO</span></a>s<a class="headerlink" href="#using-lcos" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../terminology.html#term-lightweight-control-object"><span class="xref std std-term">Lightweight Control Object</span></a>s (LCOs) provide synchronization for <em>HPX</em> applications. Most
+of them are familiar from other frameworks, but a few of them work in slightly
+different ways adapted to <em>HPX</em>. The following synchronization objects are available in <em>HPX</em>:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">future</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">queue</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">object_semaphore</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">barrier</span></code></p></li>
+</ol>
+<div class="section" id="channels">
+<h3>Channels<a class="headerlink" href="#channels" title="Permalink to this headline">¶</a></h3>
+<p>Channels combine communication (the exchange of a value) with synchronization
+(guaranteeing that two calculations (tasks) are in a known state). A channel can
+transport any number of values of a given type from a sender to a receiver:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">channel</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">c</span><span class="p">;</span>
+<span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span>
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">c</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>      <span class="c1">// will print &#39;42&#39;</span>
+</pre></div>
+</div>
+<p>Channels can be handed to another thread (or in case of channel components, to
+other localities), thus establishing a communication channel between two
+independent places in the program:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">do_something</span><span class="p">(</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">receive_channel</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">c</span><span class="p">,</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">send_channel</span><span class="o">&lt;&gt;</span> <span class="n">done</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">c</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>        <span class="c1">// prints 42</span>
+    <span class="n">done</span><span class="p">.</span><span class="n">set</span><span class="p">();</span>             <span class="c1">// signal back</span>
+<span class="p">}</span>
+
+<span class="p">{</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">channel</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">c</span><span class="p">;</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">channel</span><span class="o">&lt;&gt;</span> <span class="n">done</span><span class="p">;</span>
+
+    <span class="n">hpx</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="o">&amp;</span><span class="n">do_something</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">done</span><span class="p">);</span>
+
+    <span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span>              <span class="c1">// send some value</span>
+    <span class="n">done</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>             <span class="c1">// wait for thread to be done</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A channel component is created on one <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> and can be sent to
+another <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> using an action. This example also demonstrates how a
+channel can be used as a range of values:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// channel components need to be registered for each used type (not needed</span>
+<span class="c1">// for hpx::lcos::local::channel)</span>
+<span class="n">HPX_REGISTER_CHANNEL</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">some_action</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">channel</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">c</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">double</span> <span class="nl">d</span> <span class="p">:</span> <span class="n">c</span><span class="p">)</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">d</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">HPX_REGISTER_ACTION</span><span class="p">(</span><span class="n">some_action</span><span class="p">);</span>
+
+<span class="p">{</span>
+    <span class="c1">// create the channel on this locality</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">channel</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">c</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">());</span>
+
+    <span class="c1">// pass the channel to a (possibly remote invoked) action</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="n">some_action</span><span class="p">(),</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="n">c</span><span class="p">);</span>
+
+    <span class="c1">// send some values to the receiver</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">v</span> <span class="o">=</span> <span class="p">{</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">,</span> <span class="mf">5.0</span> <span class="p">};</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">double</span> <span class="nl">d</span> <span class="p">:</span> <span class="n">v</span><span class="p">)</span>
+        <span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+
+    <span class="c1">// explicitly close the communication channel (implicit at destruction)</span>
+    <span class="n">c</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="composable-guards">
+<h3>Composable guards<a class="headerlink" href="#composable-guards" title="Permalink to this headline">¶</a></h3>
+<p>Composable guards operate in a manner similar to locks, but are applied only to
+asynchronous functions. The guard (or guards) is automatically locked at the
+beginning of a specified task and automatically unlocked at the end. Because
+guards are never added to an existing task’s execution context, the calling of
+guards is freely composable and can never deadlock.</p>
+<p>To call an application with a single guard, simply declare the guard and call
+run_guarded() with a function (task):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">guard</span> <span class="n">gu</span><span class="p">;</span>
+<span class="n">run_guarded</span><span class="p">(</span><span class="n">gu</span><span class="p">,</span><span class="n">task</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If a single method needs to run with multiple guards, use a guard set:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">boost</span><span class="o">::</span><span class="n">shared</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">guard</span><span class="o">&gt;</span> <span class="n">gu1</span><span class="p">(</span><span class="k">new</span> <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">guard</span><span class="p">());</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">shared</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">guard</span><span class="o">&gt;</span> <span class="n">gu2</span><span class="p">(</span><span class="k">new</span> <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">guard</span><span class="p">());</span>
+<span class="n">gs</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="o">*</span><span class="n">gu1</span><span class="p">);</span>
+<span class="n">gs</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="o">*</span><span class="n">gu2</span><span class="p">);</span>
+<span class="n">run_guarded</span><span class="p">(</span><span class="n">gs</span><span class="p">,</span><span class="n">task</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Guards use two atomic operations (which are not called repeatedly) to manage
+what they do, so overhead should be extremely low. The following guards are available in <em>HPX</em>:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">conditional_trigger</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">counting_semaphore</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataflow</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">event</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mutex</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">once</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">recursive_mutex</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spinlock</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spinlock_no_backoff</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trigger</span></code></p></li>
+</ol>
+</div>
+</div>
+<div class="section" id="extended-facilities-for-futures">
+<span id="extend-futures"></span><h2>Extended facilities for futures<a class="headerlink" href="#extended-facilities-for-futures" title="Permalink to this headline">¶</a></h2>
+<p>Concurrency is about both decomposing and composing the program from the parts
+that work well individually and together. It is in the composition of connected
+and multicore components where today’s C++ libraries are still lacking.</p>
+<p>The functionality of <code class="docutils literal notranslate"><span class="pre">std::future</span></code> offers a partial solution. It allows for
+the separation of the initiation of an operation and the act of waiting for its
+result; however, the act of waiting is synchronous. In communication-intensive
+code this act of waiting can be unpredictable, inefficient and simply
+frustrating. The example below illustrates a possible synchronous wait using
+futures:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;future&gt;</span><span class="cp"></span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">future</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">async</span><span class="p">([]()</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">123</span><span class="p">;</span> <span class="p">});</span>
+    <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">get</span><span class="p">();</span> <span class="c1">// might block</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For this reason, <em>HPX</em> implements a set of extensions to <code class="docutils literal notranslate"><span class="pre">std::future</span></code> (as
+proposed by __cpp11_n4107__). This proposal introduces the following key
+asynchronous operations to <code class="docutils literal notranslate"><span class="pre">hpx::future</span></code>, <code class="docutils literal notranslate"><span class="pre">hpx::shared_future</span></code> and
+<code class="docutils literal notranslate"><span class="pre">hpx::async</span></code>, which enhance and enrich these facilities.</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-number">Table 23 </span><span class="caption-text">Facilities extending <code class="docutils literal notranslate"><span class="pre">std::future</span></code></span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Facility</p></td>
+<td><p>Description</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hpx::future::then</span></code></p></td>
+<td><p>In asynchronous programming, it is very common for one asynchronous
+operation, on completion, to invoke a second operation and pass data to
+it. The current C++ standard does not allow one to register a
+continuation to a future. With <code class="docutils literal notranslate"><span class="pre">then</span></code>, instead of waiting for the result,
+a continuation is “attached” to the asynchronous operation, which is
+invoked when the result is ready. Continuations registered using then
+function will help to avoid blocking waits or wasting threads on polling,
+greatly improving the responsiveness and scalability of an application.</p></td>
+</tr>
+<tr class="row-odd"><td><p>unwrapping constructor for <code class="docutils literal notranslate"><span class="pre">hpx::future</span></code></p></td>
+<td><p>In some scenarios, you might want to create a future that returns another
+future, resulting in nested futures. Although it is possible to write
+code to unwrap the outer future and retrieve the nested future and its
+result, such code is not easy to write because users must handle exceptions
+and it may cause a blocking call. Unwrapping can allow users to mitigate
+this problem by doing an asynchronous call to unwrap the outermost
+future.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hpx::future::is_ready</span></code></p></td>
+<td><p>There are often situations where a <code class="docutils literal notranslate"><span class="pre">get()</span></code> call on a future may not be
+a blocking call, or is only a blocking call under certain circumstances.
+This function gives the ability to test for early completion and allows
+us to avoid associating a continuation, which needs to be scheduled with
+some non-trivial overhead and near-certain loss of cache efficiency.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hpx::make_ready_future</span></code></p></td>
+<td><p>Some functions may know the value at the point of construction. In these
+cases the value is immediately available, but needs to be returned as a
+future. By using <code class="docutils literal notranslate"><span class="pre">hpx::make_ready_future</span></code> a future can be created that
+holds a pre-computed result in its shared state. In the current standard
+it is non-trivial to create a future directly from a value. First a
+promise must be created, then the promise is set, and lastly the future
+is retrieved from the promise. This can now be done with one operation.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The standard also omits the ability to compose multiple futures. This is a
+common pattern that is ubiquitous in other asynchronous frameworks and is
+absolutely necessary in order to make C++ a powerful asynchronous programming
+language. Not including these functions is synonymous to Boolean algebra without
+AND/OR.</p>
+<p>In addition to the extensions proposed by <a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4313.html">N4313</a>, <em>HPX</em> adds functions
+allowing users to compose several futures in a more flexible way.</p>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-number">Table 24 </span><span class="caption-text">Facilities for composing <code class="docutils literal notranslate"><span class="pre">hpx::future</span></code>s</span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Facility</p></td>
+<td><p>Description</p></td>
+<td><p>Comment</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api.html#_CPPv4I00EN3hpx8when_anyE6futureI15when_any_resultI9ContainerEE9InputIter9InputIter" title="hpx::when_any"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::when_any</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4I00EN3hpx10when_any_nE6futureI15when_any_resultI9ContainerEE9InputIterNSt6size_tE" title="hpx::when_any_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::when_any_n</span></code></a></p></td>
+<td><p>Asynchronously wait for at least one of multiple future or shared_future
+objects to finish.</p></td>
+<td><p><a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4313.html">N4313</a>, <code class="docutils literal notranslate"><span class="pre">..._n</span></code> versions are <em>HPX</em> only</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api.html#_CPPv4I0EN3hpx8wait_anyEv9InputIter9InputIterR10error_code" title="hpx::wait_any"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_any</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4I0EN3hpx10wait_any_nE9InputIter9InputIterNSt6size_tER10error_code" title="hpx::wait_any_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_any_n</span></code></a></p></td>
+<td><p>Synchronously wait for at least one of multiple future or shared_future
+objects to finish.</p></td>
+<td><p><em>HPX</em> only</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api.html#_CPPv4I00EN3hpx8when_allE6futureI9ContainerE9InputIter9InputIter" title="hpx::when_all"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::when_all</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4I00EN3hpx10when_all_nE6futureI9ContainerE9InputIterNSt6size_tE" title="hpx::when_all_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::when_all_n</span></code></a></p></td>
+<td><p>Asynchronously wait for all future and shared_future objects to finish.</p></td>
+<td><p><a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4313.html">N4313</a>, <code class="docutils literal notranslate"><span class="pre">..._n</span></code> versions are <em>HPX</em> only</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api.html#_CPPv4I0EN3hpx8wait_allEv9InputIter9InputIter" title="hpx::wait_all"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_all</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4I0EN3hpx10wait_all_nE9InputIter9InputIterNSt6size_tE" title="hpx::wait_all_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_all_n</span></code></a></p></td>
+<td><p>Synchronously wait for all future and shared_future objects to finish.</p></td>
+<td><p><em>HPX</em> only</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api.html#_CPPv4I00EN3hpx9when_someE6futureI16when_some_resultI9ContainerEENSt6size_tE8Iterator8IteratorR10error_code" title="hpx::when_some"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::when_some</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4I00EN3hpx11when_some_nE6futureI16when_some_resultI9ContainerEENSt6size_tE8IteratorNSt6size_tER10error_code" title="hpx::when_some_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::when_some_n</span></code></a></p></td>
+<td><p>Asynchronously wait for multiple future and shared_future objects to
+finish.</p></td>
+<td><p><em>HPX</em> only</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api.html#_CPPv4I0EN3hpx9wait_someE6futureI6vectorI6futureINSt15iterator_traitsI9InputIterE10value_typeEEEENSt6size_tE8Iterator8IteratorR10error_code" title="hpx::wait_some"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_some</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4I0EN3hpx11wait_some_nE9InputIterNSt6size_tE8IteratorNSt6size_tER10error_code" title="hpx::wait_some_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_some_n</span></code></a></p></td>
+<td><p>Synchronously wait for multiple future and shared_future objects to
+finish.</p></td>
+<td><p><em>HPX</em> only</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api.html#_CPPv4I00EN3hpx9when_eachE6futureIvERR1FRRNSt6vectorI6FutureEE" title="hpx::when_each"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::when_each</span></code></a></p></td>
+<td><p>Asynchronously wait for multiple future and shared_future objects to
+finish and call a function for each of the future objects as soon as it
+becomes ready.</p></td>
+<td><p><em>HPX</em> only</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api.html#_CPPv4I00EN3hpx9wait_eachEvRR1FRRNSt6vectorI6FutureEE" title="hpx::wait_each"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_each</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4I00EN3hpx11wait_each_nEvRR1F8IteratorNSt6size_tE" title="hpx::wait_each_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_each_n</span></code></a></p></td>
+<td><p>Synchronously wait for multiple future and shared_future objects to
+finish and call a function for each of the future objects as soon as it
+becomes ready.</p></td>
+<td><p><em>HPX</em> only</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="high-level-parallel-facilities">
+<span id="parallel"></span><h2>High level parallel facilities<a class="headerlink" href="#high-level-parallel-facilities" title="Permalink to this headline">¶</a></h2>
+<p>In preparation for the upcoming C++ Standards, there are currently several proposals
+targeting different facilities supporting parallel programming. <em>HPX</em> implements
+(and extends) some of those proposals. This is well aligned with our strategy to
+align the APIs exposed from <em>HPX</em> with current and future C++ Standards.</p>
+<p>At this point, <em>HPX</em> implements several of the C++ Standardization working
+papers, most notably <a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4409.pdf">N4409</a> (Working Draft, Technical Specification for
+C++ Extensions for Parallelism), <a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4411.pdf">N4411</a> (Task Blocks), and
+<a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4406.pdf">N4406</a> (Parallel Algorithms Need Executors).</p>
+<div class="section" id="using-parallel-algorithms">
+<span id="parallel-algorithms"></span><h3>Using parallel algorithms<a class="headerlink" href="#using-parallel-algorithms" title="Permalink to this headline">¶</a></h3>
+<p>A parallel algorithm is a function template described by this document
+which is declared in the (inline) namespace <code class="docutils literal notranslate"><span class="pre">hpx::parallel::v1</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For compilers that do not support inline namespaces, all of the <code class="docutils literal notranslate"><span class="pre">namespace</span>
+<span class="pre">v1</span></code> is imported into the namespace <code class="docutils literal notranslate"><span class="pre">hpx::parallel</span></code>. The effect is similar
+to what inline namespaces would do, namely all names defined in
+<code class="docutils literal notranslate"><span class="pre">hpx::parallel::v1</span></code> are accessible from the namespace <code class="docutils literal notranslate"><span class="pre">hpx::parallel</span></code> as
+well.</p>
+</div>
+<p>All parallel algorithms are very similar in semantics to their sequential
+counterparts (as defined in the <code class="docutils literal notranslate"><span class="pre">namespace</span> <span class="pre">std</span></code>) with an additional formal
+template parameter named <code class="docutils literal notranslate"><span class="pre">ExecutionPolicy</span></code>. The execution policy is generally
+passed as the first argument to any of the parallel algorithms and describes the
+manner in which the execution of these algorithms may be parallelized and the
+manner in which they apply user-provided function objects.</p>
+<p>The applications of function objects in parallel algorithms invoked with an
+execution policy object of type <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution16sequenced_policyE" title="hpx::parallel::execution::sequenced_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::sequenced_policy</span></code></a> or
+<a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution21sequenced_task_policyE" title="hpx::parallel::execution::sequenced_task_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::sequenced_task_policy</span></code></a> execute in sequential order. For
+<a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution16sequenced_policyE" title="hpx::parallel::execution::sequenced_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::sequenced_policy</span></code></a> the execution happens in the calling thread.</p>
+<p>The applications of function objects in parallel algorithms invoked with an
+execution policy object of type <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution15parallel_policyE" title="hpx::parallel::execution::parallel_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_policy</span></code></a> or
+<a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution20parallel_task_policyE" title="hpx::parallel::execution::parallel_task_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_task_policy</span></code></a> are permitted to execute in an unordered
+fashion in unspecified threads, and are indeterminately sequenced within each
+thread.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>It is the caller’s responsibility to ensure correctness, such as making sure that the
+invocation does not introduce data races or deadlocks.</p>
+</div>
+<p>The applications of function objects in parallel algorithms invoked with an
+execution policy of type <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution27parallel_unsequenced_policyE" title="hpx::parallel::execution::parallel_unsequenced_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_unsequenced_policy</span></code></a> is, in <em>HPX</em>,
+equivalent to the use of the execution policy <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution15parallel_policyE" title="hpx::parallel::execution::parallel_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_policy</span></code></a>.</p>
+<p>Algorithms invoked with an execution policy object of type <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::v1::execution_policy</span></code>
+execute internally as if invoked with the contained execution policy object. No
+exception is thrown when an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::v1::execution_policy</span></code> contains an execution policy of
+type <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution21sequenced_task_policyE" title="hpx::parallel::execution::sequenced_task_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::sequenced_task_policy</span></code></a> or <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution20parallel_task_policyE" title="hpx::parallel::execution::parallel_task_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_task_policy</span></code></a>
+(which normally turn the algorithm into its asynchronous version). In this case
+the execution is semantically equivalent to the case of passing a
+<a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution16sequenced_policyE" title="hpx::parallel::execution::sequenced_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::sequenced_policy</span></code></a> or <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution15parallel_policyE" title="hpx::parallel::execution::parallel_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_policy</span></code></a> contained in the
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::v1::execution_policy</span></code> object respectively.</p>
+</div>
+<div class="section" id="parallel-exceptions">
+<h3>Parallel exceptions<a class="headerlink" href="#parallel-exceptions" title="Permalink to this headline">¶</a></h3>
+<p>During the execution of a standard parallel algorithm, if temporary memory
+resources are required by any of the algorithms and no memory is available, the
+algorithm throws a <code class="docutils literal notranslate"><span class="pre">std::bad_alloc</span></code> exception.</p>
+<p>During the execution of any of the parallel algorithms, if the application of a
+function object terminates with an uncaught exception, the behavior of the
+program is determined by the type of execution policy used to invoke the
+algorithm:</p>
+<ul class="simple">
+<li><p>If the execution policy object is of type
+<a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution27parallel_unsequenced_policyE" title="hpx::parallel::execution::parallel_unsequenced_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_unsequenced_policy</span></code></a>, <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::terminate</span></code> shall
+be called.</p></li>
+<li><p>If the execution policy object is of type <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution16sequenced_policyE" title="hpx::parallel::execution::sequenced_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::sequenced_policy</span></code></a>,
+<a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution21sequenced_task_policyE" title="hpx::parallel::execution::sequenced_task_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::sequenced_task_policy</span></code></a>, <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution15parallel_policyE" title="hpx::parallel::execution::parallel_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_policy</span></code></a>, or
+<a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution20parallel_task_policyE" title="hpx::parallel::execution::parallel_task_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_task_policy</span></code></a>, the execution of the algorithm terminates
+with an <a class="reference internal" href="../libs/errors/api.html#_CPPv4N3hpx14exception_listE" title="hpx::exception_list"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::exception_list</span></code></a> exception. All uncaught exceptions thrown during the
+application of user-provided function objects shall be contained in the
+<a class="reference internal" href="../libs/errors/api.html#_CPPv4N3hpx14exception_listE" title="hpx::exception_list"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::exception_list</span></code></a>.</p></li>
+</ul>
+<p>For example, the number of invocations of the user-provided function object in
+for_each is unspecified. When <a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v18for_eachEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3RngRR1FRR4Proj" title="hpx::parallel::v1::for_each"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::v1::for_each</span></code></a> is executed sequentially, only one
+exception will be contained in the <a class="reference internal" href="../libs/errors/api.html#_CPPv4N3hpx14exception_listE" title="hpx::exception_list"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::exception_list</span></code></a> object.</p>
+<p>These guarantees imply that, unless the algorithm has failed to allocate memory
+and terminated with <code class="docutils literal notranslate"><span class="pre">std::bad_alloc</span></code>, all exceptions thrown during the
+execution of the algorithm are communicated to the caller. It is unspecified
+whether an algorithm implementation will “forge ahead” after encountering and
+capturing a user exception.</p>
+<p>The algorithm may terminate with the <code class="docutils literal notranslate"><span class="pre">std::bad_alloc</span></code> exception even if one or
+more user-provided function objects have terminated with an exception. For
+example, this can happen when an algorithm fails to allocate memory while
+creating or adding elements to the <a class="reference internal" href="../libs/errors/api.html#_CPPv4N3hpx14exception_listE" title="hpx::exception_list"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::exception_list</span></code></a> object.</p>
+</div>
+<div class="section" id="id3">
+<h3>Parallel algorithms<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p><em>HPX</em> provides implementations of the following parallel algorithms:</p>
+<table class="docutils align-default" id="id6">
+<caption><span class="caption-number">Table 25 </span><span class="caption-text">Non-modifying parallel algorithms (in header: <code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_algorithm.hpp&gt;</span></code>)</span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Algorithm page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v113adjacent_findENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeEE4typeERR8ExPolicy7FwdIter7FwdIterRR4Pred" title="hpx::parallel::v1::adjacent_find"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::adjacent_find</span></code></a></p></td>
+<td><p>Computes the differences between adjacent elements in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_adjacent_find.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/adjacent_find">adjacent_find</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v16all_ofEN4util6detail16algorithm_resultI8ExPolicybE4typeERR8ExPolicyRR3RngRR1FRR4Proj" title="hpx::parallel::v1::all_of"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::all_of</span></code></a></p></td>
+<td><p>Checks if a predicate is <code class="docutils literal notranslate"><span class="pre">true</span></code> for all of the elements in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_all_any_none.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/all_any_none_of">all_any_none_of</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v16any_ofEN4util6detail16algorithm_resultI8ExPolicybE4typeERR8ExPolicyRR3RngRR1FRR4Proj" title="hpx::parallel::v1::any_of"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::any_of</span></code></a></p></td>
+<td><p>Checks if a predicate is <code class="docutils literal notranslate"><span class="pre">true</span></code> for any of the elements in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_all_any_none.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/all_any_none_of">all_any_none_of</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v15countEN4util6detail16algorithm_resultI8ExPolicyNSt15iterator_traitsIN3hpx6traits12range_traitsI3RngE13iterator_typeEE15difference_typeEE4typeERR8ExPolicyRR3RngRK1TRR4Proj" title="hpx::parallel::v1::count"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::count</span></code></a></p></td>
+<td><p>Returns the number of elements equal to a given value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_count.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/count">count</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v18count_ifEN4util6detail16algorithm_resultI8ExPolicyNSt15iterator_traitsIN3hpx6traits12range_traitsI3RngE13iterator_typeEE15difference_typeEE4typeERR8ExPolicyRR3RngRR1FRR4Proj" title="hpx::parallel::v1::count_if"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::count_if</span></code></a></p></td>
+<td><p>Returns the number of elements satisfying a specific criteria.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_count.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/count_if">count_if</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v15equalENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicybE4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter28FwdIter2RR4Pred" title="hpx::parallel::v1::equal"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::equal</span></code></a></p></td>
+<td><p>Determines if two sets of elements are the same.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_equal.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/equal">equal</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v114exclusive_scanENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy8FwdIter2E4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter21TRR2Op" title="hpx::parallel::v1::exclusive_scan"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::exclusive_scan</span></code></a></p></td>
+<td><p>Does an exclusive parallel scan over a range of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_scan.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/exclusive_scan">exclusive_scan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v14findENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeEE4typeERR8ExPolicy7FwdIter7FwdIterRK1T" title="hpx::parallel::v1::find"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::find</span></code></a></p></td>
+<td><p>Finds the first element equal to a given value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_find.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/find">find</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v18find_endEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3RngRR4Rng2RR4PredRR4Proj" title="hpx::parallel::v1::find_end"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::find_end</span></code></a></p></td>
+<td><p>Finds the last sequence of elements in a certain range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_find.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/find_end">find_end</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000000EN3hpx8parallel2v113find_first_ofEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI4Rng1E4typeEE4typeERR8ExPolicyRR4Rng1RR4Rng2RR4PredRR5Proj1RR5Proj2" title="hpx::parallel::v1::find_first_of"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::find_first_of</span></code></a></p></td>
+<td><p>Searches for any one of a set of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_find.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/find_first_of">find_first_of</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v17find_ifENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeEE4typeERR8ExPolicy7FwdIter7FwdIterRR1F" title="hpx::parallel::v1::find_if"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::find_if</span></code></a></p></td>
+<td><p>Finds the first element satisfying a specific criteria.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_find.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/find">find</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v111find_if_notENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeEE4typeERR8ExPolicy7FwdIter7FwdIterRR1F" title="hpx::parallel::v1::find_if_not"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::find_if_not</span></code></a></p></td>
+<td><p>Finds the first element not satisfying a specific criteria.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_find.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/find_if_not">find_if_not</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v18for_eachEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3RngRR1FRR4Proj" title="hpx::parallel::v1::for_each"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::for_each</span></code></a></p></td>
+<td><p>Applies a function to a range of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_for_each.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/for_each">for_each</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v110for_each_nEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeERR8ExPolicy7FwdIter4SizeRR1FRR4Proj" title="hpx::parallel::v1::for_each_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::for_each_n</span></code></a></p></td>
+<td><p>Applies a function to a number of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_for_each.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/for_each_n">for_each_n</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v114inclusive_scanEN4util6detail16algorithm_resultI8ExPolicy8FwdIter2E4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter2RR2Op1T" title="hpx::parallel::v1::inclusive_scan"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::inclusive_scan</span></code></a></p></td>
+<td><p>Does an inclusive parallel scan over a range of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_scan.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/inclusive_scan">inclusive_scan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v123lexicographical_compareENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicybE4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter28FwdIter2RR4Pred" title="hpx::parallel::v1::lexicographical_compare"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::lexicographical_compare</span></code></a></p></td>
+<td><p>Checks if a range of values is lexicographically less than another range of values.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_lexicographical_compare.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/lexicographical_compare">lexicographical_compare</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v18mismatchENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicyNSt4pairI8FwdIter18FwdIter2EEE4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter28FwdIter2RR4Pred" title="hpx::parallel::v1::mismatch"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::mismatch</span></code></a></p></td>
+<td><p>Finds the first position where two ranges differ.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_mismatch.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/mismatch">mismatch</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v17none_ofEN4util6detail16algorithm_resultI8ExPolicybE4typeERR8ExPolicyRR3RngRR1FRR4Proj" title="hpx::parallel::v1::none_of"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::none_of</span></code></a></p></td>
+<td><p>Checks if a predicate is <code class="docutils literal notranslate"><span class="pre">true</span></code> for none of the elements in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_all_any_none.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/all_any_none_of">all_any_none_of</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000000EN3hpx8parallel2v16searchEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI4Rng1E4typeEE4typeERR8ExPolicyRR4Rng1RR4Rng2RR4PredRR5Proj1RR5Proj2" title="hpx::parallel::v1::search"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::search</span></code></a></p></td>
+<td><p>Searches for a range of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_search.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/search">search</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000000EN3hpx8parallel2v18search_nEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI4Rng1E4typeEE4typeERR8ExPolicyRR4Rng1NSt6size_tERR4Rng2RR4PredRR5Proj1RR5Proj2" title="hpx::parallel::v1::search_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::search_n</span></code></a></p></td>
+<td><p>Searches for a number consecutive copies of an element in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_search.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/search_n">search_n</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id7">
+<caption><span class="caption-number">Table 26 </span><span class="caption-text">Modifying parallel algorithms (In Header: <cite>&lt;hpx/include/parallel_algorithm.hpp&gt;</cite>)</span><a class="headerlink" href="#id7" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Algorithm page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v14copyEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits12range_traitsI3RngE13iterator_typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3Rng7OutIter" title="hpx::parallel::v1::copy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::copy</span></code></a></p></td>
+<td><p>Copies a range of elements to a new location.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_copy.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/exclusive_scan">exclusive_scan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v16copy_nEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inE8FwdIter1EFN3tag3outE8FwdIter2EEEE4typeERR8ExPolicy8FwdIter14Size8FwdIter2" title="hpx::parallel::v1::copy_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::copy_n</span></code></a></p></td>
+<td><p>Copies a number of elements to a new location.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_copy.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/copy_n">copy_n</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v17copy_ifEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits12range_traitsI3RngE13iterator_typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3Rng7OutIterRR1FRR4Proj" title="hpx::parallel::v1::copy_if"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::copy_if</span></code></a></p></td>
+<td><p>Copies the elements from a range to a new location for which the given predicate is <code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_copy.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/copy">copy</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v14moveEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits12range_traitsI3RngE13iterator_typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3Rng7OutIter" title="hpx::parallel::v1::move"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::move</span></code></a></p></td>
+<td><p>Moves a range of elements to a new location.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_fill.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/move">move</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v14fillEN4util6detail16algorithm_resultI8ExPolicyE4typeERR8ExPolicyRR3Rng1T" title="hpx::parallel::v1::fill"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::fill</span></code></a></p></td>
+<td><p>Assigns a range of elements a certain value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_fill.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/fill">fill</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v16fill_nEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits12range_traitsI3RngE13iterator_typeEE4typeERR8ExPolicyR3Rng4Size1T" title="hpx::parallel::v1::fill_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::fill_n</span></code></a></p></td>
+<td><p>Assigns a value to a number of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_fill.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/fill_n">fill_n</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v18generateEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3RngRR1F" title="hpx::parallel::v1::generate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::generate</span></code></a></p></td>
+<td><p>Saves the result of a function in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_generate.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/generate">generate</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v110generate_nEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeERR8ExPolicy7FwdIter4SizeRR1F" title="hpx::parallel::v1::generate_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::generate_n</span></code></a></p></td>
+<td><p>Saves the result of N applications of a function.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_generate.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/generate_n">generate_n</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v16removeEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3RngRK1TRR4Proj" title="hpx::parallel::v1::remove"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::remove</span></code></a></p></td>
+<td><p>Removes the elements from a range that are equal to the given value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_remove.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/remove">remove</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v19remove_ifEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3RngRR4PredRR4Proj" title="hpx::parallel::v1::remove_if"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::remove_if</span></code></a></p></td>
+<td><p>Removes the elements from a range that are equal to the given predicate is <code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_remove.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/remove">remove</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v111remove_copyEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits12range_traitsI3RngE13iterator_typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3Rng7OutIterRK1TRR4Proj" title="hpx::parallel::v1::remove_copy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::remove_copy</span></code></a></p></td>
+<td><p>Copies the elements from a range to a new location that are not equal to the given value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_remove_copy.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/remove_copy">remove_copy</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v114remove_copy_ifEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits12range_traitsI3RngE13iterator_typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3Rng7OutIterRR1FRR4Proj" title="hpx::parallel::v1::remove_copy_if"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::remove_copy_if</span></code></a></p></td>
+<td><p>Copies the elements from a range to a new location for which the given predicate is <code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_remove_copy.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/remove_copy">remove_copy</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v17replaceEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits12range_traitsI3RngE13iterator_typeEE4typeERR8ExPolicyRR3RngRK2T1RK2T2RR4Proj" title="hpx::parallel::v1::replace"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::replace</span></code></a></p></td>
+<td><p>Replaces all values satisfying specific criteria with another value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_replace.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/replace">replace</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v110replace_ifEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits12range_traitsI3RngE13iterator_typeEE4typeERR8ExPolicyRR3RngRR1FRK1TRR4Proj" title="hpx::parallel::v1::replace_if"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::replace_if</span></code></a></p></td>
+<td><p>Replaces all values satisfying specific criteria with another value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_replace.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/replace">replace</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000000EN3hpx8parallel2v112replace_copyEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits12range_traitsI3RngE13iterator_typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3Rng7OutIterRK2T1RK2T2RR4Proj" title="hpx::parallel::v1::replace_copy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::replace_copy</span></code></a></p></td>
+<td><p>Copies a range, replacing elements satisfying specific criteria with another value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_replace.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/replace_copy">replace_copy</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000000EN3hpx8parallel2v115replace_copy_ifEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits12range_traitsI3RngE13iterator_typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3Rng7OutIterRR1FRK1TRR4Proj" title="hpx::parallel::v1::replace_copy_if"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::replace_copy_if</span></code></a></p></td>
+<td><p>Copies a range, replacing elements satisfying specific criteria with another value.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_replace.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/replace_copy">replace_copy</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00EN3hpx8parallel2v17reverseEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3Rng" title="hpx::parallel::v1::reverse"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::reverse</span></code></a></p></td>
+<td><p>Reverses the order elements in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_reverse.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/reverse">reverse</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v112reverse_copyEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits14range_iteratorI3RngE4typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3Rng7OutIter" title="hpx::parallel::v1::reverse_copy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::reverse_copy</span></code></a></p></td>
+<td><p>Creates a copy of a range that is reversed.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_reverse.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/reverse_copy">reverse_copy</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00EN3hpx8parallel2v16rotateEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag5beginEN3hpx6traits14range_iteratorI3RngE4typeEEFN3tag3endEN3hpx6traits14range_iteratorI3RngE4typeEEEEE4typeERR8ExPolicyRR3RngN3hpx6traits14range_iteratorI3RngE4typeE" title="hpx::parallel::v1::rotate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::rotate</span></code></a></p></td>
+<td><p>Rotates the order of elements in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_rotate.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/rotate">rotate</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v111rotate_copyEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits14range_iteratorI3RngE4typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3RngN3hpx6traits14range_iteratorI3RngE4typeE7OutIter" title="hpx::parallel::v1::rotate_copy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::rotate_copy</span></code></a></p></td>
+<td><p>Copies and rotates a range of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_rotate.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/rotate_copy">rotate_copy</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v111swap_rangesENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy8FwdIter2E4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter2" title="hpx::parallel::v1::swap_ranges"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::swap_ranges</span></code></a></p></td>
+<td><p>Swaps two ranges of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_swap_ranges.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/swap_ranges">swap_ranges</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v19transformEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits14range_iteratorI3RngE4typeEEFN3tag3outE7OutIterEEEE4typeERR8ExPolicyRR3Rng7OutIterRR1FRR4Proj" title="hpx::parallel::v1::transform"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::transform</span></code></a></p></td>
+<td><p>Applies a function to a range of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_transform.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/transform">transform</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v111unique_copyEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits14range_iteratorI3RngE4typeEEFN3tag3outE8FwdIter2EEEE4typeERR8ExPolicyRR3Rng8FwdIter2RR4PredRR4Proj" title="hpx::parallel::v1::unique_copy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::unique_copy</span></code></a></p></td>
+<td><p>Eliminates all but the first element from every consecutive group of equivalent elements from a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_unique.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/unique">unique</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v111unique_copyEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inEN3hpx6traits14range_iteratorI3RngE4typeEEFN3tag3outE8FwdIter2EEEE4typeERR8ExPolicyRR3Rng8FwdIter2RR4PredRR4Proj" title="hpx::parallel::v1::unique_copy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::unique_copy</span></code></a></p></td>
+<td><p>Eliminates all but the first element from every consecutive group of equivalent elements from a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_unique.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/unique_copy">unique_copy</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id8">
+<caption><span class="caption-number">Table 27 </span><span class="caption-text">Set operations on sorted sequences (In Header: <cite>&lt;hpx/include/parallel_algorithm.hpp&gt;</cite>)</span><a class="headerlink" href="#id8" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Algorithm page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000000EN3hpx8parallel2v15mergeEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util12tagged_tupleIFN3tag3in1EN3hpx6traits14range_iteratorI4Rng1E4typeEEFN3tag3in2EN3hpx6traits14range_iteratorI4Rng2E4typeEEFN3tag3outE9RandIter3EEEE4typeERR8ExPolicyRR4Rng1RR4Rng29RandIter3RR4CompRR5Proj1RR5Proj2" title="hpx::parallel::v1::merge"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::merge</span></code></a></p></td>
+<td><p>Merges two sorted ranges.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_merge.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/merge">merge</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v113inplace_mergeEN4util6detail16algorithm_resultI8ExPolicy8RandIterE4typeERR8ExPolicyRR3Rng8RandIterRR4CompRR4Proj" title="hpx::parallel::v1::inplace_merge"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::inplace_merge</span></code></a></p></td>
+<td><p>Merges two ordered ranges in-place.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_merge.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/inplace_merge">inplace_merge</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v18includesENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicybE4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter28FwdIter2RR4Pred" title="hpx::parallel::v1::includes"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::includes</span></code></a></p></td>
+<td><p>Returns true if one set is a subset of another.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_set_operations.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/includes">includes</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v114set_differenceENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy8FwdIter3E4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter28FwdIter28FwdIter3RR4Pred" title="hpx::parallel::v1::set_difference"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::set_difference</span></code></a></p></td>
+<td><p>Computes the difference between two sets.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_set_operations.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/set_difference">set_difference</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v116set_intersectionENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy8FwdIter3E4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter28FwdIter28FwdIter3RR4Pred" title="hpx::parallel::v1::set_intersection"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::set_intersection</span></code></a></p></td>
+<td><p>Computes the intersection of two sets.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_set_operations.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/set_intersection">set_intersection</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v124set_symmetric_differenceENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy8FwdIter3E4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter28FwdIter28FwdIter3RR4Pred" title="hpx::parallel::v1::set_symmetric_difference"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::set_symmetric_difference</span></code></a></p></td>
+<td><p>Computes the symmetric difference between two sets.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_set_operations.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/set_symmetric_difference">set_symmetric_difference</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v19set_unionENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy8FwdIter3E4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter28FwdIter28FwdIter3RR4Pred" title="hpx::parallel::v1::set_union"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::set_union</span></code></a></p></td>
+<td><p>Computes the union of two sets.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_set_operations.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/set_union">set_union</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id9">
+<caption><span class="caption-number">Table 28 </span><span class="caption-text">Heap operations (In Header: &lt;hpx/include/parallel_algorithm.hpp&gt;)</span><a class="headerlink" href="#id9" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Algorithm page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v17is_heapEN4util6detail16algorithm_resultI8ExPolicybE4typeERR8ExPolicyRR3RngRR4CompRR4Proj" title="hpx::parallel::v1::is_heap"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::is_heap</span></code></a></p></td>
+<td><p>Returns <code class="docutils literal notranslate"><span class="pre">true</span></code> if the range is max heap.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/is_heap.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/is_heap">is_heap</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v113is_heap_untilEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3RngRR4CompRR4Proj" title="hpx::parallel::v1::is_heap_until"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::is_heap_until</span></code></a></p></td>
+<td><p>Returns the first element that breaks a max heap.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/is_heap.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/is_heap_until">is_heap_until</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id10">
+<caption><span class="caption-number">Table 29 </span><span class="caption-text">Minimum/maximum operations (In Header: &lt;hpx/include/parallel_algortithm.hpp&gt;)</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Algorithm page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v111max_elementEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits12range_traitsI3RngE13iterator_typeEE4typeERR8ExPolicyRR3RngRR1FRR4Proj" title="hpx::parallel::v1::max_element"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::max_element</span></code></a></p></td>
+<td><p>Returns the largest element in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_minmax.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/max_element">max_element</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v111min_elementEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits12range_traitsI3RngE13iterator_typeEE4typeERR8ExPolicyRR3RngRR1FRR4Proj" title="hpx::parallel::v1::min_element"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::min_element</span></code></a></p></td>
+<td><p>Returns the smallest element in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_minmax.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/min_element">min_element</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v114minmax_elementEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag3minEN3hpx6traits12range_traitsI3RngE13iterator_typeEEFN3tag3maxEN3hpx6traits12range_traitsI3RngE13iterator_typeEEEEE4typeERR8ExPolicyRR3RngRR1FRR4Proj" title="hpx::parallel::v1::minmax_element"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::minmax_element</span></code></a></p></td>
+<td><p>Returns the smallest and the largest element in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_minmax.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/minmax_element">minmax_element</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-number">Table 30 </span><span class="caption-text">Partitioning Operations (In Header: <cite>&lt;hpx/include/parallel_algorithm.hpp&gt;</cite>)</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Algorithm page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v114is_partitionedENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicybE4typeEE4typeERR8ExPolicy7FwdIter7FwdIterRR4Pred" title="hpx::parallel::v1::is_partitioned"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::is_partitioned</span></code></a></p></td>
+<td><p>Returns <code class="docutils literal notranslate"><span class="pre">true</span></code> if each true element for a predicate precedes the false elements in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_is_partitioned.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/is_partitioned">is_partitioned</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v19partitionEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3RngRR4PredRR4Proj" title="hpx::parallel::v1::partition"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::partition</span></code></a></p></td>
+<td><p>Divides elements into two groups without preserving their relative order.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_partition.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/partition">partition</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000000EN3hpx8parallel2v114partition_copyEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util12tagged_tupleIFN3tag2inEN3hpx6traits14range_iteratorI3RngE4typeEEFN3tag4out1E8FwdIter2EFN3tag4out2E8FwdIter3EEEE4typeERR8ExPolicyRR3Rng8FwdIter28FwdIter3RR4PredRR4Proj" title="hpx::parallel::v1::partition_copy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::partition_copy</span></code></a></p></td>
+<td><p>Copies a range dividing the elements into two groups.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_partition.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/partition_copy">partition_copy</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v116stable_partitionEN4util6detail16algorithm_resultI8ExPolicy9BidirIterE4typeERR8ExPolicy9BidirIter9BidirIterRR1FRR4Proj" title="hpx::parallel::v1::stable_partition"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::stable_partition</span></code></a></p></td>
+<td><p>Divides elements into two groups while preserving their relative order.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_partition.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/stable_partition">stable_partition</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id12">
+<caption><span class="caption-number">Table 31 </span><span class="caption-text">Sorting Operations (In Header: <cite>&lt;hpx/include/parallel_algorithm.hpp&gt;</cite>)</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Algorithm page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v19is_sortedENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicybE4typeEE4typeERR8ExPolicy7FwdIter7FwdIterRR4Pred" title="hpx::parallel::v1::is_sorted"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::is_sorted</span></code></a></p></td>
+<td><p>Returns <code class="docutils literal notranslate"><span class="pre">true</span></code> if each element in a range is sorted.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_is_sorted.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/is_sorted">is_sorted</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v115is_sorted_untilENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeEE4typeERR8ExPolicy7FwdIter7FwdIterRR4Pred" title="hpx::parallel::v1::is_sorted_until"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::is_sorted_until</span></code></a></p></td>
+<td><p>Returns the first unsorted element.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_is_sorted.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/is_sorted_until">is_sorted_until</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v14sortEN4util6detail16algorithm_resultI8ExPolicyN3hpx6traits14range_iteratorI3RngE4typeEE4typeERR8ExPolicyRR3RngRR7CompareRR4Proj" title="hpx::parallel::v1::sort"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::sort</span></code></a></p></td>
+<td><p>Sorts the elements in a range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_sort.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/sort">sort</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v111sort_by_keyEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag3in1E7KeyIterEFN3tag3in2E9ValueIterEEEE4typeERR8ExPolicy7KeyIter7KeyIter9ValueIterRR7Compare" title="hpx::parallel::v1::sort_by_key"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::sort_by_key</span></code></a></p></td>
+<td><p>Sorts one range of data using keys supplied in another range.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_sort.hpp&gt;</span></code></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id13">
+<caption><span class="caption-number">Table 32 </span><span class="caption-text">Numeric Parallel Algorithms (In Header: <cite>&lt;hpx/include/parallel_numeric.hpp&gt;</cite>)</span><a class="headerlink" href="#id13" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Algorithm page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v119adjacent_differenceENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy8FwdIter2E4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter2" title="hpx::parallel::v1::adjacent_difference"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::adjacent_difference</span></code></a></p></td>
+<td><p>Calculates the difference between each element in an input range and the preceding element.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_adjacent_difference.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/adjacent_difference">adjacent_difference</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00000EN3hpx8parallel2v16reduceENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy1TE4typeEE4typeERR8ExPolicy8FwdIterB8FwdIterE1TRR1F" title="hpx::parallel::v1::reduce"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::reduce</span></code></a></p></td>
+<td><p>Sums up a range of elements.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_reduce.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/reduce">reduce</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000000EN3hpx8parallel2v113reduce_by_keyEN4util6detail16algorithm_resultI8ExPolicyNSt4pairI8FwdIter18FwdIter2EEE4typeERR8ExPolicy7RanIter7RanIter8RanIter28FwdIter18FwdIter2RR7CompareRR4Func" title="hpx::parallel::v1::reduce_by_key"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::reduce_by_key</span></code></a></p></td>
+<td><p>Performs an inclusive scan on consecutive elements with matching keys,
+with a reduction to output only the final sum for each key. The key
+sequence <code class="docutils literal notranslate"><span class="pre">{1,1,1,2,3,3,3,3,1}</span></code> and value sequence
+<code class="docutils literal notranslate"><span class="pre">{2,3,4,5,6,7,8,9,10}</span></code> would be reduced to <code class="docutils literal notranslate"><span class="pre">keys={1,2,3,1}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">values={9,5,30,10}</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_reduce.hpp&gt;</span></code></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v116transform_reduceEN4util6detail16algorithm_resultI8ExPolicy1TE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter21T" title="hpx::parallel::v1::transform_reduce"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::transform_reduce</span></code></a></p></td>
+<td><p>Sums up a range of elements after applying a function. Also, accumulates the inner products of two input ranges.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_transform_reduce.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/transform_reduce">transform_reduce</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000000EN3hpx8parallel2v124transform_inclusive_scanEN4util6detail16algorithm_resultI8ExPolicy8FwdIter2E4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter2RR2OpRR4Conv1T" title="hpx::parallel::v1::transform_inclusive_scan"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::transform_inclusive_scan</span></code></a></p></td>
+<td><p>Does an inclusive parallel scan over a range of elements after applying a function.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_scan.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/transform_inclusive_scan">transform_inclusive_scan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000000EN3hpx8parallel2v124transform_exclusive_scanEN4util6detail16algorithm_resultI8ExPolicy8FwdIter2E4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter21TRR2OpRR4Conv" title="hpx::parallel::v1::transform_exclusive_scan"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::transform_exclusive_scan</span></code></a></p></td>
+<td><p>Does an exclusive parallel scan over a range of elements after applying a function.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_scan.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/algorithm/transform_exclusive_scan">transform_exclusive_scan</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id14">
+<caption><span class="caption-number">Table 33 </span><span class="caption-text">Dynamic Memory Management (In Header: <cite>&lt;hpx/include/parallel_memory.hpp&gt;</cite>)</span><a class="headerlink" href="#id14" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Algorithm page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00EN3hpx8parallel2v17destroyEN4util6detail16algorithm_resultI8ExPolicyE4typeERR8ExPolicy7FwdIter7FwdIter" title="hpx::parallel::v1::destroy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::destroy</span></code></a></p></td>
+<td><p>Destroys a range of objects.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_destroy.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/destroy">destroy</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v19destroy_nEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeERR8ExPolicy7FwdIter4Size" title="hpx::parallel::v1::destroy_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::destroy_n</span></code></a></p></td>
+<td><p>Destroys a range of objects.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_destroy.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/destroy_n">destroy_n</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v118uninitialized_copyENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy8FwdIter2E4typeEE4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter2" title="hpx::parallel::v1::uninitialized_copy"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_copy</span></code></a></p></td>
+<td><p>Copies a range of objects to an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_uninitialized_copy.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_copy">uninitialized_copy</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v120uninitialized_copy_nENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicy8FwdIter2E4typeEE4typeERR8ExPolicy8FwdIter14Size8FwdIter2" title="hpx::parallel::v1::uninitialized_copy_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_copy_n</span></code></a></p></td>
+<td><p>Copies a number of objects to an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_uninitialized_copy.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_copy_n">uninitialized_copy_n</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00EN3hpx8parallel2v131uninitialized_default_constructEN4util6detail16algorithm_resultI8ExPolicyE4typeERR8ExPolicy7FwdIter7FwdIter" title="hpx::parallel::v1::uninitialized_default_construct"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_default_construct</span></code></a></p></td>
+<td><p>Copies a range of objects to an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_uninitialized_default_construct.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_default_construct">uninitialized_default_construct</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v133uninitialized_default_construct_nEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeERR8ExPolicy7FwdIter4Size" title="hpx::parallel::v1::uninitialized_default_construct_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_default_construct_n</span></code></a></p></td>
+<td><p>Copies a number of objects to an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_uninitialized_default_construct.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_default_construct_n">uninitialized_default_construct_n</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v118uninitialized_fillENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicyE4typeEE4typeERR8ExPolicy7FwdIter7FwdIterRK1T" title="hpx::parallel::v1::uninitialized_fill"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_fill</span></code></a></p></td>
+<td><p>Copies an object to an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_uninitialized_fill.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_fill">uninitialized_fill</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v120uninitialized_fill_nENSt9enable_ifIN9execution19is_execution_policyI8ExPolicyE5valueEN4util6detail16algorithm_resultI8ExPolicyE4typeEE4typeERR8ExPolicy7FwdIter4SizeRK1T" title="hpx::parallel::v1::uninitialized_fill_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_fill_n</span></code></a></p></td>
+<td><p>Copies an object to an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_uninitialized_fill.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_fill_n">uninitialized_fill_n</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v118uninitialized_moveEN4util6detail16algorithm_resultI8ExPolicy8FwdIter2E4typeERR8ExPolicy8FwdIter18FwdIter18FwdIter2" title="hpx::parallel::v1::uninitialized_move"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_move</span></code></a></p></td>
+<td><p>Moves a range of objects to an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_uninitialized_move.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_move">uninitialized_move</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I0000EN3hpx8parallel2v120uninitialized_move_nEN4util6detail16algorithm_resultI8ExPolicyN3hpx4util11tagged_pairIFN3tag2inE8FwdIter1EFN3tag3outE8FwdIter2EEEE4typeERR8ExPolicy8FwdIter14Size8FwdIter2" title="hpx::parallel::v1::uninitialized_move_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_move_n</span></code></a></p></td>
+<td><p>Moves a number of objects to an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_uninitialized_move.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_move_n">uninitialized_move_n</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00EN3hpx8parallel2v129uninitialized_value_constructEN4util6detail16algorithm_resultI8ExPolicyE4typeERR8ExPolicy7FwdIter7FwdIter" title="hpx::parallel::v1::uninitialized_value_construct"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_value_construct</span></code></a></p></td>
+<td><p>Constructs objects in an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_uninitialized_value_construct.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_value_construct">uninitialized_value_construct</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I000EN3hpx8parallel2v131uninitialized_value_construct_nEN4util6detail16algorithm_resultI8ExPolicy7FwdIterE4typeERR8ExPolicy7FwdIter4Size" title="hpx::parallel::v1::uninitialized_value_construct_n"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v1::uninitialized_value_construct_n</span></code></a></p></td>
+<td><p>Constructs objects in an uninitialized area of memory.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/uninitialized_value_construct.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/memory/uninitialized_value_construct_n">uninitialized_value_construct_n</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id15">
+<caption><span class="caption-number">Table 34 </span><span class="caption-text">Index-based for-loops (In Header: <cite>&lt;hpx/include/parallel_algorithm.hpp&gt;</cite>)</span><a class="headerlink" href="#id15" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libs/algorithms/api.html#_CPPv4I00DpEN3hpx8parallel2v28for_loopEN4util6detail16algorithm_resultI8ExPolicyE4typeERR8ExPolicyNSt5decayI1IE4typeE1IDpRR4Args" title="hpx::parallel::v2::for_loop"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v2::for_loop</span></code></a></p></td>
+<td><p>Implements loop functionality over a range specified by integral or iterator bounds.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_for_loop.hpp&gt;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v2::for_loop_strided</span></code></p></td>
+<td><p>Implements loop functionality over a range specified by integral or iterator bounds.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_for_loop.hpp&gt;</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v2::for_loop_n</span></code></p></td>
+<td><p>Implements loop functionality over a range specified by integral or iterator bounds.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_for_loop.hpp&gt;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v2::for_loop_n_strided</span></code></p></td>
+<td><p>Implements loop functionality over a range specified by integral or iterator bounds.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/parallel_for_loop.hpp&gt;</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="executor-parameters-and-executor-parameter-traits">
+<span id="executor-parameters"></span><h3>Executor parameters and executor parameter traits<a class="headerlink" href="#executor-parameters-and-executor-parameter-traits" title="Permalink to this headline">¶</a></h3>
+<p><em>HPX</em> introduces the notion of execution parameters and execution parameter
+traits. At this point, the only parameter that can be customized is the size of
+the chunks of work executed on a single <em>HPX</em> thread (such as the number of loop
+iterations combined to run as a single task).</p>
+<p>An executor parameter object is responsible for exposing the calculation of the
+size of the chunks scheduled. It abstracts the (potentially platform-specific)
+algorithms of determining those chunk sizes.</p>
+<p>The way executor parameters are implemented is aligned with the way executors
+are implemented. All functionalities of concrete executor parameter types are
+exposed and accessible through a corresponding
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::executor_parameter_traits</span></code> type.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">executor_parameter_traits</span></code>, clients access all types of executor
+parameters uniformly:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">chunk_size</span> <span class="o">=</span>
+    <span class="n">executor_parameter_traits</span><span class="o">&lt;</span><span class="n">my_parameter_t</span><span class="o">&gt;::</span><span class="n">get_chunk_size</span><span class="p">(</span><span class="n">my_parameter</span><span class="p">,</span>
+        <span class="n">my_executor</span><span class="p">,</span> <span class="p">[](){</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="p">},</span> <span class="n">num_tasks</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This call synchronously retrieves the size of a single chunk of loop iterations
+(or similar) to combine for execution on a single <em>HPX</em> thread if the overall
+number of tasks to schedule is given by <code class="docutils literal notranslate"><span class="pre">num_tasks</span></code>. The lambda function
+exposes a means of test-probing the execution of a single iteration for
+performance measurement purposes. The execution parameter type might dynamically
+determine the execution time of one or more tasks in order to calculate the
+chunk size; see <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution15auto_chunk_sizeE" title="hpx::parallel::execution::auto_chunk_size"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::auto_chunk_size</span></code></a> for an
+example of this executor parameter type.</p>
+<p>Other functions in the interface exist to discover whether an executor parameter
+type should be invoked once (i.e., it returns a static chunk size; see
+<a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution17static_chunk_sizeE" title="hpx::parallel::execution::static_chunk_size"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::static_chunk_size</span></code></a>) or whether it should
+be invoked for each scheduled chunk of work (i.e., it returns a variable chunk
+size; for an example, see
+<a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution17guided_chunk_sizeE" title="hpx::parallel::execution::guided_chunk_size"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::guided_chunk_size</span></code></a>).</p>
+<p>Although this interface appears to require executor parameter type authors to
+implement all different basic operations, none are required. In
+practice, all operations have sensible defaults. However, some executor
+parameter types will naturally specialize all operations for maximum efficiency.</p>
+<p><em>HPX</em>  implements the following executor parameter types:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution15auto_chunk_sizeE" title="hpx::parallel::execution::auto_chunk_size"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::auto_chunk_size</span></code></a>: Loop iterations are
+divided into pieces and then assigned to threads. The number of loop
+iterations combined is determined based on measurements of how long the
+execution of 1% of the overall number of iterations takes. This executor
+parameter type makes sure that as many loop iterations are combined as
+necessary to run for the amount of time specified.</p></li>
+<li><p><a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution17static_chunk_sizeE" title="hpx::parallel::execution::static_chunk_size"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::static_chunk_size</span></code></a>: Loop iterations are
+divided into pieces of a given size and then assigned to threads. If the size
+is not specified, the iterations are, if possible, evenly divided contiguously
+among the threads. This executor parameters type is equivalent to OpenMP’s
+STATIC scheduling directive.</p></li>
+<li><p><a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution18dynamic_chunk_sizeE" title="hpx::parallel::execution::dynamic_chunk_size"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::dynamic_chunk_size</span></code></a>: Loop iterations are
+divided into pieces of a given size and then dynamically scheduled among the
+cores; when a core finishes one chunk, it is dynamically assigned another. If
+the size is not specified, the default chunk size is 1. This executor
+parameter type is equivalent to OpenMP’s DYNAMIC scheduling directive.</p></li>
+<li><p><a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution17guided_chunk_sizeE" title="hpx::parallel::execution::guided_chunk_size"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::guided_chunk_size</span></code></a>: Iterations are
+dynamically assigned to cores in blocks as cores request them until no blocks
+remain to be assigned. This is similar to <code class="docutils literal notranslate"><span class="pre">dynamic_chunk_size</span></code> except that the block
+size decreases each time a number of loop iterations is given to a thread. The
+size of the initial block is proportional to <code class="docutils literal notranslate"><span class="pre">number_of_iterations</span> <span class="pre">/</span>
+<span class="pre">number_of_cores</span></code>. Subsequent blocks are proportional to
+<code class="docutils literal notranslate"><span class="pre">number_of_iterations_remaining</span> <span class="pre">/</span> <span class="pre">number_of_cores</span></code>. The optional chunk size
+parameter defines the minimum block size. The default minimal chunk size is 1.
+This executor parameter type is equivalent to OpenMP’s GUIDED scheduling
+directive.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="using-task-blocks">
+<span id="using-task-block"></span><h2>Using task blocks<a class="headerlink" href="#using-task-blocks" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">define_task_block</span></code>, <code class="docutils literal notranslate"><span class="pre">run</span></code> and the <code class="docutils literal notranslate"><span class="pre">wait</span></code> functions implemented based
+on <a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4411.pdf">N4411</a> are based on the <code class="docutils literal notranslate"><span class="pre">task_block</span></code> concept that is a part of the
+common subset of the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/dd492418.aspx">Microsoft Parallel Patterns Library (PPL)</a> and the <a class="reference external" href="https://www.threadingbuildingblocks.org/">Intel Threading Building Blocks (TBB)</a> libraries.</p>
+<p>These implementations adopt a simpler syntax than exposed by those libraries—
+one that is influenced by language-based concepts, such as spawn and sync from
+<a class="reference external" href="https://software.intel.com/en-us/articles/intel-cilk-plus/">Cilk++</a> and async and finish from <a class="reference external" href="https://x10-lang.org/">X10</a>. They improve on existing practice in
+the following ways:</p>
+<ul class="simple">
+<li><p>The exception handling model is simplified and more consistent with normal C++
+exceptions.</p></li>
+<li><p>Most violations of strict fork-join parallelism can be enforced at compile
+time (with compiler assistance, in some cases).</p></li>
+<li><p>The syntax allows scheduling approaches other than child stealing.</p></li>
+</ul>
+<p>Consider an example of a parallel traversal of a tree, where a user-provided
+function compute is applied to each node of the tree, returning the sum of the
+results:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Func</span><span class="o">&gt;</span>
+<span class="kt">int</span> <span class="n">traverse</span><span class="p">(</span><span class="n">node</span><span class="o">&amp;</span> <span class="n">n</span><span class="p">,</span> <span class="n">Func</span> <span class="o">&amp;&amp;</span> <span class="n">compute</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">define_task_block</span><span class="p">(</span>
+        <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="n">task_block</span><span class="o">&lt;&gt;&amp;</span> <span class="n">tr</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="n">left</span><span class="p">)</span>
+                <span class="n">tr</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">{</span> <span class="n">left</span> <span class="o">=</span> <span class="n">traverse</span><span class="p">(</span><span class="o">*</span><span class="n">n</span><span class="p">.</span><span class="n">left</span><span class="p">,</span> <span class="n">compute</span><span class="p">);</span> <span class="p">});</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="n">right</span><span class="p">)</span>
+                <span class="n">tr</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">{</span> <span class="n">right</span> <span class="o">=</span> <span class="n">traverse</span><span class="p">(</span><span class="o">*</span><span class="n">n</span><span class="p">.</span><span class="n">right</span><span class="p">,</span> <span class="n">compute</span><span class="p">);</span> <span class="p">});</span>
+        <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nf">compute</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The example above demonstrates the use of two of the functions,
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::define_task_block</span></code> and the
+<code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">hpx::parallel::task_block::run</span></code> member function of a
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::task_block</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">task_block</span></code> function delineates a region in a program code potentially
+containing invocations of threads spawned by the <code class="docutils literal notranslate"><span class="pre">run</span></code> member function of the
+<code class="docutils literal notranslate"><span class="pre">task_block</span></code> class. The <code class="docutils literal notranslate"><span class="pre">run</span></code> function spawns an <em>HPX</em> thread, a unit of
+work that is allowed to execute in parallel with respect to the caller. Any
+parallel tasks spawned by <code class="docutils literal notranslate"><span class="pre">run</span></code> within the task block are joined back to a
+single thread of execution at the end of the <code class="docutils literal notranslate"><span class="pre">define_task_block</span></code>. <code class="docutils literal notranslate"><span class="pre">run</span></code>
+takes a user-provided function object <code class="docutils literal notranslate"><span class="pre">f</span></code> and starts it asynchronously—i.e.,
+it may return before the execution of <code class="docutils literal notranslate"><span class="pre">f</span></code> completes. The <em>HPX</em> scheduler may
+choose to run <code class="docutils literal notranslate"><span class="pre">f</span></code> immediately or delay running <code class="docutils literal notranslate"><span class="pre">f</span></code> until compute resources
+become available.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">task_block</span></code> can be constructed only by <code class="docutils literal notranslate"><span class="pre">define_task_block</span></code> because it has
+no public constructors. Thus, <code class="docutils literal notranslate"><span class="pre">run</span></code> can be invoked directly or indirectly
+only from a user-provided function passed to <code class="docutils literal notranslate"><span class="pre">define_task_block</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">g</span><span class="p">();</span>
+
+<span class="kt">void</span> <span class="nf">f</span><span class="p">(</span><span class="n">task_block</span><span class="o">&lt;&gt;&amp;</span> <span class="n">tr</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">tr</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">g</span><span class="p">);</span>          <span class="c1">// OK, invoked from within task_block in h</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">h</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">define_task_block</span><span class="p">(</span><span class="n">f</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">task_block</span><span class="o">&lt;&gt;</span> <span class="n">tr</span><span class="p">;</span>    <span class="c1">// Error: no public constructor</span>
+    <span class="n">tr</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">g</span><span class="p">);</span>          <span class="c1">// No way to call run outside of a define_task_block</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="extensions-for-task-blocks">
+<span id="task-block-extensions"></span><h3>Extensions for task blocks<a class="headerlink" href="#extensions-for-task-blocks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="using-execution-policies-with-task-blocks">
+<h4>Using execution policies with task blocks<a class="headerlink" href="#using-execution-policies-with-task-blocks" title="Permalink to this headline">¶</a></h4>
+<p><em>HPX</em> implements some extensions for <code class="docutils literal notranslate"><span class="pre">task_block</span></code> beyond the actual
+standards proposal <a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4411.pdf">N4411</a>. The main addition is that a <code class="docutils literal notranslate"><span class="pre">task_block</span></code>
+can be invoked with an execution policy as its first argument, very similar to
+the parallel algorithms.</p>
+<p>An execution policy is an object that expresses the requirements on the
+ordering of functions invoked as a consequence of the invocation of a
+task block. Enabling passing an execution policy to <code class="docutils literal notranslate"><span class="pre">define_task_block</span></code>
+gives the user control over the amount of parallelism employed by the
+created <code class="docutils literal notranslate"><span class="pre">task_block</span></code>. In the following example the use of an explicit
+<code class="docutils literal notranslate"><span class="pre">par</span></code> execution policy makes the user’s intent explicit:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Func</span><span class="o">&gt;</span>
+<span class="kt">int</span> <span class="n">traverse</span><span class="p">(</span><span class="n">node</span> <span class="o">*</span><span class="n">n</span><span class="p">,</span> <span class="n">Func</span><span class="o">&amp;&amp;</span> <span class="n">compute</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="n">define_task_block</span><span class="p">(</span>
+        <span class="n">execution</span><span class="o">::</span><span class="n">par</span><span class="p">,</span>                <span class="c1">// execution::parallel_policy</span>
+        <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="n">task_block</span><span class="o">&lt;&gt;&amp;</span> <span class="n">tb</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span>
+                <span class="n">tb</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">{</span> <span class="n">left</span> <span class="o">=</span> <span class="n">traverse</span><span class="p">(</span><span class="n">n</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">compute</span><span class="p">);</span> <span class="p">});</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+                <span class="n">tb</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">{</span> <span class="n">right</span> <span class="o">=</span> <span class="n">traverse</span><span class="p">(</span><span class="n">n</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">compute</span><span class="p">);</span> <span class="p">});</span>
+        <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nf">compute</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This also causes the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::v2::task_block</span></code> object to be a
+template in our implementation. The template argument is the type of the
+execution policy used to create the task block. The template argument defaults
+to <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution15parallel_policyE" title="hpx::parallel::execution::parallel_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_policy</span></code></a>.</p>
+<p><em>HPX</em> still supports calling <a class="reference internal" href="../api.html#_CPPv4I00EN3hpx8parallel2v217define_task_blockEN4util6detail16algorithm_resultI8ExPolicyE4typeERR8ExPolicyRR1F" title="hpx::parallel::v2::define_task_block"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v2::define_task_block</span></code></a>
+without an explicit execution policy. In this case the task block will run using
+the <a class="reference internal" href="../libs/execution/api.html#_CPPv4N3hpx8parallel9execution15parallel_policyE" title="hpx::parallel::execution::parallel_policy"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::parallel::execution::parallel_policy</span></code></a>.</p>
+<p><em>HPX</em> also adds the ability to access the execution policy that was used to
+create a given <code class="docutils literal notranslate"><span class="pre">task_block</span></code>.</p>
+</div>
+<div class="section" id="using-executors-to-run-tasks">
+<h4>Using executors to run tasks<a class="headerlink" href="#using-executors-to-run-tasks" title="Permalink to this headline">¶</a></h4>
+<p>Often, users want to be able to not only define an execution policy to use by
+default for all spawned tasks inside the task block, but also to
+customize the execution context for one of the tasks executed by
+<code class="docutils literal notranslate"><span class="pre">task_block::run</span></code>. Adding an optionally passed executor instance to that
+function enables this use case:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Func</span><span class="o">&gt;</span>
+<span class="kt">int</span> <span class="n">traverse</span><span class="p">(</span><span class="n">node</span> <span class="o">*</span><span class="n">n</span><span class="p">,</span> <span class="n">Func</span><span class="o">&amp;&amp;</span> <span class="n">compute</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="n">define_task_block</span><span class="p">(</span>
+        <span class="n">execution</span><span class="o">::</span><span class="n">par</span><span class="p">,</span>                <span class="c1">// execution::parallel_policy</span>
+        <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">auto</span><span class="o">&amp;</span> <span class="n">tb</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">// use explicitly specified executor to run this task</span>
+                <span class="n">tb</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">my_executor</span><span class="p">(),</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">{</span> <span class="n">left</span> <span class="o">=</span> <span class="n">traverse</span><span class="p">(</span><span class="n">n</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="n">compute</span><span class="p">);</span> <span class="p">});</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">// use the executor associated with the par execution policy</span>
+                <span class="n">tb</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">{</span> <span class="n">right</span> <span class="o">=</span> <span class="n">traverse</span><span class="p">(</span><span class="n">n</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="n">compute</span><span class="p">);</span> <span class="p">});</span>
+            <span class="p">}</span>
+        <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nf">compute</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><em>HPX</em> still supports calling <a class="reference internal" href="../api.html#_CPPv4I0DpEN3hpx8parallel2v210task_block3runEvRR1FDpRR2Ts" title="hpx::parallel::v2::task_block::run"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v2::task_block::run</span></code></a>
+without an explicit executor object. In this case the task will be run using the
+executor associated with the execution policy that was used to call
+<a class="reference internal" href="../api.html#_CPPv4I00EN3hpx8parallel2v217define_task_blockEN4util6detail16algorithm_resultI8ExPolicyE4typeERR8ExPolicyRR1F" title="hpx::parallel::v2::define_task_block"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::parallel::v2::define_task_block</span></code></a>.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="writing_distributed_hpx_applications.html" class="btn btn-neutral float-right" title="Writing distributed HPX applications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="launching_and_configuring_hpx_applications.html" class="btn btn-neutral float-left" title="Launching and configuring HPX applications" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

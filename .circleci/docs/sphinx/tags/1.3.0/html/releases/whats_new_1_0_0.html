@@ -1,0 +1,771 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>HPX V1.0.0 (Apr 24, 2017) &mdash; HPX 1.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="HPX V0.9.99 (Jul 15, 2016)" href="whats_new_0_9_99.html" />
+    <link rel="prev" title="HPX V1.1.0 (Mar 24, 2018)" href="whats_new_1_1_0.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../releases.html">Releases</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_3_0.html"><em>HPX</em> V1.3.0 (May 23, 2019)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_2_1.html"><em>HPX</em> V1.2.1 (Feb 19, 2019)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_2_0.html"><em>HPX</em> V1.2.0 (Nov 12, 2018)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_1_0.html"><em>HPX</em> V1.1.0 (Mar 24, 2018)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><em>HPX</em> V1.0.0 (Apr 24, 2017)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-changes">General changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#breaking-changes">Breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bug-fixes-closed-tickets">Bug fixes (closed tickets)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_99.html"><em>HPX</em> V0.9.99 (Jul 15, 2016)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_11.html"><em>HPX</em> V0.9.11 (Nov 11, 2015)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_10.html"><em>HPX</em> V0.9.10 (Mar 24, 2015)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_9.html"><em>HPX</em> V0.9.9 (Oct 31, 2014, codename Spooky)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_8.html"><em>HPX</em> V0.9.8 (Mar 24, 2014)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_7.html"><em>HPX</em> V0.9.7 (Nov 13, 2013)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_6.html"><em>HPX</em> V0.9.6 (Jul 30, 2013)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_5.html"><em>HPX</em> V0.9.5 (Jan 16, 2013)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_0.html"><em>HPX</em> V0.9.0 (Jul 5, 2012)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_8_1.html"><em>HPX</em> V0.8.1 (Apr 21, 2012)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_8_0.html"><em>HPX</em> V0.8.0 (Mar 23, 2012)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_7_0.html"><em>HPX</em> V0.7.0 (Dec 12, 2011)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../releases.html">Releases</a> &raquo;</li>
+        
+      <li><em>HPX</em> V1.0.0 (Apr 24, 2017)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/releases/whats_new_1_0_0.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hpx-v1-0-0-apr-24-2017">
+<span id="hpx-1-0-0"></span><h1><em>HPX</em> V1.0.0 (Apr 24, 2017)<a class="headerlink" href="#hpx-v1-0-0-apr-24-2017" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="general-changes">
+<h2>General changes<a class="headerlink" href="#general-changes" title="Permalink to this headline">¶</a></h2>
+<p>Here are some of the main highlights and changes for this release (in no
+particular order):</p>
+<ul class="simple">
+<li>Added the facility <code class="docutils literal notranslate"><span class="pre">hpx::split_future</span></code> which allows to convert a
+<code class="docutils literal notranslate"><span class="pre">future&lt;tuple&lt;Ts...&gt;&gt;</span></code> into a <code class="docutils literal notranslate"><span class="pre">tuple&lt;future&lt;Ts&gt;...&gt;</span></code>. This functionality
+is not available when compiling <em>HPX</em> with VS2012.</li>
+<li>Added a new type of performance counter which allows to return a list of
+values for each invocation. We also added a first counter of this type which
+collects a histogram of the times between parcels being created.</li>
+<li>Added new LCOs: <code class="docutils literal notranslate"><span class="pre">hpx::lcos::channel</span></code> and <code class="docutils literal notranslate"><span class="pre">hpx::lcos::local::channel</span></code> which
+are very similar to the well known channel constructs used in the Go language.</li>
+<li>Added new performance counters reporting the amount of data handled by the
+networking layer on a action-by-action basis (please see <a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2289">PR #2289</a> for
+more details).</li>
+<li>Added a new facility <code class="docutils literal notranslate"><span class="pre">hpx::lcos::barrier</span></code>, replacing the equally named older
+one. The new facility has a slightly changed API and is much more efficient.
+Most notable, the new facility exposes a (global) function
+<code class="docutils literal notranslate"><span class="pre">hpx::lcos::barrier::synchronize()</span></code> which represents a global barrier across
+all localities.</li>
+<li>We have started to add support for vectorization to our parallel algorithm
+implementations. This support depends on using an external library, currently
+either Vc Library or <a class="reference external" href="https://github.com/NumScale/boost.simd">Boost.SIMD</a>. Please see <a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2333">Issue #2333</a> for a list of
+currently supported algorithms. This is an experimental feature and its
+implementation and/or API might change in the future. Please see this
+<a class="reference external" href="http://stellar-group.org/2016/09/vectorized-cpp-parallel-algorithms-with-hpx/">blog-post</a>
+for more information.</li>
+<li>The parameter sequence for the <code class="docutils literal notranslate"><span class="pre">hpx::parallel::transform_reduce</span></code> overload
+taking one iterator range has changed to match the changes this algorithm has
+undergone while being moved to C++17. The old overload can be still enabled at
+configure time by specifying <code class="docutils literal notranslate"><span class="pre">-DHPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY=On</span></code>
+to CMake.</li>
+<li>The algorithm <code class="docutils literal notranslate"><span class="pre">hpx::parallel::inner_product</span></code> has been renamed to
+<code class="docutils literal notranslate"><span class="pre">hpx::parallel::transform_reduce</span></code> to match the changes this algorithm has
+undergone while being moved to C++17. The old inner_product names can be still
+enabled at configure time by specifying
+<code class="docutils literal notranslate"><span class="pre">-DHPX_WITH_TRANSFORM_REDUCE_COMPATIBILITY=On</span></code> to CMake.</li>
+<li>Added versions of <code class="docutils literal notranslate"><span class="pre">hpx::get_ptr</span></code> taking client side representations for
+component instances as their parameter (instead of a global id).</li>
+<li>Added the helper utility
+<code class="docutils literal notranslate"><span class="pre">hpx::performance_counters::performance_counter_set</span></code> helping to encapsulate
+a set of performance counters to be managed concurrently.</li>
+<li>All execution policies and related classes have been renamed to be consistent
+with the naming changes applied for C++17. All policies now live in the
+namespace <code class="docutils literal notranslate"><span class="pre">hpx::parallel::execution</span></code>. The ols names can be still enabled at
+configure time by specifying <code class="docutils literal notranslate"><span class="pre">-DHPX_WITH_EXECUTION_POLICY_COMPATIBILITY=On</span></code>
+to CMake.</li>
+<li>The thread scheduling subsystem has undergone a major refactoring which
+results in significant performance improvements. We have also imroved the
+performance of creating <code class="docutils literal notranslate"><span class="pre">hpx::future</span></code> and of various facilities handling
+those.</li>
+<li>We have consolidated all of the code in HPX.Compute related to the integration
+of CUDA. <code class="docutils literal notranslate"><span class="pre">hpx::partitioned_vector</span></code> has been enabled to be usable with
+<code class="docutils literal notranslate"><span class="pre">hpx::compute::vector</span></code> which allows to place the partitions on one or more
+GPU devices.</li>
+<li>Added new performance counters exposing various internals of the thread
+scheduling subsystem, such as the current idle- and busy-loop counters and
+instantaneous scheduler utilization.</li>
+<li>Extended and improved the use of the ITTNotify hooks allowing to collect
+performance counter data and function annotation information from within the
+Intel Amplifier tool.</li>
+</ul>
+</div>
+<div class="section" id="breaking-changes">
+<h2>Breaking changes<a class="headerlink" href="#breaking-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>We have dropped support for the gcc compiler versions V4.6 and 4.7. The
+minimal gcc version we now test on is gcc V4.8.</li>
+<li>We have removed (default) support for <code class="docutils literal notranslate"><span class="pre">boost::chrono</span></code> in interfaces, uses of
+it have been replaced with <code class="docutils literal notranslate"><span class="pre">std::chrono</span></code>. This facility can be still enabled
+at configure time by specifying <code class="docutils literal notranslate"><span class="pre">-DHPX_WITH_BOOST_CHRONO_COMPATIBILITY=On</span></code>
+to CMake.</li>
+<li>The parameter sequence for the <code class="docutils literal notranslate"><span class="pre">hpx::parallel::transform_reduce</span></code> overload
+taking one iterator range has changed to match the changes this algorithm has
+undergone while being moved to C++17.</li>
+<li>The algorithm <code class="docutils literal notranslate"><span class="pre">hpx::parallel::inner_product</span></code> has been renamed to
+<code class="docutils literal notranslate"><span class="pre">hpx::parallel::transform_reduce</span></code> to match the changes this algorithm has
+undergone while being moved to C++17.</li>
+<li>the build options <code class="docutils literal notranslate"><span class="pre">HPX_WITH_COLOCATED_BACKWARDS_COMPATIBILITY</span></code> and
+<code class="docutils literal notranslate"><span class="pre">HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY</span></code> are now disabled by default. Please
+change your code still depending on the deprecated interfaces.</li>
+</ul>
+</div>
+<div class="section" id="bug-fixes-closed-tickets">
+<h2>Bug fixes (closed tickets)<a class="headerlink" href="#bug-fixes-closed-tickets" title="Permalink to this headline">¶</a></h2>
+<p>Here is a list of the important tickets we closed for this release.</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2596">PR #2596</a> - Adding apex data</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2595">PR #2595</a> - Remove obsolete file</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2594">Issue #2594</a> - FindOpenCL.cmake mismatch with the official cmake module</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2592">PR #2592</a> - First attempt to introduce spmd_block in hpx</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2591">Issue #2591</a> - Feature request: continuation (then) which does not
+require the callable object to take a future&lt;R&gt; as parameter</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2588">PR #2588</a> - Daint fixes</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2587">PR #2587</a> - Fixing transfer_(continuation)_action::schedule</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2585">PR #2585</a> - Work around MSVC having an ICE when compiling with -Ob2</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2583">PR #2583</a> - chaning 7zip command to 7za in roll_release.sh</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2582">PR #2582</a> - First attempt to introduce spmd_block in hpx</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2581">PR #2581</a> - Enable annotated function for parallel algorithms</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2580">PR #2580</a> - First attempt to introduce spmd_block in hpx</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2579">PR #2579</a> - Make thread NICE level setting an option</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2578">PR #2578</a> - Implementing enqueue instead of busy wait when no sender is
+available</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2577">PR #2577</a> - Retrieve -std=c++11 consistent nvcc flag</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2576">PR #2576</a> - Add missing dependencies of cuda based tests</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2575">PR #2575</a> - Remove warnings due to some captured variables</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2573">PR #2573</a> - Attempt to resolve resolve_locality</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2572">PR #2572</a> - Adding APEX hooks to background thread</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2571">PR #2571</a> - Pick up hpx.ignore_batch_env from config map</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2570">PR #2570</a> - Add commandline options –hpx:print-counters-locally</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2569">PR #2569</a> - Fix computeapi unit tests</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2567">PR #2567</a> - This adds another barrier::synchronize before registering
+performance counters</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2564">PR #2564</a> - Cray static toolchain support</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2563">PR #2563</a> - Fixed unhandled exception during startup</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2562">PR #2562</a> - Remove partitioned_vector.cu from build tree when nvcc is
+used</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2561">Issue #2561</a> - octo-tiger crash with commit
+6e921495ff6c26f125d62629cbaad0525f14f7ab</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2560">PR #2560</a> - Prevent -Wundef warnings on Vc version checks</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2559">PR #2559</a> - Allowing CUDA callback to set the future directly from an OS
+thread</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2558">PR #2558</a> - Remove warnings due to float precisions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2557">PR #2557</a> - Removing bogus handling of compile flags for CUDA</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2556">PR #2556</a> - Fixing scan partitioner</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2554">PR #2554</a> - Add more diagnostics to error thrown from
+find_appropriate_destination</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2555">Issue #2555</a> - No valid parcelport configured</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2553">PR #2553</a> - Add cmake cuda_arch option</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2552">PR #2552</a> - Remove incomplete datapar bindings to libflatarray</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2551">PR #2551</a> - Rename hwloc_topology to hwloc_topology_info</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2550">PR #2550</a> - Apex api updates</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2549">PR #2549</a> - Pre-include defines.hpp to get the macro HPX_HAVE_CUDA value</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2548">PR #2548</a> - Fixing issue with disconnect</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2546">PR #2546</a> - Some fixes around cuda clang partitioned_vector example</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2545">PR #2545</a> - Fix uses of the Vc2 datapar flags; the value, not the type,
+should be passed to functions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2542">PR #2542</a> - Make HPX_WITH_MALLOC easier to use</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2541">PR #2541</a> - avoid recompiles when enabling/disabling examples</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2540">PR #2540</a> - Fixing usage of target_link_libraries()</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2539">PR #2539</a> - fix RPATH behaviour</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2538">Issue #2538</a> - HPX_WITH_CUDA corrupts compilation flags</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2537">PR #2537</a> - Add output of a Bazel Skylark extension for paths and compile
+options</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2536">PR #2536</a> - Add counter exposing total available memory to Windows as
+well</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2535">PR #2535</a> - Remove obsolete support for security</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2534">Issue #2534</a> - Remove command line option <code class="docutils literal notranslate"><span class="pre">--hpx:run-agas-server</span></code></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2533">PR #2533</a> - Pre-cache locality endpoints during bootstrap</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2532">PR #2532</a> - Fixing handling of GIDs during serialization preprocessing</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2531">PR #2531</a> - Amend uses of the term “functor”</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2529">PR #2529</a> - added counter for reading available memory</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2527">PR #2527</a> - Facilities to create actions from lambdas</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2526">PR #2526</a> - Updated docs: HPX_WITH_EXAMPLES</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2525">PR #2525</a> - Remove warnings related to unused captured variables</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2524">Issue #2524</a> - CMAKE failed because it is missing: TCMALLOC_LIBRARY
+TCMALLOC_INCLUDE_DIR</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2523">PR #2523</a> - Fixing compose_cb stack overflow</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2522">PR #2522</a> - Instead of unlocking, ignore the lock while creating the
+message handler</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2521">PR #2521</a> - Create <code class="docutils literal notranslate"><span class="pre">LPROGRESS_</span></code> logging macro to simplify progress
+tracking and timings</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2520">PR #2520</a> - Intel 17 support</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2519">PR #2519</a> - Fix components example</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2518">PR #2518</a> - Fixing parcel scheduling</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2517">Issue #2517</a> - Race condition during Parcel Coalescing Handler creation</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2516">Issue #2516</a> - HPX locks up when using at least 256 localities</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2515">Issue #2515</a> - error: Install cannot find
+“/lib/hpx/libparcel_coalescing.so.0.9.99” but I can see that file</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2514">PR #2514</a> - Making sure that all continuations of a shared_future are
+invoked in order</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2513">PR #2513</a> - Fixing locks held during suspension</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2512">PR #2512</a> - MPI Parcelport improvements and fixes related to the
+background work changes</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2511">PR #2511</a> - Fixing bit-wise (zero-copy) serialization</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2509">Issue #2509</a> - Linking errors in hwloc_topology</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2508">PR #2508</a> - Added documentation for debugging with core files</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2506">PR #2506</a> - Fixing background work invocations</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2505">PR #2505</a> - Fix tuple serialization</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2504">Issue #2504</a> - Ensure continuations are called in the order they have
+been attached</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2503">PR #2503</a> - Adding serialization support for Vc v2 (datapar)</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2502">PR #2502</a> - Resolve various, minor compiler warnings</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2501">PR #2501</a> - Some other fixes around cuda examples</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2500">Issue #2500</a> - nvcc / cuda clang issue due to a missing -DHPX_WITH_CUDA
+flag</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2499">PR #2499</a> - Adding support for std::array to wait_all and friends</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2498">PR #2498</a> - Execute background work as HPX thread</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2497">PR #2497</a> - Fixing configuration options for spinlock-deadlock detection</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2496">PR #2496</a> - Accounting for different compilers in CrayKNL toolchain file</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2494">PR #2494</a> - Adding component base class which ties a component instance
+to a given executor</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2493">PR #2493</a> - Enable controlling amount of pending threads which must be
+available to allow thread stealing</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2492">PR #2492</a> - Adding new command line option –hpx:print-counter-reset</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2491">PR #2491</a> - Resolve ambiguities when compiling with APEX</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2490">PR #2490</a> - Resuming threads waiting on future with higher priority</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2489">Issue #2489</a> - nvcc issue because -std=c++11 appears twice</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2488">PR #2488</a> - Adding performance counters exposing the internal idle and
+busy-loop counters</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2487">PR #2487</a> - Allowing for plain suspend to reschedule thread right away</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2486">PR #2486</a> - Only flag HPX code for CUDA if HPX_WITH_CUDA is set</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2485">PR #2485</a> - Making thread-queue parameters runtime-configurable</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2484">PR #2484</a> - Added atomic counter for parcel-destinations</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2483">PR #2483</a> - Added priority-queue lifo scheduler</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2482">PR #2482</a> - Changing scheduler to steal only if more than a minimal
+number of tasks are available</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2481">PR #2481</a> - Extending command line option –hpx:print-counter-destination
+to support value ‘none’</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2479">PR #2479</a> - Added option to disable signal handler</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2478">PR #2478</a> - Making sure the sine performance counter module gets loaded
+only for the corresponding example</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2477">Issue #2477</a> - Breaking at a throw statement</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2476">PR #2476</a> - Annotated function</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2475">PR #2475</a> - Ensure that using %osthread% during logging will not throw
+for non-hpx threads</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2474">PR #2474</a> - Remove now superficial non_direct actions from base_lco and
+friends</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2473">PR #2473</a> - Refining support for ITTNotify</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2472">PR #2472</a> - Some fixes around hpx compute</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2470">Issue #2470</a> - redefinition of boost::detail::spinlock</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2469">Issue #2469</a> - Dataflow performance issue</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2468">PR #2468</a> - Perf docs update</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2466">PR #2466</a> - Guarantee to execute remote direct actions on HPX-thread</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2465">PR #2465</a> - Improve demo : Async copy and fixed device handling</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2464">PR #2464</a> - Adding performance counter exposing instantaneous scheduler
+utilization</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2463">PR #2463</a> - Downcast to future&lt;void&gt;</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2462">PR #2462</a> - Fixed usage of ITT-Notify API with Intel Amplifier</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2461">PR #2461</a> - Cublas demo</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2460">PR #2460</a> - Fixing thread bindings</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2459">PR #2459</a> - Make -std=c++11 nvcc flag consistent for in-build and
+installed versions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2457">Issue #2457</a> - Segmentation fault when registering a partitioned vector</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2452">PR #2452</a> - Properly releasing global barrier for unhandled exceptions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2451">PR #2451</a> - Fixing long shutdown times</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2450">PR #2450</a> - Attempting to fix initialization errors on newer platforms
+(Boost V1.63)</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2449">PR #2449</a> - Replace BOOST_COMPILER_FENCE with an HPX version</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2448">PR #2448</a> - This fixes a possible race in the migration code</li>
+<li><dl class="first docutils">
+<dt><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2445">PR #2445</a> - Fixing dataflow et.al. for futures or future-ranges wrapped</dt>
+<dd>into ref()</dd>
+</dl>
+</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2444">PR #2444</a> - Fix segfaults</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2443">PR #2443</a> - Issue 2442</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2442">Issue #2442</a> - Mismatch between #if/#endif and namespace scope brackets
+in this_thread_executers.hpp</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2441">Issue #2441</a> - undeclared identifier BOOST_COMPILER_FENCE</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2440">PR #2440</a> - Knl build</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2438">PR #2438</a> - Datapar backend</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2437">PR #2437</a> - Adapt algorithm parameter sequence changes from C++17</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2436">PR #2436</a> - Adapt execution policy name changes from C++17</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2435">Issue #2435</a> - Trunk broken, undefined reference to
+hpx::thread::interrupt(hpx::thread::id, bool)</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2434">PR #2434</a> - More fixes to resource manager</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2433">PR #2433</a> - Added versions of <code class="docutils literal notranslate"><span class="pre">hpx::get_ptr</span></code> taking client side
+representations</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2432">PR #2432</a> - Warning fixes</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2431">PR #2431</a> - Adding facility representing set of performance counters</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2430">PR #2430</a> - Fix parallel_executor thread spawning</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2429">PR #2429</a> - Fix attribute warning for gcc</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2427">Issue #2427</a> - Seg fault running octo-tiger with latest HPX commit</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2426">Issue #2426</a> - Bug in 9592f5c0bc29806fce0dbe73f35b6ca7e027edcb causes
+immediate crash in Octo-tiger</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2425">PR #2425</a> - Fix nvcc errors due to constexpr specifier</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2424">Issue #2424</a> - Async action on component present on hpx::find_here is
+executing synchronously</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2423">PR #2423</a> - Fix nvcc errors due to constexpr specifier</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2422">PR #2422</a> - Implementing hpx::this_thread thread data functions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2421">PR #2421</a> - Adding benchmark for wait_all</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2420">Issue #2420</a> - Returning object of a component client from another
+component action fails</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2419">PR #2419</a> - Infiniband parcelport</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2418">Issue #2418</a> - gcc + nvcc fails to compile code that uses
+partitioned_vector</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2417">PR #2417</a> - Fixing context switching</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2416">PR #2416</a> - Adding fixes and workarounds to allow compilation with
+nvcc/msvc (VS2015up3)</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2415">PR #2415</a> - Fix errors coming from hpx compute examples</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2414">PR #2414</a> - Fixing msvc12</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2413">PR #2413</a> - Enable cuda/nvcc or cuda/clang when using
+add_hpx_executable()</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2412">PR #2412</a> - Fix issue in HPX_SetupTarget.cmake when cuda is used</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2411">PR #2411</a> - This fixes the core compilation issues with MSVC12</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2410">Issue #2410</a> - <code class="docutils literal notranslate"><span class="pre">undefined</span> <span class="pre">reference</span> <span class="pre">to</span> <span class="pre">opal_hwloc191_hwloc_.....</span></code></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2409">PR #2409</a> - Fixing locking for channel and receive_buffer</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2407">PR #2407</a> - Solving #2402 and #2403</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2406">PR #2406</a> - Improve guards</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2405">PR #2405</a> - Enable parallel::for_each for iterators returning proxy types</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2404">PR #2404</a> - Forward the explicitly given result_type in the hpx invoke</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2403">Issue #2403</a> - datapar_execution + zip iterator: lambda arguments aren’t
+references</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2402">Issue #2402</a> - datapar algorithm instantiated with wrong type #2402</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2401">PR #2401</a> - Added support for imported libraries to HPX_Libraries.cmake</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2400">PR #2400</a> - Use CMake policy CMP0060</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2399">Issue #2399</a> - Error trying to push back vector of futures to vector</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2398">PR #2398</a> - Allow config #defines to be written out to custom
+config/defines.hpp</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2397">Issue #2397</a> - CMake generated config defines can cause tedious rebuilds
+category</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2396">Issue #2396</a> - BOOST_ROOT paths are not used at link time</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2395">PR #2395</a> - Fix target_link_libraries() issue when HPX Cuda is enabled</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2394">Issue #2394</a> - Template compilation error using
+HPX_WITH_DATAPAR_LIBFLATARRAY</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2393">PR #2393</a> - Fixing lock registration for recursive mutex</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2392">PR #2392</a> - Add keywords in target_link_libraries in hpx_setup_target</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2391">PR #2391</a> - Clang goroutines</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2390">Issue #2390</a> - Adapt execution policy name changes from C++17</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2389">PR #2389</a> - Chunk allocator and pool are not used and are obsolete</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2388">PR #2388</a> - Adding functionalities to datapar needed by octotiger</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2387">PR #2387</a> - Fixing race condition for early parcels</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2386">Issue #2386</a> - Lock registration broken for recursive_mutex</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2385">PR #2385</a> - Datapar zip iterator</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2384">PR #2384</a> - Fixing race condition in for_loop_reduction</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2383">PR #2383</a> - Continuations</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2382">PR #2382</a> - add LibFlatArray-based backend for datapar</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2381">PR #2381</a> - remove unused typedef to get rid of compiler warnings</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2380">PR #2380</a> - Tau cleanup</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2379">PR #2379</a> - Can send immediate</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2378">PR #2378</a> - Renaming copy_helper/copy_n_helper/move_helper/move_n_helper</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2376">Issue #2376</a> - Boost trunk’s spinlock initializer fails to compile</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2375">PR #2375</a> - Add support for minimal thread local data</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2374">PR #2374</a> - Adding API functions set_config_entry_callback</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2373">PR #2373</a> - Add a simple utility for debugging that gives supended task
+backtraces</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2372">PR #2372</a> - Barrier Fixes</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2370">Issue #2370</a> - Can’t wait on a wrapped future</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2369">PR #2369</a> - Fixing stable_partition</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2367">PR #2367</a> - Fixing find_prefixes for Windows platforms</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2366">PR #2366</a> - Testing for experimental/optional only in C++14 mode</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2364">PR #2364</a> - Adding set_config_entry</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2363">PR #2363</a> - Fix papi</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2362">PR #2362</a> - Adding missing macros for new non-direct actions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2361">PR #2361</a> - Improve cmake output to help debug compiler incompatibility
+check</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2360">PR #2360</a> - Fixing race condition in condition_variable</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2359">PR #2359</a> - Fixing shutdown when parcels are still in flight</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2357">Issue #2357</a> - failed to insert console_print_action into
+typename_to_id_t registry</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2356">PR #2356</a> - Fixing return type of get_iterator_tuple</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2355">PR #2355</a> - Fixing compilation against Boost 1 62</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2354">PR #2354</a> - Adding serialization for mask_type if CPU_COUNT &gt; 64</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2353">PR #2353</a> - Adding hooks to tie in APEX into the parcel layer</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2352">Issue #2352</a> - Compile errors when using intel 17 beta (for KNL) on
+edison</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2351">PR #2351</a> - Fix function vtable get_function_address implementation</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2350">Issue #2350</a> - Build failure - master branch (4de09f5) with Intel
+Compiler v17</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2349">PR #2349</a> - Enabling zero-copy serialization support for std::vector&lt;&gt;</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2348">PR #2348</a> - Adding test to verify #2334 is fixed</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2347">PR #2347</a> - Bug fixes for hpx.compute and hpx::lcos::channel</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2346">PR #2346</a> - Removing cmake “find” files that are in the APEX cmake
+Modules</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2345">PR #2345</a> - Implemented parallel::stable_partition</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2344">PR #2344</a> - Making hpx::lcos::channel usable with basename registration</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2343">PR #2343</a> - Fix a couple of examples that failed to compile after recent
+api changes</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2342">Issue #2342</a> - Enabling APEX causes link errors</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2341">PR #2341</a> - Removing cmake “find” files that are in the APEX cmake
+Modules</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2340">PR #2340</a> - Implemented all existing datapar algorithms using Boost.SIMD</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2339">PR #2339</a> - Fixing 2338</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2338">PR #2338</a> - Possible race in sliding semaphore</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2337">PR #2337</a> - Adjust osu_latency test to measure window_size parcels in
+flight at once</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2336">PR #2336</a> - Allowing remote direct actions to be executed without
+spawning a task</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2335">PR #2335</a> - Making sure multiple components are properly initialized from
+arguments</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2334">Issue #2334</a> - Cannot construct component with large vector on a remote
+locality</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2332">PR #2332</a> - Fixing hpx::lcos::local::barrier</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2331">PR #2331</a> - Updating APEX support to include OTF2</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2330">PR #2330</a> - Support for data-parallelism for parallel algorithms</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2329">Issue #2329</a> - Coordinate settings in cmake</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2328">PR #2328</a> - fix LibGeoDecomp builds with HPX + GCC 5.3.0 + CUDA 8RC</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2326">PR #2326</a> - Making scan_partitioner work (for now)</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2323">Issue #2323</a> - Constructing a vector of components only correctly
+initializes the first component</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2322">PR #2322</a> - Fix problems that bubbled up after merging #2278</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2321">PR #2321</a> - Scalable barrier</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2320">PR #2320</a> - Std flag fixes</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2319">Issue #2319</a> - -std=c++14 and -std=c++1y with Intel can’t build recent
+Boost builds due to insufficient C++14 support; don’t enable these flags by
+default for Intel</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2318">PR #2318</a> - Improve handling of –hpx:bind=&lt;bind-spec&gt;</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2317">PR #2317</a> - Making sure command line warnings are printed once only</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2316">PR #2316</a> - Fixing command line handling for default bind mode</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2315">PR #2315</a> - Set id_retrieved if set_id is present</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2314">Issue #2314</a> - Warning for requested/allocated thread discrepancy is
+printed twice</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2313">Issue #2313</a> - –hpx:print-bind doesn’t work with –hpx:pu-step</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2312">Issue #2312</a> - –hpx:bind range specifier restrictions are overly
+restrictive</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2311">Issue #2311</a> - hpx_0.9.99 out of project build fails</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2310">PR #2310</a> - Simplify function registration</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2309">PR #2309</a> - Spelling and grammar revisions in documentation (and some
+code)</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2306">PR #2306</a> - Correct minor typo in the documentation</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2305">PR #2305</a> - Cleaning up and fixing parcel coalescing</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2304">PR #2304</a> - Inspect checks for stream related includes</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2303">PR #2303</a> - Add functionality allowing to enumerate threads of given
+state</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2301">PR #2301</a> - Algorithm overloads fix for VS2013</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2300">PR #2300</a> - Use &lt;cstdint&gt;, add inspect checks</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2299">PR #2299</a> - Replace boost::[c]ref with std::[c]ref, add inspect checks</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2297">PR #2297</a> - Fixing compilation with no hw_loc</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2296">PR #2296</a> - Hpx compute</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2295">PR #2295</a> - Making sure for_loop(execution::par, 0, N, …) is actually
+executed in parallel</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2294">PR #2294</a> - Throwing exceptions if the runtime is not up and running</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2293">PR #2293</a> - Removing unused parcel port code</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2292">PR #2292</a> - Refactor function vtables</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2291">PR #2291</a> - Fixing 2286</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2290">PR #2290</a> - Simplify algorithm overloads</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2289">PR #2289</a> - Adding performance counters reporting parcel related data on
+a per-action basis</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2288">Issue #2288</a> - Remove dormant parcelports</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2286">Issue #2286</a> - adjustments to parcel handling to support parcelports that
+do not need a connection cache</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2285">PR #2285</a> - add CMake option to disable package export</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2283">PR #2283</a> - Add more inspect checks for use of deprecated components</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2282">Issue #2282</a> - Arithmetic exception in executor static chunker</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2281">Issue #2281</a> - For loop doesn’t parallelize</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2280">PR #2280</a> - Fixing 2277: build failure with PAPI</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2279">PR #2279</a> - Child vs parent stealing</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2277">Issue #2277</a> - master branch build failure (53c5b4f) with papi</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2276">PR #2276</a> - Compile time launch policies</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2275">PR #2275</a> - Replace boost::chrono with std::chrono in interfaces</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2274">PR #2274</a> - Replace most uses of Boost.Assign with initializer list</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2273">PR #2273</a> - Fixed typos</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2272">PR #2272</a> - Inspect checks</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2270">PR #2270</a> - Adding test verifying -Ihpx.os_threads=all</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2269">PR #2269</a> - Added inspect check for now obsolete boost type traits</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2268">PR #2268</a> - Moving more code into source files</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2267">Issue #2267</a> - Add inspect support to deprecate Boost.TypeTraits</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2265">PR #2265</a> - Adding channel LCO</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2264">PR #2264</a> - Make support for std::ref mandatory</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2263">PR #2263</a> - Constrain tuple_member forwarding constructor</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2262">Issue #2262</a> - Test hpx.os_threads=all</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2261">Issue #2261</a> - OS X: Error: no matching constructor for initialization of
+‘hpx::lcos::local::condition_variable_any’</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2260">Issue #2260</a> - Make support for std::ref mandatory</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2259">PR #2259</a> - Remove most of Boost.MPL, Boost.EnableIf and Boost.TypeTraits</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2258">PR #2258</a> - Fixing #2256</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2257">PR #2257</a> - Fixing launch process</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2256">Issue #2256</a> - Actions are not registered if not invoked</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2255">PR #2255</a> - Coalescing histogram</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2254">PR #2254</a> - Silence explicit initialization in copy-constructor warnings</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2253">PR #2253</a> - Drop support for GCC 4.6 and 4.7</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2252">PR #2252</a> - Prepare V1.0</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2251">PR #2251</a> - Convert to 0.9.99</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2249">PR #2249</a> - Adding iterator_facade and iterator_adaptor</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2248">Issue #2248</a> - Need a feature to yield to a new task immediately</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2246">PR #2246</a> - Adding split_future</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2245">PR #2245</a> - Add an example for handing over a component instance to a
+dynamically launched locality</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2243">Issue #2243</a> - Add example demonstrating AGAS symbolic name registration</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2242">Issue #2242</a> - pkgconfig test broken on CentOS 7 / Boost 1.61</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2241">Issue #2241</a> - Compilation error for partitioned vector in hpx_compute
+branch</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2240">PR #2240</a> - Fixing termination detection on one locality</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2239">Issue #2239</a> - Create a new facility lcos::split_all</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2236">Issue #2236</a> - hpx::cout vs. std::cout</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/2232">PR #2232</a> - Implement local-only primary namespace service</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2147">Issue #2147</a> - would like to know how much data is being routed by
+particular actions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/2109">Issue #2109</a> - Warning while compiling hpx</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/1973">Issue #1973</a> - Setting INTERFACE_COMPILE_OPTIONS for hpx_init in CMake
+taints Fortran_FLAGS</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/1864">Issue #1864</a> - run_guarded using bound function ignores reference</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/1754">Issue #1754</a> - Running with TCP parcelport causes immediate crash or
+freeze</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/1655">Issue #1655</a> - Enable zip_iterator to be used with Boost traversal
+iterator categories</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/1591">Issue #1591</a> - Optimize AGAS for shared memory only operation</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/1401">Issue #1401</a> - Need an efficient infiniband parcelport</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/1125">Issue #1125</a> - Fix the IPC parcelport</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/839">Issue #839</a> - Refactor ibverbs and shmem parcelport</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/702">Issue #702</a> - Add instrumentation of parcel layer</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/668">Issue #668</a> - Implement ispc task interface</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/533">Issue #533</a> - Thread queue/deque internal parameters should be runtime
+configurable</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/475">Issue #475</a> - Create a means of combining performance counters into
+querysets</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="whats_new_0_9_99.html" class="btn btn-neutral float-right" title="HPX V0.9.99 (Jul 15, 2016)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="whats_new_1_1_0.html" class="btn btn-neutral float-left" title="HPX V1.1.0 (Mar 24, 2018)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>a943fd2</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

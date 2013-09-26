@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>testing &mdash; HPX master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Contributing to HPX" href="../../contributing.html" />
+    <link rel="prev" title="serialization" href="../serialization/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../naming_base/api.html">naming_base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">testing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-testing-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/testing.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-lightweight-test-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/lightweight_test.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>testing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/testing/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="testing">
+<span id="libs-testing-api"></span><h1>testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-testing-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/testing.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-testing-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_TEST">
+<span class="target" id="testing_8hpp_1ac9e1decde838f134fa2b9fe32c742937"></span><code class="sig-name descname">HPX_TEST</code><span class="sig-paren">(</span>expr<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_TEST_MSG">
+<span class="target" id="testing_8hpp_1aa9c7c5bdbc1f09d72e4a92018f43e5b2"></span><code class="sig-name descname">HPX_TEST_MSG</code><span class="sig-paren">(</span>expr, msg<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_TEST_EQ">
+<span class="target" id="testing_8hpp_1a59ef97afcb4f8dc89ee57cdd5c71255b"></span><code class="sig-name descname">HPX_TEST_EQ</code><span class="sig-paren">(</span>expr1, expr2<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST_EQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_TEST_NEQ">
+<span class="target" id="testing_8hpp_1a10db9f4c87181ba4de0adab27d9837ef"></span><code class="sig-name descname">HPX_TEST_NEQ</code><span class="sig-paren">(</span>expr1, expr2<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST_NEQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_TEST_LT">
+<span class="target" id="testing_8hpp_1a914bfbf71fe5aebe839e9d60f47547a6"></span><code class="sig-name descname">HPX_TEST_LT</code><span class="sig-paren">(</span>expr1, expr2<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST_LT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_TEST_LTE">
+<span class="target" id="testing_8hpp_1a5d9e4f7a9906c2af0660bdae3efb815c"></span><code class="sig-name descname">HPX_TEST_LTE</code><span class="sig-paren">(</span>expr1, expr2<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST_LTE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_TEST_RANGE">
+<span class="target" id="testing_8hpp_1a830526ce951a3235776e24b0088ddad6"></span><code class="sig-name descname">HPX_TEST_RANGE</code><span class="sig-paren">(</span>expr1, expr2, expr3<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_TEST_EQ_MSG">
+<span class="target" id="testing_8hpp_1af2c13e959532cc8119ad5387e47ef620"></span><code class="sig-name descname">HPX_TEST_EQ_MSG</code><span class="sig-paren">(</span>expr1, expr2, msg<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST_EQ_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_TEST_NEQ_MSG">
+<span class="target" id="testing_8hpp_1a7cc094d30f6e534d76bfefd52bb6eb20"></span><code class="sig-name descname">HPX_TEST_NEQ_MSG</code><span class="sig-paren">(</span>expr1, expr2, msg<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST_NEQ_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SANITY">
+<span class="target" id="testing_8hpp_1ac4c3ad13603991b062a0df4974f7a5d2"></span><code class="sig-name descname">HPX_SANITY</code><span class="sig-paren">(</span>expr<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_SANITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SANITY_MSG">
+<span class="target" id="testing_8hpp_1ac84696f8842808ce4b4dd49e4bf745d4"></span><code class="sig-name descname">HPX_SANITY_MSG</code><span class="sig-paren">(</span>expr, msg<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_SANITY_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SANITY_EQ">
+<span class="target" id="testing_8hpp_1a3cf326d88b2ae66fa29e3159434d394c"></span><code class="sig-name descname">HPX_SANITY_EQ</code><span class="sig-paren">(</span>expr1, expr2<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_SANITY_EQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SANITY_NEQ">
+<span class="target" id="testing_8hpp_1add6f95c8593c5bd4a5af9e307ecdd7f9"></span><code class="sig-name descname">HPX_SANITY_NEQ</code><span class="sig-paren">(</span>expr1, expr2<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_SANITY_NEQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SANITY_LT">
+<span class="target" id="testing_8hpp_1a3e6aff531375e5fc088afe44bbd671da"></span><code class="sig-name descname">HPX_SANITY_LT</code><span class="sig-paren">(</span>expr1, expr2<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_SANITY_LT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SANITY_LTE">
+<span class="target" id="testing_8hpp_1aa4a69b7d21d80acc738b35f246a3cb61"></span><code class="sig-name descname">HPX_SANITY_LTE</code><span class="sig-paren">(</span>expr1, expr2<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_SANITY_LTE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SANITY_RANGE">
+<span class="target" id="testing_8hpp_1a8318964d20057f6e3d0b07b3b6c90363"></span><code class="sig-name descname">HPX_SANITY_RANGE</code><span class="sig-paren">(</span>expr1, expr2, expr3<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_SANITY_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SANITY_EQ_MSG">
+<span class="target" id="testing_8hpp_1af917dcea2954e52c870e643b344c9eec"></span><code class="sig-name descname">HPX_SANITY_EQ_MSG</code><span class="sig-paren">(</span>expr1, expr2, msg<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_SANITY_EQ_MSG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_TEST_THROW">
+<span class="target" id="testing_8hpp_1aa4e0c21272574d87f3b9f0b0d7d8eb84"></span><code class="sig-name descname">HPX_TEST_THROW</code><span class="sig-paren">(</span>expression, exception<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_TEST_THROW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util25test_failure_handler_typeE">
+<span id="_CPPv3N3hpx4util25test_failure_handler_typeE"></span><span id="_CPPv2N3hpx4util25test_failure_handler_typeE"></span><span class="target" id="testing_8hpp_1a50854d355e95df911fb5ce01cca20c12"></span><em class="property">using </em><code class="sig-name descname">test_failure_handler_type</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::function&lt;void<span class="sig-paren">(</span><span class="sig-paren">)</span>&gt;<a class="headerlink" href="#_CPPv4N3hpx4util25test_failure_handler_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Enums</p>
+<dl class="enum">
+<dt id="_CPPv4N3hpx4util12counter_typeE">
+<span id="_CPPv3N3hpx4util12counter_typeE"></span><span id="_CPPv2N3hpx4util12counter_typeE"></span><span class="target" id="testing_8hpp_1a8a346eb71b75a9453afa9bc40f243dd6"></span><em class="property">enum </em><code class="sig-name descname">counter_type</code><a class="headerlink" href="#_CPPv4N3hpx4util12counter_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx4util14counter_sanityE">
+<span id="_CPPv3N3hpx4util14counter_sanityE"></span><span id="_CPPv2N3hpx4util14counter_sanityE"></span><span class="target" id="testing_8hpp_1a8a346eb71b75a9453afa9bc40f243dd6ab7e21dbc03c0966e38d7bc2e2f0e0254"></span><code class="sig-name descname">counter_sanity</code><a class="headerlink" href="#_CPPv4N3hpx4util14counter_sanityE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx4util12counter_testE">
+<span id="_CPPv3N3hpx4util12counter_testE"></span><span id="_CPPv2N3hpx4util12counter_testE"></span><span class="target" id="testing_8hpp_1a8a346eb71b75a9453afa9bc40f243dd6a66e191743f4f5a3743832a39bbf0504d"></span><code class="sig-name descname">counter_test</code><a class="headerlink" href="#_CPPv4N3hpx4util12counter_testE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util24set_test_failure_handlerE25test_failure_handler_type">
+<span id="_CPPv3N3hpx4util24set_test_failure_handlerE25test_failure_handler_type"></span><span id="_CPPv2N3hpx4util24set_test_failure_handlerE25test_failure_handler_type"></span><span id="hpx::util::set_test_failure_handler__test_failure_handler_type"></span><span class="target" id="testing_8hpp_1a74f21e5d5c1e8855cebbc18deb52ba6e"></span>void <code class="sig-name descname">set_test_failure_handler</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util25test_failure_handler_typeE" title="hpx::util::test_failure_handler_type">test_failure_handler_type</a> <em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util24set_test_failure_handlerE25test_failure_handler_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util13report_errorsERNSt7ostreamE">
+<span id="_CPPv3N3hpx4util13report_errorsERNSt7ostreamE"></span><span id="_CPPv2N3hpx4util13report_errorsERNSt7ostreamE"></span><span id="hpx::util::report_errors__osR"></span><span class="target" id="testing_8hpp_1afbf0ff58a7808ecc4cdb8a9225cd4164"></span>int <code class="sig-name descname">report_errors</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<em>stream</em> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::cerr<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util13report_errorsERNSt7ostreamE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18print_cdash_timingEPKcd">
+<span id="_CPPv3N3hpx4util18print_cdash_timingEPKcd"></span><span id="_CPPv2N3hpx4util18print_cdash_timingEPKcd"></span><span id="hpx::util::print_cdash_timing__cCP.double"></span><span class="target" id="testing_8hpp_1a57f12670bfb39ac9f4cf72384d272b27"></span>void <code class="sig-name descname">print_cdash_timing</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, double <em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18print_cdash_timingEPKcd" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18print_cdash_timingEPKcNSt8uint64_tE">
+<span id="_CPPv3N3hpx4util18print_cdash_timingEPKcNSt8uint64_tE"></span><span id="_CPPv2N3hpx4util18print_cdash_timingEPKcNSt8uint64_tE"></span><span id="hpx::util::print_cdash_timing__cCP.std::uint64_t"></span><span class="target" id="testing_8hpp_1a2bdcc84e2a9f6db3f6586adcec5a6b57"></span>void <code class="sig-name descname">print_cdash_timing</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::uint64_t <em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18print_cdash_timingEPKcNSt8uint64_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-compatibility-hpx-util-lightweight-test-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/lightweight_test.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-lightweight-test-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../contributing.html" class="btn btn-neutral float-right" title="Contributing to HPX" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../serialization/api.html" class="btn btn-neutral float-left" title="serialization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>856afc8</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

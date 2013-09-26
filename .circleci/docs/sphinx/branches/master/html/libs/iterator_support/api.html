@@ -1,0 +1,1078 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iterator_support &mdash; HPX master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="datastructures" href="../datastructures/api.html" />
+    <link rel="prev" title="program_options" href="../program_options/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../naming_base/api.html">naming_base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">iterator_support</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-iterator-support-zip-iterator-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/zip_iterator.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-iterator-support-transform-iterator-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/transform_iterator.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-iterator-support-iterator-facade-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/iterator_facade.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-iterator-support-iterator-range-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/iterator_range.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-iterator-support-range-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/range.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-iterator-support-iterator-adaptor-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/iterator_adaptor.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-iterator-support-traits-is-range-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/traits/is_range.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-iterator-support-traits-is-iterator-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/traits/is_iterator.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-traits-is-range-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/traits/is_range.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-traits-is-iterator-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/traits/is_iterator.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-transform-iterator-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/transform_iterator.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-iterator-facade-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/iterator_facade.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-iterator-range-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/iterator_range.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-range-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/range.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-iterator-adaptor-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/iterator_adaptor.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>iterator_support</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/iterator_support/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="iterator-support">
+<span id="libs-iterator-support-api"></span><h1>iterator_support<a class="headerlink" href="#iterator-support" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-iterator-support-zip-iterator-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/zip_iterator.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-iterator-support-zip-iterator-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv4I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE">
+<span id="_CPPv3I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE"></span><span id="_CPPv2I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4"></span>template&lt;typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">lift_zipped_iterators</code>&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE" title="hpx::traits::functional::lift_zipped_iterators&lt;F, util::zip_iterator&lt;Ts...&gt;&gt;::F">F</a>, <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::zip_iterator&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE" title="hpx::traits::functional::lift_zipped_iterators&lt;F, util::zip_iterator&lt;Ts...&gt;&gt;::Ts">Ts</a>...&gt;&gt;<a class="headerlink" href="#_CPPv4I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits10functional21lift_zipped_iterators10tuple_typeE">
+<span id="_CPPv3N3hpx6traits10functional21lift_zipped_iterators10tuple_typeE"></span><span id="_CPPv2N3hpx6traits10functional21lift_zipped_iterators10tuple_typeE"></span><span id="hpx::traits::functional::lift_zipped_iterators::tuple_type"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4_1a4947f0b46e02ffd7c51f74c646183ad2"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::zip_iterator&lt;Ts...&gt;::iterator_tuple_type <code class="sig-name descname">tuple_type</code><a class="headerlink" href="#_CPPv4N3hpx6traits10functional21lift_zipped_iterators10tuple_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits10functional21lift_zipped_iterators11result_typeE">
+<span id="_CPPv3N3hpx6traits10functional21lift_zipped_iterators11result_typeE"></span><span id="_CPPv2N3hpx6traits10functional21lift_zipped_iterators11result_typeE"></span><span id="hpx::traits::functional::lift_zipped_iterators::result_type"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4_1a2c0fe80314e69f31746478004d29cf77"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::tuple&lt;<em class="property">typename</em> element_result_of&lt;<em class="property">typename</em> F::template apply&lt;Ts&gt;, Ts&gt;::type...&gt; <code class="sig-name descname">result_type</code><a class="headerlink" href="#_CPPv4N3hpx6traits10functional21lift_zipped_iterators11result_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE">
+<span id="_CPPv3I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callEN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE"></span><span id="_CPPv2I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callEN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4_1a900c08a6607152d6d5abea5c894abed0"></span>template&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t... <code class="sig-name descname">Is</code>, typename ...<code class="sig-name descname">Ts_</code>&gt;<br /><em class="property">static</em> <a class="reference internal" href="#_CPPv4N3hpx6traits10functional21lift_zipped_iterators11result_typeE" title="hpx::traits::functional::lift_zipped_iterators::result_type">result_type</a> <code class="sig-name descname">call</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../type_support/api.html#_CPPv4N3hpx4util10index_packE" title="hpx::util::index_pack">index_pack</a>&lt;<a class="reference internal" href="#_CPPv4I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE" title="hpx::traits::functional::lift_zipped_iterators::call::Is">Is</a>...&gt;, <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::tuple&lt;<a class="reference internal" href="#_CPPv4I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE" title="hpx::traits::functional::lift_zipped_iterators::call::Ts_">Ts_</a>...&gt; <em class="property">const</em> &amp;<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4IDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeRKN4util12zip_iteratorIDp3Ts_EE">
+<span id="_CPPv3IDpEN3hpx6traits10functional21lift_zipped_iterators4callERKN4util12zip_iteratorIDp3Ts_EE"></span><span id="_CPPv2IDpEN3hpx6traits10functional21lift_zipped_iterators4callERKN4util12zip_iteratorIDp3Ts_EE"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4_1aa7e7043b4794cb05db800745dcb888c4"></span>template&lt;typename ...<code class="sig-name descname">Ts_</code>&gt;<br /><em class="property">static</em> <a class="reference internal" href="#_CPPv4N3hpx6traits10functional21lift_zipped_iterators11result_typeE" title="hpx::traits::functional::lift_zipped_iterators::result_type">result_type</a> <code class="sig-name descname">call</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::zip_iterator&lt;<a class="reference internal" href="#_CPPv4IDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeRKN4util12zip_iteratorIDp3Ts_EE" title="hpx::traits::functional::lift_zipped_iterators::call::Ts_">Ts_</a>...&gt; <em class="property">const</em> &amp;<em>iter</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeRKN4util12zip_iteratorIDp3Ts_EE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6traitsE">
+<span id="_CPPv3N3hpx6traitsE"></span><span id="_CPPv2N3hpx6traitsE"></span><span id="hpx::traits"></span><span class="target" id="namespacehpx_1_1traits"></span><em class="property">namespace </em><code class="sig-name descname">traits</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6traits10functionalE">
+<span id="_CPPv3N3hpx6traits10functionalE"></span><span id="_CPPv2N3hpx6traits10functionalE"></span><span id="hpx::traits::functional"></span><span class="target" id="namespacehpx_1_1traits_1_1functional"></span><em class="property">namespace </em><code class="sig-name descname">functional</code><a class="headerlink" href="#_CPPv4N3hpx6traits10functionalE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE">
+<span id="_CPPv3I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4"></span>template&lt;typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">lift_zipped_iterators</code>&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE" title="hpx::traits::functional::lift_zipped_iterators&lt;F, util::zip_iterator&lt;Ts...&gt;&gt;::F">F</a>, <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::zip_iterator&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx6traits10functional21lift_zipped_iteratorsI1FN4util12zip_iteratorIDp2TsEEEE" title="hpx::traits::functional::lift_zipped_iterators&lt;F, util::zip_iterator&lt;Ts...&gt;&gt;::Ts">Ts</a>...&gt;&gt;<br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits10functional21lift_zipped_iterators10tuple_typeE">
+<span id="_CPPv3N3hpx6traits10functional21lift_zipped_iterators10tuple_typeE"></span><span id="_CPPv2N3hpx6traits10functional21lift_zipped_iterators10tuple_typeE"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4_1a4947f0b46e02ffd7c51f74c646183ad2"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::zip_iterator&lt;Ts...&gt;::iterator_tuple_type <code class="sig-name descname">tuple_type</code><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits10functional21lift_zipped_iterators11result_typeE">
+<span id="_CPPv3N3hpx6traits10functional21lift_zipped_iterators11result_typeE"></span><span id="_CPPv2N3hpx6traits10functional21lift_zipped_iterators11result_typeE"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4_1a2c0fe80314e69f31746478004d29cf77"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::tuple&lt;<em class="property">typename</em> element_result_of&lt;<em class="property">typename</em> F::template apply&lt;Ts&gt;, Ts&gt;::type...&gt; <code class="sig-name descname">result_type</code><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE">
+<span id="_CPPv3I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callEN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4_1a900c08a6607152d6d5abea5c894abed0"></span>template&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t... <code class="sig-name descname">Is</code>, typename ...<code class="sig-name descname">Ts_</code>&gt;<br /><em class="property">static</em> <a class="reference internal" href="#_CPPv4N3hpx6traits10functional21lift_zipped_iterators11result_typeE" title="hpx::traits::functional::lift_zipped_iterators::result_type">result_type</a> <code class="sig-name descname">call</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../type_support/api.html#_CPPv4N3hpx4util10index_packE" title="hpx::util::index_pack">index_pack</a>&lt;<a class="reference internal" href="#_CPPv4I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE" title="hpx::traits::functional::lift_zipped_iterators::call::Is">Is</a>...&gt;, <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::tuple&lt;<a class="reference internal" href="#_CPPv4I_DpNSt6size_tEDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeN4util10index_packIDp2IsEERKN4util5tupleIDp3Ts_EE" title="hpx::traits::functional::lift_zipped_iterators::call::Ts_">Ts_</a>...&gt; <em class="property">const</em> &amp;<em>t</em><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4IDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeRKN4util12zip_iteratorIDp3Ts_EE">
+<span id="_CPPv3IDpEN3hpx6traits10functional21lift_zipped_iterators4callERKN4util12zip_iteratorIDp3Ts_EE"></span><span class="target" id="structhpx_1_1traits_1_1functional_1_1lift__zipped__iterators_3_01_f_00_01util_1_1zip__iterator_3_01_ts_8_8_8_01_4_01_4_1aa7e7043b4794cb05db800745dcb888c4"></span>template&lt;typename ...<code class="sig-name descname">Ts_</code>&gt;<br /><em class="property">static</em> <a class="reference internal" href="#_CPPv4N3hpx6traits10functional21lift_zipped_iterators11result_typeE" title="hpx::traits::functional::lift_zipped_iterators::result_type">result_type</a> <code class="sig-name descname">call</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::zip_iterator&lt;<a class="reference internal" href="#_CPPv4IDpEN3hpx6traits10functional21lift_zipped_iterators4callE11result_typeRKN4util12zip_iteratorIDp3Ts_EE" title="hpx::traits::functional::lift_zipped_iterators::call::Ts_">Ts_</a>...&gt; <em class="property">const</em> &amp;<em>iter</em><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="zip__iterator_8hpp_1a2f68369b316e5699be2c81c04e3ee209"></span><code class="sig-name descname">template&lt;typename... Ts&gt;HPX_HOST_DEVICE zip_iterator&lt;typename decay&lt;Ts&gt;::type...&gt; hpx::util::make_zip_iterator(Ts &amp;&amp;... vs)</code></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4IDpEN3hpx4util12zip_iteratorE">
+<span id="_CPPv3IDpEN3hpx4util12zip_iteratorE"></span><span id="_CPPv2IDpEN3hpx4util12zip_iteratorE"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator"></span>template&lt;typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">class </em><code class="sig-name descname">zip_iterator</code> : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::zip_iterator_base&lt;tuple&lt;<a class="reference internal" href="#_CPPv4IDpEN3hpx4util12zip_iteratorE" title="hpx::util::zip_iterator::Ts">Ts</a>...&gt;, <a class="reference internal" href="#_CPPv4IDpEN3hpx4util12zip_iteratorE" title="hpx::util::zip_iterator">zip_iterator</a>&lt;<a class="reference internal" href="#_CPPv4IDpEN3hpx4util12zip_iteratorE" title="hpx::util::zip_iterator::Ts">Ts</a>...&gt;&gt;<a class="headerlink" href="#_CPPv4IDpEN3hpx4util12zip_iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorEv">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorEv"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorEv"></span><span id="hpx::util::zip_iterator::zip_iterator"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_1a1a4af4e64e2a615354e7cdab249afd12"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12zip_iterator12zip_iteratorEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorEDpRK2Ts">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorEDpRK2Ts"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorEDpRK2Ts"></span><span id="hpx::util::zip_iterator::zip_iterator__TsCRDp"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_1ab3e3c34742a8408fa0f72b4c8f378e0c"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span>Ts <em class="property">const</em>&amp;... <em>vs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12zip_iterator12zip_iteratorEDpRK2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorERR5tupleIDp2TsE">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorERR5tupleIDp2TsE"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorERR5tupleIDp2TsE"></span><span id="hpx::util::zip_iterator::zip_iterator__tuple:TsDp:RR"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_1a663a84e2cf98abb340c09fbd6373f5fd"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span>tuple&lt;Ts...&gt; &amp;&amp;<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12zip_iterator12zip_iteratorERR5tupleIDp2TsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorERK12zip_iterator">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorERK12zip_iterator"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorERK12zip_iterator"></span><span id="hpx::util::zip_iterator::zip_iterator__zip_iteratorCR"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_1a49a03dcaf90cbedcc32b49bce9eee185"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util12zip_iterator12zip_iteratorEv" title="hpx::util::zip_iterator::zip_iterator">zip_iterator</a> <em class="property">const</em> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12zip_iterator12zip_iteratorERK12zip_iterator" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorERR12zip_iterator">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorERR12zip_iterator"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorERR12zip_iterator"></span><span id="hpx::util::zip_iterator::zip_iterator__zip_iteratorRR"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_1a5592a6ff05d4eddcb14fe4fa4f1bdcd3"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util12zip_iterator12zip_iteratorEv" title="hpx::util::zip_iterator::zip_iterator">zip_iterator</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12zip_iterator12zip_iteratorERR12zip_iterator" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1zip__iterator_1a76b98aa13057e87fbf3f0102090bed42"></span><code class="sig-name descname">HPX_HOST_DEVICE zip_iterator&amp; hpx::util::zip_iterator::operator=(zip_iterator  const &amp; other)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1zip__iterator_1a4c3cc48947c1d3ae61c297386de74210"></span><code class="sig-name descname">HPX_HOST_DEVICE zip_iterator&amp; hpx::util::zip_iterator::operator=(zip_iterator  &amp;&amp; other)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1zip__iterator_1a0080326feabb7bf6263df06b0a806760"></span><code class="sig-name descname">template&lt;typename... Ts_&gt;HPX_HOST_DEVICE std::enable_if&lt; std::is_assignable&lt;typename zip_iterator::iterator_tuple_type&amp;, typename zip_iterator&lt;Ts_...&gt;::iterator_tuple_type&amp;&amp;&gt;::value, zip_iterator&amp;&gt;::type hpx::util::zip_iterator::operator=(zip_iterator &lt; Ts_... &gt; const &amp; other)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1zip__iterator_1a6b81e881ba953e2849e79470dc42a218"></span><code class="sig-name descname">template&lt;typename... Ts_&gt;HPX_HOST_DEVICE std::enable_if&lt; std::is_assignable&lt;typename zip_iterator::iterator_tuple_type&amp;, typename zip_iterator&lt;Ts_...&gt;::iterator_tuple_type&amp;&amp;&gt;::value, zip_iterator&amp;&gt;::type hpx::util::zip_iterator::operator=(zip_iterator &lt; Ts_... &gt; &amp;&amp; other)</code></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util12zip_iterator9base_typeE">
+<span id="_CPPv3N3hpx4util12zip_iterator9base_typeE"></span><span id="_CPPv2N3hpx4util12zip_iterator9base_typeE"></span><span id="hpx::util::zip_iterator::base_type"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_1aba056f3237ae71c3ead28c9f883cc25d"></span><em class="property">typedef </em>detail::zip_iterator_base&lt;tuple&lt;Ts...&gt;, zip_iterator&lt;Ts...&gt;&gt; <code class="sig-name descname">base_type</code><a class="headerlink" href="#_CPPv4N3hpx4util12zip_iterator9base_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4IDpEN3hpx4util12zip_iteratorI5tupleIDp2TsEEE">
+<span id="_CPPv3IDpEN3hpx4util12zip_iteratorI5tupleIDp2TsEEE"></span><span id="_CPPv2IDpEN3hpx4util12zip_iteratorI5tupleIDp2TsEEE"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4"></span>template&lt;typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">class </em><code class="sig-name descname">zip_iterator</code>&lt;tuple&lt;<a class="reference internal" href="#_CPPv4IDpEN3hpx4util12zip_iteratorI5tupleIDp2TsEEE" title="hpx::util::zip_iterator&lt;tuple&lt;Ts...&gt;&gt;::Ts">Ts</a>...&gt;&gt; : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::zip_iterator_base&lt;tuple&lt;<a class="reference internal" href="#_CPPv4IDpEN3hpx4util12zip_iteratorI5tupleIDp2TsEEE" title="hpx::util::zip_iterator&lt;tuple&lt;Ts...&gt;&gt;::Ts">Ts</a>...&gt;, zip_iterator&lt;tuple&lt;<a class="reference internal" href="#_CPPv4IDpEN3hpx4util12zip_iteratorI5tupleIDp2TsEEE" title="hpx::util::zip_iterator&lt;tuple&lt;Ts...&gt;&gt;::Ts">Ts</a>...&gt;&gt;&gt;<a class="headerlink" href="#_CPPv4IDpEN3hpx4util12zip_iteratorI5tupleIDp2TsEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorEv">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorEv"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorEv"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1af86cf36c710e4fe0b8c0ea37af8a860b"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorEDpRK2Ts">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorEDpRK2Ts"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorEDpRK2Ts"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1a8718e9954bd300adeb5cfb97ac5c7fbf"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span>Ts <em class="property">const</em>&amp;... <em>vs</em><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorERR5tupleIDp2TsE">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorERR5tupleIDp2TsE"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorERR5tupleIDp2TsE"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1abd84d5ca6cc2da5bd4921e2f80cb6765"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span>tuple&lt;Ts...&gt; &amp;&amp;<em>t</em><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorERK12zip_iterator">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorERK12zip_iterator"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorERK12zip_iterator"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1a1a17cc086ba066e9f08b13afabbc41b9"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util12zip_iterator12zip_iteratorEv" title="hpx::util::zip_iterator::zip_iterator">zip_iterator</a> <em class="property">const</em> &amp;<em>other</em><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12zip_iterator12zip_iteratorERR12zip_iterator">
+<span id="_CPPv3N3hpx4util12zip_iterator12zip_iteratorERR12zip_iterator"></span><span id="_CPPv2N3hpx4util12zip_iterator12zip_iteratorERR12zip_iterator"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1ace74669270152ab7fb363ba659ca7344"></span>HPX_HOST_DEVICE <code class="sig-name descname">zip_iterator</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util12zip_iterator12zip_iteratorEv" title="hpx::util::zip_iterator::zip_iterator">zip_iterator</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1ae09d0bee6a84b7b1c922ffe1215d7bea"></span><code class="sig-name descname">HPX_HOST_DEVICE zip_iterator&amp; hpx::util::zip_iterator::operator=(zip_iterator  const &amp; other)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1a4266eac24641389913761e03152cea66"></span><code class="sig-name descname">HPX_HOST_DEVICE zip_iterator&amp; hpx::util::zip_iterator::operator=(zip_iterator  &amp;&amp; other)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1af93138c9025cb046fb49b35d0a038529"></span><code class="sig-name descname">template&lt;typename... Ts_&gt;HPX_HOST_DEVICE std::enable_if&lt; std::is_assignable&lt;typename zip_iterator::iterator_tuple_type&amp;, typename zip_iterator&lt;Ts_...&gt;::iterator_tuple_type&amp;&amp;&gt;::value, zip_iterator&amp;&gt;::type hpx::util::zip_iterator::operator=(zip_iterator &lt; Ts_... &gt; const &amp; other)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1a32e9a032aaff67279d36d3440295e8ff"></span><code class="sig-name descname">template&lt;typename... Ts_&gt;HPX_HOST_DEVICE std::enable_if&lt; std::is_assignable&lt;typename zip_iterator::iterator_tuple_type&amp;, typename zip_iterator&lt;Ts_...&gt;::iterator_tuple_type&amp;&amp;&gt;::value, zip_iterator&amp;&gt;::type hpx::util::zip_iterator::operator=(zip_iterator &lt; Ts_... &gt; &amp;&amp; other)</code></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util12zip_iterator9base_typeE">
+<span id="_CPPv3N3hpx4util12zip_iterator9base_typeE"></span><span id="_CPPv2N3hpx4util12zip_iterator9base_typeE"></span><span class="target" id="classhpx_1_1util_1_1zip__iterator_3_01tuple_3_01_ts_8_8_8_01_4_01_4_1a2dc22558e5e7b8ef5b47af2204f1e2cb"></span><em class="property">typedef </em>detail::zip_iterator_base&lt;tuple&lt;Ts...&gt;, zip_iterator&lt;tuple&lt;Ts...&gt;&gt;&gt; <code class="sig-name descname">base_type</code><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-iterator-support-transform-iterator-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/transform_iterator.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-iterator-support-transform-iterator-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8IteratorRK11Transformer">
+<span id="_CPPv3I00EN3hpx4util23make_transform_iteratorERK8IteratorRK11Transformer"></span><span id="_CPPv2I00EN3hpx4util23make_transform_iteratorERK8IteratorRK11Transformer"></span><span class="target" id="hpx_2iterator__support_2transform__iterator_8hpp_1a6abe63fdc22b759c8521bec191c4e537"></span>template&lt;typename <code class="sig-name descname">Transformer</code>, typename <code class="sig-name descname">Iterator</code>&gt;<br />transform_iterator&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8IteratorRK11Transformer" title="hpx::util::make_transform_iterator::Iterator">Iterator</a>, <a class="reference internal" href="#_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8IteratorRK11Transformer" title="hpx::util::make_transform_iterator::Transformer">Transformer</a>&gt; <code class="sig-name descname">make_transform_iterator</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8IteratorRK11Transformer" title="hpx::util::make_transform_iterator::Iterator">Iterator</a> <em class="property">const</em> &amp;<em>it</em>, <a class="reference internal" href="#_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8IteratorRK11Transformer" title="hpx::util::make_transform_iterator::Transformer">Transformer</a> <em class="property">const</em> &amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8IteratorRK11Transformer" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8Iterator">
+<span id="_CPPv3I00EN3hpx4util23make_transform_iteratorERK8Iterator"></span><span id="_CPPv2I00EN3hpx4util23make_transform_iteratorERK8Iterator"></span><span class="target" id="hpx_2iterator__support_2transform__iterator_8hpp_1aa52f2c6e32c0151945331bbfc65cdde7"></span>template&lt;typename <code class="sig-name descname">Transformer</code>, typename <code class="sig-name descname">Iterator</code>&gt;<br />transform_iterator&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8IteratorRK11Transformer" title="hpx::util::make_transform_iterator::Iterator">Iterator</a>, <a class="reference internal" href="#_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8IteratorRK11Transformer" title="hpx::util::make_transform_iterator::Transformer">Transformer</a>&gt; <code class="sig-name descname">make_transform_iterator</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8IteratorRK11Transformer" title="hpx::util::make_transform_iterator::Iterator">Iterator</a> <em class="property">const</em> &amp;<em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx4util23make_transform_iteratorE18transform_iteratorI8Iterator11TransformerERK8Iterator" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4I000000EN3hpx4util18transform_iteratorE">
+<span id="_CPPv3I000000EN3hpx4util18transform_iteratorE"></span><span id="_CPPv2I000000EN3hpx4util18transform_iteratorE"></span><span class="target" id="classhpx_1_1util_1_1transform__iterator"></span>template&lt;typename <code class="sig-name descname">Iterator</code>, typename <code class="sig-name descname">Transformer</code>, typename <code class="sig-name descname">Reference</code>, typename <code class="sig-name descname">Value</code>, typename <code class="sig-name descname">Category</code>, typename <code class="sig-name descname">Difference</code>&gt;<br /><em class="property">class </em><code class="sig-name descname">transform_iterator</code> : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::iterator_adaptor&lt;<a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iteratorE" title="hpx::util::transform_iterator">transform_iterator</a>&lt;<a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iteratorE" title="hpx::util::transform_iterator::Iterator">Iterator</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iteratorE" title="hpx::util::transform_iterator::Transformer">Transformer</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iteratorE" title="hpx::util::transform_iterator::Reference">Reference</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iteratorE" title="hpx::util::transform_iterator::Value">Value</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iteratorE" title="hpx::util::transform_iterator::Category">Category</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iteratorE" title="hpx::util::transform_iterator::Difference">Difference</a>&gt;, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iteratorE" title="hpx::util::transform_iterator::Iterator">Iterator</a>, value_type, iterator_category, reference_type, difference_type&gt;<a class="headerlink" href="#_CPPv4I000000EN3hpx4util18transform_iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18transform_iterator18transform_iteratorEv">
+<span id="_CPPv3N3hpx4util18transform_iterator18transform_iteratorEv"></span><span id="_CPPv2N3hpx4util18transform_iterator18transform_iteratorEv"></span><span id="hpx::util::transform_iterator::transform_iterator"></span><span class="target" id="classhpx_1_1util_1_1transform__iterator_1aa413cb2b9adf6d1f6d3c8e03da68380d"></span><code class="sig-name descname">transform_iterator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18transform_iterator18transform_iteratorEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18transform_iterator18transform_iteratorERK8Iterator">
+<span id="_CPPv3N3hpx4util18transform_iterator18transform_iteratorERK8Iterator"></span><span id="_CPPv2N3hpx4util18transform_iterator18transform_iteratorERK8Iterator"></span><span id="hpx::util::transform_iterator::transform_iterator__IteratorCR"></span><span class="target" id="classhpx_1_1util_1_1transform__iterator_1ae982f4637c22dd40c2b3f04d1c093e30"></span><code class="sig-name descname">transform_iterator</code><span class="sig-paren">(</span>Iterator <em class="property">const</em> &amp;<em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18transform_iterator18transform_iteratorERK8Iterator" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18transform_iterator18transform_iteratorERK8IteratorRK11Transformer">
+<span id="_CPPv3N3hpx4util18transform_iterator18transform_iteratorERK8IteratorRK11Transformer"></span><span id="_CPPv2N3hpx4util18transform_iterator18transform_iteratorERK8IteratorRK11Transformer"></span><span id="hpx::util::transform_iterator::transform_iterator__IteratorCR.TransformerCR"></span><span class="target" id="classhpx_1_1util_1_1transform__iterator_1a9ff1afbea2ea4d27dd2615cfceb84cc1"></span><code class="sig-name descname">transform_iterator</code><span class="sig-paren">(</span>Iterator <em class="property">const</em> &amp;<em>it</em>, Transformer <em class="property">const</em> &amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18transform_iterator18transform_iteratorERK8IteratorRK11Transformer" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE">
+<span id="_CPPv3I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE"></span><span id="_CPPv2I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXstd::is_convertible<OtherIterator, Iterator>::value && std::is_convertible<OtherTransformer, Transformer>::value && std::is_convertible<OtherCategory, Category>::value && std::is_convertible<OtherDifference, Difference>::valueEE4typeE"></span><span class="target" id="classhpx_1_1util_1_1transform__iterator_1a7749f1cb65b63c069cdecde5e3e3a778"></span>template&lt;typename <code class="sig-name descname">OtherIterator</code>, typename <code class="sig-name descname">OtherTransformer</code>, typename <code class="sig-name descname">OtherReference</code>, typename <code class="sig-name descname">OtherValue</code>, typename <code class="sig-name descname">OtherCategory</code>, typename <code class="sig-name descname">OtherDifference</code>&gt;<br /><code class="sig-name descname">transform_iterator</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator">transform_iterator</a>&lt;<a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherIterator">OtherIterator</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherTransformer">OtherTransformer</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherReference">OtherReference</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherValue">OtherValue</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherCategory">OtherCategory</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherDifference">OtherDifference</a>&gt; <em class="property">const</em> &amp;<em>t</em>, <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_convertible&lt;<a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherIterator">OtherIterator</a>, Iterator&gt;::value &amp;&amp; <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_convertible&lt;<a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherTransformer">OtherTransformer</a>, Transformer&gt;::value &amp;&amp; <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_convertible&lt;<a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherCategory">OtherCategory</a>, Category&gt;::value &amp;&amp; <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_convertible&lt;<a class="reference internal" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="hpx::util::transform_iterator::transform_iterator::OtherDifference">OtherDifference</a>, Difference&gt;::value&gt;::type * = nullptr<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000000EN3hpx4util18transform_iterator18transform_iteratorERK18transform_iteratorI13OtherIterator16OtherTransformer14OtherReference10OtherValue13OtherCategory15OtherDifferenceEPNSt9enable_ifIXaaNSt14is_convertibleI13OtherIterator8IteratorE5valueEaaNSt14is_convertibleI16OtherTransformer11TransformerE5valueEaaNSt14is_convertibleI13OtherCategory8CategoryE5valueENSt14is_convertibleI15OtherDifference10DifferenceE5valueEEE4typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18transform_iterator11transformerEv">
+<span id="_CPPv3NK3hpx4util18transform_iterator11transformerEv"></span><span id="_CPPv2NK3hpx4util18transform_iterator11transformerEv"></span><span id="hpx::util::transform_iterator::transformerC"></span><span class="target" id="classhpx_1_1util_1_1transform__iterator_1a3771e01e23546bf86ac579227c91952f"></span>Transformer <em class="property">const</em> &amp;<code class="sig-name descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18transform_iterator11transformerEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util18transform_iterator9base_typeE">
+<span id="_CPPv3N3hpx4util18transform_iterator9base_typeE"></span><span id="_CPPv2N3hpx4util18transform_iterator9base_typeE"></span><span id="hpx::util::transform_iterator::base_type"></span><span class="target" id="classhpx_1_1util_1_1transform__iterator_1a76a9771fd851a154ce15838c1f274d1a"></span><em class="property">typedef </em>detail::transform_iterator_base&lt;Iterator, Transformer, Reference, Value, Category, Difference&gt;::type <code class="sig-name descname">base_type</code><a class="headerlink" href="#_CPPv4N3hpx4util18transform_iterator9base_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18transform_iterator11dereferenceEv">
+<span id="_CPPv3NK3hpx4util18transform_iterator11dereferenceEv"></span><span id="_CPPv2NK3hpx4util18transform_iterator11dereferenceEv"></span><span id="hpx::util::transform_iterator::dereferenceC"></span><span class="target" id="classhpx_1_1util_1_1transform__iterator_1ae1948e7cbcd680ab63d32011f2c6ad8c"></span><a class="reference internal" href="#_CPPv4N3hpx4util18transform_iterator9base_typeE" title="hpx::util::transform_iterator::base_type">base_type</a>::reference <code class="sig-name descname">dereference</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18transform_iterator11dereferenceEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18transform_iterator12transformer_E">
+<span id="_CPPv3N3hpx4util18transform_iterator12transformer_E"></span><span id="_CPPv2N3hpx4util18transform_iterator12transformer_E"></span><span id="hpx::util::transform_iterator::transformer___Transformer"></span><span class="target" id="classhpx_1_1util_1_1transform__iterator_1ae3e4c71410d5ef0589d6864311986338"></span>Transformer <code class="sig-name descname">transformer_</code><a class="headerlink" href="#_CPPv4N3hpx4util18transform_iterator12transformer_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1transform__iterator_1ad00908d93ca5dd8443486a1fe00aeea2"></span><em class="property">friend </em><code class="sig-name descname">hpx::util::hpx::util::iterator_core_access</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-iterator-support-iterator-facade-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/iterator_facade.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-iterator-support-iterator-facade-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD">
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1a639c0df9b3555193226fc10359d1e429"></span><code class="sig-name descname">HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD</code><span class="sig-paren">(</span>prefix, op, result_type<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1a4bbf5351f1aa4d6ab5a04650672ba790"></span><code class="sig-name descname">template&lt;typename Derived, typename T, typename Category, typename Reference, typename Distance, typename Pointer&gt;HPX_HOST_DEVICE util::detail::postfix_increment_result&lt;Derived, typename Derived::value_type, typename Derived::reference&gt;::type hpx::util::operator++(iterator_facade &lt; Derived, T, Category, Reference, Distance, Pointer &gt; &amp; i, int)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1ada0560cbd89e469032078183dbda323b"></span><code class="sig-name descname">hpx::util::HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, bool)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1a923f98c95be46715fdc676655d795db0"></span><code class="sig-name descname">hpx::util::HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, !, bool)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1a674a85bc1848bb5d1709da8fe27aabb3"></span><code class="sig-name descname">hpx::util::HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1ad9fd4d88786e3224600120a4b10bf3a4"></span><code class="sig-name descname">hpx::util::HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, &lt;=, bool)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1af7a640dac951e71d6e8ae74bce0b9056"></span><code class="sig-name descname">hpx::util::HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, &gt;=, bool)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1a0857e7be73458e319d748bee1a2d1871"></span><code class="sig-name descname">hpx::util::HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(inline, -, typename std::iterator_traits&lt; Derived2 &gt;::difference_type)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1abc3dfbb2f9558d47e7806d5323a382c9"></span><code class="sig-name descname">template&lt;typename Derived, typename T, typename Category, typename Reference, typename Distance, typename Pointer&gt;HPX_HOST_DEVICE Derived hpx::util::operator+(iterator_facade &lt; Derived, T, Category, Reference, Distance, Pointer &gt; const &amp; it, typename Derived::difference_type n)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2iterator__facade_8hpp_1a44bfcfda631623284b9b44887611257b"></span><code class="sig-name descname">template&lt;typename Derived, typename T, typename Category, typename Reference, typename Distance, typename Pointer&gt;HPX_HOST_DEVICE Derived hpx::util::operator+(typename Derived::difference_type n, iterator_facade &lt; Derived, T, Category, Reference, Distance, Pointer &gt; const &amp; it)</code></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx4util20iterator_core_accessE">
+<span id="_CPPv3N3hpx4util20iterator_core_accessE"></span><span id="_CPPv2N3hpx4util20iterator_core_accessE"></span><span id="hpx::util::iterator_core_access"></span><span class="target" id="classhpx_1_1util_1_1iterator__core__access"></span><em class="property">class </em><code class="sig-name descname">iterator_core_access</code><a class="headerlink" href="#_CPPv4N3hpx4util20iterator_core_accessE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__core__access_1a50594a865b673fbdd547c46537596fda"></span><code class="sig-name descname">template&lt;typename Iterator1, typename Iterator2&gt;static HPX_HOST_DEVICE bool hpx::util::iterator_core_access::equal(Iterator1 const &amp; lhs, Iterator2 const &amp; rhs)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__core__access_1a78a8cb90b8bb0b47d872df6a2d9fa091"></span><code class="sig-name descname">template&lt;typename Iterator&gt;static HPX_HOST_DEVICE void hpx::util::iterator_core_access::increment(Iterator &amp; it)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__core__access_1aa3f16a3278ca6852f96aca8fc9118efb"></span><code class="sig-name descname">template&lt;typename Iterator&gt;static HPX_HOST_DEVICE void hpx::util::iterator_core_access::decrement(Iterator &amp; it)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__core__access_1a35da587d9f7e8a77cfa067f391f6808f"></span><code class="sig-name descname">template&lt;typename Reference, typename Iterator&gt;static HPX_HOST_DEVICE Reference hpx::util::iterator_core_access::dereference(Iterator const &amp; it)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__core__access_1a3d869c61ef22e744dc101d7e4b2a0e9f"></span><code class="sig-name descname">template&lt;typename Iterator, typename Distance&gt;static HPX_HOST_DEVICE void hpx::util::iterator_core_access::advance(Iterator &amp; it, Distance n)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__core__access_1add9d70d1975aefb0edecb530695bbd7f"></span><code class="sig-name descname">template&lt;typename Iterator1, typename Iterator2&gt;static HPX_HOST_DEVICE std::iterator_traits&lt;Iterator1&gt;::difference_type hpx::util::iterator_core_access::distance_to(Iterator1 const &amp; lhs, Iterator2 const &amp; rhs)</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I000000EN3hpx4util15iterator_facadeE">
+<span id="_CPPv3I000000EN3hpx4util15iterator_facadeE"></span><span id="_CPPv2I000000EN3hpx4util15iterator_facadeE"></span><span class="target" id="structhpx_1_1util_1_1iterator__facade"></span>template&lt;typename <code class="sig-name descname">Derived</code>, typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">Category</code>, typename <code class="sig-name descname">Reference</code> = <a class="reference internal" href="#_CPPv4I000000EN3hpx4util15iterator_facadeE" title="hpx::util::iterator_facade::T">T</a>&amp;, typename <code class="sig-name descname">Distance</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ptrdiff_t, typename <code class="sig-name descname">Pointer</code> = void&gt;<br /><em class="property">struct </em><code class="sig-name descname">iterator_facade</code> : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::iterator_facade_base&lt;<a class="reference internal" href="#_CPPv4I000000EN3hpx4util15iterator_facadeE" title="hpx::util::iterator_facade::Derived">Derived</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util15iterator_facadeE" title="hpx::util::iterator_facade::T">T</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util15iterator_facadeE" title="hpx::util::iterator_facade::Category">Category</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util15iterator_facadeE" title="hpx::util::iterator_facade::Reference">Reference</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util15iterator_facadeE" title="hpx::util::iterator_facade::Distance">Distance</a>, <a class="reference internal" href="#_CPPv4I000000EN3hpx4util15iterator_facadeE" title="hpx::util::iterator_facade::Pointer">Pointer</a>&gt;<a class="headerlink" href="#_CPPv4I000000EN3hpx4util15iterator_facadeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Subclassed by <a class="reference internal" href="#classhpx_1_1util_1_1iterator__adaptor"><span class="std std-ref">hpx::util::iterator_adaptor&lt; Derived, Base, Value, Category, Reference, Difference, Pointer &gt;</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util15iterator_facade15iterator_facadeEv">
+<span id="_CPPv3N3hpx4util15iterator_facade15iterator_facadeEv"></span><span id="_CPPv2N3hpx4util15iterator_facade15iterator_facadeEv"></span><span id="hpx::util::iterator_facade::iterator_facade"></span><span class="target" id="structhpx_1_1util_1_1iterator__facade_1a027b7d498caf7d0cefb2fbb8d9083ebc"></span>HPX_HOST_DEVICE <code class="sig-name descname">iterator_facade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util15iterator_facade15iterator_facadeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Protected Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util15iterator_facade17iterator_adaptor_E">
+<span id="_CPPv3N3hpx4util15iterator_facade17iterator_adaptor_E"></span><span id="_CPPv2N3hpx4util15iterator_facade17iterator_adaptor_E"></span><span id="hpx::util::iterator_facade::iterator_adaptor_"></span><span class="target" id="structhpx_1_1util_1_1iterator__facade_1a7039b8256bed165e684a1b1a3594a98c"></span><em class="property">typedef </em>iterator_facade&lt;Derived, T, Category, Reference, Distance, Pointer&gt; <code class="sig-name descname">iterator_adaptor_</code><a class="headerlink" href="#_CPPv4N3hpx4util15iterator_facade17iterator_adaptor_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util15iterator_facade9base_typeE">
+<span id="_CPPv3N3hpx4util15iterator_facade9base_typeE"></span><span id="_CPPv2N3hpx4util15iterator_facade9base_typeE"></span><span id="hpx::util::iterator_facade::base_type"></span><span class="target" id="structhpx_1_1util_1_1iterator__facade_1a74f21bb4144d021adedf010f5cf9bf45"></span><em class="property">typedef </em>detail::iterator_facade_base&lt;Derived, T, Category, Reference, Distance, Pointer&gt; <code class="sig-name descname">base_type</code><a class="headerlink" href="#_CPPv4N3hpx4util15iterator_facade9base_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-iterator-support-iterator-range-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/iterator_range.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-iterator-support-iterator-range-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeER5Range">
+<span id="_CPPv3I000EN3hpx4util19make_iterator_rangeER5Range"></span><span id="_CPPv2I000EN3hpx4util19make_iterator_rangeER5Range"></span><span class="target" id="hpx_2iterator__support_2iterator__range_8hpp_1afee7a7b5efc7ee1fa8ba7c61a49573f7"></span>template&lt;typename <code class="sig-name descname">Range</code>, typename <code class="sig-name descname">Iterator</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::range_iterator&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeER5Range" title="hpx::util::make_iterator_range::Range">Range</a>&gt;::type, typename <code class="sig-name descname">Sentinel</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::range_iterator&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeER5Range" title="hpx::util::make_iterator_range::Range">Range</a>&gt;::type&gt;<br /><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_range&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeER5Range" title="hpx::util::make_iterator_range::Range">Range</a>&gt;::value, iterator_range&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeER5Range" title="hpx::util::make_iterator_range::Iterator">Iterator</a>, <a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeER5Range" title="hpx::util::make_iterator_range::Sentinel">Sentinel</a>&gt;&gt;::type <code class="sig-name descname">make_iterator_range</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeER5Range" title="hpx::util::make_iterator_range::Range">Range</a> &amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeER5Range" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeERK5Range">
+<span id="_CPPv3I000EN3hpx4util19make_iterator_rangeERK5Range"></span><span id="_CPPv2I000EN3hpx4util19make_iterator_rangeERK5Range"></span><span class="target" id="hpx_2iterator__support_2iterator__range_8hpp_1acd605a06babb3f6a09f5c24710ff5b54"></span>template&lt;typename <code class="sig-name descname">Range</code>, typename <code class="sig-name descname">Iterator</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::range_iterator&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeERK5Range" title="hpx::util::make_iterator_range::Range">Range</a> <em class="property">const</em>&gt;::type, typename <code class="sig-name descname">Sentinel</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::range_iterator&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeERK5Range" title="hpx::util::make_iterator_range::Range">Range</a> <em class="property">const</em>&gt;::type&gt;<br /><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_range&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeERK5Range" title="hpx::util::make_iterator_range::Range">Range</a>&gt;::value, iterator_range&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeERK5Range" title="hpx::util::make_iterator_range::Iterator">Iterator</a>, <a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeERK5Range" title="hpx::util::make_iterator_range::Sentinel">Sentinel</a>&gt;&gt;::type <code class="sig-name descname">make_iterator_range</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeERK5Range" title="hpx::util::make_iterator_range::Range">Range</a> <em class="property">const</em> &amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits8is_rangeI5RangeE5valueE14iterator_rangeI8Iterator8SentinelEE4typeERK5Range" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits11is_iteratorI8IteratorE5valueE14iterator_rangeI8Iterator8SentinelEE4typeE8Iterator8Sentinel">
+<span id="_CPPv3I00EN3hpx4util19make_iterator_rangeE8Iterator8Sentinel"></span><span id="_CPPv2I00EN3hpx4util19make_iterator_rangeE8Iterator8Sentinel"></span><span class="target" id="hpx_2iterator__support_2iterator__range_8hpp_1a4861c0614344bfc2e047a4bacc0910c9"></span>template&lt;typename <code class="sig-name descname">Iterator</code>, typename <code class="sig-name descname">Sentinel</code> = <a class="reference internal" href="#_CPPv4I00EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits11is_iteratorI8IteratorE5valueE14iterator_rangeI8Iterator8SentinelEE4typeE8Iterator8Sentinel" title="hpx::util::make_iterator_range::Iterator">Iterator</a>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_iterator&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits11is_iteratorI8IteratorE5valueE14iterator_rangeI8Iterator8SentinelEE4typeE8Iterator8Sentinel" title="hpx::util::make_iterator_range::Iterator">Iterator</a>&gt;::value, iterator_range&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits11is_iteratorI8IteratorE5valueE14iterator_rangeI8Iterator8SentinelEE4typeE8Iterator8Sentinel" title="hpx::util::make_iterator_range::Iterator">Iterator</a>, <a class="reference internal" href="#_CPPv4I00EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits11is_iteratorI8IteratorE5valueE14iterator_rangeI8Iterator8SentinelEE4typeE8Iterator8Sentinel" title="hpx::util::make_iterator_range::Sentinel">Sentinel</a>&gt;&gt;::type <code class="sig-name descname">make_iterator_range</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits11is_iteratorI8IteratorE5valueE14iterator_rangeI8Iterator8SentinelEE4typeE8Iterator8Sentinel" title="hpx::util::make_iterator_range::Iterator">Iterator</a> <em>iterator</em>, <a class="reference internal" href="#_CPPv4I00EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits11is_iteratorI8IteratorE5valueE14iterator_rangeI8Iterator8SentinelEE4typeE8Iterator8Sentinel" title="hpx::util::make_iterator_range::Sentinel">Sentinel</a> <em>sentinel</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx4util19make_iterator_rangeENSt9enable_ifIN6traits11is_iteratorI8IteratorE5valueE14iterator_rangeI8Iterator8SentinelEE4typeE8Iterator8Sentinel" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4I00EN3hpx4util14iterator_rangeE">
+<span id="_CPPv3I00EN3hpx4util14iterator_rangeE"></span><span id="_CPPv2I00EN3hpx4util14iterator_rangeE"></span><span class="target" id="classhpx_1_1util_1_1iterator__range"></span>template&lt;typename <code class="sig-name descname">Iterator</code>, typename <code class="sig-name descname">Sentinel</code> = <a class="reference internal" href="#_CPPv4I00EN3hpx4util14iterator_rangeE" title="hpx::util::iterator_range::Iterator">Iterator</a>&gt;<br /><em class="property">class </em><code class="sig-name descname">iterator_range</code><a class="headerlink" href="#_CPPv4I00EN3hpx4util14iterator_rangeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util14iterator_range14iterator_rangeEv">
+<span id="_CPPv3N3hpx4util14iterator_range14iterator_rangeEv"></span><span id="_CPPv2N3hpx4util14iterator_range14iterator_rangeEv"></span><span id="hpx::util::iterator_range::iterator_range"></span><span class="target" id="classhpx_1_1util_1_1iterator__range_1abbb8f07a5c353326cbf7beb3259997cd"></span><code class="sig-name descname">iterator_range</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util14iterator_range14iterator_rangeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util14iterator_range14iterator_rangeE8Iterator8Sentinel">
+<span id="_CPPv3N3hpx4util14iterator_range14iterator_rangeE8Iterator8Sentinel"></span><span id="_CPPv2N3hpx4util14iterator_range14iterator_rangeE8Iterator8Sentinel"></span><span id="hpx::util::iterator_range::iterator_range__Iterator.Sentinel"></span><span class="target" id="classhpx_1_1util_1_1iterator__range_1a5c29a449adda173203e9041750f81330"></span><code class="sig-name descname">iterator_range</code><span class="sig-paren">(</span>Iterator <em>iterator</em>, Sentinel <em>sentinel</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util14iterator_range14iterator_rangeE8Iterator8Sentinel" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util14iterator_range5beginEv">
+<span id="_CPPv3NK3hpx4util14iterator_range5beginEv"></span><span id="_CPPv2NK3hpx4util14iterator_range5beginEv"></span><span id="hpx::util::iterator_range::beginC"></span><span class="target" id="classhpx_1_1util_1_1iterator__range_1ae6abca8903819d27d44d0eaeb53f3815"></span>Iterator <code class="sig-name descname">begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util14iterator_range5beginEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util14iterator_range3endEv">
+<span id="_CPPv3NK3hpx4util14iterator_range3endEv"></span><span id="_CPPv2NK3hpx4util14iterator_range3endEv"></span><span id="hpx::util::iterator_range::endC"></span><span class="target" id="classhpx_1_1util_1_1iterator__range_1aad1f7557244f2add899925f14e1b7851"></span>Iterator <code class="sig-name descname">end</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util14iterator_range3endEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util14iterator_range4sizeEv">
+<span id="_CPPv3NK3hpx4util14iterator_range4sizeEv"></span><span id="_CPPv2NK3hpx4util14iterator_range4sizeEv"></span><span id="hpx::util::iterator_range::sizeC"></span><span class="target" id="classhpx_1_1util_1_1iterator__range_1a1f4ee6a49a20b63cd2be16d0fc9cb3b1"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ptrdiff_t <code class="sig-name descname">size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util14iterator_range4sizeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util14iterator_range5emptyEv">
+<span id="_CPPv3NK3hpx4util14iterator_range5emptyEv"></span><span id="_CPPv2NK3hpx4util14iterator_range5emptyEv"></span><span id="hpx::util::iterator_range::emptyC"></span><span class="target" id="classhpx_1_1util_1_1iterator__range_1a8ef4f96ac5a31e0e8c484882796cda17"></span>bool <code class="sig-name descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util14iterator_range5emptyEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util14iterator_range9_iteratorE">
+<span id="_CPPv3N3hpx4util14iterator_range9_iteratorE"></span><span id="_CPPv2N3hpx4util14iterator_range9_iteratorE"></span><span id="hpx::util::iterator_range::_iterator__Iterator"></span><span class="target" id="classhpx_1_1util_1_1iterator__range_1a236e98a88d6368ca1a6bc02941ed9581"></span>Iterator <code class="sig-name descname">_iterator</code><a class="headerlink" href="#_CPPv4N3hpx4util14iterator_range9_iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util14iterator_range9_sentinelE">
+<span id="_CPPv3N3hpx4util14iterator_range9_sentinelE"></span><span id="_CPPv2N3hpx4util14iterator_range9_sentinelE"></span><span id="hpx::util::iterator_range::_sentinel__Sentinel"></span><span class="target" id="classhpx_1_1util_1_1iterator__range_1a9138ae3a7054ac1fcd1184e7181777ba"></span>Sentinel <code class="sig-name descname">_sentinel</code><a class="headerlink" href="#_CPPv4N3hpx4util14iterator_range9_sentinelE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-iterator-support-range-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/range.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-iterator-support-range-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4util9range_adlE">
+<span id="_CPPv3N3hpx4util9range_adlE"></span><span id="_CPPv2N3hpx4util9range_adlE"></span><span id="hpx::util::range_adl"></span><span class="target" id="namespacehpx_1_1util_1_1range__adl"></span><em class="property">namespace </em><code class="sig-name descname">range_adl</code><a class="headerlink" href="#_CPPv4N3hpx4util9range_adlE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2range_8hpp_1a689b47ecf4d2470688d0a9c18a63dccd"></span><code class="sig-name descname">template&lt;typename C, typename Iterator = typename detail::iterator&lt;C&gt;::type&gt;HPX_HOST_DEVICE constexpr Iterator hpx::util::range_adl::begin(C &amp; c)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2range_8hpp_1aced5044c522ec4ba1fdd719e11255f84"></span><code class="sig-name descname">template&lt;typename C, typename Iterator = typename detail::iterator&lt;C const&gt;::type&gt;HPX_HOST_DEVICE constexpr Iterator hpx::util::range_adl::begin(C const &amp; c)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2range_8hpp_1a44391134881829e13557aa92169491de"></span><code class="sig-name descname">template&lt;typename C, typename Sentinel = typename detail::sentinel&lt;C&gt;::type&gt;HPX_HOST_DEVICE constexpr Sentinel hpx::util::range_adl::end(C &amp; c)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2range_8hpp_1a470638cfd1937e0058e6efa76645dde4"></span><code class="sig-name descname">template&lt;typename C, typename Sentinel = typename detail::sentinel&lt;C const&gt;::type&gt;HPX_HOST_DEVICE constexpr Sentinel hpx::util::range_adl::end(C const &amp; c)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2range_8hpp_1a187cfbb7b8175c822ae83e20bbbd4d9a"></span><code class="sig-name descname">template&lt;typename C, typename Iterator = typename detail::iterator&lt;C const&gt;::type, typename Sentinel = typename detail::sentinel&lt;C const&gt;::type&gt;HPX_HOST_DEVICE constexpr std::size_t hpx::util::range_adl::size(C const &amp; c)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2iterator__support_2range_8hpp_1a508829252e523e5a01bb8d490276f871"></span><code class="sig-name descname">template&lt;typename C, typename Iterator = typename detail::iterator&lt;C const&gt;::type, typename Sentinel = typename detail::sentinel&lt;C const&gt;::type&gt;HPX_HOST_DEVICE constexpr bool hpx::util::range_adl::empty(C const &amp; c)</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-iterator-support-iterator-adaptor-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/iterator_adaptor.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-iterator-support-iterator-adaptor-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I0000000EN3hpx4util16iterator_adaptorE">
+<span id="_CPPv3I0000000EN3hpx4util16iterator_adaptorE"></span><span id="_CPPv2I0000000EN3hpx4util16iterator_adaptorE"></span><span class="target" id="classhpx_1_1util_1_1iterator__adaptor"></span>template&lt;typename <code class="sig-name descname">Derived</code>, typename <code class="sig-name descname">Base</code>, typename <code class="sig-name descname">Value</code> = void, typename <code class="sig-name descname">Category</code> = void, typename <code class="sig-name descname">Reference</code> = void, typename <code class="sig-name descname">Difference</code> = void, typename <code class="sig-name descname">Pointer</code> = void&gt;<br /><em class="property">class </em><code class="sig-name descname">iterator_adaptor</code> : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::iterator_facade&lt;<a class="reference internal" href="#_CPPv4I0000000EN3hpx4util16iterator_adaptorE" title="hpx::util::iterator_adaptor::Derived">Derived</a>, value_type, iterator_category, reference_type, difference_type, <a class="reference internal" href="#_CPPv4I0000000EN3hpx4util16iterator_adaptorE" title="hpx::util::iterator_adaptor::Pointer">Pointer</a>&gt;<a class="headerlink" href="#_CPPv4I0000000EN3hpx4util16iterator_adaptorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Subclassed by <a class="reference internal" href="#classhpx_1_1util_1_1transform__iterator"><span class="std std-ref">hpx::util::transform_iterator&lt; Iterator, Transformer, Reference, Value, Category, Difference &gt;</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util16iterator_adaptor9base_typeE">
+<span id="_CPPv3N3hpx4util16iterator_adaptor9base_typeE"></span><span id="_CPPv2N3hpx4util16iterator_adaptor9base_typeE"></span><span id="hpx::util::iterator_adaptor::base_type"></span><span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1abbf0cdd461f44819f1c80d480bda9e52"></span><em class="property">typedef </em>Base <code class="sig-name descname">base_type</code><a class="headerlink" href="#_CPPv4N3hpx4util16iterator_adaptor9base_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util16iterator_adaptor16iterator_adaptorEv">
+<span id="_CPPv3N3hpx4util16iterator_adaptor16iterator_adaptorEv"></span><span id="_CPPv2N3hpx4util16iterator_adaptor16iterator_adaptorEv"></span><span id="hpx::util::iterator_adaptor::iterator_adaptor"></span><span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1a1cb74780e85efc9cf1d955008d1c3e48"></span>HPX_HOST_DEVICE <code class="sig-name descname">iterator_adaptor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util16iterator_adaptor16iterator_adaptorEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util16iterator_adaptor16iterator_adaptorERK4Base">
+<span id="_CPPv3N3hpx4util16iterator_adaptor16iterator_adaptorERK4Base"></span><span id="_CPPv2N3hpx4util16iterator_adaptor16iterator_adaptorERK4Base"></span><span id="hpx::util::iterator_adaptor::iterator_adaptor__BaseCR"></span><span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1aee9eb18ff0d00f7161b0bc34769e10eb"></span>HPX_HOST_DEVICE <code class="sig-name descname">iterator_adaptor</code><span class="sig-paren">(</span>Base <em class="property">const</em> &amp;<em>iter</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util16iterator_adaptor16iterator_adaptorERK4Base" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1aca8573df000e27a2a260377f71644895"></span><code class="sig-name descname">HPX_HOST_DEVICE Base const&amp; hpx::util::iterator_adaptor::base() const</code></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Protected Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util16iterator_adaptor17base_adaptor_typeE">
+<span id="_CPPv3N3hpx4util16iterator_adaptor17base_adaptor_typeE"></span><span id="_CPPv2N3hpx4util16iterator_adaptor17base_adaptor_typeE"></span><span id="hpx::util::iterator_adaptor::base_adaptor_type"></span><span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1aa9f656e2c1cb46622c25aa030eee25ca"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::iterator_adaptor_base&lt;Derived, Base, Value, Category, Reference, Difference, Pointer&gt;::type <code class="sig-name descname">base_adaptor_type</code><a class="headerlink" href="#_CPPv4N3hpx4util16iterator_adaptor17base_adaptor_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx4util16iterator_adaptor17iterator_adaptor_E">
+<span id="_CPPv3N3hpx4util16iterator_adaptor17iterator_adaptor_E"></span><span id="_CPPv2N3hpx4util16iterator_adaptor17iterator_adaptor_E"></span><span id="hpx::util::iterator_adaptor::iterator_adaptor_"></span><span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1ae69a27a890207d4b895e7190c164d20b"></span><em class="property">typedef </em>iterator_adaptor&lt;Derived, Base, Value, Category, Reference, Difference, Pointer&gt; <code class="sig-name descname">iterator_adaptor_</code><a class="headerlink" href="#_CPPv4N3hpx4util16iterator_adaptor17iterator_adaptor_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Protected Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1a9b3d90754a1f40a764afd271d4abec28"></span><code class="sig-name descname">HPX_HOST_DEVICE Base const&amp; hpx::util::iterator_adaptor::base_reference() const</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1a5c65a14b01cc9e6105048e5ef20caf9f"></span><code class="sig-name descname">HPX_HOST_DEVICE Base&amp; hpx::util::iterator_adaptor::base_reference()</code></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1a64874b65d0d7c82f4fe88abc2c0fcee0"></span><code class="sig-name descname">HPX_HOST_DEVICE base_adaptor_type::reference hpx::util::iterator_adaptor::dereference() const</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1a5877c8f463d0ef51a092a50680d82e39"></span><code class="sig-name descname">template&lt;typename OtherDerived, typename OtherIterator, typename V, typename C, typename R, typename D, typename P&gt;HPX_HOST_DEVICE bool hpx::util::iterator_adaptor::equal(iterator_adaptor &lt; OtherDerived, OtherIterator, V, C, R, D, P &gt; const &amp; x) const</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1a3b89284e11f71b42b6872c050750a4a8"></span><code class="sig-name descname">template&lt;typename DifferenceType&gt;HPX_HOST_DEVICE void hpx::util::iterator_adaptor::advance(DifferenceType n)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1ae1a236469e487589fa759cd89c7335eb"></span><code class="sig-name descname">HPX_HOST_DEVICE void hpx::util::iterator_adaptor::increment()</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1aae90d79ce24826203c28353c35e94f83"></span><code class="sig-name descname">template&lt;typename Iterator = Base, typename Enable = typename std::enable_if&lt;                traits::is_bidirectional_iterator&lt;Iterator&gt;::value&gt;::type&gt;HPX_HOST_DEVICE void hpx::util::iterator_adaptor::decrement()</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1a2bde62f773b02f1c5058c3f278dc641a"></span><code class="sig-name descname">template&lt;typename OtherDerived, typename OtherIterator, typename V, typename C, typename R, typename D, typename P&gt;HPX_HOST_DEVICE base_adaptor_type::difference_type hpx::util::iterator_adaptor::distance_to(iterator_adaptor &lt; OtherDerived, OtherIterator, V, C, R, D, P &gt; const &amp; y) const</code></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util16iterator_adaptor9iterator_E">
+<span id="_CPPv3N3hpx4util16iterator_adaptor9iterator_E"></span><span id="_CPPv2N3hpx4util16iterator_adaptor9iterator_E"></span><span id="hpx::util::iterator_adaptor::iterator___Base"></span><span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1a177808db7e36ba030cf18db95d4da09d"></span>Base <code class="sig-name descname">iterator_</code><a class="headerlink" href="#_CPPv4N3hpx4util16iterator_adaptor9iterator_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1iterator__adaptor_1ad00908d93ca5dd8443486a1fe00aeea2"></span><em class="property">friend </em><code class="sig-name descname">hpx::util::hpx::util::iterator_core_access</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-iterator-support-traits-is-range-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/traits/is_range.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-iterator-support-traits-is-range-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6traitsE">
+<span id="_CPPv3N3hpx6traitsE"></span><span id="_CPPv2N3hpx6traitsE"></span><span class="target" id="namespacehpx_1_1traits"></span><em class="property">namespace </em><code class="sig-name descname">traits</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I0EN3hpx6traits12range_traitsI1RXL1EEEE">
+<span id="_CPPv3I0EN3hpx6traits12range_traitsI1RXL1EEEE"></span><span id="_CPPv2I0EN3hpx6traits12range_traitsI1RXtrueEEE"></span><span class="target" id="structhpx_1_1traits_1_1range__traits_3_01_r_00_01true_01_4"></span>template&lt;typename <code class="sig-name descname">R</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">range_traits</code>&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6traits12range_traitsI1RXL1EEEE" title="hpx::traits::range_traits&lt;R, true&gt;::R">R</a>, true&gt; : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::iterator_traits&lt;<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::iterator&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6traits12range_traitsI1RXL1EEEE" title="hpx::traits::range_traits&lt;R, true&gt;::R">R</a>&gt;::type&gt;<a class="headerlink" href="#_CPPv4I0EN3hpx6traits12range_traitsI1RXL1EEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits12range_traits13iterator_typeE">
+<span id="_CPPv3N3hpx6traits12range_traits13iterator_typeE"></span><span id="_CPPv2N3hpx6traits12range_traits13iterator_typeE"></span><span id="hpx::traits::range_traits::iterator_type"></span><span class="target" id="structhpx_1_1traits_1_1range__traits_3_01_r_00_01true_01_4_1aaa6153818e06cb44abd3081b1ddb9bef"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::iterator&lt;R&gt;::type <code class="sig-name descname">iterator_type</code><a class="headerlink" href="#_CPPv4N3hpx6traits12range_traits13iterator_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits12range_traits13sentinel_typeE">
+<span id="_CPPv3N3hpx6traits12range_traits13sentinel_typeE"></span><span id="_CPPv2N3hpx6traits12range_traits13sentinel_typeE"></span><span id="hpx::traits::range_traits::sentinel_type"></span><span class="target" id="structhpx_1_1traits_1_1range__traits_3_01_r_00_01true_01_4_1ab15b61566115d36c5b11ad9d5b94131c"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::sentinel&lt;R&gt;::type <code class="sig-name descname">sentinel_type</code><a class="headerlink" href="#_CPPv4N3hpx6traits12range_traits13sentinel_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-iterator-support-traits-is-iterator-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/iterator_support/traits/is_iterator.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-iterator-support-traits-is-iterator-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-traits-is-range-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/traits/is_range.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-traits-is-range-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-traits-is-iterator-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/traits/is_iterator.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-traits-is-iterator-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-transform-iterator-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/transform_iterator.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-transform-iterator-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-iterator-facade-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/iterator_facade.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-iterator-facade-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-iterator-range-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/iterator_range.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-iterator-range-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-range-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/range.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-range-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-iterator-adaptor-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/iterator_adaptor.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-iterator-adaptor-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../datastructures/api.html" class="btn btn-neutral float-right" title="datastructures" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../program_options/api.html" class="btn btn-neutral float-left" title="program_options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>856afc8</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

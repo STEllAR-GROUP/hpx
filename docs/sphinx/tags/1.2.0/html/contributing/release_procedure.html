@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Release procedure for HPX &mdash; HPX 1.2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="HPX 1.2.0 documentation" href="../index.html"/>
+        <link rel="up" title="Contributing to HPX" href="../contributing.html"/>
+        <link rel="next" title="Testing HPX" href="testing_hpx.html"/>
+        <link rel="prev" title="Contributing to HPX" href="../contributing.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Release procedure for <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing_hpx.html">Testing <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="docker_image.html">Using docker for development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../contributing.html">Contributing to <em>HPX</em></a> &raquo;</li>
+        
+      <li>Release procedure for <em>HPX</em></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/contributing/release_procedure.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="release-procedure-for-hpx">
+<h1>Release procedure for <em>HPX</em><a class="headerlink" href="#release-procedure-for-hpx" title="Permalink to this headline">¶</a></h1>
+<p>Below is a step-wise procedure for making an HPX release. We aim to produce two
+releases per year: one in March-April, and one in September-October.</p>
+<p>This is a living document and may not be totally current or accurate. It is an
+attempt to capture current practice in making an HPX release. Please update it
+as appropriate.</p>
+<p>One way to use this procedure is to print a copy and check off the lines as they
+are completed to avoid confusion.</p>
+<ol class="arabic">
+<li><p class="first">Notify developers that a release is imminent.</p>
+</li>
+<li><p class="first">Make a list of examples and benchmarks that should not go into the release.
+Build all examples and benchmarks that will go in the release and make sure
+they build and run as expected.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Make sure all examples and benchmarks have example input files, and usage
+documentation, either in the form of comments or a readme.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Send the list of examples and benchmarks that will be included in the release
+to <a class="reference external" href="mailto:hpx-users&#37;&#52;&#48;stellar&#46;cct&#46;lsu&#46;edu">hpx-users<span>&#64;</span>stellar<span>&#46;</span>cct<span>&#46;</span>lsu<span>&#46;</span>edu</a> and <a class="reference external" href="mailto:stellar&#37;&#52;&#48;cct&#46;lsu&#46;edu">stellar<span>&#64;</span>cct<span>&#46;</span>lsu<span>&#46;</span>edu</a>, and ask for
+feedback. Update the list as necessary.</p>
+</li>
+<li><p class="first">Write release notes in <code class="docutils literal notranslate"><span class="pre">docs/sphinx/releases/whats_new_$VERSION.rst</span></code>. Keep
+adding merged PRs and closed issues to this until just before the release is
+made.</p>
+</li>
+<li><p class="first">Build the docs, and proof-read them. Update any documentation that may have
+changed, and correct any typos. Pay special attention to:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">$HPX_SOURCE/README.rst</span></code><ul>
+<li>Update grant information</li>
+</ul>
+</li>
+<li><code class="docutils literal notranslate"><span class="pre">docs/sphinx/releases/whats_new_$VERSION.rst</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">docs/sphinx/about_hpx/people.rst</span></code><ul>
+<li>Update collaborators</li>
+<li>Update grant information</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first">Change the APEX release branch to be the most current release tag available
+in the <code class="docutils literal notranslate"><span class="pre">git_external</span></code> APEX section of the main <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>. Please
+contact the maintainers at the <a class="reference external" href="http://github.com/khuck/xpress-apex">APEX repository</a> to generate a new release to
+synchronize with the HPX release.</p>
+</li>
+<li><p class="first">Change the hpxMP release branch to be the most current release tag available
+in the <code class="docutils literal notranslate"><span class="pre">git_external</span></code> hpxMP section of the main <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>. Please
+contact the maintainers at the <a class="reference external" href="https://github.com/STEllAR-GROUP/hpxMP">hpxMP repository</a> to generate a new release to
+synchronize with the HPX release.</p>
+</li>
+<li><p class="first">If there have been any commits to the release branch since the last release
+create a tag from the old release branch before deleting the old release
+branch in the next step.</p>
+</li>
+<li><p class="first">Unprotect the release branch in the github repository settings so that it can
+be deleted and recreated.</p>
+</li>
+<li><p class="first">Delete the old release branch, and create a new one by branching a stable
+point from master.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">--delete</span> <span class="pre">release</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">branch</span> <span class="pre">-D</span> <span class="pre">release</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">[stable</span> <span class="pre">point</span> <span class="pre">in</span> <span class="pre">master]</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">branch</span> <span class="pre">release</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">release</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">branch</span> <span class="pre">--set-upstream-to=origin/release</span> <span class="pre">release</span></code></li>
+</ul>
+</li>
+<li><p class="first">Protect the release branch again to disable deleting and force pushes.</p>
+</li>
+<li><p class="first">Checkout the release branch, and replace the <code class="docutils literal notranslate"><span class="pre">-trunk</span></code> tag in
+<code class="docutils literal notranslate"><span class="pre">hpx/config/version.hpp</span></code> with <code class="docutils literal notranslate"><span class="pre">-rc1</span></code>.</p>
+</li>
+<li><p class="first">Remove the examples and benchmarks that will not go into the release from the
+release branch.</p>
+</li>
+<li><p class="first">Remove features which have been deprecated for at least 2 releases. This
+involves removing build options which enable those features from the main
+CMakeLists.txt and also deleting all related code and tests from the main
+source tree.</p>
+<p>The general deprecation policy involves a three-step process we have to go
+through in order to introduce a breaking change</p>
+<ol class="loweralpha simple">
+<li>First release cycle: add a build option which allows to explicitly disable
+any old (now deprecated) code.</li>
+<li>Second release cycle: turn this build option OFF by default.</li>
+<li>Third release cycle: completely remove the old code.</li>
+</ol>
+<p>The main CMakeLists.txt contains a comment indicating for which version
+the breaking change was introduced first.</p>
+</li>
+<li><p class="first">Tag a release candidate from the release branch, where tag name is the
+version to be released with a “-rcN” suffix and description is
+“HPX V$VERSION: The C++ Standards Library for Parallelism and Concurrency”.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">-a</span> <span class="pre">[tag</span> <span class="pre">name]</span> <span class="pre">-m</span> <span class="pre">'[description]'</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">[tag</span> <span class="pre">name]</span></code></li>
+<li>Create a pre-release on GitHub</li>
+</ul>
+</li>
+<li><p class="first">Switch Buildbot over to test the release branch</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg</span></code></li>
+<li>Line 120</li>
+</ul>
+</li>
+<li><p class="first">Notify <code class="docutils literal notranslate"><span class="pre">hpx-users&#64;stellar.cct.lsu.edu</span></code> and <code class="docutils literal notranslate"><span class="pre">stellar&#64;cct.lsu.edu</span></code> of the
+availability of the release candidate. Ask users to test the candidate by
+checking out the release candidate tag.</p>
+</li>
+<li><p class="first">Allow at least a week for testing of the release candidate.</p>
+<ul class="simple">
+<li>Use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">merge</span></code> when possible, and fall back to <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">cherry-pick</span></code>
+when needed.</li>
+<li>Repeat by tagging a new release candidate as many times as needed.</li>
+</ul>
+</li>
+<li><p class="first">Checkout the release branch, and replace the <code class="docutils literal notranslate"><span class="pre">-rcN</span></code> tag in
+<code class="docutils literal notranslate"><span class="pre">hpx/config/version.hpp</span></code> with an empty string.</p>
+</li>
+<li><p class="first">Add the release date to the caption of the current “What’s New” section in
+the docs, and change the value of <code class="docutils literal notranslate"><span class="pre">HPX_VERSION_DATE</span></code> in
+<code class="docutils literal notranslate"><span class="pre">hpx/config/version.hpp</span></code>.</p>
+</li>
+<li><p class="first">Tag the release from the release branch, where tag name is the version to be
+released and description is “HPX V$VERSION: The C++ Standards Library for
+Parallelism and Concurrency”. Sign the release tag with the
+<code class="docutils literal notranslate"><span class="pre">contact&#64;stellar-group.org</span></code> key by adding the <code class="docutils literal notranslate"><span class="pre">-s</span></code> flag to <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span></code>.
+Make sure you change git to sign with the <code class="docutils literal notranslate"><span class="pre">contact&#64;stellar-group.org</span></code> key,
+rather than your own key if you use one. You also need to change the name and
+email used for commits. Change them to <code class="docutils literal notranslate"><span class="pre">Ste||ar</span> <span class="pre">Group</span></code> and
+<code class="docutils literal notranslate"><span class="pre">contact&#64;stellar-group.org</span></code>, respectively. Finally, the
+<code class="docutils literal notranslate"><span class="pre">contact&#64;stellar-group.org</span></code> email address needs to be added to your GitHub
+account for the tag to show up as verified.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">-s</span> <span class="pre">-a</span> <span class="pre">[tag</span> <span class="pre">name]</span> <span class="pre">-m</span> <span class="pre">'[description]'</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">[tag</span> <span class="pre">name]</span></code></li>
+</ul>
+</li>
+<li><p class="first">Create a release on github</p>
+<ul class="simple">
+<li>Refer to ‘What’s New’ section in the documentation you uploaded in the
+notes for the Github release (see previous releases for a hint).</li>
+<li>A DOI number using Zenodo is automatically assigned once the release is
+created as such on github.</li>
+<li>Verify on Zenodo (<a class="reference external" href="https://zenodo.org/">https://zenodo.org/</a>) that release was uploaded. Logging
+into zenodo using the github credentials might be necessary to see the new
+release as it usually takes a while for it to propagate to the search
+engine used on zenodo.</li>
+</ul>
+</li>
+<li><p class="first">Roll a release candidate using <code class="docutils literal notranslate"><span class="pre">tools/roll_release.sh</span></code> (from root
+directory), and add the hashsums generated by the script to the “downloads”
+page of the website.</p>
+</li>
+<li><p class="first">Upload the packages the website. Use the following formats:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>http://stellar.cct.lsu.edu/files/hpx_#.#.#.zip
+http://stellar.cct.lsu.edu/files/hpx_#.#.#.tar.gz
+http://stellar.cct.lsu.edu/files/hpx_#.#.#.tar.bz2
+http://stellar.cct.lsu.edu/files/hpx_#.#.#.7z
+</pre></div>
+</div>
+</li>
+<li><p class="first">Update the websites (<a href="#id2"><span class="problematic" id="id3">`stellar-group.org`_</span></a> and <a href="#id4"><span class="problematic" id="id5">`stellar.cct.lsu.edu`_</span></a>) with
+the following:</p>
+<ul class="simple">
+<li>Download links on the download page</li>
+<li>Documentation links on the docs page (link to generated documentation on
+GitHub Pages)</li>
+<li>A new blog post announcing the release, which links to downloads and the
+“What’s New” section in the documentation (see previous releases for examples)</li>
+</ul>
+</li>
+<li><p class="first">Merge release branch into master.</p>
+</li>
+<li><p class="first">Create a new branch from master, and check that branch out (name it for
+example by the next version number). Bump the HPX version to the next
+release target. The following files contain version info:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">hpx/config/version.hpp</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code></li>
+<li>Grep for old version number</li>
+</ul>
+</li>
+<li><p class="first">Create a new “What’s New” section for the docs of the next anticipated
+release. Set the date to “unreleased”.</p>
+</li>
+<li><p class="first">Update <code class="docutils literal notranslate"><span class="pre">$HPX_SOURCE/README.rst</span></code></p>
+<ul class="simple">
+<li>Update version (to the about-to-be-released version)</li>
+<li>Update links to documentation</li>
+<li>Fix zenodo reference number</li>
+</ul>
+</li>
+<li><p class="first">Merge new branch containing next version numbers to master, resolve conflicts
+if necessary.</p>
+</li>
+<li><p class="first">Switch Buildbot back to test the main branch</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">https://github.com/STEllAR-GROUP/hermione-buildbot/blob/rostam/master/master.cfg</span></code></li>
+<li>Line 120</li>
+</ul>
+</li>
+<li><p class="first">Update Vcpkg (<code class="docutils literal notranslate"><span class="pre">https://github.com/Microsoft/vcpkg</span></code>) to pull from latest release.</p>
+<ul class="simple">
+<li>Update version number in CONTROL</li>
+<li>Update tag and SHA512 to that of the new release</li>
+</ul>
+</li>
+<li><p class="first">Announce the release on <a class="reference external" href="mailto:hpx-users&#37;&#52;&#48;stellar&#46;cct&#46;lsu&#46;edu">hpx-users<span>&#64;</span>stellar<span>&#46;</span>cct<span>&#46;</span>lsu<span>&#46;</span>edu</a>, <a class="reference external" href="mailto:stellar&#37;&#52;&#48;cct&#46;lsu&#46;edu">stellar<span>&#64;</span>cct<span>&#46;</span>lsu<span>&#46;</span>edu</a>,
+<a class="reference external" href="mailto:allcct&#37;&#52;&#48;cct&#46;lsu&#46;edu">allcct<span>&#64;</span>cct<span>&#46;</span>lsu<span>&#46;</span>edu</a>, <a class="reference external" href="mailto:faculty&#37;&#52;&#48;csc&#46;lsu&#46;edu">faculty<span>&#64;</span>csc<span>&#46;</span>lsu<span>&#46;</span>edu</a>, <a class="reference external" href="mailto:faculty&#37;&#52;&#48;ece&#46;lsu&#46;edu">faculty<span>&#64;</span>ece<span>&#46;</span>lsu<span>&#46;</span>edu</a>,
+<a class="reference external" href="mailto:xpress&#37;&#52;&#48;crest&#46;iu&#46;edu">xpress<span>&#64;</span>crest<span>&#46;</span>iu<span>&#46;</span>edu</a>, the <em>HPX</em> Slack channel, the IRC channel, Sonia Sachs,
+our list of external collaborators, isocpp.org, reddit.com, HPC Wire, Inside
+HPC, Heise Online, and a CCT press release.</p>
+</li>
+<li><p class="first">Beer and pizza.</p>
+</li>
+</ol>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="testing_hpx.html" class="btn btn-neutral float-right" title="Testing HPX" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../contributing.html" class="btn btn-neutral" title="Contributing to HPX" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, The Ste||ar Group.
+      
+        <span class="commit">
+          Revision <code>f52dc95</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,763 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>basic_execution &mdash; HPX 1.4.0-rc1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="checkpoint" href="../checkpoint/api.html" />
+    <link rel="prev" title="iterator_support" href="../iterator_support/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0-rc1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">basic_execution</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-register-locks-hpp"><cite>#include &lt;compatibility/hpx/util/register_locks.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-basic-execution-hpp"><cite>#include &lt;hpx/basic_execution.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-basic-execution-agent-ref-hpp"><cite>#include &lt;hpx/basic_execution/agent_ref.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-basic-execution-this-thread-hpp"><cite>#include &lt;hpx/basic_execution/this_thread.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-basic-execution-resource-base-hpp"><cite>#include &lt;hpx/basic_execution/resource_base.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-basic-execution-context-base-hpp"><cite>#include &lt;hpx/basic_execution/context_base.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-basic-execution-agent-base-hpp"><cite>#include &lt;hpx/basic_execution/agent_base.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-basic-execution-register-locks-hpp"><cite>#include &lt;hpx/basic_execution/register_locks.hpp&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>basic_execution</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/basic_execution/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="basic-execution">
+<h1>basic_execution<a class="headerlink" href="#basic-execution" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-compatibility-hpx-util-register-locks-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/register_locks.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-register-locks-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-basic-execution-hpp">
+<h2><cite>#include &lt;hpx/basic_execution.hpp&gt;</cite><a class="headerlink" href="#include-hpx-basic-execution-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-basic-execution-agent-ref-hpp">
+<h2><cite>#include &lt;hpx/basic_execution/agent_ref.hpp&gt;</cite><a class="headerlink" href="#include-hpx-basic-execution-agent-ref-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx15basic_executionE">
+<span id="_CPPv3N3hpx15basic_executionE"></span><span id="_CPPv2N3hpx15basic_executionE"></span><span id="hpx::basic_execution"></span><span class="target" id="namespacehpx_1_1basic__execution"></span><em class="property">namespace </em><code class="sig-name descname">basic_execution</code><a class="headerlink" href="#_CPPv4N3hpx15basic_executionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx15basic_execution9agent_refE">
+<span id="_CPPv3N3hpx15basic_execution9agent_refE"></span><span id="_CPPv2N3hpx15basic_execution9agent_refE"></span><span id="hpx::basic_execution::agent_ref"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref"></span><em class="property">class </em><code class="sig-name descname">agent_ref</code><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_refE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref9agent_refEv">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref9agent_refEv"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref9agent_refEv"></span><span id="hpx::basic_execution::agent_ref::agent_refCE"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1af3663ce42ae2ec41a93c48df5d88997f"></span><em class="property">constexpr</em> <code class="sig-name descname">agent_ref</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref9agent_refEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref9agent_refEP10agent_base">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref9agent_refEP10agent_base"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref9agent_refEP10agent_base"></span><span id="hpx::basic_execution::agent_ref::agent_ref__agent_basePCE"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a3a4736817e815a39df12567aa3291346"></span><em class="property">constexpr</em> <code class="sig-name descname">agent_ref</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx15basic_execution10agent_baseE" title="hpx::basic_execution::agent_base">agent_base</a> *<em>impl</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref9agent_refEP10agent_base" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref9agent_refERK9agent_ref">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref9agent_refERK9agent_ref"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref9agent_refERK9agent_ref"></span><span id="hpx::basic_execution::agent_ref::agent_ref__agent_refCRCE"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a2ee803070f989c0b6052ca9c1ca33566"></span><em class="property">constexpr</em> <code class="sig-name descname">agent_ref</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx15basic_execution9agent_ref9agent_refEv" title="hpx::basic_execution::agent_ref::agent_ref">agent_ref</a> <em class="property">const</em>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref9agent_refERK9agent_ref" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a3e5802a37581bee1c7d75676bcad772f"></span><code class="sig-name descname">HPX_CXX14_CONSTEXPR agent_ref&amp; hpx::basic_execution::agent_ref::operator=(agent_ref  const &amp;)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref9agent_refERR9agent_ref">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref9agent_refERR9agent_ref"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref9agent_refERR9agent_ref"></span><span id="hpx::basic_execution::agent_ref::agent_ref__agent_refRRCE"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1ab41a530fef696a1a0e9b4bdfa398df7b"></span><em class="property">constexpr</em> <code class="sig-name descname">agent_ref</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx15basic_execution9agent_ref9agent_refEv" title="hpx::basic_execution::agent_ref::agent_ref">agent_ref</a>&amp;&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref9agent_refERR9agent_ref" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1ad38935862b7ba9278798d1d1b2541435"></span><code class="sig-name descname">HPX_CXX14_CONSTEXPR agent_ref&amp; hpx::basic_execution::agent_ref::operator=(agent_ref  &amp;&amp;)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx15basic_execution9agent_refcvbEv">
+<span id="_CPPv3NK3hpx15basic_execution9agent_refcvbEv"></span><span id="_CPPv2NK3hpx15basic_execution9agent_refcvbEv"></span><span id="hpx::basic_execution::agent_ref::castto-b-operatorCCE"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a635bd326758b186988a560161680aed6"></span><em class="property">constexpr</em> <code class="sig-name descname">operator bool</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx15basic_execution9agent_refcvbEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref5resetEP10agent_base">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref5resetEP10agent_base"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref5resetEP10agent_base"></span><span id="hpx::basic_execution::agent_ref::reset__agent_baseP"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a5211c5eb52539638df0655678e211b40"></span>void <code class="sig-name descname">reset</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx15basic_execution10agent_baseE" title="hpx::basic_execution::agent_base">agent_base</a> *<em>impl</em> = nullptr<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref5resetEP10agent_base" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref5yieldEPKc">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref5yieldEPKc"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref5yieldEPKc"></span><span id="hpx::basic_execution::agent_ref::yield__cCP"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a993ba5f3c5ee82c251e10d1fa3b1e055"></span>void <code class="sig-name descname">yield</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::agent_ref::yield&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref5yieldEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref7yield_kENSt6size_tEPKc">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref7yield_kENSt6size_tEPKc"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref7yield_kENSt6size_tEPKc"></span><span id="hpx::basic_execution::agent_ref::yield_k__std::s.cCP"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a8bfced26c214081857c64acc0036df80"></span>void <code class="sig-name descname">yield_k</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>k</em>, char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::agent_ref::yield_k&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref7yield_kENSt6size_tEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref7suspendEPKc">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref7suspendEPKc"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref7suspendEPKc"></span><span id="hpx::basic_execution::agent_ref::suspend__cCP"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a7db67708571bbc0897958b51060c5a05"></span>void <code class="sig-name descname">suspend</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::agent_ref::suspend&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref7suspendEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref6resumeEPKc">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref6resumeEPKc"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref6resumeEPKc"></span><span id="hpx::basic_execution::agent_ref::resume__cCP"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1ae5f7fd421435f4ba12468b4809a52cfd"></span>void <code class="sig-name descname">resume</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::agent_ref::resume&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref6resumeEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref5abortEPKc">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref5abortEPKc"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref5abortEPKc"></span><span id="hpx::basic_execution::agent_ref::abort__cCP"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a26552c7a283f4da74a14092235f2fac2"></span>void <code class="sig-name descname">abort</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::agent_ref::abort&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref5abortEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx15basic_execution9agent_ref9sleep_forEvRKNSt6chrono8durationI3Rep6PeriodEEPKc">
+<span id="_CPPv3I00EN3hpx15basic_execution9agent_ref9sleep_forERKNSt6chrono8durationI3Rep6PeriodEEPKc"></span><span id="_CPPv2I00EN3hpx15basic_execution9agent_ref9sleep_forERKNSt6chrono8durationI3Rep6PeriodEEPKc"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a2160b0146fb719dd8cca69addf60c0bf"></span>template&lt;typename <code class="sig-name descname">Rep</code>, typename <code class="sig-name descname">Period</code>&gt;<br />void <code class="sig-name descname">sleep_for</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::chrono::duration&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx15basic_execution9agent_ref9sleep_forEvRKNSt6chrono8durationI3Rep6PeriodEEPKc" title="hpx::basic_execution::agent_ref::sleep_for::Rep">Rep</a>, <a class="reference internal" href="#_CPPv4I00EN3hpx15basic_execution9agent_ref9sleep_forEvRKNSt6chrono8durationI3Rep6PeriodEEPKc" title="hpx::basic_execution::agent_ref::sleep_for::Period">Period</a>&gt; <em class="property">const</em> &amp;<em>sleep_duration</em>, char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::agent_ref::sleep_for&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx15basic_execution9agent_ref9sleep_forEvRKNSt6chrono8durationI3Rep6PeriodEEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx15basic_execution9agent_ref11sleep_untilEvRKNSt6chrono10time_pointI5Clock8DurationEEPKc">
+<span id="_CPPv3I00EN3hpx15basic_execution9agent_ref11sleep_untilERKNSt6chrono10time_pointI5Clock8DurationEEPKc"></span><span id="_CPPv2I00EN3hpx15basic_execution9agent_ref11sleep_untilERKNSt6chrono10time_pointI5Clock8DurationEEPKc"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a3c8c61ea7ed4e7e89c5e65013138b855"></span>template&lt;typename <code class="sig-name descname">Clock</code>, typename <code class="sig-name descname">Duration</code>&gt;<br />void <code class="sig-name descname">sleep_until</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::chrono::time_point&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx15basic_execution9agent_ref11sleep_untilEvRKNSt6chrono10time_pointI5Clock8DurationEEPKc" title="hpx::basic_execution::agent_ref::sleep_until::Clock">Clock</a>, <a class="reference internal" href="#_CPPv4I00EN3hpx15basic_execution9agent_ref11sleep_untilEvRKNSt6chrono10time_pointI5Clock8DurationEEPKc" title="hpx::basic_execution::agent_ref::sleep_until::Duration">Duration</a>&gt; <em class="property">const</em> &amp;<em>sleep_time</em>, char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::agent_ref::sleep_until&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx15basic_execution9agent_ref11sleep_untilEvRKNSt6chrono10time_pointI5Clock8DurationEEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref3refEv">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref3refEv"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref3refEv"></span><span id="hpx::basic_execution::agent_ref::ref"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1ab45cdd88dd1a49b4ab75b37154e352f2"></span><a class="reference internal" href="#_CPPv4N3hpx15basic_execution10agent_baseE" title="hpx::basic_execution::agent_base">agent_base</a> &amp;<code class="sig-name descname">ref</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref3refEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref9sleep_forERKN3hpx4util15steady_durationEPKc">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref9sleep_forERKN3hpx4util15steady_durationEPKc"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref9sleep_forERKN3hpx4util15steady_durationEPKc"></span><span id="hpx::basic_execution::agent_ref::sleep_for__hpx::util::steady_durationCR.cCP"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a85321e96a2f5a8417205447753e59829"></span>void <code class="sig-name descname">sleep_for</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../timing/api.html#_CPPv4N3hpx4util15steady_durationE" title="hpx::util::steady_duration">steady_duration</a> <em class="property">const</em> &amp;<em>sleep_duration</em>, char <em class="property">const</em> *<em>desc</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref9sleep_forERKN3hpx4util15steady_durationEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref11sleep_untilERKN3hpx4util17steady_time_pointEPKc">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref11sleep_untilERKN3hpx4util17steady_time_pointEPKc"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref11sleep_untilERKN3hpx4util17steady_time_pointEPKc"></span><span id="hpx::basic_execution::agent_ref::sleep_until__hpx::util::steady_time_pointCR.cCP"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a34ef110e9095607eb755bdb31d2b97f2"></span>void <code class="sig-name descname">sleep_until</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../timing/api.html#_CPPv4N3hpx4util17steady_time_pointE" title="hpx::util::steady_time_point">steady_time_point</a> <em class="property">const</em> &amp;<em>sleep_time</em>, char <em class="property">const</em> *<em>desc</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref11sleep_untilERKN3hpx4util17steady_time_pointEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx15basic_execution9agent_ref5impl_E">
+<span id="_CPPv3N3hpx15basic_execution9agent_ref5impl_E"></span><span id="_CPPv2N3hpx15basic_execution9agent_ref5impl_E"></span><span id="hpx::basic_execution::agent_ref::impl___agent_baseP"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a980432f6c1cc36759f00ece3964294bc"></span><a class="reference internal" href="#_CPPv4N3hpx15basic_execution10agent_baseE" title="hpx::basic_execution::agent_base">agent_base</a> *<code class="sig-name descname">impl_</code><a class="headerlink" href="#_CPPv4N3hpx15basic_execution9agent_ref5impl_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt id="_CPPv4eqRK9agent_refRK9agent_ref">
+<span id="_CPPv3eqRK9agent_refRK9agent_ref"></span><span id="_CPPv2eqRK9agent_refRK9agent_ref"></span><span id="eq-operator__agent_refCR.agent_refCRCE"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a56185c5686f0e8c410f14b24540d094f"></span><em class="property">constexpr</em> bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span>agent_ref <em class="property">const</em> &amp;<em>lhs</em>, agent_ref <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4eqRK9agent_refRK9agent_ref" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4neRK9agent_refRK9agent_ref">
+<span id="_CPPv3neRK9agent_refRK9agent_ref"></span><span id="_CPPv2neRK9agent_refRK9agent_ref"></span><span id="neq-operator__agent_refCR.agent_refCRCE"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a34c8e6a4fb602b57c85a2396c4373672"></span><em class="property">constexpr</em> bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span>agent_ref <em class="property">const</em> &amp;<em>lhs</em>, agent_ref <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4neRK9agent_refRK9agent_ref" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4lsRNSt7ostreamERK9agent_ref">
+<span id="_CPPv3lsRNSt7ostreamERK9agent_ref"></span><span id="_CPPv2lsRNSt7ostreamERK9agent_ref"></span><span id="lshift-operator__osR.agent_refCR"></span><span class="target" id="classhpx_1_1basic__execution_1_1agent__ref_1a67a5d507629706746c8d498b842de80a"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<code class="sig-name descname">operator&lt;&lt;</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream&amp;, agent_ref <em class="property">const</em>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4lsRNSt7ostreamERK9agent_ref" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-basic-execution-this-thread-hpp">
+<h2><cite>#include &lt;hpx/basic_execution/this_thread.hpp&gt;</cite><a class="headerlink" href="#include-hpx-basic-execution-this-thread-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx15basic_executionE">
+<span id="_CPPv3N3hpx15basic_executionE"></span><span id="_CPPv2N3hpx15basic_executionE"></span><span class="target" id="namespacehpx_1_1basic__execution"></span><em class="property">namespace </em><code class="sig-name descname">basic_execution</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx15basic_execution11this_threadE">
+<span id="_CPPv3N3hpx15basic_execution11this_threadE"></span><span id="_CPPv2N3hpx15basic_execution11this_threadE"></span><span id="hpx::basic_execution::this_thread"></span><span class="target" id="namespacehpx_1_1basic__execution_1_1this__thread"></span><em class="property">namespace </em><code class="sig-name descname">this_thread</code><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_threadE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread5agentEv">
+<span id="_CPPv3N3hpx15basic_execution11this_thread5agentEv"></span><span id="_CPPv2N3hpx15basic_execution11this_thread5agentEv"></span><span id="hpx::basic_execution::this_thread::agent"></span><span class="target" id="this__thread_8hpp_1af0ee6a2785ae107ca4c2b39517712922"></span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx15basic_executionE" title="hpx::basic_execution">basic_execution</a>::<a class="reference internal" href="#_CPPv4N3hpx15basic_execution9agent_refE" title="hpx::basic_execution::agent_ref">agent_ref</a> <code class="sig-name descname">agent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread5agentEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread5yieldEPKc">
+<span id="_CPPv3N3hpx15basic_execution11this_thread5yieldEPKc"></span><span id="_CPPv2N3hpx15basic_execution11this_thread5yieldEPKc"></span><span id="hpx::basic_execution::this_thread::yield__cCP"></span><span class="target" id="this__thread_8hpp_1afb27a8a99dba1435eaaa551388a04fb6"></span>void <code class="sig-name descname">yield</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::this_thread::yield&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread5yieldEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread7yield_kENSt6size_tEPKc">
+<span id="_CPPv3N3hpx15basic_execution11this_thread7yield_kENSt6size_tEPKc"></span><span id="_CPPv2N3hpx15basic_execution11this_thread7yield_kENSt6size_tEPKc"></span><span id="hpx::basic_execution::this_thread::yield_k__std::s.cCP"></span><span class="target" id="this__thread_8hpp_1a437bcd9c9f8c31191adf4b04dc2799fa"></span>void <code class="sig-name descname">yield_k</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>k</em>, char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::this_thread::yield_k&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread7yield_kENSt6size_tEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread7suspendEPKc">
+<span id="_CPPv3N3hpx15basic_execution11this_thread7suspendEPKc"></span><span id="_CPPv2N3hpx15basic_execution11this_thread7suspendEPKc"></span><span id="hpx::basic_execution::this_thread::suspend__cCP"></span><span class="target" id="this__thread_8hpp_1afc3e6bca65bddf1a35523775ba31ef49"></span>void <code class="sig-name descname">suspend</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::this_thread::suspend&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread7suspendEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx15basic_execution11this_thread9sleep_forEvRKNSt6chrono8durationI3Rep6PeriodEEPKc">
+<span id="_CPPv3I00EN3hpx15basic_execution11this_thread9sleep_forERKNSt6chrono8durationI3Rep6PeriodEEPKc"></span><span id="_CPPv2I00EN3hpx15basic_execution11this_thread9sleep_forERKNSt6chrono8durationI3Rep6PeriodEEPKc"></span><span class="target" id="this__thread_8hpp_1abc2c561acd713dc9f388a17d6dad91b5"></span>template&lt;typename <code class="sig-name descname">Rep</code>, typename <code class="sig-name descname">Period</code>&gt;<br />void <code class="sig-name descname">sleep_for</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::chrono::duration&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx15basic_execution11this_thread9sleep_forEvRKNSt6chrono8durationI3Rep6PeriodEEPKc" title="hpx::basic_execution::this_thread::sleep_for::Rep">Rep</a>, <a class="reference internal" href="#_CPPv4I00EN3hpx15basic_execution11this_thread9sleep_forEvRKNSt6chrono8durationI3Rep6PeriodEEPKc" title="hpx::basic_execution::this_thread::sleep_for::Period">Period</a>&gt; <em class="property">const</em> &amp;<em>sleep_duration</em>, char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::this_thread::sleep_for&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx15basic_execution11this_thread9sleep_forEvRKNSt6chrono8durationI3Rep6PeriodEEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx15basic_execution11this_thread11sleep_untilEvRKNSt6chrono10time_pointI5Clock8DurationEEPKc">
+<span id="_CPPv3I00EN3hpx15basic_execution11this_thread11sleep_untilERKNSt6chrono10time_pointI5Clock8DurationEEPKc"></span><span id="_CPPv2I00EN3hpx15basic_execution11this_thread11sleep_untilERKNSt6chrono10time_pointI5Clock8DurationEEPKc"></span><span class="target" id="this__thread_8hpp_1a9bae617a61d53cd1fce753f387d5814a"></span>template&lt;class <code class="sig-name descname">Clock</code>, class <code class="sig-name descname">Duration</code>&gt;<br />void <code class="sig-name descname">sleep_until</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::chrono::time_point&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx15basic_execution11this_thread11sleep_untilEvRKNSt6chrono10time_pointI5Clock8DurationEEPKc" title="hpx::basic_execution::this_thread::sleep_until::Clock">Clock</a>, <a class="reference internal" href="#_CPPv4I00EN3hpx15basic_execution11this_thread11sleep_untilEvRKNSt6chrono10time_pointI5Clock8DurationEEPKc" title="hpx::basic_execution::this_thread::sleep_until::Duration">Duration</a>&gt; <em class="property">const</em> &amp;<em>sleep_time</em>, char <em class="property">const</em> *<em>desc</em> = &quot;hpx::basic_execution::this_thread::sleep_for&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx15basic_execution11this_thread11sleep_untilEvRKNSt6chrono10time_pointI5Clock8DurationEEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread11reset_agentE">
+<span id="_CPPv3N3hpx15basic_execution11this_thread11reset_agentE"></span><span id="_CPPv2N3hpx15basic_execution11this_thread11reset_agentE"></span><span id="hpx::basic_execution::this_thread::reset_agent"></span><span class="target" id="structhpx_1_1basic__execution_1_1this__thread_1_1reset__agent"></span><em class="property">struct </em><code class="sig-name descname">reset_agent</code><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread11reset_agentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread11reset_agent11reset_agentEPN6detail13agent_storageER10agent_base">
+<span id="_CPPv3N3hpx15basic_execution11this_thread11reset_agent11reset_agentEPN6detail13agent_storageER10agent_base"></span><span id="_CPPv2N3hpx15basic_execution11this_thread11reset_agent11reset_agentEPN6detail13agent_storageER10agent_base"></span><span id="hpx::basic_execution::this_thread::reset_agent::reset_agent__detail::agent_storageP.agent_baseR"></span><span class="target" id="structhpx_1_1basic__execution_1_1this__thread_1_1reset__agent_1a30b2b8ad420f3dad43a602a48e4e2f30"></span><code class="sig-name descname">reset_agent</code><span class="sig-paren">(</span>detail::agent_storage *, <a class="reference internal" href="#_CPPv4N3hpx15basic_execution10agent_baseE" title="hpx::basic_execution::agent_base">agent_base</a> &amp;<em>impl</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread11reset_agent11reset_agentEPN6detail13agent_storageER10agent_base" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread11reset_agent11reset_agentER10agent_base">
+<span id="_CPPv3N3hpx15basic_execution11this_thread11reset_agent11reset_agentER10agent_base"></span><span id="_CPPv2N3hpx15basic_execution11this_thread11reset_agent11reset_agentER10agent_base"></span><span id="hpx::basic_execution::this_thread::reset_agent::reset_agent__agent_baseR"></span><span class="target" id="structhpx_1_1basic__execution_1_1this__thread_1_1reset__agent_1aee6fb2d289c2fd6b806727914a2d25ea"></span><code class="sig-name descname">reset_agent</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx15basic_execution10agent_baseE" title="hpx::basic_execution::agent_base">agent_base</a> &amp;<em>impl</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread11reset_agent11reset_agentER10agent_base" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread11reset_agentD0Ev">
+<span id="_CPPv3N3hpx15basic_execution11this_thread11reset_agentD0Ev"></span><span id="_CPPv2N3hpx15basic_execution11this_thread11reset_agentD0Ev"></span><span id="hpx::basic_execution::this_thread::reset_agent::~reset_agent"></span><span class="target" id="structhpx_1_1basic__execution_1_1this__thread_1_1reset__agent_1a18fed6f961ed812a11e9a737d4071626"></span><code class="sig-name descname">~reset_agent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread11reset_agentD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread11reset_agent8storage_E">
+<span id="_CPPv3N3hpx15basic_execution11this_thread11reset_agent8storage_E"></span><span id="_CPPv2N3hpx15basic_execution11this_thread11reset_agent8storage_E"></span><span id="hpx::basic_execution::this_thread::reset_agent::storage___detail::agent_storageP"></span><span class="target" id="structhpx_1_1basic__execution_1_1this__thread_1_1reset__agent_1ad51b57d1144a581313672622236bd71d"></span>detail::agent_storage *<code class="sig-name descname">storage_</code><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread11reset_agent8storage_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx15basic_execution11this_thread11reset_agent4old_E">
+<span id="_CPPv3N3hpx15basic_execution11this_thread11reset_agent4old_E"></span><span id="_CPPv2N3hpx15basic_execution11this_thread11reset_agent4old_E"></span><span id="hpx::basic_execution::this_thread::reset_agent::old___agent_baseP"></span><span class="target" id="structhpx_1_1basic__execution_1_1this__thread_1_1reset__agent_1a14927eb44c759c488647f31c00cef080"></span><a class="reference internal" href="#_CPPv4N3hpx15basic_execution10agent_baseE" title="hpx::basic_execution::agent_base">agent_base</a> *<code class="sig-name descname">old_</code><a class="headerlink" href="#_CPPv4N3hpx15basic_execution11this_thread11reset_agent4old_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-basic-execution-resource-base-hpp">
+<h2><cite>#include &lt;hpx/basic_execution/resource_base.hpp&gt;</cite><a class="headerlink" href="#include-hpx-basic-execution-resource-base-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx15basic_executionE">
+<span id="_CPPv3N3hpx15basic_executionE"></span><span class="target" id="namespacehpx_1_1basic__execution"></span><em class="property">namespace </em><code class="sig-name descname">basic_execution</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx15basic_execution13resource_baseE">
+<span id="_CPPv3N3hpx15basic_execution13resource_baseE"></span><span id="_CPPv2N3hpx15basic_execution13resource_baseE"></span><span id="hpx::basic_execution::resource_base"></span><span class="target" id="structhpx_1_1basic__execution_1_1resource__base"></span><em class="property">struct </em><code class="sig-name descname">resource_base</code><a class="headerlink" href="#_CPPv4N3hpx15basic_execution13resource_baseE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;resource_base.hpp&gt;</em><p>TODO: implement, this is currently just a dummy. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution13resource_baseD0Ev">
+<span id="_CPPv3N3hpx15basic_execution13resource_baseD0Ev"></span><span id="_CPPv2N3hpx15basic_execution13resource_baseD0Ev"></span><span id="hpx::basic_execution::resource_base::~resource_base"></span><span class="target" id="structhpx_1_1basic__execution_1_1resource__base_1acb146aacc520d67d6fcbc8178caa5e88"></span><em class="property">virtual</em> <code class="sig-name descname">~resource_base</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution13resource_baseD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-basic-execution-context-base-hpp">
+<h2><cite>#include &lt;hpx/basic_execution/context_base.hpp&gt;</cite><a class="headerlink" href="#include-hpx-basic-execution-context-base-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx15basic_executionE">
+<span class="target" id="namespacehpx_1_1basic__execution"></span><em class="property">namespace </em><code class="sig-name descname">basic_execution</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx15basic_execution12context_baseE">
+<span id="_CPPv3N3hpx15basic_execution12context_baseE"></span><span id="_CPPv2N3hpx15basic_execution12context_baseE"></span><span id="hpx::basic_execution::context_base"></span><span class="target" id="structhpx_1_1basic__execution_1_1context__base"></span><em class="property">struct </em><code class="sig-name descname">context_base</code><a class="headerlink" href="#_CPPv4N3hpx15basic_execution12context_baseE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution12context_baseD0Ev">
+<span id="_CPPv3N3hpx15basic_execution12context_baseD0Ev"></span><span id="_CPPv2N3hpx15basic_execution12context_baseD0Ev"></span><span id="hpx::basic_execution::context_base::~context_base"></span><span class="target" id="structhpx_1_1basic__execution_1_1context__base_1a22adaa402f651ac3c19520db7441ddda"></span><em class="property">virtual</em> <code class="sig-name descname">~context_base</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution12context_baseD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx15basic_execution12context_base8resourceEv">
+<span id="_CPPv3NK3hpx15basic_execution12context_base8resourceEv"></span><span id="_CPPv2NK3hpx15basic_execution12context_base8resourceEv"></span><span id="hpx::basic_execution::context_base::resourceC"></span><span class="target" id="structhpx_1_1basic__execution_1_1context__base_1a3962a18fbea81b4bae579ab865d1131e"></span><em class="property">virtual</em> <a class="reference internal" href="#_CPPv4N3hpx15basic_execution13resource_baseE" title="hpx::basic_execution::resource_base">resource_base</a> <em class="property">const</em> &amp;<code class="sig-name descname">resource</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em> = 0<a class="headerlink" href="#_CPPv4NK3hpx15basic_execution12context_base8resourceEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-basic-execution-agent-base-hpp">
+<h2><cite>#include &lt;hpx/basic_execution/agent_base.hpp&gt;</cite><a class="headerlink" href="#include-hpx-basic-execution-agent-base-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1basic__execution"></span><em class="property">namespace </em><code class="sig-name descname">basic_execution</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx15basic_execution10agent_baseE">
+<span id="_CPPv3N3hpx15basic_execution10agent_baseE"></span><span id="_CPPv2N3hpx15basic_execution10agent_baseE"></span><span id="hpx::basic_execution::agent_base"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base"></span><em class="property">struct </em><code class="sig-name descname">agent_base</code><a class="headerlink" href="#_CPPv4N3hpx15basic_execution10agent_baseE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution10agent_baseD0Ev">
+<span id="_CPPv3N3hpx15basic_execution10agent_baseD0Ev"></span><span id="_CPPv2N3hpx15basic_execution10agent_baseD0Ev"></span><span id="hpx::basic_execution::agent_base::~agent_base"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1ae6b3911d23569430a8194d63b3d2ea12"></span><em class="property">virtual</em> <code class="sig-name descname">~agent_base</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx15basic_execution10agent_baseD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx15basic_execution10agent_base11descriptionEv">
+<span id="_CPPv3NK3hpx15basic_execution10agent_base11descriptionEv"></span><span id="_CPPv2NK3hpx15basic_execution10agent_base11descriptionEv"></span><span id="hpx::basic_execution::agent_base::descriptionC"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1a3da6d8ea79f8953267d4a4d88084f48a"></span><em class="property">virtual</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">description</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em> = 0<a class="headerlink" href="#_CPPv4NK3hpx15basic_execution10agent_base11descriptionEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx15basic_execution10agent_base7contextEv">
+<span id="_CPPv3NK3hpx15basic_execution10agent_base7contextEv"></span><span id="_CPPv2NK3hpx15basic_execution10agent_base7contextEv"></span><span id="hpx::basic_execution::agent_base::contextC"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1ae1ffd6f993ba31b08eb97edf3bba998c"></span><em class="property">virtual</em> <a class="reference internal" href="#_CPPv4N3hpx15basic_execution12context_baseE" title="hpx::basic_execution::context_base">context_base</a> <em class="property">const</em> &amp;<code class="sig-name descname">context</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em> = 0<a class="headerlink" href="#_CPPv4NK3hpx15basic_execution10agent_base7contextEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution10agent_base5yieldEPKc">
+<span id="_CPPv3N3hpx15basic_execution10agent_base5yieldEPKc"></span><span id="_CPPv2N3hpx15basic_execution10agent_base5yieldEPKc"></span><span id="hpx::basic_execution::agent_base::yield__cCP"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1af95a9821ec88d85abeef0f21c88b440c"></span><em class="property">virtual</em> void <code class="sig-name descname">yield</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N3hpx15basic_execution10agent_base5yieldEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution10agent_base7yield_kENSt6size_tEPKc">
+<span id="_CPPv3N3hpx15basic_execution10agent_base7yield_kENSt6size_tEPKc"></span><span id="_CPPv2N3hpx15basic_execution10agent_base7yield_kENSt6size_tEPKc"></span><span id="hpx::basic_execution::agent_base::yield_k__std::s.cCP"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1ac2a169c72364fe4ba6a2cbc1cdf1b064"></span><em class="property">virtual</em> void <code class="sig-name descname">yield_k</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>k</em>, char <em class="property">const</em> *<em>desc</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N3hpx15basic_execution10agent_base7yield_kENSt6size_tEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution10agent_base7suspendEPKc">
+<span id="_CPPv3N3hpx15basic_execution10agent_base7suspendEPKc"></span><span id="_CPPv2N3hpx15basic_execution10agent_base7suspendEPKc"></span><span id="hpx::basic_execution::agent_base::suspend__cCP"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1aaae2af807b05ee0c0a0dece04bad2c36"></span><em class="property">virtual</em> void <code class="sig-name descname">suspend</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N3hpx15basic_execution10agent_base7suspendEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution10agent_base6resumeEPKc">
+<span id="_CPPv3N3hpx15basic_execution10agent_base6resumeEPKc"></span><span id="_CPPv2N3hpx15basic_execution10agent_base6resumeEPKc"></span><span id="hpx::basic_execution::agent_base::resume__cCP"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1a580b28470102b81681ac76179268b08a"></span><em class="property">virtual</em> void <code class="sig-name descname">resume</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N3hpx15basic_execution10agent_base6resumeEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution10agent_base5abortEPKc">
+<span id="_CPPv3N3hpx15basic_execution10agent_base5abortEPKc"></span><span id="_CPPv2N3hpx15basic_execution10agent_base5abortEPKc"></span><span id="hpx::basic_execution::agent_base::abort__cCP"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1a1843ff30ee448b450cfbc43370e4ccb8"></span><em class="property">virtual</em> void <code class="sig-name descname">abort</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>desc</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N3hpx15basic_execution10agent_base5abortEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution10agent_base9sleep_forERKN3hpx4util15steady_durationEPKc">
+<span id="_CPPv3N3hpx15basic_execution10agent_base9sleep_forERKN3hpx4util15steady_durationEPKc"></span><span id="_CPPv2N3hpx15basic_execution10agent_base9sleep_forERKN3hpx4util15steady_durationEPKc"></span><span id="hpx::basic_execution::agent_base::sleep_for__hpx::util::steady_durationCR.cCP"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1af44c678f475521c628eb93e387bc65e4"></span><em class="property">virtual</em> void <code class="sig-name descname">sleep_for</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../timing/api.html#_CPPv4N3hpx4util15steady_durationE" title="hpx::util::steady_duration">steady_duration</a> <em class="property">const</em> &amp;<em>sleep_duration</em>, char <em class="property">const</em> *<em>desc</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N3hpx15basic_execution10agent_base9sleep_forERKN3hpx4util15steady_durationEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx15basic_execution10agent_base11sleep_untilERKN3hpx4util17steady_time_pointEPKc">
+<span id="_CPPv3N3hpx15basic_execution10agent_base11sleep_untilERKN3hpx4util17steady_time_pointEPKc"></span><span id="_CPPv2N3hpx15basic_execution10agent_base11sleep_untilERKN3hpx4util17steady_time_pointEPKc"></span><span id="hpx::basic_execution::agent_base::sleep_until__hpx::util::steady_time_pointCR.cCP"></span><span class="target" id="structhpx_1_1basic__execution_1_1agent__base_1a6a42193d8425fe903f157a8318f31d41"></span><em class="property">virtual</em> void <code class="sig-name descname">sleep_until</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../timing/api.html#_CPPv4N3hpx4util17steady_time_pointE" title="hpx::util::steady_time_point">steady_time_point</a> <em class="property">const</em> &amp;<em>sleep_time</em>, char <em class="property">const</em> *<em>desc</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N3hpx15basic_execution10agent_base11sleep_untilERKN3hpx4util17steady_time_pointEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-basic-execution-register-locks-hpp">
+<h2><cite>#include &lt;hpx/basic_execution/register_locks.hpp&gt;</cite><a class="headerlink" href="#include-hpx-basic-execution-register-locks-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util13register_lockEPKvPN4util18register_lock_dataE">
+<span id="_CPPv3N3hpx4util13register_lockEPKvPN4util18register_lock_dataE"></span><span id="_CPPv2N3hpx4util13register_lockEPKvPN4util18register_lock_dataE"></span><span id="hpx::util::register_lock__voidCP.util::register_lock_dataP"></span><span class="target" id="include_2hpx_2basic__execution_2register__locks_8hpp_1af482b20c594fc019f28cb952c993377c"></span>bool <code class="sig-name descname">register_lock</code><span class="sig-paren">(</span>void <em class="property">const</em> *, <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::register_lock_data * = nullptr<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util13register_lockEPKvPN4util18register_lock_dataE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util15unregister_lockEPKv">
+<span id="_CPPv3N3hpx4util15unregister_lockEPKv"></span><span id="_CPPv2N3hpx4util15unregister_lockEPKv"></span><span id="hpx::util::unregister_lock__voidCP"></span><span class="target" id="include_2hpx_2basic__execution_2register__locks_8hpp_1afa68a72c9850e7a46065e11d119871c6"></span>bool <code class="sig-name descname">unregister_lock</code><span class="sig-paren">(</span>void <em class="property">const</em> *<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util15unregister_lockEPKv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util15verify_no_locksEv">
+<span id="_CPPv3N3hpx4util15verify_no_locksEv"></span><span id="_CPPv2N3hpx4util15verify_no_locksEv"></span><span id="hpx::util::verify_no_locks"></span><span class="target" id="include_2hpx_2basic__execution_2register__locks_8hpp_1ae0e1837ee6f09b79b26c2e788d2e9fc9"></span>void <code class="sig-name descname">verify_no_locks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util15verify_no_locksEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util19force_error_on_lockEv">
+<span id="_CPPv3N3hpx4util19force_error_on_lockEv"></span><span id="_CPPv2N3hpx4util19force_error_on_lockEv"></span><span id="hpx::util::force_error_on_lock"></span><span class="target" id="include_2hpx_2basic__execution_2register__locks_8hpp_1adc0a74d6e9ea588ac5e798f2cd262b27"></span>void <code class="sig-name descname">force_error_on_lock</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util19force_error_on_lockEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util21enable_lock_detectionEv">
+<span id="_CPPv3N3hpx4util21enable_lock_detectionEv"></span><span id="_CPPv2N3hpx4util21enable_lock_detectionEv"></span><span id="hpx::util::enable_lock_detection"></span><span class="target" id="include_2hpx_2basic__execution_2register__locks_8hpp_1a8daf09f3353da87330f5901602232177"></span>void <code class="sig-name descname">enable_lock_detection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util21enable_lock_detectionEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util11ignore_lockEPKv">
+<span id="_CPPv3N3hpx4util11ignore_lockEPKv"></span><span id="_CPPv2N3hpx4util11ignore_lockEPKv"></span><span id="hpx::util::ignore_lock__voidCP"></span><span class="target" id="include_2hpx_2basic__execution_2register__locks_8hpp_1a4f5b17e2809bff886e3e10868af110b8"></span>void <code class="sig-name descname">ignore_lock</code><span class="sig-paren">(</span>void <em class="property">const</em> *<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util11ignore_lockEPKv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util13reset_ignoredEPKv">
+<span id="_CPPv3N3hpx4util13reset_ignoredEPKv"></span><span id="_CPPv2N3hpx4util13reset_ignoredEPKv"></span><span id="hpx::util::reset_ignored__voidCP"></span><span class="target" id="include_2hpx_2basic__execution_2register__locks_8hpp_1ad2a1db606850dc8d6c710a9b59150e16"></span>void <code class="sig-name descname">reset_ignored</code><span class="sig-paren">(</span>void <em class="property">const</em> *<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util13reset_ignoredEPKv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util16ignore_all_locksEv">
+<span id="_CPPv3N3hpx4util16ignore_all_locksEv"></span><span id="_CPPv2N3hpx4util16ignore_all_locksEv"></span><span id="hpx::util::ignore_all_locks"></span><span class="target" id="include_2hpx_2basic__execution_2register__locks_8hpp_1af532105f75862e3f897ea9b88f35c12f"></span>void <code class="sig-name descname">ignore_all_locks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util16ignore_all_locksEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util17reset_ignored_allEv">
+<span id="_CPPv3N3hpx4util17reset_ignored_allEv"></span><span id="_CPPv2N3hpx4util17reset_ignored_allEv"></span><span id="hpx::util::reset_ignored_all"></span><span class="target" id="include_2hpx_2basic__execution_2register__locks_8hpp_1a204b7670ab12a160dd2daefe33bc282a"></span>void <code class="sig-name descname">reset_ignored_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util17reset_ignored_allEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx4util25ignore_all_while_checkingE">
+<span id="_CPPv3N3hpx4util25ignore_all_while_checkingE"></span><span id="_CPPv2N3hpx4util25ignore_all_while_checkingE"></span><span id="hpx::util::ignore_all_while_checking"></span><span class="target" id="structhpx_1_1util_1_1ignore__all__while__checking"></span><em class="property">struct </em><code class="sig-name descname">ignore_all_while_checking</code><a class="headerlink" href="#_CPPv4N3hpx4util25ignore_all_while_checkingE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util25ignore_all_while_checking25ignore_all_while_checkingEv">
+<span id="_CPPv3N3hpx4util25ignore_all_while_checking25ignore_all_while_checkingEv"></span><span id="_CPPv2N3hpx4util25ignore_all_while_checking25ignore_all_while_checkingEv"></span><span id="hpx::util::ignore_all_while_checking::ignore_all_while_checking"></span><span class="target" id="structhpx_1_1util_1_1ignore__all__while__checking_1a829029f7000592a4859f11ba45c0282d"></span><code class="sig-name descname">ignore_all_while_checking</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util25ignore_all_while_checking25ignore_all_while_checkingEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I00EN3hpx4util21ignore_while_checkingE">
+<span id="_CPPv3I00EN3hpx4util21ignore_while_checkingE"></span><span id="_CPPv2I00EN3hpx4util21ignore_while_checkingE"></span><span class="target" id="structhpx_1_1util_1_1ignore__while__checking"></span>template&lt;typename <code class="sig-name descname">Lock</code>, typename <code class="sig-name descname">Enable</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">ignore_while_checking</code><a class="headerlink" href="#_CPPv4I00EN3hpx4util21ignore_while_checkingE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util21ignore_while_checking21ignore_while_checkingEPKv">
+<span id="_CPPv3N3hpx4util21ignore_while_checking21ignore_while_checkingEPKv"></span><span id="_CPPv2N3hpx4util21ignore_while_checking21ignore_while_checkingEPKv"></span><span id="hpx::util::ignore_while_checking::ignore_while_checking__voidCP"></span><span class="target" id="structhpx_1_1util_1_1ignore__while__checking_1a10c7e774a8e0e3bd84f7e56bd6ae6798"></span><code class="sig-name descname">ignore_while_checking</code><span class="sig-paren">(</span>void <em class="property">const</em> *<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util21ignore_while_checking21ignore_while_checkingEPKv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../checkpoint/api.html" class="btn btn-neutral float-right" title="checkpoint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../iterator_support/api.html" class="btn btn-neutral float-left" title="iterator_support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>8174758</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

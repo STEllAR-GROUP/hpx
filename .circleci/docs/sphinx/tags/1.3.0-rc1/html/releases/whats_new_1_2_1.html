@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>HPX V1.2.1 (Feb 19, 2019) &mdash; HPX 1.3.0-rc1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="HPX V1.2.0 (Nov 12, 2018)" href="whats_new_1_2_0.html" />
+    <link rel="prev" title="HPX V1.3.0 (unreleased)" href="whats_new_1_3_0.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.0-rc1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../releases.html">Releases</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_3_0.html"><em>HPX</em> V1.3.0 (unreleased)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><em>HPX</em> V1.2.1 (Feb 19, 2019)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-changes">General changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#closed-issues">Closed issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#closed-pull-requests">Closed pull requests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_2_0.html"><em>HPX</em> V1.2.0 (Nov 12, 2018)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_1_0.html"><em>HPX</em> V1.1.0 (Mar 24, 2018)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_0_0.html"><em>HPX</em> V1.0.0 (Apr 24, 2017)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_99.html"><em>HPX</em> V0.9.99 (Jul 15, 2016)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_11.html"><em>HPX</em> V0.9.11 (Nov 11, 2015)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_10.html"><em>HPX</em> V0.9.10 (Mar 24, 2015)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_9.html"><em>HPX</em> V0.9.9 (Oct 31, 2014, codename Spooky)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_8.html"><em>HPX</em> V0.9.8 (Mar 24, 2014)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_7.html"><em>HPX</em> V0.9.7 (Nov 13, 2013)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_6.html"><em>HPX</em> V0.9.6 (Jul 30, 2013)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_5.html"><em>HPX</em> V0.9.5 (Jan 16, 2013)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_0.html"><em>HPX</em> V0.9.0 (Jul 5, 2012)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_8_1.html"><em>HPX</em> V0.8.1 (Apr 21, 2012)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_8_0.html"><em>HPX</em> V0.8.0 (Mar 23, 2012)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_7_0.html"><em>HPX</em> V0.7.0 (Dec 12, 2011)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../releases.html">Releases</a> &raquo;</li>
+        
+      <li><em>HPX</em> V1.2.1 (Feb 19, 2019)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/releases/whats_new_1_2_1.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hpx-v1-2-1-feb-19-2019">
+<span id="hpx-1-2-1"></span><h1><em>HPX</em> V1.2.1 (Feb 19, 2019)<a class="headerlink" href="#hpx-v1-2-1-feb-19-2019" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="general-changes">
+<h2>General changes<a class="headerlink" href="#general-changes" title="Permalink to this headline">¶</a></h2>
+<p>This is a bugfix release. It contains the following changes:</p>
+<ul class="simple">
+<li>Fix compilation on ARM, s390x and 32-bit architectures.</li>
+<li>Fix a critical bug in the <code class="docutils literal notranslate"><span class="pre">future</span></code> implementation.</li>
+<li>Fix several problems in the CMake configuration which affects external
+projects.</li>
+<li>Add support for Boost 1.69.0.</li>
+</ul>
+</div>
+<div class="section" id="closed-issues">
+<h2>Closed issues<a class="headerlink" href="#closed-issues" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/3638">Issue #3638</a> - Build HPX 1.2 with boost 1.69</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/3635">Issue #3635</a> - Non-deterministic crashing on Stampede2</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/3550">Issue #3550</a> - 1&gt;e:000workhpxsrcthrow_exception.cpp(54): error C2440:
+‘&lt;function-style-cast&gt;’: cannot convert from ‘boost::system::error_code’ to
+‘hpx::exception’</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/3549">Issue #3549</a> - HPX 1.2.0 does not build on i686, but release candidate
+did</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/3511">Issue #3511</a> - Build on s390x fails</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/3509">Issue #3509</a> - Build on armv7l fails</li>
+</ul>
+</div>
+<div class="section" id="closed-pull-requests">
+<h2>Closed pull requests<a class="headerlink" href="#closed-pull-requests" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3695">PR #3695</a> - Don’t install CMake templates and packaging files</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3666">PR #3666</a> - Fixing yet another race in future_data</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3663">PR #3663</a> - Fixing race between setting and getting the value inside
+future_data</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3648">PR #3648</a> - Adding timestamp option for S390x platform</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3647">PR #3647</a> - Blind attempt to fix warnings issued by gcc V9</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3611">PR #3611</a> - Include GNUInstallDirs earlier to have it available for
+subdirectories</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3595">PR #3595</a> - Use GNUInstallDirs lib path in pkgconfig config file</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3593">PR #3593</a> - Add include(GNUInstallDirs) to HPXMacros.cmake</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3591">PR #3591</a> - Fix compilation error on arm7 architecture. Compiles and runs
+on Fedora 29 on Pi 3.</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3558">PR #3558</a> - Adding constructor <cite>exception(boost::system::error_code
+const&amp;)</cite></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3555">PR #3555</a> - cmake: make install locations configurable</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/pull/3551">PR #3551</a> - Fix uint64_t causing compilation fail on i686</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="whats_new_1_2_0.html" class="btn btn-neutral float-right" title="HPX V1.2.0 (Nov 12, 2018)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="whats_new_1_3_0.html" class="btn btn-neutral float-left" title="HPX V1.3.0 (unreleased)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>c91c752</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

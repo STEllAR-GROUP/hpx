@@ -1,0 +1,486 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>checkpoint &mdash; HPX 1.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="collectives" href="../../collectives/docs/index.html" />
+    <link rel="prev" title="cache" href="../../cache/docs/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../all_modules.html">All modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../affinity/docs/index.html">affinity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../algorithms/docs/index.html">algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../allocator_support/docs/index.html">allocator_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../assertion/docs/index.html">assertion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../basic_execution/docs/index.html">basic_execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../batch_environments/docs/index.html">batch_environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cache/docs/index.html">cache</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">checkpoint</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#checkpointing-components">Checkpointing components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../collectives/docs/index.html">collectives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../compute/docs/index.html">compute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../compute_cuda/docs/index.html">compute_cuda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/docs/index.html">concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concurrency/docs/index.html">concurrency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config/docs/index.html">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coroutines/docs/index.html">coroutines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datastructures/docs/index.html">datastructures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debugging/docs/index.html">debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../errors/docs/index.html">errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../execution/docs/index.html">execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../filesystem/docs/index.html">filesystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../format/docs/index.html">format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../functional/docs/index.html">functional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../hardware/docs/index.html">hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../hashing/docs/index.html">hashing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../iterator_support/docs/index.html">iterator_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../local_lcos/docs/index.html">local_lcos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logging/docs/index.html">logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../memory/docs/index.html">memory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugin/docs/index.html">plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../preprocessor/docs/index.html">preprocessor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../program_options/docs/index.html">program_options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../resiliency/docs/index.html">resiliency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../resource_partitioner/docs/index.html">resource_partitioner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../segmented_algorithms/docs/index.html">segmented_algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../serialization/docs/index.html">serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../static_reinit/docs/index.html">static_reinit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../statistics/docs/index.html">statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../synchronization/docs/index.html">synchronization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../testing/docs/index.html">testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../thread_support/docs/index.html">thread_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../threadmanager/docs/index.html">thread_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../timing/docs/index.html">timing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../topology/docs/index.html">topology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../type_support/docs/index.html">type_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../util/docs/index.html">util</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../all_modules.html">All modules</a> &raquo;</li>
+        
+      <li>checkpoint</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/checkpoint/docs/index.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="checkpoint">
+<span id="libs-checkpoint"></span><h1>checkpoint<a class="headerlink" href="#checkpoint" title="Permalink to this headline">¶</a></h1>
+<p>A common need of users is to periodically backup an application. This practice
+provides resiliency and potential restart points in code. We have developed the
+concept of a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> to support this use case.</p>
+<p>Found in <code class="docutils literal notranslate"><span class="pre">hpx/util/checkpoint.hpp</span></code>, <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>s are defined as objects
+which hold a serialized version of an object or set of objects at a particular
+moment in time. This representation can be stored in memory for later use or it
+can be written to disk for storage and/or recovery at a later point. In order to
+create and fill this object with data we use a function called
+<code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code>. In code the function looks like this:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="p">...);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code> takes arbitrary data containers such as int, double, float,
+vector, and future and serializes them into a newly created <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>
+object. This function returns a <code class="docutils literal notranslate"><span class="pre">future</span></code> to a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> containing the
+data. Let us look a simple use case below:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">checkpoint</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">save_checkpoint</span><span class="p">;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">vec</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">};</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">vec</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Once the future is ready the checkpoint object will contain the <code class="docutils literal notranslate"><span class="pre">vector</span></code>
+<code class="docutils literal notranslate"><span class="pre">vec</span></code> and its five elements.</p>
+<p>It is also possible to modify the launch policy used by <code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code>.
+This is accomplished by passing a launch policy as the first argument. It is
+important to note that passing <code class="docutils literal notranslate"><span class="pre">hpx::launch::sync</span></code> will cause
+<code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code> to return a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> instead of a <code class="docutils literal notranslate"><span class="pre">future</span></code> to a
+<code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. All other policies passed to <code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code> will return a
+<code class="docutils literal notranslate"><span class="pre">future</span></code> to a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>.</p>
+<p>Sometimes <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> s must be declared before they are used.
+<code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code> allows users to move pre-created <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> s into the
+function as long as they are the first container passing into the function (In
+the case where a launch policy is used, the <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> will immediately
+follow the launch policy). An example of these features can be found below:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="kt">char</span> <span class="n">character</span> <span class="o">=</span> <span class="sc">&#39;d&#39;</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">integer</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">flt</span> <span class="o">=</span> <span class="mf">10.01f</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">boolean</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">str</span> <span class="o">=</span> <span class="s">&quot;I am a string of characters&quot;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">vec</span><span class="p">(</span><span class="n">str</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">str</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+    <span class="n">checkpoint</span> <span class="n">archive</span><span class="p">;</span>
+
+    <span class="c1">// Test 1</span>
+    <span class="c1">//  test basic functionality</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">shared_future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">f_archive</span> <span class="o">=</span> <span class="n">save_checkpoint</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">archive</span><span class="p">),</span> <span class="n">character</span><span class="p">,</span> <span class="n">integer</span><span class="p">,</span> <span class="n">flt</span><span class="p">,</span> <span class="n">boolean</span><span class="p">,</span> <span class="n">str</span><span class="p">,</span> <span class="n">vec</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Now that we can create <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> s we now must be able to restore the
+objects they contain into memory. This is accomplished by the function
+<code class="docutils literal notranslate"><span class="pre">restore_checkpoint</span></code>. This function takes a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> and fills its data
+into the containers it is provided. It is important to remember that the
+containers must be ordered in the same way they were placed into the
+<code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. For clarity see the example below:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="kt">char</span> <span class="n">character2</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">integer2</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">flt2</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">boolean2</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">str2</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">vec2</span><span class="p">;</span>
+
+    <span class="n">restore_checkpoint</span><span class="p">(</span>
+        <span class="n">f_archive</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">character2</span><span class="p">,</span> <span class="n">integer2</span><span class="p">,</span> <span class="n">flt2</span><span class="p">,</span> <span class="n">boolean2</span><span class="p">,</span> <span class="n">str2</span><span class="p">,</span> <span class="n">vec2</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The core utility of <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> is in its ability to make certain data
+persistent. Often this means that the data is needed to be stored in an object,
+such as a file, for later use. For these cases we have provided two solutions:
+stream operator overloads and access iterators.</p>
+<p>We have created the two stream overloads <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> to
+stream data out of and into <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. You can see an example of the
+overloads in use below:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="kt">double</span> <span class="n">a9</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">b9</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">,</span> <span class="n">c9</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ofstream</span> <span class="n">test_file_9</span><span class="p">(</span><span class="s">&quot;test_file_9.txt&quot;</span><span class="p">);</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">f_9</span> <span class="o">=</span> <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">a9</span><span class="p">,</span> <span class="n">b9</span><span class="p">,</span> <span class="n">c9</span><span class="p">);</span>
+    <span class="n">test_file_9</span> <span class="o">&lt;&lt;</span> <span class="n">f_9</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="n">test_file_9</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+
+    <span class="kt">double</span> <span class="n">a9_1</span><span class="p">,</span> <span class="n">b9_1</span><span class="p">,</span> <span class="n">c9_1</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ifstream</span> <span class="n">test_file_9_1</span><span class="p">(</span><span class="s">&quot;test_file_9.txt&quot;</span><span class="p">);</span>
+    <span class="n">checkpoint</span> <span class="n">archive9</span><span class="p">;</span>
+    <span class="n">test_file_9_1</span> <span class="o">&gt;&gt;</span> <span class="n">archive9</span><span class="p">;</span>
+    <span class="n">restore_checkpoint</span><span class="p">(</span><span class="n">archive9</span><span class="p">,</span> <span class="n">a9_1</span><span class="p">,</span> <span class="n">b9_1</span><span class="p">,</span> <span class="n">c9_1</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This is the primary way to move data into and out of a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. It is
+important to note, however, that users should be cautious when using a stream
+operator to load data an another function to remove it (or vice versa). Both
+<code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> rely on a <code class="docutils literal notranslate"><span class="pre">.write()</span></code> and a <code class="docutils literal notranslate"><span class="pre">.read()</span></code>
+function respectively. In order to know how much data to read from the
+<code class="docutils literal notranslate"><span class="pre">std::istream</span></code>, the <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> will write the size of the <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>
+before writing the <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> data. Correspondingly, the <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> will
+read the size of the stored data before reading the data into new instance of
+<code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. As long as the user employs the <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> to stream the data this detail can be ignored.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Be careful when mixing <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> with other
+facilities to read and write to a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> writes an
+extra variable and <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> reads this variable back separately. Used
+together the user will not encounter any issues and can safely ignore this
+detail.</p>
+</div>
+<p>Users may also move the data into and out of a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> using the exposed
+<code class="docutils literal notranslate"><span class="pre">.begin()</span></code> and <code class="docutils literal notranslate"><span class="pre">.end()</span></code> iterators. An example of this use case is
+illustrated below.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="n">std</span><span class="o">::</span><span class="n">ofstream</span> <span class="n">test_file_7</span><span class="p">(</span><span class="s">&quot;checkpoint_test_file.txt&quot;</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">vec7</span><span class="p">{</span><span class="mf">1.02f</span><span class="p">,</span> <span class="mf">1.03f</span><span class="p">,</span> <span class="mf">1.04f</span><span class="p">,</span> <span class="mf">1.05f</span><span class="p">};</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">fut_7</span> <span class="o">=</span> <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">vec7</span><span class="p">);</span>
+    <span class="n">checkpoint</span> <span class="n">archive7</span> <span class="o">=</span> <span class="n">fut_7</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">copy</span><span class="p">(</span><span class="n">archive7</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span>    <span class="c1">// Write data to ofstream</span>
+        <span class="n">archive7</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span>            <span class="c1">// ie. the file</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">ostream_iterator</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="p">(</span><span class="n">test_file_7</span><span class="p">));</span>
+    <span class="n">test_file_7</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">vec7_1</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">char_vec</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ifstream</span> <span class="n">test_file_7_1</span><span class="p">(</span><span class="s">&quot;checkpoint_test_file.txt&quot;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">test_file_7_1</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">seekg</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">end</span><span class="p">);</span>
+        <span class="k">auto</span> <span class="n">length</span> <span class="o">=</span> <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">tellg</span><span class="p">();</span>
+        <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">seekg</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">beg</span><span class="p">);</span>
+        <span class="n">char_vec</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="n">length</span><span class="p">);</span>
+        <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="n">char_vec</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span> <span class="n">length</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">checkpoint</span> <span class="n">archive7_1</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">char_vec</span><span class="p">));</span>    <span class="c1">// Write data to checkpoint</span>
+    <span class="n">restore_checkpoint</span><span class="p">(</span><span class="n">archive7_1</span><span class="p">,</span> <span class="n">vec7_1</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="section" id="checkpointing-components">
+<h2>Checkpointing components<a class="headerlink" href="#checkpointing-components" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code> and <code class="docutils literal notranslate"><span class="pre">restore_checkpoint</span></code> are also able to store components
+inside <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>s. This can be done in one of two ways. First a client of
+the component can be passed to <code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code>. When the user wishes to
+resurrect the component she can pass a client instance to
+<code class="docutils literal notranslate"><span class="pre">restore_checkpoint</span></code>.</p>
+<p>This technique is demonstrated below:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="c1">// Try to checkpoint and restore a component with a client</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">vec3</span><span class="p">{</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">};</span>
+
+    <span class="c1">// Create a component instance through client constructor</span>
+    <span class="n">data_client</span> <span class="nf">D</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">vec3</span><span class="p">));</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">f3</span> <span class="o">=</span> <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">D</span><span class="p">);</span>
+
+    <span class="c1">// Create a new client</span>
+    <span class="n">data_client</span> <span class="n">E</span><span class="p">;</span>
+
+    <span class="c1">// Restore server inside client instance</span>
+    <span class="n">restore_checkpoint</span><span class="p">(</span><span class="n">f3</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">E</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The second way a user can save a component is by passing a <code class="docutils literal notranslate"><span class="pre">shared_ptr</span></code> to the
+component to <code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code>. This component can be resurrected by creating
+a new instance of the component type and passing a <code class="docutils literal notranslate"><span class="pre">shared_ptr</span></code> to the new
+instance to <code class="docutils literal notranslate"><span class="pre">restore_checkpoint</span></code>.</p>
+<p>This technique is demonstrated below:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="c1">// test checkpoint a component using a shared_ptr</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">vec</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
+    <span class="n">data_client</span> <span class="nf">A</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">vec</span><span class="p">));</span>
+
+    <span class="c1">// Checkpoint Server</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span> <span class="n">old_id</span> <span class="o">=</span> <span class="n">A</span><span class="p">.</span><span class="n">get_id</span><span class="p">();</span>
+
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">data_server</span><span class="o">&gt;&gt;</span> <span class="n">f_a_ptr</span> <span class="o">=</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">get_ptr</span><span class="o">&lt;</span><span class="n">data_server</span><span class="o">&gt;</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">get_id</span><span class="p">());</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">data_server</span><span class="o">&gt;</span> <span class="n">a_ptr</span> <span class="o">=</span> <span class="n">f_a_ptr</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">a_ptr</span><span class="p">);</span>
+
+    <span class="c1">// Restore Server</span>
+    <span class="c1">// Create a new server instance</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">data_server</span><span class="o">&gt;</span> <span class="n">b_server</span><span class="p">;</span>
+    <span class="n">restore_checkpoint</span><span class="p">(</span><span class="n">f</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">b_server</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../collectives/docs/index.html" class="btn btn-neutral float-right" title="collectives" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../../cache/docs/index.html" class="btn btn-neutral float-left" title="cache" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

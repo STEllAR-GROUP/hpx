@@ -1,0 +1,1732 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Writing distributed HPX applications &mdash; HPX 1.4.0-rc1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Running on batch systems" href="running_on_batch_systems.html" />
+    <link rel="prev" title="Writing single-node HPX applications" href="writing_single_node_hpx_applications.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0-rc1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../manual.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_hpx.html">Getting <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="building_hpx.html"><em>HPX</em> build system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_hpx_projects.html">Creating <em>HPX</em> projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="starting_the_hpx_runtime.html">Starting the <em>HPX</em> runtime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launching_and_configuring_hpx_applications.html">Launching and configuring <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_single_node_hpx_applications.html">Writing single-node <em>HPX</em> applications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Writing distributed <em>HPX</em> applications</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#global-names">Global names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#applying-actions">Applying actions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#action-type-definition">Action type definition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#action-invocation">Action invocation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#applying-an-action-asynchronously-without-any-synchronization">Applying an action asynchronously without any synchronization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#applying-an-action-asynchronously-with-synchronization">Applying an action asynchronously with synchronization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#applying-an-action-synchronously">Applying an action synchronously</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#applying-an-action-with-a-continuation-but-without-any-synchronization">Applying an action with a continuation but without any synchronization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#applying-an-action-with-a-continuation-and-with-synchronization">Applying an action with a continuation and with synchronization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#action-error-handling">Action error handling</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#writing-components">Writing components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#defining-components">Defining components</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#defining-client-side-representation-classes">Defining client side representation classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-component-instances">Creating component instances</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-component-instances">Using component instances</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#segmented-containers">Segmented containers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#using-segmented-containers">Using segmented containers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#segmented-iterators-and-segmented-iterator-traits">Segmented iterators and segmented iterator traits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-views">Using views</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c-co-arrays">C++ co-arrays</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="running_on_batch_systems.html">Running on batch systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_hpx_applications.html">Debugging <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizing_hpx_applications.html">Optimizing <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hpx_runtime_and_resources.html"><em>HPX</em> runtime and resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miscellaneous.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../manual.html">Manual</a> &raquo;</li>
+        
+      <li>Writing distributed <em>HPX</em> applications</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/manual/writing_distributed_hpx_applications.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="writing-distributed-hpx-applications">
+<span id="id2"></span><h1>Writing distributed <em>HPX</em> applications<a class="headerlink" href="#writing-distributed-hpx-applications" title="Permalink to this headline">¶</a></h1>
+<p>This section focuses on the features of <em>HPX</em> needed to write distributed
+applications, namely the <a class="reference internal" href="../terminology.html#term-active-global-address-space"><span class="xref std std-term">Active Global Address Space</span></a> (<a class="reference internal" href="../terminology.html#term-agas"><span class="xref std std-term">AGAS</span></a>),
+remotely executable functions (i.e. <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">actions</span></a>), and distributed
+objects (i.e. <a class="reference internal" href="../terminology.html#term-component"><span class="xref std std-term">components</span></a>).</p>
+<div class="section" id="global-names">
+<span id="id3"></span><h2>Global names<a class="headerlink" href="#global-names" title="Permalink to this headline">¶</a></h2>
+<p><em>HPX</em> implements an <a class="reference internal" href="../terminology.html#term-active-global-address-space"><span class="xref std std-term">Active Global Address Space</span></a> (<a class="reference internal" href="../terminology.html#term-agas"><span class="xref std std-term">AGAS</span></a>) which is
+exposing a single uniform address space spanning all localities an application
+runs on. <a class="reference internal" href="../terminology.html#term-agas"><span class="xref std std-term">AGAS</span></a> is a fundamental component of the ParalleX execution
+model. Conceptually, there is no rigid demarcation of local or global memory in
+<a class="reference internal" href="../terminology.html#term-agas"><span class="xref std std-term">AGAS</span></a>; all available memory is a part of the same address space.
+<a class="reference internal" href="../terminology.html#term-agas"><span class="xref std std-term">AGAS</span></a> enables named objects to be moved (migrated) across localities
+without having to change the object’s name, i.e., no references to migrated
+objects have to be ever updated. This feature has significance for dynamic load
+balancing and in applications where the workflow is highly dynamic, allowing
+work to be migrated from heavily loaded nodes to less loaded nodes. In addition,
+immutability of names ensures that <a class="reference internal" href="../terminology.html#term-agas"><span class="xref std std-term">AGAS</span></a> does not have to keep extra
+indirections (“bread crumbs”) when objects move, hence minimizing complexity of
+code management for system developers as well as minimizing overheads in
+maintaining and managing aliases.</p>
+<p>The <a class="reference internal" href="../terminology.html#term-agas"><span class="xref std std-term">AGAS</span></a> implementation in <em>HPX</em> does not automatically expose every
+local address to the global address space. It is the responsibility of the
+programmer to explicitly define which of the objects have to be globally visible
+and which of the objects are purely local.</p>
+<p>In <em>HPX</em> global addresses (global names) are represented using the
+<code class="docutils literal notranslate"><span class="pre">hpx::id_type</span></code> data type. This data type is conceptually very similar to
+<code class="docutils literal notranslate"><span class="pre">void*</span></code> pointers as it does not expose any type information of the object it
+is referring to.</p>
+<p>The only predefined global addresses are assigned to all localities. The
+following <em>HPX</em> API functions allow one to retrieve the global addresses of
+localities:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../api.html#_CPPv4N3hpx9find_hereER10error_code" title="hpx::find_here"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::find_here</span></code></a>: retrieve the global address of the
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> this function is called on.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4N3hpx19find_all_localitiesER10error_code" title="hpx::find_all_localities"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::find_all_localities</span></code></a>: retrieve the global addresses of all
+localities available to this application (including the <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> the
+function is being called on).</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4N3hpx22find_remote_localitiesER10error_code" title="hpx::find_remote_localities"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::find_remote_localities</span></code></a>: retrieve the global addresses of
+all remote localities available to this application (not including the
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> the function is being called on)</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4N3hpx18get_num_localitiesEv" title="hpx::get_num_localities"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_num_localities</span></code></a>: retrieve the number of localities
+available to this application.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4N3hpx13find_localityEN10components14component_typeER10error_code" title="hpx::find_locality"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::find_locality</span></code></a>: retrieve the global address of any
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> supporting the given component type.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4N3hpx17get_colocation_idEN6launch11sync_policyERKN6naming7id_typeER10error_code" title="hpx::get_colocation_id"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_colocation_id</span></code></a>: retrieve the global address of the
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> currently hosting the object with the given global address.</p></li>
+</ul>
+<p>Additionally, the global addresses of localities can be used to create new
+instances of components using the following <em>HPX</em> API function:</p>
+<ul class="simple">
+<li><p><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::components::new_</span></code>: Create a new instance of the given
+<code class="docutils literal notranslate"><span class="pre">Component</span></code> type on the specified <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>HPX</em> does not expose any functionality to delete component instances. All
+global addresses (as represented using <code class="docutils literal notranslate"><span class="pre">hpx::id_type</span></code>) are automatically
+garbage collected. When the last (global) reference to a particular component
+instance goes out of scope the corresponding component instance is
+automatically deleted.</p>
+</div>
+</div>
+<div class="section" id="applying-actions">
+<span id="id4"></span><h2>Applying actions<a class="headerlink" href="#applying-actions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="action-type-definition">
+<span id="id5"></span><h3>Action type definition<a class="headerlink" href="#action-type-definition" title="Permalink to this headline">¶</a></h3>
+<p>Actions are special types we use to describe possibly remote operations. For
+every global function and every member function which has to be invoked
+distantly, a special type must be defined. For any global function the special
+macro <a class="reference internal" href="../api.html#c.HPX_PLAIN_ACTION" title="HPX_PLAIN_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_PLAIN_ACTION</span></code></a> can be used to define the
+action type. Here is an example demonstrating this:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="n">app</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="n">some_global_function</span><span class="p">(</span><span class="kt">double</span> <span class="n">d</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">d</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// This will define the action type &#39;some_global_action&#39; which represents</span>
+<span class="c1">// the function &#39;app::some_global_function&#39;.</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">app</span><span class="o">::</span><span class="n">some_global_function</span><span class="p">,</span> <span class="n">some_global_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The macro <a class="reference internal" href="../api.html#c.HPX_PLAIN_ACTION" title="HPX_PLAIN_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_PLAIN_ACTION</span></code></a> has to be placed in
+global namespace, even if the wrapped function is located in some other
+namespace. The newly defined action type is placed in the global namespace as
+well.</p>
+</div>
+<p>If the action type should be defined somewhere not in global namespace, the
+action type definition has to be split into two macro invocations
+(<a class="reference internal" href="../api.html#c.HPX_DEFINE_PLAIN_ACTION" title="HPX_DEFINE_PLAIN_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_DEFINE_PLAIN_ACTION</span></code></a> and <a class="reference internal" href="../api.html#c.HPX_REGISTER_ACTION" title="HPX_REGISTER_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_REGISTER_ACTION</span></code></a>) as shown
+in the next example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="n">app</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="n">some_global_function</span><span class="p">(</span><span class="kt">double</span> <span class="n">d</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">d</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// On conforming compilers the following macro expands to:</span>
+    <span class="c1">//</span>
+    <span class="c1">//    typedef hpx::actions::make_action&lt;</span>
+    <span class="c1">//        decltype(&amp;some_global_function), &amp;some_global_function</span>
+    <span class="c1">//    &gt;::type some_global_action;</span>
+    <span class="c1">//</span>
+    <span class="c1">// This will define the action type &#39;some_global_action&#39; which represents</span>
+    <span class="c1">// the function &#39;some_global_function&#39;.</span>
+    <span class="n">HPX_DEFINE_PLAIN_ACTION</span><span class="p">(</span><span class="n">some_global_function</span><span class="p">,</span> <span class="n">some_global_action</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// The following macro expands to a series of definitions of global objects</span>
+<span class="c1">// which are needed for proper serialization and initialization support</span>
+<span class="c1">// enabling the remote invocation of the function``some_global_function``</span>
+<span class="n">HPX_REGISTER_ACTION</span><span class="p">(</span><span class="n">app</span><span class="o">::</span><span class="n">some_global_action</span><span class="p">,</span> <span class="n">app_some_global_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The shown code defines an action type <code class="docutils literal notranslate"><span class="pre">some_global_action</span></code> inside the namespace
+<code class="docutils literal notranslate"><span class="pre">app</span></code>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If the action type definition is split between two macros as shown above, the
+name of the action type to create has to be the same for both macro
+invocations (here <code class="docutils literal notranslate"><span class="pre">some_global_action</span></code>).</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The second argument passed to <a class="reference internal" href="../api.html#c.HPX_REGISTER_ACTION" title="HPX_REGISTER_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_REGISTER_ACTION</span></code></a> (<code class="docutils literal notranslate"><span class="pre">app_some_global_action</span></code>) has
+to comprise a globally unique C++ identifier representing the action. This is
+used for serialization purposes.</p>
+</div>
+<p>For member functions of objects which have been registered with <a class="reference internal" href="../terminology.html#term-agas"><span class="xref std std-term">AGAS</span></a>
+(e.g. ‘components’) a different registration macro
+<a class="reference internal" href="../api.html#c.HPX_DEFINE_COMPONENT_ACTION" title="HPX_DEFINE_COMPONENT_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_DEFINE_COMPONENT_ACTION</span></code></a> has to be utilized. Any component needs
+to be declared in a header file and have some special support macros defined in
+a source file. Here is an example demonstrating this. The first snippet has to
+go into the header file:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="n">app</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="nl">some_component</span>
+      <span class="p">:</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component_base</span><span class="o">&lt;</span><span class="n">some_component</span><span class="o">&gt;</span>
+    <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">some_member_function</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="n">boost</span><span class="o">::</span><span class="n">lexical_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="c1">// This will define the action type &#39;some_member_action&#39; which</span>
+        <span class="c1">// represents the member function &#39;some_member_function&#39; of the</span>
+        <span class="c1">// object type &#39;some_component&#39;.</span>
+        <span class="n">HPX_DEFINE_COMPONENT_ACTION</span><span class="p">(</span><span class="n">some_component</span><span class="p">,</span> <span class="n">some_member_function</span><span class="p">,</span>
+            <span class="n">some_member_action</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="c1">// Note: The second argument to the macro below has to be systemwide-unique</span>
+<span class="c1">//       C++ identifiers</span>
+<span class="n">HPX_REGISTER_ACTION_DECLARATION</span><span class="p">(</span><span class="n">app</span><span class="o">::</span><span class="n">some_component</span><span class="o">::</span><span class="n">some_member_action</span><span class="p">,</span> <span class="n">some_component_some_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The next snippet belongs into a source file (e.g. the main application source
+file) in the simplest case:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component</span><span class="o">&lt;</span><span class="n">app</span><span class="o">::</span><span class="n">some_component</span><span class="o">&gt;</span> <span class="n">component_type</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="n">app</span><span class="o">::</span><span class="n">some_component</span> <span class="n">some_component</span><span class="p">;</span>
+
+<span class="n">HPX_REGISTER_COMPONENT</span><span class="p">(</span><span class="n">component_type</span><span class="p">,</span> <span class="n">some_component</span><span class="p">);</span>
+
+<span class="c1">// The parameters for this macro have to be the same as used in the corresponding</span>
+<span class="c1">// HPX_REGISTER_ACTION_DECLARATION() macro invocation above</span>
+<span class="k">typedef</span> <span class="n">some_component</span><span class="o">::</span><span class="n">some_member_action</span> <span class="n">some_component_some_action</span><span class="p">;</span>
+<span class="n">HPX_REGISTER_ACTION</span><span class="p">(</span><span class="n">some_component_some_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Granted, these macro invocations are a bit more complex than for simple global
+functions, however we believe they are still manageable.</p>
+<p>The most important macro invocation is the <a class="reference internal" href="../api.html#c.HPX_DEFINE_COMPONENT_ACTION" title="HPX_DEFINE_COMPONENT_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_DEFINE_COMPONENT_ACTION</span></code></a> in the header file
+as this defines the action type we need to invoke the member function. For a
+complete example of a simple component action see [hpx_link
+examples/quickstart/component_in_executable.cpp..component_in_executable.cpp]</p>
+</div>
+<div class="section" id="action-invocation">
+<span id="id6"></span><h3>Action invocation<a class="headerlink" href="#action-invocation" title="Permalink to this headline">¶</a></h3>
+<p>The process of invoking a global function (or a member function of an object)
+with the help of the associated action is called ‘applying the action’. Actions
+can have arguments, which will be supplied while the action is applied. At the
+minimum, one parameter is required to apply any action - the id of the
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> the associated function should be invoked on (for global
+functions), or the id of the component instance (for member functions).
+Generally, <em>HPX</em> provides several ways to apply an action, all of which are
+described in the following sections.</p>
+<p>Generally, <em>HPX</em> actions are very similar to ‘normal’ C++ functions except that
+actions can be invoked remotely. <a class="reference internal" href="#figure-hpx-the-api"><span class="std std-numref">Fig. 8</span></a> below shows an
+overview of the main API exposed by HPX. This shows the function invocation
+syntax as defined by the C++ language (dark gray), the additional invocation
+syntax as provided through C++ Standard Library features (medium gray), and the
+extensions added by <em>HPX</em> (light gray) where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">f</span></code> function to invoke,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p..</span></code>: (optional) arguments,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">R</span></code>: return type of <code class="docutils literal notranslate"><span class="pre">f</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">action</span></code>: action type defined by, <a class="reference internal" href="../api.html#c.HPX_DEFINE_PLAIN_ACTION" title="HPX_DEFINE_PLAIN_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_DEFINE_PLAIN_ACTION</span></code></a> or
+<a class="reference internal" href="../api.html#c.HPX_DEFINE_COMPONENT_ACTION" title="HPX_DEFINE_COMPONENT_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_DEFINE_COMPONENT_ACTION</span></code></a> encapsulating <code class="docutils literal notranslate"><span class="pre">f</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">a</span></code>: an instance of the type <code class="docutils literal notranslate"><span class="pre">`action</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: the global address the action is applied to.</p></li>
+</ul>
+<div class="figure align-default" id="id9">
+<span id="figure-hpx-the-api"></span><img alt="../_images/hpx_the_api.png" src="../_images/hpx_the_api.png" />
+<p class="caption"><span class="caption-number">Fig. 8 </span><span class="caption-text">Overview of the main API exposed by <em>HPX</em>.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</div>
+<p>This figure shows that <em>HPX</em> allows the user to apply actions with a syntax
+similar to the C++ standard. In fact, all action types have an overloaded
+function operator allowing to synchronously apply the action. Further, <em>HPX</em>
+implements <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code> which semantically works similar to the
+way <code class="docutils literal notranslate"><span class="pre">std::async</span></code> works for plain C++ function.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The similarity of applying an action to conventional function invocations
+extends even further. <em>HPX</em> implements <code class="docutils literal notranslate"><span class="pre">hpx::bind</span></code> and <code class="docutils literal notranslate"><span class="pre">hpx::function</span></code>
+two facilities which are semantically equivalent to the <code class="docutils literal notranslate"><span class="pre">std::bind</span></code> and
+<code class="docutils literal notranslate"><span class="pre">std::function</span></code> types as defined by the C++11 Standard. While
+<code class="docutils literal notranslate"><span class="pre">hpx::async</span></code> extends beyond the conventional semantics by supporting
+actions and conventional C++ functions, the <em>HPX</em> facilities <code class="docutils literal notranslate"><span class="pre">hpx::bind</span></code>
+and <code class="docutils literal notranslate"><span class="pre">hpx::function</span></code> extend beyond the conventional standard facilities too.
+The <em>HPX</em> facilities not only support conventional functions, but can be used
+for actions as well.</p>
+</div>
+<p>Additionally, <em>HPX</em> exposes <code class="docutils literal notranslate"><span class="pre">hpx::apply</span></code> and <code class="docutils literal notranslate"><span class="pre">hpx::async_continue</span></code> both of
+which refine and extend the standard C++ facilities.</p>
+<p>The different ways to invoke a function in <em>HPX</em> will be explained in more
+detail in the following sections.</p>
+</div>
+<div class="section" id="applying-an-action-asynchronously-without-any-synchronization">
+<span id="apply"></span><h3>Applying an action asynchronously without any synchronization<a class="headerlink" href="#applying-an-action-asynchronously-without-any-synchronization" title="Permalink to this headline">¶</a></h3>
+<p>This method (‘fire and forget’) will make sure the function associated with the
+action is scheduled to run on the target <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>. Applying the action
+does not wait for the function to start running, instead it is a fully
+asynchronous operation. The following example shows how to apply the action as
+defined <a class="reference internal" href="#action-type-definition"><span class="std std-ref">in the previous section</span></a> on the local
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> (the <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> this code runs on):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">some_global_action</span> <span class="n">act</span><span class="p">;</span>     <span class="c1">// define an instance of some_global_action</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="mf">2.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>(the function <code class="docutils literal notranslate"><span class="pre">hpx::find_here()</span></code> returns the id of the local <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>,
+i.e. the <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> this code executes on).</p>
+<p>Any component member function can be invoked using the same syntactic construct.
+Given that <code class="docutils literal notranslate"><span class="pre">id</span></code> is the global address for a component instance created
+earlier, this invocation looks like:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">some_component_action</span> <span class="n">act</span><span class="p">;</span>     <span class="c1">// define an instance of some_component_action</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">id</span><span class="p">,</span> <span class="s">&quot;42&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In this case any value returned from this action (e.g. in this case the integer
+<code class="docutils literal notranslate"><span class="pre">42</span></code> is ignored. Please look at <a class="reference internal" href="#action-type-definition"><span class="std std-ref">Action type definition</span></a> for the code
+defining the component action <code class="docutils literal notranslate"><span class="pre">some_component_action</span></code> used.</p>
+</div>
+<div class="section" id="applying-an-action-asynchronously-with-synchronization">
+<span id="async"></span><h3>Applying an action asynchronously with synchronization<a class="headerlink" href="#applying-an-action-asynchronously-with-synchronization" title="Permalink to this headline">¶</a></h3>
+<p>This method will make sure the action is scheduled to run on the target
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>. Applying the action itself does not wait for the function to
+start running or to complete, instead this is a fully asynchronous operation
+similar to using <code class="docutils literal notranslate"><span class="pre">hpx::apply</span></code> as described above. The difference is that this
+method will return an instance of a <code class="docutils literal notranslate"><span class="pre">hpx::future&lt;&gt;</span></code> encapsulating the result
+of the (possibly remote) execution. The future can be used to synchronize with
+the asynchronous operation. The following example shows how to apply the action
+from above on the local <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">some_global_action</span> <span class="n">act</span><span class="p">;</span>     <span class="c1">// define an instance of some_global_action</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="mf">2.0</span><span class="p">);</span>
+<span class="c1">//</span>
+<span class="c1">// ... other code can be executed here</span>
+<span class="c1">//</span>
+<span class="n">f</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>    <span class="c1">// this will possibly wait for the asynchronous operation to &#39;return&#39;</span>
+</pre></div>
+</div>
+<p>(as before, the function <code class="docutils literal notranslate"><span class="pre">hpx::find_here()</span></code> returns the id of the local
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> (the <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> this code is executed on).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The use of a <code class="docutils literal notranslate"><span class="pre">hpx::future&lt;void&gt;</span></code> allows the current thread to synchronize
+with any remote operation not returning any value.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Any <code class="docutils literal notranslate"><span class="pre">std::future&lt;&gt;</span></code> returned from <code class="docutils literal notranslate"><span class="pre">std::async()</span></code> is required to block in
+its destructor if the value has not been set for this future yet. This is not
+true for <code class="docutils literal notranslate"><span class="pre">hpx::future&lt;&gt;</span></code> which will never block in its destructor, even if
+the value has not been returned to the future yet. We believe that
+consistency in the behavior of futures is more important than standards
+conformance in this case.</p>
+</div>
+<p>Any component member function can be invoked using the same syntactic construct.
+Given that <code class="docutils literal notranslate"><span class="pre">id</span></code> is the global address for a component instance created
+earlier, this invocation looks like:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">some_component_action</span> <span class="n">act</span><span class="p">;</span>     <span class="c1">// define an instance of some_component_action</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">id</span><span class="p">,</span> <span class="s">&quot;42&quot;</span><span class="p">);</span>
+<span class="c1">//</span>
+<span class="c1">// ... other code can be executed here</span>
+<span class="c1">//</span>
+<span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">f</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>    <span class="c1">// this will possibly wait for the asynchronous operation to &#39;return&#39; 42</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The invocation of <code class="docutils literal notranslate"><span class="pre">f.get()</span></code> will return the result immediately (without
+suspending the calling thread) if the result from the asynchronous operation
+has already been returned. Otherwise, the invocation of <code class="docutils literal notranslate"><span class="pre">f.get()</span></code> will
+suspend the execution of the calling thread until the asynchronous operation
+returns its result.</p>
+</div>
+</div>
+<div class="section" id="applying-an-action-synchronously">
+<span id="sync"></span><h3>Applying an action synchronously<a class="headerlink" href="#applying-an-action-synchronously" title="Permalink to this headline">¶</a></h3>
+<p>This method will schedule the function wrapped in the specified action on the
+target <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>. While the invocation appears to be synchronous (as we
+will see), the calling thread will be suspended while waiting for the function
+to return. Invoking a plain action (e.g. a global function) synchronously is
+straightforward:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">some_global_action</span> <span class="n">act</span><span class="p">;</span>     <span class="c1">// define an instance of some_global_action</span>
+<span class="n">act</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="mf">2.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>While this call looks just like a normal synchronous function invocation, the
+function wrapped by the action will be scheduled to run on a new thread and the
+calling thread will be suspended. After the new thread has executed the wrapped
+global function, the waiting thread will resume and return from the synchronous
+call.</p>
+<p>Equivalently, any action wrapping a component member function can be invoked
+synchronously as follows:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">some_component_action</span> <span class="n">act</span><span class="p">;</span>     <span class="c1">// define an instance of some_component_action</span>
+<span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">act</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="s">&quot;42&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The action invocation will either schedule a new thread locally to execute the
+wrapped member function (as before, <code class="docutils literal notranslate"><span class="pre">id</span></code> is the global address of the
+component instance the member function should be invoked on), or it will send a
+parcel to the remote <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> of the component causing a new thread to
+be scheduled there. The calling thread will be suspended until the function
+returns its result. This result will be returned from the synchronous action
+invocation.</p>
+<p>It is very important to understand that this ‘synchronous’ invocation syntax in
+fact conceals an asynchronous function call. This is beneficial as the calling
+thread is suspended while waiting for the outcome of a potentially remote
+operation. The <em>HPX</em> thread scheduler will schedule other work in the meantime,
+allowing the application to make further progress while the remote result is
+computed. This helps overlapping computation with communication and hiding
+communication latencies.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The syntax of applying an action is always the same, regardless whether the
+target <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> is remote to the invocation <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> or not.
+This is a very important feature of <em>HPX</em> as it frees the user from the task
+of keeping track what actions have to be applied locally and which actions
+are remote. If the target for applying an action is local, a new thread is
+automatically created and scheduled. Once this thread is scheduled and run,
+it will execute the function encapsulated by that action. If the target is
+remote, <em>HPX</em> will send a parcel to the remote <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> which
+encapsulates the action and its parameters. Once the parcel is received on
+the remote <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> <em>HPX</em> will create and schedule a new thread
+there. Once this thread runs on the remote <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>, it will execute
+the function encapsulated by the action.</p>
+</div>
+</div>
+<div class="section" id="applying-an-action-with-a-continuation-but-without-any-synchronization">
+<span id="async-continue"></span><h3>Applying an action with a continuation but without any synchronization<a class="headerlink" href="#applying-an-action-with-a-continuation-but-without-any-synchronization" title="Permalink to this headline">¶</a></h3>
+<p>This method is very similar to the method described in section <a class="reference internal" href="#apply"><span class="std std-ref">Applying an action asynchronously without any synchronization</span></a>. The
+difference is that it allows the user to chain a sequence of asynchronous
+operations, while handing the (intermediate) results from one step to the next
+step in the chain. Where <code class="docutils literal notranslate"><span class="pre">hpx::apply</span></code> invokes a single function using ‘fire
+and forget’ semantics, <code class="docutils literal notranslate"><span class="pre">hpx::apply_continue</span></code> asynchronously triggers a chain
+of functions without the need for the execution flow ‘to come back’ to the
+invocation site. Each of the asynchronous functions can be executed on a
+different <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>.</p>
+</div>
+<div class="section" id="applying-an-action-with-a-continuation-and-with-synchronization">
+<span id="apply-continue"></span><h3>Applying an action with a continuation and with synchronization<a class="headerlink" href="#applying-an-action-with-a-continuation-and-with-synchronization" title="Permalink to this headline">¶</a></h3>
+<p>This method is very similar to the method described in section <a class="reference internal" href="#async"><span class="std std-ref">Applying an action asynchronously with synchronization</span></a>. In
+addition to what <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code> can do, the functions <code class="docutils literal notranslate"><span class="pre">hpx::async_continue</span></code>
+takes an additional function argument. This function will be called as the
+continuation of the executed action. It is expected to perform additional
+operations and to make sure that a result is returned to the original invocation
+site. This method chains operations asynchronously by providing a continuation
+operation which is automatically executed once the first action has finished
+executing.</p>
+<p>As an example we chain two actions, where the result of the first action is
+forwarded to the second action and the result of the second action is sent back
+to the original invocation site:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// first action</span>
+<span class="n">std</span><span class="o">::</span><span class="kt">int32_t</span> <span class="n">action1</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">int32_t</span> <span class="n">i</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">action1</span><span class="p">);</span>    <span class="c1">// defines action1_type</span>
+
+<span class="c1">// second action</span>
+<span class="n">std</span><span class="o">::</span><span class="kt">int32_t</span> <span class="n">action2</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">int32_t</span> <span class="n">i</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">action2</span><span class="p">);</span>    <span class="c1">// defines action2_type</span>
+
+<span class="c1">// this code invokes &#39;action1&#39; above and passes along a continuation</span>
+<span class="c1">// function which will forward the result returned from &#39;action1&#39; to</span>
+<span class="c1">// &#39;action2&#39;.</span>
+<span class="n">action1_type</span> <span class="n">act1</span><span class="p">;</span>     <span class="c1">// define an instance of &#39;action1_type&#39;</span>
+<span class="n">action2_type</span> <span class="n">act2</span><span class="p">;</span>     <span class="c1">// define an instance of &#39;action2_type&#39;</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">async_continue</span><span class="p">(</span><span class="n">act1</span><span class="p">,</span> <span class="n">hpx</span><span class="o">::</span><span class="n">make_continuation</span><span class="p">(</span><span class="n">act2</span><span class="p">),</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="mi">42</span><span class="p">);</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">f</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>   <span class="c1">// will print: 86 ((42 + 1) * 2)</span>
+</pre></div>
+</div>
+<p>By default, the continuation is executed on the same <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> as
+<code class="docutils literal notranslate"><span class="pre">hpx::async_continue</span></code> is invoked from. If you want to specify the
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> where the continuation should be executed, the code above has
+to be written as:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// this code invokes &#39;action1&#39; above and passes along a continuation</span>
+<span class="c1">// function which will forward the result returned from &#39;action1&#39; to</span>
+<span class="c1">// &#39;action2&#39;.</span>
+<span class="n">action1_type</span> <span class="n">act1</span><span class="p">;</span>     <span class="c1">// define an instance of &#39;action1_type&#39;</span>
+<span class="n">action2_type</span> <span class="n">act2</span><span class="p">;</span>     <span class="c1">// define an instance of &#39;action2_type&#39;</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">async_continue</span><span class="p">(</span><span class="n">act1</span><span class="p">,</span> <span class="n">hpx</span><span class="o">::</span><span class="n">make_continuation</span><span class="p">(</span><span class="n">act2</span><span class="p">,</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">()),</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="mi">42</span><span class="p">);</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">f</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>   <span class="c1">// will print: 86 ((42 + 1) * 2)</span>
+</pre></div>
+</div>
+<p>Similarly, it is possible to chain more than 2 operations:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">action1_type</span> <span class="n">act1</span><span class="p">;</span>     <span class="c1">// define an instance of &#39;action1_type&#39;</span>
+<span class="n">action2_type</span> <span class="n">act2</span><span class="p">;</span>     <span class="c1">// define an instance of &#39;action2_type&#39;</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">async_continue</span><span class="p">(</span><span class="n">act1</span><span class="p">,</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">make_continuation</span><span class="p">(</span><span class="n">act2</span><span class="p">,</span> <span class="n">hpx</span><span class="o">::</span><span class="n">make_continuation</span><span class="p">(</span><span class="n">act1</span><span class="p">)),</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="mi">42</span><span class="p">);</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">f</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>   <span class="c1">// will print: 87 ((42 + 1) * 2 + 1)</span>
+</pre></div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">hpx::make_continuation</span></code> creates a special function object
+which exposes the following prototype:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">continuation</span>
+<span class="p">{</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Result</span><span class="o">&gt;</span>
+    <span class="kt">void</span> <span class="k">operator</span><span class="p">()(</span><span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span> <span class="n">id</span><span class="p">,</span> <span class="n">Result</span><span class="o">&amp;&amp;</span> <span class="n">result</span><span class="p">)</span> <span class="k">const</span>
+    <span class="p">{</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>where the parameters passed to the overloaded function operator <code class="docutils literal notranslate"><span class="pre">operator()()</span></code>
+are:</p>
+<ul class="simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">id</span></code> is the global id where the final result of the asynchronous chain
+of operations should be sent to (in most cases this is the id of the
+<code class="docutils literal notranslate"><span class="pre">hpx::future</span></code> returned from the initial call to <code class="docutils literal notranslate"><span class="pre">hpx::async_continue</span></code>. Any
+custom continuation function should make sure this <code class="docutils literal notranslate"><span class="pre">id</span></code> is forwarded to the
+last operation in the chain.</p></li>
+<li><p>the <code class="docutils literal notranslate"><span class="pre">result</span></code> is the result value of the current operation in the
+asynchronous execution chain. This value needs to be forwarded to the next
+operation.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All of those operations are implemented by the predefined continuation
+function object which is returned from <code class="docutils literal notranslate"><span class="pre">hpx::make_continuation</span></code>. Any (custom)
+function object used as a continuation should conform to the same interface.</p>
+</div>
+</div>
+<div class="section" id="action-error-handling">
+<span id="id7"></span><h3>Action error handling<a class="headerlink" href="#action-error-handling" title="Permalink to this headline">¶</a></h3>
+<p>Like in any other asynchronous invocation scheme it is important to be able to
+handle error conditions occurring while the asynchronous (and possibly remote)
+operation is executed. In <em>HPX</em> all error handling is based on standard C++
+exception handling. Any exception thrown during the execution of an asynchronous
+operation will be transferred back to the original invocation <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>,
+where it is rethrown during synchronization with the calling thread.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Exceptions thrown during asynchronous execution can be transferred back to
+the invoking thread only for the synchronous and the asynchronous case with
+synchronization. Like with any other unhandled exception, any exception
+thrown during the execution of an asynchronous action <em>without</em>
+synchronization will result in calling <code class="docutils literal notranslate"><span class="pre">hpx::terminate</span></code> causing the running
+application to exit immediately.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Even if error handling internally relies on exceptions, most of the API
+functions exposed by <em>HPX</em> can be used without throwing an exception. Please
+see <a class="reference internal" href="miscellaneous.html#exceptions"><span class="std std-ref">Working with exceptions</span></a> for more information.</p>
+</div>
+<p>As an example, we will assume that the following remote function will be
+executed:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="n">app</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="n">some_function_with_error</span><span class="p">(</span><span class="kt">int</span> <span class="n">arg</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">arg</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">HPX_THROW_EXCEPTION</span><span class="p">(</span><span class="n">bad_parameter</span><span class="p">,</span> <span class="s">&quot;some_function_with_error&quot;</span><span class="p">,</span>
+                <span class="s">&quot;some really bad error happened&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="c1">// do something else...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// This will define the action type &#39;some_error_action&#39; which represents</span>
+<span class="c1">// the function &#39;app::some_function_with_error&#39;.</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">app</span><span class="o">::</span><span class="n">some_function_with_error</span><span class="p">,</span> <span class="n">some_error_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The use of <a class="reference internal" href="../libs/errors/api.html#c.HPX_THROW_EXCEPTION" title="HPX_THROW_EXCEPTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_THROW_EXCEPTION</span></code></a> to report the error encapsulates the
+creation of a <a class="reference internal" href="../libs/errors/api.html#_CPPv4N3hpx9exceptionE" title="hpx::exception"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::exception</span></code></a> which is initialized with the error
+code <code class="docutils literal notranslate"><span class="pre">hpx::bad_parameter</span></code>. Additionally it carries the passed strings, the
+information about the file name, line number, and call stack of the point the
+exception was thrown from.</p>
+<p>We invoke this action using the synchronous syntax as described before:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// note: wrapped function will throw hpx::exception</span>
+<span class="n">some_error_action</span> <span class="n">act</span><span class="p">;</span>            <span class="c1">// define an instance of some_error_action</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="n">act</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="o">-</span><span class="mi">3</span><span class="p">);</span>    <span class="c1">// exception will be rethrown from here</span>
+<span class="p">}</span>
+<span class="k">catch</span> <span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">exception</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// prints: &#39;some really bad error happened: HPX(bad parameter)&#39;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If this action is invoked asynchronously with synchronization, the exception is
+propagated to the waiting thread as well and is re-thrown from the future’s
+function <code class="docutils literal notranslate"><span class="pre">get()</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// note: wrapped function will throw hpx::exception</span>
+<span class="n">some_error_action</span> <span class="n">act</span><span class="p">;</span>            <span class="c1">// define an instance of some_error_action</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="o">-</span><span class="mi">3</span><span class="p">);</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="n">f</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>                      <span class="c1">// exception will be rethrown from here</span>
+<span class="p">}</span>
+<span class="k">catch</span> <span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">exception</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// prints: &#39;some really bad error happened: HPX(bad parameter)&#39;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For more information about error handling please refer to the section
+<a class="reference internal" href="miscellaneous.html#exceptions"><span class="std std-ref">Working with exceptions</span></a>. There we also explain how to handle error conditions without
+having to rely on exception.</p>
+</div>
+</div>
+<div class="section" id="writing-components">
+<span id="components"></span><h2>Writing components<a class="headerlink" href="#writing-components" title="Permalink to this headline">¶</a></h2>
+<p>A component in <em>HPX</em> is a C++ class which can be created remotely and for which
+its member functions can be invoked remotely as well. The following sections
+highlight how components can be defined, created, and used.</p>
+<div class="section" id="defining-components">
+<span id="components-server"></span><h3>Defining components<a class="headerlink" href="#defining-components" title="Permalink to this headline">¶</a></h3>
+<p>In order for a C++ class type to be managed remotely in <em>HPX</em>, the type must be
+derived from the <code class="docutils literal notranslate"><span class="pre">hpx::components::component_base</span></code> template type. We
+call such C++ class types ‘components’.</p>
+<p>Note that the component type itself is passed as a template argument to the base
+class:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// header file some_component.hpp</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/components.hpp&gt;</span><span class="cp"></span>
+
+<span class="k">namespace</span> <span class="n">app</span>
+<span class="p">{</span>
+    <span class="c1">// Define a new component type &#39;some_component&#39;</span>
+    <span class="k">struct</span> <span class="nl">some_component</span>
+      <span class="p">:</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component_base</span><span class="o">&lt;</span><span class="n">some_component</span><span class="o">&gt;</span>
+    <span class="p">{</span>
+        <span class="c1">// This member function is has to be invoked remotely</span>
+        <span class="kt">int</span> <span class="n">some_member_function</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="n">boost</span><span class="o">::</span><span class="n">lexical_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="c1">// This will define the action type &#39;some_member_action&#39; which</span>
+        <span class="c1">// represents the member function &#39;some_member_function&#39; of the</span>
+        <span class="c1">// object type &#39;some_component&#39;.</span>
+        <span class="n">HPX_DEFINE_COMPONENT_ACTION</span><span class="p">(</span><span class="n">some_component</span><span class="p">,</span> <span class="n">some_member_function</span><span class="p">,</span> <span class="n">some_member_action</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="c1">// This will generate the necessary boiler-plate code for the action allowing</span>
+<span class="c1">// it to be invoked remotely. This declaration macro has to be placed in the</span>
+<span class="c1">// header file defining the component itself.</span>
+<span class="c1">//</span>
+<span class="c1">// Note: The second argument to the macro below has to be systemwide-unique</span>
+<span class="c1">//       C++ identifiers</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_ACTION_DECLARATION</span><span class="p">(</span><span class="n">app</span><span class="o">::</span><span class="n">some_component</span><span class="o">::</span><span class="n">some_member_action</span><span class="p">,</span> <span class="n">some_component_some_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>There is more boiler plate code which has to be placed into a source file in
+order for the component to be usable. Every component type is required to have
+macros placed into its source file, one for each component type and one macro
+for each of the actions defined by the component type.</p>
+<p>For instance:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// source file some_component.cpp</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;some_component.hpp&quot;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;app::some_component&#39; instances with &#39;hpx::new_&lt;&gt;()&#39;</span>
+<span class="c1">//</span>
+<span class="k">using</span> <span class="n">some_component</span> <span class="o">=</span> <span class="n">app</span><span class="o">::</span><span class="n">some_component</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">some_component_type</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component</span><span class="o">&lt;</span><span class="n">some_component</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="c1">// Please note that the second argument to this macro must be a</span>
+<span class="c1">// (system-wide) unique C++-style identifier (without any namespaces)</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_COMPONENT</span><span class="p">(</span><span class="n">some_component_type</span><span class="p">,</span> <span class="n">some_component</span><span class="p">);</span>
+
+<span class="c1">// The parameters for this macro have to be the same as used in the corresponding</span>
+<span class="c1">// HPX_REGISTER_ACTION_DECLARATION() macro invocation in the corresponding</span>
+<span class="c1">// header file.</span>
+<span class="c1">//</span>
+<span class="c1">// Please note that the second argument to this macro must be a</span>
+<span class="c1">// (system-wide) unique C++-style identifier (without any namespaces)</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_ACTION</span><span class="p">(</span><span class="n">app</span><span class="o">::</span><span class="n">some_component</span><span class="o">::</span><span class="n">some_member_action</span><span class="p">,</span> <span class="n">some_component_some_action</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="defining-client-side-representation-classes">
+<span id="components-client"></span><h3>Defining client side representation classes<a class="headerlink" href="#defining-client-side-representation-classes" title="Permalink to this headline">¶</a></h3>
+<p>Often it is very convenient to define a separate type for a component which can
+be used on the client side (from where the component is instantiated and used).
+This step might seem as unnecessary duplicating code, however it significantly
+increases the type safety of the code.</p>
+<p>A possible implementation of such a client side representation for the component
+described in the previous section could look like:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/include/components.hpp&gt;</span><span class="cp"></span>
+
+<span class="k">namespace</span> <span class="n">app</span>
+<span class="p">{</span>
+    <span class="c1">// Define a client side representation type for the component type</span>
+    <span class="c1">// &#39;some_component&#39; defined in the previous section.</span>
+    <span class="c1">//</span>
+    <span class="k">struct</span> <span class="nl">some_component_client</span>
+      <span class="p">:</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">client_base</span><span class="o">&lt;</span><span class="n">some_component_client</span><span class="p">,</span> <span class="n">some_component</span><span class="o">&gt;</span>
+    <span class="p">{</span>
+        <span class="k">using</span> <span class="n">base_type</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">client_base</span><span class="o">&lt;</span>
+                <span class="n">some_component_client</span><span class="p">,</span> <span class="n">some_component</span><span class="o">&gt;</span><span class="p">;</span>
+
+        <span class="n">some_component_client</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span> <span class="n">id</span><span class="p">)</span>
+          <span class="o">:</span> <span class="n">base_type</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">id</span><span class="p">))</span>
+        <span class="p">{}</span>
+
+        <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">some_member_function</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">some_component</span><span class="o">::</span><span class="n">some_member_action</span> <span class="n">act</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">get_id</span><span class="p">(),</span> <span class="n">s</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A client side object stores the global id of the component instance it
+represents. This global id is accessible by calling the function
+<code class="docutils literal notranslate"><span class="pre">client_base&lt;&gt;::get_id()</span></code>. The special constructor which is provided in the
+example allows to create this client side object directly using the API function
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::new_</span></code>.</p>
+</div>
+<div class="section" id="creating-component-instances">
+<span id="create-components"></span><h3>Creating component instances<a class="headerlink" href="#creating-component-instances" title="Permalink to this headline">¶</a></h3>
+<p>Instances of defined component types can be created in two different ways. If
+the component to create has a defined client side representation type, then this
+can be used, otherwise use the server type.</p>
+<p>The following examples assume that <code class="docutils literal notranslate"><span class="pre">some_component_type</span></code> is the type of the
+server side implementation of the component to create. All additional arguments
+(see <code class="docutils literal notranslate"><span class="pre">,</span> <span class="pre">...</span></code> notation below) are passed through to the corresponding
+constructor calls of those objects:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// create one instance on the given locality</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span> <span class="n">here</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">();</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">some_component_type</span><span class="o">&gt;</span><span class="p">(</span><span class="n">here</span><span class="p">,</span> <span class="p">...);</span>
+
+<span class="c1">// create one instance using the given distribution</span>
+<span class="c1">// policy (here: hpx::colocating_distribution_policy)</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span> <span class="n">here</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">();</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">some_component_type</span><span class="o">&gt;</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">colocated</span><span class="p">(</span><span class="n">here</span><span class="p">),</span> <span class="p">...);</span>
+
+<span class="c1">// create multiple instances on the given locality</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span> <span class="n">here</span> <span class="o">=</span> <span class="n">find_here</span><span class="p">();</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span><span class="o">&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">some_component_type</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">(</span><span class="n">here</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="p">...);</span>
+
+<span class="c1">// create multiple instances using the given distribution</span>
+<span class="c1">// policy (here: hpx::binpacking_distribution_policy)</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span><span class="o">&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">some_component_type</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">binpacking</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_all_localities</span><span class="p">()),</span> <span class="n">num</span><span class="p">,</span> <span class="p">...);</span>
+</pre></div>
+</div>
+<p>The examples below demonstrate the use of the same API functions for creating
+client side representation objects (instead of just plain ids). These examples
+assume that <code class="docutils literal notranslate"><span class="pre">client_type</span></code> is the type of the client side representation of the
+component type to create. As above, all additional arguments
+(see <code class="docutils literal notranslate"><span class="pre">,</span> <span class="pre">...</span></code> notation below) are passed through to the corresponding constructor
+calls of the server side implementation objects corresponding to the
+<code class="docutils literal notranslate"><span class="pre">client_type</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// create one instance on the given locality</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span> <span class="n">here</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">();</span>
+<span class="n">client_type</span> <span class="n">c</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">client_type</span><span class="o">&gt;</span><span class="p">(</span><span class="n">here</span><span class="p">,</span> <span class="p">...);</span>
+
+<span class="c1">// create one instance using the given distribution</span>
+<span class="c1">// policy (here: hpx::colocating_distribution_policy)</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span> <span class="n">here</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">();</span>
+<span class="n">client_type</span> <span class="n">c</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">client_type</span><span class="o">&gt;</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">colocated</span><span class="p">(</span><span class="n">here</span><span class="p">),</span> <span class="p">...);</span>
+
+<span class="c1">// create multiple instances on the given locality</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span> <span class="n">here</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">();</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">client_type</span><span class="o">&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">client_type</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">(</span><span class="n">here</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="p">...);</span>
+
+<span class="c1">// create multiple instances using the given distribution</span>
+<span class="c1">// policy (here: hpx::binpacking_distribution_policy)</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">client_type</span><span class="o">&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">client_type</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">binpacking</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_all_localities</span><span class="p">()),</span> <span class="n">num</span><span class="p">,</span> <span class="p">...);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-component-instances">
+<span id="use-components"></span><h3>Using component instances<a class="headerlink" href="#using-component-instances" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="segmented-containers">
+<span id="containers"></span><h2>Segmented containers<a class="headerlink" href="#segmented-containers" title="Permalink to this headline">¶</a></h2>
+<p>In parallel programming, there is now a plethora of solutions aimed at
+implementing “partially contiguous” or segmented data structures, whether on
+shared memory systems or distributed memory systems. <em>HPX</em> implements such
+structures by drawing inspiration from Standard C++ containers.</p>
+<div class="section" id="using-segmented-containers">
+<span id="parallel-containers"></span><h3>Using segmented containers<a class="headerlink" href="#using-segmented-containers" title="Permalink to this headline">¶</a></h3>
+<p>A segmented container is a template class that is described in the namespace
+<code class="docutils literal notranslate"><span class="pre">hpx</span></code>. All segmented containers are very similar semantically to their
+sequential counterpart (defined in <code class="docutils literal notranslate"><span class="pre">namespace</span> <span class="pre">std</span></code> but with an additional
+template parameter named <code class="docutils literal notranslate"><span class="pre">DistPolicy</span></code>). The distribution policy is an optional
+parameter that is passed last to the segmented container constructor (after the
+container size when no default value is given, after the default value if not).
+The distribution policy describes the manner in which a container is segmented
+and the placement of each segment among the available runtime localities.</p>
+<p>However, only a part of the <code class="docutils literal notranslate"><span class="pre">std</span></code> container member functions were
+reimplemented:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">(constructor)</span></code>, <code class="docutils literal notranslate"><span class="pre">(destructor)</span></code>, <code class="docutils literal notranslate"><span class="pre">operator=</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">operator[]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">begin</span></code>, <code class="docutils literal notranslate"><span class="pre">cbegin</span></code>, <code class="docutils literal notranslate"><span class="pre">end</span></code>, <code class="docutils literal notranslate"><span class="pre">cend</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">size</span></code></p></li>
+</ul>
+<p>An example of how to use the <code class="docutils literal notranslate"><span class="pre">partitioned_vector</span></code> container would be:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/include/partitioned_vector.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;partitioned_vector&#39; segments</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_PARTITIONED_VECTOR</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+
+<span class="c1">// By default, the number of segments is equal to the current number of</span>
+<span class="c1">// localities</span>
+<span class="c1">//</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">va</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">vb</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>An example of how to use the <code class="docutils literal notranslate"><span class="pre">partitioned_vector</span></code> container
+with distribution policies would be:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/include/partitioned_vector.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/runtime/find_localities.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;partitioned_vector&#39; segments</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_PARTITIONED_VECTOR</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+
+<span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">num_segments</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">id_type</span><span class="o">&gt;</span> <span class="n">locs</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_all_localities</span><span class="p">()</span>
+
+<span class="k">auto</span> <span class="n">layout</span> <span class="o">=</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">container_layout</span><span class="p">(</span> <span class="n">num_segments</span><span class="p">,</span> <span class="n">locs</span> <span class="p">);</span>
+
+<span class="c1">// The number of segments is 10 and those segments are spread across the</span>
+<span class="c1">// localities collected in the variable locs in a Round-Robin manner</span>
+<span class="c1">//</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">va</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">layout</span><span class="p">);</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">vb</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">layout</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>By definition, a segmented container must be accessible from any thread although
+its construction is synchronous only for the thread who has called its
+constructor. To overcome this problem, it is possible to assign a symbolic name
+to the segmented container:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/include/partitioned_vector.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;partitioned_vector&#39; segments</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_PARTITIONED_VECTOR</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">fserver</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">(</span>
+  <span class="p">[](){</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>
+
+    <span class="c1">// Register the &#39;partitioned_vector&#39; with the name &quot;some_name&quot;</span>
+    <span class="c1">//</span>
+    <span class="n">v</span><span class="p">.</span><span class="n">register_as</span><span class="p">(</span><span class="s">&quot;some_name&quot;</span><span class="p">);</span>
+
+    <span class="cm">/* Do some code  */</span>
+  <span class="p">});</span>
+
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">fclient</span> <span class="o">=</span>
+  <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">(</span>
+    <span class="p">[](){</span>
+      <span class="c1">// Naked &#39;partitioned_vector&#39;</span>
+      <span class="c1">//</span>
+      <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">;</span>
+
+      <span class="c1">// Now the variable v points to the same &#39;partitioned_vector&#39; that has</span>
+      <span class="c1">// been registered with the name &quot;some_name&quot;</span>
+      <span class="c1">//</span>
+      <span class="n">v</span><span class="p">.</span><span class="n">connect_to</span><span class="p">(</span><span class="s">&quot;some_name&quot;</span><span class="p">);</span>
+
+      <span class="cm">/* Do some code  */</span>
+    <span class="p">});</span>
+</pre></div>
+</div>
+<div class="section" id="id8">
+<h4>Segmented containers<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<p><em>HPX</em> provides the following segmented containers:</p>
+<table class="docutils align-default" id="id10">
+<caption><span class="caption-number">Table 35 </span><span class="caption-text">Sequence containers</span><a class="headerlink" href="#id10" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Class page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hpx::partitioned_vector</span></code></p></td>
+<td><p>Dynamic segmented contiguous array.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/partitioned_vector.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/container/vector">vector</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id11">
+<caption><span class="caption-number">Table 36 </span><span class="caption-text">Unordered associative containers</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Description</p></td>
+<td><p>In header</p></td>
+<td><p>Class page at cppreference.com</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hpx::unordered_map</span></code></p></td>
+<td><p>Segmented collection of key-value pairs, hashed by keys, keys are unique.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;hpx/include/unordered_map.hpp&gt;</span></code></p></td>
+<td><p><a class="reference external" href="http://en.cppreference.com/w/cpp/container/unordered_map">unordered_map</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="segmented-iterators-and-segmented-iterator-traits">
+<span id="segmented-iterators"></span><h3>Segmented iterators and segmented iterator traits<a class="headerlink" href="#segmented-iterators-and-segmented-iterator-traits" title="Permalink to this headline">¶</a></h3>
+<p>The basic iterator used in the STL library is only suitable for one-dimensional
+structures. The iterators we use in <em>HPX</em> must adapt to the segmented format of
+our containers. Our iterators are then able to know when incrementing themselves
+if the next element of type <code class="docutils literal notranslate"><span class="pre">T</span></code> is in the same data segment or in another
+segment. In this second case, the iterator will automatically point to the
+beginning of the next segment.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that the dereference operation <code class="docutils literal notranslate"><span class="pre">operator</span> <span class="pre">*</span></code> does not directly return a
+reference of type <code class="docutils literal notranslate"><span class="pre">T&amp;</span></code> but an intermediate object wrapping this reference.
+When this object is used as an l-value, a remote write operation is
+performed; When this object is used as an r-value, implicit conversion to
+<code class="docutils literal notranslate"><span class="pre">T</span></code> type will take care of performing remote read operation.</p>
+</div>
+<p>It is sometimes useful not only to iterate element by element, but also segment
+by segment, or simply get a local iterator in order to avoid additional
+construction costs at each deferencing operations. To mitigate this need, the
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::traits::segmented_iterator_traits</span></code> are used.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">segmented_iterator_traits</span></code> users can uniformly get the iterators
+which specifically iterates over segments (by providing a segmented iterator
+as a parameter), or get the local begin/end iterators of the nearest
+local segment (by providing a per-segment iterator as a parameter):</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/include/partitioned_vector.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;partitioned_vector&#39; segments</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_PARTITIONED_VECTOR</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+
+<span class="k">using</span> <span class="n">iterator</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">iterator</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">traits</span>   <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">traits</span><span class="o">::</span><span class="n">segmented_iterator_traits</span><span class="o">&lt;</span><span class="n">iterator</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="k">auto</span> <span class="n">seg_begin</span> <span class="o">=</span> <span class="n">traits</span><span class="o">::</span><span class="n">segment</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">());</span>
+<span class="k">auto</span> <span class="n">seg_end</span>   <span class="o">=</span> <span class="n">traits</span><span class="o">::</span><span class="n">segment</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+
+<span class="c1">// Iterate over segments</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">seg_it</span> <span class="o">=</span> <span class="n">seg_begin</span><span class="p">;</span> <span class="n">seg_it</span> <span class="o">!=</span> <span class="n">seg_end</span><span class="p">;</span> <span class="o">++</span><span class="n">seg_it</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">auto</span> <span class="n">loc_begin</span> <span class="o">=</span> <span class="n">traits</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">seg_it</span><span class="p">)</span>
+    <span class="k">auto</span> <span class="n">loc_end</span>   <span class="o">=</span> <span class="n">traits</span><span class="o">::</span><span class="n">end</span><span class="p">(</span><span class="n">seg_it</span><span class="p">);</span>
+
+    <span class="c1">// Iterate over elements inside segments</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">lit</span> <span class="o">=</span> <span class="n">loc_begin</span><span class="p">;</span> <span class="n">lit</span> <span class="o">!=</span> <span class="n">loc_end</span><span class="p">;</span> <span class="o">++</span><span class="n">lit</span><span class="p">,</span> <span class="o">++</span><span class="n">count</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">*</span><span class="n">lit</span> <span class="o">=</span> <span class="n">count</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Which is equivalent to:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="k">auto</span> <span class="n">begin</span> <span class="o">=</span> <span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+<span class="k">auto</span> <span class="n">end</span>   <span class="o">=</span> <span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">();</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">it</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span> <span class="n">it</span> <span class="o">!=</span> <span class="n">end</span><span class="p">;</span> <span class="o">++</span><span class="n">it</span><span class="p">,</span> <span class="o">++</span><span class="n">count</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="o">*</span><span class="n">it</span> <span class="o">=</span> <span class="n">count</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-views">
+<span id="partitioned-vector-views"></span><h3>Using views<a class="headerlink" href="#using-views" title="Permalink to this headline">¶</a></h3>
+<p>The use of multidimensional arrays is quite common in the numerical field
+whether to perform dense matrix operations or to process images. It exist many
+libraries which implement such object classes overloading their basic operators
+(e.g.``+``, <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">()</span></code>, etc.). However, such operation becomes more
+delicate when the underlying data layout is segmented or when it is mandatory to
+use optimized linear algebra subroutines (i.e. BLAS subroutines).</p>
+<p>Our solution is thus to relax the level of abstraction by allowing the user to
+work not directly on n-dimensionnal data, but on “n-dimensionnal collections of
+1-D arrays”. The use of well-accepted techniques on contiguous data is thus
+preserved at the segment level, and the composability of the segments is made
+possible thanks to multidimensional array-inspired access mode.</p>
+<div class="section" id="preface-why-spmd">
+<span id="spmd-block"></span><h4>Preface: Why SPMD?<a class="headerlink" href="#preface-why-spmd" title="Permalink to this headline">¶</a></h4>
+<p>Although <em>HPX</em> refutes by design this programming model, the <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>
+plays a dominant role when it comes to implement vectorized code. To maximize
+local computations and avoid unneeded data transfers, a parallel section (or
+Single Programming Multiple Data section) is required. Because the use of global
+variables is prohibited, this parallel section is created via the RAII idiom.</p>
+<p>To define a parallel section, simply write an action taking a <code class="docutils literal notranslate"><span class="pre">spmd_block</span></code>
+variable as a first parameter:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/collectives/spmd_block.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">void</span> <span class="nf">bulk_function</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">spmd_block</span> <span class="n">block</span> <span class="cm">/* , arg0, arg1, ... */</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Parallel section</span>
+
+    <span class="cm">/* Do some code */</span>
+<span class="p">}</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">bulk_function</span><span class="p">,</span> <span class="n">bulk_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the following paragraphs, we will use the term “image” several times. An
+image is defined as a lightweight process whose entry point is a function
+provided by the user. It’s an “image of the function”.</p>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">spmd_block</span></code> class contains the following methods:</p>
+<ul class="simple">
+<li><p>[def Team information] <code class="docutils literal notranslate"><span class="pre">get_num_images</span></code>, <code class="docutils literal notranslate"><span class="pre">this_image</span></code>, <code class="docutils literal notranslate"><span class="pre">images_per_locality</span></code></p></li>
+<li><p>[def Control statements] <code class="docutils literal notranslate"><span class="pre">sync_all</span></code>, <code class="docutils literal notranslate"><span class="pre">sync_images</span></code></p></li>
+</ul>
+<p>Here is a sample code summarizing the features offered by the <code class="docutils literal notranslate"><span class="pre">spmd_block</span></code>
+class:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/collectives/spmd_block.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">void</span> <span class="nf">bulk_function</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">spmd_block</span> <span class="n">block</span> <span class="cm">/* , arg0, arg1, ... */</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">num_images</span> <span class="o">=</span> <span class="n">block</span><span class="p">.</span><span class="n">get_num_images</span><span class="p">();</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">this_image</span> <span class="o">=</span> <span class="n">block</span><span class="p">.</span><span class="n">this_image</span><span class="p">();</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">images_per_locality</span> <span class="o">=</span> <span class="n">block</span><span class="p">.</span><span class="n">images_per_locality</span><span class="p">();</span>
+
+    <span class="cm">/* Do some code */</span>
+
+    <span class="c1">// Synchronize all images in the team</span>
+    <span class="n">block</span><span class="p">.</span><span class="n">sync_all</span><span class="p">();</span>
+
+    <span class="cm">/* Do some code */</span>
+
+    <span class="c1">// Synchronize image 0 and image 1</span>
+    <span class="n">block</span><span class="p">.</span><span class="n">sync_images</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="cm">/* Do some code */</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="o">&gt;</span> <span class="n">vec_images</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">};</span>
+
+    <span class="c1">// Synchronize images 2, 3 and 4</span>
+    <span class="n">block</span><span class="p">.</span><span class="n">sync_images</span><span class="p">(</span><span class="n">vec_images</span><span class="p">);</span>
+
+    <span class="c1">// Alternative call to synchronize images 2, 3 and 4</span>
+    <span class="n">block</span><span class="p">.</span><span class="n">sync_images</span><span class="p">(</span><span class="n">vec_images</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">vec_images</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+
+    <span class="cm">/* Do some code */</span>
+
+    <span class="c1">// Non-blocking version of sync_all()</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">event</span> <span class="o">=</span>
+        <span class="n">block</span><span class="p">.</span><span class="n">sync_all</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">async</span><span class="p">);</span>
+
+    <span class="c1">// Callback waiting for &#39;event&#39; to be ready before being scheduled</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">cb</span> <span class="o">=</span>
+        <span class="n">event</span><span class="p">.</span><span class="n">then</span><span class="p">(</span>
+          <span class="p">[](</span><span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">)</span>
+          <span class="p">{</span>
+
+            <span class="cm">/* Do some code */</span>
+
+          <span class="p">});</span>
+
+    <span class="c1">// Finally wait for the execution tree to be finished</span>
+    <span class="n">cb</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">bulk_test_function</span><span class="p">,</span> <span class="n">bulk_test_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Then, in order to invoke the parallel section, call the function
+<code class="docutils literal notranslate"><span class="pre">define_spmd_block</span></code> specifying an arbitrary symbolic name and indicating the
+number of images per <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> to create:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">bulk_function</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">spmd_block</span> <span class="n">block</span><span class="p">,</span> <span class="cm">/* , arg0, arg1, ... */</span><span class="p">)</span>
+<span class="p">{</span>
+
+<span class="p">}</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">bulk_test_function</span><span class="p">,</span> <span class="n">bulk_test_action</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="cm">/* std::size_t arg0, arg1, ...; */</span>
+
+    <span class="n">bulk_action</span> <span class="n">act</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">images_per_locality</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+
+    <span class="c1">// Instanciate the parallel section</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">define_spmd_block</span><span class="p">(</span>
+        <span class="s">&quot;some_name&quot;</span><span class="p">,</span> <span class="n">images_per_locality</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">act</span><span class="p">)</span> <span class="cm">/*, arg0, arg1, ... */</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In principle, the user should never call the <code class="docutils literal notranslate"><span class="pre">spmd_block</span></code> constructor. The
+<code class="docutils literal notranslate"><span class="pre">define_spmd_block</span></code> function is responsible of instantiating <code class="docutils literal notranslate"><span class="pre">spmd_block</span></code>
+objects and broadcasting them to each created image.</p>
+</div>
+</div>
+<div class="section" id="spmd-multidimensional-views">
+<span id="spmd-views"></span><h4>SPMD multidimensional views<a class="headerlink" href="#spmd-multidimensional-views" title="Permalink to this headline">¶</a></h4>
+<p>Some classes are defined as “container views” when the purpose is to observe
+and/or modify the values of a container using another perspective than the one
+that characterizes the container. For example, the values of an <code class="docutils literal notranslate"><span class="pre">std::vector</span></code>
+object can be accessed via the expression <code class="docutils literal notranslate"><span class="pre">[i]</span></code>. Container views can be used,
+for example, when it is desired for those values to be “viewed” as a 2D matrix
+that would have been flattened in a <code class="docutils literal notranslate"><span class="pre">std::vector</span></code>. The values would be
+possibly accessible via the expression <code class="docutils literal notranslate"><span class="pre">vv(i,j)</span></code> which would call internally
+the expression <code class="docutils literal notranslate"><span class="pre">v[k]</span></code>.</p>
+<p>By default, the <code class="docutils literal notranslate"><span class="pre">partitioned_vector</span></code> class integrates 1-D views of its segments:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/include/partitioned_vector.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;partitioned_vector&#39; segments</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_PARTITIONED_VECTOR</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+
+<span class="k">using</span> <span class="n">iterator</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">iterator</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">traits</span>   <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">traits</span><span class="o">::</span><span class="n">segmented_iterator_traits</span><span class="o">&lt;</span><span class="n">iterator</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">;</span>
+
+<span class="c1">// Create a 1-D view of the vector of segments</span>
+<span class="k">auto</span> <span class="n">vv</span> <span class="o">=</span> <span class="n">traits</span><span class="o">::</span><span class="n">segment</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">());</span>
+
+<span class="c1">// Access segment i</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">v</span> <span class="o">=</span> <span class="n">vv</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</pre></div>
+</div>
+<p>Our views are called “multidimensional” in the sense that they generalize to N
+dimensions the purpose of <code class="docutils literal notranslate"><span class="pre">segmented_iterator_traits::segment()</span></code> in the 1-D
+case. Note that in a parallel section, the 2-D expression <code class="docutils literal notranslate"><span class="pre">a(i,j)</span> <span class="pre">=</span> <span class="pre">b(i,j)</span></code> is
+quite confusing because without convention, each of the images invoked will race
+to execute the statement. For this reason, our views are not only
+multidimensional but also “spmd-aware”.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SPMD-awareness: The convention is simple. If an assignment statement contains
+a view subscript as an l-value, it is only and only the image holding the
+r-value who is evaluating the statement. (In MPI sense, it is called a Put
+operation).</p>
+</div>
+<div class="section" id="subscript-based-operations">
+<span id="subscripts"></span><h5>Subscript-based operations<a class="headerlink" href="#subscript-based-operations" title="Permalink to this headline">¶</a></h5>
+<p>Here are some examples of using subscripts in the 2-D view case:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/partitioned_vector.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;partitioned_vector&#39; segments</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_PARTITIONED_VECTOR</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+
+<span class="k">using</span> <span class="n">Vec</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">View_2D</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector_view</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="cm">/* Do some code */</span>
+
+<span class="n">Vec</span> <span class="n">v</span><span class="p">;</span>
+
+<span class="c1">// Parallel section (suppose &#39;block&#39; an spmd_block instance)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">;</span>
+
+    <span class="c1">// Instanciate the view</span>
+    <span class="n">View_2D</span> <span class="nf">vv</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="p">{</span><span class="n">height</span><span class="p">,</span><span class="n">width</span><span class="p">});</span>
+
+    <span class="c1">// The l-value is a view subscript, the image that owns vv(1,0)</span>
+    <span class="c1">// evaluates the assignment.</span>
+    <span class="n">vv</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">vv</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+
+    <span class="c1">// The l-value is a view subscript, the image that owns the r-value</span>
+    <span class="c1">// (result of expression &#39;std::vector&lt;double&gt;(4,1.0)&#39;) evaluates the</span>
+    <span class="c1">// assignment : oops! race between all participating images.</span>
+    <span class="n">vv</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mf">1.0</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="iterator-based-operations">
+<span id="view-iterators"></span><h5>Iterator-based operations<a class="headerlink" href="#iterator-based-operations" title="Permalink to this headline">¶</a></h5>
+<p>Here are some examples of using iterators in the 3-D view case:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/partitioned_vector.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;partitioned_vector&#39; segments</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_PARTITIONED_VECTOR</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+
+<span class="k">using</span> <span class="n">Vec</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">View_3D</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector_view</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="cm">/* Do some code */</span>
+
+<span class="n">Vec</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">;</span>
+
+<span class="c1">// Parallel section (suppose &#39;block&#39; an spmd_block instance)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">sixe_x</span><span class="p">,</span> <span class="n">size_y</span><span class="p">,</span> <span class="n">size_z</span><span class="p">;</span>
+
+    <span class="c1">// Instanciate the views</span>
+    <span class="n">View_3D</span> <span class="nf">vv1</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">v1</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">v1</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="p">{</span><span class="n">sixe_x</span><span class="p">,</span><span class="n">size_y</span><span class="p">,</span><span class="n">size_z</span><span class="p">});</span>
+    <span class="n">View_3D</span> <span class="nf">vv2</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">v2</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">v2</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="p">{</span><span class="n">sixe_x</span><span class="p">,</span><span class="n">size_y</span><span class="p">,</span><span class="n">size_z</span><span class="p">});</span>
+
+    <span class="c1">// Save previous segments covered by vv1 into segments covered by vv2</span>
+    <span class="k">auto</span> <span class="n">vv2_it</span> <span class="o">=</span> <span class="n">vv2</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+    <span class="k">auto</span> <span class="n">vv1_it</span> <span class="o">=</span> <span class="n">vv1</span><span class="p">.</span><span class="n">cbegin</span><span class="p">();</span>
+
+    <span class="k">for</span><span class="p">(;</span> <span class="n">vv2_it</span> <span class="o">!=</span> <span class="n">vv2</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">vv2_it</span><span class="o">++</span><span class="p">,</span> <span class="n">vv1_it</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// It&#39;s a Put operation</span>
+        <span class="o">*</span><span class="n">vv2_it</span> <span class="o">=</span> <span class="o">*</span><span class="n">vv1_it</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Ensure that all images have performed their Put operations</span>
+    <span class="n">block</span><span class="p">.</span><span class="n">sync_all</span><span class="p">();</span>
+
+    <span class="c1">// Ensure that only one image is putting updated data into the different</span>
+    <span class="c1">// segments covered by vv1</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">block</span><span class="p">.</span><span class="n">this_image</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="c1">// Update all the segments covered by vv1</span>
+        <span class="k">for</span><span class="p">(</span><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">vv1</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">vv1</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">// It&#39;s a Put operation</span>
+            <span class="o">*</span><span class="n">i</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(</span><span class="n">elt_size</span><span class="p">,</span><span class="n">idx</span><span class="o">++</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here is an example that shows how to iterate only over segments
+owned by the current image:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/partitioned_vector.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;partitioned_vector&#39; segments</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_PARTITIONED_VECTOR</span><span class="p">(</span><span class="kt">float</span><span class="p">);</span>
+
+<span class="k">using</span> <span class="n">Vec</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">View_1D</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector_view</span><span class="o">&lt;</span><span class="kt">float</span><span class="p">,</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="cm">/* Do some code */</span>
+
+<span class="n">Vec</span> <span class="n">v</span><span class="p">;</span>
+
+<span class="c1">// Parallel section (suppose &#39;block&#39; an spmd_block instance)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">num_segments</span><span class="p">;</span>
+
+    <span class="c1">// Instanciate the view</span>
+    <span class="n">View_1D</span> <span class="nf">vv</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="p">{</span><span class="n">num_segments</span><span class="p">});</span>
+
+    <span class="c1">// Instanciate the local view from the view</span>
+    <span class="k">auto</span> <span class="n">local_vv</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">local_view</span><span class="p">(</span><span class="n">vv</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span> <span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="n">localvv</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">localvv</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="o">&amp;</span> <span class="n">segment</span> <span class="o">=</span> <span class="o">*</span><span class="n">i</span><span class="p">;</span>
+
+        <span class="cm">/* Do some code */</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="instanciating-sub-views">
+<span id="sub-views"></span><h5>Instanciating sub-views<a class="headerlink" href="#instanciating-sub-views" title="Permalink to this headline">¶</a></h5>
+<p>It is possible to construct views from other views: we call it sub-views. The
+constraint nevertheless for the subviews is to retain the dimension and the
+value type of the input view. Here is an example showing how to create a
+sub-view:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/partitioned_vector.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// remote creation of &#39;partitioned_vector&#39; segments</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_PARTITIONED_VECTOR</span><span class="p">(</span><span class="kt">float</span><span class="p">);</span>
+
+<span class="k">using</span> <span class="n">Vec</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">View_2D</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">partitioned_vector_view</span><span class="o">&lt;</span><span class="kt">float</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="cm">/* Do some code */</span>
+
+<span class="n">Vec</span> <span class="n">v</span><span class="p">;</span>
+
+<span class="c1">// Parallel section (suppose &#39;block&#39; an spmd_block instance)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">tilesize</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+
+    <span class="c1">// Instanciate the view</span>
+    <span class="n">View_2D</span> <span class="nf">vv</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">v</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">v</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">});</span>
+
+    <span class="c1">// Instanciate the subview</span>
+    <span class="n">View_2D</span> <span class="nf">svv</span><span class="p">(</span>
+        <span class="n">block</span><span class="p">,</span><span class="o">&amp;</span><span class="n">vv</span><span class="p">(</span><span class="n">tilesize</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="o">&amp;</span><span class="n">vv</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">tilesize</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">tilesize</span><span class="o">-</span><span class="mi">1</span><span class="p">),{</span><span class="n">tilesize</span><span class="p">,</span><span class="n">tilesize</span><span class="p">},{</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">});</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">block</span><span class="p">.</span><span class="n">this_image</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Equivalent to &#39;vv(tilesize,0) = 2.0f&#39;</span>
+        <span class="n">svv</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">=</span> <span class="mf">2.0f</span><span class="p">;</span>
+
+        <span class="c1">// Equivalent to &#39;vv(2*tilesize-1,tilesize-1) = 3.0f&#39;</span>
+        <span class="n">svv</span><span class="p">(</span><span class="n">tilesize</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">tilesize</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mf">3.0f</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The last parameter of the subview constructor is the size of the original
+view. If one would like to create a subview of the subview and so on, this
+parameter should stay unchanged. <code class="docutils literal notranslate"><span class="pre">{N,N}</span></code> for the above example).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="c-co-arrays">
+<h3>C++ co-arrays<a class="headerlink" href="#c-co-arrays" title="Permalink to this headline">¶</a></h3>
+<p>Fortran has extended its scalar element indexing approach to reference each
+segment of a distributed array. In this extension, a segment is attributed a
+?co-index? and lives in a specific <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>. A co-index provides the
+application with enough information to retrieve the corresponding data
+reference. In C++, containers present themselves as a ?smarter? alternative of
+Fortran arrays but there are still no corresponding standardized features
+similar to the Fortran co-indexing approach. We present here an implementation
+of such features in <em>HPX</em>.</p>
+<div class="section" id="preface-co-array-a-segmented-container-tied-to-a-spmd-multidimensional-views">
+<h4>Preface: co-array, a segmented container tied to a SPMD multidimensional views<a class="headerlink" href="#preface-co-array-a-segmented-container-tied-to-a-spmd-multidimensional-views" title="Permalink to this headline">¶</a></h4>
+<p>As mentioned before, a co-array is a distributed array whose segments are
+accessible through an array-inspired access mode. We have previously seen that
+it is possible to reproduce such access mode using the concept of views.
+Nevertheless, the user must pre-create a segmented container to instanciate this
+view. We illustrate below how a single constructor call can perform those two
+operations:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/components/containers/coarray/coarray.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/collectives/spmd_block.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// co-creation of &#39;coarray&#39;</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_COARRAY</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+
+<span class="c1">// Parallel section (suppose &#39;block&#39; an spmd_block instance)</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">container</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">height</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">segment_size</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+
+    <span class="n">hpx</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">a</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">height</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">_</span><span class="p">},</span> <span class="n">segment_size</span><span class="p">);</span>
+
+    <span class="cm">/* Do some code */</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Unlike segmented containers, a co-array object can only be instantiated within a
+parallel section. Here is the description of the parameters to provide to the
+coarray constructor:</p>
+<table class="docutils align-default" id="id12">
+<caption><span class="caption-number">Table 37 </span><span class="caption-text">Parameters of coarray constructor</span><a class="headerlink" href="#id12" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Parameter</p></td>
+<td><p>Description</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">block</span></code></p></td>
+<td><p>Reference to a <code class="docutils literal notranslate"><span class="pre">spmd_block</span></code> object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;a&quot;</span></code></p></td>
+<td><p>Symbolic name of type <code class="docutils literal notranslate"><span class="pre">std::string</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{height,width,_}</span></code></p></td>
+<td><p>Dimensions of the <code class="docutils literal notranslate"><span class="pre">coarray</span></code> object</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">segment_size</span></code></p></td>
+<td><p>Size of a co-indexed element (i.e. size of the object referenced by the
+expression <code class="docutils literal notranslate"><span class="pre">a(i,j,k)</span></code>)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Note that the “last dimension size” cannot be set by the user. It only accepts
+the constexpr variable <code class="docutils literal notranslate"><span class="pre">hpx::container::placeholders::_</span></code>. This size, which is
+considered private, is equal to the number of current images (value returned by
+<code class="docutils literal notranslate"><span class="pre">block.get_num_images()</span></code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An important constraint to remember about coarray objects is that all
+segments sharing the same “last dimension index” are located in the same
+image.</p>
+</div>
+</div>
+<div class="section" id="using-co-arrays">
+<h4>Using co-arrays<a class="headerlink" href="#using-co-arrays" title="Permalink to this headline">¶</a></h4>
+<p>The member functions owned by the <code class="docutils literal notranslate"><span class="pre">coarray</span></code> objects are exactly the same as
+those of spmd multidimensional views. These are:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Subscript</span><span class="o">-</span><span class="n">based</span> <span class="n">operations</span>
+<span class="o">*</span> <span class="n">Iterator</span><span class="o">-</span><span class="n">based</span> <span class="n">operations</span>
+</pre></div>
+</div>
+<p>However, one additional functionality is provided. Knowing that the element
+<code class="docutils literal notranslate"><span class="pre">a(i,j,k)</span></code> is in the memory of the <code class="docutils literal notranslate"><span class="pre">k</span></code>th image, the use of local subscripts
+is possible.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For spmd multidimensional views, subscripts are only global as it still
+involves potential remote data transfers.</p>
+</div>
+<p>Here is an example of using local subscripts:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/components/containers/coarray/coarray.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/collectives/spmd_block.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The following code generates all necessary boiler plate to enable the</span>
+<span class="c1">// co-creation of &#39;coarray&#39;</span>
+<span class="c1">//</span>
+<span class="n">HPX_REGISTER_COARRAY</span><span class="p">(</span><span class="kt">double</span><span class="p">);</span>
+
+<span class="c1">// Parallel section (suppose &#39;block&#39; an spmd_block instance)</span>
+<span class="p">{</span>
+    <span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">container</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">height</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">segment_size</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+
+    <span class="n">hpx</span><span class="o">::</span><span class="n">coarray</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">a</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">height</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">_</span><span class="p">},</span> <span class="n">segment_size</span><span class="p">);</span>
+
+    <span class="kt">double</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">block</span><span class="p">.</span><span class="n">this_image</span><span class="p">()</span><span class="o">*</span><span class="n">height</span><span class="o">*</span><span class="n">width</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="n">width</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">height</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Local write operation performed via the use of local subscript</span>
+        <span class="n">a</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="n">elt_size</span><span class="p">,</span><span class="n">idx</span><span class="p">);</span>
+        <span class="n">idx</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">block</span><span class="p">.</span><span class="n">sync_all</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When the “last dimension index” of a subscript is equal to
+<code class="docutils literal notranslate"><span class="pre">hpx::container::placeholders::_</span></code>, local subscript (and not global
+subscript) is used. It is equivalent to a global subscript used with a “last
+dimension index” equal to the value returned by <code class="docutils literal notranslate"><span class="pre">block.this_image()</span></code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="running_on_batch_systems.html" class="btn btn-neutral float-right" title="Running on batch systems" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="writing_single_node_hpx_applications.html" class="btn btn-neutral float-left" title="Writing single-node HPX applications" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>8174758</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

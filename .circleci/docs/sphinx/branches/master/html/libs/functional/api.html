@@ -1,0 +1,1285 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>functional &mdash; HPX master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="threadmanager" href="../threadmanager/api.html" />
+    <link rel="prev" title="assertion" href="../assertion/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../naming_base/api.html">naming_base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">functional</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-unique-function-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/unique_function.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-protect-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/protect.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-bind-front-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/bind_front.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-function-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/function.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-bind-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/bind.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-deferred-call-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/deferred_call.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-result-of-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/result_of.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-invoke-fused-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/invoke_fused.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-mem-fn-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/mem_fn.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-invoke-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/invoke.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-first-argument-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/first_argument.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-function-ref-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/function_ref.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-one-shot-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/one_shot.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-bind-back-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/bind_back.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-traits-is-action-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/is_action.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-traits-is-placeholder-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/is_placeholder.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-traits-get-function-annotation-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/get_function_annotation.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-traits-is-bind-expression-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/is_bind_expression.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-traits-get-function-address-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/get_function_address.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-functional-traits-is-callable-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/is_callable.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-unique-function-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/unique_function.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-protect-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/protect.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-bind-front-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/bind_front.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-function-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/function.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-bind-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/bind.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-deferred-call-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/deferred_call.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-result-of-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/result_of.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-invoke-fused-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/invoke_fused.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-mem-fn-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/mem_fn.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-invoke-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/invoke.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-first-argument-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/first_argument.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-function-ref-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/function_ref.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-one-shot-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/one_shot.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-bind-back-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/bind_back.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>functional</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/functional/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="functional">
+<span id="libs-functional-api"></span><h1>functional<a class="headerlink" href="#functional" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-functional-unique-function-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/unique_function.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-unique-function-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION">
+<span class="target" id="hpx_2functional_2unique__function_8hpp_1ae5b5bfc936e3bc2d588ea90f9139ba0c"></span><code class="sig-name descname">HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION</code><span class="sig-paren">(</span>Sig, F, Name<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_UTIL_REGISTER_UNIQUE_FUNCTION">
+<span class="target" id="hpx_2functional_2unique__function_8hpp_1a399d89cd99a8bb35cbd1dc6c38183ec7"></span><code class="sig-name descname">HPX_UTIL_REGISTER_UNIQUE_FUNCTION</code><span class="sig-paren">(</span>Sig, F, Name<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_UTIL_REGISTER_UNIQUE_FUNCTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util22unique_function_nonserE">
+<span id="_CPPv3N3hpx4util22unique_function_nonserE"></span><span id="_CPPv2N3hpx4util22unique_function_nonserE"></span><span class="target" id="hpx_2functional_2unique__function_8hpp_1abda264b5341bf68c44860beede9d880a"></span><em class="property">using </em><code class="sig-name descname">unique_function_nonser</code> = unique_function&lt;Sig, false&gt;<a class="headerlink" href="#_CPPv4N3hpx4util22unique_function_nonserE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE">
+<span id="_CPPv3I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE"></span><span id="_CPPv2I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE"></span><span class="target" id="classhpx_1_1util_1_1unique__function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4"></span>template&lt;typename <code class="sig-name descname">R</code>, typename ...<code class="sig-name descname">Ts</code>, bool <code class="sig-name descname">Serializable</code>&gt;<br /><em class="property">class </em><code class="sig-name descname">unique_function</code>&lt;<a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE" title="hpx::util::unique_function&lt;R(Ts...), Serializable&gt;::R">R</a><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE" title="hpx::util::unique_function&lt;R(Ts...), Serializable&gt;::Ts">Ts</a>...<span class="sig-paren">)</span>, <a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE" title="hpx::util::unique_function&lt;R(Ts...), Serializable&gt;::Serializable">Serializable</a>&gt; : <em class="property">public</em> detail::basic_function&lt;<a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE" title="hpx::util::unique_function&lt;R(Ts...), Serializable&gt;::R">R</a><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE" title="hpx::util::unique_function&lt;R(Ts...), Serializable&gt;::Ts">Ts</a>...<span class="sig-paren">)</span>, false, <a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE" title="hpx::util::unique_function&lt;R(Ts...), Serializable&gt;::Serializable">Serializable</a>&gt;<a class="headerlink" href="#_CPPv4I0Dp_bEN3hpx4util15unique_functionIF1RDp2TsE12SerializableEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util15unique_function11result_typeE">
+<span id="_CPPv3N3hpx4util15unique_function11result_typeE"></span><span id="_CPPv2N3hpx4util15unique_function11result_typeE"></span><span id="hpx::util::unique_function::result_type"></span><span class="target" id="classhpx_1_1util_1_1unique__function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a0b3402f3df6eef8c58c2a9eb4b242624"></span><em class="property">typedef </em>R <code class="sig-name descname">result_type</code><a class="headerlink" href="#_CPPv4N3hpx4util15unique_function11result_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util15unique_function15unique_functionENSt9nullptr_tE">
+<span id="_CPPv3N3hpx4util15unique_function15unique_functionENSt9nullptr_tE"></span><span id="_CPPv2N3hpx4util15unique_function15unique_functionENSt9nullptr_tE"></span><span id="hpx::util::unique_function::unique_function__std::nullptr_tCE"></span><span class="target" id="classhpx_1_1util_1_1unique__function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1aee20bc3224ce324d95c140663be6ada7"></span><em class="property">constexpr</em> <code class="sig-name descname">unique_function</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t = nullptr<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util15unique_function15unique_functionENSt9nullptr_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util15unique_function15unique_functionERR15unique_function">
+<span id="_CPPv3N3hpx4util15unique_function15unique_functionERR15unique_function"></span><span id="_CPPv2N3hpx4util15unique_function15unique_functionERR15unique_function"></span><span id="hpx::util::unique_function::unique_function__unique_functionRR"></span><span class="target" id="classhpx_1_1util_1_1unique__function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a9ed40779ec6e1756bac3be1b82919d1c"></span><code class="sig-name descname">unique_function</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util15unique_function15unique_functionENSt9nullptr_tE" title="hpx::util::unique_function::unique_function">unique_function</a>&amp;&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util15unique_function15unique_functionERR15unique_function" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util15unique_functionaSERR15unique_function">
+<span id="_CPPv3N3hpx4util15unique_functionaSERR15unique_function"></span><span id="_CPPv2N3hpx4util15unique_functionaSERR15unique_function"></span><span id="hpx::util::unique_function::assign-operator__unique_functionRR"></span><span class="target" id="classhpx_1_1util_1_1unique__function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1abdfdd35ebb137e8d25eaf3f1c131583b"></span>unique_function &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>unique_function&amp;&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util15unique_functionaSERR15unique_function" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0000EN3hpx4util15unique_function15unique_functionERR1F">
+<span id="_CPPv3I0000EN3hpx4util15unique_function15unique_functionERR1F"></span><span id="_CPPv2I0000EN3hpx4util15unique_function15unique_functionERR1F"></span><span class="target" id="classhpx_1_1util_1_1unique__function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1ab4e60f8204c01666fe94b14e55b21d95"></span>template&lt;typename <code class="sig-name descname">F</code>, typename <code class="sig-name descname">FD</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0000EN3hpx4util15unique_function15unique_functionERR1F" title="hpx::util::unique_function::unique_function::F">F</a>&gt;::type, typename <code class="sig-name descname">Enable1</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_same&lt;<a class="reference internal" href="#_CPPv4I0000EN3hpx4util15unique_function15unique_functionERR1F" title="hpx::util::unique_function::unique_function::FD">FD</a>, <a class="reference internal" href="#_CPPv4I0000EN3hpx4util15unique_function15unique_functionERR1F" title="hpx::util::unique_function::unique_function">unique_function</a>&gt;::value&gt;::type, typename <code class="sig-name descname">Enable2</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_invocable_r&lt;R, <a class="reference internal" href="#_CPPv4I0000EN3hpx4util15unique_function15unique_functionERR1F" title="hpx::util::unique_function::unique_function::FD">FD</a>&amp;, Ts...&gt;::value&gt;::type&gt;<br /><code class="sig-name descname">unique_function</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0000EN3hpx4util15unique_function15unique_functionERR1F" title="hpx::util::unique_function::unique_function::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0000EN3hpx4util15unique_function15unique_functionERR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0000EN3hpx4util15unique_functionaSER15unique_functionRR1F">
+<span id="_CPPv3I0000EN3hpx4util15unique_functionaSERR1F"></span><span id="_CPPv2I0000EN3hpx4util15unique_functionaSERR1F"></span><span class="target" id="classhpx_1_1util_1_1unique__function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a961c3a9b6e3da0c08ed7649d652968c9"></span>template&lt;typename <code class="sig-name descname">F</code>, typename <code class="sig-name descname">FD</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0000EN3hpx4util15unique_functionaSER15unique_functionRR1F" title="hpx::util::unique_function::operator=::F">F</a>&gt;::type, typename <code class="sig-name descname">Enable1</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_same&lt;<a class="reference internal" href="#_CPPv4I0000EN3hpx4util15unique_functionaSER15unique_functionRR1F" title="hpx::util::unique_function::operator=::FD">FD</a>, unique_function&gt;::value&gt;::type, typename <code class="sig-name descname">Enable2</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_invocable_r&lt;R, <a class="reference internal" href="#_CPPv4I0000EN3hpx4util15unique_functionaSER15unique_functionRR1F" title="hpx::util::unique_function::operator=::FD">FD</a>&amp;, Ts...&gt;::value&gt;::type&gt;<br />unique_function &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0000EN3hpx4util15unique_functionaSER15unique_functionRR1F" title="hpx::util::unique_function::operator=::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0000EN3hpx4util15unique_functionaSER15unique_functionRR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4IEN3hpx4util15unique_functionIF1RDp2TsE12SerializableE9base_typeE">
+<span id="_CPPv3IEN3hpx4util15unique_functionIF1RDp2TsE12SerializableE9base_typeE"></span><span id="_CPPv2IEN3hpx4util15unique_functionIF1RDp2TsE12SerializableE9base_typeE"></span>template&lt;&gt;<br /><span class="target" id="classhpx_1_1util_1_1unique__function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a9932168a3dd12315e40f5ebcd827231b"></span><em class="property">using </em><code class="sig-name descname">base_type</code> = detail::basic_function&lt;R<span class="sig-paren">(</span>Ts...<span class="sig-paren">)</span>, false, Serializable&gt;<a class="headerlink" href="#_CPPv4IEN3hpx4util15unique_functionIF1RDp2TsE12SerializableE9base_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-protect-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/protect.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-protect-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2functional_2protect_8hpp_1a4ada16c1a9d6139cf250b763e9f9c4a7"></span><code class="sig-name descname">template&lt;typename T&gt;HPX_HOST_DEVICE std::enable_if&lt; traits::is_bind_expression&lt;typename std::decay&lt;T&gt;::type&gt;::value, detail::protected_bind&lt;typename std::decay&lt;T&gt;::type&gt; &gt;::type hpx::util::protect(T &amp;&amp; f)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2functional_2protect_8hpp_1a9dc0872fdad8dd35092ae75f9361e687"></span><code class="sig-name descname">template&lt;typename T&gt;HPX_HOST_DEVICE std::enable_if&lt; !traits::is_bind_expression&lt;typename std::decay&lt;T&gt;::type&gt;::value, T&gt;::type hpx::util::protect(T &amp;&amp; v)</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-bind-front-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/bind_front.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-bind-front-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx13serializationE">
+<span id="_CPPv3N3hpx13serializationE"></span><span id="_CPPv2N3hpx13serializationE"></span><span id="hpx::serialization"></span><span class="target" id="namespacehpx_1_1serialization"></span><em class="property">namespace </em><code class="sig-name descname">serialization</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj">
+<span id="_CPPv3I00DpEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj"></span><span id="_CPPv2I00DpEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj"></span><span class="target" id="hpx_2functional_2bind__front_8hpp_1a253bd8c61826fcc14d83f95521c60688"></span>template&lt;typename <code class="sig-name descname">Archive</code>, typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br />void <code class="sig-name descname">serialize</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::Archive">Archive</a> &amp;<em>ar</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::bound_front&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::F">F</a>, <a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::Ts">Ts</a>...&gt; &amp;<em>bound</em>, unsigned int <em class="property">const</em> <em>version</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0DpEN3hpx4util10bind_frontEN6detail11bound_frontINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts">
+<span id="_CPPv3I0DpEN3hpx4util10bind_frontERR1FDpRR2Ts"></span><span id="_CPPv2I0DpEN3hpx4util10bind_frontERR1FDpRR2Ts"></span><span class="target" id="hpx_2functional_2bind__front_8hpp_1a1bd10896942b97922bd7697d791de90b"></span>template&lt;typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">constexpr</em> detail::bound_front&lt;<em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util10bind_frontEN6detail11bound_frontINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_front::F">F</a>&gt;::type, <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::make_index_pack&lt;sizeof...(<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util10bind_frontEN6detail11bound_frontINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_front::Ts">Ts</a>)&gt;::type, <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::decay_unwrap&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util10bind_frontEN6detail11bound_frontINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_front::Ts">Ts</a>&gt;::type...&gt; <code class="sig-name descname">bind_front</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpEN3hpx4util10bind_frontEN6detail11bound_frontINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_front::F">F</a> &amp;&amp;<em>f</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util10bind_frontEN6detail11bound_frontINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_front::Ts">Ts</a>&amp;&amp;... <em>vs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util10bind_frontEN6detail11bound_frontINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util10bind_frontENSt5decayI1FE4typeERR1F">
+<span id="_CPPv3I0EN3hpx4util10bind_frontERR1F"></span><span id="_CPPv2I0EN3hpx4util10bind_frontERR1F"></span><span class="target" id="hpx_2functional_2bind__front_8hpp_1a55d7abf3a4101689d6b3ec774c0ae766"></span>template&lt;typename <code class="sig-name descname">F</code>&gt;<br /><em class="property">constexpr</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4util10bind_frontENSt5decayI1FE4typeERR1F" title="hpx::util::bind_front::F">F</a>&gt;::type <code class="sig-name descname">bind_front</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3hpx4util10bind_frontENSt5decayI1FE4typeERR1F" title="hpx::util::bind_front::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util10bind_frontENSt5decayI1FE4typeERR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-function-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/function.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-function-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_UTIL_REGISTER_FUNCTION_DECLARATION">
+<span class="target" id="hpx_2functional_2function_8hpp_1a233149c69dbaa654a3ad432be8c992fd"></span><code class="sig-name descname">HPX_UTIL_REGISTER_FUNCTION_DECLARATION</code><span class="sig-paren">(</span>Sig, F, Name<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_UTIL_REGISTER_FUNCTION_DECLARATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_UTIL_REGISTER_FUNCTION">
+<span class="target" id="hpx_2functional_2function_8hpp_1a451ddfb7c84856570ea9c38526360e74"></span><code class="sig-name descname">HPX_UTIL_REGISTER_FUNCTION</code><span class="sig-paren">(</span>Sig, F, Name<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_UTIL_REGISTER_FUNCTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util15function_nonserE">
+<span id="_CPPv3N3hpx4util15function_nonserE"></span><span id="_CPPv2N3hpx4util15function_nonserE"></span><span class="target" id="hpx_2functional_2function_8hpp_1a2a8c6a0cfe7a9e88d70ad808646a18cd"></span><em class="property">using </em><code class="sig-name descname">function_nonser</code> = function&lt;Sig, false&gt;<a class="headerlink" href="#_CPPv4N3hpx4util15function_nonserE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE">
+<span id="_CPPv3I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE"></span><span id="_CPPv2I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE"></span><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4"></span>template&lt;typename <code class="sig-name descname">R</code>, typename ...<code class="sig-name descname">Ts</code>, bool <code class="sig-name descname">Serializable</code>&gt;<br /><em class="property">class </em><code class="sig-name descname">function</code>&lt;<a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE" title="hpx::util::function&lt;R(Ts...), Serializable&gt;::R">R</a><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE" title="hpx::util::function&lt;R(Ts...), Serializable&gt;::Ts">Ts</a>...<span class="sig-paren">)</span>, <a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE" title="hpx::util::function&lt;R(Ts...), Serializable&gt;::Serializable">Serializable</a>&gt; : <em class="property">public</em> detail::basic_function&lt;<a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE" title="hpx::util::function&lt;R(Ts...), Serializable&gt;::R">R</a><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE" title="hpx::util::function&lt;R(Ts...), Serializable&gt;::Ts">Ts</a>...<span class="sig-paren">)</span>, true, <a class="reference internal" href="#_CPPv4I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE" title="hpx::util::function&lt;R(Ts...), Serializable&gt;::Serializable">Serializable</a>&gt;<a class="headerlink" href="#_CPPv4I0Dp_bEN3hpx4util8functionIF1RDp2TsE12SerializableEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util8function11result_typeE">
+<span id="_CPPv3N3hpx4util8function11result_typeE"></span><span id="_CPPv2N3hpx4util8function11result_typeE"></span><span id="hpx::util::function::result_type"></span><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a0b3330487522a9e59a839610ab22f0bd"></span><em class="property">typedef </em>R <code class="sig-name descname">result_type</code><a class="headerlink" href="#_CPPv4N3hpx4util8function11result_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util8function8functionENSt9nullptr_tE">
+<span id="_CPPv3N3hpx4util8function8functionENSt9nullptr_tE"></span><span id="_CPPv2N3hpx4util8function8functionENSt9nullptr_tE"></span><span id="hpx::util::function::function__std::nullptr_tCE"></span><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a4d0839072bdf3af380504e71be1a3ba8"></span><em class="property">constexpr</em> <code class="sig-name descname">function</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t = nullptr<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util8function8functionENSt9nullptr_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util8function8functionERK8function">
+<span id="_CPPv3N3hpx4util8function8functionERK8function"></span><span id="_CPPv2N3hpx4util8function8functionERK8function"></span><span id="hpx::util::function::function__functionCR"></span><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1af392914ee2b59d14bee2daeeed3a09e1"></span><code class="sig-name descname">function</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util8function8functionENSt9nullptr_tE" title="hpx::util::function::function">function</a> <em class="property">const</em>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util8function8functionERK8function" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util8function8functionERR8function">
+<span id="_CPPv3N3hpx4util8function8functionERR8function"></span><span id="_CPPv2N3hpx4util8function8functionERR8function"></span><span id="hpx::util::function::function__functionRR"></span><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1ac4aeb9544bad13232d387a13a36982a6"></span><code class="sig-name descname">function</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util8function8functionENSt9nullptr_tE" title="hpx::util::function::function">function</a>&amp;&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util8function8functionERR8function" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util8functionaSERK8function">
+<span id="_CPPv3N3hpx4util8functionaSERK8function"></span><span id="_CPPv2N3hpx4util8functionaSERK8function"></span><span id="hpx::util::function::assign-operator__functionCR"></span><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a368ada384629724bf546a1d0b8d4ed76"></span>function &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>function <em class="property">const</em>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util8functionaSERK8function" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util8functionaSERR8function">
+<span id="_CPPv3N3hpx4util8functionaSERR8function"></span><span id="_CPPv2N3hpx4util8functionaSERR8function"></span><span id="hpx::util::function::assign-operator__functionRR"></span><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a26901be8bed432a5034b0a8b5aa12eac"></span>function &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>function&amp;&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util8functionaSERR8function" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0000EN3hpx4util8function8functionERR1F">
+<span id="_CPPv3I0000EN3hpx4util8function8functionERR1F"></span><span id="_CPPv2I0000EN3hpx4util8function8functionERR1F"></span><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a6cbf891c0363031fb3cf732f1c8d7717"></span>template&lt;typename <code class="sig-name descname">F</code>, typename <code class="sig-name descname">FD</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0000EN3hpx4util8function8functionERR1F" title="hpx::util::function::function::F">F</a>&gt;::type, typename <code class="sig-name descname">Enable1</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_same&lt;<a class="reference internal" href="#_CPPv4I0000EN3hpx4util8function8functionERR1F" title="hpx::util::function::function::FD">FD</a>, <a class="reference internal" href="#_CPPv4I0000EN3hpx4util8function8functionERR1F" title="hpx::util::function::function">function</a>&gt;::value&gt;::type, typename <code class="sig-name descname">Enable2</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_invocable_r&lt;R, <a class="reference internal" href="#_CPPv4I0000EN3hpx4util8function8functionERR1F" title="hpx::util::function::function::FD">FD</a>&amp;, Ts...&gt;::value&gt;::type&gt;<br /><code class="sig-name descname">function</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0000EN3hpx4util8function8functionERR1F" title="hpx::util::function::function::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0000EN3hpx4util8function8functionERR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0000EN3hpx4util8functionaSER8functionRR1F">
+<span id="_CPPv3I0000EN3hpx4util8functionaSERR1F"></span><span id="_CPPv2I0000EN3hpx4util8functionaSERR1F"></span><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a9ef2fe90b33241af482913fde52eb9ac"></span>template&lt;typename <code class="sig-name descname">F</code>, typename <code class="sig-name descname">FD</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0000EN3hpx4util8functionaSER8functionRR1F" title="hpx::util::function::operator=::F">F</a>&gt;::type, typename <code class="sig-name descname">Enable1</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_same&lt;<a class="reference internal" href="#_CPPv4I0000EN3hpx4util8functionaSER8functionRR1F" title="hpx::util::function::operator=::FD">FD</a>, function&gt;::value&gt;::type, typename <code class="sig-name descname">Enable2</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;<a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_invocable_r&lt;R, <a class="reference internal" href="#_CPPv4I0000EN3hpx4util8functionaSER8functionRR1F" title="hpx::util::function::operator=::FD">FD</a>&amp;, Ts...&gt;::value&gt;::type&gt;<br />function &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0000EN3hpx4util8functionaSER8functionRR1F" title="hpx::util::function::operator=::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0000EN3hpx4util8functionaSER8functionRR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4IEN3hpx4util8functionIF1RDp2TsE12SerializableE9base_typeE">
+<span id="_CPPv3IEN3hpx4util8functionIF1RDp2TsE12SerializableE9base_typeE"></span><span id="_CPPv2IEN3hpx4util8functionIF1RDp2TsE12SerializableE9base_typeE"></span>template&lt;&gt;<br /><span class="target" id="classhpx_1_1util_1_1function_3_01_r_07_ts_8_8_8_08_00_01_serializable_01_4_1a117e67d20e97f14ac7a7fd669fa193b8"></span><em class="property">using </em><code class="sig-name descname">base_type</code> = detail::basic_function&lt;R<span class="sig-paren">(</span>Ts...<span class="sig-paren">)</span>, true, Serializable&gt;<a class="headerlink" href="#_CPPv4IEN3hpx4util8functionIF1RDp2TsE12SerializableE9base_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-bind-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/bind.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-bind-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx13serializationE">
+<span id="_CPPv3N3hpx13serializationE"></span><span id="_CPPv2N3hpx13serializationE"></span><span class="target" id="namespacehpx_1_1serialization"></span><em class="property">namespace </em><code class="sig-name descname">serialization</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail5boundI1FDp2TsEEKj">
+<span id="_CPPv3I00DpEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail5boundI1FDp2TsEEKj"></span><span id="_CPPv2I00DpEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail5boundI1FDp2TsEEKj"></span><span class="target" id="hpx_2functional_2bind_8hpp_1ad13aab8018ea730664a1bd1007b0c71d"></span>template&lt;typename <code class="sig-name descname">Archive</code>, typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br />void <code class="sig-name descname">serialize</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::Archive">Archive</a> &amp;<em>ar</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::bound&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::F">F</a>, <a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::Ts">Ts</a>...&gt; &amp;<em>bound</em>, unsigned int <em class="property">const</em> <em>version</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail5boundI1FDp2TsEEKj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0_NSt6size_tEEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11placeholderI1IEEKj">
+<span id="_CPPv3I0_NSt6size_tEEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail11placeholderI1IEEKj"></span><span id="_CPPv2I0_NSt6size_tEEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail11placeholderI1IEEKj"></span><span class="target" id="hpx_2functional_2bind_8hpp_1a4746570868d069a1ed3705042ba3378b"></span>template&lt;typename <code class="sig-name descname">Archive</code>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">I</code>&gt;<br />void <code class="sig-name descname">serialize</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11placeholderI1IEEKj" title="hpx::serialization::serialize::Archive">Archive</a> &amp;<em>ar</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::placeholder&lt;<a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11placeholderI1IEEKj" title="hpx::serialization::serialize::I">I</a>&gt;&amp;, unsigned int <em class="property">const</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_NSt6size_tEEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11placeholderI1IEEKj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0Dp0EN3hpx4util4bindEN6detail5boundINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts">
+<span id="_CPPv3I0Dp0EN3hpx4util4bindERR1FDpRR2Ts"></span><span id="_CPPv2I0Dp0EN3hpx4util4bindERR1FDpRR2Ts"></span><span class="target" id="hpx_2functional_2bind_8hpp_1a4d24fc1a26c8899c3456d9215557b7f6"></span>template&lt;typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>, typename <code class="sig-name descname">Enable</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_action&lt;<em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util4bindEN6detail5boundINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind::F">F</a>&gt;::type&gt;::value&gt;::type&gt;<br /><em class="property">constexpr</em> detail::bound&lt;<em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util4bindEN6detail5boundINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind::F">F</a>&gt;::type, <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::make_index_pack&lt;sizeof...(<a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util4bindEN6detail5boundINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind::Ts">Ts</a>)&gt;::type, <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::decay_unwrap&lt;<a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util4bindEN6detail5boundINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind::Ts">Ts</a>&gt;::type...&gt; <code class="sig-name descname">bind</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util4bindEN6detail5boundINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind::F">F</a> &amp;&amp;<em>f</em>, <a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util4bindEN6detail5boundINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind::Ts">Ts</a>&amp;&amp;... <em>vs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Dp0EN3hpx4util4bindEN6detail5boundINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util12placeholdersE">
+<span id="_CPPv3N3hpx4util12placeholdersE"></span><span id="_CPPv2N3hpx4util12placeholdersE"></span><span id="hpx::util::placeholders"></span><span class="target" id="namespacehpx_1_1util_1_1placeholders"></span><em class="property">namespace </em><code class="sig-name descname">placeholders</code><a class="headerlink" href="#_CPPv4N3hpx4util12placeholdersE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Variables</p>
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2functional_2bind_8hpp_1a89ca8533cf019f4f06973eaac96acee6"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR detail::placeholder&lt;1&gt; hpx::util::placeholders::_1 = {}</code></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2functional_2bind_8hpp_1a05a3880ac546213aa2aee3b610d31570"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR detail::placeholder&lt;2&gt; hpx::util::placeholders::_2 = {}</code></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2functional_2bind_8hpp_1a4b00a8860b98217659d44bad20a6b06d"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR detail::placeholder&lt;3&gt; hpx::util::placeholders::_3 = {}</code></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2functional_2bind_8hpp_1a2bc87c8dd22206c2ff141f7b4985b390"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR detail::placeholder&lt;4&gt; hpx::util::placeholders::_4 = {}</code></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2functional_2bind_8hpp_1a4f90bf3b332c5a58f19a0f5c8e22c518"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR detail::placeholder&lt;5&gt; hpx::util::placeholders::_5 = {}</code></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2functional_2bind_8hpp_1a6c30df1709a2808f1572a602adf12bb8"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR detail::placeholder&lt;6&gt; hpx::util::placeholders::_6 = {}</code></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2functional_2bind_8hpp_1a07f3b3ad48046aed6f901a19cff63a5d"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR detail::placeholder&lt;7&gt; hpx::util::placeholders::_7 = {}</code></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2functional_2bind_8hpp_1ab46afa69a384f63dfe5d531ab1d15d31"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR detail::placeholder&lt;8&gt; hpx::util::placeholders::_8 = {}</code></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2functional_2bind_8hpp_1a27e03d26ff7c748510762905fff7d850"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR detail::placeholder&lt;9&gt; hpx::util::placeholders::_9 = {}</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-deferred-call-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/deferred_call.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-deferred-call-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx13serializationE">
+<span id="_CPPv3N3hpx13serializationE"></span><span class="target" id="namespacehpx_1_1serialization"></span><em class="property">namespace </em><code class="sig-name descname">serialization</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail8deferredI1FDp2TsEEKj">
+<span id="_CPPv3I00DpEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail8deferredI1FDp2TsEEKj"></span><span id="_CPPv2I00DpEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail8deferredI1FDp2TsEEKj"></span><span class="target" id="hpx_2functional_2deferred__call_8hpp_1a19e16b40d845d34137de9d511d071999"></span>template&lt;typename <code class="sig-name descname">Archive</code>, typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br />void <code class="sig-name descname">serialize</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::Archive">Archive</a> &amp;<em>ar</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::deferred&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::F">F</a>, <a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::Ts">Ts</a>...&gt; &amp;<em>d</em>, unsigned int <em class="property">const</em> <em>version</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail8deferredI1FDp2TsEEKj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0DpEN3hpx4util13deferred_callEN6detail8deferredINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts">
+<span id="_CPPv3I0DpEN3hpx4util13deferred_callERR1FDpRR2Ts"></span><span id="_CPPv2I0DpEN3hpx4util13deferred_callERR1FDpRR2Ts"></span><span class="target" id="hpx_2functional_2deferred__call_8hpp_1aade41a710e8e0bf454c317f6cb09b169"></span>template&lt;typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br />detail::deferred&lt;<em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util13deferred_callEN6detail8deferredINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::deferred_call::F">F</a>&gt;::type, <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::make_index_pack&lt;sizeof...(<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util13deferred_callEN6detail8deferredINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::deferred_call::Ts">Ts</a>)&gt;::type, <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::decay_unwrap&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util13deferred_callEN6detail8deferredINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::deferred_call::Ts">Ts</a>&gt;::type...&gt; <code class="sig-name descname">deferred_call</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpEN3hpx4util13deferred_callEN6detail8deferredINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::deferred_call::F">F</a> &amp;&amp;<em>f</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util13deferred_callEN6detail8deferredINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::deferred_call::Ts">Ts</a>&amp;&amp;... <em>vs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util13deferred_callEN6detail8deferredINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util13deferred_callENSt5decayI1FE4typeERR1F">
+<span id="_CPPv3I0EN3hpx4util13deferred_callERR1F"></span><span id="_CPPv2I0EN3hpx4util13deferred_callERR1F"></span><span class="target" id="hpx_2functional_2deferred__call_8hpp_1aeffd35ca6a6685ebba9eca651e9530af"></span>template&lt;typename <code class="sig-name descname">F</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4util13deferred_callENSt5decayI1FE4typeERR1F" title="hpx::util::deferred_call::F">F</a>&gt;::type <code class="sig-name descname">deferred_call</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3hpx4util13deferred_callENSt5decayI1FE4typeERR1F" title="hpx::util::deferred_call::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util13deferred_callENSt5decayI1FE4typeERR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-result-of-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/result_of.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-result-of-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-functional-invoke-fused-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/invoke_fused.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-invoke-fused-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2functional_2invoke__fused_8hpp_1a448a4cf7ebd07c3d73431e2e29f8df61"></span><code class="sig-name descname">template&lt;typename F, typename Tuple&gt;constexpr HPX_HOST_DEVICE detail::invoke_fused_result&lt;F, Tuple&gt;::type hpx::util::invoke_fused(F &amp;&amp; f, Tuple &amp;&amp; t)</code></dt>
+<dd><p>Invokes the given callable object f with the content of the sequenced type t (tuples, pairs)</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The result of the callable object when it’s called with the content of the given sequenced type.</p>
+</dd>
+<dt><strong>Note</strong></dt><dd><p>This function is similar to <code class="docutils literal notranslate"><span class="pre">std::apply</span></code> (C++17) </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">f</span></code>: Must be a callable object. If f is a member function pointer, the first argument in the sequenced type will be treated as the callee (this object).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: A type which is content accessible through a call to hpx::util::get.</p></li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">std::exception</span></code>: like objects thrown by call to object f with the arguments contained in the sequenceable type t.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2functional_2invoke__fused_8hpp_1a00f491575d5ec2069af5e54f9ecc7756"></span><code class="sig-name descname">template&lt;typename R, typename F, typename Tuple&gt;constexpr HPX_HOST_DEVICE R hpx::util::invoke_fused_r(F &amp;&amp; f, Tuple &amp;&amp; t)</code></dt>
+<dd><p><dl class="simple">
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">R</span></code>: The result type of the function when it’s called with the content of the given sequenced type. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-mem-fn-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/mem_fn.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-mem-fn-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx4util6mem_fnEN6detail6mem_fnIM1C1MEEM1C1M">
+<span id="_CPPv3I00EN3hpx4util6mem_fnEM1C1M"></span><span id="_CPPv2I00EN3hpx4util6mem_fnEM1C1M"></span><span class="target" id="hpx_2functional_2mem__fn_8hpp_1a0470c34b2a32dc3d0f838648058b722e"></span>template&lt;typename <code class="sig-name descname">M</code>, typename <code class="sig-name descname">C</code>&gt;<br /><em class="property">constexpr</em> detail::mem_fn&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4util6mem_fnEN6detail6mem_fnIM1C1MEEM1C1M" title="hpx::util::mem_fn::M">M</a> C::*&gt; <code class="sig-name descname">mem_fn</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3hpx4util6mem_fnEN6detail6mem_fnIM1C1MEEM1C1M" title="hpx::util::mem_fn::M">M</a> <em>C</em>::*<em>pm</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx4util6mem_fnEN6detail6mem_fnIM1C1MEEM1C1M" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE">
+<span id="_CPPv3I00DpEN3hpx4util6mem_fnEM1CF1RDp2PsE"></span><span id="_CPPv2I00DpEN3hpx4util6mem_fnEM1CF1RDp2PsE"></span><span class="target" id="hpx_2functional_2mem__fn_8hpp_1a391e6269bfca3a3aad3dce91ffad2196"></span>template&lt;typename <code class="sig-name descname">R</code>, typename <code class="sig-name descname">C</code>, typename ...<code class="sig-name descname">Ps</code>&gt;<br /><em class="property">constexpr</em> detail::mem_fn&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE" title="hpx::util::mem_fn::R">R</a> (C::*)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE" title="hpx::util::mem_fn::Ps">Ps</a>...<span class="sig-paren">)</span>&gt; <code class="sig-name descname">mem_fn</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE" title="hpx::util::mem_fn::R">R</a> (<em>C</em>::*<em>pm</em>)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE" title="hpx::util::mem_fn::Ps">Ps</a>...<span class="sig-paren">)</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CKF1RDp2PsEEEM1CKF1RDp2PsE">
+<span id="_CPPv3I00DpEN3hpx4util6mem_fnEM1CKF1RDp2PsE"></span><span id="_CPPv2I00DpEN3hpx4util6mem_fnEM1CKF1RDp2PsE"></span><span class="target" id="hpx_2functional_2mem__fn_8hpp_1ac2f9b8f187cc8c4b0f6ce44df8fe0abe"></span>template&lt;typename <code class="sig-name descname">R</code>, typename <code class="sig-name descname">C</code>, typename ...<code class="sig-name descname">Ps</code>&gt;<br /><em class="property">constexpr</em> detail::mem_fn&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE" title="hpx::util::mem_fn::R">R</a> (C::*)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE" title="hpx::util::mem_fn::Ps">Ps</a>...<span class="sig-paren">)</span> <em class="property">const</em>&gt; <code class="sig-name descname">mem_fn</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE" title="hpx::util::mem_fn::R">R</a> (<em>C</em>::*<em>pm</em>)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CF1RDp2PsEEEM1CF1RDp2PsE" title="hpx::util::mem_fn::Ps">Ps</a>...<span class="sig-paren">)</span> <em class="property">const</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpEN3hpx4util6mem_fnEN6detail6mem_fnIM1CKF1RDp2PsEEEM1CKF1RDp2PsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-invoke-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/invoke.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-invoke-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_INVOKE">
+<span class="target" id="hpx_2functional_2invoke_8hpp_1a484d302e874effaa9ac2225c665711d2"></span><code class="sig-name descname">HPX_INVOKE</code><span class="sig-paren">(</span>F, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_INVOKE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_INVOKE_R">
+<span class="target" id="hpx_2functional_2invoke_8hpp_1a844016bca68f355f89c5aa1365284add"></span><code class="sig-name descname">HPX_INVOKE_R</code><span class="sig-paren">(</span>R, F, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_INVOKE_R" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2functional_2invoke_8hpp_1a502693033e553216ecedc7a38637546e"></span><code class="sig-name descname">template&lt;typename F, typename... Ts&gt;constexpr HPX_HOST_DEVICE util::invoke_result&lt;F, Ts...&gt;::type hpx::util::invoke(F &amp;&amp; f, Ts &amp;&amp;... vs)</code></dt>
+<dd><p>Invokes the given callable object f with the content of the argument pack vs</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The result of the callable object when it’s called with the given argument types.</p>
+</dd>
+<dt><strong>Note</strong></dt><dd><p>This function is similar to <code class="docutils literal notranslate"><span class="pre">std::invoke</span></code> (C++17) </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">f</span></code>: Requires to be a callable object. If f is a member function pointer, the first argument in the pack will be treated as the callee (this object).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vs</span></code>: An arbitrary pack of arguments</p></li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">std::exception</span></code>: like objects thrown by call to object f with the argument types vs.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="hpx_2functional_2invoke_8hpp_1a180c358b1b81ba203d0128bc9e5e5213"></span><code class="sig-name descname">template&lt;typename R, typename F, typename... Ts&gt;constexpr HPX_HOST_DEVICE R hpx::util::invoke_r(F &amp;&amp; f, Ts &amp;&amp;... vs)</code></dt>
+<dd><p><dl class="simple">
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">R</span></code>: The result type of the function when it’s called with the content of the given argument types vs. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util10functionalE">
+<span id="_CPPv3N3hpx4util10functionalE"></span><span id="_CPPv2N3hpx4util10functionalE"></span><span id="hpx::util::functional"></span><span class="target" id="namespacehpx_1_1util_1_1functional"></span><em class="property">namespace </em><code class="sig-name descname">functional</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx4util10functional6invokeE">
+<span id="_CPPv3N3hpx4util10functional6invokeE"></span><span id="_CPPv2N3hpx4util10functional6invokeE"></span><span id="hpx::util::functional::invoke"></span><span class="target" id="structhpx_1_1util_1_1functional_1_1invoke"></span><em class="property">struct </em><code class="sig-name descname">invoke</code><a class="headerlink" href="#_CPPv4N3hpx4util10functional6invokeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="structhpx_1_1util_1_1functional_1_1invoke_1aaf561d7346a309220431c3caf51c9ca3"></span><code class="sig-name descname">template&lt;typename F, typename... Ts&gt;constexpr HPX_HOST_DEVICE util::invoke_result&lt;F, Ts...&gt;::type hpx::util::functional::invoke::operator()(F &amp;&amp; f, Ts &amp;&amp;... vs) const</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I0EN3hpx4util10functional8invoke_rE">
+<span id="_CPPv3I0EN3hpx4util10functional8invoke_rE"></span><span id="_CPPv2I0EN3hpx4util10functional8invoke_rE"></span><span class="target" id="structhpx_1_1util_1_1functional_1_1invoke__r"></span>template&lt;typename <code class="sig-name descname">R</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">invoke_r</code><a class="headerlink" href="#_CPPv4I0EN3hpx4util10functional8invoke_rE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt>
+<span class="target" id="structhpx_1_1util_1_1functional_1_1invoke__r_1a514493a9e040e519bad744a6e01b29b7"></span><code class="sig-name descname">template&lt;typename F, typename... Ts&gt;constexpr HPX_HOST_DEVICE R hpx::util::functional::invoke_r::operator()(F &amp;&amp; f, Ts &amp;&amp;... vs) const</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-first-argument-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/first_argument.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-first-argument-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-functional-function-ref-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/function_ref.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-function-ref-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I0DpEN3hpx4util12function_refIF1RDp2TsEEE">
+<span id="_CPPv3I0DpEN3hpx4util12function_refIF1RDp2TsEEE"></span><span id="_CPPv2I0DpEN3hpx4util12function_refIF1RDp2TsEEE"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4"></span>template&lt;typename <code class="sig-name descname">R</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">class </em><code class="sig-name descname">function_ref</code>&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util12function_refIF1RDp2TsEEE" title="hpx::util::function_ref&lt;R(Ts...)&gt;::R">R</a><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpEN3hpx4util12function_refIF1RDp2TsEEE" title="hpx::util::function_ref&lt;R(Ts...)&gt;::Ts">Ts</a>...<span class="sig-paren">)</span>&gt;<a class="headerlink" href="#_CPPv4I0DpEN3hpx4util12function_refIF1RDp2TsEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4I000EN3hpx4util12function_ref12function_refERR1F">
+<span id="_CPPv3I000EN3hpx4util12function_ref12function_refERR1F"></span><span id="_CPPv2I000EN3hpx4util12function_ref12function_refERR1F"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1ae2b10bdc26b19d27c8a0a91a78ed0102"></span>template&lt;typename <code class="sig-name descname">F</code>, typename <code class="sig-name descname">FD</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_ref12function_refERR1F" title="hpx::util::function_ref::function_ref::F">F</a>&gt;::type, typename <code class="sig-name descname">Enable</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_same&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_ref12function_refERR1F" title="hpx::util::function_ref::function_ref::FD">FD</a>, <a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_ref12function_refERR1F" title="hpx::util::function_ref::function_ref">function_ref</a>&gt;::value &amp;&amp; <a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_invocable_r&lt;R, <a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_ref12function_refERR1F" title="hpx::util::function_ref::function_ref::F">F</a>&amp;, Ts...&gt;::value&gt;::type&gt;<br /><code class="sig-name descname">function_ref</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_ref12function_refERR1F" title="hpx::util::function_ref::function_ref::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000EN3hpx4util12function_ref12function_refERR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12function_ref12function_refERK12function_ref">
+<span id="_CPPv3N3hpx4util12function_ref12function_refERK12function_ref"></span><span id="_CPPv2N3hpx4util12function_ref12function_refERK12function_ref"></span><span id="hpx::util::function_ref::function_ref__function_refCR"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1ae6a0e6725232b1ec6454a37097ba2717"></span><code class="sig-name descname">function_ref</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util12function_ref12function_refERK12function_ref" title="hpx::util::function_ref::function_ref">function_ref</a> <em class="property">const</em> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12function_ref12function_refERK12function_ref" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I000EN3hpx4util12function_refaSER12function_refRR1F">
+<span id="_CPPv3I000EN3hpx4util12function_refaSERR1F"></span><span id="_CPPv2I000EN3hpx4util12function_refaSERR1F"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a43102ec94d2818bf09e914b6e3a05458"></span>template&lt;typename <code class="sig-name descname">F</code>, typename <code class="sig-name descname">FD</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_refaSER12function_refRR1F" title="hpx::util::function_ref::operator=::F">F</a>&gt;::type, typename <code class="sig-name descname">Enable</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_same&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_refaSER12function_refRR1F" title="hpx::util::function_ref::operator=::FD">FD</a>, function_ref&gt;::value &amp;&amp; <a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_invocable_r&lt;R, <a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_refaSER12function_refRR1F" title="hpx::util::function_ref::operator=::F">F</a>&amp;, Ts...&gt;::value&gt;::type&gt;<br />function_ref &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_refaSER12function_refRR1F" title="hpx::util::function_ref::operator=::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000EN3hpx4util12function_refaSER12function_refRR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12function_refaSERK12function_ref">
+<span id="_CPPv3N3hpx4util12function_refaSERK12function_ref"></span><span id="_CPPv2N3hpx4util12function_refaSERK12function_ref"></span><span id="hpx::util::function_ref::assign-operator__function_refCR"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a945b43e5a7454061281a1a50cf0ce9f3"></span>function_ref &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>function_ref <em class="property">const</em> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12function_refaSERK12function_ref" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I000EN3hpx4util12function_ref6assignEvRR1F">
+<span id="_CPPv3I000EN3hpx4util12function_ref6assignERR1F"></span><span id="_CPPv2I000EN3hpx4util12function_ref6assignERR1F"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a12dabed5b5853bed7c321ef8bca77396"></span>template&lt;typename <code class="sig-name descname">F</code>, typename <code class="sig-name descname">T</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::remove_reference&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_ref6assignEvRR1F" title="hpx::util::function_ref::assign::F">F</a>&gt;::type, typename <code class="sig-name descname">Enable</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_pointer&lt;<a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_ref6assignEvRR1F" title="hpx::util::function_ref::assign::T">T</a>&gt;::value&gt;::type&gt;<br />void <code class="sig-name descname">assign</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000EN3hpx4util12function_ref6assignEvRR1F" title="hpx::util::function_ref::assign::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I000EN3hpx4util12function_ref6assignEvRR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util12function_ref6assignEvNSt17reference_wrapperI1TEE">
+<span id="_CPPv3I0EN3hpx4util12function_ref6assignENSt17reference_wrapperI1TEE"></span><span id="_CPPv2I0EN3hpx4util12function_ref6assignENSt17reference_wrapperI1TEE"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a068bcac30977bc29c475b3ab230e23b1"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />void <code class="sig-name descname">assign</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::reference_wrapper&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4util12function_ref6assignEvNSt17reference_wrapperI1TEE" title="hpx::util::function_ref::assign::T">T</a>&gt; <em>f_ref</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util12function_ref6assignEvNSt17reference_wrapperI1TEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util12function_ref6assignEvP1T">
+<span id="_CPPv3I0EN3hpx4util12function_ref6assignEP1T"></span><span id="_CPPv2I0EN3hpx4util12function_ref6assignEP1T"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1acba78dfd3973af726bf7f809b080452d"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />void <code class="sig-name descname">assign</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3hpx4util12function_ref6assignEvNSt17reference_wrapperI1TEE" title="hpx::util::function_ref::assign::T">T</a> *<em>f_ptr</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util12function_ref6assignEvP1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12function_ref4swapER12function_ref">
+<span id="_CPPv3N3hpx4util12function_ref4swapER12function_ref"></span><span id="_CPPv2N3hpx4util12function_ref4swapER12function_ref"></span><span id="hpx::util::function_ref::swap__function_refR"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a7371f899f2964936ee120dded6577430"></span>void <code class="sig-name descname">swap</code><span class="sig-paren">(</span>function_ref &amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12function_ref4swapER12function_ref" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util12function_refclEDp2Ts">
+<span id="_CPPv3NK3hpx4util12function_refclEDp2Ts"></span><span id="_CPPv2NK3hpx4util12function_refclEDp2Ts"></span><span id="hpx::util::function_ref::call-operator__TsDpC"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a12d62c02aeb7959f9f463ff0b9a3a48c"></span>R <code class="sig-name descname">operator()</code><span class="sig-paren">(</span>Ts... <em>vs</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util12function_refclEDp2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util12function_ref20get_function_addressEv">
+<span id="_CPPv3NK3hpx4util12function_ref20get_function_addressEv"></span><span id="_CPPv2NK3hpx4util12function_ref20get_function_addressEv"></span><span id="hpx::util::function_ref::get_function_addressC"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1ac04234f8b0e7d258997a8c44a9c792d7"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_function_address</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util12function_ref20get_function_addressEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util12function_ref23get_function_annotationEv">
+<span id="_CPPv3NK3hpx4util12function_ref23get_function_annotationEv"></span><span id="_CPPv2NK3hpx4util12function_ref23get_function_annotationEv"></span><span id="hpx::util::function_ref::get_function_annotationC"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a92835cc7cd59506e79cc66c6f50b4400"></span>char <em class="property">const</em> *<code class="sig-name descname">get_function_annotation</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util12function_ref23get_function_annotationEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util12function_ref27get_function_annotation_ittEv">
+<span id="_CPPv3NK3hpx4util12function_ref27get_function_annotation_ittEv"></span><span id="_CPPv2NK3hpx4util12function_ref27get_function_annotation_ittEv"></span><span id="hpx::util::function_ref::get_function_annotation_ittC"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a01282130c0b2827d555e6f293f9dabcd"></span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../concurrency/api.html#_CPPv4N3hpx4util3ittE" title="hpx::util::itt">itt</a>::<a class="reference internal" href="../concurrency/api.html#_CPPv4N3hpx4util3itt13string_handleE" title="hpx::util::itt::string_handle">string_handle</a> <code class="sig-name descname">get_function_annotation_itt</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util12function_ref27get_function_annotation_ittEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Protected Attributes</p>
+<dl class="member">
+<dt id="_CPPv4IEN3hpx4util12function_refIF1RDp2TsEE4vptrE">
+<span id="_CPPv3IEN3hpx4util12function_refIF1RDp2TsEE4vptrE"></span><span id="_CPPv2IEN3hpx4util12function_refIF1RDp2TsEE4vptrE"></span>template&lt;&gt;<br /><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a6892525e3060df3e502c8926f5ced892"></span>R (*<code class="sig-name descname">vptr</code>)<span class="sig-paren">(</span>void *, Ts&amp;&amp;...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IEN3hpx4util12function_refIF1RDp2TsEE4vptrE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util12function_ref6objectE">
+<span id="_CPPv3N3hpx4util12function_ref6objectE"></span><span id="_CPPv2N3hpx4util12function_ref6objectE"></span><span id="hpx::util::function_ref::object__voidP"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1a4566a325c923c85f171606050b728212"></span>void *<code class="sig-name descname">object</code><a class="headerlink" href="#_CPPv4N3hpx4util12function_ref6objectE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4IEN3hpx4util12function_refIF1RDp2TsEE6VTableE">
+<span id="_CPPv3IEN3hpx4util12function_refIF1RDp2TsEE6VTableE"></span><span id="_CPPv2IEN3hpx4util12function_refIF1RDp2TsEE6VTableE"></span>template&lt;&gt;<br /><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1afd314668235ac220ff441febba0d969e"></span><em class="property">using </em><code class="sig-name descname">VTable</code> = detail::function_ref_vtable&lt;R<span class="sig-paren">(</span>Ts...<span class="sig-paren">)</span>&gt;<a class="headerlink" href="#_CPPv4IEN3hpx4util12function_refIF1RDp2TsEE6VTableE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util12function_ref10get_vtableEPK6VTablev">
+<span id="_CPPv3I0EN3hpx4util12function_ref10get_vtableEv"></span><span id="_CPPv2I0EN3hpx4util12function_ref10get_vtableEv"></span><span class="target" id="classhpx_1_1util_1_1function__ref_3_01_r_07_ts_8_8_8_08_4_1aeb2d53f6d081fdcc3748d8e3fe06e69c"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">static</em> VTable <em class="property">const</em> *<code class="sig-name descname">get_vtable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util12function_ref10get_vtableEPK6VTablev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-one-shot-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/one_shot.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-one-shot-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx13serializationE">
+<span class="target" id="namespacehpx_1_1serialization"></span><em class="property">namespace </em><code class="sig-name descname">serialization</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail16one_shot_wrapperI1FEEKj">
+<span id="_CPPv3I00EN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail16one_shot_wrapperI1FEEKj"></span><span id="_CPPv2I00EN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail16one_shot_wrapperI1FEEKj"></span><span class="target" id="hpx_2functional_2one__shot_8hpp_1ac2f456ab25e28c066276d8f351ce5648"></span>template&lt;typename <code class="sig-name descname">Archive</code>, typename <code class="sig-name descname">F</code>&gt;<br />void <code class="sig-name descname">serialize</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail16one_shot_wrapperI1FEEKj" title="hpx::serialization::serialize::Archive">Archive</a> &amp;<em>ar</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::one_shot_wrapper&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail16one_shot_wrapperI1FEEKj" title="hpx::serialization::serialize::F">F</a>&gt; &amp;<em>one_shot_wrapper</em>, unsigned int <em class="property">const</em> <em>version</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail16one_shot_wrapperI1FEEKj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util8one_shotEN6detail16one_shot_wrapperINSt5decayI1FE4typeEEERR1F">
+<span id="_CPPv3I0EN3hpx4util8one_shotERR1F"></span><span id="_CPPv2I0EN3hpx4util8one_shotERR1F"></span><span class="target" id="hpx_2functional_2one__shot_8hpp_1ade88506cdfc5003dad74f8d79de74e02"></span>template&lt;typename <code class="sig-name descname">F</code>&gt;<br /><em class="property">constexpr</em> detail::one_shot_wrapper&lt;<em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4util8one_shotEN6detail16one_shot_wrapperINSt5decayI1FE4typeEEERR1F" title="hpx::util::one_shot::F">F</a>&gt;::type&gt; <code class="sig-name descname">one_shot</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3hpx4util8one_shotEN6detail16one_shot_wrapperINSt5decayI1FE4typeEEERR1F" title="hpx::util::one_shot::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util8one_shotEN6detail16one_shot_wrapperINSt5decayI1FE4typeEEERR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-bind-back-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/bind_back.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-bind-back-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1serialization"></span><em class="property">namespace </em><code class="sig-name descname">serialization</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail10bound_backI1FDp2TsEEKj">
+<span id="_CPPv3I00DpEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail10bound_backI1FDp2TsEEKj"></span><span id="_CPPv2I00DpEN3hpx13serialization9serializeER7ArchiveRN3hpx4util6detail10bound_backI1FDp2TsEEKj"></span><span class="target" id="hpx_2functional_2bind__back_8hpp_1a187604053fda29d038de44e0f91f4b17"></span>template&lt;typename <code class="sig-name descname">Archive</code>, typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br />void <code class="sig-name descname">serialize</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::Archive">Archive</a> &amp;<em>ar</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::bound_back&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::F">F</a>, <a class="reference internal" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail11bound_frontI1FDp2TsEEKj" title="hpx::serialization::serialize::Ts">Ts</a>...&gt; &amp;<em>bound</em>, unsigned int <em class="property">const</em> <em>version</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00DpEN3hpx13serialization9serializeEvR7ArchiveRN3hpx4util6detail10bound_backI1FDp2TsEEKj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0DpEN3hpx4util9bind_backEN6detail10bound_backINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts">
+<span id="_CPPv3I0DpEN3hpx4util9bind_backERR1FDpRR2Ts"></span><span id="_CPPv2I0DpEN3hpx4util9bind_backERR1FDpRR2Ts"></span><span class="target" id="hpx_2functional_2bind__back_8hpp_1addf6f5f38a62935213e04556b1fa916a"></span>template&lt;typename <code class="sig-name descname">F</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">constexpr</em> detail::bound_back&lt;<em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util9bind_backEN6detail10bound_backINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_back::F">F</a>&gt;::type, <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::make_index_pack&lt;sizeof...(<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util9bind_backEN6detail10bound_backINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_back::Ts">Ts</a>)&gt;::type, <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::decay_unwrap&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util9bind_backEN6detail10bound_backINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_back::Ts">Ts</a>&gt;::type...&gt; <code class="sig-name descname">bind_back</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpEN3hpx4util9bind_backEN6detail10bound_backINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_back::F">F</a> &amp;&amp;<em>f</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util9bind_backEN6detail10bound_backINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="hpx::util::bind_back::Ts">Ts</a>&amp;&amp;... <em>vs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util9bind_backEN6detail10bound_backINSt5decayI1FE4typeEN4util15make_index_packIXsZ2TsEE4typeEDpN4util12decay_unwrapI2TsE4typeEEERR1FDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util9bind_backENSt5decayI1FE4typeERR1F">
+<span id="_CPPv3I0EN3hpx4util9bind_backERR1F"></span><span id="_CPPv2I0EN3hpx4util9bind_backERR1F"></span><span class="target" id="hpx_2functional_2bind__back_8hpp_1a904c0f5be1597443ac73991bde53859a"></span>template&lt;typename <code class="sig-name descname">F</code>&gt;<br /><em class="property">constexpr</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4util9bind_backENSt5decayI1FE4typeERR1F" title="hpx::util::bind_back::F">F</a>&gt;::type <code class="sig-name descname">bind_back</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3hpx4util9bind_backENSt5decayI1FE4typeERR1F" title="hpx::util::bind_back::F">F</a> &amp;&amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util9bind_backENSt5decayI1FE4typeERR1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-traits-is-action-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/is_action.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-traits-is-action-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-functional-traits-is-placeholder-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/is_placeholder.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-traits-is-placeholder-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6traitsE">
+<span id="_CPPv3N3hpx6traitsE"></span><span id="_CPPv2N3hpx6traitsE"></span><span id="hpx::traits"></span><span class="target" id="namespacehpx_1_1traits"></span><em class="property">namespace </em><code class="sig-name descname">traits</code><br /></dt>
+<dd><dl class="class">
+<dt>
+<span class="target" id="structhpx_1_1traits_1_1is__placeholder"></span><em class="property">struct </em></dt>
+<dd><p>Subclassed by hpx::traits::is_placeholder&lt; T const &gt;</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-traits-get-function-annotation-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/get_function_annotation.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-traits-get-function-annotation-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6traitsE">
+<span id="_CPPv3N3hpx6traitsE"></span><span id="_CPPv2N3hpx6traitsE"></span><span class="target" id="namespacehpx_1_1traits"></span><em class="property">namespace </em><code class="sig-name descname">traits</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I00EN3hpx6traits23get_function_annotationE">
+<span id="_CPPv3I00EN3hpx6traits23get_function_annotationE"></span><span id="_CPPv2I00EN3hpx6traits23get_function_annotationE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__annotation"></span>template&lt;typename <code class="sig-name descname">F</code>, typename <code class="sig-name descname">Enable</code> = void&gt;<br /><em class="property">struct </em><code class="sig-name descname">get_function_annotation</code><a class="headerlink" href="#_CPPv4I00EN3hpx6traits23get_function_annotationE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits23get_function_annotation4callERK1F">
+<span id="_CPPv3N3hpx6traits23get_function_annotation4callERK1F"></span><span id="_CPPv2N3hpx6traits23get_function_annotation4callERK1F"></span><span id="hpx::traits::get_function_annotation::call__FCR"></span><span class="target" id="structhpx_1_1traits_1_1get__function__annotation_1a0b3ab887f7ce8784951b266f0684d36b"></span><em class="property">static</em> char <em class="property">const</em> *<code class="sig-name descname">call</code><span class="sig-paren">(</span>F <em class="property">const</em>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits23get_function_annotation4callERK1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-traits-is-bind-expression-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/is_bind_expression.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-traits-is-bind-expression-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6traitsE">
+<span id="_CPPv3N3hpx6traitsE"></span><span class="target" id="namespacehpx_1_1traits"></span><em class="property">namespace </em><code class="sig-name descname">traits</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I0EN3hpx6traits18is_bind_expressionE">
+<span id="_CPPv3I0EN3hpx6traits18is_bind_expressionE"></span><span id="_CPPv2I0EN3hpx6traits18is_bind_expressionE"></span><span class="target" id="structhpx_1_1traits_1_1is__bind__expression"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">is_bind_expression</code> : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_bind_expression&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx6traits18is_bind_expressionE" title="hpx::traits::is_bind_expression::T">T</a>&gt;<a class="headerlink" href="#_CPPv4I0EN3hpx6traits18is_bind_expressionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Subclassed by hpx::traits::is_bind_expression&lt; T const &gt;</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-traits-get-function-address-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/get_function_address.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-traits-get-function-address-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE">
+<span id="_CPPv3I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE"></span><span id="_CPPv2I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_obj_1_1_5_08_07_ts_8_8_8_08_4"></span>template&lt;typename <code class="sig-name descname">R</code>, typename <code class="sig-name descname">Obj</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">get_function_address</code>&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (Obj::*)(Ts...)&gt;::R">R</a> (Obj::*)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (Obj::*)(Ts...)&gt;::Ts">Ts</a>...<span class="sig-paren">)</span>&gt;<a class="headerlink" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits20get_function_address4callEM3ObjF1RDp2TsE">
+<span id="_CPPv3N3hpx6traits20get_function_address4callEM3ObjF1RDp2TsE"></span><span id="_CPPv2N3hpx6traits20get_function_address4callEM3ObjF1RDp2TsE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_obj_1_1_5_08_07_ts_8_8_8_08_4_1aeabe245f5e3c46ac058fd801e8221df6"></span><em class="property">static</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">call</code><span class="sig-paren">(</span>R (<em>Obj</em>::*<em>f</em>)<span class="sig-paren">(</span>Ts...<span class="sig-paren">)</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits20get_function_address4callEM3ObjF1RDp2TsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE">
+<span id="_CPPv3I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE"></span><span id="_CPPv2I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_obj_1_1_5_08_07_ts_8_8_8_08_01const_01_4"></span>template&lt;typename <code class="sig-name descname">R</code>, typename <code class="sig-name descname">Obj</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">get_function_address</code>&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (Obj::*)(Ts...) const&gt;::R">R</a> (Obj::*)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (Obj::*)(Ts...) const&gt;::Ts">Ts</a>...<span class="sig-paren">)</span> <em class="property">const</em>&gt;<a class="headerlink" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits20get_function_address4callEM3ObjKF1RDp2TsE">
+<span id="_CPPv3N3hpx6traits20get_function_address4callEM3ObjKF1RDp2TsE"></span><span id="_CPPv2N3hpx6traits20get_function_address4callEM3ObjKF1RDp2TsE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_obj_1_1_5_08_07_ts_8_8_8_08_01const_01_4_1a76e06ec5e3bd7db846dfa8891897551e"></span><em class="property">static</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">call</code><span class="sig-paren">(</span>R (<em>Obj</em>::*<em>f</em>)<span class="sig-paren">(</span>Ts...<span class="sig-paren">)</span> <em class="property">const</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits20get_function_address4callEM3ObjKF1RDp2TsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6traitsE">
+<span class="target" id="namespacehpx_1_1traits"></span><em class="property">namespace </em><code class="sig-name descname">traits</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I00EN3hpx6traits20get_function_addressE">
+<span id="_CPPv3I00EN3hpx6traits20get_function_addressE"></span><span id="_CPPv2I00EN3hpx6traits20get_function_addressE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address"></span>template&lt;typename <code class="sig-name descname">F</code>, typename <code class="sig-name descname">Enable</code> = void&gt;<br /><em class="property">struct </em><code class="sig-name descname">get_function_address</code><a class="headerlink" href="#_CPPv4I00EN3hpx6traits20get_function_addressE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits20get_function_address4callERK1F">
+<span id="_CPPv3N3hpx6traits20get_function_address4callERK1F"></span><span id="_CPPv2N3hpx6traits20get_function_address4callERK1F"></span><span id="hpx::traits::get_function_address::call__FCR"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_1a20fe32bd59f5db3ede8eabfa8ac26da9"></span><em class="property">static</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">call</code><span class="sig-paren">(</span>F <em class="property">const</em> &amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits20get_function_address4callERK1F" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I0DpEN3hpx6traits20get_function_addressIPF1RDp2TsEEE">
+<span id="_CPPv3I0DpEN3hpx6traits20get_function_addressIPF1RDp2TsEEE"></span><span id="_CPPv2I0DpEN3hpx6traits20get_function_addressIPF1RDp2TsEEE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_5_08_07_ts_8_8_8_08_4"></span>template&lt;typename <code class="sig-name descname">R</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">get_function_address</code>&lt;<a class="reference internal" href="#_CPPv4I0DpEN3hpx6traits20get_function_addressIPF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (*)(Ts...)&gt;::R">R</a> (*)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpEN3hpx6traits20get_function_addressIPF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (*)(Ts...)&gt;::Ts">Ts</a>...<span class="sig-paren">)</span>&gt;<a class="headerlink" href="#_CPPv4I0DpEN3hpx6traits20get_function_addressIPF1RDp2TsEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits20get_function_address4callEPF1RDp2TsE">
+<span id="_CPPv3N3hpx6traits20get_function_address4callEPF1RDp2TsE"></span><span id="_CPPv2N3hpx6traits20get_function_address4callEPF1RDp2TsE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_5_08_07_ts_8_8_8_08_4_1aaa2144e0d0df5c0f6eabe0b348de7f1c"></span><em class="property">static</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">call</code><span class="sig-paren">(</span>R (*<em>f</em>)<span class="sig-paren">(</span>Ts...<span class="sig-paren">)</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits20get_function_address4callEPF1RDp2TsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE">
+<span id="_CPPv3I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_obj_1_1_5_08_07_ts_8_8_8_08_01const_01_4"></span>template&lt;typename <code class="sig-name descname">R</code>, typename <code class="sig-name descname">Obj</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">get_function_address</code>&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (Obj::*)(Ts...) const&gt;::R">R</a> (Obj::*)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjKF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (Obj::*)(Ts...) const&gt;::Ts">Ts</a>...<span class="sig-paren">)</span> <em class="property">const</em>&gt;<br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits20get_function_address4callEM3ObjKF1RDp2TsE">
+<span id="_CPPv3N3hpx6traits20get_function_address4callEM3ObjKF1RDp2TsE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_obj_1_1_5_08_07_ts_8_8_8_08_01const_01_4_1a76e06ec5e3bd7db846dfa8891897551e"></span><em class="property">static</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">call</code><span class="sig-paren">(</span>R (<em>Obj</em>::*<em>f</em>)<span class="sig-paren">(</span>Ts...<span class="sig-paren">)</span> <em class="property">const</em><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE">
+<span id="_CPPv3I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_obj_1_1_5_08_07_ts_8_8_8_08_4"></span>template&lt;typename <code class="sig-name descname">R</code>, typename <code class="sig-name descname">Obj</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">get_function_address</code>&lt;<a class="reference internal" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (Obj::*)(Ts...)&gt;::R">R</a> (Obj::*)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00DpEN3hpx6traits20get_function_addressIM3ObjF1RDp2TsEEE" title="hpx::traits::get_function_address&lt;R (Obj::*)(Ts...)&gt;::Ts">Ts</a>...<span class="sig-paren">)</span>&gt;<br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits20get_function_address4callEM3ObjF1RDp2TsE">
+<span id="_CPPv3N3hpx6traits20get_function_address4callEM3ObjF1RDp2TsE"></span><span class="target" id="structhpx_1_1traits_1_1get__function__address_3_01_r_07_obj_1_1_5_08_07_ts_8_8_8_08_4_1aeabe245f5e3c46ac058fd801e8221df6"></span><em class="property">static</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">call</code><span class="sig-paren">(</span>R (<em>Obj</em>::*<em>f</em>)<span class="sig-paren">(</span>Ts...<span class="sig-paren">)</span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-functional-traits-is-callable-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/functional/traits/is_callable.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-functional-traits-is-callable-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-unique-function-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/unique_function.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-unique-function-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-protect-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/protect.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-protect-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-bind-front-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/bind_front.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-bind-front-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-function-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/function.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-function-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-bind-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/bind.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-bind-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-deferred-call-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/deferred_call.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-deferred-call-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-result-of-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/result_of.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-result-of-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-invoke-fused-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/invoke_fused.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-invoke-fused-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-mem-fn-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/mem_fn.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-mem-fn-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-invoke-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/invoke.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-invoke-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-first-argument-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/first_argument.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-first-argument-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-function-ref-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/function_ref.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-function-ref-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-one-shot-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/one_shot.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-one-shot-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-bind-back-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/bind_back.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-bind-back-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../threadmanager/api.html" class="btn btn-neutral float-right" title="threadmanager" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../assertion/api.html" class="btn btn-neutral float-left" title="assertion" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>856afc8</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

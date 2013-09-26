@@ -1,0 +1,494 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Running on batch systems &mdash; HPX stable documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Debugging HPX applications" href="debugging_hpx_applications.html" />
+    <link rel="prev" title="Writing distributed HPX applications" href="writing_distributed_hpx_applications.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                stable
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../manual.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_hpx.html">Getting <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="building_hpx.html"><em>HPX</em> build system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_hpx_projects.html">Creating <em>HPX</em> projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="starting_the_hpx_runtime.html">Starting the <em>HPX</em> runtime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launching_and_configuring_hpx_applications.html">Launching and configuring <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_single_node_hpx_applications.html">Writing single-node <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_distributed_hpx_applications.html">Writing distributed <em>HPX</em> applications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Running on batch systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-use-hpx-applications-with-pbs">How to use <em>HPX</em> applications with PBS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-use-hpx-applications-with-slurm">How to use <em>HPX</em> applications with SLURM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#interactive-shells">Interactive shells</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scheduling-batch-jobs">Scheduling batch jobs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_hpx_applications.html">Debugging <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizing_hpx_applications.html">Optimizing <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hpx_runtime_and_resources.html"><em>HPX</em> runtime and resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miscellaneous.html">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../manual.html">Manual</a> &raquo;</li>
+        
+      <li>Running on batch systems</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/manual/running_on_batch_systems.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="running-on-batch-systems">
+<span id="id2"></span><h1>Running on batch systems<a class="headerlink" href="#running-on-batch-systems" title="Permalink to this headline">¶</a></h1>
+<p>This section walks you through launching <em>HPX</em> applications on various batch
+systems.</p>
+<div class="section" id="how-to-use-hpx-applications-with-pbs">
+<span id="unix-pbs"></span><h2>How to use <em>HPX</em> applications with PBS<a class="headerlink" href="#how-to-use-hpx-applications-with-pbs" title="Permalink to this headline">¶</a></h2>
+<p>Most <em>HPX</em> applications are executed on parallel computers. These platforms
+typically provide integrated job management services that facilitate the
+allocation of computing resources for each parallel program. <em>HPX</em> includes out
+of the box support for one of the most common job management systems, the
+Portable Batch System (PBS).</p>
+<p>All PBS jobs require a script to specify the resource requirements and other
+parameters associated with a parallel job. The PBS script is basically a shell
+script with PBS directives placed within commented sections at the beginning of
+the file. The remaining (not commented-out) portions of the file executes just
+like any other regular shell script. While the description of all available PBS
+options is outside the scope of this tutorial (the interested reader may refer
+to in-depth <a class="reference external" href="http://www.clusterresources.com/torquedocs21/">documentation</a> for
+more information), below is a minimal example to illustrate the approach. As a
+test application we will use the multithreaded <code class="docutils literal notranslate"><span class="pre">hello_world_distributed</span></code>
+program, explained in the section <a class="reference internal" href="../examples/hello_world.html#examples-hello-world"><span class="std std-ref">Remote execution with actions: Hello world</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1">#PBS -l nodes=2:ppn=4</span>
+
+<span class="nv">APP_PATH</span><span class="o">=</span>~/packages/hpx/bin/hello_world_distributed
+<span class="nv">APP_OPTIONS</span><span class="o">=</span>
+
+pbsdsh -u <span class="nv">$APP_PATH</span> <span class="nv">$APP_OPTIONS</span> --hpx:nodes<span class="o">=</span><span class="sb">`</span>cat <span class="nv">$PBS_NODEFILE</span><span class="sb">`</span>
+</pre></div>
+</div>
+<div class="admonition caution">
+<p class="first admonition-title">Caution</p>
+<p>If the first application specific argument (inside <code class="docutils literal notranslate"><span class="pre">$APP_OPTIONS</span></code>) is a
+non-option (i.e. does not start with a <code class="docutils literal notranslate"><span class="pre">-</span></code> or a <code class="docutils literal notranslate"><span class="pre">--</span></code>), then those have to
+be placed before the option <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-nodes"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:nodes</span></code></a>, which in this case should
+be the last option on the command line.</p>
+<p>Alternatively, use the option <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-endnodes"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:endnodes</span></code></a> to explicitly mark the
+end of the list of node names:</p>
+<div class="last highlight-bash notranslate"><div class="highlight"><pre><span></span>pbsdsh -u <span class="nv">$APP_PATH</span> --hpx:nodes<span class="sb">`</span>cat <span class="nv">$PBS_NODEFILE</span><span class="sb">`</span> --hpx:endnodes <span class="nv">$APP_OPTIONS</span>
+</pre></div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">#PBS</span> <span class="pre">-l</span> <span class="pre">nodes=2:ppn=4</span></code> directive will cause two compute nodes to be
+allocated for the application, as specified in the option <code class="docutils literal notranslate"><span class="pre">nodes</span></code>. Each of the
+nodes will dedicate four cores to the program, as per the option <code class="docutils literal notranslate"><span class="pre">ppn</span></code>, short
+for “processors per node” (PBS does not distinguish between processors and
+cores). Note that requesting more cores per node than physically available is
+pointless and may prevent PBS from accepting the script.</p>
+<p>On newer PBS versions the PBS command syntax might be different. For instance,
+the PBS script above would look like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1">#PBS -l select=2:ncpus=4</span>
+
+<span class="nv">APP_PATH</span><span class="o">=</span>~/packages/hpx/bin/hello_world_distributed
+<span class="nv">APP_OPTIONS</span><span class="o">=</span>
+
+pbsdsh -u <span class="nv">$APP_PATH</span> <span class="nv">$APP_OPTIONS</span> --hpx:nodes<span class="o">=</span><span class="sb">`</span>cat <span class="nv">$PBS_NODEFILE</span><span class="sb">`</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">APP_PATH</span></code> and <code class="docutils literal notranslate"><span class="pre">APP_OPTIONS</span></code> are shell variables that respectively specify
+the correct path to the executable (<code class="docutils literal notranslate"><span class="pre">hello_world_distributed</span></code> in this case)
+and the command line options. Since the <code class="docutils literal notranslate"><span class="pre">hello_world_distributed</span></code> application
+doesn’t need any command line options, <code class="docutils literal notranslate"><span class="pre">APP_OPTIONS</span></code> has been left empty.
+Unlike in other execution environments, there is no need to use the
+<a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-threads"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:threads</span></code></a> option to indicate the required number of OS threads per
+node; the <em>HPX</em> library will derive this parameter automatically from PBS.</p>
+<p>Finally, pbsdsh is a PBS command that starts tasks to the resources allocated
+to the current job. It is recommended to leave this line as shown and modify
+only the PBS options and shell variables as needed for a specific application.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">A script invoked by pbsdsh starts in a very basic environment: the user’s
+<code class="docutils literal notranslate"><span class="pre">$HOME</span></code> directory is defined and is the current directory, the <code class="docutils literal notranslate"><span class="pre">LANG</span></code>
+variable is set to <code class="docutils literal notranslate"><span class="pre">C</span></code> and the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> is set to the basic
+<code class="docutils literal notranslate"><span class="pre">/usr/local/bin:/usr/bin:/bin</span></code> as defined in a system-wide file
+pbs_environment. Nothing that would normally be set up by a system shell
+profile or user shell profile is defined, unlike the environment for the main
+job script.</p>
+</div>
+<p>Another choice is for the pbsdsh command in your main job script to invoke
+your program via a shell, like <code class="docutils literal notranslate"><span class="pre">sh</span></code> or <code class="docutils literal notranslate"><span class="pre">bash</span></code> so that it gives an initialized
+environment for each instance. We create a small script <code class="docutils literal notranslate"><span class="pre">runme.sh</span></code> which is used
+to invoke the program:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1"># Small script which invokes the program based on what was passed on its</span>
+<span class="c1"># command line.</span>
+<span class="c1">#</span>
+<span class="c1"># This script is executed by the bash shell which will initialize all</span>
+<span class="c1"># environment variables as usual.</span>
+<span class="nv">$@</span>
+</pre></div>
+</div>
+<p>Now, we invoke this script using the pbsdsh tool:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1">#</span>
+<span class="c1">#PBS -l nodes=2:ppn=4</span>
+
+<span class="nv">APP_PATH</span><span class="o">=</span>~/packages/hpx/bin/hello_world_distributed
+<span class="nv">APP_OPTIONS</span><span class="o">=</span>
+
+pbsdsh -u runme.sh <span class="nv">$APP_PATH</span> <span class="nv">$APP_OPTIONS</span> --hpx:nodes<span class="o">=</span><span class="sb">`</span>cat <span class="nv">$PBS_NODEFILE</span><span class="sb">`</span>
+</pre></div>
+</div>
+<p>All that remains now is submitting the job to the queuing system. Assuming that
+the contents of the PBS script were saved in file <code class="docutils literal notranslate"><span class="pre">pbs_hello_world.sh</span></code> in the
+current directory, this is accomplished by typing:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qsub ./pbs_hello_world_pbs.sh
+</pre></div>
+</div>
+<p>If the job is accepted, qsub will print out the assigned job ID, which may
+look like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="m">42</span>.supercomputer.some.university.edu
+</pre></div>
+</div>
+<p>To check the status of your job, issue the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>qstat <span class="m">42</span>.supercomputer.some.university.edu
+</pre></div>
+</div>
+<p>and look for a single-letter job status symbol. The common cases include:</p>
+<ul class="simple">
+<li><em>Q</em> - signifies that the job is queued and awaiting its turn to be executed.</li>
+<li><em>R</em> - indicates that the job is currently running.</li>
+<li><em>C</em> - means that the job has completed.</li>
+</ul>
+<p>The example qstat output below shows a job waiting for execution resources
+to become available:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Job id                    Name             User            Time Use S Queue
+------------------------- ---------------- --------------- -------- - -----
+42.supercomputer          ...ello_world.sh joe_user               0 Q batch
+</pre></div>
+</div>
+<p>After the job completes, PBS will place two files, <code class="docutils literal notranslate"><span class="pre">pbs_hello_world.sh.o42</span></code> and
+<code class="docutils literal notranslate"><span class="pre">pbs_hello_world.sh.e42</span></code>, in the directory where the job was submitted. The
+first contains the standard output and the second contains the standard error
+from all the nodes on which the application executed. In our example, the error
+output file should be empty and standard output file should contain something
+similar to:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>hello world from OS-thread 3 on locality 0
+hello world from OS-thread 2 on locality 0
+hello world from OS-thread 1 on locality 1
+hello world from OS-thread 0 on locality 0
+hello world from OS-thread 3 on locality 1
+hello world from OS-thread 2 on locality 1
+hello world from OS-thread 1 on locality 0
+hello world from OS-thread 0 on locality 1
+</pre></div>
+</div>
+<p>Congratulations! You have just run your first distributed <em>HPX</em> application!</p>
+</div>
+<div class="section" id="how-to-use-hpx-applications-with-slurm">
+<span id="unix-slurm"></span><h2>How to use <em>HPX</em> applications with SLURM<a class="headerlink" href="#how-to-use-hpx-applications-with-slurm" title="Permalink to this headline">¶</a></h2>
+<p>Just like PBS (described in section <a class="reference internal" href="#unix-pbs"><span class="std std-ref">How to use HPX applications with PBS</span></a>), SLURM is a job
+management system which is widely used on large supercomputing systems. Any
+<em>HPX</em> application can easily be run using SLURM. This section describes how this
+can be done.</p>
+<p>The easiest way to run an <em>HPX</em> application using SLURM is to utilize the
+command line tool srun which interacts with the SLURM batch scheduling system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>srun -p &lt;partition&gt; -N &lt;number-of-nodes&gt; hpx-application &lt;application-arguments&gt;
+</pre></div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">&lt;partition&gt;</span></code> is one of the node partitions existing on the target
+machine (consult the machines documentation to get a list of existing
+partitions) and <code class="docutils literal notranslate"><span class="pre">&lt;number-of-nodes&gt;</span></code> is the number of compute nodes you want to
+use. By default, the HPX application is started with one <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> per
+node and uses all available cores on a node. You can change the number of
+localities started per node (for example to account for NUMA effects) by
+specifying the <code class="docutils literal notranslate"><span class="pre">-n</span></code> option of srun. The number of cores per <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>
+can be set by <code class="docutils literal notranslate"><span class="pre">-c</span></code>. The <code class="docutils literal notranslate"><span class="pre">&lt;application-arguments&gt;</span></code> are any application
+specific arguments which need to be passed on to the application.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There is no need to use any of the <em>HPX</em> command line options related to the
+number of localities, number of threads, or related to networking ports. All
+of this information is automatically extracted from the SLURM environment by
+the <em>HPX</em> startup code.</p>
+</div>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">The srun documentation explicitly states: “If <code class="docutils literal notranslate"><span class="pre">-c</span></code> is specified without
+<code class="docutils literal notranslate"><span class="pre">-n</span></code> as many tasks will be allocated per node as possible while satisfying
+the <code class="docutils literal notranslate"><span class="pre">-c</span></code> restriction. For instance on a cluster with 8 CPUs per node, a job
+request for 4 nodes and 3 CPUs per task may be allocated 3 or 6 CPUs per node
+(1 or 2 tasks per node) depending upon resource consumption by other jobs.”
+For this reason, we suggest to always specify <code class="docutils literal notranslate"><span class="pre">-n</span> <span class="pre">&lt;number-of-instances&gt;</span></code>,
+even if <code class="docutils literal notranslate"><span class="pre">&lt;number-of-instances&gt;</span></code> is equal to one (<code class="docutils literal notranslate"><span class="pre">1</span></code>).</p>
+</div>
+<div class="section" id="interactive-shells">
+<h3>Interactive shells<a class="headerlink" href="#interactive-shells" title="Permalink to this headline">¶</a></h3>
+<p>To get an interactive development shell on one of the nodes you can issue the
+following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>srun -p &lt;node-type&gt; -N &lt;number-of-nodes&gt; --pty /bin/bash -l
+</pre></div>
+</div>
+<p>After the shell has been opened, you can run your HPX application. By default,
+it uses all available cores. Note that if you requested one node, you don’t need
+to do <code class="docutils literal notranslate"><span class="pre">srun</span></code> again. However, if you requested more than one node, and want to
+run your distributed application, you can use <code class="docutils literal notranslate"><span class="pre">srun</span></code> again to start up the
+distributed HPX application. It will use the resources that have been requested
+for the interactive shell.</p>
+</div>
+<div class="section" id="scheduling-batch-jobs">
+<h3>Scheduling batch jobs<a class="headerlink" href="#scheduling-batch-jobs" title="Permalink to this headline">¶</a></h3>
+<p>The above mentioned method of running <em>HPX</em> applications is fine for development
+purposes. The disadvantage that comes with <code class="docutils literal notranslate"><span class="pre">srun</span></code> is that it only returns once
+the application is finished. This might not be appropriate for longer running
+applications (for example benchmarks or larger scale simulations). In order to
+cope with that limitation you can use the sbatch command.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">sbatch</span></code> command expects a script that it can run once the requested
+resources are available. In order to request resources you need to add
+<code class="docutils literal notranslate"><span class="pre">#SBATCH</span></code> comments in your script or provide the necessary parameters to
+<code class="docutils literal notranslate"><span class="pre">sbatch</span></code> directly. The parameters are the same as with <code class="docutils literal notranslate"><span class="pre">run</span></code>. The commands
+you need to execute are the same you would need to start your application as if
+you were in an interactive shell.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="debugging_hpx_applications.html" class="btn btn-neutral float-right" title="Debugging HPX applications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="writing_distributed_hpx_applications.html" class="btn btn-neutral float-left" title="Writing distributed HPX applications" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>966745e</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

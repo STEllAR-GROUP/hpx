@@ -1,0 +1,543 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>HPX runtime and resources &mdash; HPX 1.2.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="HPX 1.2.1 documentation" href="../index.html"/>
+        <link rel="up" title="Manual" href="../manual.html"/>
+        <link rel="next" title="Miscellaneous" href="miscellaneous.html"/>
+        <link rel="prev" title="Optimizing HPX applications" href="optimizing_hpx_applications.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../manual.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="building_hpx.html"><em>HPX</em> build system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_hpx_projects.html">Creating <em>HPX</em> projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="starting_the_hpx_runtime.html">Starting the <em>HPX</em> runtime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launching_and_configuring_hpx_applications.html">Launching and configuring <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_single_node_hpx_applications.html">Writing single-node <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_distributed_hpx_applications.html">Writing distributed <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_on_batch_systems.html">Running on batch systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_hpx_applications.html">Debugging <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizing_hpx_applications.html">Optimizing <em>HPX</em> applications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><em>HPX</em> runtime and resources</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hpx-thread-scheduling-policies"><em>HPX</em> thread scheduling policies</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#priority-local-scheduling-policy-default-policy">Priority local scheduling policy (default policy)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#static-priority-scheduling-policy">Static priority scheduling policy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#local-scheduling-policy">Local scheduling policy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#static-scheduling-policy">Static scheduling policy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#priority-abp-scheduling-policy">Priority ABP scheduling policy</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#the-hpx-resource-partitioner">The <em>HPX</em> resource partitioner</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#using-the-resource-partitioner">Using the resource partitioner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#advanced-usage">Advanced usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="miscellaneous.html">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../manual.html">Manual</a> &raquo;</li>
+        
+      <li><em>HPX</em> runtime and resources</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/manual/hpx_runtime_and_resources.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hpx-runtime-and-resources">
+<h1><em>HPX</em> runtime and resources<a class="headerlink" href="#hpx-runtime-and-resources" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="hpx-thread-scheduling-policies">
+<span id="schedulers"></span><h2><em>HPX</em> thread scheduling policies<a class="headerlink" href="#hpx-thread-scheduling-policies" title="Permalink to this headline">¶</a></h2>
+<p>The HPX runtime has five thread scheduling policies: local-priority,
+static-priority, local, static and abp-priority. These policies can be specified
+from the command line using the command line option <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-queuing"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:queuing</span></code></a>. In
+order to use a particular scheduling policy, the runtime system must be built
+with the appropriate scheduler flag turned on (e.g. <code class="docutils literal notranslate"><span class="pre">cmake</span>
+<span class="pre">-DHPX_THREAD_SCHEDULERS=local</span></code>, see <a class="reference internal" href="building_hpx.html#cmake-variables"><span class="std std-ref">CMake variables used to configure HPX</span></a> for more
+information).</p>
+<div class="section" id="priority-local-scheduling-policy-default-policy">
+<h3>Priority local scheduling policy (default policy)<a class="headerlink" href="#priority-local-scheduling-policy-default-policy" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>default or invoke using: <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-queuing"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:queuing</span></code></a><code class="docutils literal notranslate"><span class="pre">local-priority-fifo</span></code></li>
+</ul>
+<p>The priority local scheduling policy maintains one queue per operating system
+(OS) thread. The OS thread pulls its work from this queue. By default the number
+of high priority queues is equal to the number of OS threads; the number of high
+priority queues can be specified on the command line using
+<a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-high-priority-threads"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:high-priority-threads</span></code></a>. High priority threads are executed by any
+of the OS threads before any other work is executed. When a queue is empty work
+will be taken from high priority queues first. There is one low priority queue
+from which threads will be scheduled only when there is no other work.</p>
+<p>For this scheduling policy there is an option to turn on NUMA sensitivity using
+the command line option <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-numa-sensitive"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:numa-sensitive</span></code></a>. When NUMA sensitivity is
+turned on work stealing is done from queues associated with the same NUMA domain
+first, only after that work is stolen from other NUMA domains.</p>
+<p>This scheduler is enabled at build time by default and will be available always.</p>
+<p>This scheduler can be used with two underlying queuing policies (FIFO:
+first-in-first-out, and LIFO: last-in-first-out). The default is FIFO. In order
+to use the LIFO policy use the command line option <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-queuing"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:queuing</span></code></a><code class="docutils literal notranslate"><span class="pre">=local-priority-lifo</span></code>.</p>
+</div>
+<div class="section" id="static-priority-scheduling-policy">
+<h3>Static priority scheduling policy<a class="headerlink" href="#static-priority-scheduling-policy" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>invoke using: <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-queuing"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:queuing</span></code></a><code class="docutils literal notranslate"><span class="pre">=static-priority</span></code> (or <code class="docutils literal notranslate"><span class="pre">-qs</span></code>)</li>
+<li>flag to turn on for build: <code class="docutils literal notranslate"><span class="pre">HPX_THREAD_SCHEDULERS=all</span></code> or
+<code class="docutils literal notranslate"><span class="pre">HPX_THREAD_SCHEDULERS=static-priority</span></code></li>
+</ul>
+<p>The static scheduling policy maintains one queue per OS thread from which each
+OS thread pulls its tasks (user threads). Threads are distributed in a round
+robin fashion. There is no thread stealing in this policy.</p>
+</div>
+<div class="section" id="local-scheduling-policy">
+<h3>Local scheduling policy<a class="headerlink" href="#local-scheduling-policy" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>invoke using: <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-queuing"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:queuing</span></code></a><code class="docutils literal notranslate"><span class="pre">=local</span></code> (or <code class="docutils literal notranslate"><span class="pre">-ql</span></code>)</li>
+<li>flag to turn on for build: <code class="docutils literal notranslate"><span class="pre">HPX_THREAD_SCHEDULERS=all</span></code> or
+<code class="docutils literal notranslate"><span class="pre">HPX_THREAD_SCHEDULERS=local</span></code></li>
+</ul>
+<p>The local scheduling policy maintains one queue per OS thread from which each OS
+thread pulls its tasks (user threads).</p>
+</div>
+<div class="section" id="static-scheduling-policy">
+<h3>Static scheduling policy<a class="headerlink" href="#static-scheduling-policy" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>invoke using: <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-queuing"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:queuing</span></code></a><code class="docutils literal notranslate"><span class="pre">=static</span></code></li>
+<li>flag to turn on for build: <code class="docutils literal notranslate"><span class="pre">HPX_THREAD_SCHEDULERS=all</span></code> or
+<code class="docutils literal notranslate"><span class="pre">HPX_THREAD_SCHEDULERS=static</span></code></li>
+</ul>
+<p>The static scheduling policy maintains one queue per OS thread from which each
+OS thread pulls its tasks (user threads). Threads are distributed in a round
+robin fashion. There is no thread stealing in this policy.</p>
+</div>
+<div class="section" id="priority-abp-scheduling-policy">
+<h3>Priority ABP scheduling policy<a class="headerlink" href="#priority-abp-scheduling-policy" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>invoke using: <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-queuing"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:queuing</span></code></a><code class="docutils literal notranslate"><span class="pre">=abp-priority-fifo</span></code></li>
+<li>flag to turn on for build: <code class="docutils literal notranslate"><span class="pre">HPX_THREAD_SCHEDULERS=all</span></code> or
+<code class="docutils literal notranslate"><span class="pre">HPX_THREAD_SCHEDULERS=abp-priority</span></code></li>
+</ul>
+<p>Priority ABP policy maintains a double ended lock free queue for each OS thread.
+By default the number of high priority queues is equal to the number of OS
+threads; the number of high priority queues can be specified on the command line
+using <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-high-priority-threads"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:high-priority-threads</span></code></a>. High priority threads are executed
+by the first OS threads before any other work is executed. When a queue is empty
+work will be taken from high priority queues first. There is one low priority
+queue from which threads will be scheduled only when there is no other work. For
+this scheduling policy there is an option to turn on NUMA sensitivity using the
+command line option <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-numa-sensitive"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:numa-sensitive</span></code></a>. When NUMA sensitivity
+is turned on work stealing is done from queues associated with the same NUMA
+domain first, only after that work is stolen from other NUMA domains.</p>
+<p>This scheduler can be used with two underlying queuing policies (FIFO:
+first-in-first-out, and LIFO: last-in-first-out). In order to use the LIFO
+policy use the command line option <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-queuing"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:queuing</span></code></a><code class="docutils literal notranslate"><span class="pre">=abp-priority-lifo</span></code>.</p>
+</div>
+</div>
+<div class="section" id="the-hpx-resource-partitioner">
+<h2>The <em>HPX</em> resource partitioner<a class="headerlink" href="#the-hpx-resource-partitioner" title="Permalink to this headline">¶</a></h2>
+<p>The <em>HPX</em> resource partitioner lets you take the execution resources available
+on a system—processing units, cores, and numa domains—and assign them to
+thread pools. By default <em>HPX</em> creates a single thread pool name <code class="docutils literal notranslate"><span class="pre">default</span></code>.
+While this is good for most use cases, the resource partitioner lets you create
+multiple thread pools with custom resources and options.</p>
+<p>Creating custom thread pools is useful for cases where you have tasks which
+absolutely need to run without interference from other tasks. An example of this
+is when using <a class="reference external" href="https://en.wikipedia.org/wiki/Message_Passing_Interface">MPI</a> for distribution instead of the built-in mechanisms in
+<em>HPX</em> (useful in legacy applications). In this case one can create a thread pool
+containing a single thread for <a class="reference external" href="https://en.wikipedia.org/wiki/Message_Passing_Interface">MPI</a> communication. <a class="reference external" href="https://en.wikipedia.org/wiki/Message_Passing_Interface">MPI</a> tasks will then
+always run on the same thread, instead of potentially being stuck in a queue
+behind other threads.</p>
+<p>Note that <em>HPX</em> thread pools are completely independent from each other in the
+sense that task stealing will never happen between different thread pools.
+However, tasks running on a particular thread pool can schedule tasks on another
+thread pool.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is simpler in some situations to to schedule important tasks with high
+priority instead of using a separate thread pool.</p>
+</div>
+<div class="section" id="using-the-resource-partitioner">
+<h3>Using the resource partitioner<a class="headerlink" href="#using-the-resource-partitioner" title="Permalink to this headline">¶</a></h3>
+<p>In order to create custom thread pools the resource partitioner needs to be set
+up before <em>HPX</em> is initialized by creating an instance of
+<a class="reference internal" href="../api.html#_CPPv3N3hpx8resource11partitionerE" title="hpx::resource::partitioner"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::resource::partitioner</span></code></a>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_init.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/runtime/resource/partitioner.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">resource</span><span class="o">::</span><span class="n">partitioner</span> <span class="n">rp</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that we have to pass <code class="docutils literal notranslate"><span class="pre">argc</span></code> and <code class="docutils literal notranslate"><span class="pre">argv</span></code> to the resource partitioner to
+be able to parse thread binding options passed on the command line. You should
+pass the same arguments to the <a class="reference internal" href="../api.html#_CPPv3N3hpx8resource11partitionerE" title="hpx::resource::partitioner"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::resource::partitioner</span></code></a>
+constructor as you would to <a class="reference internal" href="../api.html#_CPPv3N3hpx4initERN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERN5boost15program_options19options_descriptionEiPPcRNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::init</span></code></a> or <a class="reference internal" href="../api.html#_CPPv3N3hpx5startERN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERN5boost15program_options19options_descriptionEiPPcRNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::start"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::start</span></code></a>.
+Running the above code will have the same effect as not initializing it at all,
+i.e. a default thread pool will be created with the type and number of threads
+specified on the command line.</p>
+<p>The resource partitioner class is the interface to add thread pools to the <em>HPX</em>
+runtime and to assign resources to the thread pools.</p>
+<p>To add a thread pool use the
+<a class="reference internal" href="../api.html#_CPPv3N3hpx8resource11partitioner18create_thread_poolERNSt6stringE17scheduling_policyN3hpx7threads8policies14scheduler_modeE" title="hpx::resource::partitioner::create_thread_pool"><code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">hpx::resource::partitioner::create_thread_pool</span></code></a> method. If you
+simply want to use the default scheduler and scheduler options it is enough to
+call <code class="docutils literal notranslate"><span class="pre">rp.create_thread_pool(&quot;my-thread-pool&quot;)</span></code>.</p>
+<p>Then, to add resources to the thread pool you can use the
+<a class="reference internal" href="../api.html#_CPPv3N3hpx8resource11partitioner12add_resourceERN3hpx8resource2puERNSt6stringENSt6size_tE" title="hpx::resource::partitioner::add_resource"><code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">hpx::resource::partitioner::add_resource</span></code></a> method. The resource
+partitioner exposes the hardware topology retrieved using <a class="reference external" href="https://www.open-mpi.org/projects/hwloc/">Portable Hardware Locality (HWLOC)</a> and lets you
+iterate through the topology to add the wanted processing units to the thread
+pool. Below is an example of adding all processing units from the first NUMA
+domain to a custom thread pool, unless there is only one NUMA domain in which
+case we leave the first processing unit for the default thread pool:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_init.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/runtime/resource/partitioner.hpp&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">resource</span><span class="o">::</span><span class="n">partitioner</span> <span class="n">rp</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+
+    <span class="n">rp</span><span class="p">.</span><span class="n">create_thread_pool</span><span class="p">(</span><span class="s">&quot;my-thread-pool&quot;</span><span class="p">);</span>
+
+    <span class="kt">bool</span> <span class="n">one_numa_domain</span> <span class="o">=</span> <span class="n">rp</span><span class="p">.</span><span class="n">numa_domains</span><span class="p">().</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">skipped_first_pu</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+
+    <span class="n">hpx</span><span class="o">::</span><span class="n">resource</span><span class="o">::</span><span class="n">numa_domain</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">d</span> <span class="o">=</span> <span class="n">rp</span><span class="p">.</span><span class="n">numa_domains</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">hpx</span><span class="o">::</span><span class="n">resource</span><span class="o">::</span><span class="n">core</span><span class="o">&amp;</span> <span class="nl">c</span> <span class="p">:</span> <span class="n">d</span><span class="p">.</span><span class="n">cores</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="n">hpx</span><span class="o">::</span><span class="n">resource</span><span class="o">::</span><span class="n">pu</span><span class="o">&amp;</span> <span class="nl">p</span> <span class="p">:</span> <span class="n">c</span><span class="p">.</span><span class="n">pus</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">one_numa_domain</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">skipped_first_pu</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="n">skipped_first_pu</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">rp</span><span class="p">.</span><span class="n">add_resource</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s">&quot;my-thread-pool&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Whatever processing units not assigned to a thread pool by the time
+<a class="reference internal" href="../api.html#_CPPv3N3hpx4initERN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERN5boost15program_options19options_descriptionEiPPcRNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::init</span></code></a> is called will be added to the default thread pool. It
+is also possible to explicitly add processing units to the default thread
+pool, and to create the default thread pool manually (in order to e.g. set
+the scheduler type).</p>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">The command line option <a class="reference internal" href="launching_and_configuring_hpx_applications.html#cmdoption-hpx-print-bind"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:print-bind</span></code></a> is useful for checking
+that the thread pools have been set up the way you expect.</p>
+</div>
+</div>
+<div class="section" id="advanced-usage">
+<h3>Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h3>
+<p>It is possible to customize the built in schedulers by passing scheduler options
+to <a class="reference internal" href="../api.html#_CPPv3N3hpx8resource11partitioner18create_thread_poolERNSt6stringE17scheduling_policyN3hpx7threads8policies14scheduler_modeE" title="hpx::resource::partitioner::create_thread_pool"><code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">hpx::resource::partitioner::create_thread_pool</span></code></a>. It is also possible
+to create and use custom schedulers.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is not recommended to create your own scheduler. The <em>HPX</em> developers use
+this to experiment with new scheduler designs before making them available to
+users via the standard mechanisms of choosing a scheduler (command line
+options). If you would like to experiment with a custom scheduler the
+resource partitioner example <code class="docutils literal notranslate"><span class="pre">shared_priority_queue_scheduler.cpp</span></code> contains
+a fully implemented scheduler with logging etc. to make exploration easier.</p>
+</div>
+<p>To choose a scheduler and custom mode for a thread pool, pass additional options
+when creating the thread pool like this:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">rp</span><span class="p">.</span><span class="n">create_thread_pool</span><span class="p">(</span><span class="s">&quot;my-thread-pool&quot;</span><span class="p">,</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">resource</span><span class="o">::</span><span class="n">policies</span><span class="o">::</span><span class="n">local_priority_lifo</span><span class="p">,</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">policies</span><span class="o">::</span><span class="n">scheduler_mode</span><span class="p">(</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">policies</span><span class="o">::</span><span class="n">scheduler_mode</span><span class="o">::</span><span class="k">default</span> <span class="o">|</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">policies</span><span class="o">::</span><span class="n">scheduler_mode</span><span class="o">::</span><span class="n">enable_elasticity</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>The available schedulers are documented here:
+<a class="reference internal" href="../api.html#_CPPv3N3hpx8resource17scheduling_policyE" title="hpx::resource::scheduling_policy"><code class="xref cpp cpp-enum docutils literal notranslate"><span class="pre">hpx::resource::scheduling_policy</span></code></a>, and the available scheduler modes
+here: <a class="reference internal" href="../api.html#_CPPv3N3hpx7threads8policies14scheduler_modeE" title="hpx::threads::policies::scheduler_mode"><code class="xref cpp cpp-enum docutils literal notranslate"><span class="pre">hpx::threads::policies::scheduler_mode</span></code></a>. Also see the examples
+folder for examples of advanced resource partitioner usage:
+<code class="docutils literal notranslate"><span class="pre">simple_resource_partitioner.cpp</span></code> and
+<code class="docutils literal notranslate"><span class="pre">oversubscribing_resource_partitioner.cpp</span></code>.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="miscellaneous.html" class="btn btn-neutral float-right" title="Miscellaneous" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="optimizing_hpx_applications.html" class="btn btn-neutral" title="Optimizing HPX applications" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, The Ste||ar Group.
+      
+        <span class="commit">
+          Revision <code>b26d3ba</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.2.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

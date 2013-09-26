@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>debugging &mdash; HPX 1.4.0-rc1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="errors" href="../errors/api.html" />
+    <link rel="prev" title="hashing" href="../hashing/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0-rc1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">debugging</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-debug-demangle-helper-hpp"><cite>#include &lt;compatibility/hpx/util/debug/demangle_helper.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-debugging-demangle-helper-hpp"><cite>#include &lt;hpx/debugging/demangle_helper.hpp&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>debugging</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/debugging/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="debugging">
+<h1>debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-compatibility-hpx-util-debug-demangle-helper-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/debug/demangle_helper.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-debug-demangle-helper-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-debugging-demangle-helper-hpp">
+<h2><cite>#include &lt;hpx/debugging/demangle_helper.hpp&gt;</cite><a class="headerlink" href="#include-hpx-debugging-demangle-helper-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4util5debugE">
+<span id="_CPPv3N3hpx4util5debugE"></span><span id="_CPPv2N3hpx4util5debugE"></span><span id="hpx::util::debug"></span><span class="target" id="namespacehpx_1_1util_1_1debug"></span><em class="property">namespace </em><code class="sig-name descname">debug</code><a class="headerlink" href="#_CPPv4N3hpx4util5debugE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util5debug22cxxabi_demangle_helperE">
+<span id="_CPPv3N3hpx4util5debug22cxxabi_demangle_helperE"></span><span id="_CPPv2N3hpx4util5debug22cxxabi_demangle_helperE"></span><span class="target" id="include_2hpx_2debugging_2demangle__helper_8hpp_1aab1bd62908f2f0ce9822b4ea9970cf16"></span><em class="property">using </em><code class="sig-name descname">cxxabi_demangle_helper</code> = demangle_helper&lt;T&gt;<a class="headerlink" href="#_CPPv4N3hpx4util5debug22cxxabi_demangle_helperE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx4util5debug11cxx_type_idE">
+<span id="_CPPv3N3hpx4util5debug11cxx_type_idE"></span><span id="_CPPv2N3hpx4util5debug11cxx_type_idE"></span><span class="target" id="include_2hpx_2debugging_2demangle__helper_8hpp_1a7d38e334a54aa67dc5f9a27344e80b83"></span><em class="property">using </em><code class="sig-name descname">cxx_type_id</code> = type_id&lt;T&gt;<a class="headerlink" href="#_CPPv4N3hpx4util5debug11cxx_type_idE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util5debug10print_typeENSt6stringEPKc">
+<span id="_CPPv3I0EN3hpx4util5debug10print_typeEPKc"></span><span id="_CPPv2I0EN3hpx4util5debug10print_typeEPKc"></span><span class="target" id="include_2hpx_2debugging_2demangle__helper_8hpp_1ae5cb939e2dcf3e2beb8d894ee6505a30"></span>template&lt;typename <code class="sig-name descname">T</code> = void&gt;<br /><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">print_type</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>delim</em> = &quot;&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util5debug10print_typeENSt6stringEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4IEN3hpx4util5debug10print_typeENSt6stringEPKc">
+<span id="_CPPv3IEN3hpx4util5debug10print_typeEPKc"></span><span id="_CPPv2IEN3hpx4util5debug10print_typeEPKc"></span><span class="target" id="include_2hpx_2debugging_2demangle__helper_8hpp_1ac3e46cd537606468d3f7f352497773f9"></span>template&lt;&gt;<br /><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">print_type</code><span class="sig-paren">(</span><em class="property">const</em> char *<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IEN3hpx4util5debug10print_typeENSt6stringEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0DpEN3hpx4util5debug10print_typeENSt9enable_ifIXnesZ4ArgsL0EENSt6stringEE4typeEPKc">
+<span id="_CPPv3I0DpEN3hpx4util5debug10print_typeEPKc"></span><span id="_CPPv2I0DpEN3hpx4util5debug10print_typeEPKc"></span><span class="target" id="include_2hpx_2debugging_2demangle__helper_8hpp_1afa449a6b6f09abf5e9af25c66482da8d"></span>template&lt;typename <code class="sig-name descname">T</code>, typename ...<code class="sig-name descname">Args</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;sizeof...(<a class="reference internal" href="#_CPPv4I0DpEN3hpx4util5debug10print_typeENSt9enable_ifIXnesZ4ArgsL0EENSt6stringEE4typeEPKc" title="hpx::util::debug::print_type::Args">Args</a>) != 0, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt;::type <code class="sig-name descname">print_type</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>delim</em> = &quot;&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util5debug10print_typeENSt9enable_ifIXnesZ4ArgsL0EENSt6stringEE4typeEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4I0EN3hpx4util5debug15demangle_helperE">
+<span id="_CPPv3I0EN3hpx4util5debug15demangle_helperE"></span><span id="_CPPv2I0EN3hpx4util5debug15demangle_helperE"></span><span class="target" id="structhpx_1_1util_1_1debug_1_1demangle__helper"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">demangle_helper</code><a class="headerlink" href="#_CPPv4I0EN3hpx4util5debug15demangle_helperE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util5debug15demangle_helper7type_idEv">
+<span id="_CPPv3NK3hpx4util5debug15demangle_helper7type_idEv"></span><span id="_CPPv2NK3hpx4util5debug15demangle_helper7type_idEv"></span><span id="hpx::util::debug::demangle_helper::type_idC"></span><span class="target" id="structhpx_1_1util_1_1debug_1_1demangle__helper_1a73fa080ccbf5cf4ba81144e958b22fed"></span>char <em class="property">const</em> *<code class="sig-name descname">type_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util5debug15demangle_helper7type_idEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I0EN3hpx4util5debug7type_idE">
+<span id="_CPPv3I0EN3hpx4util5debug7type_idE"></span><span id="_CPPv2I0EN3hpx4util5debug7type_idE"></span><span class="target" id="structhpx_1_1util_1_1debug_1_1type__id"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">type_id</code><a class="headerlink" href="#_CPPv4I0EN3hpx4util5debug7type_idE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Attributes</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util5debug7type_id7typeid_E">
+<span id="_CPPv3N3hpx4util5debug7type_id7typeid_E"></span><span id="_CPPv2N3hpx4util5debug7type_id7typeid_E"></span><span id="hpx::util::debug::type_id::typeid___demangle_helper:T:"></span><span class="target" id="structhpx_1_1util_1_1debug_1_1type__id_1a1de0c56bfdd48f8d79cd2e629dde4eaf"></span>demangle_helper&lt;T&gt; <code class="sig-name descname">typeid_</code> = demangle_helper&lt;T&gt;()<a class="headerlink" href="#_CPPv4N3hpx4util5debug7type_id7typeid_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../errors/api.html" class="btn btn-neutral float-right" title="errors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../hashing/api.html" class="btn btn-neutral float-left" title="hashing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>8174758</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

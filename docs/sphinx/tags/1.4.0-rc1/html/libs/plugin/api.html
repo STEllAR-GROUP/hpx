@@ -1,0 +1,717 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>plugin &mdash; HPX 1.4.0-rc1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="functional" href="../functional/api.html" />
+    <link rel="prev" title="config" href="../config/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0-rc1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">plugin</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-plugin-hpp"><cite>#include &lt;compatibility/hpx/util/plugin.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-plugin-config-hpp"><cite>#include &lt;compatibility/hpx/util/plugin/config.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-plugin-abstract-factory-hpp"><cite>#include &lt;compatibility/hpx/util/plugin/abstract_factory.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-plugin-dll-hpp"><cite>#include &lt;compatibility/hpx/util/plugin/dll.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-plugin-plugin-factory-hpp"><cite>#include &lt;compatibility/hpx/util/plugin/plugin_factory.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-plugin-plugin-wrapper-hpp"><cite>#include &lt;compatibility/hpx/util/plugin/plugin_wrapper.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-plugin-export-plugin-hpp"><cite>#include &lt;compatibility/hpx/util/plugin/export_plugin.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-plugin-concrete-factory-hpp"><cite>#include &lt;compatibility/hpx/util/plugin/concrete_factory.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-plugin-virtual-constructor-hpp"><cite>#include &lt;compatibility/hpx/util/plugin/virtual_constructor.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-traits-plugin-config-data-hpp"><cite>#include &lt;compatibility/hpx/traits/plugin_config_data.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-hpp"><cite>#include &lt;hpx/plugin.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-config-hpp"><cite>#include &lt;hpx/plugin/config.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-abstract-factory-hpp"><cite>#include &lt;hpx/plugin/abstract_factory.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-dll-hpp"><cite>#include &lt;hpx/plugin/dll.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-plugin-factory-hpp"><cite>#include &lt;hpx/plugin/plugin_factory.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-plugin-wrapper-hpp"><cite>#include &lt;hpx/plugin/plugin_wrapper.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-export-plugin-hpp"><cite>#include &lt;hpx/plugin/export_plugin.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-concrete-factory-hpp"><cite>#include &lt;hpx/plugin/concrete_factory.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-virtual-constructor-hpp"><cite>#include &lt;hpx/plugin/virtual_constructor.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-plugin-traits-plugin-config-data-hpp"><cite>#include &lt;hpx/plugin/traits/plugin_config_data.hpp&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>plugin</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/plugin/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="plugin">
+<h1>plugin<a class="headerlink" href="#plugin" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-compatibility-hpx-util-plugin-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/plugin.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-plugin-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-plugin-config-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/plugin/config.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-plugin-config-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-plugin-abstract-factory-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/plugin/abstract_factory.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-plugin-abstract-factory-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-plugin-dll-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/plugin/dll.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-plugin-dll-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-plugin-plugin-factory-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/plugin/plugin_factory.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-plugin-plugin-factory-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-plugin-plugin-wrapper-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/plugin/plugin_wrapper.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-plugin-plugin-wrapper-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-plugin-export-plugin-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/plugin/export_plugin.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-plugin-export-plugin-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-plugin-concrete-factory-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/plugin/concrete_factory.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-plugin-concrete-factory-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-plugin-virtual-constructor-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/plugin/virtual_constructor.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-plugin-virtual-constructor-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-traits-plugin-config-data-hpp">
+<h2><cite>#include &lt;compatibility/hpx/traits/plugin_config_data.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-traits-plugin-config-data-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-plugin-hpp">
+<h2><cite>#include &lt;hpx/plugin.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-plugin-config-hpp">
+<h2><cite>#include &lt;hpx/plugin/config.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-config-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORT_API">
+<span class="target" id="include_2hpx_2plugin_2config_8hpp_1a9a10d6fab32b7e94a806081e70f8f6c7"></span><code class="sig-name descname">HPX_PLUGIN_EXPORT_API</code><a class="headerlink" href="#c.HPX_PLUGIN_EXPORT_API" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_API">
+<span class="target" id="include_2hpx_2plugin_2config_8hpp_1a27cf4452bf5e9ff0c9a02a91ac7d9763"></span><code class="sig-name descname">HPX_PLUGIN_API</code><a class="headerlink" href="#c.HPX_PLUGIN_API" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_ARGUMENT_LIMIT">
+<span class="target" id="include_2hpx_2plugin_2config_8hpp_1a6b68073c89815c60d25558cd88745d31"></span><code class="sig-name descname">HPX_PLUGIN_ARGUMENT_LIMIT</code><a class="headerlink" href="#c.HPX_PLUGIN_ARGUMENT_LIMIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC">
+<span class="target" id="include_2hpx_2plugin_2config_8hpp_1aec98ea3f48808b5855df3ca72fdf56e4"></span><code class="sig-name descname">HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC</code><a class="headerlink" href="#c.HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_SYMBOLS_PREFIX">
+<span class="target" id="include_2hpx_2plugin_2config_8hpp_1af923b47d85b23b9b53062ff2689799be"></span><code class="sig-name descname">HPX_PLUGIN_SYMBOLS_PREFIX</code><a class="headerlink" href="#c.HPX_PLUGIN_SYMBOLS_PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR">
+<span class="target" id="include_2hpx_2plugin_2config_8hpp_1a5b0ceeeca44a52cdcf44d43a1f80104d"></span><code class="sig-name descname">HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR</code><a class="headerlink" href="#c.HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_SYMBOLS_PREFIX_STR">
+<span class="target" id="include_2hpx_2plugin_2config_8hpp_1a333ea0f8aa4172dd512d3629dd894273"></span><code class="sig-name descname">HPX_PLUGIN_SYMBOLS_PREFIX_STR</code><a class="headerlink" href="#c.HPX_PLUGIN_SYMBOLS_PREFIX_STR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4util6pluginE">
+<span id="_CPPv3N3hpx4util6pluginE"></span><span id="_CPPv2N3hpx4util6pluginE"></span><span id="hpx::util::plugin"></span><span class="target" id="namespacehpx_1_1util_1_1plugin"></span><em class="property">namespace </em><code class="sig-name descname">plugin</code><a class="headerlink" href="#_CPPv4N3hpx4util6pluginE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util6plugin10shared_ptrE">
+<span id="_CPPv3N3hpx4util6plugin10shared_ptrE"></span><span id="_CPPv2N3hpx4util6plugin10shared_ptrE"></span><span class="target" id="include_2hpx_2plugin_2config_8hpp_1a478ec7385dd70421090269f1bb8985e6"></span><em class="property">using </em><code class="sig-name descname">shared_ptr</code> = <a class="reference internal" href="../concurrency/api.html#_CPPv45boost" title="boost">boost</a>::shared_ptr&lt;T&gt;<a class="headerlink" href="#_CPPv4N3hpx4util6plugin10shared_ptrE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-plugin-abstract-factory-hpp">
+<h2><cite>#include &lt;hpx/plugin/abstract_factory.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-abstract-factory-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-plugin-dll-hpp">
+<h2><cite>#include &lt;hpx/plugin/dll.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-dll-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_HAS_DLOPEN">
+<span class="target" id="include_2hpx_2plugin_2dll_8hpp_1a44ed7f3eb97d329db955d4ae0c3f4dfa"></span><code class="sig-name descname">HPX_HAS_DLOPEN</code><a class="headerlink" href="#c.HPX_HAS_DLOPEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-plugin-plugin-factory-hpp">
+<h2><cite>#include &lt;hpx/plugin/plugin_factory.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-plugin-factory-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4util6pluginE">
+<span id="_CPPv3N3hpx4util6pluginE"></span><span id="_CPPv2N3hpx4util6pluginE"></span><span class="target" id="namespacehpx_1_1util_1_1plugin"></span><em class="property">namespace </em><code class="sig-name descname">plugin</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I0EN3hpx4util6plugin14plugin_factoryE">
+<span id="_CPPv3I0EN3hpx4util6plugin14plugin_factoryE"></span><span id="_CPPv2I0EN3hpx4util6plugin14plugin_factoryE"></span><span class="target" id="structhpx_1_1util_1_1plugin_1_1plugin__factory"></span>template&lt;class <code class="sig-name descname">BasePlugin</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">plugin_factory</code> : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="#_CPPv4N3hpx4util6pluginE" title="hpx::util::plugin">plugin</a>::detail::plugin_factory_item&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4util6plugin14plugin_factoryE" title="hpx::util::plugin::plugin_factory::BasePlugin">BasePlugin</a>, detail::plugin_factory_item_base, virtual_constructor&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4util6plugin14plugin_factoryE" title="hpx::util::plugin::plugin_factory::BasePlugin">BasePlugin</a>&gt;::<a class="reference internal" href="#_CPPv4IEN3hpx4util6plugin19virtual_constructorI10BasePluginE4typeE" title="hpx::util::plugin::virtual_constructor&lt;BasePlugin&gt;::type">type</a>&gt;<a class="headerlink" href="#_CPPv4I0EN3hpx4util6plugin14plugin_factoryE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util6plugin14plugin_factory14plugin_factoryER3dllRKNSt6stringE">
+<span id="_CPPv3N3hpx4util6plugin14plugin_factory14plugin_factoryER3dllRKNSt6stringE"></span><span id="_CPPv2N3hpx4util6plugin14plugin_factory14plugin_factoryER3dllRKNSt6stringE"></span><span id="hpx::util::plugin::plugin_factory::plugin_factory__dllR.ssCR"></span><span class="target" id="structhpx_1_1util_1_1plugin_1_1plugin__factory_1a3684f321fb081ac0cbd93ef101ffb612"></span><code class="sig-name descname">plugin_factory</code><span class="sig-paren">(</span>dll &amp;<em>d</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>basename</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util6plugin14plugin_factory14plugin_factoryER3dllRKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4IEN3hpx4util6plugin14plugin_factoryI10BasePluginE9base_typeE">
+<span id="_CPPv3IEN3hpx4util6plugin14plugin_factoryI10BasePluginE9base_typeE"></span><span id="_CPPv2IEN3hpx4util6plugin14plugin_factoryI10BasePluginE9base_typeE"></span>template&lt;&gt;<br /><span class="target" id="structhpx_1_1util_1_1plugin_1_1plugin__factory_1ae8fa01400b26f96d5cbb486b56fa4015"></span><em class="property">using </em><code class="sig-name descname">base_type</code> = detail::plugin_factory_item&lt;BasePlugin, detail::plugin_factory_item_base, <em class="property">typename</em> virtual_constructor&lt;BasePlugin&gt;::<a class="reference internal" href="#_CPPv4IEN3hpx4util6plugin19virtual_constructorI10BasePluginE4typeE" title="hpx::util::plugin::virtual_constructor&lt;BasePlugin&gt;::type">type</a>&gt;<a class="headerlink" href="#_CPPv4IEN3hpx4util6plugin14plugin_factoryI10BasePluginE9base_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I0EN3hpx4util6plugin21static_plugin_factoryE">
+<span id="_CPPv3I0EN3hpx4util6plugin21static_plugin_factoryE"></span><span id="_CPPv2I0EN3hpx4util6plugin21static_plugin_factoryE"></span><span class="target" id="structhpx_1_1util_1_1plugin_1_1static__plugin__factory"></span>template&lt;class <code class="sig-name descname">BasePlugin</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">static_plugin_factory</code> : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="#_CPPv4N3hpx4util6pluginE" title="hpx::util::plugin">plugin</a>::detail::static_plugin_factory_item&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4util6plugin21static_plugin_factoryE" title="hpx::util::plugin::static_plugin_factory::BasePlugin">BasePlugin</a>, detail::static_plugin_factory_item_base, virtual_constructor&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4util6plugin21static_plugin_factoryE" title="hpx::util::plugin::static_plugin_factory::BasePlugin">BasePlugin</a>&gt;::<a class="reference internal" href="#_CPPv4IEN3hpx4util6plugin19virtual_constructorI10BasePluginE4typeE" title="hpx::util::plugin::virtual_constructor&lt;BasePlugin&gt;::type">type</a>&gt;<a class="headerlink" href="#_CPPv4I0EN3hpx4util6plugin21static_plugin_factoryE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util6plugin21static_plugin_factory21static_plugin_factoryERK21get_plugins_list_type">
+<span id="_CPPv3N3hpx4util6plugin21static_plugin_factory21static_plugin_factoryERK21get_plugins_list_type"></span><span id="_CPPv2N3hpx4util6plugin21static_plugin_factory21static_plugin_factoryERK21get_plugins_list_type"></span><span id="hpx::util::plugin::static_plugin_factory::static_plugin_factory__get_plugins_list_typeCR"></span><span class="target" id="structhpx_1_1util_1_1plugin_1_1static__plugin__factory_1a8ed116b3ba679fda49153506d84669b4"></span><code class="sig-name descname">static_plugin_factory</code><span class="sig-paren">(</span>get_plugins_list_type <em class="property">const</em> &amp;<em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util6plugin21static_plugin_factory21static_plugin_factoryERK21get_plugins_list_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4IEN3hpx4util6plugin21static_plugin_factoryI10BasePluginE9base_typeE">
+<span id="_CPPv3IEN3hpx4util6plugin21static_plugin_factoryI10BasePluginE9base_typeE"></span><span id="_CPPv2IEN3hpx4util6plugin21static_plugin_factoryI10BasePluginE9base_typeE"></span>template&lt;&gt;<br /><span class="target" id="structhpx_1_1util_1_1plugin_1_1static__plugin__factory_1a994ea33fc5da45e8bec78a34f2af968a"></span><em class="property">using </em><code class="sig-name descname">base_type</code> = detail::static_plugin_factory_item&lt;BasePlugin, detail::static_plugin_factory_item_base, <em class="property">typename</em> virtual_constructor&lt;BasePlugin&gt;::<a class="reference internal" href="#_CPPv4IEN3hpx4util6plugin19virtual_constructorI10BasePluginE4typeE" title="hpx::util::plugin::virtual_constructor&lt;BasePlugin&gt;::type">type</a>&gt;<a class="headerlink" href="#_CPPv4IEN3hpx4util6plugin21static_plugin_factoryI10BasePluginE9base_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-plugin-plugin-wrapper-hpp">
+<h2><cite>#include &lt;hpx/plugin/plugin_wrapper.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-plugin-wrapper-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4util6pluginE">
+<span id="_CPPv3N3hpx4util6pluginE"></span><span class="target" id="namespacehpx_1_1util_1_1plugin"></span><em class="property">namespace </em><code class="sig-name descname">plugin</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I0DpEN3hpx4util6plugin14plugin_wrapperE">
+<span id="_CPPv3I0DpEN3hpx4util6plugin14plugin_wrapperE"></span><span id="_CPPv2I0DpEN3hpx4util6plugin14plugin_wrapperE"></span><span class="target" id="structhpx_1_1util_1_1plugin_1_1plugin__wrapper"></span>template&lt;typename <code class="sig-name descname">Wrapped</code>, typename ...<code class="sig-name descname">Parameters</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">plugin_wrapper</code> : <em class="property">public</em> <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="#_CPPv4N3hpx4util6pluginE" title="hpx::util::plugin">plugin</a>::detail::dll_handle_holder, <em class="property">public</em> <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util6plugin14plugin_wrapperE" title="hpx::util::plugin::plugin_wrapper::Wrapped">Wrapped</a><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util6plugin14plugin_wrapperE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util6plugin14plugin_wrapper14plugin_wrapperE10dll_handleDp10Parameters">
+<span id="_CPPv3N3hpx4util6plugin14plugin_wrapper14plugin_wrapperE10dll_handleDp10Parameters"></span><span id="_CPPv2N3hpx4util6plugin14plugin_wrapper14plugin_wrapperE10dll_handleDp10Parameters"></span><span id="hpx::util::plugin::plugin_wrapper::plugin_wrapper__dll_handle.ParametersDp"></span><span class="target" id="structhpx_1_1util_1_1plugin_1_1plugin__wrapper_1a471a172db5dc65fbb432211036d40642"></span><code class="sig-name descname">plugin_wrapper</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util6plugin10dll_handleE" title="hpx::util::plugin::dll_handle">dll_handle</a> <em>dll</em>, Parameters... <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util6plugin14plugin_wrapper14plugin_wrapperE10dll_handleDp10Parameters" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-plugin-export-plugin-hpp">
+<h2><cite>#include &lt;hpx/plugin/export_plugin.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-export-plugin-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_NAME_2">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1ade589500556b18ada7346013d2371813"></span><code class="sig-name descname">HPX_PLUGIN_NAME_2</code><span class="sig-paren">(</span>name1, name2<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_NAME_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_NAME_3">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a0185e5af9983d950141d8cc5133a9887"></span><code class="sig-name descname">HPX_PLUGIN_NAME_3</code><span class="sig-paren">(</span>name, base, cname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_NAME_3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_LIST_NAME_">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1aaf784a95c445c7a367a23ec8c51a917d"></span><code class="sig-name descname">HPX_PLUGIN_LIST_NAME_</code><span class="sig-paren">(</span>prefix, name, base<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_LIST_NAME_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORTER_NAME_">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a7bd15120d6a3a8590d5cb823f753cb0c"></span><code class="sig-name descname">HPX_PLUGIN_EXPORTER_NAME_</code><span class="sig-paren">(</span>prefix, name, base, cname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORTER_NAME_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORTER_INSTANCE_NAME_">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1adb77076137388ef4b90cafcd3d600f33"></span><code class="sig-name descname">HPX_PLUGIN_EXPORTER_INSTANCE_NAME_</code><span class="sig-paren">(</span>prefix, name, base, cname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORTER_INSTANCE_NAME_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_FORCE_LOAD_NAME_">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1adf8dfcdba6e8a38be7b06bbefc7d3882"></span><code class="sig-name descname">HPX_PLUGIN_FORCE_LOAD_NAME_</code><span class="sig-paren">(</span>prefix, name, base<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_FORCE_LOAD_NAME_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_LIST_NAME">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1aacc823b698abac7f1474be532292c186"></span><code class="sig-name descname">HPX_PLUGIN_LIST_NAME</code><span class="sig-paren">(</span>name, base<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_LIST_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORTER_NAME">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a338b1f4b62297065437cdf8c9aafe3e4"></span><code class="sig-name descname">HPX_PLUGIN_EXPORTER_NAME</code><span class="sig-paren">(</span>name, base, cname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORTER_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORTER_INSTANCE_NAME">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1afeb7fde862247c5c5bd2964e760426ea"></span><code class="sig-name descname">HPX_PLUGIN_EXPORTER_INSTANCE_NAME</code><span class="sig-paren">(</span>name, base, cname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORTER_INSTANCE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_FORCE_LOAD_NAME">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1ac0997b908e74e3f13259f8076bb49a4d"></span><code class="sig-name descname">HPX_PLUGIN_FORCE_LOAD_NAME</code><span class="sig-paren">(</span>name, base<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_FORCE_LOAD_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_LIST_NAME_DYNAMIC">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1aec9d3c6a3da93944b709a32f8c0cde00"></span><code class="sig-name descname">HPX_PLUGIN_LIST_NAME_DYNAMIC</code><span class="sig-paren">(</span>name, base<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_LIST_NAME_DYNAMIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORTER_NAME_DYNAMIC">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a4390ee70547551b22ccd04220721e5c9"></span><code class="sig-name descname">HPX_PLUGIN_EXPORTER_NAME_DYNAMIC</code><span class="sig-paren">(</span>name, base, cname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORTER_NAME_DYNAMIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORTER_INSTANCE_NAME_DYNAMIC">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a0ac5d7898b03cb9385e796c194c64682"></span><code class="sig-name descname">HPX_PLUGIN_EXPORTER_INSTANCE_NAME_DYNAMIC</code><span class="sig-paren">(</span>name, base, cname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORTER_INSTANCE_NAME_DYNAMIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_FORCE_LOAD_NAME_DYNAMIC">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a8bd0c0e9dd9c91321cb1ad45a65c21ba"></span><code class="sig-name descname">HPX_PLUGIN_FORCE_LOAD_NAME_DYNAMIC</code><span class="sig-paren">(</span>name, base<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_FORCE_LOAD_NAME_DYNAMIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORT_">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a7023590ecdf2c245759c06d725f80eb2"></span><code class="sig-name descname">HPX_PLUGIN_EXPORT_</code><span class="sig-paren">(</span>prefix, name, BaseType, ActualType, actualname, classname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORT_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORT">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a5073f0ee00b44346fcda8d1062f7bd99"></span><code class="sig-name descname">HPX_PLUGIN_EXPORT</code><span class="sig-paren">(</span>name, BaseType, ActualType, actualname, classname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORT_DYNAMIC">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a363a53653e8f633cd4f18e08ebff95e0"></span><code class="sig-name descname">HPX_PLUGIN_EXPORT_DYNAMIC</code><span class="sig-paren">(</span>name, BaseType, ActualType, actualname, classname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORT_DYNAMIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORT_LIST_">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1add526919b5cd8882ff769f34c49122b6"></span><code class="sig-name descname">HPX_PLUGIN_EXPORT_LIST_</code><span class="sig-paren">(</span>prefix, name, classname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORT_LIST_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORT_LIST">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a99956e9fa9dd1cb37183a9c93e95bd89"></span><code class="sig-name descname">HPX_PLUGIN_EXPORT_LIST</code><span class="sig-paren">(</span>name, classname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORT_LIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_EXPORT_LIST_DYNAMIC">
+<span class="target" id="include_2hpx_2plugin_2export__plugin_8hpp_1a803aa3843328f0b365bb1d471ddb283e"></span><code class="sig-name descname">HPX_PLUGIN_EXPORT_LIST_DYNAMIC</code><span class="sig-paren">(</span>name, classname<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_PLUGIN_EXPORT_LIST_DYNAMIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-plugin-concrete-factory-hpp">
+<h2><cite>#include &lt;hpx/plugin/concrete_factory.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-concrete-factory-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-plugin-virtual-constructor-hpp">
+<h2><cite>#include &lt;hpx/plugin/virtual_constructor.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-virtual-constructor-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4util6pluginE">
+<span class="target" id="namespacehpx_1_1util_1_1plugin"></span><em class="property">namespace </em><code class="sig-name descname">plugin</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util6plugin21exported_plugins_typeE">
+<span id="_CPPv3N3hpx4util6plugin21exported_plugins_typeE"></span><span id="_CPPv2N3hpx4util6plugin21exported_plugins_typeE"></span><span class="target" id="include_2hpx_2plugin_2virtual__constructor_8hpp_1a75cbdde07fa4a199bba06ca047760def"></span><em class="property">using </em><code class="sig-name descname">exported_plugins_type</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::map&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../datastructures/api.html#_CPPv4N3hpx4util10any_nonserE" title="hpx::util::any_nonser">any_nonser</a>&gt;<a class="headerlink" href="#_CPPv4N3hpx4util6plugin21exported_plugins_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt>
+<span class="target" id="include_2hpx_2plugin_2virtual__constructor_8hpp_1aa4acdc9b147041e705b5a42856ce280d"></span><em class="property">typedef </em><code class="sig-name descname">exported_plugins_type*(HPX_PLUGIN_API* hpx::util::plugin::get_plugins_list_type) ()</code></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt>
+<span class="target" id="include_2hpx_2plugin_2virtual__constructor_8hpp_1ac21db35ad4933e0c578c3014f4bb02c8"></span><em class="property">typedef </em><code class="sig-name descname">exported_plugins_type* HPX_PLUGIN_API hpx::util::plugin::get_plugins_list_np()</code></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx4util6plugin10dll_handleE">
+<span id="_CPPv3N3hpx4util6plugin10dll_handleE"></span><span id="_CPPv2N3hpx4util6plugin10dll_handleE"></span><span class="target" id="include_2hpx_2plugin_2virtual__constructor_8hpp_1aff0055b07282526a7980fca15efb94d4"></span><em class="property">using </em><code class="sig-name descname">dll_handle</code> = <a class="reference internal" href="#_CPPv4N3hpx4util6plugin10shared_ptrE" title="hpx::util::plugin::shared_ptr">shared_ptr</a>&lt;get_plugins_list_np&gt;<a class="headerlink" href="#_CPPv4N3hpx4util6plugin10dll_handleE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4I0EN3hpx4util6plugin19virtual_constructorE">
+<span id="_CPPv3I0EN3hpx4util6plugin19virtual_constructorE"></span><span id="_CPPv2I0EN3hpx4util6plugin19virtual_constructorE"></span><span class="target" id="structhpx_1_1util_1_1plugin_1_1virtual__constructor"></span>template&lt;typename <code class="sig-name descname">BasePlugin</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">virtual_constructor</code><a class="headerlink" href="#_CPPv4I0EN3hpx4util6plugin19virtual_constructorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4IEN3hpx4util6plugin19virtual_constructorI10BasePluginE4typeE">
+<span id="_CPPv3IEN3hpx4util6plugin19virtual_constructorI10BasePluginE4typeE"></span><span id="_CPPv2IEN3hpx4util6plugin19virtual_constructorI10BasePluginE4typeE"></span>template&lt;&gt;<br /><span class="target" id="structhpx_1_1util_1_1plugin_1_1virtual__constructor_1ad588d92c961217924ed7eefa9ebaa710"></span><em class="property">using </em><code class="sig-name descname">type</code> = <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::detail::pack&lt;&gt;<a class="headerlink" href="#_CPPv4IEN3hpx4util6plugin19virtual_constructorI10BasePluginE4typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-plugin-traits-plugin-config-data-hpp">
+<h2><cite>#include &lt;hpx/plugin/traits/plugin_config_data.hpp&gt;</cite><a class="headerlink" href="#include-hpx-plugin-traits-plugin-config-data-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt>
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6traitsE">
+<span id="_CPPv3N3hpx6traitsE"></span><span id="_CPPv2N3hpx6traitsE"></span><span id="hpx::traits"></span><span class="target" id="namespacehpx_1_1traits"></span><em class="property">namespace </em><code class="sig-name descname">traits</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I00EN3hpx6traits18plugin_config_dataE">
+<span id="_CPPv3I00EN3hpx6traits18plugin_config_dataE"></span><span id="_CPPv2I00EN3hpx6traits18plugin_config_dataE"></span><span class="target" id="structhpx_1_1traits_1_1plugin__config__data"></span>template&lt;typename <code class="sig-name descname">Plugin</code>, typename <code class="sig-name descname">Enable</code> = void&gt;<br /><em class="property">struct </em><code class="sig-name descname">plugin_config_data</code><a class="headerlink" href="#_CPPv4I00EN3hpx6traits18plugin_config_dataE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits18plugin_config_data4callEv">
+<span id="_CPPv3N3hpx6traits18plugin_config_data4callEv"></span><span id="_CPPv2N3hpx6traits18plugin_config_data4callEv"></span><span id="hpx::traits::plugin_config_data::call"></span><span class="target" id="structhpx_1_1traits_1_1plugin__config__data_1a59aba990474ecd550e5ee5eefc26373a"></span><em class="property">static</em> char <em class="property">const</em> *<code class="sig-name descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits18plugin_config_data4callEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../functional/api.html" class="btn btn-neutral float-right" title="functional" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../config/api.html" class="btn btn-neutral float-left" title="config" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>8174758</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

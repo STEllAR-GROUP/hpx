@@ -1,0 +1,620 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Starting the HPX runtime &mdash; HPX 1.3.0-rc3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Launching and configuring HPX applications" href="launching_and_configuring_hpx_applications.html" />
+    <link rel="prev" title="Creating HPX projects" href="creating_hpx_projects.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.0-rc3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../manual.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_hpx.html">Getting <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="building_hpx.html"><em>HPX</em> build system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_hpx_projects.html">Creating <em>HPX</em> projects</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Starting the <em>HPX</em> runtime</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#re-use-the-main-function-as-the-main-hpx-entry-point">Re-use the <code class="docutils literal notranslate"><span class="pre">main()</span></code> function as the main <em>HPX</em> entry point</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supply-your-own-main-hpx-entry-point-while-blocking-the-main-thread">Supply your own main <em>HPX</em> entry point while blocking the main thread</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supply-your-own-main-hpx-entry-point-while-avoiding-to-block-the-main-thread">Supply your own main <em>HPX</em> entry point while avoiding to block the main thread</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#suspending-and-resuming-the-hpx-runtime">Suspending and resuming the <em>HPX</em> runtime</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#automatically-suspending-worker-threads">Automatically suspending worker threads</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#working-of-hpx-main-hpp">Working of <code class="docutils literal notranslate"><span class="pre">hpx_main.hpp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#linux-implementation">Linux implementation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mac-osx-implementation">Mac OSX implementation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#windows-implementation">Windows implementation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="launching_and_configuring_hpx_applications.html">Launching and configuring <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_single_node_hpx_applications.html">Writing single-node <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_distributed_hpx_applications.html">Writing distributed <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_on_batch_systems.html">Running on batch systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_hpx_applications.html">Debugging <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizing_hpx_applications.html">Optimizing <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hpx_runtime_and_resources.html"><em>HPX</em> runtime and resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miscellaneous.html">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../manual.html">Manual</a> &raquo;</li>
+        
+      <li>Starting the <em>HPX</em> runtime</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/manual/starting_the_hpx_runtime.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="starting-the-hpx-runtime">
+<span id="starting-hpx"></span><h1>Starting the <em>HPX</em> runtime<a class="headerlink" href="#starting-the-hpx-runtime" title="Permalink to this headline">¶</a></h1>
+<p>In order to write an application which uses services from the <em>HPX</em> runtime
+system you need to initialize the <em>HPX</em> library by inserting certain calls
+into the code of your application. Depending on your use case, this can be done
+in 3 different ways:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#minimal"><span class="std std-ref">Minimally invasive</span></a>: Re-use the <code class="docutils literal notranslate"><span class="pre">main()</span></code> function as the
+main <em>HPX</em> entry point.</li>
+<li><a class="reference internal" href="#medium"><span class="std std-ref">Balanced use case</span></a>: Supply your own main <em>HPX</em> entry point
+while blocking the main thread.</li>
+<li><a class="reference internal" href="#flexible"><span class="std std-ref">Most flexibility</span></a>: Supply your own main <em>HPX</em> entry point
+while avoiding to block the main thread.</li>
+<li><a class="reference internal" href="#suspend-resume"><span class="std std-ref">Suspend and resume</span></a>: As above but suspend and resume
+the <em>HPX</em> runtime to allow for other runtimes to be used.</li>
+</ul>
+<div class="section" id="re-use-the-main-function-as-the-main-hpx-entry-point">
+<span id="minimal"></span><h2>Re-use the <code class="docutils literal notranslate"><span class="pre">main()</span></code> function as the main <em>HPX</em> entry point<a class="headerlink" href="#re-use-the-main-function-as-the-main-hpx-entry-point" title="Permalink to this headline">¶</a></h2>
+<p>This method is the least intrusive to your code. It however provides you with
+the smallest flexibility in terms of initializing the <em>HPX</em> runtime system. The
+following code snippet shows what a minimal <em>HPX</em> application using this
+technique looks like:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_main.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The only change to your code you have to make is to include the file
+<code class="docutils literal notranslate"><span class="pre">hpx/hpx_main.hpp</span></code>. In this case the function <code class="docutils literal notranslate"><span class="pre">main()</span></code> will be invoked as
+the first <em>HPX</em> thread of the application. The runtime system will be
+initialized behind the scenes before the function <code class="docutils literal notranslate"><span class="pre">main()</span></code> is executed and
+will automatically stop after <code class="docutils literal notranslate"><span class="pre">main()</span></code> has returned. All <em>HPX</em> API functions
+can be used from within this function now.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The function <code class="docutils literal notranslate"><span class="pre">main()</span></code> does not need to expect receiving <code class="docutils literal notranslate"><span class="pre">argc</span></code> <code class="docutils literal notranslate"><span class="pre">argv</span></code>
+as shown above, but could expose the signature <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">main()</span></code>. This is
+consistent with the usually allowed prototypes for the function <code class="docutils literal notranslate"><span class="pre">main()</span></code> in
+C++ applications.</p>
+</div>
+<p>All command line arguments specific to <em>HPX</em> will still be processed by the
+<em>HPX</em> runtime system as usual. However, those command line options will be
+removed from the list of values passed to <code class="docutils literal notranslate"><span class="pre">argc</span></code>/<code class="docutils literal notranslate"><span class="pre">argv</span></code> of the function
+<code class="docutils literal notranslate"><span class="pre">main()</span></code>. The list of values passed to <code class="docutils literal notranslate"><span class="pre">main()</span></code> will hold only the
+commandline options which are not recognized by the <em>HPX</em> runtime system (see
+the section <a class="reference internal" href="launching_and_configuring_hpx_applications.html#commandline"><span class="std std-ref">HPX Command Line Options</span></a> for more details on what options are recognized
+by <em>HPX</em>).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In this mode all one-letter-shortcuts are disabled which are normally
+available on the <em>HPX</em> command line (such as <code class="docutils literal notranslate"><span class="pre">-t</span></code> or <code class="docutils literal notranslate"><span class="pre">-l</span></code> see
+<a class="reference internal" href="launching_and_configuring_hpx_applications.html#commandline"><span class="std std-ref">HPX Command Line Options</span></a>). This is done to minimize any possible interaction
+between the command line options recognized by the <em>HPX</em> runtime system and
+any command line options defined by the application.</p>
+</div>
+<p>The value returned from the function <code class="docutils literal notranslate"><span class="pre">main()</span></code> as shown above will be returned
+to the operating system as usual.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p>To achieve this seamless integration, the header file <code class="docutils literal notranslate"><span class="pre">hpx/hpx_main.hpp</span></code>
+defines a macro:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#define main hpx_startup::user_main</span>
+</pre></div>
+</div>
+<p class="last">which could result in unexpected behavior.</p>
+</div>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p>To achieve this seamless integration, we use different implementations for
+different Operating Systems. In case of Linux or Mac OSX, the code present in
+<code class="docutils literal notranslate"><span class="pre">hpx_wrap.cpp</span></code> is put into action. We hook into the system function in case
+of Linux and provide alternate entry point in case of Mac OSX. For other
+Operating Systems we rely on a macro:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#define main hpx_startup::user_main</span>
+</pre></div>
+</div>
+<p class="last">provided in the header file <code class="docutils literal notranslate"><span class="pre">hpx/hpx_main.hpp</span></code>. This implementation can
+result in unexpected behavior.</p>
+</div>
+<div class="admonition caution">
+<p class="first admonition-title">Caution</p>
+<p class="last">We make use of an <em>override</em> variable <code class="docutils literal notranslate"><span class="pre">include_libhpx_wrap</span></code> in the header
+file <code class="docutils literal notranslate"><span class="pre">hpx/hpx_main.hpp</span></code> to swiftly choose the function call stack at
+runtime. Therefore, the header file should <em>only</em> be included in the main
+executable. Including it in the components will result in multiple definition
+of the variable.</p>
+</div>
+</div>
+<div class="section" id="supply-your-own-main-hpx-entry-point-while-blocking-the-main-thread">
+<span id="medium"></span><h2>Supply your own main <em>HPX</em> entry point while blocking the main thread<a class="headerlink" href="#supply-your-own-main-hpx-entry-point-while-blocking-the-main-thread" title="Permalink to this headline">¶</a></h2>
+<p>With this method you need to provide an explicit main thread function named
+<code class="docutils literal notranslate"><span class="pre">hpx_main</span></code> at global scope. This function will be invoked as the main entry
+point of your <em>HPX</em> application on the console <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> only (this
+function will be invoked as the first <em>HPX</em> thread of your application). All
+<em>HPX</em> API functions can be used from within this function.</p>
+<p>The thread executing the function <a class="reference internal" href="../api.html#_CPPv4N3hpx4initERKN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERKN5boost15program_options19options_descriptionEiPPcRKNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::init</span></code></a> will block waiting for
+the runtime system to exit. The value returned from <code class="docutils literal notranslate"><span class="pre">hpx_main</span></code> will be
+returned from <a class="reference internal" href="../api.html#_CPPv4N3hpx4initERKN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERKN5boost15program_options19options_descriptionEiPPcRKNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::init</span></code></a> after the runtime system has stopped.</p>
+<p>The function <a class="reference internal" href="../api.html#_CPPv4N3hpx8finalizeEddR10error_code" title="hpx::finalize"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::finalize</span></code></a> has to be called on one of the <em>HPX</em>
+localities in order to signal that all work has been scheduled and the runtime
+system should be stopped after the scheduled work has been executed.</p>
+<p>This method of invoking <em>HPX</em> has the advantage of you being able to decide
+which version of <a class="reference internal" href="../api.html#_CPPv4N3hpx4initERKN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERKN5boost15program_options19options_descriptionEiPPcRKNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::init</span></code></a> to call. This allows to pass
+additional configuration parameters while initializing the <em>HPX</em> runtime system.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_init.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="c1">// Any HPX application logic goes here...</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="c1">// Initialize HPX, run hpx_main as the first HPX thread, and</span>
+    <span class="c1">// wait for hpx::finalize being called.</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The function <code class="docutils literal notranslate"><span class="pre">hpx_main</span></code> does not need to expect receiving <code class="docutils literal notranslate"><span class="pre">argc</span></code>/<code class="docutils literal notranslate"><span class="pre">argv</span></code>
+as shown above, but could expose one of the following signatures:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">();</span>
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[]);</span>
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">program_options</span><span class="o">::</span><span class="n">variables_map</span><span class="o">&amp;</span> <span class="n">vm</span><span class="p">);</span>
+</pre></div>
+</div>
+<p class="last">This is consistent with (and extends) the usually allowed prototypes for the
+function <code class="docutils literal notranslate"><span class="pre">main()</span></code> in C++ applications.</p>
+</div>
+<p>The header file to include for this method of using <em>HPX</em> is
+<code class="docutils literal notranslate"><span class="pre">hpx/hpx_init.hpp</span></code>.</p>
+<p>There are many additional overloads of <a class="reference internal" href="../api.html#_CPPv4N3hpx4initERKN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERKN5boost15program_options19options_descriptionEiPPcRKNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::init</span></code></a> available, such as
+for instance to provide your own entry point function instead of <code class="docutils literal notranslate"><span class="pre">hpx_main</span></code>.
+Please refer to the function documentation for more details (see: <code class="docutils literal notranslate"><span class="pre">hpx/hpx_init.hpp</span></code>).</p>
+</div>
+<div class="section" id="supply-your-own-main-hpx-entry-point-while-avoiding-to-block-the-main-thread">
+<span id="flexible"></span><h2>Supply your own main <em>HPX</em> entry point while avoiding to block the main thread<a class="headerlink" href="#supply-your-own-main-hpx-entry-point-while-avoiding-to-block-the-main-thread" title="Permalink to this headline">¶</a></h2>
+<p>With this method you need to provide an explicit main thread function named
+<code class="docutils literal notranslate"><span class="pre">hpx_main</span></code> at global scope. This function will be invoked as the main entry
+point of your <em>HPX</em> application on the console <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> only (this
+function will be invoked as the first <em>HPX</em> thread of your application). All
+<em>HPX</em> API functions can be used from within this function.</p>
+<p>The thread executing the function <a class="reference internal" href="../api.html#_CPPv4N3hpx5startERKN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERKN5boost15program_options19options_descriptionEiPPcRKNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::start"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::start</span></code></a> will <em>not</em> block
+waiting for the runtime system to exit, but will return immediately.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">You cannot use any of the <em>HPX</em> API functions other that
+<a class="reference internal" href="../api.html#_CPPv4N3hpx4stopER10error_code" title="hpx::stop"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::stop</span></code></a> from inside your <code class="docutils literal notranslate"><span class="pre">main()</span></code> function.</p>
+</div>
+<p>The function <a class="reference internal" href="../api.html#_CPPv4N3hpx8finalizeEddR10error_code" title="hpx::finalize"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::finalize</span></code></a> has to be called on one of the <em>HPX</em>
+localities in order to signal that all work has been scheduled and the runtime
+system should be stopped after the scheduled work has been executed.</p>
+<p>This method of invoking <em>HPX</em> is useful for applications where the main thread
+is used for special operations, such a GUIs. The function <a class="reference internal" href="../api.html#_CPPv4N3hpx4stopER10error_code" title="hpx::stop"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::stop</span></code></a>
+can be used to wait for the <em>HPX</em> runtime system to exit and should be at least
+used as the last function called in <code class="docutils literal notranslate"><span class="pre">main()</span></code>. The value returned from
+<code class="docutils literal notranslate"><span class="pre">hpx_main</span></code> will be returned from <a class="reference internal" href="../api.html#_CPPv4N3hpx4stopER10error_code" title="hpx::stop"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::stop</span></code></a> after the runtime
+system has stopped.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_start.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="c1">// Any HPX application logic goes here...</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="c1">// Initialize HPX, run hpx_main.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">start</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+
+    <span class="c1">// ...Execute other code here...</span>
+
+    <span class="c1">// Wait for hpx::finalize being called.</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">stop</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The function <code class="docutils literal notranslate"><span class="pre">hpx_main</span></code> does not need to expect receiving <code class="docutils literal notranslate"><span class="pre">argc</span></code>/<code class="docutils literal notranslate"><span class="pre">argv</span></code>
+as shown above, but could expose one of the following signatures:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">();</span>
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[]);</span>
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">program_options</span><span class="o">::</span><span class="n">variables_map</span><span class="o">&amp;</span> <span class="n">vm</span><span class="p">);</span>
+</pre></div>
+</div>
+<p class="last">This is consistent with (and extends) the usually allowed prototypes for the
+function <code class="docutils literal notranslate"><span class="pre">main()</span></code> in C++ applications.</p>
+</div>
+<p>The header file to include for this method of using <em>HPX</em> is
+<code class="docutils literal notranslate"><span class="pre">hpx/hpx_start.hpp</span></code>.</p>
+<p>There are many additional overloads of <a class="reference internal" href="../api.html#_CPPv4N3hpx5startERKN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERKN5boost15program_options19options_descriptionEiPPcRKNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::start"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::start</span></code></a> available, such as
+for instance to provide your own entry point function instead of <code class="docutils literal notranslate"><span class="pre">hpx_main</span></code>.
+Please refer to the function documentation for more details (see:
+<code class="docutils literal notranslate"><span class="pre">hpx/hpx_start.hpp</span></code>).</p>
+</div>
+<div class="section" id="suspending-and-resuming-the-hpx-runtime">
+<span id="suspend-resume"></span><h2>Suspending and resuming the <em>HPX</em> runtime<a class="headerlink" href="#suspending-and-resuming-the-hpx-runtime" title="Permalink to this headline">¶</a></h2>
+<p>In some applications it is required to combine <em>HPX</em> with other runtimes. To
+support this use case <em>HPX</em> provides two functions: <a class="reference internal" href="../api.html#_CPPv4N3hpx7suspendER10error_code" title="hpx::suspend"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::suspend</span></code></a> and
+<a class="reference internal" href="../api.html#_CPPv4N3hpx6resumeER10error_code" title="hpx::resume"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resume</span></code></a>. <a class="reference internal" href="../api.html#_CPPv4N3hpx7suspendER10error_code" title="hpx::suspend"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::suspend</span></code></a> is a blocking call which will
+wait for all scheduled tasks to finish executing and then put the thread pool OS
+threads to sleep. <a class="reference internal" href="../api.html#_CPPv4N3hpx6resumeER10error_code" title="hpx::resume"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resume</span></code></a> simply wakes up the sleeping threads
+so that they are ready to accept new work. <a class="reference internal" href="../api.html#_CPPv4N3hpx7suspendER10error_code" title="hpx::suspend"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::suspend</span></code></a> and
+<a class="reference internal" href="../api.html#_CPPv4N3hpx6resumeER10error_code" title="hpx::resume"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resume</span></code></a> can be found in the header <code class="docutils literal notranslate"><span class="pre">hpx/hpx_suspend.hpp</span></code>.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_start.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_suspend.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+
+   <span class="c1">// Initialize HPX, don&#39;t run hpx_main</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">start</span><span class="p">(</span><span class="k">nullptr</span><span class="p">,</span> <span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+
+    <span class="c1">// Schedule a function on the HPX runtime</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="o">&amp;</span><span class="n">my_function</span><span class="p">,</span> <span class="p">...);</span>
+
+    <span class="c1">// Wait for all tasks to finish, and suspend the HPX runtime</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">suspend</span><span class="p">();</span>
+
+    <span class="c1">// Execute non-HPX code here</span>
+
+    <span class="c1">// Resume the HPX runtime</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">resume</span><span class="p">();</span>
+
+    <span class="c1">// Schedule more work on the HPX runtime</span>
+
+    <span class="c1">// hpx::finalize has to be called from the HPX runtime before hpx::stop</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">apply</span><span class="p">([]()</span> <span class="p">{</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span> <span class="p">});</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">stop</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="../api.html#_CPPv4N3hpx7suspendER10error_code" title="hpx::suspend"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::suspend</span></code></a> does not wait for <a class="reference internal" href="../api.html#_CPPv4N3hpx8finalizeEddR10error_code" title="hpx::finalize"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::finalize</span></code></a> to be
+called. Only call <a class="reference internal" href="../api.html#_CPPv4N3hpx8finalizeEddR10error_code" title="hpx::finalize"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::finalize</span></code></a> when you wish to fully stop the
+<em>HPX</em> runtime.</p>
+</div>
+<p><em>HPX</em> also supports suspending individual thread pools and threads. For details
+on how to do that see the documentation for <a class="reference internal" href="../api.html#_CPPv4N3hpx7threads16thread_pool_baseE" title="hpx::threads::thread_pool_base"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::threads::thread_pool_base</span></code></a>.</p>
+<div class="section" id="automatically-suspending-worker-threads">
+<h3>Automatically suspending worker threads<a class="headerlink" href="#automatically-suspending-worker-threads" title="Permalink to this headline">¶</a></h3>
+<p>The previous method guarantees that the worker threads are suspended when you
+ask for it and that they stay suspended. An alternative way to achieve the same
+effect is to tweak how quickly <em>HPX</em> suspends its worker threads when they run
+out of work. The following configuration values make sure that <em>HPX</em> idles very
+quickly:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">hpx.max_idle_backoff_time</span> <span class="o">=</span> <span class="s">1000</span>
+<span class="na">hpx.max_idle_loop_count</span> <span class="o">=</span> <span class="s">0</span>
+</pre></div>
+</div>
+<p>They can be set on the command line using
+<code class="docutils literal notranslate"><span class="pre">--hpx:ini=hpx.max_idle_backoff_time=1000</span></code> and
+<code class="docutils literal notranslate"><span class="pre">--hpx:ini=hpx.max_idle_loop_count=0</span></code>. See <a class="reference internal" href="launching_and_configuring_hpx_applications.html#launching-and-configuring"><span class="std std-ref">Launching and configuring HPX applications</span></a>
+for more details on how to set configuration parameters.</p>
+<p>After setting idling parameters the previous example could now be written like
+this instead:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_start.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+
+   <span class="c1">// Initialize HPX, don&#39;t run hpx_main</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">start</span><span class="p">(</span><span class="k">nullptr</span><span class="p">,</span> <span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+
+    <span class="c1">// Schedule some functions on the HPX runtime</span>
+    <span class="c1">// NOTE: run_as_hpx_thread blocks until completion.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">run_as_hpx_thread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">my_function</span><span class="p">,</span> <span class="p">...);</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">run_as_hpx_thread</span><span class="p">(</span><span class="o">&amp;</span><span class="n">my_other_function</span><span class="p">,</span> <span class="p">...);</span>
+
+    <span class="c1">// hpx::finalize has to be called from the HPX runtime before hpx::stop</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">apply</span><span class="p">([]()</span> <span class="p">{</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span> <span class="p">});</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">stop</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In this example each call to <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::run_as_hpx_thread</span></code> acts as a
+“parallel region”.</p>
+</div>
+</div>
+<div class="section" id="working-of-hpx-main-hpp">
+<span id="hpx-main-implementation"></span><h2>Working of <code class="docutils literal notranslate"><span class="pre">hpx_main.hpp</span></code><a class="headerlink" href="#working-of-hpx-main-hpp" title="Permalink to this headline">¶</a></h2>
+<p>In order to initialize <em>HPX</em> from <code class="docutils literal notranslate"><span class="pre">main()</span></code>, we make use of linker tricks.</p>
+<p>It is implemented differently for different Operating Systems. Method of
+implementation is as follows:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#hpx-main-implementation-linux"><span class="std std-ref">Linux</span></a>: Using linker <code class="docutils literal notranslate"><span class="pre">--wrap</span></code> option.</li>
+<li><a class="reference internal" href="#hpx-main-implementation-osx"><span class="std std-ref">Mac OSX</span></a>: Using the linker <code class="docutils literal notranslate"><span class="pre">-e</span></code> option.</li>
+<li><a class="reference internal" href="#hpx-main-implementation-windows"><span class="std std-ref">Windows</span></a>: Using <code class="docutils literal notranslate"><span class="pre">#define</span> <span class="pre">main</span>
+<span class="pre">hpx_startup::user_main</span></code></li>
+</ul>
+<div class="section" id="linux-implementation">
+<span id="hpx-main-implementation-linux"></span><h3>Linux implementation<a class="headerlink" href="#linux-implementation" title="Permalink to this headline">¶</a></h3>
+<p>We make use of the Linux linker <code class="docutils literal notranslate"><span class="pre">ld</span></code>’s <code class="docutils literal notranslate"><span class="pre">--wrap</span></code> option to wrap the
+<code class="docutils literal notranslate"><span class="pre">main()</span></code> function. This way any call to <code class="docutils literal notranslate"><span class="pre">main()</span></code> are redirected to our own
+implementation of main. It is here that we check for the existence of
+<code class="docutils literal notranslate"><span class="pre">hpx_main.hpp</span></code> by making use of a shadow variable <code class="docutils literal notranslate"><span class="pre">include_libhpx_wrap</span></code>. The
+value of this variable determines the function stack at runtime.</p>
+<p>The implementation can be found in <code class="docutils literal notranslate"><span class="pre">libhpx_wrap.a</span></code>.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">It is necessary that <code class="docutils literal notranslate"><span class="pre">hpx_main.hpp</span></code> be not included more than once.
+Multiple inclusions can result in multiple definition of
+<code class="docutils literal notranslate"><span class="pre">include_libhpx_wrap</span></code>.</p>
+</div>
+</div>
+<div class="section" id="mac-osx-implementation">
+<span id="hpx-main-implementation-osx"></span><h3>Mac OSX implementation<a class="headerlink" href="#mac-osx-implementation" title="Permalink to this headline">¶</a></h3>
+<p>Here we make use of yet another linker option <code class="docutils literal notranslate"><span class="pre">-e</span></code> to change the entry point
+to our custom entry function <code class="docutils literal notranslate"><span class="pre">initialize_main</span></code>. We initialize the <em>HPX</em>
+runtime system from this function and call main from the initialized system. We
+determine the function stack at runtime by making use of the shadow variable
+<code class="docutils literal notranslate"><span class="pre">include_libhpx_wrap</span></code>.</p>
+<p>The implementation can be found in <code class="docutils literal notranslate"><span class="pre">libhpx_wrap.a</span></code>.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">It is necessary that <code class="docutils literal notranslate"><span class="pre">hpx_main.hpp</span></code> be not included more than once.
+Multiple inclusions can result in multiple definition of
+<code class="docutils literal notranslate"><span class="pre">include_libhpx_wrap</span></code>.</p>
+</div>
+</div>
+<div class="section" id="windows-implementation">
+<span id="hpx-main-implementation-windows"></span><h3>Windows implementation<a class="headerlink" href="#windows-implementation" title="Permalink to this headline">¶</a></h3>
+<p>We make use of a macro <code class="docutils literal notranslate"><span class="pre">#define</span> <span class="pre">main</span> <span class="pre">hpx_startup::user_main</span></code> to take care of
+the initializations.</p>
+<p>This implementation could result in unexpected behaviors.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="launching_and_configuring_hpx_applications.html" class="btn btn-neutral float-right" title="Launching and configuring HPX applications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="creating_hpx_projects.html" class="btn btn-neutral float-left" title="Creating HPX projects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>58fa1f0</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

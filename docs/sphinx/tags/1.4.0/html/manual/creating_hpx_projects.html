@@ -1,0 +1,903 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Creating HPX projects &mdash; HPX 1.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Starting the HPX runtime" href="starting_the_hpx_runtime.html" />
+    <link rel="prev" title="HPX build system" href="building_hpx.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../manual.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_hpx.html">Getting <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="building_hpx.html"><em>HPX</em> build system</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Creating <em>HPX</em> projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-hpx-with-pkg-config">Using HPX with pkg-config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-build-hpx-applications-with-pkg-config">How to build <em>HPX</em> applications with pkg-config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-build-hpx-components-with-pkg-config">How to build <em>HPX</em> components with pkg-config</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#using-hpx-with-cmake-based-projects">Using <em>HPX</em> with CMake-based projects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cmake-macros-to-integrate-hpx-into-existing-applications">CMake macros to integrate <em>HPX</em> into existing applications</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#using-hpx-with-makefile">Using <em>HPX</em> with Makefile</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-build-hpx-applications-with-makefile">How to build <em>HPX</em> applications with makefile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-build-hpx-components-with-makefile">How to build <em>HPX</em> components with makefile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="starting_the_hpx_runtime.html">Starting the <em>HPX</em> runtime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launching_and_configuring_hpx_applications.html">Launching and configuring <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_single_node_hpx_applications.html">Writing single-node <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_distributed_hpx_applications.html">Writing distributed <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_on_batch_systems.html">Running on batch systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_hpx_applications.html">Debugging <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizing_hpx_applications.html">Optimizing <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hpx_runtime_and_resources.html"><em>HPX</em> runtime and resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="miscellaneous.html">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../manual.html">Manual</a> &raquo;</li>
+        
+      <li>Creating <em>HPX</em> projects</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/manual/creating_hpx_projects.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="creating-hpx-projects">
+<span id="id2"></span><h1>Creating <em>HPX</em> projects<a class="headerlink" href="#creating-hpx-projects" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-hpx-with-pkg-config">
+<span id="pkgconfig"></span><h2>Using HPX with pkg-config<a class="headerlink" href="#using-hpx-with-pkg-config" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="how-to-build-hpx-applications-with-pkg-config">
+<span id="apps"></span><h3>How to build <em>HPX</em> applications with pkg-config<a class="headerlink" href="#how-to-build-hpx-applications-with-pkg-config" title="Permalink to this headline">¶</a></h3>
+<p>After you are done installing <em>HPX</em>, you should be able to build the following
+program. It prints <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World!</span></code> on the <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> you run it on.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//  Copyright (c) 2007-2012 Hartmut Kaiser</span>
+<span class="c1">//</span>
+<span class="c1">//  SPDX-License-Identifier: BSL-1.0</span>
+<span class="c1">//  Distributed under the Boost Software License, Version 1.0. (See accompanying</span>
+<span class="c1">//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)</span>
+
+<span class="c1">///////////////////////////////////////////////////////////////////////////////</span>
+<span class="c1">// The purpose of this example is to execute a HPX-thread printing</span>
+<span class="c1">// &quot;Hello World!&quot; once. That&#39;s all.</span>
+
+<span class="c1">//[hello_world_1_getting_started</span>
+<span class="c1">// Including &#39;hpx/hpx_main.hpp&#39; instead of the usual &#39;hpx/hpx_init.hpp&#39; enables</span>
+<span class="c1">// to use the plain C-main below as the direct main HPX entry point.</span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_main.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/iostreams.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Say hello to the world!</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//]</span>
+</pre></div>
+</div>
+<p>Copy the text of this program into a file called hello_world.cpp.</p>
+<p>Now, in the directory where you put hello_world.cpp, issue the following
+commands (where <code class="docutils literal notranslate"><span class="pre">$HPX_LOCATION</span></code> is the build directory or
+<code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code> you used while building <em>HPX</em>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span><span class="nv">$PKG_CONFIG_PATH</span>:<span class="nv">$HPX_LOCATION</span>/lib/pkgconfig
+c++ -o hello_world hello_world.cpp <span class="se">\</span>
+   <span class="sb">`</span>pkg-config --cflags --libs hpx_application<span class="sb">`</span><span class="se">\</span>
+    -lhpx_iostreams -DHPX_APPLICATION_NAME<span class="o">=</span>hello_world
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>When using pkg-config with <em>HPX</em>, the pkg-config flags must go after the
+<code class="docutils literal notranslate"><span class="pre">-o</span></code> flag.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>HPX</em> libraries have different names in debug and release mode. If you want
+to link against a debug <em>HPX</em> library, you need to use the <code class="docutils literal notranslate"><span class="pre">_debug</span></code> suffix
+for the pkg-config name. That means instead of <code class="docutils literal notranslate"><span class="pre">hpx_application</span></code> or
+<code class="docutils literal notranslate"><span class="pre">hpx_component</span></code>, you will have to use <code class="docutils literal notranslate"><span class="pre">hpx_application_debug</span></code> or
+<code class="docutils literal notranslate"><span class="pre">hpx_component_debug</span></code> Moreover, all referenced <em>HPX</em> components need to
+have an appended <code class="docutils literal notranslate"><span class="pre">d</span></code> suffix. For example, instead of <code class="docutils literal notranslate"><span class="pre">-lhpx_iostreams</span></code> you will
+need to specify <code class="docutils literal notranslate"><span class="pre">-lhpx_iostreamsd</span></code>.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If the <em>HPX</em> libraries are in a path that is not found by the dynamic
+linker, you will need to add the path <code class="docutils literal notranslate"><span class="pre">$HPX_LOCATION/lib</span></code> to your linker search
+path (for example <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> on Linux).</p>
+</div>
+<p>To test the program, type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./hello_world
+</pre></div>
+</div>
+<p>which should print <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World!</span></code> and exit.</p>
+</div>
+<div class="section" id="how-to-build-hpx-components-with-pkg-config">
+<span id="comps"></span><h3>How to build <em>HPX</em> components with pkg-config<a class="headerlink" href="#how-to-build-hpx-components-with-pkg-config" title="Permalink to this headline">¶</a></h3>
+<p>Let’s try a more complex example involving an <em>HPX</em> component. An <em>HPX</em>
+component is a class that exposes <em>HPX</em> actions. <em>HPX</em> components are compiled
+into dynamically loaded modules called component libraries. Here’s the source
+code:</p>
+<p><strong>hello_world_component.cpp</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//[hello_world_cpp_getting_started</span>
+<span class="cp">#include</span> <span class="cpf">&quot;hello_world_component.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/iostreams.hpp&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+
+<span class="k">namespace</span> <span class="n">examples</span> <span class="p">{</span> <span class="k">namespace</span> <span class="n">server</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="n">hello_world</span><span class="o">::</span><span class="n">invoke</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello HPX World!&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}}</span>
+
+<span class="n">HPX_REGISTER_COMPONENT_MODULE</span><span class="p">();</span>
+
+<span class="k">typedef</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component</span><span class="o">&lt;</span>
+    <span class="n">examples</span><span class="o">::</span><span class="n">server</span><span class="o">::</span><span class="n">hello_world</span>
+<span class="o">&gt;</span> <span class="n">hello_world_type</span><span class="p">;</span>
+
+<span class="n">HPX_REGISTER_COMPONENT</span><span class="p">(</span><span class="n">hello_world_type</span><span class="p">,</span> <span class="n">hello_world</span><span class="p">);</span>
+
+<span class="n">HPX_REGISTER_ACTION</span><span class="p">(</span>
+</pre></div>
+</div>
+<p><strong>hello_world_component.hpp</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//[hello_world_hpp_getting_started</span>
+<span class="cp">#if !defined(HELLO_WORLD_COMPONENT_HPP)</span>
+<span class="cp">#define HELLO_WORLD_COMPONENT_HPP</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/actions.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/lcos.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/components.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/serialization.hpp&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;utility&gt;</span><span class="cp"></span>
+
+<span class="k">namespace</span> <span class="n">examples</span> <span class="p">{</span> <span class="k">namespace</span> <span class="n">server</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">HPX_COMPONENT_EXPORT</span> <span class="nl">hello_world</span>
+        <span class="p">:</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component_base</span><span class="o">&lt;</span><span class="n">hello_world</span><span class="o">&gt;</span>
+    <span class="p">{</span>
+        <span class="kt">void</span> <span class="n">invoke</span><span class="p">();</span>
+        <span class="n">HPX_DEFINE_COMPONENT_ACTION</span><span class="p">(</span><span class="n">hello_world</span><span class="p">,</span> <span class="n">invoke</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">}}</span>
+
+<span class="n">HPX_REGISTER_ACTION_DECLARATION</span><span class="p">(</span>
+    <span class="n">examples</span><span class="o">::</span><span class="n">server</span><span class="o">::</span><span class="n">hello_world</span><span class="o">::</span><span class="n">invoke_action</span><span class="p">,</span> <span class="n">hello_world_invoke_action</span><span class="p">);</span>
+
+<span class="k">namespace</span> <span class="n">examples</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="nl">hello_world</span>
+      <span class="p">:</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">client_base</span><span class="o">&lt;</span><span class="n">hello_world</span><span class="p">,</span> <span class="n">server</span><span class="o">::</span><span class="n">hello_world</span><span class="o">&gt;</span>
+    <span class="p">{</span>
+        <span class="k">typedef</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">client_base</span><span class="o">&lt;</span><span class="n">hello_world</span><span class="p">,</span> <span class="n">server</span><span class="o">::</span><span class="n">hello_world</span><span class="o">&gt;</span>
+            <span class="n">base_type</span><span class="p">;</span>
+
+        <span class="n">hello_world</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">naming</span><span class="o">::</span><span class="n">id_type</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span>
+          <span class="o">:</span> <span class="n">base_type</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="p">{}</span>
+
+        <span class="n">hello_world</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">naming</span><span class="o">::</span><span class="n">id_type</span> <span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span>
+          <span class="o">:</span> <span class="n">base_type</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="p">{}</span>
+
+        <span class="kt">void</span> <span class="n">invoke</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="o">&lt;</span><span class="n">server</span><span class="o">::</span><span class="n">hello_world</span><span class="o">::</span><span class="n">invoke_action</span><span class="o">&gt;</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_id</span><span class="p">()).</span><span class="n">get</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>hello_world_client.cpp</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//  Copyright (c) 2012 Bryce Lelbach</span>
+<span class="c1">//</span>
+<span class="c1">//  SPDX-License-Identifier: BSL-1.0</span>
+<span class="c1">//  Distributed under the Boost Software License, Version 1.0. (See accompanying</span>
+<span class="c1">//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)</span>
+
+<span class="c1">//[hello_world_client_getting_started</span>
+<span class="cp">#include</span> <span class="cpf">&quot;hello_world_component.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_init.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">program_options</span><span class="o">::</span><span class="n">variables_map</span><span class="o">&amp;</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">{</span>
+        <span class="c1">// Create a single instance of the component on this locality.</span>
+        <span class="n">examples</span><span class="o">::</span><span class="n">hello_world</span> <span class="n">client</span> <span class="o">=</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">examples</span><span class="o">::</span><span class="n">hello_world</span><span class="o">&gt;</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">());</span>
+
+        <span class="c1">// Invoke the component&#39;s action, which will print &quot;Hello World!&quot;.</span>
+        <span class="n">client</span><span class="p">.</span><span class="n">invoke</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span> <span class="c1">// Initiate shutdown of the runtime system.</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span> <span class="c1">// Initialize and run HPX.</span>
+<span class="p">}</span>
+<span class="c1">//]</span>
+</pre></div>
+</div>
+<p>Copy the three source files above into three files (called
+<code class="docutils literal notranslate"><span class="pre">hello_world_component.cpp</span></code>, <code class="docutils literal notranslate"><span class="pre">hello_world_component.hpp</span></code> and
+<code class="docutils literal notranslate"><span class="pre">hello_world_client.cpp</span></code>, respectively).</p>
+<p>Now, in the directory where you put the files, run the following command to
+build the component library. (where <code class="docutils literal notranslate"><span class="pre">$HPX_LOCATION</span></code> is the build directory or
+<code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code> you used while building <em>HPX</em>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span><span class="nv">$PKG_CONFIG_PATH</span>:<span class="nv">$HPX_LOCATION</span>/lib/pkgconfig
+c++ -o libhpx_hello_world.so hello_world_component.cpp <span class="se">\</span>
+   <span class="sb">`</span>pkg-config --cflags --libs hpx_component<span class="sb">`</span> <span class="se">\</span>
+    -lhpx_iostreams -DHPX_COMPONENT_NAME<span class="o">=</span>hpx_hello_world
+</pre></div>
+</div>
+<p>Now pick a directory in which to install your <em>HPX</em> component libraries. For
+this example, we’ll choose a directory named <code class="docutils literal notranslate"><span class="pre">my_hpx_libs</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir ~/my_hpx_libs
+mv libhpx_hello_world.so ~/my_hpx_libs
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>HPX</em> libraries have different names in debug and release mode. If you want
+to link against a debug <em>HPX</em> library, you need to use the <code class="docutils literal notranslate"><span class="pre">_debug</span></code> suffix
+for the pkg-config name. That means instead of <code class="docutils literal notranslate"><span class="pre">hpx_application</span></code> or
+<code class="docutils literal notranslate"><span class="pre">hpx_component</span></code> you will have to use <code class="docutils literal notranslate"><span class="pre">hpx_application_debug</span></code> or
+<code class="docutils literal notranslate"><span class="pre">hpx_component_debug</span></code>. Moreover, all referenced <em>HPX</em> components need to
+have a appended <code class="docutils literal notranslate"><span class="pre">d</span></code> suffix, e.g. instead of <code class="docutils literal notranslate"><span class="pre">-lhpx_iostreams</span></code> you will
+need to specify <code class="docutils literal notranslate"><span class="pre">-lhpx_iostreamsd</span></code>.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If the <em>HPX</em> libraries are in a path that is not found by the dynamic linker.
+You need to add the path <code class="docutils literal notranslate"><span class="pre">$HPX_LOCATION/lib</span></code> to your linker search path
+(for example <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> on Linux).</p>
+</div>
+<p>Now, to build the application that uses this component (<code class="docutils literal notranslate"><span class="pre">hello_world_client.cpp</span></code>),
+we do:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span><span class="nv">$PKG_CONFIG_PATH</span>:<span class="nv">$HPX_LOCATION</span>/lib/pkgconfig
+c++ -o hello_world_client hello_world_client.cpp <span class="se">\</span>
+   <span class="sb">``</span>pkg-config --cflags --libs hpx_application<span class="sb">``</span><span class="se">\</span>
+    -L<span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/my_hpx_libs -lhpx_hello_world -lhpx_iostreams
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>When using pkg-config with <em>HPX</em>, the pkg-config flags must go after the
+<code class="docutils literal notranslate"><span class="pre">-o</span></code> flag.</p>
+</div>
+<p>Finally, you’ll need to set your LD_LIBRARY_PATH before you can run the program.
+To run the program, type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$LD_LIBRARY_PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/my_hpx_libs&quot;</span>
+./hello_world_client
+</pre></div>
+</div>
+<p>which should print <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">HPX</span> <span class="pre">World!</span></code> and exit.</p>
+</div>
+</div>
+<div class="section" id="using-hpx-with-cmake-based-projects">
+<span id="using-hpx-cmake"></span><h2>Using <em>HPX</em> with CMake-based projects<a class="headerlink" href="#using-hpx-with-cmake-based-projects" title="Permalink to this headline">¶</a></h2>
+<p>In addition to the pkg-config support discussed on the previous pages, <em>HPX</em>
+comes with full CMake support. In order to integrate <em>HPX</em> into existing or
+new CMakeLists.txt, you can leverage the <a class="reference external" href="https://www.cmake.org/cmake/help/latest/command/find_package.html">find_package</a> command
+integrated into CMake. Following, is a Hello World component example using CMake.</p>
+<p>Let’s revisit what we have. We have three files that compose our example
+application:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hello_world_component.hpp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hello_world_component.cpp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hello_world_client.hpp</span></code></p></li>
+</ul>
+<p>The basic structure to include <em>HPX</em> into your CMakeLists.txt is shown here:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="c"># Require a recent version of cmake</span>
+<span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.3.2</span> <span class="s">FATAL_ERROR</span><span class="p">)</span>
+
+<span class="c"># This project is C++ based.</span>
+<span class="nb">project</span><span class="p">(</span><span class="s">your_app</span> <span class="s">CXX</span><span class="p">)</span>
+
+<span class="c"># Instruct cmake to find the HPX settings</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">HPX</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In order to have CMake find <em>HPX</em>, it needs to be told where to look for the
+<code class="docutils literal notranslate"><span class="pre">HPXConfig.cmake</span></code> file that is generated when <em>HPX</em> is built or installed. It is
+used by <code class="docutils literal notranslate"><span class="pre">find_package(HPX)</span></code> to set up all the necessary macros needed to use
+<em>HPX</em> in your project. The ways to achieve this are:</p>
+<ul>
+<li><p>Set the <code class="docutils literal notranslate"><span class="pre">HPX_DIR</span></code> CMake variable to point to the directory containing the
+<code class="docutils literal notranslate"><span class="pre">HPXConfig.cmake</span></code> script on the command line when you invoke CMake:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake -DHPX_DIR<span class="o">=</span><span class="nv">$HPX_LOCATION</span>/lib/cmake/HPX ...
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">$HPX_LOCATION</span></code> is the build directory or <code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code> you
+used when building/configuring <em>HPX</em>.</p>
+</li>
+<li><p>Set the <code class="docutils literal notranslate"><span class="pre">CMAKE_PREFIX_PATH</span></code> variable to the root directory of your <em>HPX</em>
+build or install location on the command line when you invoke CMake:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake -DCMAKE_PREFIX_PATH<span class="o">=</span><span class="nv">$HPX_LOCATION</span> ...
+</pre></div>
+</div>
+<p>The difference between <code class="docutils literal notranslate"><span class="pre">CMAKE_PREFIX_PATH</span></code> and <code class="docutils literal notranslate"><span class="pre">HPX_DIR</span></code> is that CMake
+will add common postfixes, such as <code class="docutils literal notranslate"><span class="pre">lib/cmake/&lt;project</span></code>, to the
+<code class="docutils literal notranslate"><span class="pre">MAKE_PREFIX_PATH</span></code> and search in these locations too. Note that if your
+project uses <em>HPX</em> as well as other CMake-managed projects, the paths to the
+locations of these multiple projects may be concatenated in the
+<code class="docutils literal notranslate"><span class="pre">CMAKE_PREFIX_PATH</span></code>.</p>
+</li>
+<li><p>The variables above may be set in the CMake GUI or curses ccmake interface
+instead of the command line.</p></li>
+</ul>
+<p>Additionally, if you wish to require <em>HPX</em> for your project, replace the
+<code class="docutils literal notranslate"><span class="pre">find_package(HPX)</span></code> line with <code class="docutils literal notranslate"><span class="pre">find_package(HPX</span> <span class="pre">REQUIRED)</span></code>.</p>
+<p>You can check if <em>HPX</em> was successfully found with the <code class="docutils literal notranslate"><span class="pre">HPX_FOUND</span></code> CMake variable.</p>
+<p>The simplest way to add the <em>HPX</em> component is to use the <code class="docutils literal notranslate"><span class="pre">add_hpx_component</span></code>
+macro and add it to the <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="c"># build your application using HPX</span>
+<span class="nb">add_hpx_component</span><span class="p">(</span><span class="s">hello_world</span>
+    <span class="s">SOURCES</span> <span class="s">hello_world_component.cpp</span>
+    <span class="s">HEADERS</span> <span class="s">hello_world_component.hpp</span>
+    <span class="s">COMPONENT_DEPENDENCIES</span> <span class="s">iostreams</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">add_hpx_component</span></code> adds a <code class="docutils literal notranslate"><span class="pre">_component</span></code> suffix to the target name. In the
+example above, a <code class="docutils literal notranslate"><span class="pre">hello_world_component</span></code> target will be created.</p>
+</div>
+<p>The available options to <code class="docutils literal notranslate"><span class="pre">add_hpx_component</span></code> are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SOURCES</span></code>: The source files for that component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HEADERS</span></code>: The header files for that component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DEPENDENCIES</span></code>: Other libraries or targets this component depends on</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">COMPONENT_DEPENDENCIES</span></code>: The components this component depends on</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PLUGIN</span></code>: Treats this component as a plugin-able library</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">COMPILE_FLAGS</span></code>: Additional compiler flags</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LINK_FLAGS</span></code>: Additional linker flags</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FOLDER</span></code>: Adds the headers and source files to this Source Group folder</p></li>
+</ul>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">EXCLUDE_FROM_ALL</span></code>: Do not build this component as part of the <code class="docutils literal notranslate"><span class="pre">all</span></code> target</p></li>
+</ul>
+<p>After adding the component, the way you add the executable is as follows:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="c"># build your application using HPX</span>
+<span class="nb">add_hpx_executable</span><span class="p">(</span><span class="s">hello_world</span>
+    <span class="s">ESSENTIAL</span>
+    <span class="s">SOURCES</span> <span class="s">hello_world_client.cpp</span>
+    <span class="s">COMPONENT_DEPENDENCIES</span> <span class="s">hello_world</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">add_hpx_executable</span></code> automatically adds a <code class="docutils literal notranslate"><span class="pre">_component</span></code> suffix to dependencies
+specified in <code class="docutils literal notranslate"><span class="pre">COMPONENT_DEPENDENCIES</span></code>, meaning you can directly use the name given
+when adding a component using <code class="docutils literal notranslate"><span class="pre">add_hpx_component</span></code>.</p>
+</div>
+<p>When you configure your application, all you need to do is set the <code class="docutils literal notranslate"><span class="pre">HPX_DIR</span></code>
+variable to point to the installation of <em>HPX</em>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All library targets built with <em>HPX</em> are exported and readily available to be
+used as arguments to <a class="reference external" href="https://www.cmake.org/cmake/help/latest/command/target_link_libraries.html">target_link_libraries</a>
+in your targets. The <em>HPX</em> include directories are available with the
+<code class="docutils literal notranslate"><span class="pre">HPX_INCLUDE_DIRS</span></code> CMake variable.</p>
+</div>
+<div class="section" id="cmake-macros-to-integrate-hpx-into-existing-applications">
+<span id="cmake-integrate-hpx"></span><h3>CMake macros to integrate <em>HPX</em> into existing applications<a class="headerlink" href="#cmake-macros-to-integrate-hpx-into-existing-applications" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the <code class="docutils literal notranslate"><span class="pre">add_hpx_component</span></code> and <code class="docutils literal notranslate"><span class="pre">add_hpx_executable</span></code>, you can use
+the <code class="docutils literal notranslate"><span class="pre">hpx_setup_target</span></code> macro to have an already existing target to be used
+with the <em>HPX</em> libraries:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">hpx_setup_target</span><span class="p">(</span><span class="s">target</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Optional parameters are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">EXPORT</span></code>: Adds it to the CMake export list HPXTargets</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">INSTALL</span></code>: Generates an install rule for the target</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PLUGIN</span></code>: Treats this component as a plugin-able library</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TYPE</span></code>: The type can be: EXECUTABLE, LIBRARY or COMPONENT</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DEPENDENCIES</span></code>: Other libraries or targets this component depends on</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">COMPONENT_DEPENDENCIES</span></code>: The components this component depends on</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">COMPILE_FLAGS</span></code>: Additional compiler flags</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LINK_FLAGS</span></code>: Additional linker flags</p></li>
+</ul>
+<p>If you do not use CMake, you can still build against <em>HPX</em>, but you should refer
+to the section on <a class="reference internal" href="#comps"><span class="std std-ref">How to build HPX components with pkg-config</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since <em>HPX</em> relies on dynamic libraries, the dynamic linker needs to know
+where to look for them. If <em>HPX</em> isn’t installed into a path that is
+configured as a linker search path, external projects need to either set
+<code class="docutils literal notranslate"><span class="pre">RPATH</span></code> or adapt <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> to point to where the <em>HPX</em> libraries
+reside. In order to set <code class="docutils literal notranslate"><span class="pre">RPATH</span></code>s, you can include <code class="docutils literal notranslate"><span class="pre">HPX_SetFullRPATH</span></code> in
+your project after all libraries you want to link against have been added.
+Please also consult the CMake documentation <a class="reference external" href="https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH-handling">here</a>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="using-hpx-with-makefile">
+<span id="makefile"></span><h2>Using <em>HPX</em> with Makefile<a class="headerlink" href="#using-hpx-with-makefile" title="Permalink to this headline">¶</a></h2>
+<p>A basic project building with <em>HPX</em> is through creating makefiles. The process
+of creating one can get complex depending upon the use of cmake parameter
+<code class="docutils literal notranslate"><span class="pre">HPX_WITH_HPX_MAIN</span></code> (which defaults to ON).</p>
+<div class="section" id="how-to-build-hpx-applications-with-makefile">
+<h3>How to build <em>HPX</em> applications with makefile<a class="headerlink" href="#how-to-build-hpx-applications-with-makefile" title="Permalink to this headline">¶</a></h3>
+<p>If <em>HPX</em> is installed correctly, you should be able to build and run a simple
+Hello World program. It prints <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World!</span></code> on the <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> you
+run it on.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//  Copyright (c) 2007-2012 Hartmut Kaiser</span>
+<span class="c1">//</span>
+<span class="c1">//  SPDX-License-Identifier: BSL-1.0</span>
+<span class="c1">//  Distributed under the Boost Software License, Version 1.0. (See accompanying</span>
+<span class="c1">//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)</span>
+
+<span class="c1">///////////////////////////////////////////////////////////////////////////////</span>
+<span class="c1">// The purpose of this example is to execute a HPX-thread printing</span>
+<span class="c1">// &quot;Hello World!&quot; once. That&#39;s all.</span>
+
+<span class="c1">//[hello_world_1_getting_started</span>
+<span class="c1">// Including &#39;hpx/hpx_main.hpp&#39; instead of the usual &#39;hpx/hpx_init.hpp&#39; enables</span>
+<span class="c1">// to use the plain C-main below as the direct main HPX entry point.</span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_main.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/iostreams.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Say hello to the world!</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//]</span>
+</pre></div>
+</div>
+<p>Copy the content of this program into a file called hello_world.cpp.</p>
+<p>Now, in the directory where you put hello_world.cpp, create a Makefile.
+Add the following code:</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">CXX</span><span class="o">=(</span>CXX<span class="o">)</span>  <span class="c1"># Add your favourite compiler here or let makefile choose default.</span>
+
+<span class="nv">CXXFLAGS</span><span class="o">=</span>-O3 -std<span class="o">=</span>c++17
+
+<span class="nv">BOOST_ROOT</span><span class="o">=</span>/path/to/boost
+<span class="nv">HWLOC_ROOT</span><span class="o">=</span>/path/to/hwloc
+<span class="nv">TCMALLOC_ROOT</span><span class="o">=</span>/path/to/tcmalloc
+<span class="nv">HPX_ROOT</span><span class="o">=</span>/path/to/hpx
+
+<span class="nv">INCLUDE_DIRECTIVES</span><span class="o">=</span><span class="k">$(</span>HPX_ROOT<span class="k">)</span>/include <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/include <span class="k">$(</span>HWLOC_ROOT<span class="k">)</span>/include
+
+<span class="nv">LIBRARY_DIRECTIVES</span><span class="o">=</span>-L<span class="k">$(</span>HPX_ROOT<span class="k">)</span>/lib <span class="k">$(</span>HPX_ROOT<span class="k">)</span>/lib/libhpx_init.a <span class="k">$(</span>HPX_ROOT<span class="k">)</span>/lib/libhpx.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_atomic-mt.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_filesystem-mt.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_program_options-mt.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_regex-mt.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_system-mt.so -lpthread <span class="k">$(</span>TCMALLOC_ROOT<span class="k">)</span>/libtcmalloc_minimal.so <span class="k">$(</span>HWLOC_ROOT<span class="k">)</span>/libhwloc.so -ldl -lrt
+
+<span class="nv">LINK_FLAGS</span><span class="o">=</span><span class="k">$(</span>HPX_ROOT<span class="k">)</span>/lib/libhpx_wrap.a -Wl,-wrap<span class="o">=</span>main  <span class="c1"># should be left empty for HPX_WITH_HPX_MAIN=OFF</span>
+
+<span class="nf">hello_world</span><span class="o">:</span> <span class="n">hello_world</span>.<span class="n">o</span>
+   <span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -o hello_world hello_world.o <span class="k">$(</span>LIBRARY_DIRECTIVES<span class="k">)</span> <span class="k">$(</span>LINK_FLAGS<span class="k">)</span>
+
+<span class="nf">hello_world.o</span><span class="o">:</span>
+   <span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -c -o hello_world.o hello_world.cpp <span class="k">$(</span>INCLUDE_DIRECTIVES<span class="k">)</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><code class="docutils literal notranslate"><span class="pre">LINK_FLAGS</span></code> should be left empty if HPX_WITH_HPX_MAIN is set to OFF.
+Boost in the above example is build with <code class="docutils literal notranslate"><span class="pre">--layout=tagged</span></code>. Actual Boost
+flags may vary on your build of Boost.</p>
+</div>
+<p>To build the program, type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<p>A successfull build should result in hello_world binary. To test, type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./hello_world
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-build-hpx-components-with-makefile">
+<h3>How to build <em>HPX</em> components with makefile<a class="headerlink" href="#how-to-build-hpx-components-with-makefile" title="Permalink to this headline">¶</a></h3>
+<p>Let’s try a more complex example involving an <em>HPX</em> component. An <em>HPX</em>
+component is a class that exposes <em>HPX</em> actions. <em>HPX</em> components are compiled
+into dynamically-loaded modules called component libraries. Here’s the source
+code:</p>
+<p><strong>hello_world_component.cpp</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//[hello_world_cpp_getting_started</span>
+<span class="cp">#include</span> <span class="cpf">&quot;hello_world_component.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/iostreams.hpp&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+
+<span class="k">namespace</span> <span class="n">examples</span> <span class="p">{</span> <span class="k">namespace</span> <span class="n">server</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="n">hello_world</span><span class="o">::</span><span class="n">invoke</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello HPX World!&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}}</span>
+
+<span class="n">HPX_REGISTER_COMPONENT_MODULE</span><span class="p">();</span>
+
+<span class="k">typedef</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component</span><span class="o">&lt;</span>
+    <span class="n">examples</span><span class="o">::</span><span class="n">server</span><span class="o">::</span><span class="n">hello_world</span>
+<span class="o">&gt;</span> <span class="n">hello_world_type</span><span class="p">;</span>
+
+<span class="n">HPX_REGISTER_COMPONENT</span><span class="p">(</span><span class="n">hello_world_type</span><span class="p">,</span> <span class="n">hello_world</span><span class="p">);</span>
+
+<span class="n">HPX_REGISTER_ACTION</span><span class="p">(</span>
+</pre></div>
+</div>
+<p><strong>hello_world_component.hpp</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//[hello_world_hpp_getting_started</span>
+<span class="cp">#if !defined(HELLO_WORLD_COMPONENT_HPP)</span>
+<span class="cp">#define HELLO_WORLD_COMPONENT_HPP</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/actions.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/lcos.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/components.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/serialization.hpp&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;utility&gt;</span><span class="cp"></span>
+
+<span class="k">namespace</span> <span class="n">examples</span> <span class="p">{</span> <span class="k">namespace</span> <span class="n">server</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">HPX_COMPONENT_EXPORT</span> <span class="nl">hello_world</span>
+        <span class="p">:</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component_base</span><span class="o">&lt;</span><span class="n">hello_world</span><span class="o">&gt;</span>
+    <span class="p">{</span>
+        <span class="kt">void</span> <span class="n">invoke</span><span class="p">();</span>
+        <span class="n">HPX_DEFINE_COMPONENT_ACTION</span><span class="p">(</span><span class="n">hello_world</span><span class="p">,</span> <span class="n">invoke</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">}}</span>
+
+<span class="n">HPX_REGISTER_ACTION_DECLARATION</span><span class="p">(</span>
+    <span class="n">examples</span><span class="o">::</span><span class="n">server</span><span class="o">::</span><span class="n">hello_world</span><span class="o">::</span><span class="n">invoke_action</span><span class="p">,</span> <span class="n">hello_world_invoke_action</span><span class="p">);</span>
+
+<span class="k">namespace</span> <span class="n">examples</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="nl">hello_world</span>
+      <span class="p">:</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">client_base</span><span class="o">&lt;</span><span class="n">hello_world</span><span class="p">,</span> <span class="n">server</span><span class="o">::</span><span class="n">hello_world</span><span class="o">&gt;</span>
+    <span class="p">{</span>
+        <span class="k">typedef</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">client_base</span><span class="o">&lt;</span><span class="n">hello_world</span><span class="p">,</span> <span class="n">server</span><span class="o">::</span><span class="n">hello_world</span><span class="o">&gt;</span>
+            <span class="n">base_type</span><span class="p">;</span>
+
+        <span class="n">hello_world</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">naming</span><span class="o">::</span><span class="n">id_type</span><span class="o">&gt;</span> <span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span>
+          <span class="o">:</span> <span class="n">base_type</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="p">{}</span>
+
+        <span class="n">hello_world</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">naming</span><span class="o">::</span><span class="n">id_type</span> <span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span>
+          <span class="o">:</span> <span class="n">base_type</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="p">{}</span>
+
+        <span class="kt">void</span> <span class="n">invoke</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="o">&lt;</span><span class="n">server</span><span class="o">::</span><span class="n">hello_world</span><span class="o">::</span><span class="n">invoke_action</span><span class="o">&gt;</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_id</span><span class="p">()).</span><span class="n">get</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>hello_world_client.cpp</strong></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//  Copyright (c) 2012 Bryce Lelbach</span>
+<span class="c1">//</span>
+<span class="c1">//  SPDX-License-Identifier: BSL-1.0</span>
+<span class="c1">//  Distributed under the Boost Software License, Version 1.0. (See accompanying</span>
+<span class="c1">//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)</span>
+
+<span class="c1">//[hello_world_client_getting_started</span>
+<span class="cp">#include</span> <span class="cpf">&quot;hello_world_component.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_init.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">program_options</span><span class="o">::</span><span class="n">variables_map</span><span class="o">&amp;</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">{</span>
+        <span class="c1">// Create a single instance of the component on this locality.</span>
+        <span class="n">examples</span><span class="o">::</span><span class="n">hello_world</span> <span class="n">client</span> <span class="o">=</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">examples</span><span class="o">::</span><span class="n">hello_world</span><span class="o">&gt;</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">());</span>
+
+        <span class="c1">// Invoke the component&#39;s action, which will print &quot;Hello World!&quot;.</span>
+        <span class="n">client</span><span class="p">.</span><span class="n">invoke</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span> <span class="c1">// Initiate shutdown of the runtime system.</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span> <span class="c1">// Initialize and run HPX.</span>
+<span class="p">}</span>
+<span class="c1">//]</span>
+</pre></div>
+</div>
+<p>Now, in the directory, create a Makefile. Add the following code:</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">CXX</span><span class="o">=(</span>CXX<span class="o">)</span>  <span class="c1"># Add your favourite compiler here or let makefile choose default.</span>
+
+<span class="nv">CXXFLAGS</span><span class="o">=</span>-O3 -std<span class="o">=</span>c++17
+
+<span class="nv">BOOST_ROOT</span><span class="o">=</span>/path/to/boost
+<span class="nv">HWLOC_ROOT</span><span class="o">=</span>/path/to/hwloc
+<span class="nv">TCMALLOC_ROOT</span><span class="o">=</span>/path/to/tcmalloc
+<span class="nv">HPX_ROOT</span><span class="o">=</span>/path/to/hpx
+
+<span class="nv">INCLUDE_DIRECTIVES</span><span class="o">=</span><span class="k">$(</span>HPX_ROOT<span class="k">)</span>/include <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/include <span class="k">$(</span>HWLOC_ROOT<span class="k">)</span>/include
+
+<span class="nv">LIBRARY_DIRECTIVES</span><span class="o">=</span>-L<span class="k">$(</span>HPX_ROOT<span class="k">)</span>/lib <span class="k">$(</span>HPX_ROOT<span class="k">)</span>/lib/libhpx_init.a <span class="k">$(</span>HPX_ROOT<span class="k">)</span>/lib/libhpx.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_atomic-mt.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_filesystem-mt.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_program_options-mt.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_regex-mt.so <span class="k">$(</span>BOOST_ROOT<span class="k">)</span>/lib/libboost_system-mt.so -lpthread <span class="k">$(</span>TCMALLOC_ROOT<span class="k">)</span>/libtcmalloc_minimal.so <span class="k">$(</span>HWLOC_ROOT<span class="k">)</span>/libhwloc.so -ldl -lrt
+
+<span class="nv">LINK_FLAGS</span><span class="o">=</span><span class="k">$(</span>HPX_ROOT<span class="k">)</span>/lib/libhpx_wrap.a -Wl,-wrap<span class="o">=</span>main  <span class="c1"># should be left empty for HPX_WITH_HPX_MAIN=OFF</span>
+
+<span class="nf">hello_world_client</span><span class="o">:</span> <span class="n">libhpx_hello_world</span> <span class="n">hello_world_client</span>.<span class="n">o</span>
+  <span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -o hello_world_client <span class="k">$(</span>LIBRARY_DIRECTIVES<span class="k">)</span> libhpx_hello_world <span class="k">$(</span>LINK_FLAGS<span class="k">)</span>
+
+<span class="nf">hello_world_client.o</span><span class="o">:</span> <span class="n">hello_world_client</span>.<span class="n">cpp</span>
+  <span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -o hello_world_client.o hello_world_client.cpp <span class="k">$(</span>INCLUDE_DIRECTIVES<span class="k">)</span>
+
+<span class="nf">libhpx_hello_world</span><span class="o">:</span> <span class="n">hello_world_component</span>.<span class="n">o</span>
+  <span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -o libhpx_hello_world hello_world_component.o <span class="k">$(</span>LIBRARY_DIRECTIVES<span class="k">)</span>
+
+<span class="nf">hello_world_component.o</span><span class="o">:</span> <span class="n">hello_world_component</span>.<span class="n">cpp</span>
+  <span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -c -o hello_world_component.o hello_world_component.cpp <span class="k">$(</span>INCLUDE_DIRECTIVES<span class="k">)</span>
+</pre></div>
+</div>
+<p>To build the program, type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<p>A successfull build should result in hello_world binary. To test, type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./hello_world
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Due to high variations in CMake flags and library dependencies, it is
+recommended to build <em>HPX</em> applications and components with pkg-config
+or CMakeLists.txt. Writing Makefile may result in broken builds if
+due care is not taken.
+pkg-config files and CMake systems are configured with CMake build of
+<em>HPX</em>. Hence, they are stable when used together and provide better support overall.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="starting_the_hpx_runtime.html" class="btn btn-neutral float-right" title="Starting the HPX runtime" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="building_hpx.html" class="btn btn-neutral float-left" title="HPX build system" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

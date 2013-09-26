@@ -1,0 +1,671 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>threadmanager &mdash; HPX 1.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="concepts" href="../concepts/api.html" />
+    <link rel="prev" title="basic_execution" href="../basic_execution/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">threadmanager</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-threadmanager-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/threadmanager.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-runtime-threads-threadmanager-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/threadmanager.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>threadmanager</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/threadmanager/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="threadmanager">
+<span id="libs-threadmanager-api"></span><h1>threadmanager<a class="headerlink" href="#threadmanager" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-threadmanager-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/threadmanager.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-threadmanager-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx7threadsE">
+<span id="_CPPv3N3hpx7threadsE"></span><span id="_CPPv2N3hpx7threadsE"></span><span id="hpx::threads"></span><span class="target" id="namespacehpx_1_1threads"></span><em class="property">namespace </em><code class="sig-name descname">threads</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx7threads13threadmanagerE">
+<span id="_CPPv3N3hpx7threads13threadmanagerE"></span><span id="_CPPv2N3hpx7threads13threadmanagerE"></span><span id="hpx::threads::threadmanager"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager"></span><em class="property">class </em><code class="sig-name descname">threadmanager</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanagerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;threadmanager.hpp&gt;</em><p>The <em>thread-manager</em> class is the central instance of management for all (non-depleted) threads </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads13threadmanager24notification_policy_typeE">
+<span id="_CPPv3N3hpx7threads13threadmanager24notification_policy_typeE"></span><span id="_CPPv2N3hpx7threads13threadmanager24notification_policy_typeE"></span><span id="hpx::threads::threadmanager::notification_policy_type"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a760ca81edbc19ef874697b228c801ce6"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::callback_notifier <code class="sig-name descname">notification_policy_type</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager24notification_policy_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads13threadmanager9pool_typeE">
+<span id="_CPPv3N3hpx7threads13threadmanager9pool_typeE"></span><span id="_CPPv2N3hpx7threads13threadmanager9pool_typeE"></span><span id="hpx::threads::threadmanager::pool_type"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a1a590da6acf07ffc2850dffbd433eb98"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::unique_ptr&lt;<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads16thread_pool_baseE" title="hpx::threads::thread_pool_base">thread_pool_base</a>&gt; <code class="sig-name descname">pool_type</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager9pool_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads13threadmanager14scheduler_typeE">
+<span id="_CPPv3N3hpx7threads13threadmanager14scheduler_typeE"></span><span id="_CPPv2N3hpx7threads13threadmanager14scheduler_typeE"></span><span id="hpx::threads::threadmanager::scheduler_type"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1add7e8808a64e83bf785971a2ba44710d"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::scheduler_base <code class="sig-name descname">scheduler_type</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager14scheduler_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads13threadmanager11pool_vectorE">
+<span id="_CPPv3N3hpx7threads13threadmanager11pool_vectorE"></span><span id="_CPPv2N3hpx7threads13threadmanager11pool_vectorE"></span><span id="hpx::threads::threadmanager::pool_vector"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a5a8d7e8099f9ed2c26e2f27e7efcf21c"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4N3hpx7threads13threadmanager9pool_typeE" title="hpx::threads::threadmanager::pool_type">pool_type</a>&gt; <code class="sig-name descname">pool_vector</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager11pool_vectorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager13threadmanagerER24notification_policy_typeN6detail32network_background_callback_typeE">
+<span id="_CPPv3N3hpx7threads13threadmanager13threadmanagerER24notification_policy_typeN6detail32network_background_callback_typeE"></span><span id="_CPPv2N3hpx7threads13threadmanager13threadmanagerER24notification_policy_typeN6detail32network_background_callback_typeE"></span><span id="hpx::threads::threadmanager::threadmanager__notification_policy_typeR.detail::network_background_callback_type"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1aedf56ee960b9c0a50d7e9d801d173c8c"></span><code class="sig-name descname">threadmanager</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads13threadmanager24notification_policy_typeE" title="hpx::threads::threadmanager::notification_policy_type">notification_policy_type</a> &amp;<em>notifier</em>, detail::network_background_callback_type <em>network_background_callback</em> = detail::network_background_callback_type()<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager13threadmanagerER24notification_policy_typeN6detail32network_background_callback_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanagerD0Ev">
+<span id="_CPPv3N3hpx7threads13threadmanagerD0Ev"></span><span id="_CPPv2N3hpx7threads13threadmanagerD0Ev"></span><span id="hpx::threads::threadmanager::~threadmanager"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a7d1183ff74ed80bc4a60812ad8051d06"></span><code class="sig-name descname">~threadmanager</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanagerD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager4initEv">
+<span id="_CPPv3N3hpx7threads13threadmanager4initEv"></span><span id="_CPPv2N3hpx7threads13threadmanager4initEv"></span><span id="hpx::threads::threadmanager::init"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a761bb0ba0059f415f9a1857306aaa04f"></span>void <code class="sig-name descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager4initEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager12create_poolsEv">
+<span id="_CPPv3N3hpx7threads13threadmanager12create_poolsEv"></span><span id="_CPPv2N3hpx7threads13threadmanager12create_poolsEv"></span><span id="hpx::threads::threadmanager::create_pools"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a06b54e28bef5baacf1e8bff34adac4d0"></span>void <code class="sig-name descname">create_pools</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager12create_poolsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager11print_poolsERNSt7ostreamE">
+<span id="_CPPv3N3hpx7threads13threadmanager11print_poolsERNSt7ostreamE"></span><span id="_CPPv2N3hpx7threads13threadmanager11print_poolsERNSt7ostreamE"></span><span id="hpx::threads::threadmanager::print_pools__osR"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a98e273a8412984db73c2df6770e07d9f"></span>void <code class="sig-name descname">print_pools</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager11print_poolsERNSt7ostreamE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>FIXME move to private and add hpx:printpools cmd line option. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager12default_poolEv">
+<span id="_CPPv3NK3hpx7threads13threadmanager12default_poolEv"></span><span id="_CPPv2NK3hpx7threads13threadmanager12default_poolEv"></span><span id="hpx::threads::threadmanager::default_poolC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1aef6005da35d1c9f5bd8e9d7a763d8f6b"></span><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads16thread_pool_baseE" title="hpx::threads::thread_pool_base">thread_pool_base</a> &amp;<code class="sig-name descname">default_pool</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager12default_poolEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager17default_schedulerEv">
+<span id="_CPPv3NK3hpx7threads13threadmanager17default_schedulerEv"></span><span id="_CPPv2NK3hpx7threads13threadmanager17default_schedulerEv"></span><span id="hpx::threads::threadmanager::default_schedulerC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a7aed9e702b39639b88cdfcb7192444fd"></span><a class="reference internal" href="#_CPPv4N3hpx7threads13threadmanager14scheduler_typeE" title="hpx::threads::threadmanager::scheduler_type">scheduler_type</a> &amp;<code class="sig-name descname">default_scheduler</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager17default_schedulerEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager8get_poolERKNSt6stringE">
+<span id="_CPPv3NK3hpx7threads13threadmanager8get_poolERKNSt6stringE"></span><span id="_CPPv2NK3hpx7threads13threadmanager8get_poolERKNSt6stringE"></span><span id="hpx::threads::threadmanager::get_pool__ssCRC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a5d4d01b175d26d425e15530e031eda3f"></span><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads16thread_pool_baseE" title="hpx::threads::thread_pool_base">thread_pool_base</a> &amp;<code class="sig-name descname">get_pool</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager8get_poolERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager8get_poolERK12pool_id_type">
+<span id="_CPPv3NK3hpx7threads13threadmanager8get_poolERK12pool_id_type"></span><span id="_CPPv2NK3hpx7threads13threadmanager8get_poolERK12pool_id_type"></span><span id="hpx::threads::threadmanager::get_pool__pool_id_typeCRC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a84eb942fde09c8d64e42c58e15d49413"></span><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads16thread_pool_baseE" title="hpx::threads::thread_pool_base">thread_pool_base</a> &amp;<code class="sig-name descname">get_pool</code><span class="sig-paren">(</span>pool_id_type <em class="property">const</em> &amp;<em>pool_id</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager8get_poolERK12pool_id_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager8get_poolENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads13threadmanager8get_poolENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads13threadmanager8get_poolENSt6size_tE"></span><span id="hpx::threads::threadmanager::get_pool__std::sC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a93cd51f30f6bd02cbbf6bb7e73d9e6ef"></span><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads16thread_pool_baseE" title="hpx::threads::thread_pool_base">thread_pool_base</a> &amp;<code class="sig-name descname">get_pool</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>thread_index</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager8get_poolENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager13register_workER16thread_init_data17thread_state_enumR10error_code">
+<span id="_CPPv3N3hpx7threads13threadmanager13register_workER16thread_init_data17thread_state_enumR10error_code"></span><span id="_CPPv2N3hpx7threads13threadmanager13register_workER16thread_init_data17thread_state_enumR10error_code"></span><span id="hpx::threads::threadmanager::register_work__thread_init_dataR.thread_state_enum.error_codeR"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1acaf980f67457995abfd56decf1d09274"></span>void <code class="sig-name descname">register_work</code><span class="sig-paren">(</span>thread_init_data &amp;<em>data</em>, <a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads17thread_state_enumE" title="hpx::threads::thread_state_enum">thread_state_enum</a> <em>initial_state</em> = <a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads7pendingE" title="hpx::threads::pending">pending</a>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager13register_workER16thread_init_data17thread_state_enumR10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The function <em>register_work</em> adds a new work item to the thread manager. It doesn’t immediately create a new <em>thread</em>, it just adds the task parameters (function, initial state and description) to the internal management data structures. The thread itself will be created when the number of existing threads drops below the number of threads specified by the constructors max_count parameter.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">func</span></code>: [in] The function or function object to execute as the thread’s function. This must have a signature as defined by <em>thread_function_type</em>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code>: [in] The value of this parameter allows to specify a description of the thread to create. This information is used for logging purposes mainly, but might be useful for debugging as well. This parameter is optional and defaults to an empty string. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">initial_state</span></code>: [in] The value of this parameter defines the initial state of the newly created <em>thread</em>. This must be one of the values as defined by the <em>thread_state</em> enumeration (thread_state::pending, or <em>thread_state::suspended</em>, any other value will throw a hpx::bad_parameter exception). </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager15register_threadER16thread_init_dataR14thread_id_type17thread_state_enumbR10error_code">
+<span id="_CPPv3N3hpx7threads13threadmanager15register_threadER16thread_init_dataR14thread_id_type17thread_state_enumbR10error_code"></span><span id="_CPPv2N3hpx7threads13threadmanager15register_threadER16thread_init_dataR14thread_id_type17thread_state_enumbR10error_code"></span><span id="hpx::threads::threadmanager::register_thread__thread_init_dataR.thread_id_typeR.thread_state_enum.b.error_codeR"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a7f79c7578e08a60ca45eb276ce8133d8"></span>void <code class="sig-name descname">register_thread</code><span class="sig-paren">(</span>thread_init_data &amp;<em>data</em>, <a class="reference internal" href="../synchronization/api.html#_CPPv4N3hpx7threads14thread_id_typeE" title="hpx::threads::thread_id_type">thread_id_type</a> &amp;<em>id</em>, <a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads17thread_state_enumE" title="hpx::threads::thread_state_enum">thread_state_enum</a> <em>initial_state</em> = <a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads7pendingE" title="hpx::threads::pending">pending</a>, bool <em>run_now</em> = true, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager15register_threadER16thread_init_dataR14thread_id_type17thread_state_enumbR10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The function <em>register_thread</em> adds a new work item to the thread manager. It creates a new <em>thread</em>, adds it to the internal management data structures, and schedules the new thread, if appropriate.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">func</span></code>: [in] The function or function object to execute as the thread’s function. This must have a signature as defined by <em>thread_function_type</em>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: [out] This parameter will hold the id of the created thread. This id is guaranteed to be validly initialized before the thread function is executed. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code>: [in] The value of this parameter allows to specify a description of the thread to create. This information is used for logging purposes mainly, but might be useful for debugging as well. This parameter is optional and defaults to an empty string. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">initial_state</span></code>: [in] The value of this parameter defines the initial state of the newly created <em>thread</em>. This must be one of the values as defined by the <em>thread_state</em> enumeration (thread_state::pending, or <em>thread_state::suspended</em>, any other value will throw a hpx::bad_parameter exception). </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_now</span></code>: [in] If this parameter is <em>true</em> and the initial state is given as <em>thread_state::pending</em> the thread will be run immediately, otherwise it will be scheduled to run later (either this function is called for another thread using <em>true</em> for the parameter <em>run_now</em> or the function <em>threadmanager::do_some_work</em> is called). This parameter is optional and defaults to <em>true</em>. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager3runEv">
+<span id="_CPPv3N3hpx7threads13threadmanager3runEv"></span><span id="_CPPv2N3hpx7threads13threadmanager3runEv"></span><span id="hpx::threads::threadmanager::run"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a4048232d414b114c61b44b8eb9a5c167"></span>bool <code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager3runEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Run the thread manager’s work queue. This function instantiates the specified number of OS threads in each pool. All OS threads are started to execute the function <em>tfunc</em>. </p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The function returns <em>true</em> if the thread manager has been started successfully, otherwise it returns <em>false</em>. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager4stopEb">
+<span id="_CPPv3N3hpx7threads13threadmanager4stopEb"></span><span id="_CPPv2N3hpx7threads13threadmanager4stopEb"></span><span id="hpx::threads::threadmanager::stop__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a08a2db158e18672b8237e36a3e82597f"></span>void <code class="sig-name descname">stop</code><span class="sig-paren">(</span>bool <em>blocking</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager4stopEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Forcefully stop the thread-manager. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">blocking</span></code>: </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager7suspendEv">
+<span id="_CPPv3N3hpx7threads13threadmanager7suspendEv"></span><span id="_CPPv2N3hpx7threads13threadmanager7suspendEv"></span><span id="hpx::threads::threadmanager::suspend"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a058d743d18a219fbe266a604904cbb6f"></span>void <code class="sig-name descname">suspend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager7suspendEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager6resumeEv">
+<span id="_CPPv3N3hpx7threads13threadmanager6resumeEv"></span><span id="_CPPv2N3hpx7threads13threadmanager6resumeEv"></span><span id="hpx::threads::threadmanager::resume"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a673d0ce50d3927bae294f183f0893d82"></span>void <code class="sig-name descname">resume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager6resumeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager6statusEv">
+<span id="_CPPv3NK3hpx7threads13threadmanager6statusEv"></span><span id="_CPPv2NK3hpx7threads13threadmanager6statusEv"></span><span id="hpx::threads::threadmanager::statusC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1ad356526186c9d3ebfd1677bea135141c"></span>state <code class="sig-name descname">status</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager6statusEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return whether the thread manager is still running This returns the “minimal state”, i.e. the state of the least advanced thread pool. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager16get_thread_countE17thread_state_enum15thread_priorityNSt6size_tEb">
+<span id="_CPPv3N3hpx7threads13threadmanager16get_thread_countE17thread_state_enum15thread_priorityNSt6size_tEb"></span><span id="_CPPv2N3hpx7threads13threadmanager16get_thread_countE17thread_state_enum15thread_priorityNSt6size_tEb"></span><span id="hpx::threads::threadmanager::get_thread_count__thread_state_enum.thread_priority.std::s.b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a99c0004e6ed0e91a033720b7f52ab5b8"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_thread_count</code><span class="sig-paren">(</span><a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads17thread_state_enumE" title="hpx::threads::thread_state_enum">thread_state_enum</a> <em>state</em> = <a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads7unknownE" title="hpx::threads::unknown">unknown</a>, <a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads15thread_priorityE" title="hpx::threads::thread_priority">thread_priority</a> <em>priority</em> = <a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads23thread_priority_defaultE" title="hpx::threads::thread_priority_default">thread_priority_default</a>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t(-1), bool <em>reset</em> = false<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager16get_thread_countE17thread_state_enum15thread_priorityNSt6size_tEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>return the number of HPX-threads with the given state </p>
+<p><dl class="simple">
+<dt><strong>Note</strong></dt><dd><p>This function lock the internal OS lock in the thread manager </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager27get_background_thread_countEv">
+<span id="_CPPv3N3hpx7threads13threadmanager27get_background_thread_countEv"></span><span id="_CPPv2N3hpx7threads13threadmanager27get_background_thread_countEv"></span><span id="hpx::threads::threadmanager::get_background_thread_count"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1af6821d5416e52886292eb7b3ab283fe8"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_background_thread_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager27get_background_thread_countEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager17enumerate_threadsERKN4util15function_nonserIFb14thread_id_typeEEE17thread_state_enum">
+<span id="_CPPv3NK3hpx7threads13threadmanager17enumerate_threadsERKN4util15function_nonserIFb14thread_id_typeEEE17thread_state_enum"></span><span id="_CPPv2NK3hpx7threads13threadmanager17enumerate_threadsERKN4util15function_nonserIFb14thread_id_typeEEE17thread_state_enum"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a8cdd7f11e2411b7943e10fb628aab40a"></span>bool <code class="sig-name descname">enumerate_threads</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../functional/api.html#_CPPv4N3hpx4util15function_nonserE" title="hpx::util::function_nonser">function_nonser</a>&lt;bool<span class="sig-paren">(</span><a class="reference internal" href="../synchronization/api.html#_CPPv4N3hpx7threads14thread_id_typeE" title="hpx::threads::thread_id_type">thread_id_type</a><span class="sig-paren">)</span>&gt; <em class="property">const</em> &amp;<em>f</em>, <a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads17thread_state_enumE" title="hpx::threads::thread_state_enum">thread_state_enum</a> <em>state</em> = <a class="reference internal" href="../coroutines/api.html#_CPPv4N3hpx7threads7unknownE" title="hpx::threads::unknown">unknown</a>, <span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager17enumerate_threadsERKN4util15function_nonserIFb14thread_id_typeEEE17thread_state_enum" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager27abort_all_suspended_threadsEv">
+<span id="_CPPv3N3hpx7threads13threadmanager27abort_all_suspended_threadsEv"></span><span id="_CPPv2N3hpx7threads13threadmanager27abort_all_suspended_threadsEv"></span><span id="hpx::threads::threadmanager::abort_all_suspended_threads"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a96a47ed43e65197d7fdd79309c19c957"></span>void <code class="sig-name descname">abort_all_suspended_threads</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager27abort_all_suspended_threadsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager18cleanup_terminatedEb">
+<span id="_CPPv3N3hpx7threads13threadmanager18cleanup_terminatedEb"></span><span id="_CPPv2N3hpx7threads13threadmanager18cleanup_terminatedEb"></span><span id="hpx::threads::threadmanager::cleanup_terminated__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1ad38eab8c401c3b1702c80b873f78ea64"></span>bool <code class="sig-name descname">cleanup_terminated</code><span class="sig-paren">(</span>bool <em>delete_all</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager18cleanup_terminatedEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager19get_os_thread_countEv">
+<span id="_CPPv3NK3hpx7threads13threadmanager19get_os_thread_countEv"></span><span id="_CPPv2NK3hpx7threads13threadmanager19get_os_thread_countEv"></span><span id="hpx::threads::threadmanager::get_os_thread_countC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1aecc3d3e2bd87d497cef9682361fec646"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_os_thread_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager19get_os_thread_countEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the number of OS threads running in this thread-manager. </p>
+<p>This function will return correct results only if the thread-manager is running. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager20get_os_thread_handleENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads13threadmanager20get_os_thread_handleENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads13threadmanager20get_os_thread_handleENSt6size_tE"></span><span id="hpx::threads::threadmanager::get_os_thread_handle__std::sC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a42cda42a8f2ab1b7eba3de6f3ed1a73e"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::thread &amp;<code class="sig-name descname">get_os_thread_handle</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager20get_os_thread_handleENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager12report_errorENSt6size_tERKNSt13exception_ptrE">
+<span id="_CPPv3N3hpx7threads13threadmanager12report_errorENSt6size_tERKNSt13exception_ptrE"></span><span id="_CPPv2N3hpx7threads13threadmanager12report_errorENSt6size_tERKNSt13exception_ptrE"></span><span id="hpx::threads::threadmanager::report_error__std::s.std::exception_ptrCR"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a5a58356c968bebc3aafc1276b5ca8ff2"></span>void <code class="sig-name descname">report_error</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::exception_ptr <em class="property">const</em> &amp;<em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager12report_errorENSt6size_tERKNSt13exception_ptrE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>API functions forwarding to notification policy. </p>
+<p>This notifies the thread manager that the passed exception has been raised. The exception will be routed through the notifier and the scheduler (which will result in it being passed to the runtime object, which in turn will report it to the console, etc.). </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager25get_used_processing_unitsEv">
+<span id="_CPPv3NK3hpx7threads13threadmanager25get_used_processing_unitsEv"></span><span id="_CPPv2NK3hpx7threads13threadmanager25get_used_processing_unitsEv"></span><span id="hpx::threads::threadmanager::get_used_processing_unitsC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1afb70f0b84f443558addb01b870fafe6b"></span>mask_type <code class="sig-name descname">get_used_processing_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager25get_used_processing_unitsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the mask identifying all processing units used by this thread manager. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads13threadmanager20get_pool_numa_bitmapERKNSt6stringE">
+<span id="_CPPv3NK3hpx7threads13threadmanager20get_pool_numa_bitmapERKNSt6stringE"></span><span id="_CPPv2NK3hpx7threads13threadmanager20get_pool_numa_bitmapERKNSt6stringE"></span><span id="hpx::threads::threadmanager::get_pool_numa_bitmap__ssCRC"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a28d2a2d4bab184522aa5dbb4c2109c46"></span><a class="reference internal" href="../topology/api.html#_CPPv4N3hpx7threads16hwloc_bitmap_ptrE" title="hpx::threads::hwloc_bitmap_ptr">hwloc_bitmap_ptr</a> <code class="sig-name descname">get_pool_numa_bitmap</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string &amp;<em>pool_name</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads13threadmanager20get_pool_numa_bitmapERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager18set_scheduler_modeEN7threads8policies14scheduler_modeE">
+<span id="_CPPv3N3hpx7threads13threadmanager18set_scheduler_modeEN7threads8policies14scheduler_modeE"></span><span id="_CPPv2N3hpx7threads13threadmanager18set_scheduler_modeEN7threads8policies14scheduler_modeE"></span><span id="hpx::threads::threadmanager::set_scheduler_mode__threads::policies::scheduler_mode"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a28055b066637069a1dafa5cede312701"></span>void <code class="sig-name descname">set_scheduler_mode</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policies14scheduler_modeE" title="hpx::threads::policies::scheduler_mode">scheduler_mode</a> <em>mode</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager18set_scheduler_modeEN7threads8policies14scheduler_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager18add_scheduler_modeEN7threads8policies14scheduler_modeE">
+<span id="_CPPv3N3hpx7threads13threadmanager18add_scheduler_modeEN7threads8policies14scheduler_modeE"></span><span id="_CPPv2N3hpx7threads13threadmanager18add_scheduler_modeEN7threads8policies14scheduler_modeE"></span><span id="hpx::threads::threadmanager::add_scheduler_mode__threads::policies::scheduler_mode"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a39b6e8a4894755bffc94787229056f94"></span>void <code class="sig-name descname">add_scheduler_mode</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policies14scheduler_modeE" title="hpx::threads::policies::scheduler_mode">scheduler_mode</a> <em>mode</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager18add_scheduler_modeEN7threads8policies14scheduler_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager25add_remove_scheduler_modeEN7threads8policies14scheduler_modeEN7threads8policies14scheduler_modeE">
+<span id="_CPPv3N3hpx7threads13threadmanager25add_remove_scheduler_modeEN7threads8policies14scheduler_modeEN7threads8policies14scheduler_modeE"></span><span id="_CPPv2N3hpx7threads13threadmanager25add_remove_scheduler_modeEN7threads8policies14scheduler_modeEN7threads8policies14scheduler_modeE"></span><span id="hpx::threads::threadmanager::add_remove_scheduler_mode__threads::policies::scheduler_mode.threads::policies::scheduler_mode"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a7f2d88e60a31000fe91843b0ebb8a59a"></span>void <code class="sig-name descname">add_remove_scheduler_mode</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policies14scheduler_modeE" title="hpx::threads::policies::scheduler_mode">scheduler_mode</a> <em>to_add_mode</em>, <a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policies14scheduler_modeE" title="hpx::threads::policies::scheduler_mode">scheduler_mode</a> <em>to_remove_mode</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager25add_remove_scheduler_modeEN7threads8policies14scheduler_modeEN7threads8policies14scheduler_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager21remove_scheduler_modeEN7threads8policies14scheduler_modeE">
+<span id="_CPPv3N3hpx7threads13threadmanager21remove_scheduler_modeEN7threads8policies14scheduler_modeE"></span><span id="_CPPv2N3hpx7threads13threadmanager21remove_scheduler_modeEN7threads8policies14scheduler_modeE"></span><span id="hpx::threads::threadmanager::remove_scheduler_mode__threads::policies::scheduler_mode"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1aa8a93bac3b9abd293bdd3dfba53618e9"></span>void <code class="sig-name descname">remove_scheduler_mode</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policies14scheduler_modeE" title="hpx::threads::policies::scheduler_mode">scheduler_mode</a> <em>mode</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager21remove_scheduler_modeEN7threads8policies14scheduler_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager25reset_thread_distributionEv">
+<span id="_CPPv3N3hpx7threads13threadmanager25reset_thread_distributionEv"></span><span id="_CPPv2N3hpx7threads13threadmanager25reset_thread_distributionEv"></span><span id="hpx::threads::threadmanager::reset_thread_distribution"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a4abd51aa1c838d6f2b8a3e59f8c4ca32"></span>void <code class="sig-name descname">reset_thread_distribution</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager25reset_thread_distributionEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager8init_tssENSt6size_tE">
+<span id="_CPPv3N3hpx7threads13threadmanager8init_tssENSt6size_tE"></span><span id="_CPPv2N3hpx7threads13threadmanager8init_tssENSt6size_tE"></span><span id="hpx::threads::threadmanager::init_tss__std::s"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a37ea6db33b224840c45c2e24899adf67"></span>void <code class="sig-name descname">init_tss</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>global_thread_num</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager8init_tssENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager10deinit_tssEv">
+<span id="_CPPv3N3hpx7threads13threadmanager10deinit_tssEv"></span><span id="_CPPv2N3hpx7threads13threadmanager10deinit_tssEv"></span><span id="hpx::threads::threadmanager::deinit_tss"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a1f4c8c7394b387f4b5d222e01c15fd91"></span>void <code class="sig-name descname">deinit_tss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager10deinit_tssEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager11shrink_poolERKNSt6stringE">
+<span id="_CPPv3N3hpx7threads13threadmanager11shrink_poolERKNSt6stringE"></span><span id="_CPPv2N3hpx7threads13threadmanager11shrink_poolERKNSt6stringE"></span><span id="hpx::threads::threadmanager::shrink_pool__ssCR"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a29170722b44bd7e3b8722d39fdff704c"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">shrink_pool</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager11shrink_poolERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager11expand_poolERKNSt6stringE">
+<span id="_CPPv3N3hpx7threads13threadmanager11expand_poolERKNSt6stringE"></span><span id="_CPPv2N3hpx7threads13threadmanager11expand_poolERKNSt6stringE"></span><span id="hpx::threads::threadmanager::expand_pool__ssCR"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a4f3cf57d4561a7cca4c47d6bc05ccc58"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">expand_pool</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager11expand_poolERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager16get_queue_lengthEb">
+<span id="_CPPv3N3hpx7threads13threadmanager16get_queue_lengthEb"></span><span id="_CPPv2N3hpx7threads13threadmanager16get_queue_lengthEb"></span><span id="hpx::threads::threadmanager::get_queue_length__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a3a26e01d8e379b77e619d24c4dd5683a"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_queue_length</code><span class="sig-paren">(</span>bool <em>reset</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager16get_queue_lengthEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager23get_cumulative_durationEb">
+<span id="_CPPv3N3hpx7threads13threadmanager23get_cumulative_durationEb"></span><span id="_CPPv2N3hpx7threads13threadmanager23get_cumulative_durationEb"></span><span id="hpx::threads::threadmanager::get_cumulative_duration__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a6d34d67f428a9efe5aff813a3d8bd11a"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_cumulative_duration</code><span class="sig-paren">(</span>bool <em>reset</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager23get_cumulative_durationEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager24get_thread_count_unknownEb">
+<span id="_CPPv3N3hpx7threads13threadmanager24get_thread_count_unknownEb"></span><span id="_CPPv2N3hpx7threads13threadmanager24get_thread_count_unknownEb"></span><span id="hpx::threads::threadmanager::get_thread_count_unknown__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1ad75a1d271b940bc2d1ccde52abcce0d2"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_thread_count_unknown</code><span class="sig-paren">(</span>bool <em>reset</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager24get_thread_count_unknownEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager23get_thread_count_activeEb">
+<span id="_CPPv3N3hpx7threads13threadmanager23get_thread_count_activeEb"></span><span id="_CPPv2N3hpx7threads13threadmanager23get_thread_count_activeEb"></span><span id="hpx::threads::threadmanager::get_thread_count_active__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a3e9db00b3decb717d179dc0e707af4cd"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_thread_count_active</code><span class="sig-paren">(</span>bool <em>reset</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager23get_thread_count_activeEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager24get_thread_count_pendingEb">
+<span id="_CPPv3N3hpx7threads13threadmanager24get_thread_count_pendingEb"></span><span id="_CPPv2N3hpx7threads13threadmanager24get_thread_count_pendingEb"></span><span id="hpx::threads::threadmanager::get_thread_count_pending__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a78186cd627ca08761fbabd200039f5d6"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_thread_count_pending</code><span class="sig-paren">(</span>bool <em>reset</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager24get_thread_count_pendingEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager26get_thread_count_suspendedEb">
+<span id="_CPPv3N3hpx7threads13threadmanager26get_thread_count_suspendedEb"></span><span id="_CPPv2N3hpx7threads13threadmanager26get_thread_count_suspendedEb"></span><span id="hpx::threads::threadmanager::get_thread_count_suspended__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a5f5b51d2a9b593992d66fea4e09520b6"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_thread_count_suspended</code><span class="sig-paren">(</span>bool <em>reset</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager26get_thread_count_suspendedEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager27get_thread_count_terminatedEb">
+<span id="_CPPv3N3hpx7threads13threadmanager27get_thread_count_terminatedEb"></span><span id="_CPPv2N3hpx7threads13threadmanager27get_thread_count_terminatedEb"></span><span id="hpx::threads::threadmanager::get_thread_count_terminated__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a139f6fbe4895f773a6486061e5851112"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_thread_count_terminated</code><span class="sig-paren">(</span>bool <em>reset</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager27get_thread_count_terminatedEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads13threadmanager23get_thread_count_stagedEb">
+<span id="_CPPv3N3hpx7threads13threadmanager23get_thread_count_stagedEb"></span><span id="_CPPv2N3hpx7threads13threadmanager23get_thread_count_stagedEb"></span><span id="hpx::threads::threadmanager::get_thread_count_staged__b"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1aa02326974dc87b8a798bb11428b06871"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">get_thread_count_staged</code><span class="sig-paren">(</span>bool <em>reset</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager23get_thread_count_stagedEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads13threadmanager10mutex_typeE">
+<span id="_CPPv3N3hpx7threads13threadmanager10mutex_typeE"></span><span id="_CPPv2N3hpx7threads13threadmanager10mutex_typeE"></span><span id="hpx::threads::threadmanager::mutex_type"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1ad45c362fb76a373d240f7d2238ddf52d"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::mutex <code class="sig-name descname">mutex_type</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager10mutex_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads13threadmanager4mtx_E">
+<span id="_CPPv3N3hpx7threads13threadmanager4mtx_E"></span><span id="_CPPv2N3hpx7threads13threadmanager4mtx_E"></span><span id="hpx::threads::threadmanager::mtx___mutex_type"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1aef1825ba6629646cda537b90ec407e75"></span><a class="reference internal" href="#_CPPv4N3hpx7threads13threadmanager10mutex_typeE" title="hpx::threads::threadmanager::mutex_type">mutex_type</a> <code class="sig-name descname">mtx_</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager4mtx_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads13threadmanager12num_threads_E">
+<span id="_CPPv3N3hpx7threads13threadmanager12num_threads_E"></span><span id="_CPPv2N3hpx7threads13threadmanager12num_threads_E"></span><span id="hpx::threads::threadmanager::num_threads___std::s"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a49c04b9b42fe2344e099c9a1408c29b1"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_threads_</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager12num_threads_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads13threadmanager15threads_lookup_E">
+<span id="_CPPv3N3hpx7threads13threadmanager15threads_lookup_E"></span><span id="_CPPv2N3hpx7threads13threadmanager15threads_lookup_E"></span><span id="hpx::threads::threadmanager::threads_lookup___std::vector:pool_id_type:"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a76fed6fec4ec709a55324e83fa0c8db8"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;pool_id_type&gt; <code class="sig-name descname">threads_lookup_</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager15threads_lookup_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads13threadmanager6pools_E">
+<span id="_CPPv3N3hpx7threads13threadmanager6pools_E"></span><span id="_CPPv2N3hpx7threads13threadmanager6pools_E"></span><span id="hpx::threads::threadmanager::pools___pool_vector"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1af2775fbd55222a49b39ba71f0e15d865"></span><a class="reference internal" href="#_CPPv4N3hpx7threads13threadmanager11pool_vectorE" title="hpx::threads::threadmanager::pool_vector">pool_vector</a> <code class="sig-name descname">pools_</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager6pools_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads13threadmanager9notifier_E">
+<span id="_CPPv3N3hpx7threads13threadmanager9notifier_E"></span><span id="_CPPv2N3hpx7threads13threadmanager9notifier_E"></span><span id="hpx::threads::threadmanager::notifier___notification_policy_typeR"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a9e8f1f1adc8797141d48fde21d7f34f5"></span><a class="reference internal" href="#_CPPv4N3hpx7threads13threadmanager24notification_policy_typeE" title="hpx::threads::threadmanager::notification_policy_type">notification_policy_type</a> &amp;<code class="sig-name descname">notifier_</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager9notifier_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads13threadmanager28network_background_callback_E">
+<span id="_CPPv3N3hpx7threads13threadmanager28network_background_callback_E"></span><span id="_CPPv2N3hpx7threads13threadmanager28network_background_callback_E"></span><span id="hpx::threads::threadmanager::network_background_callback___detail::network_background_callback_type"></span><span class="target" id="classhpx_1_1threads_1_1threadmanager_1a2f3d88d9dcc31692735af27aa196d3ab"></span>detail::network_background_callback_type <code class="sig-name descname">network_background_callback_</code><a class="headerlink" href="#_CPPv4N3hpx7threads13threadmanager28network_background_callback_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-compatibility-hpx-runtime-threads-threadmanager-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/threadmanager.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-runtime-threads-threadmanager-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../concepts/api.html" class="btn btn-neutral float-right" title="concepts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../basic_execution/api.html" class="btn btn-neutral float-left" title="basic_execution" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,617 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>timing &mdash; HPX release documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="format" href="../format/api.html" />
+    <link rel="prev" title="assertion" href="../assertion/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                release
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">timing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-steady-clock-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/steady_clock.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-high-resolution-timer-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/high_resolution_timer.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-high-resolution-clock-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/high_resolution_clock.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-scoped-timer-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/scoped_timer.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-timing-steady-clock-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/timing/steady_clock.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-timing-high-resolution-timer-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/timing/high_resolution_timer.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-timing-high-resolution-clock-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/timing/high_resolution_clock.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-timing-scoped-timer-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/timing/scoped_timer.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>timing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/timing/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="timing">
+<span id="libs-timing-api"></span><h1>timing<a class="headerlink" href="#timing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-compatibility-hpx-util-steady-clock-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/steady_clock.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-steady-clock-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-high-resolution-timer-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/high_resolution_timer.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-high-resolution-timer-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-high-resolution-clock-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/high_resolution_clock.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-high-resolution-clock-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-scoped-timer-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/scoped_timer.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-scoped-timer-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-timing-steady-clock-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/timing/steady_clock.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-timing-steady-clock-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx4util15steady_durationE">
+<span id="_CPPv3N3hpx4util15steady_durationE"></span><span id="_CPPv2N3hpx4util15steady_durationE"></span><span id="hpx::util::steady_duration"></span><span class="target" id="classhpx_1_1util_1_1steady__duration"></span><em class="property">class </em><code class="sig-name descname">steady_duration</code><a class="headerlink" href="#_CPPv4N3hpx4util15steady_durationE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util15steady_duration15steady_durationERK10value_type">
+<span id="_CPPv3N3hpx4util15steady_duration15steady_durationERK10value_type"></span><span id="_CPPv2N3hpx4util15steady_duration15steady_durationERK10value_type"></span><span id="hpx::util::steady_duration::steady_duration__value_typeCR"></span><span class="target" id="classhpx_1_1util_1_1steady__duration_1a094db5d7b95fca8271d7ded94fab0b8d"></span><code class="sig-name descname">steady_duration</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util15steady_duration10value_typeE" title="hpx::util::steady_duration::value_type">value_type</a> <em class="property">const</em> &amp;<em>rel_time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util15steady_duration15steady_durationERK10value_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx4util15steady_duration15steady_durationERKNSt6chrono8durationI3Rep6PeriodEE">
+<span id="_CPPv3I00EN3hpx4util15steady_duration15steady_durationERKNSt6chrono8durationI3Rep6PeriodEE"></span><span id="_CPPv2I00EN3hpx4util15steady_duration15steady_durationERKNSt6chrono8durationI3Rep6PeriodEE"></span><span class="target" id="classhpx_1_1util_1_1steady__duration_1a2e5fb213267405a44e3c955a51aca9dc"></span>template&lt;typename <code class="sig-name descname">Rep</code>, typename <code class="sig-name descname">Period</code>&gt;<br /><code class="sig-name descname">steady_duration</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::chrono::duration&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4util15steady_duration15steady_durationERKNSt6chrono8durationI3Rep6PeriodEE" title="hpx::util::steady_duration::steady_duration::Rep">Rep</a>, <a class="reference internal" href="#_CPPv4I00EN3hpx4util15steady_duration15steady_durationERKNSt6chrono8durationI3Rep6PeriodEE" title="hpx::util::steady_duration::steady_duration::Period">Period</a>&gt; <em class="property">const</em> &amp;<em>rel_time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx4util15steady_duration15steady_durationERKNSt6chrono8durationI3Rep6PeriodEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util15steady_duration5valueEv">
+<span id="_CPPv3NK3hpx4util15steady_duration5valueEv"></span><span id="_CPPv2NK3hpx4util15steady_duration5valueEv"></span><span id="hpx::util::steady_duration::valueC"></span><span class="target" id="classhpx_1_1util_1_1steady__duration_1a167356f0db9de4e17db9e7fd6355b269"></span><a class="reference internal" href="#_CPPv4N3hpx4util15steady_duration10value_typeE" title="hpx::util::steady_duration::value_type">value_type</a> <em class="property">const</em> &amp;<code class="sig-name descname">value</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util15steady_duration5valueEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util15steady_duration8from_nowEv">
+<span id="_CPPv3NK3hpx4util15steady_duration8from_nowEv"></span><span id="_CPPv2NK3hpx4util15steady_duration8from_nowEv"></span><span id="hpx::util::steady_duration::from_nowC"></span><span class="target" id="classhpx_1_1util_1_1steady__duration_1a0132206d767cd0f7395507b40111a153"></span>steady_clock::time_point <code class="sig-name descname">from_now</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util15steady_duration8from_nowEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util15steady_duration10value_typeE">
+<span id="_CPPv3N3hpx4util15steady_duration10value_typeE"></span><span id="_CPPv2N3hpx4util15steady_duration10value_typeE"></span><span id="hpx::util::steady_duration::value_type"></span><span class="target" id="classhpx_1_1util_1_1steady__duration_1aa3f2bfeb53e9be67d594377528d7388c"></span><em class="property">typedef </em>steady_clock::duration <code class="sig-name descname">value_type</code><a class="headerlink" href="#_CPPv4N3hpx4util15steady_duration10value_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util15steady_duration9_rel_timeE">
+<span id="_CPPv3N3hpx4util15steady_duration9_rel_timeE"></span><span id="_CPPv2N3hpx4util15steady_duration9_rel_timeE"></span><span id="hpx::util::steady_duration::_rel_time__value_type"></span><span class="target" id="classhpx_1_1util_1_1steady__duration_1a286c8324668968a1c3fe4386e88ea275"></span><a class="reference internal" href="#_CPPv4N3hpx4util15steady_duration10value_typeE" title="hpx::util::steady_duration::value_type">value_type</a> <code class="sig-name descname">_rel_time</code><a class="headerlink" href="#_CPPv4N3hpx4util15steady_duration9_rel_timeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4N3hpx4util17steady_time_pointE">
+<span id="_CPPv3N3hpx4util17steady_time_pointE"></span><span id="_CPPv2N3hpx4util17steady_time_pointE"></span><span id="hpx::util::steady_time_point"></span><span class="target" id="classhpx_1_1util_1_1steady__time__point"></span><em class="property">class </em><code class="sig-name descname">steady_time_point</code><a class="headerlink" href="#_CPPv4N3hpx4util17steady_time_pointE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util17steady_time_point17steady_time_pointERK10value_type">
+<span id="_CPPv3N3hpx4util17steady_time_point17steady_time_pointERK10value_type"></span><span id="_CPPv2N3hpx4util17steady_time_point17steady_time_pointERK10value_type"></span><span id="hpx::util::steady_time_point::steady_time_point__value_typeCR"></span><span class="target" id="classhpx_1_1util_1_1steady__time__point_1a66fdf9179fbe6153f1f8103045a81caf"></span><code class="sig-name descname">steady_time_point</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util17steady_time_point10value_typeE" title="hpx::util::steady_time_point::value_type">value_type</a> <em class="property">const</em> &amp;<em>abs_time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util17steady_time_point17steady_time_pointERK10value_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx4util17steady_time_point17steady_time_pointERKNSt6chrono10time_pointI5Clock8DurationEE">
+<span id="_CPPv3I00EN3hpx4util17steady_time_point17steady_time_pointERKNSt6chrono10time_pointI5Clock8DurationEE"></span><span id="_CPPv2I00EN3hpx4util17steady_time_point17steady_time_pointERKNSt6chrono10time_pointI5Clock8DurationEE"></span><span class="target" id="classhpx_1_1util_1_1steady__time__point_1adfaab55e224710f1ff890e141cb687dc"></span>template&lt;typename <code class="sig-name descname">Clock</code>, typename <code class="sig-name descname">Duration</code>&gt;<br /><code class="sig-name descname">steady_time_point</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::chrono::time_point&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4util17steady_time_point17steady_time_pointERKNSt6chrono10time_pointI5Clock8DurationEE" title="hpx::util::steady_time_point::steady_time_point::Clock">Clock</a>, <a class="reference internal" href="#_CPPv4I00EN3hpx4util17steady_time_point17steady_time_pointERKNSt6chrono10time_pointI5Clock8DurationEE" title="hpx::util::steady_time_point::steady_time_point::Duration">Duration</a>&gt; <em class="property">const</em> &amp;<em>abs_time</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx4util17steady_time_point17steady_time_pointERKNSt6chrono10time_pointI5Clock8DurationEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17steady_time_point5valueEv">
+<span id="_CPPv3NK3hpx4util17steady_time_point5valueEv"></span><span id="_CPPv2NK3hpx4util17steady_time_point5valueEv"></span><span id="hpx::util::steady_time_point::valueC"></span><span class="target" id="classhpx_1_1util_1_1steady__time__point_1ab3ac884d51b3f3eeadd4363f76c00f68"></span><a class="reference internal" href="#_CPPv4N3hpx4util17steady_time_point10value_typeE" title="hpx::util::steady_time_point::value_type">value_type</a> <em class="property">const</em> &amp;<code class="sig-name descname">value</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17steady_time_point5valueEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util17steady_time_point10value_typeE">
+<span id="_CPPv3N3hpx4util17steady_time_point10value_typeE"></span><span id="_CPPv2N3hpx4util17steady_time_point10value_typeE"></span><span id="hpx::util::steady_time_point::value_type"></span><span class="target" id="classhpx_1_1util_1_1steady__time__point_1a0fed38b92650d4a584a8d926c75c0877"></span><em class="property">typedef </em>steady_clock::time_point <code class="sig-name descname">value_type</code><a class="headerlink" href="#_CPPv4N3hpx4util17steady_time_point10value_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util17steady_time_point9_abs_timeE">
+<span id="_CPPv3N3hpx4util17steady_time_point9_abs_timeE"></span><span id="_CPPv2N3hpx4util17steady_time_point9_abs_timeE"></span><span id="hpx::util::steady_time_point::_abs_time__value_type"></span><span class="target" id="classhpx_1_1util_1_1steady__time__point_1a6ee1722e2446c0b249d298959ccf9671"></span><a class="reference internal" href="#_CPPv4N3hpx4util17steady_time_point10value_typeE" title="hpx::util::steady_time_point::value_type">value_type</a> <code class="sig-name descname">_abs_time</code><a class="headerlink" href="#_CPPv4N3hpx4util17steady_time_point9_abs_timeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-timing-high-resolution-timer-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/timing/high_resolution_timer.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-timing-high-resolution-timer-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx4util21high_resolution_timerE">
+<span id="_CPPv3N3hpx4util21high_resolution_timerE"></span><span id="_CPPv2N3hpx4util21high_resolution_timerE"></span><span id="hpx::util::high_resolution_timer"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer"></span><em class="property">class </em><code class="sig-name descname">high_resolution_timer</code><a class="headerlink" href="#_CPPv4N3hpx4util21high_resolution_timerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util21high_resolution_timer21high_resolution_timerEv">
+<span id="_CPPv3N3hpx4util21high_resolution_timer21high_resolution_timerEv"></span><span id="_CPPv2N3hpx4util21high_resolution_timer21high_resolution_timerEv"></span><span id="hpx::util::high_resolution_timer::high_resolution_timer"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1a56ab0d60aa728fb808c414f6a3de6a18"></span><code class="sig-name descname">high_resolution_timer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util21high_resolution_timer21high_resolution_timerEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util21high_resolution_timer21high_resolution_timerEd">
+<span id="_CPPv3N3hpx4util21high_resolution_timer21high_resolution_timerEd"></span><span id="_CPPv2N3hpx4util21high_resolution_timer21high_resolution_timerEd"></span><span id="hpx::util::high_resolution_timer::high_resolution_timer__double"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1a1ef014083a88f318b6ae12ea971017a2"></span><code class="sig-name descname">high_resolution_timer</code><span class="sig-paren">(</span>double <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util21high_resolution_timer21high_resolution_timerEd" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util21high_resolution_timer7restartEv">
+<span id="_CPPv3N3hpx4util21high_resolution_timer7restartEv"></span><span id="_CPPv2N3hpx4util21high_resolution_timer7restartEv"></span><span id="hpx::util::high_resolution_timer::restart"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1a135417c97a57cb7e77d52544d5ce4950"></span>void <code class="sig-name descname">restart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util21high_resolution_timer7restartEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util21high_resolution_timer7elapsedEv">
+<span id="_CPPv3NK3hpx4util21high_resolution_timer7elapsedEv"></span><span id="_CPPv2NK3hpx4util21high_resolution_timer7elapsedEv"></span><span id="hpx::util::high_resolution_timer::elapsedC"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1abdf9bf5837743b9abdccc618a1c86736"></span>double <code class="sig-name descname">elapsed</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util21high_resolution_timer7elapsedEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util21high_resolution_timer20elapsed_microsecondsEv">
+<span id="_CPPv3NK3hpx4util21high_resolution_timer20elapsed_microsecondsEv"></span><span id="_CPPv2NK3hpx4util21high_resolution_timer20elapsed_microsecondsEv"></span><span id="hpx::util::high_resolution_timer::elapsed_microsecondsC"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1a6c379d15dcb874a23cfab6057899029a"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">elapsed_microseconds</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util21high_resolution_timer20elapsed_microsecondsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util21high_resolution_timer19elapsed_nanosecondsEv">
+<span id="_CPPv3NK3hpx4util21high_resolution_timer19elapsed_nanosecondsEv"></span><span id="_CPPv2NK3hpx4util21high_resolution_timer19elapsed_nanosecondsEv"></span><span id="hpx::util::high_resolution_timer::elapsed_nanosecondsC"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1ace92217d04bfb8f44f2acf7ab6156033"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int64_t <code class="sig-name descname">elapsed_nanoseconds</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util21high_resolution_timer19elapsed_nanosecondsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util21high_resolution_timer11elapsed_maxEv">
+<span id="_CPPv3NK3hpx4util21high_resolution_timer11elapsed_maxEv"></span><span id="_CPPv2NK3hpx4util21high_resolution_timer11elapsed_maxEv"></span><span id="hpx::util::high_resolution_timer::elapsed_maxC"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1aa1b4184e7d6b12ceda8d291d18bc0c2e"></span>double <code class="sig-name descname">elapsed_max</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util21high_resolution_timer11elapsed_maxEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util21high_resolution_timer11elapsed_minEv">
+<span id="_CPPv3NK3hpx4util21high_resolution_timer11elapsed_minEv"></span><span id="_CPPv2NK3hpx4util21high_resolution_timer11elapsed_minEv"></span><span id="hpx::util::high_resolution_timer::elapsed_minC"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1ae18c4a2b6793eb2f66a963ae3978c945"></span>double <code class="sig-name descname">elapsed_min</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util21high_resolution_timer11elapsed_minEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util21high_resolution_timer3nowEv">
+<span id="_CPPv3N3hpx4util21high_resolution_timer3nowEv"></span><span id="_CPPv2N3hpx4util21high_resolution_timer3nowEv"></span><span id="hpx::util::high_resolution_timer::now"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1a4c3cd19f74c6244f5ba21433d4af63ef"></span><em class="property">static</em> double <code class="sig-name descname">now</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util21high_resolution_timer3nowEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Protected Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util21high_resolution_timer15take_time_stampEv">
+<span id="_CPPv3N3hpx4util21high_resolution_timer15take_time_stampEv"></span><span id="_CPPv2N3hpx4util21high_resolution_timer15take_time_stampEv"></span><span id="hpx::util::high_resolution_timer::take_time_stamp"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1abdc7f9511dd3bfe1c5da2c38fe295851"></span><em class="property">static</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::uint64_t <code class="sig-name descname">take_time_stamp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util21high_resolution_timer15take_time_stampEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util21high_resolution_timer11start_time_E">
+<span id="_CPPv3N3hpx4util21high_resolution_timer11start_time_E"></span><span id="_CPPv2N3hpx4util21high_resolution_timer11start_time_E"></span><span id="hpx::util::high_resolution_timer::start_time___std::uint64_t"></span><span class="target" id="classhpx_1_1util_1_1high__resolution__timer_1a2b92e027186cd81038c38e59478790e6"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::uint64_t <code class="sig-name descname">start_time_</code><a class="headerlink" href="#_CPPv4N3hpx4util21high_resolution_timer11start_time_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-timing-high-resolution-clock-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/timing/high_resolution_clock.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-timing-high-resolution-clock-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx4util21high_resolution_clockE">
+<span id="_CPPv3N3hpx4util21high_resolution_clockE"></span><span id="_CPPv2N3hpx4util21high_resolution_clockE"></span><span id="hpx::util::high_resolution_clock"></span><span class="target" id="structhpx_1_1util_1_1high__resolution__clock"></span><em class="property">struct </em><code class="sig-name descname">high_resolution_clock</code><a class="headerlink" href="#_CPPv4N3hpx4util21high_resolution_clockE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util21high_resolution_clock3nowEv">
+<span id="_CPPv3N3hpx4util21high_resolution_clock3nowEv"></span><span id="_CPPv2N3hpx4util21high_resolution_clock3nowEv"></span><span id="hpx::util::high_resolution_clock::now"></span><span class="target" id="structhpx_1_1util_1_1high__resolution__clock_1aaf1ff59c3ef8d3b70696fadb0a55842c"></span><em class="property">static</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::uint64_t <code class="sig-name descname">now</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util21high_resolution_clock3nowEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="structhpx_1_1util_1_1high__resolution__clock_1a7cb7f0560e76afa7c57a0bb2fe6bb578"></span><code class="sig-name descname">static std::uint64_t() hpx::util::high_resolution_clock::min()</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="structhpx_1_1util_1_1high__resolution__clock_1a74659e1723015aba1c5833d333560f8f"></span><code class="sig-name descname">static std::uint64_t() hpx::util::high_resolution_clock::max()</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-timing-scoped-timer-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/timing/scoped_timer.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-timing-scoped-timer-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I0EN3hpx4util12scoped_timerE">
+<span id="_CPPv3I0EN3hpx4util12scoped_timerE"></span><span id="_CPPv2I0EN3hpx4util12scoped_timerE"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">scoped_timer</code><a class="headerlink" href="#_CPPv4I0EN3hpx4util12scoped_timerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12scoped_timer12scoped_timerER1Tb">
+<span id="_CPPv3N3hpx4util12scoped_timer12scoped_timerER1Tb"></span><span id="_CPPv2N3hpx4util12scoped_timer12scoped_timerER1Tb"></span><span id="hpx::util::scoped_timer::scoped_timer__TR.b"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer_1a6234d748b0b38ded767478ad538cc28e"></span><code class="sig-name descname">scoped_timer</code><span class="sig-paren">(</span>T &amp;<em>t</em>, bool <em>enabled</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12scoped_timer12scoped_timerER1Tb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12scoped_timer12scoped_timerERK12scoped_timer">
+<span id="_CPPv3N3hpx4util12scoped_timer12scoped_timerERK12scoped_timer"></span><span id="_CPPv2N3hpx4util12scoped_timer12scoped_timerERK12scoped_timer"></span><span id="hpx::util::scoped_timer::scoped_timer__scoped_timerCR"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer_1a6b9999b9c64a49e598f98a82451def85"></span><code class="sig-name descname">scoped_timer</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util12scoped_timer12scoped_timerER1Tb" title="hpx::util::scoped_timer::scoped_timer">scoped_timer</a> <em class="property">const</em>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12scoped_timer12scoped_timerERK12scoped_timer" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12scoped_timer12scoped_timerERR12scoped_timer">
+<span id="_CPPv3N3hpx4util12scoped_timer12scoped_timerERR12scoped_timer"></span><span id="_CPPv2N3hpx4util12scoped_timer12scoped_timerERR12scoped_timer"></span><span id="hpx::util::scoped_timer::scoped_timer__scoped_timerRR"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer_1af2a111eb940bc358c18298975d37088c"></span><code class="sig-name descname">scoped_timer</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util12scoped_timer12scoped_timerER1Tb" title="hpx::util::scoped_timer::scoped_timer">scoped_timer</a> &amp;&amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12scoped_timer12scoped_timerERR12scoped_timer" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12scoped_timerD0Ev">
+<span id="_CPPv3N3hpx4util12scoped_timerD0Ev"></span><span id="_CPPv2N3hpx4util12scoped_timerD0Ev"></span><span id="hpx::util::scoped_timer::~scoped_timer"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer_1a6b6985d662abe85470ecc18f6006856e"></span><code class="sig-name descname">~scoped_timer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12scoped_timerD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12scoped_timeraSERK12scoped_timer">
+<span id="_CPPv3N3hpx4util12scoped_timeraSERK12scoped_timer"></span><span id="_CPPv2N3hpx4util12scoped_timeraSERK12scoped_timer"></span><span id="hpx::util::scoped_timer::assign-operator__scoped_timerCR"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer_1a0b26a25a931098bce2b0cab79ddfa283"></span>scoped_timer &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>scoped_timer <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12scoped_timeraSERK12scoped_timer" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util12scoped_timeraSERR12scoped_timer">
+<span id="_CPPv3N3hpx4util12scoped_timeraSERR12scoped_timer"></span><span id="_CPPv2N3hpx4util12scoped_timeraSERR12scoped_timer"></span><span id="hpx::util::scoped_timer::assign-operator__scoped_timerRR"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer_1a7a9ec3baccca86464c11b934e6f26f64"></span>scoped_timer &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span>scoped_timer &amp;&amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util12scoped_timeraSERR12scoped_timer" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util12scoped_timer7enabledEv">
+<span id="_CPPv3NK3hpx4util12scoped_timer7enabledEv"></span><span id="_CPPv2NK3hpx4util12scoped_timer7enabledEv"></span><span id="hpx::util::scoped_timer::enabledC"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer_1a4a6fe2b7b698e4259b0d6ead616b426b"></span>bool <code class="sig-name descname">enabled</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util12scoped_timer7enabledEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util12scoped_timer11started_at_E">
+<span id="_CPPv3N3hpx4util12scoped_timer11started_at_E"></span><span id="_CPPv2N3hpx4util12scoped_timer11started_at_E"></span><span id="hpx::util::scoped_timer::started_at___std::uint64_t"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer_1a2cba7eeafa7c93cb22198d8500742fd2"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::uint64_t <code class="sig-name descname">started_at_</code><a class="headerlink" href="#_CPPv4N3hpx4util12scoped_timer11started_at_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util12scoped_timer2t_E">
+<span id="_CPPv3N3hpx4util12scoped_timer2t_E"></span><span id="_CPPv2N3hpx4util12scoped_timer2t_E"></span><span id="hpx::util::scoped_timer::t___TP"></span><span class="target" id="structhpx_1_1util_1_1scoped__timer_1a14a036c9b3feaefc41e38071a085950a"></span>T *<code class="sig-name descname">t_</code><a class="headerlink" href="#_CPPv4N3hpx4util12scoped_timer2t_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../format/api.html" class="btn btn-neutral float-right" title="format" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../assertion/api.html" class="btn btn-neutral float-left" title="assertion" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,989 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>topology &mdash; HPX release documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="filesystem" href="../filesystem/api.html" />
+    <link rel="prev" title="local_lcos" href="../local_lcos/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                release
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">topology</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-cache-aligned-data-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/cache_aligned_data.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-runtime-threads-topology-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/topology.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-runtime-threads-cpu-mask-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/cpu_mask.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-topology-topology-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/topology/topology.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-topology-cpu-mask-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/topology/cpu_mask.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>topology</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/topology/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="topology">
+<span id="libs-topology-api"></span><h1>topology<a class="headerlink" href="#topology" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-compatibility-hpx-util-cache-aligned-data-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/cache_aligned_data.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-cache-aligned-data-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-runtime-threads-topology-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/topology.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-runtime-threads-topology-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-runtime-threads-cpu-mask-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/cpu_mask.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-runtime-threads-cpu-mask-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-topology-topology-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/topology/topology.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-topology-topology-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx7threadsE">
+<span id="_CPPv3N3hpx7threadsE"></span><span id="_CPPv2N3hpx7threadsE"></span><span id="hpx::threads"></span><span class="target" id="namespacehpx_1_1threads"></span><em class="property">namespace </em><code class="sig-name descname">threads</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads16hwloc_bitmap_ptrE">
+<span id="_CPPv3N3hpx7threads16hwloc_bitmap_ptrE"></span><span id="_CPPv2N3hpx7threads16hwloc_bitmap_ptrE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa444b9bb30b0296697e84ae761cf7e66"></span><em class="property">using </em><code class="sig-name descname">hwloc_bitmap_ptr</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::shared_ptr&lt;<a class="reference internal" href="#_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapperE" title="hpx::threads::hpx_hwloc_bitmap_wrapper">hpx_hwloc_bitmap_wrapper</a>&gt;<a class="headerlink" href="#_CPPv4N3hpx7threads16hwloc_bitmap_ptrE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Enums</p>
+<dl class="enum">
+<dt id="_CPPv4N3hpx7threads24hpx_hwloc_membind_policyE">
+<span id="_CPPv3N3hpx7threads24hpx_hwloc_membind_policyE"></span><span id="_CPPv2N3hpx7threads24hpx_hwloc_membind_policyE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa3eecf4fc4dfdb19545eeefc4fd5c83f"></span><em class="property">enum </em><code class="sig-name descname">hpx_hwloc_membind_policy</code><a class="headerlink" href="#_CPPv4N3hpx7threads24hpx_hwloc_membind_policyE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Please see hwloc documentation for the corresponding enums HWLOC_MEMBIND_XXX. </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads15membind_defaultE">
+<span id="_CPPv3N3hpx7threads15membind_defaultE"></span><span id="_CPPv2N3hpx7threads15membind_defaultE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa3eecf4fc4dfdb19545eeefc4fd5c83fad8b92b209272f5b000970c6fe8e7593a"></span><code class="sig-name descname">membind_default</code> = HWLOC_MEMBIND_DEFAULT<a class="headerlink" href="#_CPPv4N3hpx7threads15membind_defaultE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads18membind_firsttouchE">
+<span id="_CPPv3N3hpx7threads18membind_firsttouchE"></span><span id="_CPPv2N3hpx7threads18membind_firsttouchE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa3eecf4fc4dfdb19545eeefc4fd5c83faa7e1b3262d7d7c284623a78deff53722"></span><code class="sig-name descname">membind_firsttouch</code> = HWLOC_MEMBIND_FIRSTTOUCH<a class="headerlink" href="#_CPPv4N3hpx7threads18membind_firsttouchE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads12membind_bindE">
+<span id="_CPPv3N3hpx7threads12membind_bindE"></span><span id="_CPPv2N3hpx7threads12membind_bindE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa3eecf4fc4dfdb19545eeefc4fd5c83fa55845a0f3f103122589010a576bb0142"></span><code class="sig-name descname">membind_bind</code> = HWLOC_MEMBIND_BIND<a class="headerlink" href="#_CPPv4N3hpx7threads12membind_bindE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads18membind_interleaveE">
+<span id="_CPPv3N3hpx7threads18membind_interleaveE"></span><span id="_CPPv2N3hpx7threads18membind_interleaveE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa3eecf4fc4dfdb19545eeefc4fd5c83fab58c1372b5148b703183aaa89ae3f051"></span><code class="sig-name descname">membind_interleave</code> = HWLOC_MEMBIND_INTERLEAVE<a class="headerlink" href="#_CPPv4N3hpx7threads18membind_interleaveE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads17membind_replicateE">
+<span id="_CPPv3N3hpx7threads17membind_replicateE"></span><span id="_CPPv2N3hpx7threads17membind_replicateE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa3eecf4fc4dfdb19545eeefc4fd5c83faba9eb305dbd936c13fa761d23ccd53a9"></span><code class="sig-name descname">membind_replicate</code> = HWLOC_MEMBIND_REPLICATE<a class="headerlink" href="#_CPPv4N3hpx7threads17membind_replicateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads17membind_nexttouchE">
+<span id="_CPPv3N3hpx7threads17membind_nexttouchE"></span><span id="_CPPv2N3hpx7threads17membind_nexttouchE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa3eecf4fc4dfdb19545eeefc4fd5c83fa9559f7fa896fdc47d877f69da23d8dd7"></span><code class="sig-name descname">membind_nexttouch</code> = HWLOC_MEMBIND_NEXTTOUCH<a class="headerlink" href="#_CPPv4N3hpx7threads17membind_nexttouchE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads13membind_mixedE">
+<span id="_CPPv3N3hpx7threads13membind_mixedE"></span><span id="_CPPv2N3hpx7threads13membind_mixedE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa3eecf4fc4dfdb19545eeefc4fd5c83faffd11643bfdded8c325d5fb78df8e69f"></span><code class="sig-name descname">membind_mixed</code> = HWLOC_MEMBIND_MIXED<a class="headerlink" href="#_CPPv4N3hpx7threads13membind_mixedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads12membind_userE">
+<span id="_CPPv3N3hpx7threads12membind_userE"></span><span id="_CPPv2N3hpx7threads12membind_userE"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa3eecf4fc4dfdb19545eeefc4fd5c83fa136849d5a867483292218be72d8c52ec"></span><code class="sig-name descname">membind_user</code> = HWLOC_MEMBIND_MIXED + 256<a class="headerlink" href="#_CPPv4N3hpx7threads12membind_userE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads15create_topologyEv">
+<span id="_CPPv3N3hpx7threads15create_topologyEv"></span><span id="_CPPv2N3hpx7threads15create_topologyEv"></span><span id="hpx::threads::create_topology"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa4cc56111111c0910b6705047d8e6588"></span><a class="reference internal" href="#_CPPv4N3hpx7threads8topologyE" title="hpx::threads::topology">topology</a> &amp;<code class="sig-name descname">create_topology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads15create_topologyEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads20hardware_concurrencyEv">
+<span id="_CPPv3N3hpx7threads20hardware_concurrencyEv"></span><span id="_CPPv2N3hpx7threads20hardware_concurrencyEv"></span><span id="hpx::threads::hardware_concurrency"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aa8752a235478d2ad7b5ac467b63ab527"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">hardware_concurrency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads20hardware_concurrencyEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads20get_memory_page_sizeEv">
+<span id="_CPPv3N3hpx7threads20get_memory_page_sizeEv"></span><span id="_CPPv2N3hpx7threads20get_memory_page_sizeEv"></span><span id="hpx::threads::get_memory_page_size"></span><span class="target" id="include_2hpx_2topology_2topology_8hpp_1aff71d33ac5e19dbcdde859b490f98722"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_memory_page_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads20get_memory_page_sizeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapperE">
+<span id="_CPPv3N3hpx7threads24hpx_hwloc_bitmap_wrapperE"></span><span id="_CPPv2N3hpx7threads24hpx_hwloc_bitmap_wrapperE"></span><span id="hpx::threads::hpx_hwloc_bitmap_wrapper"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper"></span><em class="property">struct </em><code class="sig-name descname">hpx_hwloc_bitmap_wrapper</code><a class="headerlink" href="#_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapperE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper16HPX_NON_COPYABLEE24hpx_hwloc_bitmap_wrapper">
+<span id="_CPPv3N3hpx7threads24hpx_hwloc_bitmap_wrapper16HPX_NON_COPYABLEE24hpx_hwloc_bitmap_wrapper"></span><span id="_CPPv2N3hpx7threads24hpx_hwloc_bitmap_wrapper16HPX_NON_COPYABLEE24hpx_hwloc_bitmap_wrapper"></span><span id="hpx::threads::hpx_hwloc_bitmap_wrapper::HPX_NON_COPYABLE__hpx_hwloc_bitmap_wrapper"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper_1a97a706a1cbaeb476b6cfc40a6acf24ce"></span><code class="sig-name descname">HPX_NON_COPYABLE</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapperE" title="hpx::threads::hpx_hwloc_bitmap_wrapper">hpx_hwloc_bitmap_wrapper</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper16HPX_NON_COPYABLEE24hpx_hwloc_bitmap_wrapper" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper24hpx_hwloc_bitmap_wrapperEv">
+<span id="_CPPv3N3hpx7threads24hpx_hwloc_bitmap_wrapper24hpx_hwloc_bitmap_wrapperEv"></span><span id="_CPPv2N3hpx7threads24hpx_hwloc_bitmap_wrapper24hpx_hwloc_bitmap_wrapperEv"></span><span id="hpx::threads::hpx_hwloc_bitmap_wrapper::hpx_hwloc_bitmap_wrapper"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper_1a7de90c98fa0549db054242525544b94a"></span><code class="sig-name descname">hpx_hwloc_bitmap_wrapper</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper24hpx_hwloc_bitmap_wrapperEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper24hpx_hwloc_bitmap_wrapperEPv">
+<span id="_CPPv3N3hpx7threads24hpx_hwloc_bitmap_wrapper24hpx_hwloc_bitmap_wrapperEPv"></span><span id="_CPPv2N3hpx7threads24hpx_hwloc_bitmap_wrapper24hpx_hwloc_bitmap_wrapperEPv"></span><span id="hpx::threads::hpx_hwloc_bitmap_wrapper::hpx_hwloc_bitmap_wrapper__voidP"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper_1a6e77b0c975fec332b9bd675c564b45cc"></span><code class="sig-name descname">hpx_hwloc_bitmap_wrapper</code><span class="sig-paren">(</span>void *<em>bmp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper24hpx_hwloc_bitmap_wrapperEPv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapperD0Ev">
+<span id="_CPPv3N3hpx7threads24hpx_hwloc_bitmap_wrapperD0Ev"></span><span id="_CPPv2N3hpx7threads24hpx_hwloc_bitmap_wrapperD0Ev"></span><span id="hpx::threads::hpx_hwloc_bitmap_wrapper::~hpx_hwloc_bitmap_wrapper"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper_1a6565ad51223eed7e98cb068e00a374dc"></span><code class="sig-name descname">~hpx_hwloc_bitmap_wrapper</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapperD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper5resetE14hwloc_bitmap_t">
+<span id="_CPPv3N3hpx7threads24hpx_hwloc_bitmap_wrapper5resetE14hwloc_bitmap_t"></span><span id="_CPPv2N3hpx7threads24hpx_hwloc_bitmap_wrapper5resetE14hwloc_bitmap_t"></span><span id="hpx::threads::hpx_hwloc_bitmap_wrapper::reset__hwloc_bitmap_t"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper_1aa558880bce00473842ceec3e34801cf3"></span>void <code class="sig-name descname">reset</code><span class="sig-paren">(</span>hwloc_bitmap_t <em>bmp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper5resetE14hwloc_bitmap_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads24hpx_hwloc_bitmap_wrappercvbEv">
+<span id="_CPPv3NK3hpx7threads24hpx_hwloc_bitmap_wrappercvbEv"></span><span id="_CPPv2NK3hpx7threads24hpx_hwloc_bitmap_wrappercvbEv"></span><span id="hpx::threads::hpx_hwloc_bitmap_wrapper::castto-b-operatorC"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper_1a461cb32478d2cacd71c4cb7283ccbf71"></span><code class="sig-name descname">operator bool</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads24hpx_hwloc_bitmap_wrappercvbEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads24hpx_hwloc_bitmap_wrapper7get_bmpEv">
+<span id="_CPPv3NK3hpx7threads24hpx_hwloc_bitmap_wrapper7get_bmpEv"></span><span id="_CPPv2NK3hpx7threads24hpx_hwloc_bitmap_wrapper7get_bmpEv"></span><span id="hpx::threads::hpx_hwloc_bitmap_wrapper::get_bmpC"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper_1a1c3f6f168e14351436ebeace8c77a128"></span>hwloc_bitmap_t <code class="sig-name descname">get_bmp</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads24hpx_hwloc_bitmap_wrapper7get_bmpEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper4bmp_E">
+<span id="_CPPv3N3hpx7threads24hpx_hwloc_bitmap_wrapper4bmp_E"></span><span id="_CPPv2N3hpx7threads24hpx_hwloc_bitmap_wrapper4bmp_E"></span><span id="hpx::threads::hpx_hwloc_bitmap_wrapper::bmp___hwloc_bitmap_t"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper_1ad7326d0a2979d7283b9734ace93751ae"></span>hwloc_bitmap_t <code class="sig-name descname">bmp_</code><a class="headerlink" href="#_CPPv4N3hpx7threads24hpx_hwloc_bitmap_wrapper4bmp_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt id="_CPPv4lsRNSt7ostreamEPK24hpx_hwloc_bitmap_wrapper">
+<span id="_CPPv3lsRNSt7ostreamEPK24hpx_hwloc_bitmap_wrapper"></span><span id="_CPPv2lsRNSt7ostreamEPK24hpx_hwloc_bitmap_wrapper"></span><span id="lshift-operator__osR.hpx_hwloc_bitmap_wrapperCP"></span><span class="target" id="structhpx_1_1threads_1_1hpx__hwloc__bitmap__wrapper_1aba9a4d7cb9178f3451ec6dab5da8b0dc"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<code class="sig-name descname">operator&lt;&lt;</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<em>os</em>, hpx_hwloc_bitmap_wrapper <em class="property">const</em> *<em>bmp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4lsRNSt7ostreamEPK24hpx_hwloc_bitmap_wrapper" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4N3hpx7threads8topologyE">
+<span id="_CPPv3N3hpx7threads8topologyE"></span><span id="_CPPv2N3hpx7threads8topologyE"></span><span id="hpx::threads::topology"></span><span class="target" id="structhpx_1_1threads_1_1topology"></span><em class="property">struct </em><code class="sig-name descname">topology</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topologyE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads8topology8topologyEv">
+<span id="_CPPv3N3hpx7threads8topology8topologyEv"></span><span id="_CPPv2N3hpx7threads8topology8topologyEv"></span><span id="hpx::threads::topology::topology"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a1f8e5bb59dbc9f713acf50bc05f8bd52"></span><code class="sig-name descname">topology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads8topology8topologyEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads8topologyD0Ev">
+<span id="_CPPv3N3hpx7threads8topologyD0Ev"></span><span id="_CPPv2N3hpx7threads8topologyD0Ev"></span><span id="hpx::threads::topology::~topology"></span><span class="target" id="structhpx_1_1threads_1_1topology_1abc0088b3ef774b6f79b92c4dd6830cb9"></span><code class="sig-name descname">~topology</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads8topologyD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology17get_socket_numberENSt6size_tER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology17get_socket_numberENSt6size_tER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology17get_socket_numberENSt6size_tER10error_code"></span><span id="hpx::threads::topology::get_socket_number__std::s.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a19a9dabfd85e47c8c2670bd154339305"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_socket_number</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a>&amp; = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology17get_socket_numberENSt6size_tER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the Socket number of the processing unit the given thread is running on. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology20get_numa_node_numberENSt6size_tER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology20get_numa_node_numberENSt6size_tER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology20get_numa_node_numberENSt6size_tER10error_code"></span><span id="hpx::threads::topology::get_numa_node_number__std::s.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1af99d27cc69b7eae0cccd012f416a2e8d"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_numa_node_number</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a>&amp; = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology20get_numa_node_numberENSt6size_tER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the NUMA node number of the processing unit the given thread is running on. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology25get_machine_affinity_maskER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology25get_machine_affinity_maskER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology25get_machine_affinity_maskER10error_code"></span><span id="hpx::threads::topology::get_machine_affinity_mask__error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a1d362ffedd8e89ea479f11c597cfe0c3"></span>mask_cref_type <code class="sig-name descname">get_machine_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology25get_machine_affinity_maskER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return a bit mask where each set bit corresponds to a processing unit available to the application. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology25get_service_affinity_maskE14mask_cref_typeR10error_code">
+<span id="_CPPv3NK3hpx7threads8topology25get_service_affinity_maskE14mask_cref_typeR10error_code"></span><span id="_CPPv2NK3hpx7threads8topology25get_service_affinity_maskE14mask_cref_typeR10error_code"></span><span id="hpx::threads::topology::get_service_affinity_mask__mask_cref_type.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a9f0786c5c16ca3dac8d5555451ebf793"></span>mask_type <code class="sig-name descname">get_service_affinity_mask</code><span class="sig-paren">(</span>mask_cref_type <em>used_processing_units</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology25get_service_affinity_maskE14mask_cref_typeR10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return a bit mask where each set bit corresponds to a processing unit available to the service threads in the application. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">used_processing_units</span></code>: [in] This is the mask of processing units which are not available for service threads. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology24get_socket_affinity_maskENSt6size_tER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology24get_socket_affinity_maskENSt6size_tER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology24get_socket_affinity_maskENSt6size_tER10error_code"></span><span id="hpx::threads::topology::get_socket_affinity_mask__std::s.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a31616c9d31ea6b9da6b17b102e7733ae"></span>mask_cref_type <code class="sig-name descname">get_socket_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology24get_socket_affinity_maskENSt6size_tER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return a bit mask where each set bit corresponds to a processing unit available to the given thread inside the socket it is running on. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology27get_numa_node_affinity_maskENSt6size_tER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology27get_numa_node_affinity_maskENSt6size_tER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology27get_numa_node_affinity_maskENSt6size_tER10error_code"></span><span id="hpx::threads::topology::get_numa_node_affinity_mask__std::s.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a83911e0b9597400fc980ce4b5f64d291"></span>mask_cref_type <code class="sig-name descname">get_numa_node_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology27get_numa_node_affinity_maskENSt6size_tER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return a bit mask where each set bit corresponds to a processing unit available to the given thread inside the NUMA domain it is running on. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology42get_numa_node_affinity_mask_from_numa_nodeENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology42get_numa_node_affinity_mask_from_numa_nodeENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology42get_numa_node_affinity_mask_from_numa_nodeENSt6size_tE"></span><span id="hpx::threads::topology::get_numa_node_affinity_mask_from_numa_node__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a7c167c0995615e8fdb15c4a2b4448ab2"></span>mask_type <code class="sig-name descname">get_numa_node_affinity_mask_from_numa_node</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_node</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology42get_numa_node_affinity_mask_from_numa_nodeENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return a bit mask where each set bit corresponds to a processing unit associated with the given NUMA node. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology22get_core_affinity_maskENSt6size_tER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology22get_core_affinity_maskENSt6size_tER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology22get_core_affinity_maskENSt6size_tER10error_code"></span><span id="hpx::threads::topology::get_core_affinity_mask__std::s.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a26040cb446fc31ea0e870fb674c2772a"></span>mask_cref_type <code class="sig-name descname">get_core_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology22get_core_affinity_maskENSt6size_tER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return a bit mask where each set bit corresponds to a processing unit available to the given thread inside the core it is running on. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology24get_thread_affinity_maskENSt6size_tER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology24get_thread_affinity_maskENSt6size_tER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology24get_thread_affinity_maskENSt6size_tER10error_code"></span><span id="hpx::threads::topology::get_thread_affinity_mask__std::s.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a1d7ba473481582a84f5550c1aa1aecac"></span>mask_cref_type <code class="sig-name descname">get_thread_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology24get_thread_affinity_maskENSt6size_tER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return a bit mask where each set bit corresponds to a processing unit available to the given thread. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology24set_thread_affinity_maskE14mask_cref_typeR10error_code">
+<span id="_CPPv3NK3hpx7threads8topology24set_thread_affinity_maskE14mask_cref_typeR10error_code"></span><span id="_CPPv2NK3hpx7threads8topology24set_thread_affinity_maskE14mask_cref_typeR10error_code"></span><span id="hpx::threads::topology::set_thread_affinity_mask__mask_cref_type.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ad1b2af859359248cf913d02e7fc82e84"></span>void <code class="sig-name descname">set_thread_affinity_mask</code><span class="sig-paren">(</span>mask_cref_type <em>mask</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology24set_thread_affinity_maskE14mask_cref_typeR10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Use the given bit mask to set the affinity of the given thread. Each set bit corresponds to a processing unit the thread will be allowed to run on. </p>
+<p><dl class="simple">
+<dt><strong>Note</strong></dt><dd><p>Use this function on systems where the affinity must be set from inside the thread itself. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology33get_thread_affinity_mask_from_lvaEPKvR10error_code">
+<span id="_CPPv3NK3hpx7threads8topology33get_thread_affinity_mask_from_lvaEPKvR10error_code"></span><span id="_CPPv2NK3hpx7threads8topology33get_thread_affinity_mask_from_lvaEPKvR10error_code"></span><span id="hpx::threads::topology::get_thread_affinity_mask_from_lva__voidCP.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a17c9e09e457c9a2a9b0cb051196c2588"></span>mask_type <code class="sig-name descname">get_thread_affinity_mask_from_lva</code><span class="sig-paren">(</span>void <em class="property">const</em> *<em>lva</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology33get_thread_affinity_mask_from_lvaEPKvR10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return a bit mask where each set bit corresponds to a processing unit co-located with the memory the given address is currently allocated on. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology19print_affinity_maskERNSt7ostreamENSt6size_tE14mask_cref_typeRKNSt6stringE">
+<span id="_CPPv3NK3hpx7threads8topology19print_affinity_maskERNSt7ostreamENSt6size_tE14mask_cref_typeRKNSt6stringE"></span><span id="_CPPv2NK3hpx7threads8topology19print_affinity_maskERNSt7ostreamENSt6size_tE14mask_cref_typeRKNSt6stringE"></span><span id="hpx::threads::topology::print_affinity_mask__osR.std::s.mask_cref_type.ssCRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a0bee02b91738002b5fa6d47f96fefc79"></span>void <code class="sig-name descname">print_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<em>os</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, mask_cref_type <em>m</em>, <em class="property">const</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string &amp;<em>pool_name</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology19print_affinity_maskERNSt7ostreamENSt6size_tE14mask_cref_typeRKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Prints the. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">m</span></code>: to os in a human readable form </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology22reduce_thread_priorityER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology22reduce_thread_priorityER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology22reduce_thread_priorityER10error_code"></span><span id="hpx::threads::topology::reduce_thread_priority__error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a3752f213bc1a82cc001736ecdcdcc675"></span>bool <code class="sig-name descname">reduce_thread_priority</code><span class="sig-paren">(</span><a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology22reduce_thread_priorityER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Reduce thread priority of the current thread. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ec</span></code>: [in,out] this represents the error status on exit, if this is pre-initialized to <em>hpx::throws</em> the function will throw on error instead. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology21get_number_of_socketsEv">
+<span id="_CPPv3NK3hpx7threads8topology21get_number_of_socketsEv"></span><span id="_CPPv2NK3hpx7threads8topology21get_number_of_socketsEv"></span><span id="hpx::threads::topology::get_number_of_socketsC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a39fed3fac2d530cd05dafd7757a6acc0"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_of_sockets</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology21get_number_of_socketsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the number of available NUMA domains. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology24get_number_of_numa_nodesEv">
+<span id="_CPPv3NK3hpx7threads8topology24get_number_of_numa_nodesEv"></span><span id="_CPPv2NK3hpx7threads8topology24get_number_of_numa_nodesEv"></span><span id="hpx::threads::topology::get_number_of_numa_nodesC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a9668edda13825dee424e42f57e9a67eb"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_of_numa_nodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology24get_number_of_numa_nodesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the number of available NUMA domains. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology19get_number_of_coresEv">
+<span id="_CPPv3NK3hpx7threads8topology19get_number_of_coresEv"></span><span id="_CPPv2NK3hpx7threads8topology19get_number_of_coresEv"></span><span id="hpx::threads::topology::get_number_of_coresC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1aef677602c5cf87c19276da4e7faab32f"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_of_cores</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology19get_number_of_coresEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the number of available cores. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology17get_number_of_pusEv">
+<span id="_CPPv3NK3hpx7threads8topology17get_number_of_pusEv"></span><span id="_CPPv2NK3hpx7threads8topology17get_number_of_pusEv"></span><span id="hpx::threads::topology::get_number_of_pusC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a29f7ee66117cc4c46995b26d938990a8"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_of_pus</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology17get_number_of_pusEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the number of available hardware processing units. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology29get_number_of_numa_node_coresENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology29get_number_of_numa_node_coresENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology29get_number_of_numa_node_coresENSt6size_tE"></span><span id="hpx::threads::topology::get_number_of_numa_node_cores__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a56a1e84bc042f5b5eeb58a7ae02e9d17"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_of_numa_node_cores</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>numa</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology29get_number_of_numa_node_coresENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return number of cores in given numa domain. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology27get_number_of_numa_node_pusENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology27get_number_of_numa_node_pusENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology27get_number_of_numa_node_pusENSt6size_tE"></span><span id="hpx::threads::topology::get_number_of_numa_node_pus__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1aacd2c1576931da07e7014115715ed445"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_of_numa_node_pus</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>numa</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology27get_number_of_numa_node_pusENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return number of processing units in a given numa domain. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology24get_number_of_socket_pusENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology24get_number_of_socket_pusENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology24get_number_of_socket_pusENSt6size_tE"></span><span id="hpx::threads::topology::get_number_of_socket_pus__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a298a4d32f0ddbf98869a2be2b00d8fde"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_of_socket_pus</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>socket</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology24get_number_of_socket_pusENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return number of processing units in a given socket. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology22get_number_of_core_pusENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology22get_number_of_core_pusENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology22get_number_of_core_pusENSt6size_tE"></span><span id="hpx::threads::topology::get_number_of_core_pus__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a24ad5efe327a19ea5870303bfa5a3834"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_of_core_pus</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>core</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology22get_number_of_core_pusENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return number of processing units in given core. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology26get_number_of_socket_coresENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology26get_number_of_socket_coresENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology26get_number_of_socket_coresENSt6size_tE"></span><span id="hpx::threads::topology::get_number_of_socket_cores__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1afb1f47adb493e9e3ff92660b732add02"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_of_socket_cores</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>socket</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology26get_number_of_socket_coresENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return number of cores units in given socket. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology15get_core_numberENSt6size_tER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology15get_core_numberENSt6size_tER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology15get_core_numberENSt6size_tER10error_code"></span><span id="hpx::threads::topology::get_core_number__std::s.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1aef38685fb561430ed12e9eafe85ba46c"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_core_number</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a>&amp; = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology15get_core_numberENSt6size_tER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology13get_pu_numberENSt6size_tENSt6size_tER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology13get_pu_numberENSt6size_tENSt6size_tER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology13get_pu_numberENSt6size_tENSt6size_tER10error_code"></span><span id="hpx::threads::topology::get_pu_number__std::s.std::s.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a3acf7b3e700ad6dae929c26dee1fa64f"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_pu_number</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_core</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_pu</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology13get_pu_numberENSt6size_tENSt6size_tER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology16get_cpubind_maskER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology16get_cpubind_maskER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology16get_cpubind_maskER10error_code"></span><span id="hpx::threads::topology::get_cpubind_mask__error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ac50fddf7a98015e674b59873475782f2"></span>mask_type <code class="sig-name descname">get_cpubind_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology16get_cpubind_maskER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology16get_cpubind_maskERNSt6threadER10error_code">
+<span id="_CPPv3NK3hpx7threads8topology16get_cpubind_maskERNSt6threadER10error_code"></span><span id="_CPPv2NK3hpx7threads8topology16get_cpubind_maskERNSt6threadER10error_code"></span><span id="hpx::threads::topology::get_cpubind_mask__std::threadR.error_codeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1aa8b6beba948fcbb17f6d12388746acbb"></span>mask_type <code class="sig-name descname">get_cpubind_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::thread &amp;<em>handle</em>, <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code">error_code</a> &amp;<em>ec</em> = <a class="reference internal" href="../errors/api.html#_CPPv4N3hpx6throwsE" title="hpx::throws">throws</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology16get_cpubind_maskERNSt6threadER10error_code" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology17cpuset_to_nodesetE14mask_cref_type">
+<span id="_CPPv3NK3hpx7threads8topology17cpuset_to_nodesetE14mask_cref_type"></span><span id="_CPPv2NK3hpx7threads8topology17cpuset_to_nodesetE14mask_cref_type"></span><span id="hpx::threads::topology::cpuset_to_nodeset__mask_cref_typeC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a8977c9a1f034b329efbf3bae0955c28c"></span><a class="reference internal" href="#_CPPv4N3hpx7threads16hwloc_bitmap_ptrE" title="hpx::threads::hwloc_bitmap_ptr">hwloc_bitmap_ptr</a> <code class="sig-name descname">cpuset_to_nodeset</code><span class="sig-paren">(</span>mask_cref_type <em>cpuset</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology17cpuset_to_nodesetE14mask_cref_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>convert a cpu mask into a numa node mask in hwloc bitmap form </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology12write_to_logEv">
+<span id="_CPPv3NK3hpx7threads8topology12write_to_logEv"></span><span id="_CPPv2NK3hpx7threads8topology12write_to_logEv"></span><span id="hpx::threads::topology::write_to_logC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a2ac517ebcec8d23c0a625a777b240399"></span>void <code class="sig-name descname">write_to_log</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology12write_to_logEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology8allocateENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology8allocateENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology8allocateENSt6size_tE"></span><span id="hpx::threads::topology::allocate__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ac30338b16e01abba2e75f3d32f07ff2d"></span>void *<code class="sig-name descname">allocate</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>len</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology8allocateENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This is equivalent to malloc(), except that it tries to allocate page-aligned memory from the OS. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology16allocate_membindENSt6size_tE16hwloc_bitmap_ptr24hpx_hwloc_membind_policyi">
+<span id="_CPPv3NK3hpx7threads8topology16allocate_membindENSt6size_tE16hwloc_bitmap_ptr24hpx_hwloc_membind_policyi"></span><span id="_CPPv2NK3hpx7threads8topology16allocate_membindENSt6size_tE16hwloc_bitmap_ptr24hpx_hwloc_membind_policyi"></span><span id="hpx::threads::topology::allocate_membind__std::s.hwloc_bitmap_ptr.hpx_hwloc_membind_policy.iC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a9fd4e2b15b96c577513398a9a7825302"></span>void *<code class="sig-name descname">allocate_membind</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>len</em>, <a class="reference internal" href="#_CPPv4N3hpx7threads16hwloc_bitmap_ptrE" title="hpx::threads::hwloc_bitmap_ptr">hwloc_bitmap_ptr</a> <em>bitmap</em>, <a class="reference internal" href="#_CPPv4N3hpx7threads24hpx_hwloc_membind_policyE" title="hpx::threads::hpx_hwloc_membind_policy">hpx_hwloc_membind_policy</a> <em>policy</em>, int <em>flags</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology16allocate_membindENSt6size_tE16hwloc_bitmap_ptr24hpx_hwloc_membind_policyi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>allocate memory with binding to a numa node set as specified by the policy and flags (see hwloc docs) </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology24get_area_membind_nodesetEPKvNSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology24get_area_membind_nodesetEPKvNSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology24get_area_membind_nodesetEPKvNSt6size_tE"></span><span id="hpx::threads::topology::get_area_membind_nodeset__voidCP.std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a0e3955e652f93176056f089367caa498"></span><a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::mask_type <code class="sig-name descname">get_area_membind_nodeset</code><span class="sig-paren">(</span><em class="property">const</em> void *<em>addr</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>len</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology24get_area_membind_nodesetEPKvNSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology24set_area_membind_nodesetEPKvNSt6size_tEPv">
+<span id="_CPPv3NK3hpx7threads8topology24set_area_membind_nodesetEPKvNSt6size_tEPv"></span><span id="_CPPv2NK3hpx7threads8topology24set_area_membind_nodesetEPKvNSt6size_tEPv"></span><span id="hpx::threads::topology::set_area_membind_nodeset__voidCP.std::s.voidPC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ac0dbae38f2c50decc3c19b31031e22e5"></span>bool <code class="sig-name descname">set_area_membind_nodeset</code><span class="sig-paren">(</span><em class="property">const</em> void *<em>addr</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>len</em>, void *<em>nodeset</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology24set_area_membind_nodesetEPKvNSt6size_tEPv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology15get_numa_domainEPKv">
+<span id="_CPPv3NK3hpx7threads8topology15get_numa_domainEPKv"></span><span id="_CPPv2NK3hpx7threads8topology15get_numa_domainEPKv"></span><span id="hpx::threads::topology::get_numa_domain__voidCPC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a12fe62e177c50e0329f875ad73ad1ae7"></span>int <code class="sig-name descname">get_numa_domain</code><span class="sig-paren">(</span><em class="property">const</em> void *<em>addr</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology15get_numa_domainEPKv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology10deallocateEPvNSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology10deallocateEPvNSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology10deallocateEPvNSt6size_tE"></span><span id="hpx::threads::topology::deallocate__voidP.std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1af829f0d496fb508d56881130add4357e"></span>void <code class="sig-name descname">deallocate</code><span class="sig-paren">(</span>void *<em>addr</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>len</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology10deallocateEPvNSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Free memory that was previously allocated by allocate. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology12print_vectorERNSt7ostreamERKNSt6vectorINSt6size_tEEE">
+<span id="_CPPv3NK3hpx7threads8topology12print_vectorERNSt7ostreamERKNSt6vectorINSt6size_tEEE"></span><span id="_CPPv2NK3hpx7threads8topology12print_vectorERNSt7ostreamERKNSt6vectorINSt6size_tEEE"></span><span id="hpx::threads::topology::print_vector__osR.std::vector:std::s:CRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ac844636c4ac225a95a96e27da6bf2531"></span>void <code class="sig-name descname">print_vector</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<em>os</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t&gt; <em class="property">const</em> &amp;<em>v</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology12print_vectorERNSt7ostreamERKNSt6vectorINSt6size_tEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology17print_mask_vectorERNSt7ostreamERKNSt6vectorI9mask_typeEE">
+<span id="_CPPv3NK3hpx7threads8topology17print_mask_vectorERNSt7ostreamERKNSt6vectorI9mask_typeEE"></span><span id="_CPPv2NK3hpx7threads8topology17print_mask_vectorERNSt7ostreamERKNSt6vectorI9mask_typeEE"></span><span id="hpx::threads::topology::print_mask_vector__osR.std::vector:mask_type:CRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a3081513fbdca3be3325c92552c3e910e"></span>void <code class="sig-name descname">print_mask_vector</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<em>os</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;mask_type&gt; <em class="property">const</em> &amp;<em>v</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology17print_mask_vectorERNSt7ostreamERKNSt6vectorI9mask_typeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology11print_hwlocERNSt7ostreamE">
+<span id="_CPPv3NK3hpx7threads8topology11print_hwlocERNSt7ostreamE"></span><span id="_CPPv2NK3hpx7threads8topology11print_hwlocERNSt7ostreamE"></span><span id="hpx::threads::topology::print_hwloc__osRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ae4ed70873782cb1cd7cd2d586755a66b"></span>void <code class="sig-name descname">print_hwloc</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream&amp;<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology11print_hwlocERNSt7ostreamE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology37init_socket_affinity_mask_from_socketENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology37init_socket_affinity_mask_from_socketENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology37init_socket_affinity_mask_from_socketENSt6size_tE"></span><span id="hpx::threads::topology::init_socket_affinity_mask_from_socket__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a7d2e55d67f471c01f57ae55fd73f20a9"></span>mask_type <code class="sig-name descname">init_socket_affinity_mask_from_socket</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_socket</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology37init_socket_affinity_mask_from_socketENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology43init_numa_node_affinity_mask_from_numa_nodeENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology43init_numa_node_affinity_mask_from_numa_nodeENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology43init_numa_node_affinity_mask_from_numa_nodeENSt6size_tE"></span><span id="hpx::threads::topology::init_numa_node_affinity_mask_from_numa_node__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a3738f6db8f49967f1b199da555ecfe53"></span>mask_type <code class="sig-name descname">init_numa_node_affinity_mask_from_numa_node</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_numa_node</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology43init_numa_node_affinity_mask_from_numa_nodeENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology33init_core_affinity_mask_from_coreENSt6size_tE14mask_cref_type">
+<span id="_CPPv3NK3hpx7threads8topology33init_core_affinity_mask_from_coreENSt6size_tE14mask_cref_type"></span><span id="_CPPv2NK3hpx7threads8topology33init_core_affinity_mask_from_coreENSt6size_tE14mask_cref_type"></span><span id="hpx::threads::topology::init_core_affinity_mask_from_core__std::s.mask_cref_typeC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ad13d877640640775325e6f78d7f94618"></span>mask_type <code class="sig-name descname">init_core_affinity_mask_from_core</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_core</em>, mask_cref_type <em>default_mask</em> = <a class="reference internal" href="#_CPPv4N3hpx7threads8topology10empty_maskE" title="hpx::threads::topology::empty_mask">empty_mask</a><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology33init_core_affinity_mask_from_coreENSt6size_tE14mask_cref_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology25init_thread_affinity_maskENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology25init_thread_affinity_maskENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology25init_thread_affinity_maskENSt6size_tE"></span><span id="hpx::threads::topology::init_thread_affinity_mask__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a5a0c7567120d45c880faae553c089e05"></span>mask_type <code class="sig-name descname">init_thread_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology25init_thread_affinity_maskENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology25init_thread_affinity_maskENSt6size_tENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology25init_thread_affinity_maskENSt6size_tENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology25init_thread_affinity_maskENSt6size_tENSt6size_tE"></span><span id="hpx::threads::topology::init_thread_affinity_mask__std::s.std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a2816018d0de56d06c46b8ad11282bd50"></span>mask_type <code class="sig-name descname">init_thread_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_core</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_pu</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology25init_thread_affinity_maskENSt6size_tENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology14mask_to_bitmapE14mask_cref_type16hwloc_obj_type_t">
+<span id="_CPPv3NK3hpx7threads8topology14mask_to_bitmapE14mask_cref_type16hwloc_obj_type_t"></span><span id="_CPPv2NK3hpx7threads8topology14mask_to_bitmapE14mask_cref_type16hwloc_obj_type_t"></span><span id="hpx::threads::topology::mask_to_bitmap__mask_cref_type.hwloc_obj_type_tC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a4ad550c846ba9ec3e55650b8f060df31"></span>hwloc_bitmap_t <code class="sig-name descname">mask_to_bitmap</code><span class="sig-paren">(</span>mask_cref_type <em>mask</em>, hwloc_obj_type_t <em>htype</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology14mask_to_bitmapE14mask_cref_type16hwloc_obj_type_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology14bitmap_to_maskE14hwloc_bitmap_t16hwloc_obj_type_t">
+<span id="_CPPv3NK3hpx7threads8topology14bitmap_to_maskE14hwloc_bitmap_t16hwloc_obj_type_t"></span><span id="_CPPv2NK3hpx7threads8topology14bitmap_to_maskE14hwloc_bitmap_t16hwloc_obj_type_t"></span><span id="hpx::threads::topology::bitmap_to_mask__hwloc_bitmap_t.hwloc_obj_type_tC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a355af363ed290f7310f75fbeabdfe08b"></span>mask_type <code class="sig-name descname">bitmap_to_mask</code><span class="sig-paren">(</span>hwloc_bitmap_t <em>bitmap</em>, hwloc_obj_type_t <em>htype</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology14bitmap_to_maskE14hwloc_bitmap_t16hwloc_obj_type_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads8topology10mutex_typeE">
+<span id="_CPPv3N3hpx7threads8topology10mutex_typeE"></span><span id="_CPPv2N3hpx7threads8topology10mutex_typeE"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a786c208670738086742f5ee33c1d724f"></span><em class="property">using </em><code class="sig-name descname">mutex_type</code> = <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../concurrency/api.html#_CPPv4N3hpx4util8spinlockE" title="hpx::util::spinlock">spinlock</a><a class="headerlink" href="#_CPPv4N3hpx7threads8topology10mutex_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads8topology16init_node_numberENSt6size_tE16hwloc_obj_type_t">
+<span id="_CPPv3N3hpx7threads8topology16init_node_numberENSt6size_tE16hwloc_obj_type_t"></span><span id="_CPPv2N3hpx7threads8topology16init_node_numberENSt6size_tE16hwloc_obj_type_t"></span><span id="hpx::threads::topology::init_node_number__std::s.hwloc_obj_type_t"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a5a9e4c3f39820d979ba4e59d6e5ae71b"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">init_node_number</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em>, hwloc_obj_type_t <em>type</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads8topology16init_node_numberENSt6size_tE16hwloc_obj_type_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads8topology18init_socket_numberENSt6size_tE">
+<span id="_CPPv3N3hpx7threads8topology18init_socket_numberENSt6size_tE"></span><span id="_CPPv2N3hpx7threads8topology18init_socket_numberENSt6size_tE"></span><span id="hpx::threads::topology::init_socket_number__std::s"></span><span class="target" id="structhpx_1_1threads_1_1topology_1aa755c9a208b5a6f83f7ed765e40acea7"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">init_socket_number</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads8topology18init_socket_numberENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads8topology21init_numa_node_numberENSt6size_tE">
+<span id="_CPPv3N3hpx7threads8topology21init_numa_node_numberENSt6size_tE"></span><span id="_CPPv2N3hpx7threads8topology21init_numa_node_numberENSt6size_tE"></span><span id="hpx::threads::topology::init_numa_node_number__std::s"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ac78d4e77f8d998edcbfd03f56cb6f1c6"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">init_numa_node_number</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads8topology21init_numa_node_numberENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads8topology16init_core_numberENSt6size_tE">
+<span id="_CPPv3N3hpx7threads8topology16init_core_numberENSt6size_tE"></span><span id="_CPPv2N3hpx7threads8topology16init_core_numberENSt6size_tE"></span><span id="hpx::threads::topology::init_core_number__std::s"></span><span class="target" id="structhpx_1_1threads_1_1topology_1abd98d2af19aad52dd4c86c7ffb38bfc9"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">init_core_number</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads8topology16init_core_numberENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology17extract_node_maskE11hwloc_obj_tR9mask_type">
+<span id="_CPPv3NK3hpx7threads8topology17extract_node_maskE11hwloc_obj_tR9mask_type"></span><span id="_CPPv2NK3hpx7threads8topology17extract_node_maskE11hwloc_obj_tR9mask_type"></span><span id="hpx::threads::topology::extract_node_mask__hwloc_obj_t.mask_typeRC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1af85ab6c8c67d3370b1a161211ecef40c"></span>void <code class="sig-name descname">extract_node_mask</code><span class="sig-paren">(</span>hwloc_obj_t <em>parent</em>, mask_type &amp;<em>mask</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology17extract_node_maskE11hwloc_obj_tR9mask_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology18extract_node_countE11hwloc_obj_t16hwloc_obj_type_tNSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology18extract_node_countE11hwloc_obj_t16hwloc_obj_type_tNSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology18extract_node_countE11hwloc_obj_t16hwloc_obj_type_tNSt6size_tE"></span><span id="hpx::threads::topology::extract_node_count__hwloc_obj_t.hwloc_obj_type_t.std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a88ecb35ec33b99828881023f0c70bac8"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">extract_node_count</code><span class="sig-paren">(</span>hwloc_obj_t <em>parent</em>, hwloc_obj_type_t <em>type</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>count</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology18extract_node_countE11hwloc_obj_t16hwloc_obj_type_tNSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology26init_machine_affinity_maskEv">
+<span id="_CPPv3NK3hpx7threads8topology26init_machine_affinity_maskEv"></span><span id="_CPPv2NK3hpx7threads8topology26init_machine_affinity_maskEv"></span><span id="hpx::threads::topology::init_machine_affinity_maskC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a72ba2f8fead36d97b8a1a08e48a301f5"></span>mask_type <code class="sig-name descname">init_machine_affinity_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology26init_machine_affinity_maskEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology25init_socket_affinity_maskENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology25init_socket_affinity_maskENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology25init_socket_affinity_maskENSt6size_tE"></span><span id="hpx::threads::topology::init_socket_affinity_mask__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1aadf587315f4fbf2e8648ee6bf89a1353"></span>mask_type <code class="sig-name descname">init_socket_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology25init_socket_affinity_maskENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology28init_numa_node_affinity_maskENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology28init_numa_node_affinity_maskENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology28init_numa_node_affinity_maskENSt6size_tE"></span><span id="hpx::threads::topology::init_numa_node_affinity_mask__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a91244c3207273ff03161a97db38a2b83"></span>mask_type <code class="sig-name descname">init_numa_node_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology28init_numa_node_affinity_maskENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads8topology23init_core_affinity_maskENSt6size_tE">
+<span id="_CPPv3NK3hpx7threads8topology23init_core_affinity_maskENSt6size_tE"></span><span id="_CPPv2NK3hpx7threads8topology23init_core_affinity_maskENSt6size_tE"></span><span id="hpx::threads::topology::init_core_affinity_mask__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a316db0c99cdf530b38fa945d8cc0a930"></span>mask_type <code class="sig-name descname">init_core_affinity_mask</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_thread</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads8topology23init_core_affinity_maskENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads8topology15init_num_of_pusEv">
+<span id="_CPPv3N3hpx7threads8topology15init_num_of_pusEv"></span><span id="_CPPv2N3hpx7threads8topology15init_num_of_pusEv"></span><span id="hpx::threads::topology::init_num_of_pus"></span><span class="target" id="structhpx_1_1threads_1_1topology_1af577a5084be29830e23aa030619da25f"></span>void <code class="sig-name descname">init_num_of_pus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads8topology15init_num_of_pusEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology4topoE">
+<span id="_CPPv3N3hpx7threads8topology4topoE"></span><span id="_CPPv2N3hpx7threads8topology4topoE"></span><span id="hpx::threads::topology::topo__hwloc_topology_t"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ae40c77484b6970d9dea7ba551e2bb1ee"></span>hwloc_topology_t <code class="sig-name descname">topo</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology4topoE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology11num_of_pus_E">
+<span id="_CPPv3N3hpx7threads8topology11num_of_pus_E"></span><span id="_CPPv2N3hpx7threads8topology11num_of_pus_E"></span><span id="hpx::threads::topology::num_of_pus___std::s"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ae3b2e43416ba0ef73ab36f58de7eaf30"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_of_pus_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology11num_of_pus_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology8topo_mtxE">
+<span id="_CPPv3N3hpx7threads8topology8topo_mtxE"></span><span id="_CPPv2N3hpx7threads8topology8topo_mtxE"></span><span id="hpx::threads::topology::topo_mtx__mutex_type"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a2cd893c09f122fdb1350290eed92608b"></span><a class="reference internal" href="#_CPPv4N3hpx7threads8topology10mutex_typeE" title="hpx::threads::topology::mutex_type">mutex_type</a> <code class="sig-name descname">topo_mtx</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology8topo_mtxE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology15socket_numbers_E">
+<span id="_CPPv3N3hpx7threads8topology15socket_numbers_E"></span><span id="_CPPv2N3hpx7threads8topology15socket_numbers_E"></span><span id="hpx::threads::topology::socket_numbers___std::vector:std::s:"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a54c0bde87d70b8ed6d312d35996884c4"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t&gt; <code class="sig-name descname">socket_numbers_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology15socket_numbers_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology18numa_node_numbers_E">
+<span id="_CPPv3N3hpx7threads8topology18numa_node_numbers_E"></span><span id="_CPPv2N3hpx7threads8topology18numa_node_numbers_E"></span><span id="hpx::threads::topology::numa_node_numbers___std::vector:std::s:"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a33f0a5462f46ed0bc742cadf2f5fe509"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t&gt; <code class="sig-name descname">numa_node_numbers_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology18numa_node_numbers_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology13core_numbers_E">
+<span id="_CPPv3N3hpx7threads8topology13core_numbers_E"></span><span id="_CPPv2N3hpx7threads8topology13core_numbers_E"></span><span id="hpx::threads::topology::core_numbers___std::vector:std::s:"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a09f9d6aa8a2111bc694a1ab0f53fabdd"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t&gt; <code class="sig-name descname">core_numbers_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology13core_numbers_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology22machine_affinity_mask_E">
+<span id="_CPPv3N3hpx7threads8topology22machine_affinity_mask_E"></span><span id="_CPPv2N3hpx7threads8topology22machine_affinity_mask_E"></span><span id="hpx::threads::topology::machine_affinity_mask___mask_type"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ac1a7045655f97eb61a8cc9de207ff63d"></span>mask_type <code class="sig-name descname">machine_affinity_mask_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology22machine_affinity_mask_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology22socket_affinity_masks_E">
+<span id="_CPPv3N3hpx7threads8topology22socket_affinity_masks_E"></span><span id="_CPPv2N3hpx7threads8topology22socket_affinity_masks_E"></span><span id="hpx::threads::topology::socket_affinity_masks___std::vector:mask_type:"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a0ba87c1a996e445fe39db70c285e8ef5"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;mask_type&gt; <code class="sig-name descname">socket_affinity_masks_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology22socket_affinity_masks_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology25numa_node_affinity_masks_E">
+<span id="_CPPv3N3hpx7threads8topology25numa_node_affinity_masks_E"></span><span id="_CPPv2N3hpx7threads8topology25numa_node_affinity_masks_E"></span><span id="hpx::threads::topology::numa_node_affinity_masks___std::vector:mask_type:"></span><span class="target" id="structhpx_1_1threads_1_1topology_1af02c1489e78df7440e9b99937d679224"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;mask_type&gt; <code class="sig-name descname">numa_node_affinity_masks_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology25numa_node_affinity_masks_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology20core_affinity_masks_E">
+<span id="_CPPv3N3hpx7threads8topology20core_affinity_masks_E"></span><span id="_CPPv2N3hpx7threads8topology20core_affinity_masks_E"></span><span id="hpx::threads::topology::core_affinity_masks___std::vector:mask_type:"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a3144e3f10b5272651243361d9a3880d3"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;mask_type&gt; <code class="sig-name descname">core_affinity_masks_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology20core_affinity_masks_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology22thread_affinity_masks_E">
+<span id="_CPPv3N3hpx7threads8topology22thread_affinity_masks_E"></span><span id="_CPPv2N3hpx7threads8topology22thread_affinity_masks_E"></span><span id="hpx::threads::topology::thread_affinity_masks___std::vector:mask_type:"></span><span class="target" id="structhpx_1_1threads_1_1topology_1aaa9b407f26d33439026cd2b40f6b752d"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;mask_type&gt; <code class="sig-name descname">thread_affinity_masks_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology22thread_affinity_masks_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Static Attributes</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology10empty_maskE">
+<span id="_CPPv3N3hpx7threads8topology10empty_maskE"></span><span id="_CPPv2N3hpx7threads8topology10empty_maskE"></span><span id="hpx::threads::topology::empty_mask__mask_type"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ab102572675687725f03644245bd6de9f"></span>mask_type <code class="sig-name descname">empty_mask</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology10empty_maskE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology17memory_page_size_E">
+<span id="_CPPv3N3hpx7threads8topology17memory_page_size_E"></span><span id="_CPPv2N3hpx7threads8topology17memory_page_size_E"></span><span id="hpx::threads::topology::memory_page_size___std::s"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a1c9166acec26c0a06222ecc17b71efe4"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">memory_page_size_</code><a class="headerlink" href="#_CPPv4N3hpx7threads8topology17memory_page_size_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology9pu_offsetE">
+<span id="_CPPv3N3hpx7threads8topology9pu_offsetE"></span><span id="_CPPv2N3hpx7threads8topology9pu_offsetE"></span><span id="hpx::threads::topology::pu_offset__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1ae50b3c2cc0a6bb70acd24a5f53c2ce4b"></span><em class="property">const</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">pu_offset</code> = 0<a class="headerlink" href="#_CPPv4N3hpx7threads8topology9pu_offsetE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads8topology11core_offsetE">
+<span id="_CPPv3N3hpx7threads8topology11core_offsetE"></span><span id="_CPPv2N3hpx7threads8topology11core_offsetE"></span><span id="hpx::threads::topology::core_offset__std::sC"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a69c2afd1a1771750597fd48168f8687c"></span><em class="property">const</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">core_offset</code> = 0<a class="headerlink" href="#_CPPv4N3hpx7threads8topology11core_offsetE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt id="_CPPv420get_memory_page_sizev">
+<span id="_CPPv320get_memory_page_sizev"></span><span id="_CPPv220get_memory_page_sizev"></span><span id="get_memory_page_size"></span><span class="target" id="structhpx_1_1threads_1_1topology_1a7fb95bcf8d10facb7ab641755253ccd1"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_memory_page_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420get_memory_page_sizev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-topology-cpu-mask-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/topology/cpu_mask.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-topology-cpu-mask-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../filesystem/api.html" class="btn btn-neutral float-right" title="filesystem" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../local_lcos/api.html" class="btn btn-neutral float-left" title="local_lcos" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,454 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>assertion &mdash; HPX stable documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="parallel_executors" href="../parallel_executors/api.html" />
+    <link rel="prev" title="cache" href="../cache/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                stable
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">assertion</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-assert-hpp"><cite>#include &lt;compatibility/hpx/util/assert.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-assertion-hpp"><cite>#include &lt;hpx/assertion.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-assertion-force-linking-hpp"><cite>#include &lt;hpx/assertion/force_linking.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-assertion-evaluate-assert-hpp"><cite>#include &lt;hpx/assertion/evaluate_assert.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-assertion-source-location-hpp"><cite>#include &lt;hpx/assertion/source_location.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-assertion-current-function-hpp"><cite>#include &lt;hpx/assertion/current_function.hpp&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../parallel_executors/api.html">parallel_executors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>assertion</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/assertion/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="assertion">
+<h1>assertion<a class="headerlink" href="#assertion" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-compatibility-hpx-util-assert-hpp">
+<h2><cite>#include &lt;compatibility/hpx/util/assert.hpp&gt;</cite><a class="headerlink" href="#include-compatibility-hpx-util-assert-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-assertion-hpp">
+<h2><cite>#include &lt;hpx/assertion.hpp&gt;</cite><a class="headerlink" href="#include-hpx-assertion-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_ASSERT">
+<span class="target" id="assertion_8hpp_1a8d1e72f13bfab6a86ea41d879f6ce8c1"></span><code class="descname">HPX_ASSERT</code><span class="sig-paren">(</span>expr<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_ASSERT" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro asserts that <em>expr</em> evaluates to true. </p>
+<p><p>If </p>
+<em>expr</em> evaluates to false, The source location and <em>msg</em> is being printed along with the expression and additional. Afterwards the program is being aborted. The assertion handler can be costumized by calling <em>hpx::assertion::set_assertion_handler()</em>.<dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The expression to assert on. This can either be an expression that’s convertible to bool or a callable which returns bool </li>
+<li><code class="docutils literal notranslate"><span class="pre">msg</span></code>: The optional message that is used to give further information if the assert fails. This should be convertible to a std::string</li>
+</ul>
+</dd>
+</dl>
+</p>
+<p>Asserts are enabled if <em>HPX_DEBUG</em> is set. This is the default for <code class="docutils literal notranslate"><span class="pre">CMAKE_BUILD_TYPE=Debug</span></code> </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_ASSERT_MSG">
+<span class="target" id="assertion_8hpp_1a0bbe59f13315213a1d1dd0b45483f791"></span><code class="descname">HPX_ASSERT_MSG</code><span class="sig-paren">(</span>expr, msg<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_ASSERT_MSG" title="Permalink to this definition">¶</a></dt>
+<dd><p><dl class="docutils">
+<dt><strong>See</strong></dt>
+<dd>HPX_ASSERT </dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx9assertionE">
+<span id="_CPPv3N3hpx9assertionE"></span><span id="_CPPv2N3hpx9assertionE"></span><span id="hpx::assertion"></span><span class="target" id="namespacehpx_1_1assertion"></span><em class="property">namespace </em><code class="descname">assertion</code><a class="headerlink" href="#_CPPv4N3hpx9assertionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx9assertion17assertion_handlerE">
+<span id="_CPPv3N3hpx9assertion17assertion_handlerE"></span><span id="_CPPv2N3hpx9assertion17assertion_handlerE"></span><span class="target" id="assertion_8hpp_1af6d210c01c4e2706fd331f0074e8beb5"></span><em class="property">using </em><code class="descname">assertion_handler</code> = void (*)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx9assertion15source_locationE" title="hpx::assertion::source_location">source_location</a> <em class="property">const</em> &amp;loc, <em class="property">const</em> char *expr, <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;msg<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx9assertion17assertion_handlerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The signature for an assertion handler. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx9assertion21set_assertion_handlerE17assertion_handler">
+<span id="_CPPv3N3hpx9assertion21set_assertion_handlerE17assertion_handler"></span><span id="_CPPv2N3hpx9assertion21set_assertion_handlerE17assertion_handler"></span><span id="hpx::assertion::set_assertion_handler__assertion_handler"></span><span class="target" id="assertion_8hpp_1a9a87ef3d53009656d30509726d1f70ec"></span>void <code class="descname">set_assertion_handler</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx9assertion17assertion_handlerE" title="hpx::assertion::assertion_handler">assertion_handler</a> <em>handler</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx9assertion21set_assertion_handlerE17assertion_handler" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Set the assertion handler to be used within a program. If the handler has been set already once, the call to this function will be ignored. <dl class="docutils">
+<dt><strong>Note</strong></dt>
+<dd>This function is not thread safe </dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-assertion-force-linking-hpp">
+<h2><cite>#include &lt;hpx/assertion/force_linking.hpp&gt;</cite><a class="headerlink" href="#include-hpx-assertion-force-linking-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx9assertionE">
+<span id="_CPPv3N3hpx9assertionE"></span><span id="_CPPv2N3hpx9assertionE"></span><span class="target" id="namespacehpx_1_1assertion"></span><em class="property">namespace </em><code class="descname">assertion</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx9assertion13force_linkingEv">
+<span id="_CPPv3N3hpx9assertion13force_linkingEv"></span><span id="_CPPv2N3hpx9assertion13force_linkingEv"></span><span id="hpx::assertion::force_linking"></span><span class="target" id="force__linking_8hpp_1af29ecf0182739d8ec694623bec95af6a"></span><a class="reference internal" href="#_CPPv4N3hpx9assertion20force_linking_helperE" title="hpx::assertion::force_linking_helper">force_linking_helper</a> &amp;<code class="descname">force_linking</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx9assertion13force_linkingEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx9assertion20force_linking_helperE">
+<span id="_CPPv3N3hpx9assertion20force_linking_helperE"></span><span id="_CPPv2N3hpx9assertion20force_linking_helperE"></span><span id="hpx::assertion::force_linking_helper"></span><span class="target" id="structhpx_1_1assertion_1_1force__linking__helper"></span><em class="property">struct </em><code class="descname">force_linking_helper</code><a class="headerlink" href="#_CPPv4N3hpx9assertion20force_linking_helperE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx9assertion20force_linking_helper13handle_assertE">
+<span id="_CPPv3N3hpx9assertion20force_linking_helper13handle_assertE"></span><span id="_CPPv2N3hpx9assertion20force_linking_helper13handle_assertE"></span><span class="target" id="structhpx_1_1assertion_1_1force__linking__helper_1afe962113aeecdd857011c888b335e566"></span>void (*<code class="descname">handle_assert</code>)<span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx9assertion15source_locationE" title="hpx::assertion::source_location">source_location</a> <em class="property">const</em>&amp;, <em class="property">const</em> char *, <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx9assertion20force_linking_helper13handle_assertE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-assertion-evaluate-assert-hpp">
+<h2><cite>#include &lt;hpx/assertion/evaluate_assert.hpp&gt;</cite><a class="headerlink" href="#include-hpx-assertion-evaluate-assert-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-assertion-source-location-hpp">
+<h2><cite>#include &lt;hpx/assertion/source_location.hpp&gt;</cite><a class="headerlink" href="#include-hpx-assertion-source-location-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx9assertionE">
+<span id="_CPPv3N3hpx9assertionE"></span><span class="target" id="namespacehpx_1_1assertion"></span><em class="property">namespace </em><code class="descname">assertion</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx9assertionlsERNSt7ostreamERK15source_location">
+<span id="_CPPv3N3hpx9assertionlsERNSt7ostreamERK15source_location"></span><span id="_CPPv2N3hpx9assertionlsERNSt7ostreamERK15source_location"></span><span id="hpx::assertion::lshift-operator__osR.source_locationCR"></span><span class="target" id="source__location_8hpp_1acc3983f20c71225cc74c0564531d3d43"></span><a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::ostream &amp;<code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span><a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::ostream &amp;<em>os</em>, <a class="reference internal" href="#_CPPv4N3hpx9assertion15source_locationE" title="hpx::assertion::source_location">source_location</a> <em class="property">const</em> &amp;<em>loc</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx9assertionlsERNSt7ostreamERK15source_location" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx9assertion15source_locationE">
+<span id="_CPPv3N3hpx9assertion15source_locationE"></span><span id="_CPPv2N3hpx9assertion15source_locationE"></span><span id="hpx::assertion::source_location"></span><span class="target" id="structhpx_1_1assertion_1_1source__location"></span><em class="property">struct </em><code class="descname">source_location</code><a class="headerlink" href="#_CPPv4N3hpx9assertion15source_locationE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;source_location.hpp&gt;</em><p>This contains the location information where <em>HPX_ASSERT</em> has been called </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx9assertion15source_location9file_nameE">
+<span id="_CPPv3N3hpx9assertion15source_location9file_nameE"></span><span id="_CPPv2N3hpx9assertion15source_location9file_nameE"></span><span id="hpx::assertion::source_location::file_name__cCP"></span><span class="target" id="structhpx_1_1assertion_1_1source__location_1a5deb5f759b1758a0405484d7a5205e0c"></span><em class="property">const</em> char *<code class="descname">file_name</code><a class="headerlink" href="#_CPPv4N3hpx9assertion15source_location9file_nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx9assertion15source_location11line_numberE">
+<span id="_CPPv3N3hpx9assertion15source_location11line_numberE"></span><span id="_CPPv2N3hpx9assertion15source_location11line_numberE"></span><span id="hpx::assertion::source_location::line_number__unsigned"></span><span class="target" id="structhpx_1_1assertion_1_1source__location_1a8747c3cd285e4336f4b0fb6f779699b2"></span>unsigned <code class="descname">line_number</code><a class="headerlink" href="#_CPPv4N3hpx9assertion15source_location11line_numberE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx9assertion15source_location13function_nameE">
+<span id="_CPPv3N3hpx9assertion15source_location13function_nameE"></span><span id="_CPPv2N3hpx9assertion15source_location13function_nameE"></span><span id="hpx::assertion::source_location::function_name__cCP"></span><span class="target" id="structhpx_1_1assertion_1_1source__location_1ae073ed87ace9350aaf82528341f9f429"></span><em class="property">const</em> char *<code class="descname">function_name</code><a class="headerlink" href="#_CPPv4N3hpx9assertion15source_location13function_nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-assertion-current-function-hpp">
+<h2><cite>#include &lt;hpx/assertion/current_function.hpp&gt;</cite><a class="headerlink" href="#include-hpx-assertion-current-function-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_ASSERT_CURRENT_FUNCTION">
+<span class="target" id="current__function_8hpp_1abdb1c8723972df5c50059a81608c2490"></span><code class="descname">HPX_ASSERT_CURRENT_FUNCTION</code><a class="headerlink" href="#c.HPX_ASSERT_CURRENT_FUNCTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../parallel_executors/api.html" class="btn btn-neutral float-right" title="parallel_executors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../cache/api.html" class="btn btn-neutral float-left" title="cache" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>966745e</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

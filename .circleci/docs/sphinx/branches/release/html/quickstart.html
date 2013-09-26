@@ -1,0 +1,641 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Quick start &mdash; HPX release documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Terminology" href="terminology.html" />
+    <link rel="prev" title="Why HPX?" href="why_hpx.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                release
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-hpx">Getting <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hpx-dependencies"><em>HPX</em> dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-hpx">Building <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hello-world">Hello, World!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-task-based-applications">Writing task-based applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Quick start</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/quickstart.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="quick-start">
+<span id="quickstart"></span><h1>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<p>This section is intended to get you to the point of running a basic <em>HPX</em>
+program as quickly as possible. To that end we skip many details but instead
+give you hints and links to more details along the way.</p>
+<p>We assume that you are on a Unix system with access to reasonably recent
+packages. You should have <code class="docutils literal notranslate"><span class="pre">cmake</span></code> and <code class="docutils literal notranslate"><span class="pre">make</span></code> available for the build system
+(<code class="docutils literal notranslate"><span class="pre">pkg-config</span></code> is also supported, see <a class="reference internal" href="manual/creating_hpx_projects.html#pkgconfig"><span class="std std-ref">Using HPX with pkg-config</span></a>).</p>
+<div class="section" id="getting-hpx">
+<h2>Getting <em>HPX</em><a class="headerlink" href="#getting-hpx" title="Permalink to this headline">¶</a></h2>
+<p>Download a tarball of the latest release from <a class="reference external" href="https://stellar-group.org/downloads/"><em>HPX</em> Downloads</a> and
+unpack it or clone the repository directly using <code class="docutils literal notranslate"><span class="pre">git</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/STEllAR-GROUP/hpx.git
+</pre></div>
+</div>
+<p>It is also recommended that you check out the latest stable tag:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git checkout <span class="m">1</span>.4.0
+</pre></div>
+</div>
+</div>
+<div class="section" id="hpx-dependencies">
+<h2><em>HPX</em> dependencies<a class="headerlink" href="#hpx-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>The minimum dependencies needed to use <em>HPX</em> are <a class="reference external" href="https://www.boost.org/">Boost</a> and <a class="reference external" href="https://www.open-mpi.org/projects/hwloc/">Portable Hardware Locality (HWLOC)</a>. If these
+are not available through your system package manager, see
+<a class="reference internal" href="manual/building_hpx.html#boost-installation"><span class="std std-ref">Installing Boost</span></a> and <a class="reference internal" href="manual/building_hpx.html#hwloc-installation"><span class="std std-ref">Installing Hwloc</span></a> for instructions on how
+to build them yourself. In addition to <a class="reference external" href="https://www.boost.org/">Boost</a> and <a class="reference external" href="https://www.open-mpi.org/projects/hwloc/">Portable Hardware Locality (HWLOC)</a>, it is recommended
+that you don’t use the system allocator, but instead use either <code class="docutils literal notranslate"><span class="pre">tcmalloc</span></code>
+from <a class="reference external" href="https://code.google.com/p/gperftools">google-perftools</a> (default) or <a class="reference external" href="http://jemalloc.net">jemalloc</a> for better performance. If you
+would like to try <em>HPX</em> without a custom allocator at this point you can
+configure <em>HPX</em> to use the system allocator in the next step.</p>
+<p>A full list of required and optional dependencies, including recommended
+versions is available at <a class="reference internal" href="manual/building_hpx.html#prerequisites"><span class="std std-ref">Prerequisites</span></a>.</p>
+</div>
+<div class="section" id="building-hpx">
+<h2>Building <em>HPX</em><a class="headerlink" href="#building-hpx" title="Permalink to this headline">¶</a></h2>
+<p>Once you have the source code and the dependencies, set up a separate build
+directory and configure the project. Assuming all your dependencies are in paths
+known to CMake, the following gets you started:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># In the HPX source directory</span>
+mkdir build <span class="o">&amp;&amp;</span> <span class="nb">cd</span> build
+cmake -DCMAKE_INSTALL_PREFIX<span class="o">=</span>/install/path ..
+make install
+</pre></div>
+</div>
+<p>This will build the core <em>HPX</em> libraries and examples, and install them to your
+chosen location. If you want to install <em>HPX</em> to system folders simply leave out
+the <code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code> option. This may take a while. To speed up the
+process launch more jobs by passing the <code class="docutils literal notranslate"><span class="pre">-jN</span></code> option to <code class="docutils literal notranslate"><span class="pre">make</span></code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Do not set only <code class="docutils literal notranslate"><span class="pre">-j</span></code> (i.e. <code class="docutils literal notranslate"><span class="pre">-j</span></code> without an explicit number of jobs)
+unless you have a lot of memory available on your machine.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you want to change <a class="reference external" href="https://www.cmake.org">CMake</a> variables for your build it is usually a good
+idea to start with a clean build directory to avoid configuration problems.
+It is especially important that you use a clean build directory when changing
+between <code class="docutils literal notranslate"><span class="pre">Release</span></code> and <code class="docutils literal notranslate"><span class="pre">Debug</span></code> modes.</p>
+</div>
+<p>If your dependencies are in custom locations you may need to tell <a class="reference external" href="https://www.cmake.org">CMake</a> where
+to find them by passing one or more of the following options to <a class="reference external" href="https://www.cmake.org">CMake</a>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>-DBOOST_ROOT<span class="o">=</span>/path/to/boost
+-DHWLOC_ROOT<span class="o">=</span>/path/to/hwloc
+-DTCMALLOC_ROOT<span class="o">=</span>/path/to/tcmalloc
+-DJEMALLOC_ROOT<span class="o">=</span>/path/to/jemalloc
+</pre></div>
+</div>
+<p>If you want to try <em>HPX</em> without using a custom allocator pass
+<code class="docutils literal notranslate"><span class="pre">-DHPX_WITH_MALLOC=system</span></code> to <a class="reference external" href="https://www.cmake.org">CMake</a>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you are building <em>HPX</em> for a system with more than 64 processing units you
+must change the CMake variables <code class="docutils literal notranslate"><span class="pre">HPX_WITH_MORE_THAN_64_THREADS</span></code> (to
+<code class="docutils literal notranslate"><span class="pre">On</span></code>) and <code class="docutils literal notranslate"><span class="pre">HPX_WITH_MAX_CPU_COUNT</span></code> (to a value at least as big as the
+number of (virtual) cores on your system).</p>
+</div>
+<p>To build the tests run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">tests</span></code>. To run the tests run either <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code>
+or use <code class="docutils literal notranslate"><span class="pre">ctest</span></code> for more control over which tests to run. You can run single
+tests for example with <code class="docutils literal notranslate"><span class="pre">ctest</span> <span class="pre">--output-on-failure</span> <span class="pre">-R</span>
+<span class="pre">tests.unit.parallel.algorithms.for_loop</span></code> or a whole group of tests with <code class="docutils literal notranslate"><span class="pre">ctest</span>
+<span class="pre">--output-on-failure</span> <span class="pre">-R</span> <span class="pre">tests.unit</span></code>.</p>
+<p>If you did not run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code> earlier do so now or build the
+<code class="docutils literal notranslate"><span class="pre">hello_world_1</span></code> example by running:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make hello_world_1
+</pre></div>
+</div>
+<p><em>HPX</em> executables end up in the <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory in your build directory. You
+can now run <code class="docutils literal notranslate"><span class="pre">hello_world_1</span></code> and should see the following output:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./bin/hello_world_1
+Hello World!
+</pre></div>
+</div>
+<p>You’ve just run an example which prints <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World!</span></code> from the <em>HPX</em> runtime.
+The source for the example is in <code class="docutils literal notranslate"><span class="pre">examples/quickstart/hello_world_1.cpp</span></code>. The
+<code class="docutils literal notranslate"><span class="pre">hello_world_distributed</span></code> example (also available in the
+<code class="docutils literal notranslate"><span class="pre">examples/quickstart</span></code> directory) is a distributed hello world program which is
+described in <a class="reference internal" href="examples/hello_world.html#examples-hello-world"><span class="std std-ref">Remote execution with actions: Hello world</span></a>. It provides a gentle introduction to
+the distributed aspects of <em>HPX</em>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Most build targets in <em>HPX</em> have two names: a simple name and
+a hierarchical name corresponding to what type of example or
+test the target is. If you are developing <em>HPX</em> it is often helpful to run
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">help</span></code> to get a list of available targets. For example, <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">help</span> <span class="pre">|</span>
+<span class="pre">grep</span> <span class="pre">hello_world</span></code> outputs the following:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>... examples.quickstart.hello_world_2
+... hello_world_2
+... examples.quickstart.hello_world_1
+... hello_world_1
+... examples.quickstart.hello_world_distributed
+... hello_world_distributed
+</pre></div>
+</div>
+<p>It is also possible to build e.g. all quickstart examples using <code class="docutils literal notranslate"><span class="pre">make</span>
+<span class="pre">examples.quickstart</span></code>.</p>
+</div>
+</div>
+<div class="section" id="hello-world">
+<h2>Hello, World!<a class="headerlink" href="#hello-world" title="Permalink to this headline">¶</a></h2>
+<p>The following <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> is a minimal example of what you need in order to
+build an executable using <a class="reference external" href="https://www.cmake.org">CMake</a> and <em>HPX</em>:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.3.2</span><span class="p">)</span>
+<span class="nb">project</span><span class="p">(</span><span class="s">my_hpx_project</span> <span class="s">CXX</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">HPX</span> <span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">add_hpx_executable</span><span class="p">(</span><span class="s">my_hpx_program</span>
+    <span class="s">SOURCES</span> <span class="s">main.cpp</span>
+    <span class="s">COMPONENT_DEPENDENCIES</span> <span class="s">iostreams</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You will most likely have more than one <code class="docutils literal notranslate"><span class="pre">main.cpp</span></code> file in your project.
+See the section on <a class="reference internal" href="manual/creating_hpx_projects.html#using-hpx-cmake"><span class="std std-ref">Using HPX with CMake-based projects</span></a> for more details on how to use
+<code class="docutils literal notranslate"><span class="pre">add_hpx_executable</span></code>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">COMPONENT_DEPENDENCIES</span> <span class="pre">iostreams</span></code> is optional for a minimal project but
+lets us use the <em>HPX</em> equivalent of <code class="docutils literal notranslate"><span class="pre">std::cout</span></code>, i.e. the <em>HPX</em>
+<a class="reference internal" href="manual/miscellaneous.html#iostreams"><span class="std std-ref">The HPX I/O-streams component</span></a> functionality in our application.</p>
+</div>
+<p>Create a new project directory and a <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> with the contents above.
+Also create a <code class="docutils literal notranslate"><span class="pre">main.cpp</span></code> with the contents below.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">// Including &#39;hpx/hpx_main.hpp&#39; instead of the usual &#39;hpx/hpx_init.hpp&#39; enables</span>
+<span class="c1">// to use the plain C-main below as the direct main HPX entry point.</span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_main.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/iostreams.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Say hello to the world!</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then, in your project directory run the following:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mkdir build <span class="o">&amp;&amp;</span> <span class="nb">cd</span> build
+cmake -DCMAKE_PREFIX_PATH<span class="o">=</span>/path/to/hpx/installation ..
+make all
+./my_hpx_program
+</pre></div>
+</div>
+<p>The program looks almost like a regular C++ hello world with the exception of
+the two includes and <code class="docutils literal notranslate"><span class="pre">hpx::cout</span></code>. When you include <code class="docutils literal notranslate"><span class="pre">hpx_main.hpp</span></code> some
+things will be done behind the scenes to make sure that <code class="docutils literal notranslate"><span class="pre">main</span></code> actually gets
+launched on the <em>HPX</em> runtime. So while it looks almost the same you can now use
+futures, <code class="docutils literal notranslate"><span class="pre">async</span></code>, parallel algorithms and more which make use of the <em>HPX</em>
+runtime with lightweight threads. <code class="docutils literal notranslate"><span class="pre">hpx::cout</span></code> is a replacement for
+<code class="docutils literal notranslate"><span class="pre">std::cout</span></code> to make sure printing never blocks a lightweight thread. You can
+read more about <code class="docutils literal notranslate"><span class="pre">hpx::cout</span></code> in <a class="reference internal" href="manual/miscellaneous.html#iostreams"><span class="std std-ref">The HPX I/O-streams component</span></a>. If you rebuild and run your
+program now you should see the familiar <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World!</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>./my_hpx_program
+Hello World!
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You do not have to let <em>HPX</em> take over your main function like in the
+example. You can instead keep your normal main function, and define a
+separate <code class="docutils literal notranslate"><span class="pre">hpx_main</span></code> function which acts as the entry point to the <em>HPX</em>
+runtime. In that case you start the <em>HPX</em> runtime explicitly by calling
+<code class="docutils literal notranslate"><span class="pre">hpx::init</span></code>:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//  Copyright (c) 2007-2012 Hartmut Kaiser</span>
+<span class="c1">//</span>
+<span class="c1">//  SPDX-License-Identifier: BSL-1.0</span>
+<span class="c1">//  Distributed under the Boost Software License, Version 1.0. (See accompanying</span>
+<span class="c1">//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)</span>
+
+<span class="c1">///////////////////////////////////////////////////////////////////////////////</span>
+<span class="c1">// The purpose of this example is to initialize the HPX runtime explicitly and</span>
+<span class="c1">// execute a HPX-thread printing &quot;Hello World!&quot; once. That&#39;s all.</span>
+
+<span class="c1">//[hello_world_2_getting_started</span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_init.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/iostreams.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Say hello to the world!</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="c1">//]</span>
+</pre></div>
+</div>
+<p>You can also use <a class="reference internal" href="api.html#_CPPv4N3hpx5startERKN4util15function_nonserIFiRN3hpx15program_options13variables_mapEEEERKN3hpx15program_options19options_descriptionEiPPcRKNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::start"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::start</span></code></a> and <a class="reference internal" href="api.html#_CPPv4N3hpx4stopER10error_code" title="hpx::stop"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::stop</span></code></a> for a
+non-blocking alternative, or use <a class="reference internal" href="api.html#_CPPv4N3hpx6resumeER10error_code" title="hpx::resume"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resume</span></code></a> and
+<a class="reference internal" href="api.html#_CPPv4N3hpx7suspendER10error_code" title="hpx::suspend"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::suspend</span></code></a> if you need to combine <em>HPX</em> with other runtimes.</p>
+<p>See <a class="reference internal" href="manual/starting_the_hpx_runtime.html#starting-hpx"><span class="std std-ref">Starting the HPX runtime</span></a> for more details on how to initialize and run the
+<em>HPX</em> runtime.</p>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>When including <code class="docutils literal notranslate"><span class="pre">hpx_main.hpp</span></code> the user-defined <code class="docutils literal notranslate"><span class="pre">main</span></code> gets renamed and
+the real <code class="docutils literal notranslate"><span class="pre">main</span></code> function is defined by <em>HPX</em>. This means that the
+user-defined <code class="docutils literal notranslate"><span class="pre">main</span></code> must include a return statement, unlike the real
+<code class="docutils literal notranslate"><span class="pre">main</span></code>. If you do not include the return statement you may end up with
+confusing compile time errors mentioning <code class="docutils literal notranslate"><span class="pre">user_main</span></code> or even runtime
+errors.</p>
+</div>
+</div>
+<div class="section" id="writing-task-based-applications">
+<h2>Writing task-based applications<a class="headerlink" href="#writing-task-based-applications" title="Permalink to this headline">¶</a></h2>
+<p>So far we haven’t done anything that can’t be done using the C++ standard
+library. In this section we will give a short overview of what you can do with
+<em>HPX</em> on a single node. The essence is to avoid global synchronization and break
+up your application into small, composable tasks whose dependencies control the
+flow of your application. Remember, however, that <em>HPX</em> allows you to write
+distributed applications similarly to how you would write applications for a
+single node (see <a class="reference internal" href="why_hpx.html#why-hpx"><span class="std std-ref">Why HPX?</span></a> and
+<a class="reference internal" href="manual/writing_distributed_hpx_applications.html#writing-distributed-hpx-applications"><span class="std std-ref">Writing distributed HPX applications</span></a>).</p>
+<p>If you are already familiar with <code class="docutils literal notranslate"><span class="pre">async</span></code> and <code class="docutils literal notranslate"><span class="pre">future</span></code>s from the C++ standard
+library, the same functionality is available in <em>HPX</em>.</p>
+<p>The following terminology is essential when talking about task-based C++
+programs:</p>
+<ul class="simple">
+<li><p>lightweight thread: Essential for good performance with task-based programs.
+Lightweight refers to smaller stacks and faster context switching compared to
+OS-threads. Smaller overheads allow the program to be broken up into smaller
+tasks, which in turns helps the runtime fully utilize all processing units.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">async</span></code>: The most basic way of launching tasks asynchronously. Returns a
+<code class="docutils literal notranslate"><span class="pre">future&lt;T&gt;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">future&lt;T&gt;</span></code>: Represents a value of type <code class="docutils literal notranslate"><span class="pre">T</span></code> that will be ready in the future.
+The value can be retrieved with <code class="docutils literal notranslate"><span class="pre">get</span></code> (blocking) and one can check if the
+value is ready with <code class="docutils literal notranslate"><span class="pre">is_ready</span></code> (non-blocking).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shared_future&lt;T&gt;</span></code>: Same as <code class="docutils literal notranslate"><span class="pre">future&lt;T&gt;</span></code> but can be copied (similar to
+<code class="docutils literal notranslate"><span class="pre">std::unique_ptr</span></code> vs <code class="docutils literal notranslate"><span class="pre">std::shared_ptr</span></code>).</p></li>
+<li><p>continuation: A function that is to be run after a previous task has run
+(represented by a future). <code class="docutils literal notranslate"><span class="pre">then</span></code> is a method of <code class="docutils literal notranslate"><span class="pre">future&lt;T&gt;</span></code> that takes a
+function to run next. Used to build up dataflow DAGs (directed acyclic
+graphs). <code class="docutils literal notranslate"><span class="pre">shared_future</span></code>s help you split up nodes in the DAG and functions
+like <code class="docutils literal notranslate"><span class="pre">when_all</span></code> help you join nodes in the DAG.</p></li>
+</ul>
+<p>The following example is a collection of the most commonly used functionality in
+<em>HPX</em>:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_main.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/iostreams.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/lcos.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/parallel_generate.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/parallel_sort.hpp&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;random&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
+
+<span class="kt">void</span> <span class="nf">final_task</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;&gt;&gt;</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;in final_task&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Avoid ABI incompatibilities between C++11/C++17 as std::rand has exception</span>
+<span class="c1">// specification in libstdc++.</span>
+<span class="kt">int</span> <span class="nf">rand_wrapper</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">rand</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// A function can be launched asynchronously. The program will not block</span>
+    <span class="c1">// here until the result is available.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">([]()</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">42</span><span class="p">;</span> <span class="p">});</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Just launched a task!&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// Use get to retrieve the value from the future. This will block this task</span>
+    <span class="c1">// until the future is ready, but the HPX runtime will schedule other tasks</span>
+    <span class="c1">// if there are tasks available.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;f contains &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">f</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// Let&#39;s launch another task.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">([]()</span> <span class="p">{</span> <span class="k">return</span> <span class="mf">3.14</span><span class="p">;</span> <span class="p">});</span>
+
+    <span class="c1">// Tasks can be chained using the then method. The continuation takes the</span>
+    <span class="c1">// future as an argument.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="n">g</span><span class="p">.</span><span class="n">then</span><span class="p">([](</span><span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&amp;&amp;</span> <span class="n">gg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">// This function will be called once g is ready. gg is g moved</span>
+            <span class="c1">// into the continuation.</span>
+            <span class="k">return</span> <span class="n">gg</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="o">*</span> <span class="mf">42.0</span> <span class="o">*</span> <span class="mf">42.0</span><span class="p">;</span>
+        <span class="p">});</span>
+
+    <span class="c1">// You can check if a future is ready with the is_ready method.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Result is ready? &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">result</span><span class="p">.</span><span class="n">is_ready</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// You can launch other work in the meantime. Let&#39;s sort a vector.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">(</span><span class="mi">1000000</span><span class="p">);</span>
+
+    <span class="c1">// We fill the vector synchronously and sequentially.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">parallel</span><span class="o">::</span><span class="n">generate</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">parallel</span><span class="o">::</span><span class="n">execution</span><span class="o">::</span><span class="n">seq</span><span class="p">,</span>
+                  <span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">end</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">rand_wrapper</span><span class="p">);</span>
+
+    <span class="c1">// We can launch the sort in parallel and asynchronously.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">done_sorting</span> <span class="o">=</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">parallel</span><span class="o">::</span><span class="n">sort</span><span class="p">(</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">parallel</span><span class="o">::</span><span class="n">execution</span><span class="o">::</span><span class="n">par</span><span class="p">(</span> <span class="c1">// In parallel.</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">parallel</span><span class="o">::</span><span class="n">execution</span><span class="o">::</span><span class="n">task</span><span class="p">),</span> <span class="c1">// Asynchronously.</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">end</span><span class="p">(</span><span class="n">v</span><span class="p">));</span>
+
+    <span class="c1">// We launch the final task when the vector has been sorted and result is</span>
+    <span class="c1">// ready using when_all.</span>
+    <span class="k">auto</span> <span class="n">all</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">when_all</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">done_sorting</span><span class="p">).</span><span class="n">then</span><span class="p">(</span><span class="o">&amp;</span><span class="n">final_task</span><span class="p">);</span>
+
+    <span class="c1">// We can wait for all to be ready.</span>
+    <span class="n">all</span><span class="p">.</span><span class="n">wait</span><span class="p">();</span>
+
+    <span class="c1">// all must be ready at this point because we waited for it to be ready.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span>
+        <span class="p">(</span><span class="n">all</span><span class="p">.</span><span class="n">is_ready</span><span class="p">()</span> <span class="o">?</span> <span class="s">&quot;all is ready!&quot;</span> <span class="o">:</span> <span class="s">&quot;all is not ready...&quot;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Try copying the contents to your <code class="docutils literal notranslate"><span class="pre">main.cpp</span></code> file and look at the output. It can
+be a good idea to go through the program step by step with a debugger. You can
+also try changing the types or adding new arguments to functions to make sure
+you can get the types to match. The type of the <code class="docutils literal notranslate"><span class="pre">then</span></code> method can be especially
+tricky to get right (the continuation needs to take the future as an argument).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>HPX</em> programs accept command line arguments. The most important one is
+<a class="reference internal" href="manual/launching_and_configuring_hpx_applications.html#cmdoption-hpx-threads"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:threads</span></code></a><code class="docutils literal notranslate"><span class="pre">=N</span></code> to set the number of OS-threads used by
+<em>HPX</em>. <em>HPX</em> uses one thread per core by default. Play around with the
+example above and see what difference the number of threads makes on the
+<code class="docutils literal notranslate"><span class="pre">sort</span></code> function. See <a class="reference internal" href="manual/launching_and_configuring_hpx_applications.html#launching-and-configuring"><span class="std std-ref">Launching and configuring HPX applications</span></a> for more details on
+how and what options you can pass to <em>HPX</em>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The example above used the construction <code class="docutils literal notranslate"><span class="pre">hpx::when_all(...).then(...)</span></code>. For
+convenience and performance it is a good idea to replace uses of
+<code class="docutils literal notranslate"><span class="pre">hpx::when_all(...).then(...)</span></code> with <code class="docutils literal notranslate"><span class="pre">dataflow</span></code>. See
+<a class="reference internal" href="examples/interest_calculator.html#examples-interest-calculator"><span class="std std-ref">Dataflow: Interest calculator</span></a> for more details on <code class="docutils literal notranslate"><span class="pre">dataflow</span></code>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If possible, prefer to use the provided parallel algorithms instead of
+writing your own implementation. This can save you time and the resulting
+program is often faster.</p>
+</div>
+</div>
+<div class="section" id="next-steps">
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>If you haven’t done so already, reading the <a class="reference internal" href="terminology.html#terminology"><span class="std std-ref">Terminology</span></a> section will help
+you get familiar with the terms used in <em>HPX</em>.</p>
+<p>The <a class="reference internal" href="examples.html#examples"><span class="std std-ref">Examples</span></a> section contains small, self-contained walkthroughs of
+example <em>HPX</em> programs. The <a class="reference internal" href="examples/1d_stencil.html#examples-1d-stencil"><span class="std std-ref">Local to remote: 1D stencil</span></a> example is a thorough,
+realistic example starting from a single node implementation and going stepwise
+to a distributed implementation.</p>
+<p>The <a class="reference internal" href="manual.html#manual"><span class="std std-ref">Manual</span></a> contains detailed information on writing, building and running
+<em>HPX</em> applications.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="terminology.html" class="btn btn-neutral float-right" title="Terminology" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="why_hpx.html" class="btn btn-neutral float-left" title="Why HPX?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,465 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Remote execution with actions: Hello world &mdash; HPX 1.3.0-rc2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Components and actions: Accumulator" href="accumulator.html" />
+    <link rel="prev" title="Asynchronous execution with hpx::async and actions: Fibonacci" href="fibonacci.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.0-rc2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fibonacci_local.html">Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code>: Fibonacci</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fibonacci.html">Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code> and actions: Fibonacci</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Remote execution with actions: Hello world</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setup">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#walkthrough">Walkthrough</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accumulator.html">Components and actions: Accumulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interest_calculator.html">Dataflow: Interest calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="1d_stencil.html">Local to remote: 1D stencil</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../examples.html">Examples</a> &raquo;</li>
+        
+      <li>Remote execution with actions: Hello world</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/examples/hello_world.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="remote-execution-with-actions-hello-world">
+<span id="examples-hello-world"></span><h1>Remote execution with actions: Hello world<a class="headerlink" href="#remote-execution-with-actions-hello-world" title="Permalink to this headline">¶</a></h1>
+<p>This program will print out a hello world message on every OS-thread on every
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>. The output will look something like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>hello world from OS-thread 1 on locality 0
+hello world from OS-thread 1 on locality 1
+hello world from OS-thread 0 on locality 0
+hello world from OS-thread 0 on locality 1
+</pre></div>
+</div>
+<div class="section" id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
+<p>The source code for this example can be found here:
+<a class="reference download internal" download="" href="../_downloads/9ac1cc48d02caad35f2820499bb24707/hello_world_distributed.cpp"><code class="xref download docutils literal notranslate"><span class="pre">hello_world_distributed.cpp</span></code></a>.</p>
+<p>To compile this program, go to your <em>HPX</em> build directory (see
+<a class="reference internal" href="../manual/building_hpx.html#hpx-build-system"><span class="std std-ref">HPX build system</span></a> for information on configuring and building <em>HPX</em>) and
+enter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make examples.quickstart.hello_world_distributed
+</pre></div>
+</div>
+<p>To run the program type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/hello_world_distributed
+</pre></div>
+</div>
+<p>This should print:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>hello world from OS-thread 0 on locality 0
+</pre></div>
+</div>
+<p>To use more OS-threads use the command line option <a class="reference internal" href="../manual/launching_and_configuring_hpx_applications.html#cmdoption-hpx-threads"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:threads</span></code></a> and
+type the number of threads that you wish to use. For example, typing:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/hello_world_distributed --hpx:threads <span class="m">2</span>
+</pre></div>
+</div>
+<p>will yield:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>hello world from OS-thread 1 on locality 0
+hello world from OS-thread 0 on locality 0
+</pre></div>
+</div>
+<p>Notice how the ordering of the two print statements will change with
+subsequent runs. To run this program on multiple localities please see the
+section <a class="reference internal" href="../manual/running_on_batch_systems.html#unix-pbs"><span class="std std-ref">How to use HPX applications with PBS</span></a>.</p>
+</div>
+<div class="section" id="walkthrough">
+<h2>Walkthrough<a class="headerlink" href="#walkthrough" title="Permalink to this headline">¶</a></h2>
+<p>Now that you have compiled and run the code, let’s look at how the code works,
+beginning with <code class="docutils literal notranslate"><span class="pre">main()</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">//` Here is the main entry point. By using the include &#39;hpx/hpx_main.hpp&#39; HPX</span>
+<span class="c1">//` will invoke the plain old C-main() as its first HPX thread.</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Get a list of all available localities.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">naming</span><span class="o">::</span><span class="n">id_type</span><span class="o">&gt;</span> <span class="n">localities</span> <span class="o">=</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">find_all_localities</span><span class="p">();</span>
+
+    <span class="c1">// Reserve storage space for futures, one for each locality.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">futures</span><span class="p">;</span>
+    <span class="n">futures</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">localities</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">naming</span><span class="o">::</span><span class="n">id_type</span> <span class="k">const</span><span class="o">&amp;</span> <span class="nl">node</span> <span class="p">:</span> <span class="n">localities</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Asynchronously start a new task. The task is encapsulated in a</span>
+        <span class="c1">// future, which we can query to determine if the task has</span>
+        <span class="c1">// completed.</span>
+        <span class="k">typedef</span> <span class="n">hello_world_foreman_action</span> <span class="n">action_type</span><span class="p">;</span>
+        <span class="n">futures</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="o">&lt;</span><span class="n">action_type</span><span class="o">&gt;</span><span class="p">(</span><span class="n">node</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="c1">// The non-callback version of hpx::lcos::wait_all takes a single parameter,</span>
+    <span class="c1">// a vector of futures to wait on. hpx::wait_all only returns when</span>
+    <span class="c1">// all of the futures have finished.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">wait_all</span><span class="p">(</span><span class="n">futures</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In this excerpt of the code we again see the use of futures. This time the
+futures are stored in a vector so that they can easily be accessed.
+<a class="reference internal" href="../api.html#_CPPv4I0EN3hpx8wait_allEv9InputIter9InputIter" title="hpx::wait_all"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_all</span></code></a> is a family of functions that wait on for an
+<code class="docutils literal notranslate"><span class="pre">std::vector&lt;&gt;</span></code> of futures to become ready. In this piece of code, we are
+using the synchronous version of <a class="reference internal" href="../api.html#_CPPv4I0EN3hpx8wait_allEv9InputIter9InputIter" title="hpx::wait_all"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_all</span></code></a>, which takes one
+argument (the <code class="docutils literal notranslate"><span class="pre">std::vector&lt;&gt;</span></code> of futures to wait on). This function will not
+return until all the futures in the vector have been executed.</p>
+<p>In <a class="reference internal" href="fibonacci.html#examples-fibonacci"><span class="std std-ref">Asynchronous execution with hpx::async and actions: Fibonacci</span></a> we used <a class="reference internal" href="../api.html#_CPPv4N3hpx9find_hereER10error_code" title="hpx::find_here"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::find_here</span></code></a> to specify the
+target of our actions. Here, we instead use
+<a class="reference internal" href="../api.html#_CPPv4N3hpx19find_all_localitiesER10error_code" title="hpx::find_all_localities"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::find_all_localities</span></code></a>, which returns an <code class="docutils literal notranslate"><span class="pre">std::vector&lt;&gt;</span></code>
+containing the identifiers of all the machines in the system, including the one
+that we are on.</p>
+<p>As in <a class="reference internal" href="fibonacci.html#examples-fibonacci"><span class="std std-ref">Asynchronous execution with hpx::async and actions: Fibonacci</span></a> our futures are set using
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::async&lt;&gt;</span></code>. The <code class="docutils literal notranslate"><span class="pre">hello_world_foreman_action</span></code> is declared
+here:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Define the boilerplate code necessary for the function &#39;hello_world_foreman&#39;</span>
+<span class="c1">// to be invoked as an HPX action.</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">hello_world_foreman</span><span class="p">,</span> <span class="n">hello_world_foreman_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Another way of thinking about this wrapping technique is as follows: functions
+(the work to be done) are wrapped in actions, and actions can be executed
+locally or remotely (e.g. on another machine participating in the computation).</p>
+<p>Now it is time to look at the <code class="docutils literal notranslate"><span class="pre">hello_world_foreman()</span></code> function which was
+wrapped in the action above:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">hello_world_foreman</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Get the number of worker OS-threads in use by this locality.</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="k">const</span> <span class="n">os_threads</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_os_thread_count</span><span class="p">();</span>
+
+    <span class="c1">// Find the global name of the current locality.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">naming</span><span class="o">::</span><span class="n">id_type</span> <span class="k">const</span> <span class="n">here</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">();</span>
+
+    <span class="c1">// Populate a set with the OS-thread numbers of all OS-threads on this</span>
+    <span class="c1">// locality. When the hello world message has been printed on a particular</span>
+    <span class="c1">// OS-thread, we will remove it from the set.</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">set</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="o">&gt;</span> <span class="n">attendance</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">os_thread</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">os_thread</span> <span class="o">&lt;</span> <span class="n">os_threads</span><span class="p">;</span> <span class="o">++</span><span class="n">os_thread</span><span class="p">)</span>
+        <span class="n">attendance</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">os_thread</span><span class="p">);</span>
+
+    <span class="c1">// As long as there are still elements in the set, we must keep scheduling</span>
+    <span class="c1">// HPX-threads. Because HPX features work-stealing task schedulers, we have</span>
+    <span class="c1">// no way of enforcing which worker OS-thread will actually execute</span>
+    <span class="c1">// each HPX-thread.</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">attendance</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="c1">// Each iteration, we create a task for each element in the set of</span>
+        <span class="c1">// OS-threads that have not said &quot;Hello world&quot;. Each of these tasks</span>
+        <span class="c1">// is encapsulated in a future.</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">futures</span><span class="p">;</span>
+        <span class="n">futures</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="n">attendance</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="nl">worker</span> <span class="p">:</span> <span class="n">attendance</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">// Asynchronously start a new task. The task is encapsulated in a</span>
+            <span class="c1">// future, which we can query to determine if the task has</span>
+            <span class="c1">// completed.</span>
+            <span class="k">typedef</span> <span class="n">hello_world_worker_action</span> <span class="n">action_type</span><span class="p">;</span>
+            <span class="n">futures</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="o">&lt;</span><span class="n">action_type</span><span class="o">&gt;</span><span class="p">(</span><span class="n">here</span><span class="p">,</span> <span class="n">worker</span><span class="p">));</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Wait for all of the futures to finish. The callback version of the</span>
+        <span class="c1">// hpx::lcos::wait_each function takes two arguments: a vector of futures,</span>
+        <span class="c1">// and a binary callback.  The callback takes two arguments; the first</span>
+        <span class="c1">// is the index of the future in the vector, and the second is the</span>
+        <span class="c1">// return value of the future. hpx::lcos::wait_each doesn&#39;t return until</span>
+        <span class="c1">// all the futures in the vector have returned.</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">spinlock</span> <span class="n">mtx</span><span class="p">;</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">wait_each</span><span class="p">(</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">unwrapping</span><span class="p">([</span><span class="o">&amp;</span><span class="p">](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">t</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">lcos</span><span class="o">::</span><span class="n">local</span><span class="o">::</span><span class="n">spinlock</span><span class="o">&gt;</span> <span class="n">lk</span><span class="p">(</span><span class="n">mtx</span><span class="p">);</span>
+                    <span class="n">attendance</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}),</span>
+            <span class="n">futures</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now, before we discuss <code class="docutils literal notranslate"><span class="pre">hello_world_foreman()</span></code>, let’s talk about the
+<a class="reference internal" href="../api.html#_CPPv4I00EN3hpx9wait_eachEvRR1FRRNSt6vectorI6FutureEE" title="hpx::wait_each"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_each</span></code></a> function. <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::lcos::wait_each</span></code> for each
+one. The version of <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::lcos::wait_each</span></code> invokes a callback function
+provided by the user, supplying the callback function with the result of the
+future.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">hello_world_foreman()</span></code>, an <code class="docutils literal notranslate"><span class="pre">std::set&lt;&gt;</span></code> called <code class="docutils literal notranslate"><span class="pre">attendance</span></code> keeps
+track of which OS-threads have printed out the hello world message. When the
+OS-thread prints out the statement, the future is marked as ready, and
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::lcos::wait_each</span></code> in <code class="docutils literal notranslate"><span class="pre">hello_world_foreman()</span></code>. If it is not
+executing on the correct OS-thread, it returns a value of -1, which causes
+<code class="docutils literal notranslate"><span class="pre">hello_world_foreman()</span></code> to leave the OS-thread id in <code class="docutils literal notranslate"><span class="pre">attendance</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">hello_world_worker</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">desired</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Returns the OS-thread number of the worker that is running this</span>
+    <span class="c1">// HPX-thread.</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">current</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_worker_thread_num</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">current</span> <span class="o">==</span> <span class="n">desired</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// The HPX-thread has been run on the desired OS-thread.</span>
+        <span class="kt">char</span> <span class="k">const</span><span class="o">*</span> <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;hello world from OS-thread {1} on locality {2}</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+        <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">format_to</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">cout</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">desired</span><span class="p">,</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_locality_id</span><span class="p">())</span>
+            <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="n">desired</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// This HPX-thread has been run by the wrong OS-thread, make the foreman</span>
+    <span class="c1">// try again by rescheduling it.</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Define the boilerplate code necessary for the function &#39;hello_world_worker&#39;</span>
+<span class="c1">// to be invoked as an HPX action (by a HPX future). This macro defines the</span>
+<span class="c1">// type &#39;hello_world_worker_action&#39;.</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">hello_world_worker</span><span class="p">,</span> <span class="n">hello_world_worker_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Because <em>HPX</em> features work stealing task schedulers, there is no way to
+guarantee that an action will be scheduled on a particular OS-thread. This is
+why we must use a guess-and-check approach.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="accumulator.html" class="btn btn-neutral float-right" title="Components and actions: Accumulator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="fibonacci.html" class="btn btn-neutral float-left" title="Asynchronous execution with hpx::async and actions: Fibonacci" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>2298179</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

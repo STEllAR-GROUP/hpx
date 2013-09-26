@@ -1,0 +1,708 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Miscellaneous &mdash; HPX 1.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Additional material" href="../additional_material.html" />
+    <link rel="prev" title="HPX runtime and resources" href="hpx_runtime_and_resources.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../manual.html">Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_hpx.html">Getting <em>HPX</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="building_hpx.html"><em>HPX</em> build system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_hpx_projects.html">Creating <em>HPX</em> projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="starting_the_hpx_runtime.html">Starting the <em>HPX</em> runtime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launching_and_configuring_hpx_applications.html">Launching and configuring <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_single_node_hpx_applications.html">Writing single-node <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_distributed_hpx_applications.html">Writing distributed <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_on_batch_systems.html">Running on batch systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging_hpx_applications.html">Debugging <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizing_hpx_applications.html">Optimizing <em>HPX</em> applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hpx_runtime_and_resources.html"><em>HPX</em> runtime and resources</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Miscellaneous</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#error-handling">Error handling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#working-with-exceptions">Working with exceptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#working-with-error-codes">Working with error codes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lightweight-error-codes">Lightweight error codes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#utilities-in-hpx">Utilities in <em>HPX</em></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#checkpoint">Checkpoint</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#the-hpx-i-o-streams-component">The <em>HPX</em> I/O-streams component</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../manual.html">Manual</a> &raquo;</li>
+        
+      <li>Miscellaneous</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/manual/miscellaneous.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="miscellaneous">
+<h1>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="error-handling">
+<span id="id2"></span><h2>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
+<p>Like in any other asynchronous invocation scheme it is important to be able to
+handle error conditions occurring while the asynchronous (and possibly remote)
+operation is executed. In <em>HPX</em> all error handling is based on standard C++
+exception handling. Any exception thrown during the execution of an asynchronous
+operation will be transferred back to the original invocation <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>,
+where it is rethrown during synchronization with the calling thread.</p>
+<p>The source code for this example can be found here:
+<a class="reference download internal" download="" href="../_downloads/1a7e3061691b9b3b17a924604b4db1cd/error_handling.cpp"><code class="xref download docutils literal notranslate"><span class="pre">error_handling.cpp</span></code></a>.</p>
+<div class="section" id="working-with-exceptions">
+<span id="exceptions"></span><h3>Working with exceptions<a class="headerlink" href="#working-with-exceptions" title="Permalink to this headline">¶</a></h3>
+<p>For the following description we assume that the function <code class="docutils literal notranslate"><span class="pre">raise_exception()</span></code>
+is executed by invoking the plain action <code class="docutils literal notranslate"><span class="pre">raise_exception_type</span></code>.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">raise_exception</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">HPX_THROW_EXCEPTION</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">no_success</span><span class="p">,</span> <span class="s">&quot;raise_exception&quot;</span><span class="p">,</span> <span class="s">&quot;simulated error&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">raise_exception</span><span class="p">,</span> <span class="n">raise_exception_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The exception is thrown using the macro <a class="reference internal" href="../api.html#c.HPX_THROW_EXCEPTION" title="HPX_THROW_EXCEPTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_THROW_EXCEPTION</span></code></a>. The type
+of the thrown exception is <a class="reference internal" href="../api.html#_CPPv4N3hpx9exceptionE" title="hpx::exception"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::exception</span></code></a>. This associates
+additional diagnostic information with the exception, such as file name and line
+number, <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> id and thread id, and stack backtrace from the point
+where the exception was thrown.</p>
+<p>Any exception thrown during the execution of an action is transferred back to
+the (asynchronous) invocation site. It will be rethrown in this context when the
+calling thread tries to wait for the result of the action by invoking either
+<code class="docutils literal notranslate"><span class="pre">future&lt;&gt;::get()</span></code> or the synchronous action invocation wrapper as shown here:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>        <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error reporting using exceptions</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="c1">// invoke raise_exception() which throws an exception</span>
+            <span class="n">raise_exception_action</span> <span class="n">do_it</span><span class="p">;</span>
+            <span class="n">do_it</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">());</span>
+        <span class="p">}</span>
+        <span class="k">catch</span> <span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">exception</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Print just the essential error information.</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;caught exception: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">what</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+            <span class="c1">// Print all of the available diagnostic information as stored with</span>
+            <span class="c1">// the exception.</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;diagnostic information:&quot;</span>
+                <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">diagnostic_information</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The exception is transferred back to the invocation site even if it is
+executed on a different <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>.</p>
+</div>
+<p>Additionally, this example demonstrates how an exception thrown by an (possibly
+remote) action can be handled. It shows the use of
+<a class="reference internal" href="../api.html#_CPPv4N3hpx22diagnostic_informationERK14exception_info" title="hpx::diagnostic_information"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::diagnostic_information</span></code></a> which retrieves all available diagnostic
+information from the exception as a formatted string. This includes, for
+instance, the name of the source file and line number, the sequence number of
+the OS-thread and the <em>HPX</em>-thread id, the <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> id and the stack
+backtrace of the point where the original exception was thrown.</p>
+<p>Under certain circumstances it is desirable to output only some of the
+diagnostics, or to output those using different formatting. For this case, <em>HPX</em>
+exposes a set of lower level functions as demonstrated in the following code
+snippet:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>        <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Detailed error reporting using exceptions</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="c1">// Invoke raise_exception() which throws an exception.</span>
+            <span class="n">raise_exception_action</span> <span class="n">do_it</span><span class="p">;</span>
+            <span class="n">do_it</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">());</span>
+        <span class="p">}</span>
+        <span class="k">catch</span> <span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">exception</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Print the elements of the diagnostic information separately.</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{what}: &quot;</span>        <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_what</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{locality-id}: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_locality_id</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{hostname}: &quot;</span>    <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_host_name</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{pid}: &quot;</span>         <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_process_id</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{function}: &quot;</span>    <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_function_name</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{file}: &quot;</span>        <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_file_name</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{line}: &quot;</span>        <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_line_number</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{os-thread}: &quot;</span>   <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_os_thread</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{thread-id}: &quot;</span>   <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">hex</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_thread_id</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{thread-description}: &quot;</span>
+                <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_thread_description</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{state}: &quot;</span>       <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">hex</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_state</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{stack-trace}: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_backtrace</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{env}: &quot;</span>         <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_env</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="working-with-error-codes">
+<span id="error-code"></span><h3>Working with error codes<a class="headerlink" href="#working-with-error-codes" title="Permalink to this headline">¶</a></h3>
+<p>Most of the API functions exposed by <em>HPX</em> can be invoked in two different
+modes. By default those will throw an exception on error as described above.
+However, sometimes it is desirable not to throw an exception in case of an error
+condition. In this case an object instance of the <a class="reference internal" href="../api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::error_code</span></code></a>
+type can be passed as the last argument to the API function. In case of an error
+the error condition will be returned in that <a class="reference internal" href="../api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::error_code</span></code></a>
+instance. The following example demonstrates extracting the full diagnostic
+information without exception handling:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error reporting using error code</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+            <span class="c1">// Create a new error_code instance.</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">error_code</span> <span class="n">ec</span><span class="p">;</span>
+
+            <span class="c1">// If an instance of an error_code is passed as the last argument while</span>
+            <span class="c1">// invoking the action, the function will not throw in case of an error</span>
+            <span class="c1">// but store the error information in this error_code instance instead.</span>
+            <span class="n">raise_exception_action</span> <span class="n">do_it</span><span class="p">;</span>
+            <span class="n">do_it</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="n">ec</span><span class="p">);</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// Print just the essential error information.</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;returned error: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">get_message</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+                <span class="c1">// Print all of the available diagnostic information as stored with</span>
+                <span class="c1">// the exception.</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;diagnostic information:&quot;</span>
+                    <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">diagnostic_information</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The error information is transferred back to the invocation site even if it
+is executed on a different <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>.</p>
+</div>
+<p>This example show how an error can be handled without having to resolve to
+exceptions and that the returned <a class="reference internal" href="../api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::error_code</span></code></a> instance can be
+used in a very similar way as the <a class="reference internal" href="../api.html#_CPPv4N3hpx9exceptionE" title="hpx::exception"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::exception</span></code></a> type above. Simply
+pass it to the <a class="reference internal" href="../api.html#_CPPv4N3hpx22diagnostic_informationERK14exception_info" title="hpx::diagnostic_information"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::diagnostic_information</span></code></a> which retrieves all
+available diagnostic information from the error code instance as a formatted
+string.</p>
+<p>As for handling exceptions, when working with error codes, under certain
+circumstances it is desirable to output only some of the diagnostics, or to
+output those using different formatting. For this case, <em>HPX</em> exposes a set of
+lower level functions usable with error codes as demonstrated in the following
+code snippet:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Detailed error reporting using error code</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+            <span class="c1">// Create a new error_code instance.</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">error_code</span> <span class="n">ec</span><span class="p">;</span>
+
+            <span class="c1">// If an instance of an error_code is passed as the last argument while</span>
+            <span class="c1">// invoking the action, the function will not throw in case of an error</span>
+            <span class="c1">// but store the error information in this error_code instance instead.</span>
+            <span class="n">raise_exception_action</span> <span class="n">do_it</span><span class="p">;</span>
+            <span class="n">do_it</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="n">ec</span><span class="p">);</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// Print the elements of the diagnostic information separately.</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{what}: &quot;</span>        <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_what</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{locality-id}: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_locality_id</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{hostname}: &quot;</span>    <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_host_name</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{pid}: &quot;</span>         <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_process_id</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{function}: &quot;</span>    <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_function_name</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+                    <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{file}: &quot;</span>        <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_file_name</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{line}: &quot;</span>        <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_line_number</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{os-thread}: &quot;</span>   <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_os_thread</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{thread-id}: &quot;</span>   <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">hex</span>
+                    <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_thread_id</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{thread-description}: &quot;</span>
+                    <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_thread_description</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{state}: &quot;</span>       <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">hex</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_state</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+                    <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{stack-trace}: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_backtrace</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;{env}: &quot;</span>         <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">get_error_env</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>For more information please refer to the documentation of
+<a class="reference internal" href="../api.html#_CPPv4N3hpx14get_error_whatERK14exception_info" title="hpx::get_error_what"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_what</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4N3hpx21get_error_locality_idERKN3hpx14exception_infoE" title="hpx::get_error_locality_id"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_locality_id</span></code></a>,
+<a class="reference internal" href="../api.html#_CPPv4N3hpx19get_error_host_nameERKN3hpx14exception_infoE" title="hpx::get_error_host_name"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_host_name</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4N3hpx20get_error_process_idERKN3hpx14exception_infoE" title="hpx::get_error_process_id"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_process_id</span></code></a>,
+<a class="reference internal" href="../api.html#_CPPv4N3hpx23get_error_function_nameERKN3hpx14exception_infoE" title="hpx::get_error_function_name"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_function_name</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4N3hpx19get_error_file_nameERKN3hpx14exception_infoE" title="hpx::get_error_file_name"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_file_name</span></code></a>,
+<a class="reference internal" href="../api.html#_CPPv4N3hpx21get_error_line_numberERKN3hpx14exception_infoE" title="hpx::get_error_line_number"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_line_number</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4N3hpx19get_error_os_threadERKN3hpx14exception_infoE" title="hpx::get_error_os_thread"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_os_thread</span></code></a>,
+<a class="reference internal" href="../api.html#_CPPv4N3hpx19get_error_thread_idERKN3hpx14exception_infoE" title="hpx::get_error_thread_id"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_thread_id</span></code></a>,
+<a class="reference internal" href="../api.html#_CPPv4N3hpx28get_error_thread_descriptionERKN3hpx14exception_infoE" title="hpx::get_error_thread_description"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_thread_description</span></code></a>,
+<a class="reference internal" href="../api.html#_CPPv4N3hpx19get_error_backtraceERKN3hpx14exception_infoE" title="hpx::get_error_backtrace"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_backtrace</span></code></a>, <a class="reference internal" href="../api.html#_CPPv4N3hpx13get_error_envERKN3hpx14exception_infoE" title="hpx::get_error_env"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_env</span></code></a>, and
+<a class="reference internal" href="../api.html#_CPPv4N3hpx15get_error_stateERKN3hpx14exception_infoE" title="hpx::get_error_state"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_error_state</span></code></a>.</p>
+</div>
+<div class="section" id="lightweight-error-codes">
+<span id="lightweight-error-code"></span><h3>Lightweight error codes<a class="headerlink" href="#lightweight-error-codes" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes it is not desirable to collect all the ambient information about the
+error at the point where it happened as this might impose too much overhead for
+simple scenarios. In this case, <em>HPX</em> provides a lightweight error code facility
+which will hold the error code only. The following snippet demonstrates its use:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error reporting using an lightweight error code</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+            <span class="c1">// Create a new error_code instance.</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">error_code</span> <span class="n">ec</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">lightweight</span><span class="p">);</span>
+
+            <span class="c1">// If an instance of an error_code is passed as the last argument while</span>
+            <span class="c1">// invoking the action, the function will not throw in case of an error</span>
+            <span class="c1">// but store the error information in this error_code instance instead.</span>
+            <span class="n">raise_exception_action</span> <span class="n">do_it</span><span class="p">;</span>
+            <span class="n">do_it</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="n">ec</span><span class="p">);</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// Print just the essential error information.</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;returned error: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">get_message</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+                <span class="c1">// Print all of the available diagnostic information as stored with</span>
+                <span class="c1">// the exception.</span>
+                <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;error code:&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">ec</span><span class="p">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>All functions which retrieve other diagnostic elements from the
+<a class="reference internal" href="../api.html#_CPPv4N3hpx10error_codeE" title="hpx::error_code"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::error_code</span></code></a> will fail if called with a lightweight error_code
+instance.</p>
+</div>
+</div>
+<div class="section" id="utilities-in-hpx">
+<span id="utilities"></span><h2>Utilities in <em>HPX</em><a class="headerlink" href="#utilities-in-hpx" title="Permalink to this headline">¶</a></h2>
+<p>In order to ease the burden of programming in <em>HPX</em> we have provided several
+utilities to users. The following section documents those facilies.</p>
+<div class="section" id="checkpoint">
+<span id="id3"></span><h3>Checkpoint<a class="headerlink" href="#checkpoint" title="Permalink to this headline">¶</a></h3>
+<p>A common need of users is to periodically backup an application. This practice
+provides resiliency and potential restart points in code. We have developed the
+concept of a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> to support this use case.</p>
+<p>Found in <code class="docutils literal notranslate"><span class="pre">hpx/util/checkpoint.hpp</span></code>, <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>s are defined as objects
+which hold a serialized version of an object or set of objects at a particular
+moment in time. This representation can be stored in memory for later use or it
+can be written to disk for storage and/or recovery at a later point. In order to
+create and fill this object with data we use a function called
+<code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code>. In code the function looks like this:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="p">...);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code> takes arbitrary data containers such as int, double, float,
+vector, and future and serializes them into a newly created <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>
+object. This function returns a <code class="docutils literal notranslate"><span class="pre">future</span></code> to a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> containing the
+data. Let us look a simple use case below:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">checkpoint</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">save_checkpoint</span><span class="p">;</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">vec</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">};</span>
+<span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">vec</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Once the future is ready the checkpoint object will contain the <code class="docutils literal notranslate"><span class="pre">vector</span></code>
+<code class="docutils literal notranslate"><span class="pre">vec</span></code> and its five elements.</p>
+<p>It is also possible to modify the launch policy used by <code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code>.
+This is accomplished by passing a launch policy as the first argument. It is
+important to note that passing <code class="docutils literal notranslate"><span class="pre">hpx::launch::sync</span></code> will cause
+<code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code> to return a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> instead of a <code class="docutils literal notranslate"><span class="pre">future</span></code> to a
+<code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. All other policies passed to <code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code> will return a
+<code class="docutils literal notranslate"><span class="pre">future</span></code> to a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>.</p>
+<p>Sometimes <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> s must be declared before they are used.
+<code class="docutils literal notranslate"><span class="pre">save_checkpoint</span></code> allows users to move pre-created <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> s into the
+function as long as they are the first container passing into the function (In
+the case where a launch policy is used, the <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> will immediately
+follow the launch policy). An example of these features can be found below:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="kt">char</span> <span class="n">character</span> <span class="o">=</span> <span class="sc">&#39;d&#39;</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">integer</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">flt</span> <span class="o">=</span> <span class="mf">10.01f</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">boolean</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">str</span> <span class="o">=</span> <span class="s">&quot;I am a string of characters&quot;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">vec</span><span class="p">(</span><span class="n">str</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">str</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+    <span class="n">checkpoint</span> <span class="n">archive</span><span class="p">;</span>
+
+    <span class="c1">// Test 1</span>
+    <span class="c1">//  test basic functionality</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">shared_future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">f_archive</span> <span class="o">=</span> <span class="n">save_checkpoint</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">archive</span><span class="p">),</span> <span class="n">character</span><span class="p">,</span> <span class="n">integer</span><span class="p">,</span> <span class="n">flt</span><span class="p">,</span> <span class="n">boolean</span><span class="p">,</span> <span class="n">str</span><span class="p">,</span> <span class="n">vec</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Now that we can create <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> s we now must be able to restore the
+objects they contain into memory. This is accomplished by the function
+<code class="docutils literal notranslate"><span class="pre">restore_checkpoint</span></code>. This function takes a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> and fills its data
+into the containers it is provided. It is important to remember that the
+containers must be ordered in the same way they were placed into the
+<code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. For clarity see the example below:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="kt">char</span> <span class="n">character2</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">integer2</span><span class="p">;</span>
+    <span class="kt">float</span> <span class="n">flt2</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">boolean2</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">str2</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">vec2</span><span class="p">;</span>
+
+    <span class="n">restore_checkpoint</span><span class="p">(</span>
+        <span class="n">f_archive</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">character2</span><span class="p">,</span> <span class="n">integer2</span><span class="p">,</span> <span class="n">flt2</span><span class="p">,</span> <span class="n">boolean2</span><span class="p">,</span> <span class="n">str2</span><span class="p">,</span> <span class="n">vec2</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The core utility of <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> is in its ability to make certain data
+persistent. Often this means that the data is needed to be stored in an object,
+such as a file, for later use. For these cases we have provided two solutions:
+stream operator overloads and access iterators.</p>
+<p>We have created the two stream overloads
+<code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> to stream data
+out of and into <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. You can see an
+example of the overloads in use below:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="kt">double</span> <span class="n">a9</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">b9</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">,</span> <span class="n">c9</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ofstream</span> <span class="n">test_file_9</span><span class="p">(</span><span class="s">&quot;test_file_9.txt&quot;</span><span class="p">);</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">f_9</span> <span class="o">=</span> <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">a9</span><span class="p">,</span> <span class="n">b9</span><span class="p">,</span> <span class="n">c9</span><span class="p">);</span>
+    <span class="n">test_file_9</span> <span class="o">&lt;&lt;</span> <span class="n">f_9</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="n">test_file_9</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+
+    <span class="kt">double</span> <span class="n">a9_1</span><span class="p">,</span> <span class="n">b9_1</span><span class="p">,</span> <span class="n">c9_1</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ifstream</span> <span class="n">test_file_9_1</span><span class="p">(</span><span class="s">&quot;test_file_9.txt&quot;</span><span class="p">);</span>
+    <span class="n">checkpoint</span> <span class="n">archive9</span><span class="p">;</span>
+    <span class="n">test_file_9_1</span> <span class="o">&gt;&gt;</span> <span class="n">archive9</span><span class="p">;</span>
+    <span class="n">restore_checkpoint</span><span class="p">(</span><span class="n">archive9</span><span class="p">,</span> <span class="n">a9_1</span><span class="p">,</span> <span class="n">b9_1</span><span class="p">,</span> <span class="n">c9_1</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This is the primary way to move data into and out of a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. It is
+important to note, however, that users should be cautious when using a stream
+operator to load data an another function to remove it (or vice versa). Both
+<code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> rely on a <code class="docutils literal notranslate"><span class="pre">.write()</span></code> and a <code class="docutils literal notranslate"><span class="pre">.read()</span></code>
+function respectively. In order to know how much data to read from the
+<code class="docutils literal notranslate"><span class="pre">std::istream</span></code>, the <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> will write the size of the <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>
+before writing the <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> data. Correspondingly, the <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> will
+read the size of the stored data before reading the data into new instance of
+<code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. As long as the user employs the <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> to stream the data this detail can be ignored.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Be careful when mixing <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> with other
+facilities to read and write to a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code>. <code class="docutils literal notranslate"><span class="pre">operator&lt;&lt;</span></code> writes and
+extra variable and <code class="docutils literal notranslate"><span class="pre">operator&gt;&gt;</span></code> reads this variable back separately. Used
+together the user will not encounter any issues and can safely ignore this
+detail.</p>
+</div>
+<p>Users may also move the data into and out of a <code class="docutils literal notranslate"><span class="pre">checkpoint</span></code> using the exposed
+<code class="docutils literal notranslate"><span class="pre">.begin()</span></code> and <code class="docutils literal notranslate"><span class="pre">.end()</span></code> iterators. An example of this use case is
+illustrated below.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span>    <span class="n">std</span><span class="o">::</span><span class="n">ofstream</span> <span class="n">test_file_7</span><span class="p">(</span><span class="s">&quot;checkpoint_test_file.txt&quot;</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">vec7</span><span class="p">{</span><span class="mf">1.02f</span><span class="p">,</span> <span class="mf">1.03f</span><span class="p">,</span> <span class="mf">1.04f</span><span class="p">,</span> <span class="mf">1.05f</span><span class="p">};</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">checkpoint</span><span class="o">&gt;</span> <span class="n">fut_7</span> <span class="o">=</span> <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">vec7</span><span class="p">);</span>
+    <span class="n">checkpoint</span> <span class="n">archive7</span> <span class="o">=</span> <span class="n">fut_7</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">copy</span><span class="p">(</span><span class="n">archive7</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span>    <span class="c1">// Write data to ofstream</span>
+        <span class="p">,</span> <span class="n">archive7</span><span class="p">.</span><span class="n">end</span><span class="p">()</span>    <span class="c1">// ie. the file</span>
+        <span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ostream_iterator</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="p">(</span><span class="n">test_file_7</span><span class="p">));</span>
+    <span class="n">test_file_7</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span> <span class="n">vec7_1</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">char_vec</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">ifstream</span> <span class="n">test_file_7_1</span><span class="p">(</span><span class="s">&quot;checkpoint_test_file.txt&quot;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">test_file_7_1</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">seekg</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">end</span><span class="p">);</span>
+        <span class="kt">int</span> <span class="n">length</span> <span class="o">=</span> <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">tellg</span><span class="p">();</span>
+        <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">seekg</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">beg</span><span class="p">);</span>
+        <span class="n">char_vec</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="n">length</span><span class="p">);</span>
+        <span class="n">test_file_7_1</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="n">char_vec</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span> <span class="n">length</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">checkpoint</span> <span class="n">archive7_1</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">char_vec</span><span class="p">));</span>  <span class="c1">// Write data to checkpoint</span>
+    <span class="n">restore_checkpoint</span><span class="p">(</span><span class="n">archive7_1</span><span class="p">,</span> <span class="n">vec7_1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-hpx-i-o-streams-component">
+<span id="iostreams"></span><h2>The <em>HPX</em> I/O-streams component<a class="headerlink" href="#the-hpx-i-o-streams-component" title="Permalink to this headline">¶</a></h2>
+<p>The <em>HPX</em> I/O-streams subsystem extends the standard C++ output streams
+<code class="docutils literal notranslate"><span class="pre">std::cout</span></code> and <code class="docutils literal notranslate"><span class="pre">std::cerr</span></code> to work in the distributed setting of an <em>HPX</em>
+application. All of the output streamed to``hpx::cout``will be dispatched to
+<code class="docutils literal notranslate"><span class="pre">std::cout</span></code> on the console <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>. Likewise, all output generated
+from <code class="docutils literal notranslate"><span class="pre">hpx::cerr</span></code> will be dispatched to <code class="docutils literal notranslate"><span class="pre">std::cerr</span></code> on the console
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All existing standard manipulators can be used in conjunction with
+<code class="docutils literal notranslate"><span class="pre">hpx::cout</span></code> and <code class="docutils literal notranslate"><span class="pre">hpx::cerr</span></code> Historically, <em>HPX</em> also defines
+<code class="docutils literal notranslate"><span class="pre">hpx::endl</span></code> and <code class="docutils literal notranslate"><span class="pre">hpx::flush</span></code> but those are just aliases for the
+corresponding standard manipulators.</p>
+</div>
+<p>In order to use either <code class="docutils literal notranslate"><span class="pre">hpx::cout</span></code> or <code class="docutils literal notranslate"><span class="pre">hpx::cerr</span></code> application codes need to
+<code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/include/iostreams.hpp&gt;</span></code>. For an example, please see the
+simplest possible ‘Hello world’ program as included as an example with <em>HPX</em>:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">//  Copyright (c) 2007-2012 Hartmut Kaiser</span>
+<span class="c1">//</span>
+<span class="c1">//  Distributed under the Boost Software License, Version 1.0. (See accompanying</span>
+<span class="c1">//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)</span>
+
+<span class="c1">///////////////////////////////////////////////////////////////////////////////</span>
+<span class="c1">// The purpose of this example is to execute a HPX-thread printing</span>
+<span class="c1">// &quot;Hello World!&quot; once. That&#39;s all.</span>
+
+<span class="c1">//[hello_world_1_getting_started</span>
+<span class="c1">// Including &#39;hpx/hpx_main.hpp&#39; instead of the usual &#39;hpx/hpx_init.hpp&#39; enables</span>
+<span class="c1">// to use the plain C-main below as the direct main HPX entry point.</span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_main.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;hpx/include/iostreams.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Say hello to the world!</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">hpx</span><span class="o">::</span><span class="n">flush</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//]</span>
+</pre></div>
+</div>
+<p>Additionally those applications need to link with the iostreams component. When
+using cmake this can be achieved by using the <code class="docutils literal notranslate"><span class="pre">COMPONENT_DEPENDENCIES</span></code>
+parameter, for instance:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">include</span><span class="p">(</span><span class="s">HPX_AddExecutable</span><span class="p">)</span>
+
+<span class="nb">add_hpx_executable</span><span class="p">(</span>
+    <span class="s">hello_world</span>
+    <span class="s">SOURCES</span> <span class="s">hello_world.cpp</span>
+    <span class="s">COMPONENT_DEPENDENCIES</span> <span class="s">iostreams</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">hpx::cout</span></code> and <code class="docutils literal notranslate"><span class="pre">hpx::cerr</span></code> streams buffer all output locally until a
+<code class="docutils literal notranslate"><span class="pre">std::endl</span></code> or <code class="docutils literal notranslate"><span class="pre">std::flush</span></code> is encountered. That means that no output
+will appear on the console as long as either of those is explicitly used.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../additional_material.html" class="btn btn-neutral float-right" title="Additional material" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="hpx_runtime_and_resources.html" class="btn btn-neutral float-left" title="HPX runtime and resources" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>a943fd2</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

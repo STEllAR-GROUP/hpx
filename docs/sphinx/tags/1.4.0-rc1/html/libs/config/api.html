@@ -1,0 +1,1017 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>config &mdash; HPX 1.4.0-rc1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="plugin" href="../plugin/api.html" />
+    <link rel="prev" title="concepts" href="../concepts/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0-rc1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">config</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-hpp"><cite>#include &lt;hpx/config.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-export-definitions-hpp"><cite>#include &lt;hpx/config/export_definitions.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-autolink-hpp"><cite>#include &lt;hpx/config/autolink.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-compiler-fence-hpp"><cite>#include &lt;hpx/config/compiler_fence.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-threads-stack-hpp"><cite>#include &lt;hpx/config/threads_stack.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-branch-hints-hpp"><cite>#include &lt;hpx/config/branch_hints.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-compiler-specific-hpp"><cite>#include &lt;hpx/config/compiler_specific.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-warnings-prefix-hpp"><cite>#include &lt;hpx/config/warnings_prefix.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-weak-symbol-hpp"><cite>#include &lt;hpx/config/weak_symbol.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-attributes-hpp"><cite>#include &lt;hpx/config/attributes.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-compiler-native-tls-hpp"><cite>#include &lt;hpx/config/compiler_native_tls.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-manual-profiling-hpp"><cite>#include &lt;hpx/config/manual_profiling.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-lambda-capture-hpp"><cite>#include &lt;hpx/config/lambda_capture.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-warnings-suffix-hpp"><cite>#include &lt;hpx/config/warnings_suffix.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-constexpr-hpp"><cite>#include &lt;hpx/config/constexpr.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-debug-hpp"><cite>#include &lt;hpx/config/debug.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-emulate-deleted-hpp"><cite>#include &lt;hpx/config/emulate_deleted.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-asio-hpp"><cite>#include &lt;hpx/config/asio.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-forceinline-hpp"><cite>#include &lt;hpx/config/forceinline.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-config-force-linking-hpp"><cite>#include &lt;hpx/config/force_linking.hpp&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/config/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="config">
+<h1>config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-config-hpp">
+<h2><cite>#include &lt;hpx/config.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_INITIAL_IP_PORT">
+<span class="target" id="config_8hpp_1a025c01b506611f52da2867fe06a88aee"></span><code class="sig-name descname">HPX_INITIAL_IP_PORT</code><a class="headerlink" href="#c.HPX_INITIAL_IP_PORT" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the default ip/port number used by the parcel subsystem. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_CONNECTING_IP_PORT">
+<span class="target" id="config_8hpp_1a25ea8b53d4a2faf535bc86520aee485b"></span><code class="sig-name descname">HPX_CONNECTING_IP_PORT</code><a class="headerlink" href="#c.HPX_CONNECTING_IP_PORT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_INITIAL_IP_ADDRESS">
+<span class="target" id="config_8hpp_1a50d871d5e6cb80c2c08c82a376998174"></span><code class="sig-name descname">HPX_INITIAL_IP_ADDRESS</code><a class="headerlink" href="#c.HPX_INITIAL_IP_ADDRESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_RUNTIME_INSTANCE_LIMIT">
+<span class="target" id="config_8hpp_1ab1db3ae67bd8369601f955ba0e9bfafd"></span><code class="sig-name descname">HPX_RUNTIME_INSTANCE_LIMIT</code><a class="headerlink" href="#c.HPX_RUNTIME_INSTANCE_LIMIT" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the maximum number of possible runtime instances in one executable </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PARCEL_BOOTSTRAP">
+<span class="target" id="config_8hpp_1a51719233f5953f10ded70f7aa373de21"></span><code class="sig-name descname">HPX_PARCEL_BOOTSTRAP</code><a class="headerlink" href="#c.HPX_PARCEL_BOOTSTRAP" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the type of the parcelport to be used during application bootstrap. This value can be changed at runtime by the configuration parameter:</p>
+<p>hpx.parcel.bootstrap = …</p>
+<p>(or by setting the corresponding environment variable HPX_PARCEL_BOOTSTRAP). </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PARCEL_MAX_CONNECTIONS">
+<span class="target" id="config_8hpp_1aa6598c0099497949925680e0b61c3773"></span><code class="sig-name descname">HPX_PARCEL_MAX_CONNECTIONS</code><a class="headerlink" href="#c.HPX_PARCEL_MAX_CONNECTIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the number of outgoing (parcel-) connections kept alive (to all other localities). This value can be changed at runtime by setting the configuration parameter:</p>
+<p>hpx.parcel.max_connections = …</p>
+<p>(or by setting the corresponding environment variable HPX_PARCEL_MAX_CONNECTIONS). </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE">
+<span class="target" id="config_8hpp_1aafb57dfa0766fa7de18dfe323c4ec105"></span><code class="sig-name descname">HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE</code><a class="headerlink" href="#c.HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the number of outgoing ipc (parcel-) connections kept alive (to each of the other localities on the same node). This value can be changed at runtime by setting the configuration parameter:</p>
+<p>hpx.parcel.ipc.data_buffer_cache_size = …</p>
+<p>(or by setting the corresponding environment variable HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE). </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PARCEL_MPI_MAX_REQUESTS">
+<span class="target" id="config_8hpp_1ad6ff34f85d05aab0afebfaef8d41dd28"></span><code class="sig-name descname">HPX_PARCEL_MPI_MAX_REQUESTS</code><a class="headerlink" href="#c.HPX_PARCEL_MPI_MAX_REQUESTS" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the number of MPI requests in flight This value can be changed at runtime by setting the configuration parameter:</p>
+<p>hpx.parcel.mpi.max_requests = …</p>
+<p>(or by setting the corresponding environment variable HPX_PARCEL_MPI_MAX_REQUESTS). </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY">
+<span class="target" id="config_8hpp_1a53638702838c5638c289493aa77b1f5d"></span><code class="sig-name descname">HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY</code><a class="headerlink" href="#c.HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the number of outgoing (parcel-) connections kept alive (to each of the other localities). This value can be changed at runtime by setting the configuration parameter:</p>
+<p>hpx.parcel.max_connections_per_locality = …</p>
+<p>(or by setting the corresponding environment variable HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY). </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PARCEL_MAX_MESSAGE_SIZE">
+<span class="target" id="config_8hpp_1a4e8b11c330760af0408ef93b0274b6de"></span><code class="sig-name descname">HPX_PARCEL_MAX_MESSAGE_SIZE</code><a class="headerlink" href="#c.HPX_PARCEL_MAX_MESSAGE_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the maximally allowed message size for messages transferred between localities. This value can be changed at runtime by setting the configuration parameter:</p>
+<p>hpx.parcel.max_message_size = …</p>
+<p>(or by setting the corresponding environment variable HPX_PARCEL_MAX_MESSAGE_SIZE). </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE">
+<span class="target" id="config_8hpp_1a1051feb0f8514e951b74866e43840b4a"></span><code class="sig-name descname">HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE</code><a class="headerlink" href="#c.HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the maximally allowed outbound message size for coalescing messages transferred between localities. This value can be changed at runtime by setting the configuration parameter:</p>
+<p>hpx.parcel.max_outbound_message_size = …</p>
+<p>(or by setting the corresponding environment variable HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE). </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PARCEL_SERIALIZATION_OVERHEAD">
+<span class="target" id="config_8hpp_1abb36d94c78cc467c9cee884a9b97827c"></span><code class="sig-name descname">HPX_PARCEL_SERIALIZATION_OVERHEAD</code><a class="headerlink" href="#c.HPX_PARCEL_SERIALIZATION_OVERHEAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_LOCAL_CACHE_SIZE">
+<span class="target" id="config_8hpp_1a22a73a68946b22eb70c1530c3789b16d"></span><code class="sig-name descname">HPX_AGAS_LOCAL_CACHE_SIZE</code><a class="headerlink" href="#c.HPX_AGAS_LOCAL_CACHE_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the number of AGAS address translations kept in the local cache. This is just the initial size which may be adjusted depending on the load of the system (not implemented yet), etc. It must be a minimum of 3 for AGAS v3 bootstrapping.</p>
+<p>This value can be changes at runtime by setting the configuration parameter:</p>
+<p>hpx.agas.local_cache_size = …</p>
+<p>(or by setting the corresponding environment variable HPX_AGAS_LOCAL_CACHE_SIZE) </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS">
+<span class="target" id="config_8hpp_1a445adb5ad727db38d800e2fed22e6b00"></span><code class="sig-name descname">HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS</code><a class="headerlink" href="#c.HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_GLOBALCREDIT_INITIAL">
+<span class="target" id="config_8hpp_1a48b644a82fc0b37e55b88959319d1433"></span><code class="sig-name descname">HPX_GLOBALCREDIT_INITIAL</code><a class="headerlink" href="#c.HPX_GLOBALCREDIT_INITIAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the initial global reference count associated with any created object. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_NUM_IO_POOL_SIZE">
+<span class="target" id="config_8hpp_1af11a257a992bea129253ebe1ca4efadf"></span><code class="sig-name descname">HPX_NUM_IO_POOL_SIZE</code><a class="headerlink" href="#c.HPX_NUM_IO_POOL_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the default number of OS-threads created for the different internal thread pools </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_NUM_PARCEL_POOL_SIZE">
+<span class="target" id="config_8hpp_1a45ef9eb00cc3869cd97a3b576d2569a1"></span><code class="sig-name descname">HPX_NUM_PARCEL_POOL_SIZE</code><a class="headerlink" href="#c.HPX_NUM_PARCEL_POOL_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_NUM_TIMER_POOL_SIZE">
+<span class="target" id="config_8hpp_1a2f12a53c34b7d7c10fc81015e4e0b58a"></span><code class="sig-name descname">HPX_NUM_TIMER_POOL_SIZE</code><a class="headerlink" href="#c.HPX_NUM_TIMER_POOL_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT">
+<span class="target" id="config_8hpp_1a1b329c7f161b8a20da60589add1e1d28"></span><code class="sig-name descname">HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT</code><a class="headerlink" href="#c.HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT" title="Permalink to this definition">¶</a></dt>
+<dd><p>By default, enable minimal thread deadlock detection in debug builds only. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_COROUTINE_NUM_HEAPS">
+<span class="target" id="config_8hpp_1ab6c899559655bbcc9852e138768edb09"></span><code class="sig-name descname">HPX_COROUTINE_NUM_HEAPS</code><a class="headerlink" href="#c.HPX_COROUTINE_NUM_HEAPS" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines the default number of coroutine heaps. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_HAVE_THREAD_BACKTRACE_DEPTH">
+<span class="target" id="config_8hpp_1a7b9031c9017e5c2fee29b1f454b61c77"></span><code class="sig-name descname">HPX_HAVE_THREAD_BACKTRACE_DEPTH</code><a class="headerlink" href="#c.HPX_HAVE_THREAD_BACKTRACE_DEPTH" title="Permalink to this definition">¶</a></dt>
+<dd><p>By default, enable storing the thread phase in debug builds only. </p>
+<p>By default, enable storing the parent thread information in debug builds only.By default, enable storing the thread description in debug builds only. By default, enable storing the target address of the data the thread is accessing in debug builds only. By default we do not maintain stack back-traces on suspension. This is a pure debugging aid to be able to see in the debugger where a suspended thread got stuck. By default we capture only 5 levels of stack back trace on suspension </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_MAX_NETWORK_RETRIES">
+<span class="target" id="config_8hpp_1a88dd1b81f23e7260433070019d2073bd"></span><code class="sig-name descname">HPX_MAX_NETWORK_RETRIES</code><a class="headerlink" href="#c.HPX_MAX_NETWORK_RETRIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_NETWORK_RETRIES_SLEEP">
+<span class="target" id="config_8hpp_1a5bbb54ec4f42999cb368673f38cfb5f8"></span><code class="sig-name descname">HPX_NETWORK_RETRIES_SLEEP</code><a class="headerlink" href="#c.HPX_NETWORK_RETRIES_SLEEP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_INI_PATH_DELIMITER">
+<span class="target" id="config_8hpp_1aa194cd22f28cfeeeaccb575d65f39647"></span><code class="sig-name descname">HPX_INI_PATH_DELIMITER</code><a class="headerlink" href="#c.HPX_INI_PATH_DELIMITER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PATH_DELIMITERS">
+<span class="target" id="config_8hpp_1a5e92af45482ed7eeb4fa20414046b048"></span><code class="sig-name descname">HPX_PATH_DELIMITERS</code><a class="headerlink" href="#c.HPX_PATH_DELIMITERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SHARED_LIB_EXTENSION">
+<span class="target" id="config_8hpp_1ade1d1f7b0781a2611ff3fbc1f9147fac"></span><code class="sig-name descname">HPX_SHARED_LIB_EXTENSION</code><a class="headerlink" href="#c.HPX_SHARED_LIB_EXTENSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_EXECUTABLE_EXTENSION">
+<span class="target" id="config_8hpp_1a96af021a78c0a5f62415cc08b31490ac"></span><code class="sig-name descname">HPX_EXECUTABLE_EXTENSION</code><a class="headerlink" href="#c.HPX_EXECUTABLE_EXTENSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_MAKE_DLL_STRING">
+<span class="target" id="config_8hpp_1a316e09db9fc06417e2d4d1e3acbd2248"></span><code class="sig-name descname">HPX_MAKE_DLL_STRING</code><span class="sig-paren">(</span>n<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_MAKE_DLL_STRING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_MANGLE_NAME">
+<span class="target" id="config_8hpp_1a41edee8e3be38dd0350497992863edd4"></span><code class="sig-name descname">HPX_MANGLE_NAME</code><span class="sig-paren">(</span>n<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_MANGLE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_MANGLE_STRING">
+<span class="target" id="config_8hpp_1aeab76221b266b8ab743c221e1eae6b28"></span><code class="sig-name descname">HPX_MANGLE_STRING</code><span class="sig-paren">(</span>n<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_MANGLE_STRING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_COMPONENT_NAME">
+<span class="target" id="config_8hpp_1a566d7a4fe3d6de82171618286e25209b"></span><code class="sig-name descname">HPX_COMPONENT_NAME</code><a class="headerlink" href="#c.HPX_COMPONENT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_COMPONENT_STRING">
+<span class="target" id="config_8hpp_1a2d8032767889759cc436f64a97a0d97d"></span><code class="sig-name descname">HPX_COMPONENT_STRING</code><a class="headerlink" href="#c.HPX_COMPONENT_STRING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_COMPONENT_PREFIX">
+<span class="target" id="config_8hpp_1a0747b85d26bb54da2da21896dcb4aa93"></span><code class="sig-name descname">HPX_PLUGIN_COMPONENT_PREFIX</code><a class="headerlink" href="#c.HPX_PLUGIN_COMPONENT_PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_NAME">
+<span class="target" id="config_8hpp_1a030c7e2d40a5b91f0d788a5a003e41d4"></span><code class="sig-name descname">HPX_PLUGIN_NAME</code><a class="headerlink" href="#c.HPX_PLUGIN_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_STRING">
+<span class="target" id="config_8hpp_1a8cab36d520ac0afe9517a046b0df8316"></span><code class="sig-name descname">HPX_PLUGIN_STRING</code><a class="headerlink" href="#c.HPX_PLUGIN_STRING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PLUGIN_PLUGIN_PREFIX">
+<span class="target" id="config_8hpp_1adbd48776144ee87a17292ebb73ba1a1c"></span><code class="sig-name descname">HPX_PLUGIN_PLUGIN_PREFIX</code><a class="headerlink" href="#c.HPX_PLUGIN_PLUGIN_PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_APPLICATION_STRING">
+<span class="target" id="config_8hpp_1abc39ca4ce7116b3d936c7cfdd6fd8aba"></span><code class="sig-name descname">HPX_APPLICATION_STRING</code><a class="headerlink" href="#c.HPX_APPLICATION_STRING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_IDLE_LOOP_COUNT_MAX">
+<span class="target" id="config_8hpp_1a00da2cf8c3c047ec6be490f7842e2642"></span><code class="sig-name descname">HPX_IDLE_LOOP_COUNT_MAX</code><a class="headerlink" href="#c.HPX_IDLE_LOOP_COUNT_MAX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_BUSY_LOOP_COUNT_MAX">
+<span class="target" id="config_8hpp_1ac2858dd57302741961d1ba2b99a8d183"></span><code class="sig-name descname">HPX_BUSY_LOOP_COUNT_MAX</code><a class="headerlink" href="#c.HPX_BUSY_LOOP_COUNT_MAX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_THREAD_QUEUE_MAX_THREAD_COUNT">
+<span class="target" id="config_8hpp_1ac8fc1e80eabd431518f1577583cbe7f1"></span><code class="sig-name descname">HPX_THREAD_QUEUE_MAX_THREAD_COUNT</code><a class="headerlink" href="#c.HPX_THREAD_QUEUE_MAX_THREAD_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING">
+<span class="target" id="config_8hpp_1a9a6efa51f39d2d54d0cbfca533721519"></span><code class="sig-name descname">HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING</code><a class="headerlink" href="#c.HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED">
+<span class="target" id="config_8hpp_1ab310e4b2265afc40f94d109ff75f0d13"></span><code class="sig-name descname">HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED</code><a class="headerlink" href="#c.HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT">
+<span class="target" id="config_8hpp_1abe44125c76efb1a0ea3a6d50c2ad74b0"></span><code class="sig-name descname">HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT</code><a class="headerlink" href="#c.HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT">
+<span class="target" id="config_8hpp_1a127e1165a79ef6a0112886858fd3c31d"></span><code class="sig-name descname">HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT</code><a class="headerlink" href="#c.HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_THREAD_QUEUE_MIN_DELETE_COUNT">
+<span class="target" id="config_8hpp_1a49b42ee7256229cc180c0d30663311a6"></span><code class="sig-name descname">HPX_THREAD_QUEUE_MIN_DELETE_COUNT</code><a class="headerlink" href="#c.HPX_THREAD_QUEUE_MIN_DELETE_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_THREAD_QUEUE_MAX_DELETE_COUNT">
+<span class="target" id="config_8hpp_1a42327d97ad3b4867bba8e1350ac1111e"></span><code class="sig-name descname">HPX_THREAD_QUEUE_MAX_DELETE_COUNT</code><a class="headerlink" href="#c.HPX_THREAD_QUEUE_MAX_DELETE_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS">
+<span class="target" id="config_8hpp_1a581cb8b15e42f2575febd94fa178c0f7"></span><code class="sig-name descname">HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS</code><a class="headerlink" href="#c.HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_IDLE_BACKOFF_TIME_MAX">
+<span class="target" id="config_8hpp_1a91114e435c5879596fc0759c43c15ef7"></span><code class="sig-name descname">HPX_IDLE_BACKOFF_TIME_MAX</code><a class="headerlink" href="#c.HPX_IDLE_BACKOFF_TIME_MAX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_WRAPPER_HEAP_STEP">
+<span class="target" id="config_8hpp_1ae06b04fb7fa7cfaf22b8d9927aaa6d05"></span><code class="sig-name descname">HPX_WRAPPER_HEAP_STEP</code><a class="headerlink" href="#c.HPX_WRAPPER_HEAP_STEP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_INITIAL_GID_RANGE">
+<span class="target" id="config_8hpp_1a4f985d6e3c2a7f8c54d759bcb2336275"></span><code class="sig-name descname">HPX_INITIAL_GID_RANGE</code><a class="headerlink" href="#c.HPX_INITIAL_GID_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_CONTINUATION_MAX_RECURSION_DEPTH">
+<span class="target" id="config_8hpp_1a1e34e222fabaf74dde93ae9f3304044b"></span><code class="sig-name descname">HPX_CONTINUATION_MAX_RECURSION_DEPTH</code><a class="headerlink" href="#c.HPX_CONTINUATION_MAX_RECURSION_DEPTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_BOOTSTRAP_PREFIX">
+<span class="target" id="config_8hpp_1aa17069a4cc0db659aca17da74f30c21a"></span><code class="sig-name descname">HPX_AGAS_BOOTSTRAP_PREFIX</code><a class="headerlink" href="#c.HPX_AGAS_BOOTSTRAP_PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_NS_MSB">
+<span class="target" id="config_8hpp_1a6f5e36fd0886eb174380ff0b3f6deca8"></span><code class="sig-name descname">HPX_AGAS_NS_MSB</code><a class="headerlink" href="#c.HPX_AGAS_NS_MSB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_PRIMARY_NS_MSB">
+<span class="target" id="config_8hpp_1aa4eb14d71b2d04301e58e689b9c18771"></span><code class="sig-name descname">HPX_AGAS_PRIMARY_NS_MSB</code><a class="headerlink" href="#c.HPX_AGAS_PRIMARY_NS_MSB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_PRIMARY_NS_LSB">
+<span class="target" id="config_8hpp_1a19b1ccd981e2e5ee3acde462475143b2"></span><code class="sig-name descname">HPX_AGAS_PRIMARY_NS_LSB</code><a class="headerlink" href="#c.HPX_AGAS_PRIMARY_NS_LSB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_COMPONENT_NS_MSB">
+<span class="target" id="config_8hpp_1ab3eb499c8040541a0de035d03b2c8fe1"></span><code class="sig-name descname">HPX_AGAS_COMPONENT_NS_MSB</code><a class="headerlink" href="#c.HPX_AGAS_COMPONENT_NS_MSB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_COMPONENT_NS_LSB">
+<span class="target" id="config_8hpp_1a8402f8aa16d8c3c60e30ee70bb4ed1db"></span><code class="sig-name descname">HPX_AGAS_COMPONENT_NS_LSB</code><a class="headerlink" href="#c.HPX_AGAS_COMPONENT_NS_LSB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_SYMBOL_NS_MSB">
+<span class="target" id="config_8hpp_1a515f704e64fa7b60572e10f1dca54826"></span><code class="sig-name descname">HPX_AGAS_SYMBOL_NS_MSB</code><a class="headerlink" href="#c.HPX_AGAS_SYMBOL_NS_MSB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_SYMBOL_NS_LSB">
+<span class="target" id="config_8hpp_1a7da68f671b9affc01d0b20d6d9387abc"></span><code class="sig-name descname">HPX_AGAS_SYMBOL_NS_LSB</code><a class="headerlink" href="#c.HPX_AGAS_SYMBOL_NS_LSB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_LOCALITY_NS_MSB">
+<span class="target" id="config_8hpp_1a1d37bd7458d494543dbf7853f51cb105"></span><code class="sig-name descname">HPX_AGAS_LOCALITY_NS_MSB</code><a class="headerlink" href="#c.HPX_AGAS_LOCALITY_NS_MSB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_AGAS_LOCALITY_NS_LSB">
+<span class="target" id="config_8hpp_1ab4f38997f9858754489f491db279173c"></span><code class="sig-name descname">HPX_AGAS_LOCALITY_NS_LSB</code><a class="headerlink" href="#c.HPX_AGAS_LOCALITY_NS_LSB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-export-definitions-hpp">
+<h2><cite>#include &lt;hpx/config/export_definitions.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-export-definitions-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_EXPORT">
+<span class="target" id="export__definitions_8hpp_1af09bd4629094eeddf095955080614127"></span><code class="sig-name descname">HPX_EXPORT</code><a class="headerlink" href="#c.HPX_EXPORT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks a class or function to be exported from HPX or imported if it is consumed. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-autolink-hpp">
+<h2><cite>#include &lt;hpx/config/autolink.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-autolink-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-config-compiler-fence-hpp">
+<h2><cite>#include &lt;hpx/config/compiler_fence.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-compiler-fence-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_COMPILER_FENCE">
+<span class="target" id="compiler__fence_8hpp_1adf3537ec8a8caa1b3d17b9ee70173ed9"></span><code class="sig-name descname">HPX_COMPILER_FENCE</code><a class="headerlink" href="#c.HPX_COMPILER_FENCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates assembly that serves as a fence to the compiler CPU to disable optimization. Usually implemented in the form of a memory barrier. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SMT_PAUSE">
+<span class="target" id="compiler__fence_8hpp_1a054dcc72a86eb9efc3e68fd66a06986b"></span><code class="sig-name descname">HPX_SMT_PAUSE</code><a class="headerlink" href="#c.HPX_SMT_PAUSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates assembly the executes a “pause” instruction. Useful in spinning loops. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-threads-stack-hpp">
+<h2><cite>#include &lt;hpx/config/threads_stack.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-threads-stack-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_THREADS_STACK_OVERHEAD">
+<span class="target" id="threads__stack_8hpp_1a6bd3036a030fe0e0c1d060a644de186e"></span><code class="sig-name descname">HPX_THREADS_STACK_OVERHEAD</code><a class="headerlink" href="#c.HPX_THREADS_STACK_OVERHEAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_SMALL_STACK_SIZE">
+<span class="target" id="threads__stack_8hpp_1a9eb6bba760bd0431a322e2d771ab5a2a"></span><code class="sig-name descname">HPX_SMALL_STACK_SIZE</code><a class="headerlink" href="#c.HPX_SMALL_STACK_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_MEDIUM_STACK_SIZE">
+<span class="target" id="threads__stack_8hpp_1aab76559cac42584e847410417369b367"></span><code class="sig-name descname">HPX_MEDIUM_STACK_SIZE</code><a class="headerlink" href="#c.HPX_MEDIUM_STACK_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_LARGE_STACK_SIZE">
+<span class="target" id="threads__stack_8hpp_1a93d1a97fd03804fd30c2242f3b528654"></span><code class="sig-name descname">HPX_LARGE_STACK_SIZE</code><a class="headerlink" href="#c.HPX_LARGE_STACK_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_HUGE_STACK_SIZE">
+<span class="target" id="threads__stack_8hpp_1a7f726308912823ddcf2d6c34b945cc55"></span><code class="sig-name descname">HPX_HUGE_STACK_SIZE</code><a class="headerlink" href="#c.HPX_HUGE_STACK_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-branch-hints-hpp">
+<h2><cite>#include &lt;hpx/config/branch_hints.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-branch-hints-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_LIKELY">
+<span class="target" id="branch__hints_8hpp_1af2fd7fea20e608239a8af8a2c8d886c8"></span><code class="sig-name descname">HPX_LIKELY</code><span class="sig-paren">(</span>expr<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_LIKELY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hint at the compiler that <code class="docutils literal notranslate"><span class="pre">expr</span></code> is likely to be true. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_UNLIKELY">
+<span class="target" id="branch__hints_8hpp_1ad92a1d036a58cfd44a5513ce0b2c3a09"></span><code class="sig-name descname">HPX_UNLIKELY</code><span class="sig-paren">(</span>expr<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_UNLIKELY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hint at the compiler that <code class="docutils literal notranslate"><span class="pre">expr</span></code> is likely to be false. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-compiler-specific-hpp">
+<h2><cite>#include &lt;hpx/config/compiler_specific.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-compiler-specific-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_GCC_VERSION">
+<span class="target" id="compiler__specific_8hpp_1a0012e14f6115ee9c507adc202abbf10a"></span><code class="sig-name descname">HPX_GCC_VERSION</code><a class="headerlink" href="#c.HPX_GCC_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the GCC version HPX is compiled with. Only set if compiled with GCC. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_CLANG_VERSION">
+<span class="target" id="compiler__specific_8hpp_1ad4a72fad16cb3a811a03726504447a43"></span><code class="sig-name descname">HPX_CLANG_VERSION</code><a class="headerlink" href="#c.HPX_CLANG_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Clang version HPX is compiled with. Only set if compiled with Clang. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_INTEL_VERSION">
+<span class="target" id="compiler__specific_8hpp_1a3f760e45b5350000b0a95ea1d7070e36"></span><code class="sig-name descname">HPX_INTEL_VERSION</code><a class="headerlink" href="#c.HPX_INTEL_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Intel Compiler version HPX is compiled with. Only set if compiled with the Intel Compiler. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_MSVC">
+<span class="target" id="compiler__specific_8hpp_1a99aa9d933ce54222675e51c4e38ad353"></span><code class="sig-name descname">HPX_MSVC</code><a class="headerlink" href="#c.HPX_MSVC" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro is set if the compilation is with MSVC. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_MINGW">
+<span class="target" id="compiler__specific_8hpp_1a85194e2895c5b47c2d78c7eb7db58fa4"></span><code class="sig-name descname">HPX_MINGW</code><a class="headerlink" href="#c.HPX_MINGW" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro is set if the compilation is with Mingw. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_WINDOWS">
+<span class="target" id="compiler__specific_8hpp_1a7754a492e298bea4d22f0532c73a47bd"></span><code class="sig-name descname">HPX_WINDOWS</code><a class="headerlink" href="#c.HPX_WINDOWS" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro is set if the compilation is for Windows. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_NATIVE_MIC">
+<span class="target" id="compiler__specific_8hpp_1a7242f78e078f18997a47dcb8638ab728"></span><code class="sig-name descname">HPX_NATIVE_MIC</code><a class="headerlink" href="#c.HPX_NATIVE_MIC" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro is set if the compilation is for Intel Knights Landing. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-warnings-prefix-hpp">
+<h2><cite>#include &lt;hpx/config/warnings_prefix.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-warnings-prefix-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-config-weak-symbol-hpp">
+<h2><cite>#include &lt;hpx/config/weak_symbol.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-weak-symbol-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_WEAK_SYMBOL">
+<span class="target" id="weak__symbol_8hpp_1abce408f72ed1d4fbb3ecfbf6d15ff19f"></span><code class="sig-name descname">HPX_WEAK_SYMBOL</code><a class="headerlink" href="#c.HPX_WEAK_SYMBOL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-attributes-hpp">
+<h2><cite>#include &lt;hpx/config/attributes.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-attributes-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_NOINLINE">
+<span class="target" id="attributes_8hpp_1a107ccaaf8d6e6b35b0f1755e30ee1b2b"></span><code class="sig-name descname">HPX_NOINLINE</code><a class="headerlink" href="#c.HPX_NOINLINE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function attribute to tell compiler not to inline the function. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_NORETURN">
+<span class="target" id="attributes_8hpp_1a28a0e496c2f6476b7bece86a51b86f59"></span><code class="sig-name descname">HPX_NORETURN</code><a class="headerlink" href="#c.HPX_NORETURN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function attribute to tell compiler that the function does not return. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_DEPRECATED">
+<span class="target" id="attributes_8hpp_1ac25b01a924151a79d951ea21b82a1271"></span><code class="sig-name descname">HPX_DEPRECATED</code><span class="sig-paren">(</span>x<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_DEPRECATED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks an entity as deprecated. The argument <code class="docutils literal notranslate"><span class="pre">x</span></code> specifies a custom message that is included in the compiler warning. For more details see <code class="docutils literal notranslate"><span class="pre">&lt;</span><span class="pre">&gt;</span></code>__. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_FALLTHROUGH">
+<span class="target" id="attributes_8hpp_1a33b9b0f4a399e506766f8e4e7bdbb540"></span><code class="sig-name descname">HPX_FALLTHROUGH</code><a class="headerlink" href="#c.HPX_FALLTHROUGH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that the fall through from the previous case label is intentional and should not be diagnosed by a compiler that warns on fallthrough. For more details see <code class="docutils literal notranslate"><span class="pre">&lt;</span><span class="pre">&gt;</span></code>__. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-compiler-native-tls-hpp">
+<h2><cite>#include &lt;hpx/config/compiler_native_tls.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-compiler-native-tls-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_NATIVE_TLS">
+<span class="target" id="compiler__native__tls_8hpp_1afcfc8e4f691006a38756c5dbadc44eb4"></span><code class="sig-name descname">HPX_NATIVE_TLS</code><a class="headerlink" href="#c.HPX_NATIVE_TLS" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro is replaced with the compiler specific keyword attribute to mark a variable as thread local. For more details see <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>__. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-manual-profiling-hpp">
+<h2><cite>#include &lt;hpx/config/manual_profiling.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-manual-profiling-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_SUPER_PURE">
+<span class="target" id="manual__profiling_8hpp_1a63cd3108df490518a33da21f0a390a40"></span><code class="sig-name descname">HPX_SUPER_PURE</code><a class="headerlink" href="#c.HPX_SUPER_PURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_PURE">
+<span class="target" id="manual__profiling_8hpp_1a34979eb87dc38dd9605c6ce44fc8bc93"></span><code class="sig-name descname">HPX_PURE</code><a class="headerlink" href="#c.HPX_PURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_HOT">
+<span class="target" id="manual__profiling_8hpp_1abe86cf4bc9ac4f20dba2d0ae46d356ea"></span><code class="sig-name descname">HPX_HOT</code><a class="headerlink" href="#c.HPX_HOT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_COLD">
+<span class="target" id="manual__profiling_8hpp_1a6ff44a2b36c6540dce6f494e924bcf93"></span><code class="sig-name descname">HPX_COLD</code><a class="headerlink" href="#c.HPX_COLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-lambda-capture-hpp">
+<h2><cite>#include &lt;hpx/config/lambda_capture.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-lambda-capture-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_CAPTURE_FORWARD">
+<span class="target" id="lambda__capture_8hpp_1ac9b3f911f31fc3a8297d9a6cb80c7615"></span><code class="sig-name descname">HPX_CAPTURE_FORWARD</code><span class="sig-paren">(</span>var<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_CAPTURE_FORWARD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates to <code class="docutils literal notranslate"><span class="pre">var</span> <span class="pre">=</span> <span class="pre">std::forward&lt;decltype(var)&gt;(var)</span></code> if the compiler supports C++14 Lambdas. Defaults to <code class="docutils literal notranslate"><span class="pre">var</span></code>. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_CAPTURE_MOVE">
+<span class="target" id="lambda__capture_8hpp_1a8d4568ba5bc2e83e17c56c97bfe77532"></span><code class="sig-name descname">HPX_CAPTURE_MOVE</code><span class="sig-paren">(</span>var<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_CAPTURE_MOVE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates to <code class="docutils literal notranslate"><span class="pre">var</span> <span class="pre">=</span> <span class="pre">std::move(var)</span></code> if the compiler supports C++14 Lambdas. Defaults to <code class="docutils literal notranslate"><span class="pre">var</span></code>. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-warnings-suffix-hpp">
+<h2><cite>#include &lt;hpx/config/warnings_suffix.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-warnings-suffix-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-config-constexpr-hpp">
+<h2><cite>#include &lt;hpx/config/constexpr.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-constexpr-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_CONSTEXPR">
+<span class="target" id="constexpr_8hpp_1aa846473f288508525b2dac0a0b08ef92"></span><code class="sig-name descname">HPX_CONSTEXPR</code><a class="headerlink" href="#c.HPX_CONSTEXPR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro evaluates to <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the compiler supports it. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_CONSTEXPR_OR_CONST">
+<span class="target" id="constexpr_8hpp_1afb9c12478f19754fe5186a3d486541d7"></span><code class="sig-name descname">HPX_CONSTEXPR_OR_CONST</code><a class="headerlink" href="#c.HPX_CONSTEXPR_OR_CONST" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro evaluates to <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the compiler supports it, <code class="docutils literal notranslate"><span class="pre">const</span></code> otherwise. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_CXX14_CONSTEXPR">
+<span class="target" id="constexpr_8hpp_1a5d9d21eb86f6e696ddd1731e901d516b"></span><code class="sig-name descname">HPX_CXX14_CONSTEXPR</code><a class="headerlink" href="#c.HPX_CXX14_CONSTEXPR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro evaluates to <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the compiler supports C++14 constexpr. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_STATIC_CONSTEXPR">
+<span class="target" id="constexpr_8hpp_1ac3293373fed9c5497e8d716acc9aa30d"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR</code><a class="headerlink" href="#c.HPX_STATIC_CONSTEXPR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This macro evaluates to <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">:c:macro:HPX_CONSTEXPR_OR_CONST</span></code>. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-debug-hpp">
+<h2><cite>#include &lt;hpx/config/debug.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-debug-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_DEBUG">
+<span class="target" id="debug_8hpp_1a639170b3d90bdd00ef61f9ff4f5a6314"></span><code class="sig-name descname">HPX_DEBUG</code><a class="headerlink" href="#c.HPX_DEBUG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defined if HPX is compiled in debug mode. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_BUILD_TYPE">
+<span class="target" id="debug_8hpp_1abbd863bb8f9c902a34fdd8fdf29f92b3"></span><code class="sig-name descname">HPX_BUILD_TYPE</code><a class="headerlink" href="#c.HPX_BUILD_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates to <code class="docutils literal notranslate"><span class="pre">debug</span></code> if compiled in debug mode, <code class="docutils literal notranslate"><span class="pre">release</span></code> otherwise. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-emulate-deleted-hpp">
+<h2><cite>#include &lt;hpx/config/emulate_deleted.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-emulate-deleted-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_NON_COPYABLE">
+<span class="target" id="emulate__deleted_8hpp_1a6d2894ee62cc1927ba99bff42e89b376"></span><code class="sig-name descname">HPX_NON_COPYABLE</code><span class="sig-paren">(</span>cls<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_NON_COPYABLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks a class as non-copyable and non-movable. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-asio-hpp">
+<h2><cite>#include &lt;hpx/config/asio.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-asio-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-config-forceinline-hpp">
+<h2><cite>#include &lt;hpx/config/forceinline.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-forceinline-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_FORCEINLINE">
+<span class="target" id="forceinline_8hpp_1a6c8f31b01feb29751470093a9a75b04f"></span><code class="sig-name descname">HPX_FORCEINLINE</code><a class="headerlink" href="#c.HPX_FORCEINLINE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks a function to be forced inline. </p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="include-hpx-config-force-linking-hpp">
+<h2><cite>#include &lt;hpx/config/force_linking.hpp&gt;</cite><a class="headerlink" href="#include-hpx-config-force-linking-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6configE">
+<span id="_CPPv3N3hpx6configE"></span><span id="_CPPv2N3hpx6configE"></span><span id="hpx::config"></span><span class="target" id="namespacehpx_1_1config"></span><em class="property">namespace </em><code class="sig-name descname">config</code><a class="headerlink" href="#_CPPv4N3hpx6configE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6config13force_linkingEv">
+<span id="_CPPv3N3hpx6config13force_linkingEv"></span><span id="_CPPv2N3hpx6config13force_linkingEv"></span><span id="hpx::config::force_linking"></span><span class="target" id="force__linking_8hpp_1a54312f04689852b301895c5a87cbf842"></span><a class="reference internal" href="#_CPPv4N3hpx6config20force_linking_helperE" title="hpx::config::force_linking_helper">force_linking_helper</a> &amp;<code class="sig-name descname">force_linking</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6config13force_linkingEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx6config20force_linking_helperE">
+<span id="_CPPv3N3hpx6config20force_linking_helperE"></span><span id="_CPPv2N3hpx6config20force_linking_helperE"></span><span id="hpx::config::force_linking_helper"></span><span class="target" id="structhpx_1_1config_1_1force__linking__helper"></span><em class="property">struct </em><code class="sig-name descname">force_linking_helper</code><a class="headerlink" href="#_CPPv4N3hpx6config20force_linking_helperE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx6config20force_linking_helper11hpx_versionE">
+<span id="_CPPv3N3hpx6config20force_linking_helper11hpx_versionE"></span><span id="_CPPv2N3hpx6config20force_linking_helper11hpx_versionE"></span><span id="hpx::config::force_linking_helper::hpx_version__cCPC"></span><span class="target" id="structhpx_1_1config_1_1force__linking__helper_1a2105ed4286d4dd565526dbec3642f80e"></span><em class="property">const</em> char *<em class="property">const</em> <code class="sig-name descname">hpx_version</code><a class="headerlink" href="#_CPPv4N3hpx6config20force_linking_helper11hpx_versionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx6config20force_linking_helper13boost_versionE">
+<span id="_CPPv3N3hpx6config20force_linking_helper13boost_versionE"></span><span id="_CPPv2N3hpx6config20force_linking_helper13boost_versionE"></span><span id="hpx::config::force_linking_helper::boost_version__cCPC"></span><span class="target" id="structhpx_1_1config_1_1force__linking__helper_1ae525a3c653a2a32af83da6deee5a2c65"></span><em class="property">const</em> char *<em class="property">const</em> <code class="sig-name descname">boost_version</code><a class="headerlink" href="#_CPPv4N3hpx6config20force_linking_helper13boost_versionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../plugin/api.html" class="btn btn-neutral float-right" title="plugin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../concepts/api.html" class="btn btn-neutral float-left" title="concepts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>8174758</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

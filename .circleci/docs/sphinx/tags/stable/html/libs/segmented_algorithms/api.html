@@ -1,0 +1,433 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>segmented_algorithms &mdash; HPX stable documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="hardware" href="../hardware/api.html" />
+    <link rel="prev" title="testing" href="../testing/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                stable
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">segmented_algorithms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithm-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithm.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-transform-reduce-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/transform_reduce.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-transform-exclusive-scan-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-reduce-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/reduce.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-all-any-none-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/all_any_none.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-inclusive-scan-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/inclusive_scan.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-minmax-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/minmax.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-generate-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/generate.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-for-each-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/for_each.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-transform-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/transform.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-count-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/count.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-fill-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/fill.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-transform-inclusive-scan-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-exclusive-scan-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/exclusive_scan.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-adjacent-difference-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/adjacent_difference.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-find-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/find.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-parallel-segmented-algorithms-adjacent-find-hpp"><cite>#include &lt;hpx/parallel/segmented_algorithms/adjacent_find.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-traits-segmented-iterator-traits-hpp"><cite>#include &lt;hpx/traits/segmented_iterator_traits.hpp&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../parallel_executors/api.html">parallel_executors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>segmented_algorithms</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/segmented_algorithms/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="segmented-algorithms">
+<h1>segmented_algorithms<a class="headerlink" href="#segmented-algorithms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-parallel-segmented-algorithm-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithm.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithm-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-transform-reduce-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/transform_reduce.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-transform-reduce-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-transform-exclusive-scan-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-transform-exclusive-scan-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-reduce-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/reduce.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-reduce-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-all-any-none-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/all_any_none.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-all-any-none-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-inclusive-scan-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/inclusive_scan.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-inclusive-scan-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-minmax-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/minmax.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-minmax-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-generate-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/generate.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-generate-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-for-each-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/for_each.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-for-each-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-transform-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/transform.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-transform-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-count-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/count.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-count-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-fill-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/fill.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-fill-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-transform-inclusive-scan-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/transform_inclusive_scan.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-transform-inclusive-scan-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-exclusive-scan-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/exclusive_scan.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-exclusive-scan-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-adjacent-difference-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/adjacent_difference.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-adjacent-difference-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-find-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/find.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-find-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-parallel-segmented-algorithms-adjacent-find-hpp">
+<h2><cite>#include &lt;hpx/parallel/segmented_algorithms/adjacent_find.hpp&gt;</cite><a class="headerlink" href="#include-hpx-parallel-segmented-algorithms-adjacent-find-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-traits-segmented-iterator-traits-hpp">
+<h2><cite>#include &lt;hpx/traits/segmented_iterator_traits.hpp&gt;</cite><a class="headerlink" href="#include-hpx-traits-segmented-iterator-traits-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx6traitsE">
+<span id="_CPPv3N3hpx6traitsE"></span><span id="_CPPv2N3hpx6traitsE"></span><span id="hpx::traits"></span><span class="target" id="namespacehpx_1_1traits"></span><em class="property">namespace </em><code class="descname">traits</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4I00EN3hpx6traits25segmented_iterator_traitsE">
+<span id="_CPPv3I00EN3hpx6traits25segmented_iterator_traitsE"></span><span id="_CPPv2I00EN3hpx6traits25segmented_iterator_traitsE"></span><span class="target" id="structhpx_1_1traits_1_1segmented__iterator__traits"></span>template&lt;typename <code class="descname">Iterator</code>, typename <code class="descname">Enable</code> = void&gt;<br /><em class="property">struct </em><code class="descname">segmented_iterator_traits</code><a class="headerlink" href="#_CPPv4I00EN3hpx6traits25segmented_iterator_traitsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits25segmented_iterator_traits21is_segmented_iteratorE">
+<span id="_CPPv3N3hpx6traits25segmented_iterator_traits21is_segmented_iteratorE"></span><span id="_CPPv2N3hpx6traits25segmented_iterator_traits21is_segmented_iteratorE"></span><span id="hpx::traits::segmented_iterator_traits::is_segmented_iterator"></span><span class="target" id="structhpx_1_1traits_1_1segmented__iterator__traits_1afe6702096744b0fc81a2b27136fd9fe4"></span><em class="property">typedef </em><a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::false_type <code class="descname">is_segmented_iterator</code><a class="headerlink" href="#_CPPv4N3hpx6traits25segmented_iterator_traits21is_segmented_iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4I00EN3hpx6traits31segmented_local_iterator_traitsE">
+<span id="_CPPv3I00EN3hpx6traits31segmented_local_iterator_traitsE"></span><span id="_CPPv2I00EN3hpx6traits31segmented_local_iterator_traitsE"></span><span class="target" id="structhpx_1_1traits_1_1segmented__local__iterator__traits"></span>template&lt;typename <code class="descname">Iterator</code>, typename <code class="descname">Enable</code> = void&gt;<br /><em class="property">struct </em><code class="descname">segmented_local_iterator_traits</code><a class="headerlink" href="#_CPPv4I00EN3hpx6traits31segmented_local_iterator_traitsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits31segmented_local_iterator_traits27is_segmented_local_iteratorE">
+<span id="_CPPv3N3hpx6traits31segmented_local_iterator_traits27is_segmented_local_iteratorE"></span><span id="_CPPv2N3hpx6traits31segmented_local_iterator_traits27is_segmented_local_iteratorE"></span><span id="hpx::traits::segmented_local_iterator_traits::is_segmented_local_iterator"></span><span class="target" id="structhpx_1_1traits_1_1segmented__local__iterator__traits_1a98a6c6ec06d9e6a75fd406b19a42c57c"></span><em class="property">typedef </em><a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::false_type <code class="descname">is_segmented_local_iterator</code><a class="headerlink" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits27is_segmented_local_iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits31segmented_local_iterator_traits8iteratorE">
+<span id="_CPPv3N3hpx6traits31segmented_local_iterator_traits8iteratorE"></span><span id="_CPPv2N3hpx6traits31segmented_local_iterator_traits8iteratorE"></span><span id="hpx::traits::segmented_local_iterator_traits::iterator"></span><span class="target" id="structhpx_1_1traits_1_1segmented__local__iterator__traits_1a83946176aa4d631c568b09a28e7a0052"></span><em class="property">typedef </em>Iterator <code class="descname">iterator</code><a class="headerlink" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits8iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits31segmented_local_iterator_traits14local_iteratorE">
+<span id="_CPPv3N3hpx6traits31segmented_local_iterator_traits14local_iteratorE"></span><span id="_CPPv2N3hpx6traits31segmented_local_iterator_traits14local_iteratorE"></span><span id="hpx::traits::segmented_local_iterator_traits::local_iterator"></span><span class="target" id="structhpx_1_1traits_1_1segmented__local__iterator__traits_1a8dcd416064b064cdd1f6a131462ab99c"></span><em class="property">typedef </em>Iterator <code class="descname">local_iterator</code><a class="headerlink" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits14local_iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx6traits31segmented_local_iterator_traits18local_raw_iteratorE">
+<span id="_CPPv3N3hpx6traits31segmented_local_iterator_traits18local_raw_iteratorE"></span><span id="_CPPv2N3hpx6traits31segmented_local_iterator_traits18local_raw_iteratorE"></span><span id="hpx::traits::segmented_local_iterator_traits::local_raw_iterator"></span><span class="target" id="structhpx_1_1traits_1_1segmented__local__iterator__traits_1ac06a4f873b7374217e2829eb2f6609eb"></span><em class="property">typedef </em>Iterator <code class="descname">local_raw_iterator</code><a class="headerlink" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits18local_raw_iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits31segmented_local_iterator_traits5localERK14local_iterator">
+<span id="_CPPv3N3hpx6traits31segmented_local_iterator_traits5localERK14local_iterator"></span><span id="_CPPv2N3hpx6traits31segmented_local_iterator_traits5localERK14local_iterator"></span><span id="hpx::traits::segmented_local_iterator_traits::local__local_iteratorCR"></span><span class="target" id="structhpx_1_1traits_1_1segmented__local__iterator__traits_1a958909ea6f85316cd6382f892cb4cb4c"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits18local_raw_iteratorE" title="hpx::traits::segmented_local_iterator_traits::local_raw_iterator">local_raw_iterator</a> <em class="property">const</em> &amp;<code class="descname">local</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits14local_iteratorE" title="hpx::traits::segmented_local_iterator_traits::local_iterator">local_iterator</a> <em class="property">const</em> &amp;<em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits5localERK14local_iterator" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits31segmented_local_iterator_traits6remoteERK18local_raw_iterator">
+<span id="_CPPv3N3hpx6traits31segmented_local_iterator_traits6remoteERK18local_raw_iterator"></span><span id="_CPPv2N3hpx6traits31segmented_local_iterator_traits6remoteERK18local_raw_iterator"></span><span id="hpx::traits::segmented_local_iterator_traits::remote__local_raw_iteratorCR"></span><span class="target" id="structhpx_1_1traits_1_1segmented__local__iterator__traits_1a903225a9c54bfec5374f1b023497e1b2"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits14local_iteratorE" title="hpx::traits::segmented_local_iterator_traits::local_iterator">local_iterator</a> <em class="property">const</em> &amp;<code class="descname">remote</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits18local_raw_iteratorE" title="hpx::traits::segmented_local_iterator_traits::local_raw_iterator">local_raw_iterator</a> <em class="property">const</em> &amp;<em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits6remoteERK18local_raw_iterator" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits31segmented_local_iterator_traits5localERR14local_iterator">
+<span id="_CPPv3N3hpx6traits31segmented_local_iterator_traits5localERR14local_iterator"></span><span id="_CPPv2N3hpx6traits31segmented_local_iterator_traits5localERR14local_iterator"></span><span id="hpx::traits::segmented_local_iterator_traits::local__local_iteratorRR"></span><span class="target" id="structhpx_1_1traits_1_1segmented__local__iterator__traits_1a31596424cc1dfb1946878c0abd1ae917"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits18local_raw_iteratorE" title="hpx::traits::segmented_local_iterator_traits::local_raw_iterator">local_raw_iterator</a> <code class="descname">local</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits14local_iteratorE" title="hpx::traits::segmented_local_iterator_traits::local_iterator">local_iterator</a> &amp;&amp;<em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits5localERR14local_iterator" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx6traits31segmented_local_iterator_traits6remoteERR18local_raw_iterator">
+<span id="_CPPv3N3hpx6traits31segmented_local_iterator_traits6remoteERR18local_raw_iterator"></span><span id="_CPPv2N3hpx6traits31segmented_local_iterator_traits6remoteERR18local_raw_iterator"></span><span id="hpx::traits::segmented_local_iterator_traits::remote__local_raw_iteratorRR"></span><span class="target" id="structhpx_1_1traits_1_1segmented__local__iterator__traits_1aff8300699bf4be294e7276412527e520"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits14local_iteratorE" title="hpx::traits::segmented_local_iterator_traits::local_iterator">local_iterator</a> <code class="descname">remote</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits18local_raw_iteratorE" title="hpx::traits::segmented_local_iterator_traits::local_raw_iterator">local_raw_iterator</a> &amp;&amp;<em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx6traits31segmented_local_iterator_traits6remoteERR18local_raw_iterator" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../hardware/api.html" class="btn btn-neutral float-right" title="hardware" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../testing/api.html" class="btn btn-neutral float-left" title="testing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>966745e</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

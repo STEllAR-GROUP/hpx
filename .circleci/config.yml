@@ -1,0 +1,26 @@
+#  Copyright (c) 2017-2018 Thomas Heller
+#  Copyright (c) 2015 Martin Stumpf
+#
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+version: 2
+
+gh_pages_filter: &gh_pages_filter
+    filters:
+      branches:
+        ignore: gh-pages
+
+jobs:
+  dummy_job:
+    steps:
+      - run:
+          name: Dummy step
+          command:
+
+workflows:
+  version: 2
+  dummy_workflow:
+    jobs:
+      - dummy_job:
+          <<: *gh_pages_filter

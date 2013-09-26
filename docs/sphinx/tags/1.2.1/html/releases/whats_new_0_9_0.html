@@ -1,0 +1,526 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>HPX V0.9.0 (Jul 5, 2012) &mdash; HPX 1.2.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="HPX 1.2.1 documentation" href="../index.html"/>
+        <link rel="up" title="Releases" href="../releases.html"/>
+        <link rel="next" title="HPX V0.8.1 (Apr 21, 2012)" href="whats_new_0_8_1.html"/>
+        <link rel="prev" title="HPX V0.9.5 (Jan 16, 2013)" href="whats_new_0_9_5.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../releases.html">Releases</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_2_1.html"><em>HPX</em> V1.2.1 (Feb 19, 2019)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_2_0.html"><em>HPX</em> V1.2.0 (Nov 12, 2018)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_1_0.html"><em>HPX</em> V1.1.0 (Mar 24, 2018)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_1_0_0.html"><em>HPX</em> V1.0.0 (Apr 24, 2017)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_99.html"><em>HPX</em> V0.9.99 (Jul 15, 2016)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_11.html"><em>HPX</em> V0.9.11 (Nov 11, 2015)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_10.html"><em>HPX</em> V0.9.10 (Mar 24, 2015)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_9.html"><em>HPX</em> V0.9.9 (Oct 31, 2014, codename Spooky)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_8.html"><em>HPX</em> V0.9.8 (Mar 24, 2014)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_7.html"><em>HPX</em> V0.9.7 (Nov 13, 2013)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_6.html"><em>HPX</em> V0.9.6 (Jul 30, 2013)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_9_5.html"><em>HPX</em> V0.9.5 (Jan 16, 2013)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><em>HPX</em> V0.9.0 (Jul 5, 2012)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-changes">General changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bug-fixes-closed-tickets">Bug fixes (closed tickets)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_8_1.html"><em>HPX</em> V0.8.1 (Apr 21, 2012)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_8_0.html"><em>HPX</em> V0.8.0 (Mar 23, 2012)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whats_new_0_7_0.html"><em>HPX</em> V0.7.0 (Dec 12, 2011)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../releases.html">Releases</a> &raquo;</li>
+        
+      <li><em>HPX</em> V0.9.0 (Jul 5, 2012)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/releases/whats_new_0_9_0.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hpx-v0-9-0-jul-5-2012">
+<span id="hpx-0-9-0"></span><h1><em>HPX</em> V0.9.0 (Jul 5, 2012)<a class="headerlink" href="#hpx-v0-9-0-jul-5-2012" title="Permalink to this headline">¶</a></h1>
+<p>We have had roughly 800 commits since the last release and we have closed
+approximately 80 tickets (bugs, feature requests, etc.).</p>
+<div class="section" id="general-changes">
+<h2>General changes<a class="headerlink" href="#general-changes" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Significant improvements made to the usability of <em>HPX</em> in large-scale,
+distributed environments.</p>
+</li>
+<li><p class="first">Renamed <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::lcos::packaged_task</span></code> to
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::lcos::packaged_action</span></code> to reflect the semantic differences to
+a packaged_task as defined by the <a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21">C++11 Standard</a>.</p>
+</li>
+<li><p class="first"><em>HPX</em> now exposes <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::thread</span></code> which is compliant to the C++11
+std::thread type except that it (purely locally) represents an <em>HPX</em> thread.
+This new type does not expose any of the remote capabilities of the underlying
+<em>HPX</em>-thread implementation.</p>
+</li>
+<li><p class="first">The type <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::lcos::future</span></code> is now compliant to the C++11
+std::future&lt;&gt; type. This type can be used to synchronize both, local and
+remote operations. In both cases the control flow will ‘return’ to the future
+in order to trigger any continuation.</p>
+</li>
+<li><p class="first">The types <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::lcos::local::promise</span></code> and
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::lcos::local::packaged_task</span></code> are now compliant to the C++11
+<code class="docutils literal notranslate"><span class="pre">std::promise&lt;&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">std::packaged_task&lt;&gt;</span></code> types. These can be used to
+create a future representing local work only. Use the types
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::lcos::promise</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::lcos::packaged_action</span></code>
+to wrap any (possibly remote) action into a future.</p>
+</li>
+<li><p class="first"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::thread</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::lcos::future</span></code> are now
+cancelable.</p>
+</li>
+<li><p class="first">Added support for sequential and logic composition of
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::lcos::future</span></code>s. The member function
+<code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">hpx::lcos::future::when</span></code> permits futures to be sequentially
+composed. The helper functions <a class="reference internal" href="../api.html#_CPPv3N3hpx8wait_allE9InputIter9InputIter" title="hpx::wait_all"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_all</span></code></a>,
+<a class="reference internal" href="../api.html#_CPPv3N3hpx8wait_anyE9InputIter9InputIterR10error_code" title="hpx::wait_any"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_any</span></code></a>, and <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::wait_n</span></code> can be used to wait for
+more than one future at a time.</p>
+</li>
+<li><p class="first"><em>HPX</em> now exposes <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::apply</span></code> and <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::async</span></code> as the
+preferred way of creating (or invoking) any deferred work. These functions are
+usable with various types of functions, function objects, and actions and
+provide a uniform way to spawn deferred tasks.</p>
+</li>
+<li><p class="first"><em>HPX</em> now utilizes <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::util::bind</span></code> to (partially) bind local
+functions and function objects, and also actions. Remote bound actions can
+have placeholders as well.</p>
+</li>
+<li><p class="first"><em>HPX</em> continuations are now fully polymorphic. The class
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::actions::forwarding_continuation</span></code> is an example of how the
+user can write is own types of continuations. It can be used to execute any
+function as an continuation of a particular action.</p>
+</li>
+<li><p class="first">Reworked the action invocation API to be fully conformant to normal functions.
+Actions can now be invoked using <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::apply</span></code>,
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::async</span></code>, or using the <code class="docutils literal notranslate"><span class="pre">operator()</span></code> implemented on actions.
+Actions themselves can now be cheaply instantiated as they do not have any
+members anymore.</p>
+</li>
+<li><p class="first">Reworked the lazy action invocation API. Actions can now be directly bound
+using <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::util::bind</span></code> by passing an action instance as the first
+argument.</p>
+</li>
+<li><p class="first">A minimal <em>HPX</em> program now looks like this:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_init.hpp&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This removes the immediate dependency on the <a class="reference external" href="https://www.boost.org/doc/html/program_options.html">Boost.Program Options</a> library.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This minimal version of an <em>HPX</em> program does not support any of the
+default command line arguments (such as –help, or command line options
+related to PBS). It is suggested to always pass <code class="docutils literal notranslate"><span class="pre">argc</span></code> and <code class="docutils literal notranslate"><span class="pre">argv</span></code> to
+<em>HPX</em> as shown in the example below.</p>
+</div>
+</li>
+<li><p class="first">In order to support those, but still not to depend on <a class="reference external" href="https://www.boost.org/doc/html/program_options.html">Boost.Program Options</a>,
+the minimal program can be written as:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;hpx/hpx_init.hpp&gt;</span><span class="cp"></span>
+
+<span class="c1">// The arguments for hpx_main can be left off, which very similar to the</span>
+<span class="c1">// behavior of ``main()`` as defined by C++.</span>
+<span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Added performance counters exposing the number of component instances which
+are alive on a given locality.</p>
+</li>
+<li><p class="first">Added performance counters exposing then number of messages sent and received,
+the number of parcels sent and received, the number of bytes sent and
+received, the overall time required to send and receive data, and the overall
+time required to serialize and deserialize the data.</p>
+</li>
+<li><p class="first">Added a new component: <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::components::binpacking_factory</span></code> which
+is equivalent to the existing
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::components::distributing_factory</span></code> component, except that it
+equalizes the overall population of the components to create. It exposes two
+factory methods, one based on the number of existing instances of the
+component type to create, and one based on an arbitrary performance counter
+which will be queried for all relevant localities.</p>
+</li>
+<li><p class="first">Added API functions allowing to access elements of the diagnostic information
+embedded in the given exception: <a class="reference internal" href="../api.html#_CPPv3N3hpx15get_locality_idER10error_code" title="hpx::get_locality_id"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_locality_id</span></code></a>,
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_host_name</span></code>, <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_process_id</span></code>,
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_function_name</span></code>, <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_file_name</span></code>,
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_line_number</span></code>, <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_os_thread</span></code>,
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_thread_id</span></code>, and <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::get_thread_description</span></code>.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="bug-fixes-closed-tickets">
+<h2>Bug fixes (closed tickets)<a class="headerlink" href="#bug-fixes-closed-tickets" title="Permalink to this headline">¶</a></h2>
+<p>Here is a list of the important tickets we closed for this release:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/71">Issue #71</a> - GIDs that are not serialized via <code class="docutils literal notranslate"><span class="pre">handle_gid&lt;&gt;</span></code> should
+raise an exception</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/105">Issue #105</a> - Allow for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::util::function</span></code>s to be registered
+in the AGAS symbolic namespace</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/107">Issue #107</a> - Nasty threadmanger race condition (reproducible in
+sheneos_test)</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/108">Issue #108</a> - Add millisecond resolution to <em>HPX</em> logs on Linux</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/110">Issue #110</a> - Shutdown hang in distributed with release build</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/116">Issue #116</a> - Don’t use TSS for the applier and runtime pointers</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/162">Issue #162</a> - Move local synchronous execution shortcut from
+hpx::function to the applier</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/172">Issue #172</a> - Cache sources in CMake and check if they change manually</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/178">Issue #178</a> - Add an INI option to turn off ranged-based AGAS caching</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/187">Issue #187</a> - Support for disabling performance counter deployment</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/202">Issue #202</a> - Support for sending performance counter data to a specific
+file</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/218">Issue #218</a> - boost.coroutines allows different stack sizes, but stack
+pool is unaware of this</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/231">Issue #231</a> - Implement movable <code class="docutils literal notranslate"><span class="pre">boost::bind</span></code></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/232">Issue #232</a> - Implement movable <code class="docutils literal notranslate"><span class="pre">boost::function</span></code></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/236">Issue #236</a> - Allow binding <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::util::function</span></code> to actions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/239">Issue #239</a> - Replace <code class="docutils literal notranslate"><span class="pre">hpx::function</span></code> with
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::util::function</span></code></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/240">Issue #240</a> - Can’t specify RemoteResult with lcos::async</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/242">Issue #242</a> - REGISTER_TEMPLATE support for plain actions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/243">Issue #243</a> - <code class="docutils literal notranslate"><span class="pre">handle_gid&lt;&gt;</span></code> support for
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::util::function</span></code></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/245">Issue #245</a> - <code class="docutils literal notranslate"><span class="pre">*_c_cache</span> <span class="pre">code</span></code> throws an exception if the queried GID
+is not in the local cache</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/246">Issue #246</a> - Undefined references in dataflow/adaptive1d example</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/252">Issue #252</a> - Problems configuring sheneos with CMake</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/254">Issue #254</a> - Lifetime of components doesn’t end when client goes out of
+scope</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/259">Issue #259</a> - CMake does not detect that MSVC10 has lambdas</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/260">Issue #260</a> - io_service_pool segfault</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/261">Issue #261</a> - Late parcel executed outside of pxthread</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/263">Issue #263</a> - Cannot select allocator with CMake</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/264">Issue #264</a> - Fix allocator select</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/267">Issue #267</a> - Runtime error for hello_world</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/269">Issue #269</a> - pthread_affinity_np test fails to compile</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/270">Issue #270</a> - Compiler noise due to -Wcast-qual</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/275">Issue #275</a> - Problem with configuration tests/include paths on Gentoo</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/325">Issue #325</a> - Sheneos is 200-400 times slower than the fortran equivalent</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/331">Issue #331</a> - <a class="reference internal" href="../api.html#_CPPv3N3hpx4initERN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERN5boost15program_options19options_descriptionEiPPcRNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::init</span></code></a> and <code class="docutils literal notranslate"><span class="pre">hpx_main()</span></code> should not depend
+on program_options</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/333">Issue #333</a> - Add doxygen support to CMake for doc toolchain</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/340">Issue #340</a> - Performance counters for parcels</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/346">Issue #346</a> - Component loading error when running hello_world in
+distributed on MSVC2010</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/362">Issue #362</a> - Missing initializer error</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/363">Issue #363</a> - Parcel port serialization error</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/366">Issue #366</a> - Parcel buffering leads to types incompatible exception</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/368">Issue #368</a> - Scalable alternative to rand() needed for <em>HPX</em></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/369">Issue #369</a> - IB over IP is substantially slower than just using standard
+TCP/IP</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/374">Issue #374</a> - <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::lcos::wait</span></code> should work with dataflows and
+arbitrary classes meeting the future interface</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/375">Issue #375</a> - Conflicting/ambiguous overloads of
+<code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::lcos::wait</span></code></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/376">Issue #376</a> - Find_HPX.cmake should set CMake variable HPX_FOUND for out
+of tree builds</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/377">Issue #377</a> - ShenEOS interpolate bulk and interpolate_one_bulk are
+broken</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/379">Issue #379</a> - Add support for distributed runs under SLURM</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/382">Issue #382</a> - _Unwind_Word not declared in boost.backtrace</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/387">Issue #387</a> - Doxygen should look only at list of specified files</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/388">Issue #388</a> - Running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code> on an out-of-tree application is
+broken</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/391">Issue #391</a> - Out-of-tree application segfaults when running in qsub</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/392">Issue #392</a> - Remove HPX_NO_INSTALL option from cmake build system</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/396">Issue #396</a> - Pragma related warnings when compiling with older gcc
+versions</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/399">Issue #399</a> - Out of tree component build problems</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/400">Issue #400</a> - Out of source builds on Windows: linker should not receive
+compiler flags</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/401">Issue #401</a> - Out of source builds on Windows: components need to be
+linked with hpx_serialization</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/404">Issue #404</a> - gfortran fails to link automatically when fortran files are
+present</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/405">Issue #405</a> - Inability to specify linking order for external libraries</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/406">Issue #406</a> - Adapt action limits such that dataflow applications work
+without additional defines</li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/415">Issue #415</a> - <code class="docutils literal notranslate"><span class="pre">locality_results</span></code> is not a member of
+<code class="docutils literal notranslate"><span class="pre">hpx::components::server</span></code></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/425">Issue #425</a> - Breaking changes to <code class="docutils literal notranslate"><span class="pre">traits::*result</span></code> wrt
+<code class="docutils literal notranslate"><span class="pre">std::vector&lt;id_type&gt;</span></code></li>
+<li><a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues/426">Issue #426</a> - AUTOGLOB needs to be updated to support fortran</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="whats_new_0_8_1.html" class="btn btn-neutral float-right" title="HPX V0.8.1 (Apr 21, 2012)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="whats_new_0_9_5.html" class="btn btn-neutral" title="HPX V0.9.5 (Jan 16, 2013)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2018, The Ste||ar Group.
+      
+        <span class="commit">
+          Revision <code>b26d3ba</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.2.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

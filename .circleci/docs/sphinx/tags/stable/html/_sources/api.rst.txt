@@ -1,0 +1,44 @@
+..
+    Copyright (C) 2018 Mikael Simberg
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+=============
+API reference
+=============
+
+Main |hpx| library reference
+============================
+
+.. doxygenindex::
+
+Modules reference
+=================
+
+.. toctree::
+   :maxdepth: 1
+
+   /libs/datastructures/api.rst
+   /libs/testing/api.rst
+   /libs/segmented_algorithms/api.rst
+   /libs/hardware/api.rst
+   /libs/collectives/api.rst
+   /libs/statistics/api.rst
+   /libs/cache/api.rst
+   /libs/assertion/api.rst
+   /libs/parallel_executors/api.rst
+   /libs/iterator_support/api.rst
+   /libs/format/api.rst
+   /libs/allocator_support/api.rst
+   /libs/util/api.rst
+   /libs/preprocessor/api.rst
+   /libs/timing/api.rst
+   /libs/type_support/api.rst
+   /libs/hashing/api.rst
+   /libs/logging/api.rst
+   /libs/config/api.rst
+   /libs/algorithms/api.rst
+   /libs/concepts/api.rst
+   /libs/thread_support/api.rst
+

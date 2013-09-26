@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dataflow: Interest calculator &mdash; HPX stable documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Local to remote: 1D stencil" href="1d_stencil.html" />
+    <link rel="prev" title="Components and actions: Accumulator" href="accumulator.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                stable
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fibonacci_local.html">Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code>: Fibonacci</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fibonacci.html">Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code> and actions: Fibonacci</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hello_world.html">Remote execution with actions: Hello world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="accumulator.html">Components and actions: Accumulator</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Dataflow: Interest calculator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setup">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#walkthrough">Walkthrough</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="1d_stencil.html">Local to remote: 1D stencil</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../examples.html">Examples</a> &raquo;</li>
+        
+      <li>Dataflow: Interest calculator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/examples/interest_calculator.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dataflow-interest-calculator">
+<span id="examples-interest-calculator"></span><h1>Dataflow: Interest calculator<a class="headerlink" href="#dataflow-interest-calculator" title="Permalink to this headline">¶</a></h1>
+<p><em>HPX</em> provides its users with several different tools to simply express parallel
+concepts. One of these tools is a <a class="reference internal" href="../terminology.html#term-local-control-object"><span class="xref std std-term">local control object</span></a> (<a class="reference internal" href="../terminology.html#term-lco"><span class="xref std std-term">LCO</span></a>)
+called dataflow. An <a class="reference internal" href="../terminology.html#term-lco"><span class="xref std std-term">LCO</span></a> is a type of component that can spawn a new
+thread when triggered. They are also distinguished from other components by a
+standard interface which allow users to understand and use them easily.
+A Dataflow, being an <a class="reference internal" href="../terminology.html#term-lco"><span class="xref std std-term">LCO</span></a>, is triggered when the values it depends on
+become available. For instance, if you have a calculation X that depends on the
+results of three other calculations, you could set up a dataflow that would begin
+the calculation X as soon as the other three calculations have returned their
+values. Dataflows are set up to depend on other dataflows. It is this property
+that makes dataflow a powerful parallelization tool. If you understand the
+dependencies of your calculation, you can devise a simple algorithm which sets
+up a dependency tree to be executed. In this example, we calculate compound
+interest. To calculate compound interest, one must calculate the interest made
+in each compound period, and then add that interest back to the principal before
+calculating the interest made in the next period. A practical person would of
+course use the formula for compound interest:</p>
+<div class="math notranslate nohighlight">
+\[F = P(1 + i) ^ n\]</div>
+<p>where <span class="math notranslate nohighlight">\(F\)</span> is the future value, <span class="math notranslate nohighlight">\(P\)</span> is the principal value, <span class="math notranslate nohighlight">\(i\)</span>
+is the interest rate, and <span class="math notranslate nohighlight">\(n\)</span> is the number of compound periods.</p>
+<p>Nevertheless, we have chosen for the sake of example to manually calculate the
+future value by iterating:</p>
+<div class="math notranslate nohighlight">
+\[I = Pi\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[P = P + I\]</div>
+<div class="section" id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
+<p>The source code for this example can be found here:
+<a class="reference download internal" download="" href="../_downloads/4589bc8135f219c4d569bb7acf8d0c84/interest_calculator.cpp"><code class="xref download docutils literal notranslate"><span class="pre">interest_calculator.cpp</span></code></a>.</p>
+<p>To compile this program, go to your <em>HPX</em> build directory (see
+<a class="reference internal" href="../manual/building_hpx.html#hpx-build-system"><span class="std std-ref">HPX build system</span></a> for information on configuring and building <em>HPX</em>) and
+enter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make examples.quickstart.interest_calculator
+</pre></div>
+</div>
+<p>To run the program type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/interest_calculator --principal <span class="m">100</span> --rate <span class="m">5</span> --cp <span class="m">6</span> --time <span class="m">36</span>
+</pre></div>
+</div>
+<p>This should print:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Final amount: 134.01
+Amount made: 34.0096
+</pre></div>
+</div>
+</div>
+<div class="section" id="walkthrough">
+<h2>Walkthrough<a class="headerlink" href="#walkthrough" title="Permalink to this headline">¶</a></h2>
+<p>Let us begin with main, here we can see that we again are using
+Boost.Program Options to set our command line variables (see
+<a class="reference internal" href="fibonacci.html#examples-fibonacci"><span class="std std-ref">Asynchronous execution with hpx::async and actions: Fibonacci</span></a> for more details). These options set the principal,
+rate, compound period, and time. It is important to note that the units of time
+for <code class="docutils literal notranslate"><span class="pre">cp</span></code> and <code class="docutils literal notranslate"><span class="pre">time</span></code> must be the same.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span> <span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">options_description</span> <span class="n">cmdline</span><span class="p">(</span><span class="s">&quot;Usage: &quot;</span> <span class="n">HPX_APPLICATION_STRING</span> <span class="s">&quot; [options]&quot;</span><span class="p">);</span>
+
+    <span class="n">cmdline</span><span class="p">.</span><span class="n">add_options</span><span class="p">()</span>
+        <span class="p">(</span><span class="s">&quot;principal&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">default_value</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span> <span class="s">&quot;The principal [$]&quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="s">&quot;rate&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">default_value</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="s">&quot;The interest rate [%]&quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="s">&quot;cp&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">default_value</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="s">&quot;The compound period [months]&quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="s">&quot;time&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">default_value</span><span class="p">(</span><span class="mi">12</span><span class="o">*</span><span class="mi">30</span><span class="p">),</span>
+            <span class="s">&quot;The time money is invested [months]&quot;</span><span class="p">)</span>
+    <span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">cmdline</span><span class="p">,</span> <span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Next we look at hpx_main.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="n">variables_map</span> <span class="o">&amp;</span> <span class="n">vm</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">{</span>
+        <span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">shared_future</span><span class="p">;</span>
+        <span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">make_ready_future</span><span class="p">;</span>
+        <span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">dataflow</span><span class="p">;</span>
+        <span class="k">using</span> <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">unwrapping</span><span class="p">;</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">naming</span><span class="o">::</span><span class="n">id_type</span> <span class="n">here</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">();</span>
+
+        <span class="kt">double</span> <span class="n">init_principal</span><span class="o">=</span><span class="n">vm</span><span class="p">[</span><span class="s">&quot;principal&quot;</span><span class="p">].</span><span class="n">as</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">();</span> <span class="c1">//Initial principal</span>
+        <span class="kt">double</span> <span class="n">init_rate</span><span class="o">=</span><span class="n">vm</span><span class="p">[</span><span class="s">&quot;rate&quot;</span><span class="p">].</span><span class="n">as</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">();</span> <span class="c1">//Interest rate</span>
+        <span class="kt">int</span> <span class="n">cp</span><span class="o">=</span><span class="n">vm</span><span class="p">[</span><span class="s">&quot;cp&quot;</span><span class="p">].</span><span class="n">as</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">();</span> <span class="c1">//Length of a compound period</span>
+        <span class="kt">int</span> <span class="n">t</span><span class="o">=</span><span class="n">vm</span><span class="p">[</span><span class="s">&quot;time&quot;</span><span class="p">].</span><span class="n">as</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">();</span> <span class="c1">//Length of time money is invested</span>
+
+        <span class="n">init_rate</span><span class="o">/=</span><span class="mi">100</span><span class="p">;</span> <span class="c1">//Rate is a % and must be converted</span>
+        <span class="n">t</span><span class="o">/=</span><span class="n">cp</span><span class="p">;</span> <span class="c1">//Determine how many times to iterate interest calculation:</span>
+               <span class="c1">//How many full compound periods can fit in the time invested</span>
+
+        <span class="c1">// In non-dataflow terms the implemented algorithm would look like:</span>
+        <span class="c1">//</span>
+        <span class="c1">// int t = 5;    // number of time periods to use</span>
+        <span class="c1">// double principal = init_principal;</span>
+        <span class="c1">// double rate = init_rate;</span>
+        <span class="c1">//</span>
+        <span class="c1">// for (int i = 0; i &lt; t; ++i)</span>
+        <span class="c1">// {</span>
+        <span class="c1">//     double interest = calc(principal, rate);</span>
+        <span class="c1">//     principal = add(principal, interest);</span>
+        <span class="c1">// }</span>
+        <span class="c1">//</span>
+        <span class="c1">// Please note the similarity with the code below!</span>
+
+        <span class="n">shared_future</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">principal</span> <span class="o">=</span> <span class="n">make_ready_future</span><span class="p">(</span><span class="n">init_principal</span><span class="p">);</span>
+        <span class="n">shared_future</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">rate</span> <span class="o">=</span> <span class="n">make_ready_future</span><span class="p">(</span><span class="n">init_rate</span><span class="p">);</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">t</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">shared_future</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">interest</span> <span class="o">=</span> <span class="n">dataflow</span><span class="p">(</span><span class="n">unwrapping</span><span class="p">(</span><span class="n">calc</span><span class="p">),</span> <span class="n">principal</span><span class="p">,</span> <span class="n">rate</span><span class="p">);</span>
+            <span class="n">principal</span> <span class="o">=</span> <span class="n">dataflow</span><span class="p">(</span><span class="n">unwrapping</span><span class="p">(</span><span class="n">add</span><span class="p">),</span> <span class="n">principal</span><span class="p">,</span> <span class="n">interest</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="c1">// wait for the dataflow execution graph to be finished calculating our</span>
+        <span class="c1">// overall interest</span>
+        <span class="kt">double</span> <span class="n">result</span> <span class="o">=</span> <span class="n">principal</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Final amount: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">result</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Amount made: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">result</span><span class="o">-</span><span class="n">init_principal</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here we find our command line variables read in, the rate is converted from a
+percent to a decimal, the number of calculation iterations is determined, and
+then our shared_futures are set up. Notice that we first place our principal and
+rate into shares futures by passing the variables <code class="docutils literal notranslate"><span class="pre">init_principal</span></code> and
+<code class="docutils literal notranslate"><span class="pre">init_rate</span></code> using <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::make_ready_future</span></code>.</p>
+<p>In this way <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::shared_future</span></code><code class="docutils literal notranslate"><span class="pre">&lt;double&gt;</span></code> <code class="docutils literal notranslate"><span class="pre">principal</span></code>
+and <code class="docutils literal notranslate"><span class="pre">rate</span></code> will be initialized to <code class="docutils literal notranslate"><span class="pre">init_principal</span></code> and <code class="docutils literal notranslate"><span class="pre">init_rate</span></code> when
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::make_ready_future</span></code><code class="docutils literal notranslate"><span class="pre">&lt;double&gt;</span></code> returns a future containing
+those initial values. These shared futures then enter the for loop and are
+passed to <code class="docutils literal notranslate"><span class="pre">interest</span></code>. Next <code class="docutils literal notranslate"><span class="pre">principal</span></code> and <code class="docutils literal notranslate"><span class="pre">interest</span></code> are passed to the
+reassignment of <code class="docutils literal notranslate"><span class="pre">principal</span></code> using a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::dataflow</span></code>. A dataflow
+will first wait for its arguments to be ready before launching any callbacks, so
+<code class="docutils literal notranslate"><span class="pre">add</span></code> in this case will not begin until both <code class="docutils literal notranslate"><span class="pre">principal</span></code> and <code class="docutils literal notranslate"><span class="pre">interest</span></code>
+are ready. This loop continues for each compound period that must be calculated.
+To see how <code class="docutils literal notranslate"><span class="pre">interest</span></code> and <code class="docutils literal notranslate"><span class="pre">principal</span></code> are calculated in the loop let us look
+at <code class="docutils literal notranslate"><span class="pre">calc_action</span></code> and <code class="docutils literal notranslate"><span class="pre">add_action</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Calculate interest for one period</span>
+<span class="kt">double</span> <span class="nf">calc</span><span class="p">(</span><span class="kt">double</span> <span class="n">principal</span><span class="p">,</span> <span class="kt">double</span> <span class="n">rate</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">principal</span> <span class="o">*</span> <span class="n">rate</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">///////////////////////////////////////////////////////////////////////////////</span>
+<span class="c1">// Add the amount made to the principal</span>
+<span class="kt">double</span> <span class="nf">add</span><span class="p">(</span><span class="kt">double</span> <span class="n">principal</span><span class="p">,</span> <span class="kt">double</span> <span class="n">interest</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">principal</span> <span class="o">+</span> <span class="n">interest</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>After the shared future dependencies have been defined in hpx_main, we see the
+following statement:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">double</span> <span class="n">result</span> <span class="o">=</span> <span class="n">principal</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>This statement calls <code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">hpx::future::get</span></code> on the shared future
+principal which had its value calculated by our for loop. The program will wait
+here until the entire dataflow tree has been calculated and the value assigned
+to result. The program then prints out the final value of the investment and the
+amount of interest made by subtracting the final value of the investment from
+the initial value of the investment.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="1d_stencil.html" class="btn btn-neutral float-right" title="Local to remote: 1D stencil" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="accumulator.html" class="btn btn-neutral float-left" title="Components and actions: Accumulator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>966745e</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

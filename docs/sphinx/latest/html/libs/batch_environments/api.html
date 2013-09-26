@@ -1,0 +1,721 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>batch_environments &mdash; HPX 1.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="testing" href="../testing/api.html" />
+    <link rel="prev" title="allocator_support" href="../allocator_support/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">batch_environments</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-batch-environments-batch-environment-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/batch_environments/batch_environment.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-batch-environments-alps-environment-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/batch_environments/alps_environment.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-batch-environments-pbs-environment-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/batch_environments/pbs_environment.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-batch-environments-slurm-environment-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/batch_environments/slurm_environment.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-batch-environment-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/batch_environment.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-batch-environments-alps-environment-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/batch_environments/alps_environment.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-batch-environments-pbs-environment-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/batch_environments/pbs_environment.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-batch-environments-slurm-environment-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/batch_environments/slurm_environment.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>batch_environments</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/batch_environments/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="batch-environments">
+<span id="libs-batch-environments-api"></span><h1>batch_environments<a class="headerlink" href="#batch-environments" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-batch-environments-batch-environment-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/batch_environments/batch_environment.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-batch-environments-batch-environment-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx4util17batch_environmentE">
+<span id="_CPPv3N3hpx4util17batch_environmentE"></span><span id="_CPPv2N3hpx4util17batch_environmentE"></span><span id="hpx::util::batch_environment"></span><span class="target" id="structhpx_1_1util_1_1batch__environment"></span><em class="property">struct </em><code class="sig-name descname">batch_environment</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environmentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util17batch_environment13node_map_typeE">
+<span id="_CPPv3N3hpx4util17batch_environment13node_map_typeE"></span><span id="_CPPv2N3hpx4util17batch_environment13node_map_typeE"></span><span id="hpx::util::batch_environment::node_map_type"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1af547fecd99f7acd35726f4bc5f6bb5da"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::map&lt;<a class="reference internal" href="../concurrency/api.html#_CPPv45boost" title="boost">boost</a>::asio::ip::tcp::endpoint, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::pair&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t&gt;&gt; <code class="sig-name descname">node_map_type</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment13node_map_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util17batch_environment17batch_environmentERNSt6vectorINSt6stringEEEbbb">
+<span id="_CPPv3N3hpx4util17batch_environment17batch_environmentERNSt6vectorINSt6stringEEEbbb"></span><span id="_CPPv2N3hpx4util17batch_environment17batch_environmentERNSt6vectorINSt6stringEEEbbb"></span><span id="hpx::util::batch_environment::batch_environment__std::vector:ss:R.b.b.b"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1a4e3f41e0b077f1bd64e169f00fb1da4f"></span><code class="sig-name descname">batch_environment</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; &amp;<em>nodelist</em>, bool <em>have_mpi</em> = false, bool <em>debug</em> = false, bool <em>enable</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment17batch_environmentERNSt6vectorINSt6stringEEEbbb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util17batch_environment18init_from_nodelistERKNSt6vectorINSt6stringEEERKNSt6stringE">
+<span id="_CPPv3N3hpx4util17batch_environment18init_from_nodelistERKNSt6vectorINSt6stringEEERKNSt6stringE"></span><span id="_CPPv2N3hpx4util17batch_environment18init_from_nodelistERKNSt6vectorINSt6stringEEERKNSt6stringE"></span><span id="hpx::util::batch_environment::init_from_nodelist__std::vector:ss:CR.ssCR"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1abb3f230af6105af7d478900973726cce"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">init_from_nodelist</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; <em class="property">const</em> &amp;<em>nodes</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>agas_host</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment18init_from_nodelistERKNSt6vectorINSt6stringEEERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17batch_environment26retrieve_number_of_threadsEv">
+<span id="_CPPv3NK3hpx4util17batch_environment26retrieve_number_of_threadsEv"></span><span id="_CPPv2NK3hpx4util17batch_environment26retrieve_number_of_threadsEv"></span><span id="hpx::util::batch_environment::retrieve_number_of_threadsC"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1aa9a3bc866be4f260720c53b0695e955c"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">retrieve_number_of_threads</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17batch_environment26retrieve_number_of_threadsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17batch_environment29retrieve_number_of_localitiesEv">
+<span id="_CPPv3NK3hpx4util17batch_environment29retrieve_number_of_localitiesEv"></span><span id="_CPPv2NK3hpx4util17batch_environment29retrieve_number_of_localitiesEv"></span><span id="hpx::util::batch_environment::retrieve_number_of_localitiesC"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1add78bdafa846f04cf89e86cd45085ff9"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">retrieve_number_of_localities</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17batch_environment29retrieve_number_of_localitiesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17batch_environment20retrieve_node_numberEv">
+<span id="_CPPv3NK3hpx4util17batch_environment20retrieve_node_numberEv"></span><span id="_CPPv2NK3hpx4util17batch_environment20retrieve_node_numberEv"></span><span id="hpx::util::batch_environment::retrieve_node_numberC"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1aca6b40ffa4242a78d904a22e9c1c8366"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">retrieve_node_number</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17batch_environment20retrieve_node_numberEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17batch_environment9host_nameEv">
+<span id="_CPPv3NK3hpx4util17batch_environment9host_nameEv"></span><span id="_CPPv2NK3hpx4util17batch_environment9host_nameEv"></span><span id="hpx::util::batch_environment::host_nameC"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1a261ffb1e8d171e8a7aaec9a857bbf89f"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">host_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17batch_environment9host_nameEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17batch_environment9host_nameERKNSt6stringE">
+<span id="_CPPv3NK3hpx4util17batch_environment9host_nameERKNSt6stringE"></span><span id="_CPPv2NK3hpx4util17batch_environment9host_nameERKNSt6stringE"></span><span id="hpx::util::batch_environment::host_name__ssCRC"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1a08e9ee9fe8e73e00c1384292c7b07ec7"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">host_name</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>def_hpx_name</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17batch_environment9host_nameERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17batch_environment14agas_host_nameERKNSt6stringE">
+<span id="_CPPv3NK3hpx4util17batch_environment14agas_host_nameERKNSt6stringE"></span><span id="_CPPv2NK3hpx4util17batch_environment14agas_host_nameERKNSt6stringE"></span><span id="hpx::util::batch_environment::agas_host_name__ssCRC"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1ac1ac668d1f5ce3b26bcd68ce1aebe533"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">agas_host_name</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>def_agas</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17batch_environment14agas_host_nameERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17batch_environment9agas_nodeEv">
+<span id="_CPPv3NK3hpx4util17batch_environment9agas_nodeEv"></span><span id="_CPPv2NK3hpx4util17batch_environment9agas_nodeEv"></span><span id="hpx::util::batch_environment::agas_nodeC"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1adafcb8d091fc2f875bef8d6aad34d4fc"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">agas_node</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17batch_environment9agas_nodeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17batch_environment23found_batch_environmentEv">
+<span id="_CPPv3NK3hpx4util17batch_environment23found_batch_environmentEv"></span><span id="_CPPv2NK3hpx4util17batch_environment23found_batch_environmentEv"></span><span id="hpx::util::batch_environment::found_batch_environmentC"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1abc8cfd78aa0c3f8ecb401489c742aeaf"></span>bool <code class="sig-name descname">found_batch_environment</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17batch_environment23found_batch_environmentEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util17batch_environment14get_batch_nameEv">
+<span id="_CPPv3NK3hpx4util17batch_environment14get_batch_nameEv"></span><span id="_CPPv2NK3hpx4util17batch_environment14get_batch_nameEv"></span><span id="hpx::util::batch_environment::get_batch_nameC"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1a676d453fc38e01d5766ef7f814490073"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">get_batch_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util17batch_environment14get_batch_nameEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util17batch_environment10agas_node_E">
+<span id="_CPPv3N3hpx4util17batch_environment10agas_node_E"></span><span id="_CPPv2N3hpx4util17batch_environment10agas_node_E"></span><span id="hpx::util::batch_environment::agas_node___ss"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1ae595f9c30c619a99e4f956657661700e"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">agas_node_</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment10agas_node_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util17batch_environment14agas_node_num_E">
+<span id="_CPPv3N3hpx4util17batch_environment14agas_node_num_E"></span><span id="_CPPv2N3hpx4util17batch_environment14agas_node_num_E"></span><span id="hpx::util::batch_environment::agas_node_num___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1a830637df7d8c17ce88a7c583df2cfb0d"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">agas_node_num_</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment14agas_node_num_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util17batch_environment9node_num_E">
+<span id="_CPPv3N3hpx4util17batch_environment9node_num_E"></span><span id="_CPPv2N3hpx4util17batch_environment9node_num_E"></span><span id="hpx::util::batch_environment::node_num___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1adf71dad8edfb96f10c45247bb1fb5cc9"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">node_num_</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment9node_num_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util17batch_environment12num_threads_E">
+<span id="_CPPv3N3hpx4util17batch_environment12num_threads_E"></span><span id="_CPPv2N3hpx4util17batch_environment12num_threads_E"></span><span id="hpx::util::batch_environment::num_threads___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1acb068013974419dcc8c54218c3bfaec0"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_threads_</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment12num_threads_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util17batch_environment6nodes_E">
+<span id="_CPPv3N3hpx4util17batch_environment6nodes_E"></span><span id="_CPPv2N3hpx4util17batch_environment6nodes_E"></span><span id="hpx::util::batch_environment::nodes___node_map_type"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1a7166b7a50c93605c7f37a025de1d7ab9"></span><a class="reference internal" href="#_CPPv4N3hpx4util17batch_environment13node_map_typeE" title="hpx::util::batch_environment::node_map_type">node_map_type</a> <code class="sig-name descname">nodes_</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment6nodes_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util17batch_environment15num_localities_E">
+<span id="_CPPv3N3hpx4util17batch_environment15num_localities_E"></span><span id="_CPPv2N3hpx4util17batch_environment15num_localities_E"></span><span id="hpx::util::batch_environment::num_localities___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1ab26ac5e55f844264ffbca29d03558607"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_localities_</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment15num_localities_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util17batch_environment11batch_name_E">
+<span id="_CPPv3N3hpx4util17batch_environment11batch_name_E"></span><span id="_CPPv2N3hpx4util17batch_environment11batch_name_E"></span><span id="hpx::util::batch_environment::batch_name___ss"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1afc43617ef776d81e07919d01dc485631"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <code class="sig-name descname">batch_name_</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment11batch_name_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util17batch_environment6debug_E">
+<span id="_CPPv3N3hpx4util17batch_environment6debug_E"></span><span id="_CPPv2N3hpx4util17batch_environment6debug_E"></span><span id="hpx::util::batch_environment::debug___b"></span><span class="target" id="structhpx_1_1util_1_1batch__environment_1a5871fd5ef62e3f53b2913050ed362cc4"></span>bool <code class="sig-name descname">debug_</code><a class="headerlink" href="#_CPPv4N3hpx4util17batch_environment6debug_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-batch-environments-alps-environment-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/batch_environments/alps_environment.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-batch-environments-alps-environment-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4util18batch_environmentsE">
+<span id="_CPPv3N3hpx4util18batch_environmentsE"></span><span id="_CPPv2N3hpx4util18batch_environmentsE"></span><span id="hpx::util::batch_environments"></span><span class="target" id="namespacehpx_1_1util_1_1batch__environments"></span><em class="property">namespace </em><code class="sig-name descname">batch_environments</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environmentsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx4util18batch_environments16alps_environmentE">
+<span id="_CPPv3N3hpx4util18batch_environments16alps_environmentE"></span><span id="_CPPv2N3hpx4util18batch_environments16alps_environmentE"></span><span id="hpx::util::batch_environments::alps_environment"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment"></span><em class="property">struct </em><code class="sig-name descname">alps_environment</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments16alps_environmentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18batch_environments16alps_environment16alps_environmentERNSt6vectorINSt6stringEEEb">
+<span id="_CPPv3N3hpx4util18batch_environments16alps_environment16alps_environmentERNSt6vectorINSt6stringEEEb"></span><span id="_CPPv2N3hpx4util18batch_environments16alps_environment16alps_environmentERNSt6vectorINSt6stringEEEb"></span><span id="hpx::util::batch_environments::alps_environment::alps_environment__std::vector:ss:R.b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment_1a68e1f98e5fa7a0277071430bdcf5ae94"></span><code class="sig-name descname">alps_environment</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; &amp;<em>nodelist</em>, bool <em>debug</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments16alps_environment16alps_environmentERNSt6vectorINSt6stringEEEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments16alps_environment5validEv">
+<span id="_CPPv3NK3hpx4util18batch_environments16alps_environment5validEv"></span><span id="_CPPv2NK3hpx4util18batch_environments16alps_environment5validEv"></span><span id="hpx::util::batch_environments::alps_environment::validC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment_1ab48a31d595178e54a46cd7060722dbe8"></span>bool <code class="sig-name descname">valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments16alps_environment5validEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments16alps_environment8node_numEv">
+<span id="_CPPv3NK3hpx4util18batch_environments16alps_environment8node_numEv"></span><span id="_CPPv2NK3hpx4util18batch_environments16alps_environment8node_numEv"></span><span id="hpx::util::batch_environments::alps_environment::node_numC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment_1a51576abd48ccc661030f86b56f71ba2f"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">node_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments16alps_environment8node_numEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments16alps_environment11num_threadsEv">
+<span id="_CPPv3NK3hpx4util18batch_environments16alps_environment11num_threadsEv"></span><span id="_CPPv2NK3hpx4util18batch_environments16alps_environment11num_threadsEv"></span><span id="hpx::util::batch_environments::alps_environment::num_threadsC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment_1a347f683f0467ba17dc134a9d8aa6b160"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_threads</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments16alps_environment11num_threadsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments16alps_environment14num_localitiesEv">
+<span id="_CPPv3NK3hpx4util18batch_environments16alps_environment14num_localitiesEv"></span><span id="_CPPv2NK3hpx4util18batch_environments16alps_environment14num_localitiesEv"></span><span id="hpx::util::batch_environments::alps_environment::num_localitiesC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment_1aec380f36d356d1677c721d4fb3503e85"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_localities</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments16alps_environment14num_localitiesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments16alps_environment9node_num_E">
+<span id="_CPPv3N3hpx4util18batch_environments16alps_environment9node_num_E"></span><span id="_CPPv2N3hpx4util18batch_environments16alps_environment9node_num_E"></span><span id="hpx::util::batch_environments::alps_environment::node_num___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment_1ab05fd7c6a767e653bfae2816436b187e"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">node_num_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments16alps_environment9node_num_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments16alps_environment12num_threads_E">
+<span id="_CPPv3N3hpx4util18batch_environments16alps_environment12num_threads_E"></span><span id="_CPPv2N3hpx4util18batch_environments16alps_environment12num_threads_E"></span><span id="hpx::util::batch_environments::alps_environment::num_threads___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment_1a86c7f8525d8aa1a0b3c0814fd90f8f68"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_threads_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments16alps_environment12num_threads_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments16alps_environment15num_localities_E">
+<span id="_CPPv3N3hpx4util18batch_environments16alps_environment15num_localities_E"></span><span id="_CPPv2N3hpx4util18batch_environments16alps_environment15num_localities_E"></span><span id="hpx::util::batch_environments::alps_environment::num_localities___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment_1a829fac5ec5060d4fca78f9edb8b8f9f3"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_localities_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments16alps_environment15num_localities_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments16alps_environment6valid_E">
+<span id="_CPPv3N3hpx4util18batch_environments16alps_environment6valid_E"></span><span id="_CPPv2N3hpx4util18batch_environments16alps_environment6valid_E"></span><span id="hpx::util::batch_environments::alps_environment::valid___b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1alps__environment_1a4da9688a45e48861f0c4664bf39d32c0"></span>bool <code class="sig-name descname">valid_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments16alps_environment6valid_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-batch-environments-pbs-environment-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/batch_environments/pbs_environment.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-batch-environments-pbs-environment-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4util18batch_environmentsE">
+<span id="_CPPv3N3hpx4util18batch_environmentsE"></span><span id="_CPPv2N3hpx4util18batch_environmentsE"></span><span class="target" id="namespacehpx_1_1util_1_1batch__environments"></span><em class="property">namespace </em><code class="sig-name descname">batch_environments</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx4util18batch_environments15pbs_environmentE">
+<span id="_CPPv3N3hpx4util18batch_environments15pbs_environmentE"></span><span id="_CPPv2N3hpx4util18batch_environments15pbs_environmentE"></span><span id="hpx::util::batch_environments::pbs_environment"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment"></span><em class="property">struct </em><code class="sig-name descname">pbs_environment</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments15pbs_environmentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18batch_environments15pbs_environment15pbs_environmentERNSt6vectorINSt6stringEEEbb">
+<span id="_CPPv3N3hpx4util18batch_environments15pbs_environment15pbs_environmentERNSt6vectorINSt6stringEEEbb"></span><span id="_CPPv2N3hpx4util18batch_environments15pbs_environment15pbs_environmentERNSt6vectorINSt6stringEEEbb"></span><span id="hpx::util::batch_environments::pbs_environment::pbs_environment__std::vector:ss:R.b.b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1ae49305e55347fa8badce7ad967450b75"></span><code class="sig-name descname">pbs_environment</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; &amp;<em>nodelist</em>, bool <em>have_mpi</em>, bool <em>debug</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments15pbs_environment15pbs_environmentERNSt6vectorINSt6stringEEEbb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments15pbs_environment5validEv">
+<span id="_CPPv3NK3hpx4util18batch_environments15pbs_environment5validEv"></span><span id="_CPPv2NK3hpx4util18batch_environments15pbs_environment5validEv"></span><span id="hpx::util::batch_environments::pbs_environment::validC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1a6e5f80196133d1403a710981931b84f7"></span>bool <code class="sig-name descname">valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments15pbs_environment5validEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments15pbs_environment8node_numEv">
+<span id="_CPPv3NK3hpx4util18batch_environments15pbs_environment8node_numEv"></span><span id="_CPPv2NK3hpx4util18batch_environments15pbs_environment8node_numEv"></span><span id="hpx::util::batch_environments::pbs_environment::node_numC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1afcf3f120823add0c25e7b0ca3de70c7e"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">node_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments15pbs_environment8node_numEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments15pbs_environment11num_threadsEv">
+<span id="_CPPv3NK3hpx4util18batch_environments15pbs_environment11num_threadsEv"></span><span id="_CPPv2NK3hpx4util18batch_environments15pbs_environment11num_threadsEv"></span><span id="hpx::util::batch_environments::pbs_environment::num_threadsC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1ab4e2a05f628fc57064ad200188a8a184"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_threads</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments15pbs_environment11num_threadsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments15pbs_environment14num_localitiesEv">
+<span id="_CPPv3NK3hpx4util18batch_environments15pbs_environment14num_localitiesEv"></span><span id="_CPPv2NK3hpx4util18batch_environments15pbs_environment14num_localitiesEv"></span><span id="hpx::util::batch_environments::pbs_environment::num_localitiesC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1af07b3251e38219c73fce2871b3d0c74b"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_localities</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments15pbs_environment14num_localitiesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18batch_environments15pbs_environment13read_nodefileERNSt6vectorINSt6stringEEEbb">
+<span id="_CPPv3N3hpx4util18batch_environments15pbs_environment13read_nodefileERNSt6vectorINSt6stringEEEbb"></span><span id="_CPPv2N3hpx4util18batch_environments15pbs_environment13read_nodefileERNSt6vectorINSt6stringEEEbb"></span><span id="hpx::util::batch_environments::pbs_environment::read_nodefile__std::vector:ss:R.b.b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1ae840855cba03abc71b775202a934c657"></span>void <code class="sig-name descname">read_nodefile</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; &amp;<em>nodelist</em>, bool <em>have_mpi</em>, bool <em>debug</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments15pbs_environment13read_nodefileERNSt6vectorINSt6stringEEEbb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18batch_environments15pbs_environment13read_nodelistERNSt6vectorINSt6stringEEEb">
+<span id="_CPPv3N3hpx4util18batch_environments15pbs_environment13read_nodelistERNSt6vectorINSt6stringEEEb"></span><span id="_CPPv2N3hpx4util18batch_environments15pbs_environment13read_nodelistERNSt6vectorINSt6stringEEEb"></span><span id="hpx::util::batch_environments::pbs_environment::read_nodelist__std::vector:ss:R.b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1abd8ef1e219185eabc0dadb16783cc27e"></span>void <code class="sig-name descname">read_nodelist</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; &amp;<em>nodelist</em>, bool <em>debug</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments15pbs_environment13read_nodelistERNSt6vectorINSt6stringEEEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments15pbs_environment9node_num_E">
+<span id="_CPPv3N3hpx4util18batch_environments15pbs_environment9node_num_E"></span><span id="_CPPv2N3hpx4util18batch_environments15pbs_environment9node_num_E"></span><span id="hpx::util::batch_environments::pbs_environment::node_num___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1a03d6672a5abc6161b62471e61bf18118"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">node_num_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments15pbs_environment9node_num_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments15pbs_environment15num_localities_E">
+<span id="_CPPv3N3hpx4util18batch_environments15pbs_environment15num_localities_E"></span><span id="_CPPv2N3hpx4util18batch_environments15pbs_environment15num_localities_E"></span><span id="hpx::util::batch_environments::pbs_environment::num_localities___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1a1673275166b0e3eebc818caa01a42392"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_localities_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments15pbs_environment15num_localities_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments15pbs_environment12num_threads_E">
+<span id="_CPPv3N3hpx4util18batch_environments15pbs_environment12num_threads_E"></span><span id="_CPPv2N3hpx4util18batch_environments15pbs_environment12num_threads_E"></span><span id="hpx::util::batch_environments::pbs_environment::num_threads___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1ab34c0c717fda7bbc6bb55b3999445652"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_threads_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments15pbs_environment12num_threads_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments15pbs_environment6valid_E">
+<span id="_CPPv3N3hpx4util18batch_environments15pbs_environment6valid_E"></span><span id="_CPPv2N3hpx4util18batch_environments15pbs_environment6valid_E"></span><span id="hpx::util::batch_environments::pbs_environment::valid___b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1pbs__environment_1a1acef8f960c2e8780cab7d483b3bde2e"></span>bool <code class="sig-name descname">valid_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments15pbs_environment6valid_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-batch-environments-slurm-environment-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/batch_environments/slurm_environment.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-batch-environments-slurm-environment-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4util18batch_environmentsE">
+<span id="_CPPv3N3hpx4util18batch_environmentsE"></span><span class="target" id="namespacehpx_1_1util_1_1batch__environments"></span><em class="property">namespace </em><code class="sig-name descname">batch_environments</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environmentE">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environmentE"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environmentE"></span><span id="hpx::util::batch_environments::slurm_environment"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment"></span><em class="property">struct </em><code class="sig-name descname">slurm_environment</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environmentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment17slurm_environmentERNSt6vectorINSt6stringEEEb">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment17slurm_environmentERNSt6vectorINSt6stringEEEb"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment17slurm_environmentERNSt6vectorINSt6stringEEEb"></span><span id="hpx::util::batch_environments::slurm_environment::slurm_environment__std::vector:ss:R.b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a7f8b4905f9cdf42827a12df05c711519"></span><code class="sig-name descname">slurm_environment</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; &amp;<em>nodelist</em>, bool <em>debug</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment17slurm_environmentERNSt6vectorINSt6stringEEEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments17slurm_environment5validEv">
+<span id="_CPPv3NK3hpx4util18batch_environments17slurm_environment5validEv"></span><span id="_CPPv2NK3hpx4util18batch_environments17slurm_environment5validEv"></span><span id="hpx::util::batch_environments::slurm_environment::validC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a1b165d8593b9a9770795ec8e1bbe5440"></span>bool <code class="sig-name descname">valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments17slurm_environment5validEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments17slurm_environment8node_numEv">
+<span id="_CPPv3NK3hpx4util18batch_environments17slurm_environment8node_numEv"></span><span id="_CPPv2NK3hpx4util18batch_environments17slurm_environment8node_numEv"></span><span id="hpx::util::batch_environments::slurm_environment::node_numC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a56e6e56205611095297be5b8ec1e4a7d"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">node_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments17slurm_environment8node_numEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments17slurm_environment11num_threadsEv">
+<span id="_CPPv3NK3hpx4util18batch_environments17slurm_environment11num_threadsEv"></span><span id="_CPPv2NK3hpx4util18batch_environments17slurm_environment11num_threadsEv"></span><span id="hpx::util::batch_environments::slurm_environment::num_threadsC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a04e7d9cc78d886ef8fdc20f3a99b32f7"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_threads</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments17slurm_environment11num_threadsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util18batch_environments17slurm_environment14num_localitiesEv">
+<span id="_CPPv3NK3hpx4util18batch_environments17slurm_environment14num_localitiesEv"></span><span id="_CPPv2NK3hpx4util18batch_environments17slurm_environment14num_localitiesEv"></span><span id="hpx::util::batch_environments::slurm_environment::num_localitiesC"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a58e4250b5d67c66386baf3581899673b"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_localities</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util18batch_environments17slurm_environment14num_localitiesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment29retrieve_number_of_localitiesEb">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment29retrieve_number_of_localitiesEb"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment29retrieve_number_of_localitiesEb"></span><span id="hpx::util::batch_environments::slurm_environment::retrieve_number_of_localities__b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1aa47690b509ad1295afb05b4fa9334aa7"></span>void <code class="sig-name descname">retrieve_number_of_localities</code><span class="sig-paren">(</span>bool <em>debug</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment29retrieve_number_of_localitiesEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment24retrieve_number_of_tasksEb">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment24retrieve_number_of_tasksEb"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment24retrieve_number_of_tasksEb"></span><span id="hpx::util::batch_environments::slurm_environment::retrieve_number_of_tasks__b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a204bc25ddfcce0d3fbc557a4ef0ef4f0"></span>void <code class="sig-name descname">retrieve_number_of_tasks</code><span class="sig-paren">(</span>bool <em>debug</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment24retrieve_number_of_tasksEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment17retrieve_nodelistERNSt6vectorINSt6stringEEEb">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment17retrieve_nodelistERNSt6vectorINSt6stringEEEb"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment17retrieve_nodelistERNSt6vectorINSt6stringEEEb"></span><span id="hpx::util::batch_environments::slurm_environment::retrieve_nodelist__std::vector:ss:R.b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1ad102a41c144fee80c1226ad2e2b1ba02"></span>void <code class="sig-name descname">retrieve_nodelist</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; &amp;<em>nodes</em>, bool <em>debug</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment17retrieve_nodelistERNSt6vectorINSt6stringEEEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment26retrieve_number_of_threadsEv">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment26retrieve_number_of_threadsEv"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment26retrieve_number_of_threadsEv"></span><span id="hpx::util::batch_environments::slurm_environment::retrieve_number_of_threads"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a63444f625e49ca1e2232daf785b56fd5"></span>void <code class="sig-name descname">retrieve_number_of_threads</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment26retrieve_number_of_threadsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment9node_num_E">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment9node_num_E"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment9node_num_E"></span><span id="hpx::util::batch_environments::slurm_environment::node_num___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a6ca36273a34799af1d41dda269015358"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">node_num_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment9node_num_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment12num_threads_E">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment12num_threads_E"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment12num_threads_E"></span><span id="hpx::util::batch_environments::slurm_environment::num_threads___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1afd8c1822537f27fdb454ba95e448dbea"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_threads_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment12num_threads_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment10num_tasks_E">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment10num_tasks_E"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment10num_tasks_E"></span><span id="hpx::util::batch_environments::slurm_environment::num_tasks___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a628951a8feeb62613e7dc47418ee2680"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_tasks_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment10num_tasks_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment15num_localities_E">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment15num_localities_E"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment15num_localities_E"></span><span id="hpx::util::batch_environments::slurm_environment::num_localities___std::s"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a2f1fab58411ca8a02e7f2e9654d60d96"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">num_localities_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment15num_localities_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util18batch_environments17slurm_environment6valid_E">
+<span id="_CPPv3N3hpx4util18batch_environments17slurm_environment6valid_E"></span><span id="_CPPv2N3hpx4util18batch_environments17slurm_environment6valid_E"></span><span id="hpx::util::batch_environments::slurm_environment::valid___b"></span><span class="target" id="structhpx_1_1util_1_1batch__environments_1_1slurm__environment_1a2a4497e169849c3873e64d154e3a8a69"></span>bool <code class="sig-name descname">valid_</code><a class="headerlink" href="#_CPPv4N3hpx4util18batch_environments17slurm_environment6valid_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-compatibility-hpx-util-batch-environment-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/batch_environment.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-batch-environment-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-batch-environments-alps-environment-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/batch_environments/alps_environment.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-batch-environments-alps-environment-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-batch-environments-pbs-environment-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/batch_environments/pbs_environment.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-batch-environments-pbs-environment-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-batch-environments-slurm-environment-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/batch_environments/slurm_environment.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-batch-environments-slurm-environment-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../testing/api.html" class="btn btn-neutral float-right" title="testing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../allocator_support/api.html" class="btn btn-neutral float-left" title="allocator_support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Components and actions: Accumulator &mdash; HPX 1.3.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dataflow: Interest calculator" href="interest_calculator.html" />
+    <link rel="prev" title="Remote execution with actions: Hello world" href="hello_world.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fibonacci_local.html">Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code>: Fibonacci</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fibonacci.html">Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code> and actions: Fibonacci</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hello_world.html">Remote execution with actions: Hello world</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Components and actions: Accumulator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setup">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#walkthrough">Walkthrough</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-server-class">The server class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-client-class">The client class</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="interest_calculator.html">Dataflow: Interest calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="1d_stencil.html">Local to remote: 1D stencil</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../examples.html">Examples</a> &raquo;</li>
+        
+      <li>Components and actions: Accumulator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/examples/accumulator.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="components-and-actions-accumulator">
+<span id="examples-accumulator"></span><h1>Components and actions: Accumulator<a class="headerlink" href="#components-and-actions-accumulator" title="Permalink to this headline">¶</a></h1>
+<p>The accumulator example demonstrates the use of components. Components are C++
+classes that expose methods as a type of <em>HPX</em> action. These actions are called
+component actions.</p>
+<p>Components are globally named, meaning that a component action can be called
+remotely (e.g.  from another machine). There are two accumulator examples in
+<em>HPX</em>; accumulator.</p>
+<p>In the <a class="reference internal" href="fibonacci.html#examples-fibonacci"><span class="std std-ref">Asynchronous execution with hpx::async and actions: Fibonacci</span></a> and the <a class="reference internal" href="hello_world.html#examples-hello-world"><span class="std std-ref">Remote execution with actions: Hello world</span></a>, we
+introduced plain actions, which wrapped global functions. The target of a plain
+action is an identifier which refers to a particular machine involved in the
+computation. For plain actions, the target is the machine where the action will
+be executed.</p>
+<p>Component actions, however, do not target machines. Instead, they target
+component instances. The instance may live on the machine that we’ve invoked the
+component action from, or it may live on another machine.</p>
+<p>The component in this example exposes three different functions:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">reset()</span></code> - Resets the accumulator value to 0.</li>
+<li><code class="docutils literal notranslate"><span class="pre">add(arg)</span></code> - Adds <code class="docutils literal notranslate"><span class="pre">arg</span></code> to the accumulators value.</li>
+<li><code class="docutils literal notranslate"><span class="pre">query()</span></code> - Queries the value of the accumulator.</li>
+</ul>
+<p>This example creates an instance of the accumulator, and then allows the user to
+enter commands at a prompt, which subsequently invoke actions on the accumulator
+instance.</p>
+<div class="section" id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
+<p>The source code for this example can be found here:
+<a class="reference download internal" download="" href="../_downloads/780abd8af1e3d5f15b8f30bcf05db6e8/accumulator_client.cpp"><code class="xref download docutils literal notranslate"><span class="pre">accumulator_client.cpp</span></code></a>.</p>
+<p>To compile this program, go to your <em>HPX</em> build directory (see
+<a class="reference internal" href="../manual/building_hpx.html#hpx-build-system"><span class="std std-ref">HPX build system</span></a> for information on configuring and building <em>HPX</em>) and
+enter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make examples.accumulators.accumulator
+</pre></div>
+</div>
+<p>To run the program type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/accumulator_client
+</pre></div>
+</div>
+<p>Once the program starts running, it will print the following prompt and then
+wait for input. An example session is given below:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>commands: reset, add [amount], query, help, quit
+&gt; add 5
+&gt; add 10
+&gt; query
+15
+&gt; add 2
+&gt; query
+17
+&gt; reset
+&gt; add 1
+&gt; query
+1
+&gt; quit
+</pre></div>
+</div>
+</div>
+<div class="section" id="walkthrough">
+<h2>Walkthrough<a class="headerlink" href="#walkthrough" title="Permalink to this headline">¶</a></h2>
+<p>Now, let’s take a look at the source code of the accumulator example. This
+example consists of two parts: an <em>HPX</em> component library (a library that
+exposes an <em>HPX</em> component) and a client application which uses the library.
+This walkthrough will cover the <em>HPX</em> component library. The code for the client
+application can be found here: <a class="reference download internal" download="" href="../_downloads/780abd8af1e3d5f15b8f30bcf05db6e8/accumulator_client.cpp"><code class="xref download docutils literal notranslate"><span class="pre">accumulator_client.cpp</span></code></a>.</p>
+<p>An <em>HPX</em> component is represented by two C++ classes:</p>
+<ul class="simple">
+<li><strong>A server class</strong> - The implementation of the components functionality.</li>
+<li><strong>A client class</strong> - A high-level interface that acts as a proxy for an
+instance of the component.</li>
+</ul>
+<p>Typically, these two classes all have the same name, but the server class
+usually lives in different sub-namespaces (<code class="docutils literal notranslate"><span class="pre">server</span></code>). For example, the full
+names of the two classes in accumulator are:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">examples::server::accumulator</span></code> (server class)</li>
+<li><code class="docutils literal notranslate"><span class="pre">examples::accumulator</span></code> (client class)</li>
+</ul>
+<div class="section" id="the-server-class">
+<h3>The server class<a class="headerlink" href="#the-server-class" title="Permalink to this headline">¶</a></h3>
+<p>The following code is from: <a class="reference download internal" download="" href="../_downloads/22b0c6ef51fdc9b187bdf9929ce3b34f/accumulator.hpp"><code class="xref download docutils literal notranslate"><span class="pre">accumulator.hpp</span></code></a>.</p>
+<p>All <em>HPX</em> component server classes must inherit publicly from the <em>HPX</em>
+component base class: <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::components::component_base</span></code></p>
+<p>The accumulator component inherits from
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::components::locking_hook</span></code>. This allows the runtime system to
+ensure that all action invocations are serialized. That means that the system
+ensures that no two actions are invoked at the same time on a given component
+instance. This makes the component thread safe and no additional locking has to
+be implemented by the user. Moreover, accumulator component is a component,
+because it also inherits from <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::components::component_base</span></code> (the
+template argument passed to locking_hook is used as its base class). The
+following snippet shows the corresponding code:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">accumulator</span>
+      <span class="o">:</span> <span class="k">public</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">locking_hook</span><span class="o">&lt;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component_base</span><span class="o">&lt;</span><span class="n">accumulator</span><span class="o">&gt;</span> <span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Our accumulator class will need a data member to store its value in, so let’s
+declare a data member:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>        <span class="n">argument_type</span> <span class="n">value_</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The constructor for this class simply initializes <code class="docutils literal notranslate"><span class="pre">value_</span></code> to 0:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>        <span class="n">accumulator</span><span class="p">()</span> <span class="o">:</span> <span class="n">value_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{}</span>
+</pre></div>
+</div>
+<p>Next, let’s look at the three methods of this component that we will be exposing
+as component actions:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>        <span class="c1">/// Reset the components value to 0.</span>
+        <span class="kt">void</span> <span class="nf">reset</span><span class="p">()</span>
+        <span class="p">{</span>
+            <span class="c1">//  set value_ to 0.</span>
+            <span class="n">value_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">/// Add the given number to the accumulator.</span>
+        <span class="kt">void</span> <span class="nf">add</span><span class="p">(</span><span class="n">argument_type</span> <span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">//  add value_ to arg, and store the result in value_.</span>
+            <span class="n">value_</span> <span class="o">+=</span> <span class="n">arg</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">/// Return the current value to the caller.</span>
+        <span class="n">argument_type</span> <span class="nf">query</span><span class="p">()</span> <span class="k">const</span>
+        <span class="p">{</span>
+            <span class="c1">// Get the value of value_.</span>
+            <span class="k">return</span> <span class="n">value_</span><span class="p">;</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+<p>Here are the action types. These types wrap the methods we’re exposing. The
+wrapping technique is very similar to the one used in the
+<a class="reference internal" href="fibonacci.html#examples-fibonacci"><span class="std std-ref">Asynchronous execution with hpx::async and actions: Fibonacci</span></a> and the <a class="reference internal" href="hello_world.html#examples-hello-world"><span class="std std-ref">Remote execution with actions: Hello world</span></a>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>        <span class="n">HPX_DEFINE_COMPONENT_ACTION</span><span class="p">(</span><span class="n">accumulator</span><span class="p">,</span> <span class="n">reset</span><span class="p">);</span>
+        <span class="n">HPX_DEFINE_COMPONENT_ACTION</span><span class="p">(</span><span class="n">accumulator</span><span class="p">,</span> <span class="n">add</span><span class="p">);</span>
+        <span class="n">HPX_DEFINE_COMPONENT_ACTION</span><span class="p">(</span><span class="n">accumulator</span><span class="p">,</span> <span class="n">query</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The last piece of code in the server class header is the declaration of the
+action type registration code:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">HPX_REGISTER_ACTION_DECLARATION</span><span class="p">(</span>
+    <span class="n">examples</span><span class="o">::</span><span class="n">server</span><span class="o">::</span><span class="n">accumulator</span><span class="o">::</span><span class="n">reset_action</span><span class="p">,</span>
+    <span class="n">accumulator_reset_action</span><span class="p">);</span>
+
+<span class="n">HPX_REGISTER_ACTION_DECLARATION</span><span class="p">(</span>
+    <span class="n">examples</span><span class="o">::</span><span class="n">server</span><span class="o">::</span><span class="n">accumulator</span><span class="o">::</span><span class="n">add_action</span><span class="p">,</span>
+    <span class="n">accumulator_add_action</span><span class="p">);</span>
+
+<span class="n">HPX_REGISTER_ACTION_DECLARATION</span><span class="p">(</span>
+    <span class="n">examples</span><span class="o">::</span><span class="n">server</span><span class="o">::</span><span class="n">accumulator</span><span class="o">::</span><span class="n">query_action</span><span class="p">,</span>
+    <span class="n">accumulator_query_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The code above must be placed in the global namespace.</p>
+</div>
+<p>The rest of the registration code is in
+<a class="reference download internal" download="" href="../_downloads/9cdae7995ee2f56df1b14dfc1b79585e/accumulator.cpp"><code class="xref download docutils literal notranslate"><span class="pre">accumulator.cpp</span></code></a></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">///////////////////////////////////////////////////////////////////////////////</span>
+<span class="c1">// Add factory registration functionality.</span>
+<span class="n">HPX_REGISTER_COMPONENT_MODULE</span><span class="p">();</span>
+
+<span class="c1">///////////////////////////////////////////////////////////////////////////////</span>
+<span class="k">typedef</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">component</span><span class="o">&lt;</span>
+    <span class="n">examples</span><span class="o">::</span><span class="n">server</span><span class="o">::</span><span class="n">accumulator</span>
+<span class="o">&gt;</span> <span class="n">accumulator_type</span><span class="p">;</span>
+
+<span class="n">HPX_REGISTER_COMPONENT</span><span class="p">(</span><span class="n">accumulator_type</span><span class="p">,</span> <span class="n">accumulator</span><span class="p">);</span>
+
+<span class="c1">///////////////////////////////////////////////////////////////////////////////</span>
+<span class="c1">// Serialization support for accumulator actions.</span>
+<span class="n">HPX_REGISTER_ACTION</span><span class="p">(</span>
+    <span class="n">accumulator_type</span><span class="o">::</span><span class="n">wrapped_type</span><span class="o">::</span><span class="n">reset_action</span><span class="p">,</span>
+    <span class="n">accumulator_reset_action</span><span class="p">);</span>
+<span class="n">HPX_REGISTER_ACTION</span><span class="p">(</span>
+    <span class="n">accumulator_type</span><span class="o">::</span><span class="n">wrapped_type</span><span class="o">::</span><span class="n">add_action</span><span class="p">,</span>
+    <span class="n">accumulator_add_action</span><span class="p">);</span>
+<span class="n">HPX_REGISTER_ACTION</span><span class="p">(</span>
+    <span class="n">accumulator_type</span><span class="o">::</span><span class="n">wrapped_type</span><span class="o">::</span><span class="n">query_action</span><span class="p">,</span>
+    <span class="n">accumulator_query_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The code above must be placed in the global namespace.</p>
+</div>
+</div>
+<div class="section" id="the-client-class">
+<h3>The client class<a class="headerlink" href="#the-client-class" title="Permalink to this headline">¶</a></h3>
+<p>The following code is from <a class="reference download internal" download="" href="../_downloads/719c5265d30690ce1c1aa6f40697ad94/accumulator.hpp"><code class="xref download docutils literal notranslate"><span class="pre">accumulator.hpp</span></code></a>.</p>
+<p>The client class is the primary interface to a component instance. Client classes
+are used to create components:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Create a component on this locality.</span>
+<span class="n">examples</span><span class="o">::</span><span class="n">accumulator</span> <span class="n">c</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">new_</span><span class="o">&lt;</span><span class="n">examples</span><span class="o">::</span><span class="n">accumulator</span><span class="o">&gt;</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>and to invoke component actions:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">apply</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Clients, like servers, need to inherit from a base class, this time,
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::components::client_base</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">accumulator</span>
+      <span class="o">:</span> <span class="k">public</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">client_base</span><span class="o">&lt;</span>
+            <span class="n">accumulator</span><span class="p">,</span> <span class="n">server</span><span class="o">::</span><span class="n">accumulator</span>
+        <span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>For readability, we typedef the base class like so:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>        <span class="k">typedef</span> <span class="n">hpx</span><span class="o">::</span><span class="n">components</span><span class="o">::</span><span class="n">client_base</span><span class="o">&lt;</span>
+            <span class="n">accumulator</span><span class="p">,</span> <span class="n">server</span><span class="o">::</span><span class="n">accumulator</span>
+        <span class="o">&gt;</span> <span class="n">base_type</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Here are examples of how to expose actions through a client class:</p>
+<p>There are a few different ways of invoking actions:</p>
+<ul class="simple">
+<li><strong>Non-blocking</strong>: For actions which don’t have return types, or when we do not
+care about the result of an action, we can invoke the action using
+fire-and-forget semantics. This means that once we have asked <em>HPX</em> to compute
+the action, we forget about it completely and continue with our computation.
+We use <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::apply</span></code> to invoke an action in a non-blocking fashion.</li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>        <span class="kt">void</span> <span class="nf">reset</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">apply_policy</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">HPX_ASSERT</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_id</span><span class="p">());</span>
+
+            <span class="k">typedef</span> <span class="n">server</span><span class="o">::</span><span class="n">accumulator</span><span class="o">::</span><span class="n">reset_action</span> <span class="n">action_type</span><span class="p">;</span>
+            <span class="n">hpx</span><span class="o">::</span><span class="n">apply</span><span class="o">&lt;</span><span class="n">action_type</span><span class="o">&gt;</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_id</span><span class="p">());</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><strong>Asynchronous</strong>: Futures, as demonstrated in <a class="reference internal" href="fibonacci_local.html#examples-fibonacci-local"><span class="std std-ref">Asynchronous execution with hpx::async: Fibonacci</span></a>,
+<a class="reference internal" href="fibonacci.html#examples-fibonacci"><span class="std std-ref">Asynchronous execution with hpx::async and actions: Fibonacci</span></a>, and the <a class="reference internal" href="hello_world.html#examples-hello-world"><span class="std std-ref">Remote execution with actions: Hello world</span></a>, enable
+asynchronous action invocation. Here’s an example from the accumulator client
+class:</li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>        <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">argument_type</span><span class="o">&gt;</span> <span class="n">query</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">async_policy</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">HPX_ASSERT</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_id</span><span class="p">());</span>
+
+            <span class="k">typedef</span> <span class="n">server</span><span class="o">::</span><span class="n">accumulator</span><span class="o">::</span><span class="n">query_action</span> <span class="n">action_type</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="o">&lt;</span><span class="n">action_type</span><span class="o">&gt;</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">async</span><span class="p">,</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">get_id</span><span class="p">());</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><strong>Synchronous</strong>: To invoke an action in a fully synchronous manner, we can
+simply call <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::async</span></code><code class="docutils literal notranslate"><span class="pre">().get()</span></code> (e.g., create a future and
+immediately wait on it to be ready). Here’s an example from the accumulator
+client class:</li>
+</ul>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>        <span class="kt">void</span> <span class="nf">add</span><span class="p">(</span><span class="n">argument_type</span> <span class="n">arg</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">HPX_ASSERT</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_id</span><span class="p">());</span>
+
+            <span class="k">typedef</span> <span class="n">server</span><span class="o">::</span><span class="n">accumulator</span><span class="o">::</span><span class="n">add_action</span> <span class="n">action_type</span><span class="p">;</span>
+            <span class="n">action_type</span><span class="p">()(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">arg</span><span class="p">);</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">this-&gt;get_id()</span></code> references a data member of the
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::components::client_base</span></code> base class which identifies the server
+accumulator instance.</p>
+<p><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::naming::id_type</span></code> is a type which represents a global identifier
+in <em>HPX</em>. This type specifies the target of an action. This is the type that is
+returned by <a class="reference internal" href="../api.html#_CPPv4N3hpx9find_hereER10error_code" title="hpx::find_here"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::find_here</span></code></a> in which case it represents the
+<a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">locality</span></a> the code is running on.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="interest_calculator.html" class="btn btn-neutral float-right" title="Dataflow: Interest calculator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="hello_world.html" class="btn btn-neutral float-left" title="Remote execution with actions: Hello world" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>a943fd2</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

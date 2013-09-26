@@ -1,0 +1,726 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>checkpoint &mdash; HPX release documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coroutines" href="../coroutines/api.html" />
+    <link rel="prev" title="logging" href="../logging/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                release
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">checkpoint</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-checkpoint-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/checkpoint.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-checkpoint-checkpoint-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/checkpoint/checkpoint.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>checkpoint</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/checkpoint/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="checkpoint">
+<span id="libs-checkpoint-api"></span><h1>checkpoint<a class="headerlink" href="#checkpoint" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-compatibility-hpx-util-checkpoint-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/checkpoint.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-checkpoint-hpp" title="Permalink to this headline">¶</a></h2>
+<p>This header defines the save_checkpoint and restore_checkpoint functions. These functions are designed to help HPX application developer’s checkpoint their applications. Save_checkpoint serializes one or more objects and saves them as a byte stream. Restore_checkpoint converts the byte stream back into instances of the objects. </p>
+</div>
+<div class="section" id="include-hpx-checkpoint-checkpoint-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/checkpoint/checkpoint.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-checkpoint-checkpoint-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4utillsERNSt7ostreamERK10checkpoint">
+<span id="_CPPv3N3hpx4utillsERNSt7ostreamERK10checkpoint"></span><span id="_CPPv2N3hpx4utillsERNSt7ostreamERK10checkpoint"></span><span id="hpx::util::lshift-operator__osR.checkpointCR"></span><span class="target" id="include_2hpx_2checkpoint_2checkpoint_8hpp_1a1bd050426e811a324853146573d39c0b"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<code class="sig-name descname">operator&lt;&lt;</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<em>ost</em>, <a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> <em class="property">const</em> &amp;<em>ckp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4utillsERNSt7ostreamERK10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Operator&lt;&lt; Overload</p>
+<p><p>This overload is the main way to write data from a checkpoint to an object such as a file. Inside the function, the size of the checkpoint will be written to the stream before the checkpoint’s data. The operator&gt;&gt; overload uses this to read the correct number of bytes. Be mindful of this additional write and read when you use different facilities to write out or read in data to a checkpoint!</p>
+<dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ost</span></code>: Output stream to write to.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ckp</span></code>: Checkpoint to copy from.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Operator&lt;&lt; returns the ostream object. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4utilrsERNSt7istreamER10checkpoint">
+<span id="_CPPv3N3hpx4utilrsERNSt7istreamER10checkpoint"></span><span id="_CPPv2N3hpx4utilrsERNSt7istreamER10checkpoint"></span><span id="hpx::util::rshift-operator__isR.checkpointR"></span><span class="target" id="include_2hpx_2checkpoint_2checkpoint_8hpp_1a9f7d6820696ba0ccff45125664b1cebc"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::istream &amp;<code class="sig-name descname">operator&gt;&gt;</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::istream &amp;<em>ist</em>, <a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> &amp;<em>ckp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4utilrsERNSt7istreamER10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Operator&gt;&gt; Overload</p>
+<p><p>This overload is the main way to read in data from an object such as a file to a checkpoint. It is important to note that inside the function, the first variable to be read is the size of the checkpoint. This size variable is written to the stream before the checkpoint’s data in the operator&lt;&lt; overload. Be mindful of this additional read and write when you use different facilities to read in or write out data from a checkpoint!</p>
+<dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ist</span></code>: Input stream to write from.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ckp</span></code>: Checkpoint to write to.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Operator&gt;&gt; returns the ostream object. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0Dp0EN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR1TDpRR2Ts">
+<span id="_CPPv3I0Dp0EN3hpx4util15save_checkpointERR1TDpRR2Ts"></span><span id="_CPPv2I0Dp0EN3hpx4util15save_checkpointERR1TDpRR2Ts"></span><span class="target" id="include_2hpx_2checkpoint_2checkpoint_8hpp_1a9026c6688d04d1a48068e32468036336"></span>template&lt;typename <code class="sig-name descname">T</code>, typename ...<code class="sig-name descname">Ts</code>, typename <code class="sig-name descname">U</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx6traitsE" title="hpx::traits">traits</a>::is_launch_policy&lt;<a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR1TDpRR2Ts" title="hpx::util::save_checkpoint::T">T</a>&gt;::value &amp;&amp; !<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_same&lt;<em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR1TDpRR2Ts" title="hpx::util::save_checkpoint::T">T</a>&gt;::type, <a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a>&gt;::value&gt;::type&gt;<br /><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a>&gt; <code class="sig-name descname">save_checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR1TDpRR2Ts" title="hpx::util::save_checkpoint::T">T</a> &amp;&amp;<em>t</em>, <a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR1TDpRR2Ts" title="hpx::util::save_checkpoint::Ts">Ts</a>&amp;&amp;... <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Dp0EN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR1TDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Save_checkpoint</p>
+<p><p>Save_checkpoint takes any number of objects which a user may wish to store and returns a future to a checkpoint object. This function can also store a component either by passing a shared_ptr to the component or by passing a component’s client instance to save_checkpoint. Additionally the function can take a policy as a first object which changes its behavior depending on the policy passed to it. Most notably, if a sync policy is used save_checkpoint will simply return a checkpoint object.</p>
+<dl class="simple">
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code>: Containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ts</span></code>: More containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">U</span></code>: This parameter is used to make sure that T is not a launch policy or a checkpoint. This forces the compiler to choose the correct overload.</p></li>
+</ul>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ts</span></code>: Other containers to restore Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Save_checkpoint returns a future to a checkpoint with one exception: if you pass hpx::launch::sync as the first argument. In this case save_checkpoint will simply return a checkpoint. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts">
+<span id="_CPPv3I0DpEN3hpx4util15save_checkpointERR10checkpointRR1TDpRR2Ts"></span><span id="_CPPv2I0DpEN3hpx4util15save_checkpointERR10checkpointRR1TDpRR2Ts"></span><span class="target" id="include_2hpx_2checkpoint_2checkpoint_8hpp_1a4f60d562081d278b87073dba958bef83"></span>template&lt;typename <code class="sig-name descname">T</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a>&gt; <code class="sig-name descname">save_checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> &amp;&amp;<em>c</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts" title="hpx::util::save_checkpoint::T">T</a> &amp;&amp;<em>t</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts" title="hpx::util::save_checkpoint::Ts">Ts</a>&amp;&amp;... <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Save_checkpoint - Take a pre-initialized checkpoint</p>
+<p><p>Save_checkpoint takes any number of objects which a user may wish to store and returns a future to a checkpoint object. This function can also store a component either by passing a shared_ptr to the component or by passing a component’s client instance to save_checkpoint. Additionally the function can take a policy as a first object which changes its behavior depending on the policy passed to it. Most notably, if a sync policy is used save_checkpoint will simply return a checkpoint object.</p>
+<dl class="simple">
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code>: Containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ts</span></code>: More containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+</ul>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: Takes a pre-initialized checkpoint to copy data into.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ts</span></code>: Other containers to restore Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Save_checkpoint returns a future to a checkpoint with one exception: if you pass hpx::launch::sync as the first argument. In this case save_checkpoint will simply return a checkpoint. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEEN3hpx6launchERR1TDpRR2Ts">
+<span id="_CPPv3I0DpEN3hpx4util15save_checkpointEN3hpx6launchERR1TDpRR2Ts"></span><span id="_CPPv2I0DpEN3hpx4util15save_checkpointEN3hpx6launchERR1TDpRR2Ts"></span><span class="target" id="include_2hpx_2checkpoint_2checkpoint_8hpp_1a1be65fd5914ba68bd22969b3da59ad4e"></span>template&lt;typename <code class="sig-name descname">T</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a>&gt; <code class="sig-name descname">save_checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx6launchE" title="hpx::launch">launch</a> <em>p</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts" title="hpx::util::save_checkpoint::T">T</a> &amp;&amp;<em>t</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts" title="hpx::util::save_checkpoint::Ts">Ts</a>&amp;&amp;... <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEEN3hpx6launchERR1TDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Save_checkpoint - Policy overload</p>
+<p><p>Save_checkpoint takes any number of objects which a user may wish to store and returns a future to a checkpoint object. This function can also store a component either by passing a shared_ptr to the component or by passing a component’s client instance to save_checkpoint. Additionally the function can take a policy as a first object which changes its behavior depending on the policy passed to it. Most notably, if a sync policy is used save_checkpoint will simply return a checkpoint object.</p>
+<dl class="simple">
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code>: Containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ts</span></code>: More containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+</ul>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">p</span></code>: Takes an HPX launch policy. Allows the user to change the way the function is launched i.e. async, sync, etc.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ts</span></code>: Other containers to restore Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Save_checkpoint returns a future to a checkpoint with one exception: if you pass hpx::launch::sync as the first argument. In this case save_checkpoint will simply return a checkpoint. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEEN3hpx6launchERR10checkpointRR1TDpRR2Ts">
+<span id="_CPPv3I0DpEN3hpx4util15save_checkpointEN3hpx6launchERR10checkpointRR1TDpRR2Ts"></span><span id="_CPPv2I0DpEN3hpx4util15save_checkpointEN3hpx6launchERR10checkpointRR1TDpRR2Ts"></span><span class="target" id="include_2hpx_2checkpoint_2checkpoint_8hpp_1a094238683d20fda25fa5e5a961f8c81a"></span>template&lt;typename <code class="sig-name descname">T</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a>&gt; <code class="sig-name descname">save_checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx6launchE" title="hpx::launch">launch</a> <em>p</em>, <a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> &amp;&amp;<em>c</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts" title="hpx::util::save_checkpoint::T">T</a> &amp;&amp;<em>t</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts" title="hpx::util::save_checkpoint::Ts">Ts</a>&amp;&amp;... <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEEN3hpx6launchERR10checkpointRR1TDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Save_checkpoint - Policy overload &amp; pre-initialized checkpoint</p>
+<p><p>Save_checkpoint takes any number of objects which a user may wish to store and returns a future to a checkpoint object. This function can also store a component either by passing a shared_ptr to the component or by passing a component’s client instance to save_checkpoint. Additionally the function can take a policy as a first object which changes its behavior depending on the policy passed to it. Most notably, if a sync policy is used save_checkpoint will simply return a checkpoint object.</p>
+<dl class="simple">
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code>: Containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ts</span></code>: More containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+</ul>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">p</span></code>: Takes an HPX launch policy. Allows the user to change the way the function is launched i.e. async, sync, etc.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: Takes a pre-initialized checkpoint to copy data into.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ts</span></code>: Other containers to restore Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Save_checkpoint returns a future to a checkpoint with one exception: if you pass hpx::launch::sync as the first argument. In this case save_checkpoint will simply return a checkpoint. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0Dp0EN3hpx4util15save_checkpointE10checkpointN3hpx6launch11sync_policyERR1TDpRR2Ts">
+<span id="_CPPv3I0Dp0EN3hpx4util15save_checkpointEN3hpx6launch11sync_policyERR1TDpRR2Ts"></span><span id="_CPPv2I0Dp0EN3hpx4util15save_checkpointEN3hpx6launch11sync_policyERR1TDpRR2Ts"></span><span class="target" id="include_2hpx_2checkpoint_2checkpoint_8hpp_1a07600540eecdc965db102235aa7c9935"></span>template&lt;typename <code class="sig-name descname">T</code>, typename ...<code class="sig-name descname">Ts</code>, typename <code class="sig-name descname">U</code> = <em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::enable_if&lt;!<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::is_same&lt;<em class="property">typename</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util15save_checkpointE10checkpointN3hpx6launch11sync_policyERR1TDpRR2Ts" title="hpx::util::save_checkpoint::T">T</a>&gt;::type, <a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a>&gt;::value&gt;::type&gt;<br /><a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> <code class="sig-name descname">save_checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx6launchE" title="hpx::launch">launch</a>::sync_policy <em>sync_p</em>, <a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util15save_checkpointE10checkpointN3hpx6launch11sync_policyERR1TDpRR2Ts" title="hpx::util::save_checkpoint::T">T</a> &amp;&amp;<em>t</em>, <a class="reference internal" href="#_CPPv4I0Dp0EN3hpx4util15save_checkpointE10checkpointN3hpx6launch11sync_policyERR1TDpRR2Ts" title="hpx::util::save_checkpoint::Ts">Ts</a>&amp;&amp;... <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Dp0EN3hpx4util15save_checkpointE10checkpointN3hpx6launch11sync_policyERR1TDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Save_checkpoint - Sync_policy overload</p>
+<p><p>Save_checkpoint takes any number of objects which a user may wish to store and returns a future to a checkpoint object. This function can also store a component either by passing a shared_ptr to the component or by passing a component’s client instance to save_checkpoint. Additionally the function can take a policy as a first object which changes its behavior depending on the policy passed to it. Most notably, if a sync policy is used save_checkpoint will simply return a checkpoint object.</p>
+<dl class="simple">
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code>: Containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ts</span></code>: More containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">U</span></code>: This parameter is used to make sure that T is not a checkpoint. This forces the compiler to choose the correct overload.</p></li>
+</ul>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sync_p</span></code>: hpx::launch::sync_policy</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ts</span></code>: Other containers to restore Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Save_checkpoint which is passed hpx::launch::sync_policy will return a checkpoint which contains the serialized values checkpoint. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0DpEN3hpx4util15save_checkpointE10checkpointN3hpx6launch11sync_policyERR10checkpointRR1TDpRR2Ts">
+<span id="_CPPv3I0DpEN3hpx4util15save_checkpointEN3hpx6launch11sync_policyERR10checkpointRR1TDpRR2Ts"></span><span id="_CPPv2I0DpEN3hpx4util15save_checkpointEN3hpx6launch11sync_policyERR10checkpointRR1TDpRR2Ts"></span><span class="target" id="include_2hpx_2checkpoint_2checkpoint_8hpp_1a2336322e49b8dc02c73d3b5234470d1c"></span>template&lt;typename <code class="sig-name descname">T</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br /><a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> <code class="sig-name descname">save_checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx6launchE" title="hpx::launch">launch</a>::sync_policy <em>sync_p</em>, <a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> &amp;&amp;<em>c</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts" title="hpx::util::save_checkpoint::T">T</a> &amp;&amp;<em>t</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util15save_checkpointEN3hpx6futureI10checkpointEERR10checkpointRR1TDpRR2Ts" title="hpx::util::save_checkpoint::Ts">Ts</a>&amp;&amp;... <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util15save_checkpointE10checkpointN3hpx6launch11sync_policyERR10checkpointRR1TDpRR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Save_checkpoint - Sync_policy overload &amp; pre-init. checkpoint</p>
+<p><p>Save_checkpoint takes any number of objects which a user may wish to store and returns a future to a checkpoint object. This function can also store a component either by passing a shared_ptr to the component or by passing a component’s client instance to save_checkpoint. Additionally the function can take a policy as a first object which changes its behavior depending on the policy passed to it. Most notably, if a sync policy is used save_checkpoint will simply return a checkpoint object.</p>
+<dl class="simple">
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code>: Containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ts</span></code>: More containers passed to save_checkpoint to be serialized and placed into a checkpoint object.</p></li>
+</ul>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sync_p</span></code>: hpx::launch::sync_policy</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: Takes a pre-initialized checkpoint to copy data into.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ts</span></code>: Other containers to restore Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Save_checkpoint which is passed hpx::launch::sync_policy will return a checkpoint which contains the serialized values checkpoint. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0DpEN3hpx4util18restore_checkpointEvRK10checkpointR1TDpR2Ts">
+<span id="_CPPv3I0DpEN3hpx4util18restore_checkpointERK10checkpointR1TDpR2Ts"></span><span id="_CPPv2I0DpEN3hpx4util18restore_checkpointERK10checkpointR1TDpR2Ts"></span><span class="target" id="include_2hpx_2checkpoint_2checkpoint_8hpp_1a5f1bc74c756dd18e238a61787cd067a3"></span>template&lt;typename <code class="sig-name descname">T</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br />void <code class="sig-name descname">restore_checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> <em class="property">const</em> &amp;<em>c</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util18restore_checkpointEvRK10checkpointR1TDpR2Ts" title="hpx::util::restore_checkpoint::T">T</a> &amp;<em>t</em>, <a class="reference internal" href="#_CPPv4I0DpEN3hpx4util18restore_checkpointEvRK10checkpointR1TDpR2Ts" title="hpx::util::restore_checkpoint::Ts">Ts</a>&amp;... <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN3hpx4util18restore_checkpointEvRK10checkpointR1TDpR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Restore_checkpoint</p>
+<p>Restore_checkpoint takes a checkpoint object as a first argument and the containers which will be filled from the byte stream (in the same order as they were placed in save_checkpoint). Restore_checkpoint can resurrect a stored component in two ways: by passing in a instance of a component’s shared_ptr or by passing in an instance of the component’s client.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Restore_checkpoint returns void. </p>
+</dd>
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ts</span></code>: Other containers to restore. Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: The checkpoint to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ts</span></code>: Other containers to restore Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx4util10checkpointE">
+<span id="_CPPv3N3hpx4util10checkpointE"></span><span id="_CPPv2N3hpx4util10checkpointE"></span><span id="hpx::util::checkpoint"></span><span class="target" id="classhpx_1_1util_1_1checkpoint"></span><em class="property">class </em><code class="sig-name descname">checkpoint</code><a class="headerlink" href="#_CPPv4N3hpx4util10checkpointE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;checkpoint.hpp&gt;</em><p>Checkpoint Object</p>
+<p>Checkpoint is the container object which is produced by save_checkpoint and is consumed by a restore_checkpoint. A checkpoint may be moved into the save_checkpoint object to write the byte stream to the pre-created checkpoint object.</p>
+<p>Checkpoints are able to store all containers which are able to be serialized including components. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util10checkpoint14const_iteratorE">
+<span id="_CPPv3N3hpx4util10checkpoint14const_iteratorE"></span><span id="_CPPv2N3hpx4util10checkpoint14const_iteratorE"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a82de877cacbb15cfdeee974d6f3c63af"></span><em class="property">using </em><code class="sig-name descname">const_iterator</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector::const_iterator<a class="headerlink" href="#_CPPv4N3hpx4util10checkpoint14const_iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util10checkpoint10checkpointEv">
+<span id="_CPPv3N3hpx4util10checkpoint10checkpointEv"></span><span id="_CPPv2N3hpx4util10checkpoint10checkpointEv"></span><span id="hpx::util::checkpoint::checkpoint"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a73fa7ae72803c1595b90fa0b3c7415dc"></span><code class="sig-name descname">checkpoint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util10checkpoint10checkpointEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util10checkpoint10checkpointERK10checkpoint">
+<span id="_CPPv3N3hpx4util10checkpoint10checkpointERK10checkpoint"></span><span id="_CPPv2N3hpx4util10checkpoint10checkpointERK10checkpoint"></span><span id="hpx::util::checkpoint::checkpoint__checkpointCR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a3d4919b754f7de5939121f2bb0281302"></span><code class="sig-name descname">checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpoint10checkpointEv" title="hpx::util::checkpoint::checkpoint">checkpoint</a> <em class="property">const</em> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util10checkpoint10checkpointERK10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util10checkpoint10checkpointERR10checkpoint">
+<span id="_CPPv3N3hpx4util10checkpoint10checkpointERR10checkpoint"></span><span id="_CPPv2N3hpx4util10checkpoint10checkpointERR10checkpoint"></span><span id="hpx::util::checkpoint::checkpoint__checkpointRR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1ad98c2e2db700085508a5f2c65c3239fe"></span><code class="sig-name descname">checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpoint10checkpointEv" title="hpx::util::checkpoint::checkpoint">checkpoint</a> &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util10checkpoint10checkpointERR10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util10checkpointD0Ev">
+<span id="_CPPv3N3hpx4util10checkpointD0Ev"></span><span id="_CPPv2N3hpx4util10checkpointD0Ev"></span><span id="hpx::util::checkpoint::~checkpoint"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a0b260023e856328d1b7d62bd291218ca"></span><code class="sig-name descname">~checkpoint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util10checkpointD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util10checkpoint10checkpointERKNSt6vectorIcEE">
+<span id="_CPPv3N3hpx4util10checkpoint10checkpointERKNSt6vectorIcEE"></span><span id="_CPPv2N3hpx4util10checkpoint10checkpointERKNSt6vectorIcEE"></span><span id="hpx::util::checkpoint::checkpoint__std::vector:c:CR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a203c02b31d67597ef996c38a5bdf58d1"></span><code class="sig-name descname">checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;char&gt; <em class="property">const</em> &amp;<em>vec</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util10checkpoint10checkpointERKNSt6vectorIcEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util10checkpoint10checkpointERRNSt6vectorIcEE">
+<span id="_CPPv3N3hpx4util10checkpoint10checkpointERRNSt6vectorIcEE"></span><span id="_CPPv2N3hpx4util10checkpoint10checkpointERRNSt6vectorIcEE"></span><span id="hpx::util::checkpoint::checkpoint__std::vector:c:RR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a8f8d5808e06cdd6e0d47488c042b0417"></span><code class="sig-name descname">checkpoint</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;char&gt; &amp;&amp;<em>vec</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util10checkpoint10checkpointERRNSt6vectorIcEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util10checkpointaSERK10checkpoint">
+<span id="_CPPv3N3hpx4util10checkpointaSERK10checkpoint"></span><span id="_CPPv2N3hpx4util10checkpointaSERK10checkpoint"></span><span id="hpx::util::checkpoint::assign-operator__checkpointCR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a107d0a201a33a291a219696c33d57105"></span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> <em class="property">const</em> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util10checkpointaSERK10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util10checkpointaSERR10checkpoint">
+<span id="_CPPv3N3hpx4util10checkpointaSERR10checkpoint"></span><span id="_CPPv2N3hpx4util10checkpointaSERR10checkpoint"></span><span id="hpx::util::checkpoint::assign-operator__checkpointRR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a9044f339d486db516dd2820415da14bb"></span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpointE" title="hpx::util::checkpoint">checkpoint</a> &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util10checkpointaSERR10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util10checkpoint5beginEv">
+<span id="_CPPv3NK3hpx4util10checkpoint5beginEv"></span><span id="_CPPv2NK3hpx4util10checkpoint5beginEv"></span><span id="hpx::util::checkpoint::beginC"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a763e553bf23b0ebe3d79e887b734d2d4"></span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpoint14const_iteratorE" title="hpx::util::checkpoint::const_iterator">const_iterator</a> <code class="sig-name descname">begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util10checkpoint5beginEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util10checkpoint3endEv">
+<span id="_CPPv3NK3hpx4util10checkpoint3endEv"></span><span id="_CPPv2NK3hpx4util10checkpoint3endEv"></span><span id="hpx::util::checkpoint::endC"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a7719f7ad1bfacb0f15b083d5b7b6c88e"></span><a class="reference internal" href="#_CPPv4N3hpx4util10checkpoint14const_iteratorE" title="hpx::util::checkpoint::const_iterator">const_iterator</a> <code class="sig-name descname">end</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util10checkpoint3endEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util10checkpoint4sizeEv">
+<span id="_CPPv3NK3hpx4util10checkpoint4sizeEv"></span><span id="_CPPv2NK3hpx4util10checkpoint4sizeEv"></span><span id="hpx::util::checkpoint::sizeC"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1ad33cab513f15c34bc56a8a0d2c82baca"></span>size_t <code class="sig-name descname">size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util10checkpoint4sizeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util10checkpoint9serializeEvR7ArchiveKj">
+<span id="_CPPv3I0EN3hpx4util10checkpoint9serializeER7ArchiveKj"></span><span id="_CPPv2I0EN3hpx4util10checkpoint9serializeER7ArchiveKj"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a3a86f9af2c42be37deb07f9f88800c17"></span>template&lt;typename <code class="sig-name descname">Archive</code>&gt;<br />void <code class="sig-name descname">serialize</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3hpx4util10checkpoint9serializeEvR7ArchiveKj" title="hpx::util::checkpoint::serialize::Archive">Archive</a> &amp;<em>arch</em>, <em class="property">const</em> unsigned int <em>version</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util10checkpoint9serializeEvR7ArchiveKj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util10checkpoint5data_E">
+<span id="_CPPv3N3hpx4util10checkpoint5data_E"></span><span id="_CPPv2N3hpx4util10checkpoint5data_E"></span><span id="hpx::util::checkpoint::data___std::vector:c:"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a84b7cf2f06940b7efe4b3d51f3f0955c"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;char&gt; <code class="sig-name descname">data_</code><a class="headerlink" href="#_CPPv4N3hpx4util10checkpoint5data_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1util_1_1checkpoint_1add50dcae00a1300662d4d2f8c52c804f"></span><em class="property">friend </em><code class="sig-name descname">hpx::util::hpx::serialization::access</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4lsRNSt7ostreamERK10checkpoint">
+<span id="_CPPv3lsRNSt7ostreamERK10checkpoint"></span><span id="_CPPv2lsRNSt7ostreamERK10checkpoint"></span><span id="lshift-operator__osR.checkpointCR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1ae4abc2da95d873bfacce9b6f969c9319"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<code class="sig-name descname">operator&lt;&lt;</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ostream &amp;<em>ost</em>, checkpoint <em class="property">const</em> &amp;<em>ckp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4lsRNSt7ostreamERK10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Operator&lt;&lt; Overload</p>
+<p><p>This overload is the main way to write data from a checkpoint to an object such as a file. Inside the function, the size of the checkpoint will be written to the stream before the checkpoint’s data. The operator&gt;&gt; overload uses this to read the correct number of bytes. Be mindful of this additional write and read when you use different facilities to write out or read in data to a checkpoint!</p>
+<dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ost</span></code>: Output stream to write to.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ckp</span></code>: Checkpoint to copy from.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Operator&lt;&lt; returns the ostream object. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4rsRNSt7istreamER10checkpoint">
+<span id="_CPPv3rsRNSt7istreamER10checkpoint"></span><span id="_CPPv2rsRNSt7istreamER10checkpoint"></span><span id="rshift-operator__isR.checkpointR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1a17563b5358dc4372447c4471e93d66f7"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::istream &amp;<code class="sig-name descname">operator&gt;&gt;</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::istream &amp;<em>ist</em>, checkpoint &amp;<em>ckp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4rsRNSt7istreamER10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Operator&gt;&gt; Overload</p>
+<p><p>This overload is the main way to read in data from an object such as a file to a checkpoint. It is important to note that inside the function, the first variable to be read is the size of the checkpoint. This size variable is written to the stream before the checkpoint’s data in the operator&lt;&lt; overload. Be mindful of this additional read and write when you use different facilities to read in or write out data from a checkpoint!</p>
+<dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ist</span></code>: Input stream to write from.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ckp</span></code>: Checkpoint to write to.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Operator&gt;&gt; returns the ostream object. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0DpE18restore_checkpointvRK10checkpointR1TDpR2Ts">
+<span id="_CPPv3I0DpE18restore_checkpointRK10checkpointR1TDpR2Ts"></span><span id="_CPPv2I0DpE18restore_checkpointRK10checkpointR1TDpR2Ts"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1ad29203790e2102706b1394aa139ee4ef"></span>template&lt;typename <code class="sig-name descname">T</code>, typename ...<code class="sig-name descname">Ts</code>&gt;<br />void <code class="sig-name descname">restore_checkpoint</code><span class="sig-paren">(</span>checkpoint <em class="property">const</em> &amp;<em>c</em>, <a class="reference internal" href="#_CPPv4I0DpE18restore_checkpointvRK10checkpointR1TDpR2Ts" title="restore_checkpoint::T">T</a> &amp;<em>t</em>, <a class="reference internal" href="#_CPPv4I0DpE18restore_checkpointvRK10checkpointR1TDpR2Ts" title="restore_checkpoint::Ts">Ts</a>&amp;... <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE18restore_checkpointvRK10checkpointR1TDpR2Ts" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Restore_checkpoint</p>
+<p>Restore_checkpoint takes a checkpoint object as a first argument and the containers which will be filled from the byte stream (in the same order as they were placed in save_checkpoint). Restore_checkpoint can resurrect a stored component in two ways: by passing in a instance of a component’s shared_ptr or by passing in an instance of the component’s client.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>Restore_checkpoint returns void. </p>
+</dd>
+<dt><strong>Template Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ts</span></code>: Other containers to restore. Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: The checkpoint to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t</span></code>: A container to restore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ts</span></code>: Other containers to restore Containers must be in the same order that they were inserted into the checkpoint.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4eqRK10checkpointRK10checkpoint">
+<span id="_CPPv3eqRK10checkpointRK10checkpoint"></span><span id="_CPPv2eqRK10checkpointRK10checkpoint"></span><span id="eq-operator__checkpointCR.checkpointCR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1acc3a76ec386128fc15ad07f25b203dfe"></span>bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span>checkpoint <em class="property">const</em> &amp;<em>lhs</em>, checkpoint <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4eqRK10checkpointRK10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4neRK10checkpointRK10checkpoint">
+<span id="_CPPv3neRK10checkpointRK10checkpoint"></span><span id="_CPPv2neRK10checkpointRK10checkpoint"></span><span id="neq-operator__checkpointCR.checkpointCR"></span><span class="target" id="classhpx_1_1util_1_1checkpoint_1ad6b4358ac19f799f403fdd3daa8eb4f8"></span>bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span>checkpoint <em class="property">const</em> &amp;<em>lhs</em>, checkpoint <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4neRK10checkpointRK10checkpoint" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../coroutines/api.html" class="btn btn-neutral float-right" title="coroutines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../logging/api.html" class="btn btn-neutral float-left" title="logging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

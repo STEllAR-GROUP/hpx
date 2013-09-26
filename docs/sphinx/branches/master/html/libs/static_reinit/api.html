@@ -1,0 +1,502 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>static_reinit &mdash; HPX master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coroutines" href="../coroutines/api.html" />
+    <link rel="prev" title="filesystem" href="../filesystem/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">static_reinit</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-static-reinit-reinitializable-static-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/static_reinit/reinitializable_static.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-static-reinit-static-reinit-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/static_reinit/static_reinit.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-reinitializable-static-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/reinitializable_static.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-util-static-reinit-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/static_reinit.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../naming_base/api.html">naming_base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>static_reinit</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/static_reinit/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="static-reinit">
+<span id="libs-static-reinit-api"></span><h1>static_reinit<a class="headerlink" href="#static-reinit" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-static-reinit-reinitializable-static-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/static_reinit/reinitializable_static.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-static-reinit-reinitializable-static-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_EXPORT_REINITIALIZABLE_STATIC">
+<span class="target" id="hpx_2static__reinit_2reinitializable__static_8hpp_1a13799c0f8483a2073c85f17fe636dcf7"></span><code class="sig-name descname">HPX_EXPORT_REINITIALIZABLE_STATIC</code><a class="headerlink" href="#c.HPX_EXPORT_REINITIALIZABLE_STATIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span id="hpx::util"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Variables</p>
+<dl class="member">
+<dt id="_CPPv4I00_NSt6size_tEEN3hpx4util22reinitializable_staticE">
+<span id="_CPPv3I00_NSt6size_tEEN3hpx4util22reinitializable_staticE"></span><span id="_CPPv2I00_NSt6size_tEEN3hpx4util22reinitializable_staticE"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">Tag</code> = <a class="reference internal" href="#_CPPv4I00_NSt6size_tEEN3hpx4util22reinitializable_staticE" title="hpx::util::reinitializable_static::T">T</a>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">N</code> = 1&gt;<br /><span class="target" id="hpx_2static__reinit_2reinitializable__static_8hpp_1a1fe25dac706d25f2e61fda2769b4529a"></span><em class="property">struct</em> HPX_EXPORT_REINITIALIZABLE_STATIC <code class="sig-name descname">reinitializable_static</code><a class="headerlink" href="#_CPPv4I00_NSt6size_tEEN3hpx4util22reinitializable_staticE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4I00_NSt6size_tEEN3hpx4util22reinitializable_staticE">
+<span id="_CPPv3I00_NSt6size_tEEN3hpx4util22reinitializable_staticE"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">Tag</code>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">N</code>&gt;<br /><em class="property">struct </em><code class="sig-name descname">reinitializable_static</code><a class="headerlink" href="#_CPPv4I00_NSt6size_tEEN3hpx4util22reinitializable_staticE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util22reinitializable_static10value_typeE">
+<span id="_CPPv3N3hpx4util22reinitializable_static10value_typeE"></span><span id="_CPPv2N3hpx4util22reinitializable_static10value_typeE"></span><span id="hpx::util::reinitializable_static::value_type"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a1dc1916dc0b609eb454a84ded4cc55c1"></span><em class="property">typedef </em>T <code class="sig-name descname">value_type</code><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static10value_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx4util22reinitializable_static9referenceE">
+<span id="_CPPv3N3hpx4util22reinitializable_static9referenceE"></span><span id="_CPPv2N3hpx4util22reinitializable_static9referenceE"></span><span id="hpx::util::reinitializable_static::reference"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a4309a00a3e5d871c24c9a953aa206865"></span><em class="property">typedef </em>T &amp;<code class="sig-name descname">reference</code><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static9referenceE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx4util22reinitializable_static15const_referenceE">
+<span id="_CPPv3N3hpx4util22reinitializable_static15const_referenceE"></span><span id="_CPPv2N3hpx4util22reinitializable_static15const_referenceE"></span><span id="hpx::util::reinitializable_static::const_reference"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a950024074065a027add85890340cdec5"></span><em class="property">typedef </em>T <em class="property">const</em> &amp;<code class="sig-name descname">const_reference</code><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static15const_referenceE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util22reinitializable_static16HPX_NON_COPYABLEE22reinitializable_static">
+<span id="_CPPv3N3hpx4util22reinitializable_static16HPX_NON_COPYABLEE22reinitializable_static"></span><span id="_CPPv2N3hpx4util22reinitializable_static16HPX_NON_COPYABLEE22reinitializable_static"></span><span id="hpx::util::reinitializable_static::HPX_NON_COPYABLE__reinitializable_static"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1aefdfeeed1d10c5af8685c511dde3f8ed"></span><code class="sig-name descname">HPX_NON_COPYABLE</code><span class="sig-paren">(</span>reinitializable_static<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static16HPX_NON_COPYABLEE22reinitializable_static" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util22reinitializable_static22reinitializable_staticEv">
+<span id="_CPPv3N3hpx4util22reinitializable_static22reinitializable_staticEv"></span><span id="_CPPv2N3hpx4util22reinitializable_static22reinitializable_staticEv"></span><span id="hpx::util::reinitializable_static::reinitializable_static"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a8ebb2d00ae9b9ed3bef5751a326e57b3"></span><code class="sig-name descname">reinitializable_static</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static22reinitializable_staticEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util22reinitializable_static22reinitializable_staticERK1U">
+<span id="_CPPv3I0EN3hpx4util22reinitializable_static22reinitializable_staticERK1U"></span><span id="_CPPv2I0EN3hpx4util22reinitializable_static22reinitializable_staticERK1U"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1aac60be46c8a97553a961ff121ee126ff"></span>template&lt;typename <code class="sig-name descname">U</code>&gt;<br /><code class="sig-name descname">reinitializable_static</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3hpx4util22reinitializable_static22reinitializable_staticERK1U" title="hpx::util::reinitializable_static::reinitializable_static::U">U</a> <em class="property">const</em> &amp;<em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util22reinitializable_static22reinitializable_staticERK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util22reinitializable_staticcv9referenceEv">
+<span id="_CPPv3N3hpx4util22reinitializable_staticcv9referenceEv"></span><span id="_CPPv2N3hpx4util22reinitializable_staticcv9referenceEv"></span><span id="hpx::util::reinitializable_static::castto-reference-operator"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1adce0774b266df83388154ea1877557b3"></span><code class="sig-name descname">operator reference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_staticcv9referenceEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util22reinitializable_staticcv15const_referenceEv">
+<span id="_CPPv3NK3hpx4util22reinitializable_staticcv15const_referenceEv"></span><span id="_CPPv2NK3hpx4util22reinitializable_staticcv15const_referenceEv"></span><span id="hpx::util::reinitializable_static::castto-const_reference-operatorC"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a0a3feb83c11e9352b924783b13ad3db5"></span><code class="sig-name descname">operator const_reference</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util22reinitializable_staticcv15const_referenceEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util22reinitializable_static3getENSt6size_tE">
+<span id="_CPPv3N3hpx4util22reinitializable_static3getENSt6size_tE"></span><span id="_CPPv2N3hpx4util22reinitializable_static3getENSt6size_tE"></span><span id="hpx::util::reinitializable_static::get__std::s"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a2c616d22a193ed9d3b0b58d4203b3809"></span><a class="reference internal" href="#_CPPv4N3hpx4util22reinitializable_static9referenceE" title="hpx::util::reinitializable_static::reference">reference</a> <code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>item</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static3getENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx4util22reinitializable_static3getENSt6size_tE">
+<span id="_CPPv3NK3hpx4util22reinitializable_static3getENSt6size_tE"></span><span id="_CPPv2NK3hpx4util22reinitializable_static3getENSt6size_tE"></span><span id="hpx::util::reinitializable_static::get__std::sC"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a4076fad969eeace2f76c686fa8c9023f"></span><a class="reference internal" href="#_CPPv4N3hpx4util22reinitializable_static15const_referenceE" title="hpx::util::reinitializable_static::const_reference">const_reference</a> <code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>item</em> = 0<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx4util22reinitializable_static3getENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx4util22reinitializable_static7pointerE">
+<span id="_CPPv3N3hpx4util22reinitializable_static7pointerE"></span><span id="_CPPv2N3hpx4util22reinitializable_static7pointerE"></span><span id="hpx::util::reinitializable_static::pointer"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1ae177ed94bc4a126ea6e9368f319480d2"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::add_pointer&lt;<a class="reference internal" href="#_CPPv4N3hpx4util22reinitializable_static10value_typeE" title="hpx::util::reinitializable_static::value_type">value_type</a>&gt;::type <code class="sig-name descname">pointer</code><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static7pointerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx4util22reinitializable_static12storage_typeE">
+<span id="_CPPv3N3hpx4util22reinitializable_static12storage_typeE"></span><span id="_CPPv2N3hpx4util22reinitializable_static12storage_typeE"></span><span id="hpx::util::reinitializable_static::storage_type"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a5122418ac9ca29c7e599060aa40c8e84"></span><em class="property">typedef </em><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::aligned_storage&lt;sizeof(<a class="reference internal" href="#_CPPv4N3hpx4util22reinitializable_static10value_typeE" title="hpx::util::reinitializable_static::value_type">value_type</a>), <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::alignment_of&lt;<a class="reference internal" href="#_CPPv4N3hpx4util22reinitializable_static10value_typeE" title="hpx::util::reinitializable_static::value_type">value_type</a>&gt;::value&gt;::type <code class="sig-name descname">storage_type</code><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static12storage_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Static Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util22reinitializable_static17default_constructEv">
+<span id="_CPPv3N3hpx4util22reinitializable_static17default_constructEv"></span><span id="_CPPv2N3hpx4util22reinitializable_static17default_constructEv"></span><span id="hpx::util::reinitializable_static::default_construct"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a435904e8c1b7aa6d71794ae78fcc3765"></span><em class="property">static</em> void <code class="sig-name descname">default_construct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static17default_constructEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util22reinitializable_static15value_constructEvRK1U">
+<span id="_CPPv3I0EN3hpx4util22reinitializable_static15value_constructERK1U"></span><span id="_CPPv2I0EN3hpx4util22reinitializable_static15value_constructERK1U"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a4141902e3fed5892742d9f4b21c6259e"></span>template&lt;typename <code class="sig-name descname">U</code>&gt;<br /><em class="property">static</em> void <code class="sig-name descname">value_construct</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3hpx4util22reinitializable_static15value_constructEvRK1U" title="hpx::util::reinitializable_static::value_construct::U">U</a> <em class="property">const</em> &amp;<em>v</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util22reinitializable_static15value_constructEvRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util22reinitializable_static8destructEv">
+<span id="_CPPv3N3hpx4util22reinitializable_static8destructEv"></span><span id="_CPPv2N3hpx4util22reinitializable_static8destructEv"></span><span id="hpx::util::reinitializable_static::destruct"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1af4bd8d54ab7f4275872fb0fce7a26bb8"></span><em class="property">static</em> void <code class="sig-name descname">destruct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static8destructEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util22reinitializable_static19default_constructorEv">
+<span id="_CPPv3N3hpx4util22reinitializable_static19default_constructorEv"></span><span id="_CPPv2N3hpx4util22reinitializable_static19default_constructorEv"></span><span id="hpx::util::reinitializable_static::default_constructor"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a01e4e4a98a885f186ca57c72aebc3b65"></span><em class="property">static</em> void <code class="sig-name descname">default_constructor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static19default_constructorEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4util22reinitializable_static17value_constructorEvPK1U">
+<span id="_CPPv3I0EN3hpx4util22reinitializable_static17value_constructorEPK1U"></span><span id="_CPPv2I0EN3hpx4util22reinitializable_static17value_constructorEPK1U"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a338131044978c0b7a26d84c7dfca8eb7"></span>template&lt;typename <code class="sig-name descname">U</code>&gt;<br /><em class="property">static</em> void <code class="sig-name descname">value_constructor</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3hpx4util22reinitializable_static17value_constructorEvPK1U" title="hpx::util::reinitializable_static::value_constructor::U">U</a> <em class="property">const</em> *<em>pv</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4util22reinitializable_static17value_constructorEvPK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util22reinitializable_static11get_addressENSt6size_tE">
+<span id="_CPPv3N3hpx4util22reinitializable_static11get_addressENSt6size_tE"></span><span id="_CPPv2N3hpx4util22reinitializable_static11get_addressENSt6size_tE"></span><span id="hpx::util::reinitializable_static::get_address__std::s"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a2b115f269736a73ae29af5ffed3f8b9c"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv4N3hpx4util22reinitializable_static7pointerE" title="hpx::util::reinitializable_static::pointer">pointer</a> <code class="sig-name descname">get_address</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>item</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static11get_addressENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Static Attributes</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx4util22reinitializable_static5data_E">
+<span id="_CPPv3N3hpx4util22reinitializable_static5data_E"></span><span id="_CPPv2N3hpx4util22reinitializable_static5data_E"></span><span id="hpx::util::reinitializable_static::data___reinitializable_static:T.Tag.N:::storage_type"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1af411ab6e4315014ecfe7fb89f02466d3"></span>reinitializable_static&lt;T, Tag, N&gt;::storage_type <code class="sig-name descname">data_</code><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static5data_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx4util22reinitializable_static12constructed_E">
+<span id="_CPPv3N3hpx4util22reinitializable_static12constructed_E"></span><span id="_CPPv2N3hpx4util22reinitializable_static12constructed_E"></span><span id="hpx::util::reinitializable_static::constructed___std::once_flag"></span><span class="target" id="structhpx_1_1util_1_1reinitializable__static_1a9242744cbca6241eda074894ca623701"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::once_flag <code class="sig-name descname">constructed_</code><a class="headerlink" href="#_CPPv4N3hpx4util22reinitializable_static12constructed_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-static-reinit-static-reinit-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/static_reinit/static_reinit.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-static-reinit-static-reinit-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4utilE">
+<span id="_CPPv3N3hpx4utilE"></span><span id="_CPPv2N3hpx4utilE"></span><span class="target" id="namespacehpx_1_1util"></span><em class="property">namespace </em><code class="sig-name descname">util</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx4util15reinit_registerERKN4util15function_nonserIFvvEEERKN4util15function_nonserIFvvEEE">
+<span id="_CPPv3N3hpx4util15reinit_registerERKN4util15function_nonserIFvvEEERKN4util15function_nonserIFvvEEE"></span><span id="_CPPv2N3hpx4util15reinit_registerERKN4util15function_nonserIFvvEEERKN4util15function_nonserIFvvEEE"></span><span class="target" id="hpx_2static__reinit_2static__reinit_8hpp_1abf23cdf3d13d5806a396d5b878adad86"></span>void <code class="sig-name descname">reinit_register</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../functional/api.html#_CPPv4N3hpx4util15function_nonserE" title="hpx::util::function_nonser">function_nonser</a>&lt;void<span class="sig-paren">(</span><span class="sig-paren">)</span>&gt; <em class="property">const</em> &amp;<em>construct</em><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../functional/api.html#_CPPv4N3hpx4util15function_nonserE" title="hpx::util::function_nonser">function_nonser</a>&lt;void<span class="sig-paren">(</span><span class="sig-paren">)</span>&gt; <em class="property">const</em> &amp;<em>destruct</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util15reinit_registerERKN4util15function_nonserIFvvEEERKN4util15function_nonserIFvvEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util16reinit_constructEv">
+<span id="_CPPv3N3hpx4util16reinit_constructEv"></span><span id="_CPPv2N3hpx4util16reinit_constructEv"></span><span id="hpx::util::reinit_construct"></span><span class="target" id="hpx_2static__reinit_2static__reinit_8hpp_1a59e92c2dd5f5f005ae9ef9e9d9029cc3"></span>void <code class="sig-name descname">reinit_construct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util16reinit_constructEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx4util15reinit_destructEv">
+<span id="_CPPv3N3hpx4util15reinit_destructEv"></span><span id="_CPPv2N3hpx4util15reinit_destructEv"></span><span id="hpx::util::reinit_destruct"></span><span class="target" id="hpx_2static__reinit_2static__reinit_8hpp_1a83a1d66da67e542f3ef2d2bd6bbe97bc"></span>void <code class="sig-name descname">reinit_destruct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx4util15reinit_destructEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-compatibility-hpx-util-reinitializable-static-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/reinitializable_static.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-reinitializable-static-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-util-static-reinit-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/util/static_reinit.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-util-static-reinit-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../coroutines/api.html" class="btn btn-neutral float-right" title="coroutines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../filesystem/api.html" class="btn btn-neutral float-left" title="filesystem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>856afc8</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Asynchronous execution with hpx::async and actions: Fibonacci &mdash; HPX 1.3.0-rc3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Remote execution with actions: Hello world" href="hello_world.html" />
+    <link rel="prev" title="Asynchronous execution with hpx::async: Fibonacci" href="fibonacci_local.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.0-rc3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fibonacci_local.html">Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code>: Fibonacci</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code> and actions: Fibonacci</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setup">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#walkthrough">Walkthrough</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="hello_world.html">Remote execution with actions: Hello world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="accumulator.html">Components and actions: Accumulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interest_calculator.html">Dataflow: Interest calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="1d_stencil.html">Local to remote: 1D stencil</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../examples.html">Examples</a> &raquo;</li>
+        
+      <li>Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code> and actions: Fibonacci</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/examples/fibonacci.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asynchronous-execution-with-hpx-async-and-actions-fibonacci">
+<span id="examples-fibonacci"></span><h1>Asynchronous execution with <code class="docutils literal notranslate"><span class="pre">hpx::async</span></code> and actions: Fibonacci<a class="headerlink" href="#asynchronous-execution-with-hpx-async-and-actions-fibonacci" title="Permalink to this headline">¶</a></h1>
+<p>This example extends the <a class="reference internal" href="fibonacci_local.html#examples-fibonacci-local"><span class="std std-ref">previous example</span></a> by
+introducing <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">actions</span></a>: functions that can be run remotely. In this
+example, however, we will still only run the action locally. The mechanism to
+execute <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">actions</span></a> stays the same: <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::async</span></code>. Later
+examples will demonstrate running actions on remote <a class="reference internal" href="../terminology.html#term-locality"><span class="xref std std-term">localities</span></a>
+(e.g. <a class="reference internal" href="hello_world.html#examples-hello-world"><span class="std std-ref">Remote execution with actions: Hello world</span></a>).</p>
+<div class="section" id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
+<p>The source code for this example can be found here:
+<a class="reference download internal" download="" href="../_downloads/7d976e80475489edf953e28f14f75573/fibonacci.cpp"><code class="xref download docutils literal notranslate"><span class="pre">fibonacci.cpp</span></code></a>.</p>
+<p>To compile this program, go to your <em>HPX</em> build directory (see
+<a class="reference internal" href="../manual/building_hpx.html#hpx-build-system"><span class="std std-ref">HPX build system</span></a> for information on configuring and building <em>HPX</em>) and
+enter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make examples.quickstart.fibonacci
+</pre></div>
+</div>
+<p>To run the program type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/fibonacci
+</pre></div>
+</div>
+<p>This should print (time should be approximate):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>fibonacci(10) == 55
+elapsed time: 0.00186288 [s]
+</pre></div>
+</div>
+<p>This run used the default settings, which calculate the tenth element of the
+Fibonacci sequence. To declare which Fibonacci value you want to calculate, use
+the <code class="docutils literal notranslate"><span class="pre">--n-value</span></code> option. Additionally you can use the <a class="reference internal" href="../manual/launching_and_configuring_hpx_applications.html#cmdoption-hpx-threads"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hpx:threads</span></code></a>
+option to declare how many OS-threads you wish to use when running the program.
+For instance, running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/fibonacci --n-value <span class="m">20</span> --hpx:threads <span class="m">4</span>
+</pre></div>
+</div>
+<p>Will yield:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>fibonacci(20) == 6765
+elapsed time: 0.233827 [s]
+</pre></div>
+</div>
+</div>
+<div class="section" id="walkthrough">
+<h2>Walkthrough<a class="headerlink" href="#walkthrough" title="Permalink to this headline">¶</a></h2>
+<p>The code needed to initialize the <em>HPX</em> runtime is the same as in the
+<a class="reference internal" href="fibonacci_local.html#examples-fibonacci-local"><span class="std std-ref">previous example</span></a>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="c1">// Configure application-specific options</span>
+    <span class="n">boost</span><span class="o">::</span><span class="n">program_options</span><span class="o">::</span><span class="n">options_description</span>
+       <span class="n">desc_commandline</span><span class="p">(</span><span class="s">&quot;Usage: &quot;</span> <span class="n">HPX_APPLICATION_STRING</span> <span class="s">&quot; [options]&quot;</span><span class="p">);</span>
+
+    <span class="n">desc_commandline</span><span class="p">.</span><span class="n">add_options</span><span class="p">()</span>
+        <span class="p">(</span> <span class="s">&quot;n-value&quot;</span><span class="p">,</span>
+          <span class="n">boost</span><span class="o">::</span><span class="n">program_options</span><span class="o">::</span><span class="n">value</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">default_value</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+          <span class="s">&quot;n value for the Fibonacci function&quot;</span><span class="p">)</span>
+        <span class="p">;</span>
+
+    <span class="c1">// Initialize and run HPX</span>
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">desc_commandline</span><span class="p">,</span> <span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../api.html#_CPPv4N3hpx4initERKN4util15function_nonserIFiRN5boost15program_options13variables_mapEEEERKN5boost15program_options19options_descriptionEiPPcRKNSt6vectorINSt6stringEEE21startup_function_type22shutdown_function_typeN3hpx12runtime_modeE" title="hpx::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::init</span></code></a> function in <code class="docutils literal notranslate"><span class="pre">main()</span></code> starts the runtime system, and
+invokes <code class="docutils literal notranslate"><span class="pre">hpx_main()</span></code> as the first <em>HPX</em>-thread. The command line option
+<code class="docutils literal notranslate"><span class="pre">--n-value</span></code> is read in, a timer
+(<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">hpx::util::high_resolution_timer</span></code>) is set up to record the time it
+takes to do the computation, the <code class="docutils literal notranslate"><span class="pre">fibonacci</span></code> <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> is invoked
+synchronously, and the answer is printed out.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">hpx_main</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">program_options</span><span class="o">::</span><span class="n">variables_map</span><span class="o">&amp;</span> <span class="n">vm</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// extract command line argument, i.e. fib(N)</span>
+    <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">n</span> <span class="o">=</span> <span class="n">vm</span><span class="p">[</span><span class="s">&quot;n-value&quot;</span><span class="p">].</span><span class="n">as</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">();</span>
+
+    <span class="p">{</span>
+        <span class="c1">// Keep track of the time required to execute.</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">high_resolution_timer</span> <span class="n">t</span><span class="p">;</span>
+
+        <span class="c1">// Wait for fib() to return the value</span>
+        <span class="n">fibonacci_action</span> <span class="n">fib</span><span class="p">;</span>
+        <span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">r</span> <span class="o">=</span> <span class="n">fib</span><span class="p">(</span><span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">(),</span> <span class="n">n</span><span class="p">);</span>
+
+        <span class="kt">char</span> <span class="k">const</span><span class="o">*</span> <span class="n">fmt</span> <span class="o">=</span> <span class="s">&quot;fibonacci({1}) == {2}</span><span class="se">\n</span><span class="s">elapsed time: {3} [s]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">util</span><span class="o">::</span><span class="n">format_to</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">.</span><span class="n">elapsed</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">hpx</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span> <span class="c1">// Handles HPX shutdown</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Upon a closer look we see that we’ve created a <code class="docutils literal notranslate"><span class="pre">std::uint64_t</span></code> to store the
+result of invoking our <code class="docutils literal notranslate"><span class="pre">fibonacci_action</span></code> <code class="docutils literal notranslate"><span class="pre">fib</span></code>. This <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> will
+launch synchronously (as the work done inside of the <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> will be
+asynchronous itself) and return the result of the Fibonacci sequence. But wait,
+what is an <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a>? And what is this <code class="docutils literal notranslate"><span class="pre">fibonacci_action</span></code>? For starters,
+an <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> is a wrapper for a function. By wrapping functions, <em>HPX</em> can
+send packets of work to different processing units. These vehicles allow users
+to calculate work now, later, or on certain nodes. The first argument to our
+<a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> is the location where the <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> should be run. In this
+case, we just want to run the <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> on the machine that we are
+currently on, so we use <a class="reference internal" href="../api.html#_CPPv4N3hpx9find_hereER10error_code" title="hpx::find_here"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::find_here</span></code></a> that we wish to calculate. To
+further understand this we turn to the code to find where <code class="docutils literal notranslate"><span class="pre">fibonacci_action</span></code>
+was defined:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// forward declaration of the Fibonacci function</span>
+<span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">fibonacci</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">);</span>
+
+<span class="c1">// This is to generate the required boilerplate we need for the remote</span>
+<span class="c1">// invocation to work.</span>
+<span class="n">HPX_PLAIN_ACTION</span><span class="p">(</span><span class="n">fibonacci</span><span class="p">,</span> <span class="n">fibonacci_action</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>A plain <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> is the most basic form of <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a>. Plain
+<a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a>s wrap simple global functions which are not associated with any
+particular object (we will discuss other types of <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a>s in
+<a class="reference internal" href="accumulator.html#examples-accumulator"><span class="std std-ref">Components and actions: Accumulator</span></a>). In this block of code the function <code class="docutils literal notranslate"><span class="pre">fibonacci()</span></code>
+is declared. After the declaration, the function is wrapped in an <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a>
+in the declaration <a class="reference internal" href="../api.html#c.HPX_PLAIN_ACTION" title="HPX_PLAIN_ACTION"><code class="xref c c-macro docutils literal notranslate"><span class="pre">HPX_PLAIN_ACTION</span></code></a>. This function takes two
+arguments: the name of the function that is to be wrapped and the name of the
+<a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> that you are creating.</p>
+<p>This picture should now start making sense. The function <code class="docutils literal notranslate"><span class="pre">fibonacci()</span></code> is
+wrapped in an <a class="reference internal" href="../terminology.html#term-action"><span class="xref std std-term">action</span></a> <code class="docutils literal notranslate"><span class="pre">fibonacci_action</span></code>, which was run synchronously
+but created asynchronous work, then returns a <code class="docutils literal notranslate"><span class="pre">std::uint64_t</span></code> representing the
+result of the function <code class="docutils literal notranslate"><span class="pre">fibonacci()</span></code>. Now, let’s look at the function
+<code class="docutils literal notranslate"><span class="pre">fibonacci()</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">fibonacci</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
+
+    <span class="c1">// We restrict ourselves to execute the Fibonacci function locally.</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">naming</span><span class="o">::</span><span class="n">id_type</span> <span class="k">const</span> <span class="n">locality_id</span> <span class="o">=</span> <span class="n">hpx</span><span class="o">::</span><span class="n">find_here</span><span class="p">();</span>
+
+    <span class="c1">// Invoking the Fibonacci algorithm twice is inefficient.</span>
+    <span class="c1">// However, we intentionally demonstrate it this way to create some</span>
+    <span class="c1">// heavy workload.</span>
+
+    <span class="n">fibonacci_action</span> <span class="n">fib</span><span class="p">;</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;</span> <span class="n">n1</span> <span class="o">=</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">(</span><span class="n">fib</span><span class="p">,</span> <span class="n">locality_id</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">hpx</span><span class="o">::</span><span class="n">future</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint64_t</span><span class="o">&gt;</span> <span class="n">n2</span> <span class="o">=</span>
+        <span class="n">hpx</span><span class="o">::</span><span class="n">async</span><span class="p">(</span><span class="n">fib</span><span class="p">,</span> <span class="n">locality_id</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">n1</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="o">+</span> <span class="n">n2</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>   <span class="c1">// wait for the Futures to return their values</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This block of code is much more straightforward and should look familiar from
+the <a class="reference internal" href="fibonacci_local.html#examples-fibonacci-local"><span class="std std-ref">previous example</span></a>. First, <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">(n</span> <span class="pre">&lt;</span> <span class="pre">2)</span></code>,
+meaning n is 0 or 1, then we return 0 or 1 (recall the first element of the
+Fibonacci sequence is 0 and the second is 1). If n is larger than 1 we spawn two
+tasks using <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::async</span></code>. Each of these futures represents an
+asynchronous, recursive call to <code class="docutils literal notranslate"><span class="pre">fibonacci</span></code>. As previously we wait for both
+futures to finish computing, get the results, add them together, and return that
+value as our result. The recursive call tree will continue until n is equal to 0
+or 1, at which point the value can be returned because it is implicitly known.
+When this termination condition is reached, the futures can then be added up,
+producing the n-th value of the Fibonacci sequence.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="hello_world.html" class="btn btn-neutral float-right" title="Remote execution with actions: Hello world" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="fibonacci_local.html" class="btn btn-neutral float-left" title="Asynchronous execution with hpx::async: Fibonacci" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>58fa1f0</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

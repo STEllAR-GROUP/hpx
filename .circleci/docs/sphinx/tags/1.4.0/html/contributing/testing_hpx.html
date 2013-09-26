@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Testing HPX &mdash; HPX 1.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using docker for development" href="docker_image.html" />
+    <link rel="prev" title="Release procedure for HPX" href="release_procedure.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libs/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libs/all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../contributing.html">Contributing to <em>HPX</em></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="release_procedure.html">Release procedure for <em>HPX</em></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Testing <em>HPX</em></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#running-tests-manually">Running tests manually</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#issue-tracker">Issue tracker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#continuous-testing">Continuous testing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="docker_image.html">Using docker for development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html">Module structure</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../contributing.html">Contributing to <em>HPX</em></a> &raquo;</li>
+        
+      <li>Testing <em>HPX</em></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/contributing/testing_hpx.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="testing-hpx">
+<h1>Testing <em>HPX</em><a class="headerlink" href="#testing-hpx" title="Permalink to this headline">¶</a></h1>
+<p>To ensure correctness of <em>HPX</em>, we ship a large variety of unit and regression
+tests. The tests are driven by the <a class="reference external" href="https://gitlab.kitware.com/cmake/community/wikis/doc/ctest/Testing-With-CTest">CTest</a> tool and are executed automatically
+by buildbot (see <a class="reference external" href="http://rostam.cct.lsu.edu/"><em>HPX</em> Buildbot Website</a>) on each commit to the <em>HPX</em> <a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/">Github</a>
+repository. In addition, it is encouraged to run the test suite manually to
+ensure proper operation on your target system. If a test fails for your
+platform, we highly recommend submitting an issue on our <a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues"><em>HPX</em> Issues</a>
+tracker with detailed information about the target system.</p>
+<div class="section" id="running-tests-manually">
+<h2>Running tests manually<a class="headerlink" href="#running-tests-manually" title="Permalink to this headline">¶</a></h2>
+<p>Running the tests manually is as easy as typing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">tests</span> <span class="pre">&amp;&amp;</span> <span class="pre">make</span> <span class="pre">test</span></code>.
+This will build all tests and run them once the tests are built successfully.
+After the tests have been built, you can invoke separate tests with the help of
+the <code class="docutils literal notranslate"><span class="pre">ctest</span></code> command. You can list all available test targets using <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">help</span>
+<span class="pre">|</span> <span class="pre">grep</span> <span class="pre">tests</span></code>. Please see the <a class="reference external" href="https://www.cmake.org/cmake/help/latest/manual/ctest.1.html">CTest Documentation</a> for further details.</p>
+</div>
+<div class="section" id="issue-tracker">
+<h2>Issue tracker<a class="headerlink" href="#issue-tracker" title="Permalink to this headline">¶</a></h2>
+<p>If you stumble over a bug or missing feature in <em>HPX</em>, please
+submit an issue to our <a class="reference external" href="https://github.com/STEllAR-GROUP/hpx/issues"><em>HPX</em> Issues</a> page. For more information on how to
+submit support requests or other means of getting in contact with the developers,
+please see the <a class="reference external" href="https://stellar.cct.lsu.edu/support/">Support Website</a> page.</p>
+</div>
+<div class="section" id="continuous-testing">
+<h2>Continuous testing<a class="headerlink" href="#continuous-testing" title="Permalink to this headline">¶</a></h2>
+<p>In addition to manual testing, we run automated tests on various platforms. You
+can see the status of the current master head by visiting the
+<a class="reference external" href="http://rostam.cct.lsu.edu/"><em>HPX</em> Buildbot Website</a>. We also run tests on all pull requests using both
+<a class="reference external" href="https://circleci.com">CircleCI</a> and a combination of <a class="reference external" href="https://www.kitware.com/cdash/project/about.html">CDash</a> and <a class="reference external" href="https://github.com/biddisco/pycicle/">pycicle</a>. You can see the
+dashboards here: <a class="reference external" href="https://circleci.com/gh/STEllAR-GROUP/hpx">CircleCI HPX dashboard</a> and <a class="reference external" href="https://cdash.cscs.ch/index.php?project=HPX">CDash HPX dashboard</a> .</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="docker_image.html" class="btn btn-neutral float-right" title="Using docker for development" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="release_procedure.html" class="btn btn-neutral float-left" title="Release procedure for HPX" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

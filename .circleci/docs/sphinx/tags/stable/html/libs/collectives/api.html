@@ -1,0 +1,477 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>collectives &mdash; HPX stable documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="statistics" href="../statistics/api.html" />
+    <link rel="prev" title="hardware" href="../hardware/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                stable
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">collectives</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-collectives-all-reduce-hpp"><cite>#include &lt;hpx/collectives/all_reduce.hpp&gt;</cite></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-collectives-all-to-all-hpp"><cite>#include &lt;hpx/collectives/all_to_all.hpp&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../parallel_executors/api.html">parallel_executors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>collectives</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/collectives/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="collectives">
+<h1>collectives<a class="headerlink" href="#collectives" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-collectives-all-reduce-hpp">
+<h2><cite>#include &lt;hpx/collectives/all_reduce.hpp&gt;</cite><a class="headerlink" href="#include-hpx-collectives-all-reduce-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_REGISTER_ALLREDUCE_DECLARATION">
+<span class="target" id="all__reduce_8hpp_1a8a3e8b99658ce96b72821972e509eac1"></span><code class="descname">HPX_REGISTER_ALLREDUCE_DECLARATION</code><span class="sig-paren">(</span>type, name<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_REGISTER_ALLREDUCE_DECLARATION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Declare a all_reduce object named <em>name</em> for a given data type <em>type</em>. </p>
+<p>The macro <em>HPX_REGISTER_ALLREDUCE_DECLARATION</em> can be used to declare all facilities necessary for a (possibly remote) all_reduce operation.</p>
+<p>The parameter <em>type</em> specifies for which data type the all_reduce operations should be enabled.</p>
+<p>The (optional) parameter <em>name</em> should be a unique C-style identifier that will be internally used to identify a particular all_reduce operation. If this defaults to <em>&lt;type&gt;_all_reduce</em> if not specified.</p>
+<p><dl class="docutils">
+<dt><strong>Note</strong></dt>
+<dd>The macro <em>HPX_REGISTER_ALLREDUCE_DECLARATION</em> can be used with 1 or 2 arguments. The second argument is optional and defaults to <em>&lt;type&gt;_all_reduce</em>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_REGISTER_ALLREDUCE">
+<span class="target" id="all__reduce_8hpp_1a9e47dedd3343fa45765287b279159ec1"></span><code class="descname">HPX_REGISTER_ALLREDUCE</code><span class="sig-paren">(</span>type, name<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_REGISTER_ALLREDUCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a all_reduce object named <em>name</em> for a given data type <em>type</em>. </p>
+<p>The macro <em>HPX_REGISTER_ALLREDUCE</em> can be used to define all facilities necessary for a (possibly remote) all_reduce operation.</p>
+<p>The parameter <em>type</em> specifies for which data type the all_reduce operations should be enabled.</p>
+<p>The (optional) parameter <em>name</em> should be a unique C-style identifier that will be internally used to identify a particular all_reduce operation. If this defaults to <em>&lt;type&gt;_all_reduce</em> if not specified.</p>
+<p><dl class="docutils">
+<dt><strong>Note</strong></dt>
+<dd>The macro <em>HPX_REGISTER_ALLREDUCE</em> can be used with 1 or 2 arguments. The second argument is optional and defaults to <em>&lt;type&gt;_all_reduce</em>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4lcosE">
+<span id="_CPPv3N3hpx4lcosE"></span><span id="_CPPv2N3hpx4lcosE"></span><span id="hpx::lcos"></span><span class="target" id="namespacehpx_1_1lcos"></span><em class="property">namespace </em><code class="descname">lcos</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureI1TEEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE">
+<span id="_CPPv3I00EN3hpx4lcos10all_reduceEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE"></span><span id="_CPPv2I00EN3hpx4lcos10all_reduceEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE"></span><span class="target" id="all__reduce_8hpp_1a30b8df3db6823b22b47f96eb77ac6b42"></span>template&lt;typename <code class="descname">T</code>, typename <code class="descname">F</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureI1TEEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_reduce::T">T</a>&gt; <code class="descname">all_reduce</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>basename</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureI1TEEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_reduce::T">T</a>&gt; <em>result</em>, <a class="reference internal" href="#_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureI1TEEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_reduce::F">F</a> &amp;&amp;<em>op</em>, <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>num_sites</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>generation</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>this_site</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>root_site</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureI1TEEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>AllReduce a set of values from different call sites</p>
+<p>This function receives a set of values that are the result of applying a given operator on values supplied from all call sites operating on the given base name.</p>
+<p><dl class="docutils">
+<dt><strong>Note</strong></dt>
+<dd>Each all_reduce operation has to be accompanied with a unique usage of the <em>HPX_REGISTER_ALLREDUCE</em> macro to define the necessary internal facilities used by <em>all_reduce</em>.</dd>
+<dt><strong>Return</strong></dt>
+<dd>This function returns a future holding a vector with all values send by all participating sites. It will become ready once the all_reduce operation has been completed. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">basename</span></code>: The base name identifying the all_reduce operation </li>
+<li><code class="docutils literal notranslate"><span class="pre">local_result</span></code>: A future referring to the value to transmit to all participating sites from this call site. </li>
+<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: Reduction operation to apply to all values supplied from all participating sites </li>
+<li><code class="docutils literal notranslate"><span class="pre">num_sites</span></code>: The number of participating sites (default: all localities). </li>
+<li><code class="docutils literal notranslate"><span class="pre">generation</span></code>: The generational counter identifying the sequence number of the all_reduce operation performed on the given base name. This is optional and needs to be supplied only if the all_reduce operation on the given base name has to be performed more than once. </li>
+<li><code class="docutils literal notranslate"><span class="pre">this_site</span></code>: The sequence number of this invocation (usually the locality id). This value is optional and defaults to whatever hpx::get_locality_id() returns.  root_site The site that is responsible for creating the all_reduce support object. This value is optional and defaults to ‘0’ (zero).</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureINSt7decay_tI1TEEEEPKcRR1TRR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE">
+<span id="_CPPv3I00EN3hpx4lcos10all_reduceEPKcRR1TRR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE"></span><span id="_CPPv2I00EN3hpx4lcos10all_reduceEPKcRR1TRR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE"></span><span class="target" id="all__reduce_8hpp_1ae3b21b7b5d7405ce306ff6da651119ba"></span>template&lt;typename <code class="descname">T</code>, typename <code class="descname">F</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::decay_t&lt;<a class="reference internal" href="#_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureI1TEEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_reduce::T">T</a>&gt;&gt; <code class="descname">all_reduce</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>basename</em>, <a class="reference internal" href="#_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureI1TEEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_reduce::T">T</a> &amp;&amp;<em>result</em>, <a class="reference internal" href="#_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureI1TEEPKcN3hpx6futureI1TEERR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_reduce::F">F</a> &amp;&amp;<em>op</em>, <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>num_sites</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>generation</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>this_site</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>root_site</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3hpx4lcos10all_reduceEN3hpx6futureINSt7decay_tI1TEEEEPKcRR1TRR1FNSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>AllReduce a set of values from different call sites</p>
+<p>This function receives a set of values from all call sites operating on the given base name.</p>
+<p><dl class="docutils">
+<dt><strong>Note</strong></dt>
+<dd>Each all_reduce operation has to be accompanied with a unique usage of the <em>HPX_REGISTER_ALLREDUCE</em> macro to define the necessary internal facilities used by <em>all_reduce</em>.</dd>
+<dt><strong>Return</strong></dt>
+<dd>This function returns a future holding a vector with all values send by all participating sites. It will become ready once the all_reduce operation has been completed. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">basename</span></code>: The base name identifying the all_reduce operation </li>
+<li><code class="docutils literal notranslate"><span class="pre">local_result</span></code>: The value to transmit to all participating sites from this call site. </li>
+<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: Reduction operation to apply to all values supplied from all participating sites </li>
+<li><code class="docutils literal notranslate"><span class="pre">num_sites</span></code>: The number of participating sites (default: all localities). </li>
+<li><code class="docutils literal notranslate"><span class="pre">generation</span></code>: The generational counter identifying the sequence number of the all_reduce operation performed on the given base name. This is optional and needs to be supplied only if the all_reduce operation on the given base name has to be performed more than once. </li>
+<li><code class="docutils literal notranslate"><span class="pre">this_site</span></code>: The sequence number of this invocation (usually the locality id). This value is optional and defaults to whatever hpx::get_locality_id() returns.  root_site The site that is responsible for creating the all_reduce support object. This value is optional and defaults to ‘0’ (zero).</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-collectives-all-to-all-hpp">
+<h2><cite>#include &lt;hpx/collectives/all_to_all.hpp&gt;</cite><a class="headerlink" href="#include-hpx-collectives-all-to-all-hpp" title="Permalink to this headline">¶</a></h2>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.HPX_REGISTER_ALLTOALL_DECLARATION">
+<span class="target" id="all__to__all_8hpp_1ac2852598ac0d8748d1f93d2f84dd9d3e"></span><code class="descname">HPX_REGISTER_ALLTOALL_DECLARATION</code><span class="sig-paren">(</span>type, name<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_REGISTER_ALLTOALL_DECLARATION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Declare a all_to_all object named <em>name</em> for a given data type <em>type</em>. </p>
+<p>The macro <em>HPX_REGISTER_ALLTOALL_DECLARATION</em> can be used to declare all facilities necessary for a (possibly remote) all_to_all operation.</p>
+<p>The parameter <em>type</em> specifies for which data type the all_to_all operations should be enabled.</p>
+<p>The (optional) parameter <em>name</em> should be a unique C-style identifier that will be internally used to identify a particular all_to_all operation. If this defaults to <em>&lt;type&gt;_all_to_all</em> if not specified.</p>
+<p><dl class="docutils">
+<dt><strong>Note</strong></dt>
+<dd>The macro <em>HPX_REGISTER_ALLTOALL_DECLARATION</em> can be used with 1 or 2 arguments. The second argument is optional and defaults to <em>&lt;type&gt;_all_to_all</em>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.HPX_REGISTER_ALLTOALL">
+<span class="target" id="all__to__all_8hpp_1a0397d093f29f0a7dd8ee17c5142c52b5"></span><code class="descname">HPX_REGISTER_ALLTOALL</code><span class="sig-paren">(</span>type, name<span class="sig-paren">)</span><a class="headerlink" href="#c.HPX_REGISTER_ALLTOALL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a all_to_all object named <em>name</em> for a given data type <em>type</em>. </p>
+<p>The macro <em>HPX_REGISTER_ALLTOALL</em> can be used to define all facilities necessary for a (possibly remote) all_to_all operation.</p>
+<p>The parameter <em>type</em> specifies for which data type the all_to_all operations should be enabled.</p>
+<p>The (optional) parameter <em>name</em> should be a unique C-style identifier that will be internally used to identify a particular all_to_all operation. If this defaults to <em>&lt;type&gt;_all_to_all</em> if not specified.</p>
+<p><dl class="docutils">
+<dt><strong>Note</strong></dt>
+<dd>The macro <em>HPX_REGISTER_ALLTOALL</em> can be used with 1 or 2 arguments. The second argument is optional and defaults to <em>&lt;type&gt;_all_to_all</em>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx4lcosE">
+<span id="_CPPv3N3hpx4lcosE"></span><span id="_CPPv2N3hpx4lcosE"></span><span class="target" id="namespacehpx_1_1lcos"></span><em class="property">namespace </em><code class="descname">lcos</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4lcos10all_to_allEN3hpx6futureINSt6vectorI1TEEEEPKcN3hpx6futureI1TEENSt6size_tENSt6size_tENSt6size_tENSt6size_tE">
+<span id="_CPPv3I0EN3hpx4lcos10all_to_allEPKcN3hpx6futureI1TEENSt6size_tENSt6size_tENSt6size_tENSt6size_tE"></span><span id="_CPPv2I0EN3hpx4lcos10all_to_allEPKcN3hpx6futureI1TEENSt6size_tENSt6size_tENSt6size_tENSt6size_tE"></span><span class="target" id="all__to__all_8hpp_1a9cbae81981cd40beff75ff937a8f3dbe"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4lcos10all_to_allEN3hpx6futureINSt6vectorI1TEEEEPKcN3hpx6futureI1TEENSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_to_all::T">T</a>&gt;&gt; <code class="descname">all_to_all</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>basename</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4lcos10all_to_allEN3hpx6futureINSt6vectorI1TEEEEPKcN3hpx6futureI1TEENSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_to_all::T">T</a>&gt; <em>result</em>, <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>num_sites</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>generation</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>this_site</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>root_site</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4lcos10all_to_allEN3hpx6futureINSt6vectorI1TEEEEPKcN3hpx6futureI1TEENSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>AllToAll a set of values from different call sites</p>
+<p>This function receives a set of values from all call sites operating on the given base name.</p>
+<p><dl class="docutils">
+<dt><strong>Note</strong></dt>
+<dd>Each all_to_all operation has to be accompanied with a unique usage of the <em>HPX_REGISTER_ALLTOALL</em> macro to define the necessary internal facilities used by <em>all_to_all</em>.</dd>
+<dt><strong>Return</strong></dt>
+<dd>This function returns a future holding a vector with all values send by all participating sites. It will become ready once the all_to_all operation has been completed. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">basename</span></code>: The base name identifying the all_to_all operation </li>
+<li><code class="docutils literal notranslate"><span class="pre">local_result</span></code>: A future referring to the value to transmit to all participating sites from this call site. </li>
+<li><code class="docutils literal notranslate"><span class="pre">num_sites</span></code>: The number of participating sites (default: all localities). </li>
+<li><code class="docutils literal notranslate"><span class="pre">generation</span></code>: The generational counter identifying the sequence number of the all_to_all operation performed on the given base name. This is optional and needs to be supplied only if the all_to_all operation on the given base name has to be performed more than once. </li>
+<li><code class="docutils literal notranslate"><span class="pre">this_site</span></code>: The sequence number of this invocation (usually the locality id). This value is optional and defaults to whatever hpx::get_locality_id() returns.  root_site The site that is responsible for creating the all_to_all support object. This value is optional and defaults to ‘0’ (zero).</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I0EN3hpx4lcos10all_to_allEN3hpx6futureINSt6vectorINSt5decayI1TE4typeEEEEEPKcRR1TNSt6size_tENSt6size_tENSt6size_tENSt6size_tE">
+<span id="_CPPv3I0EN3hpx4lcos10all_to_allEPKcRR1TNSt6size_tENSt6size_tENSt6size_tENSt6size_tE"></span><span id="_CPPv2I0EN3hpx4lcos10all_to_allEPKcRR1TNSt6size_tENSt6size_tENSt6size_tENSt6size_tE"></span><span class="target" id="all__to__all_8hpp_1a0289c3c315d67597fe2ad4ddf14cbc20"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::future&lt;<a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::vector&lt;<em class="property">typename</em> <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::decay&lt;<a class="reference internal" href="#_CPPv4I0EN3hpx4lcos10all_to_allEN3hpx6futureINSt6vectorI1TEEEEPKcN3hpx6futureI1TEENSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_to_all::T">T</a>&gt;::type&gt;&gt; <code class="descname">all_to_all</code><span class="sig-paren">(</span>char <em class="property">const</em> *<em>basename</em>, <a class="reference internal" href="#_CPPv4I0EN3hpx4lcos10all_to_allEN3hpx6futureINSt6vectorI1TEEEEPKcN3hpx6futureI1TEENSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="hpx::lcos::all_to_all::T">T</a> &amp;&amp;<em>result</em>, <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>num_sites</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>generation</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>this_site</em> = <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t(-1), <a class="reference internal" href="../datastructures/api.html#_CPPv4St" title="std">std</a>::size_t <em>root_site</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3hpx4lcos10all_to_allEN3hpx6futureINSt6vectorINSt5decayI1TE4typeEEEEEPKcRR1TNSt6size_tENSt6size_tENSt6size_tENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>AllToAll a set of values from different call sites</p>
+<p>This function receives a set of values from all call sites operating on the given base name.</p>
+<p><dl class="docutils">
+<dt><strong>Note</strong></dt>
+<dd>Each all_to_all operation has to be accompanied with a unique usage of the <em>HPX_REGISTER_ALLTOALL</em> macro to define the necessary internal facilities used by <em>all_to_all</em>.</dd>
+<dt><strong>Return</strong></dt>
+<dd>This function returns a future holding a vector with all values send by all participating sites. It will become ready once the all_to_all operation has been completed. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">basename</span></code>: The base name identifying the all_to_all operation </li>
+<li><code class="docutils literal notranslate"><span class="pre">local_result</span></code>: The value to transmit to all participating sites from this call site. </li>
+<li><code class="docutils literal notranslate"><span class="pre">num_sites</span></code>: The number of participating sites (default: all localities). </li>
+<li><code class="docutils literal notranslate"><span class="pre">generation</span></code>: The generational counter identifying the sequence number of the all_to_all operation performed on the given base name. This is optional and needs to be supplied only if the all_to_all operation on the given base name has to be performed more than once. </li>
+<li><code class="docutils literal notranslate"><span class="pre">this_site</span></code>: The sequence number of this invocation (usually the locality id). This value is optional and defaults to whatever hpx::get_locality_id() returns.  root_site The site that is responsible for creating the all_to_all support object. This value is optional and defaults to ‘0’ (zero).</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../statistics/api.html" class="btn btn-neutral float-right" title="statistics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../hardware/api.html" class="btn btn-neutral float-left" title="hardware" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>966745e</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

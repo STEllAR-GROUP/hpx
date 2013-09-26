@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hashing &mdash; HPX 1.4.0-rc1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="iterator_support" href="../../iterator_support/docs/index.html" />
+    <link rel="prev" title="hardware" href="../../hardware/docs/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0-rc1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../all_modules.html">All modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../algorithms/docs/index.html">algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../allocator_support/docs/index.html">allocator_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../assertion/docs/index.html">assertion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../basic_execution/docs/index.html">Baisc Execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cache/docs/index.html">cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../checkpoint/docs/index.html">checkpoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../collectives/docs/index.html">collectives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../compute/docs/index.html">compute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../compute_cuda/docs/index.html">compute_cuda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/docs/index.html">concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concurrency/docs/index.html">concurrency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config/docs/index.html">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coroutines/docs/index.html">coroutines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datastructures/docs/index.html">datastructures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debugging/docs/index.html">debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../errors/docs/index.html">errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../execution/docs/index.html">execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../filesystem/docs/index.html">filesystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../format/docs/index.html">format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../functional/docs/index.html">functional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../hardware/docs/index.html">hardware</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">hashing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../iterator_support/docs/index.html">iterator_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logging/docs/index.html">logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../memory/docs/index.html">memory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugin/docs/index.html">plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../preprocessor/docs/index.html">preprocessor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../program_options/docs/index.html">program_options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../resiliency/docs/index.html">Resiliency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../resource_partitioner/docs/index.html">resource_partitioner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../segmented_algorithms/docs/index.html">segmented_algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../serialization/docs/index.html">serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../statistics/docs/index.html">statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../testing/docs/index.html">testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../thread_support/docs/index.html">thread_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../threadmanager/docs/index.html">thread_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../timing/docs/index.html">timing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../topology/docs/index.html">topology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../type_support/docs/index.html">type_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../util/docs/index.html">util</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../all_modules.html">All modules</a> &raquo;</li>
+        
+      <li>hashing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/hashing/docs/index.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hashing">
+<span id="libs-hashing"></span><h1>hashing<a class="headerlink" href="#hashing" title="Permalink to this headline">¶</a></h1>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../iterator_support/docs/index.html" class="btn btn-neutral float-right" title="iterator_support" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../../hardware/docs/index.html" class="btn btn-neutral float-left" title="hardware" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>8174758</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>resiliency &mdash; HPX master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="resource_partitioner" href="../../resource_partitioner/docs/index.html" />
+    <link rel="prev" title="program_options" href="../../program_options/docs/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../all_modules.html">All modules</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../affinity/docs/index.html">affinity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../algorithms/docs/index.html">algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../allocator_support/docs/index.html">allocator_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../assertion/docs/index.html">assertion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../basic_execution/docs/index.html">basic_execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../batch_environments/docs/index.html">batch_environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cache/docs/index.html">cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../checkpoint/docs/index.html">checkpoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../collectives/docs/index.html">collectives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../compute/docs/index.html">compute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../compute_cuda/docs/index.html">compute_cuda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concepts/docs/index.html">concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../concurrency/docs/index.html">concurrency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config/docs/index.html">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coroutines/docs/index.html">coroutines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../datastructures/docs/index.html">datastructures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debugging/docs/index.html">debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../errors/docs/index.html">errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../execution/docs/index.html">execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../filesystem/docs/index.html">filesystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../format/docs/index.html">format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../functional/docs/index.html">functional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../hardware/docs/index.html">hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../hashing/docs/index.html">hashing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../iterator_support/docs/index.html">iterator_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../local_lcos/docs/index.html">local_lcos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logging/docs/index.html">logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../memory/docs/index.html">memory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../naming_base/docs/index.html">naming_base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugin/docs/index.html">plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../preprocessor/docs/index.html">preprocessor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../program_options/docs/index.html">program_options</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">resiliency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../resource_partitioner/docs/index.html">resource_partitioner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../segmented_algorithms/docs/index.html">segmented_algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../serialization/docs/index.html">serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../static_reinit/docs/index.html">static_reinit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../statistics/docs/index.html">statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../synchronization/docs/index.html">synchronization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../testing/docs/index.html">testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../thread_support/docs/index.html">thread_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../threadmanager/docs/index.html">thread_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../timing/docs/index.html">timing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../topology/docs/index.html">topology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../type_support/docs/index.html">type_support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../util/docs/index.html">util</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../all_modules.html">All modules</a> &raquo;</li>
+        
+      <li>resiliency</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/resiliency/docs/index.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="resiliency">
+<span id="libs-resiliency"></span><h1>resiliency<a class="headerlink" href="#resiliency" title="Permalink to this headline">¶</a></h1>
+<p>In <em>HPX</em>, a program failure is a manifestation of a failing task. This module
+exposes several APIs that allow to manage failing tasks in a convenient way by
+either replaying a failed task or by replicating a specific task to begin with.</p>
+<p>Task replay is analogous to the Checkpoint/Restart mechanism found in conventional
+execution models. The key difference being localized fault detection. When the
+runtime detects an error it replays the failing task as opposed to completely
+rolling back of the entire program to the previous checkpoint.</p>
+<p>Task replication is designed to provide reliability enhancements by replicating
+a set of tasks and evaluating their results to determine a consensus among them.
+This technique is most effective in situations where there are few tasks in the
+critical path of the DAG which leaves the system underutilized or where hardware
+or software failures may result in an incorrect result instead of an error.
+However, the drawback of this method is the additional computational cost incurred
+by repeating a task multiple times.</p>
+<p>The following API functions are exposed:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../api.html#_CPPv4I0DpEN3hpx10resiliency12async_replayEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR1FDpRR2Ts" title="hpx::resiliency::async_replay"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::async_replay</span></code></a>: This version of task replay will
+catch user defined exceptions and automatically reschedule the task N times
+before throwing an <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::abort_replay_exception</span></code> if no
+task is able to complete execution without an exception.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I00DpEN3hpx10resiliency21async_replay_validateEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR4PredRR1FDpRR2Ts" title="hpx::resiliency::async_replay_validate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::async_replay_validate</span></code></a>: This version of replay
+adds an argument to async replay which receives a user provided validation
+function to test the result of the task against. If the task’s output is
+validated, the result is returned. If the output fails the check or an
+exception is thrown, the task is replayed until no errors are encountered or
+the number of specified retries have been exceeded.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I0DpEN3hpx10resiliency15async_replicateEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR1FDpRR2Ts" title="hpx::resiliency::async_replicate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::async_replicate</span></code></a>: This is the most basic
+implementation of the task replication. The API returns the first result that
+runs without detecting any errors.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I00DpEN3hpx10resiliency24async_replicate_validateEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR4PredRR1FDpRR2Ts" title="hpx::resiliency::async_replicate_validate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::async_replicate_validate</span></code></a>: This API additionally
+takes a validation function which evaluates the return values produced by the
+threads. The first task to compute a valid result is returned.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I00DpEN3hpx10resiliency20async_replicate_voteEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR4VoteRR1FDpRR2Ts" title="hpx::resiliency::async_replicate_vote"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::async_replicate_vote</span></code></a>: This API adds a vote
+function to the basic replicate function. Many hardware or software failures
+are silent errors which do not interrupt program flow. In order to detect
+errors of this kind, it is necessary to run the task several times and compare
+the values returned by every version of the task. In order to determine which
+return value is “correct”, the API allow the user to provide a custom
+consensus function to properly form a consensus. This voting function then
+returns the “correct”” answer.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I000DpEN3hpx10resiliency29async_replicate_vote_validateEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR4VoteRR4PredRR1FDpRR2Ts" title="hpx::resiliency::async_replicate_vote_validate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::async_replicate_vote_validate</span></code></a>: This combines the
+features of the previously discussed replicate set. Replicate vote validate
+allows a user to provide a validation function to filter results.
+Additionally, as described in replicate vote, the user can provide a “voting
+function” which returns the consensus formed by the voting logic.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I0DpEN3hpx10resiliency15dataflow_replayEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR1FDpRR2Ts" title="hpx::resiliency::dataflow_replay"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::dataflow_replay</span></code></a>: This version of dataflow replay
+will catch user defined exceptions and automatically reschedules the task N
+times before throwing an <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::abort_replay_exception</span></code>
+if no task is able to complete execution without an exception. Any arguments
+for the executed task that are futures will cause the task invocation to be
+delayed until all of those futures have become ready.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I00DpEN3hpx10resiliency24dataflow_replay_validateEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR4PredRR1FDpRR2Ts" title="hpx::resiliency::dataflow_replay_validate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::dataflow_replay_validate</span></code></a> : This version of replay
+adds an argument to dataflow replay which receives a user provided validation
+function to test the result of the task against. If the task’s output is
+validated, the result is returned. If the output fails the check or an
+exception is thrown, the task is replayed until no errors are encountered or
+the number of specified retries have been exceeded. Any arguments for the
+executed task that are futures will cause the task invocation to be delayed
+until all of those futures have become ready.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I0DpEN3hpx10resiliency18dataflow_replicateEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR1FDpRR2Ts" title="hpx::resiliency::dataflow_replicate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::dataflow_replicate</span></code></a>: This is the most basic
+implementation of the task replication. The API returns the first result that
+runs without detecting any errors. Any arguments for the executed task that
+are futures will cause the task invocation to be delayed until all of those
+futures have become ready.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I00DpEN3hpx10resiliency27dataflow_replicate_validateEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR4PredRR1FDpRR2Ts" title="hpx::resiliency::dataflow_replicate_validate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::dataflow_replicate_validate</span></code></a>: This API
+additionally takes a validation function which evaluates the return values
+produced by the threads. The first task to compute a valid result is returned.
+Any arguments for the executed task that are futures will cause the task
+invocation to be delayed until all of those futures have become ready.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I00DpEN3hpx10resiliency23dataflow_replicate_voteEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR4VoteRR1FDpRR2Ts" title="hpx::resiliency::dataflow_replicate_vote"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::dataflow_replicate_vote</span></code></a>: This API adds a vote
+function to the basic replicate function. Many hardware or software failures
+are silent errors which do not interrupt program flow. In order to detect
+errors of this kind, it is necessary to run the task several times and compare
+the values returned by every version of the task. In order to determine which
+return value is “correct”, the API allows the user to provide a custom
+consensus function to properly form a consensus. This voting function then
+returns the “correct” answer. Any arguments for the executed task that are
+futures will cause the task invocation to be delayed until all of those
+futures have become ready.</p></li>
+<li><p><a class="reference internal" href="../api.html#_CPPv4I000DpEN3hpx10resiliency32dataflow_replicate_vote_validateEN3hpx6futureIN3hpx4util6detail22invoke_deferred_resultI1FDp2TsE4typeEEENSt6size_tERR4VoteRR4PredRR1FDpRR2Ts" title="hpx::resiliency::dataflow_replicate_vote_validate"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">hpx::resiliency::dataflow_replicate_vote_validate</span></code></a>: This combines
+the features of the previously discussed replicate set. Replicate vote
+validate allows a user to provide a validation function to filter results.
+Additionally, as described in replicate vote, the user can provide a “voting
+function” which returns the consensus formed by the voting logic. Any
+arguments for the executed task that are futures will cause the task
+invocation to be delayed until all of those futures have become ready.</p></li>
+</ul>
+<p>See the <a class="reference internal" href="../api.html#libs-resiliency-api"><span class="std std-ref">API reference</span></a> of the module for more
+details.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../resource_partitioner/docs/index.html" class="btn btn-neutral float-right" title="resource_partitioner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../../program_options/docs/index.html" class="btn btn-neutral float-left" title="program_options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>856afc8</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

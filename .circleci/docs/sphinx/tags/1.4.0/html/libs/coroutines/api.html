@@ -1,0 +1,1186 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coroutines &mdash; HPX 1.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="config" href="../config/api.html" />
+    <link rel="prev" title="thread_support" href="../thread_support/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">coroutines</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-coroutines-stackless-coroutine-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/stackless_coroutine.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-coroutines-thread-id-type-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/thread_id_type.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-coroutines-coroutine-fwd-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/coroutine_fwd.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-coroutines-coroutine-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/coroutine.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-coroutines-thread-enums-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/thread_enums.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-runtime-threads-thread-id-type-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/thread_id_type.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-runtime-threads-thread-enums-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/thread_enums.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-runtime-threads-coroutines-coroutine-fwd-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/coroutines/coroutine_fwd.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-runtime-threads-coroutines-coroutine-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/coroutines/coroutine.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resource_partitioner/api.html">resource_partitioner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>coroutines</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/coroutines/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="coroutines">
+<span id="libs-coroutines-api"></span><h1>coroutines<a class="headerlink" href="#coroutines" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-coroutines-stackless-coroutine-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/stackless_coroutine.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-coroutines-stackless-coroutine-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx7threadsE">
+<span id="_CPPv3N3hpx7threadsE"></span><span id="_CPPv2N3hpx7threadsE"></span><span id="hpx::threads"></span><span class="target" id="namespacehpx_1_1threads"></span><em class="property">namespace </em><code class="sig-name descname">threads</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutinesE">
+<span id="_CPPv3N3hpx7threads10coroutinesE"></span><span id="_CPPv2N3hpx7threads10coroutinesE"></span><span id="hpx::threads::coroutines"></span><span class="target" id="namespacehpx_1_1threads_1_1coroutines"></span><em class="property">namespace </em><code class="sig-name descname">coroutines</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutinesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutineE">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutineE"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutineE"></span><span id="hpx::threads::coroutines::stackless_coroutine"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine"></span><em class="property">class </em><code class="sig-name descname">stackless_coroutine</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine14thread_id_typeE">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine14thread_id_typeE"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine14thread_id_typeE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a1601b0c195c79a43fe678f6f860a3081"></span><em class="property">using </em><code class="sig-name descname">thread_id_type</code> = <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="#_CPPv4N3hpx7threads9thread_idE" title="hpx::threads::thread_id">thread_id</a><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine14thread_id_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine11result_typeE">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine11result_typeE"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine11result_typeE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1af9a380addfb05c845b06f7cdb98a7494"></span><em class="property">using </em><code class="sig-name descname">result_type</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::pair&lt;<a class="reference internal" href="#_CPPv4N3hpx7threads17thread_state_enumE" title="hpx::threads::thread_state_enum">thread_state_enum</a>, <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine14thread_id_typeE" title="hpx::threads::coroutines::stackless_coroutine::thread_id_type">thread_id_type</a>&gt;<a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine11result_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine8arg_typeE">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine8arg_typeE"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine8arg_typeE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a3cb613116b19f9aae7be60d0c0e0a5e6"></span><em class="property">using </em><code class="sig-name descname">arg_type</code> = <a class="reference internal" href="#_CPPv4N3hpx7threads20thread_state_ex_enumE" title="hpx::threads::thread_state_ex_enum">thread_state_ex_enum</a><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine8arg_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine12functor_typeE">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine12functor_typeE"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine12functor_typeE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1aa5766e9e11a6668ea7e3e424431a6be9"></span><em class="property">using </em><code class="sig-name descname">functor_type</code> = <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../functional/api.html#_CPPv4N3hpx4util22unique_function_nonserE" title="hpx::util::unique_function_nonser">unique_function_nonser</a>&lt;<a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine11result_typeE" title="hpx::threads::coroutines::stackless_coroutine::result_type">result_type</a><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine8arg_typeE" title="hpx::threads::coroutines::stackless_coroutine::arg_type">arg_type</a><span class="sig-paren">)</span>&gt;<a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine12functor_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE"></span><span id="hpx::threads::coroutines::stackless_coroutine::stackless_coroutine__functor_typeRR.thread_id_type.std::ptrdiff_t"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a985e0bf16df344171660187c4c9c679b"></span><code class="sig-name descname">stackless_coroutine</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine12functor_typeE" title="hpx::threads::coroutines::stackless_coroutine::functor_type">functor_type</a> &amp;&amp;<em>f</em>, <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine14thread_id_typeE" title="hpx::threads::coroutines::stackless_coroutine::thread_id_type">thread_id_type</a> <em>id</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ptrdiff_t <em>stack_size</em> = default_stack_size<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutineD0Ev">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutineD0Ev"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutineD0Ev"></span><span id="hpx::threads::coroutines::stackless_coroutine::~stackless_coroutine"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a75ba02a7b5cc1877c19e360280414683"></span><code class="sig-name descname">~stackless_coroutine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERK19stackless_coroutine">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERK19stackless_coroutine"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERK19stackless_coroutine"></span><span id="hpx::threads::coroutines::stackless_coroutine::stackless_coroutine__stackless_coroutineCR"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a31605853b426adbcded0a541c4811950"></span><code class="sig-name descname">stackless_coroutine</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE" title="hpx::threads::coroutines::stackless_coroutine::stackless_coroutine">stackless_coroutine</a> <em class="property">const</em> &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERK19stackless_coroutine" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutineaSERK19stackless_coroutine">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutineaSERK19stackless_coroutine"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutineaSERK19stackless_coroutine"></span><span id="hpx::threads::coroutines::stackless_coroutine::assign-operator__stackless_coroutineCR"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1abc01ebdb9f0113ba5cdc07882354139c"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineE" title="hpx::threads::coroutines::stackless_coroutine">stackless_coroutine</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineE" title="hpx::threads::coroutines::stackless_coroutine">stackless_coroutine</a> <em class="property">const</em> &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineaSERK19stackless_coroutine" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR19stackless_coroutine">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR19stackless_coroutine"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR19stackless_coroutine"></span><span id="hpx::threads::coroutines::stackless_coroutine::stackless_coroutine__stackless_coroutineRR"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a2021027c2e3980c25fbb61784f818cd3"></span><code class="sig-name descname">stackless_coroutine</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE" title="hpx::threads::coroutines::stackless_coroutine::stackless_coroutine">stackless_coroutine</a> &amp;&amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine19stackless_coroutineERR19stackless_coroutine" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutineaSERR19stackless_coroutine">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutineaSERR19stackless_coroutine"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutineaSERR19stackless_coroutine"></span><span id="hpx::threads::coroutines::stackless_coroutine::assign-operator__stackless_coroutineRR"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a8acbfda953f63ea9b3ec5fcb8c375fdb"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineE" title="hpx::threads::coroutines::stackless_coroutine">stackless_coroutine</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineE" title="hpx::threads::coroutines::stackless_coroutine">stackless_coroutine</a> &amp;&amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineaSERR19stackless_coroutine" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads10coroutines19stackless_coroutine13get_thread_idEv">
+<span id="_CPPv3NK3hpx7threads10coroutines19stackless_coroutine13get_thread_idEv"></span><span id="_CPPv2NK3hpx7threads10coroutines19stackless_coroutine13get_thread_idEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::get_thread_idC"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a768c35409bc1f0c03a209751b1b81858"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine14thread_id_typeE" title="hpx::threads::coroutines::stackless_coroutine::thread_id_type">thread_id_type</a> <code class="sig-name descname">get_thread_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads10coroutines19stackless_coroutine13get_thread_idEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads10coroutines19stackless_coroutine15get_thread_dataEv">
+<span id="_CPPv3NK3hpx7threads10coroutines19stackless_coroutine15get_thread_dataEv"></span><span id="_CPPv2NK3hpx7threads10coroutines19stackless_coroutine15get_thread_dataEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::get_thread_dataC"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a481be5783490d9aeb458bbd168e9c235"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_thread_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads10coroutines19stackless_coroutine15get_thread_dataEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine15set_thread_dataENSt6size_tE">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine15set_thread_dataENSt6size_tE"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine15set_thread_dataENSt6size_tE"></span><span id="hpx::threads::coroutines::stackless_coroutine::set_thread_data__std::s"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1abd7a4c70f9fd5820164986e5cbc99d5a"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">set_thread_data</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine15set_thread_dataENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine6rebindERR12functor_type14thread_id_type">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine6rebindERR12functor_type14thread_id_type"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine6rebindERR12functor_type14thread_id_type"></span><span id="hpx::threads::coroutines::stackless_coroutine::rebind__functor_typeRR.thread_id_type"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a3a471b52cfe8de0c22fc035040a465e1"></span>void <code class="sig-name descname">rebind</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine12functor_typeE" title="hpx::threads::coroutines::stackless_coroutine::functor_type">functor_type</a> &amp;&amp;<em>f</em>, <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine14thread_id_typeE" title="hpx::threads::coroutines::stackless_coroutine::thread_id_type">thread_id_type</a> <em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine6rebindERR12functor_type14thread_id_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine9reset_tssEv">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine9reset_tssEv"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine9reset_tssEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::reset_tss"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a76ba53cf7bc042a88960f67c7d7f2092"></span>void <code class="sig-name descname">reset_tss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine9reset_tssEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine5resetEv">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine5resetEv"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine5resetEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::reset"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a248edd6f74cf614e2c2017ff4303772c"></span>void <code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine5resetEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutineclE8arg_type">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutineclE8arg_type"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutineclE8arg_type"></span><span id="hpx::threads::coroutines::stackless_coroutine::call-operator__arg_type"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a441cc86c1aa4ff5761e461105f0a2a7d"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineE" title="hpx::threads::coroutines::stackless_coroutine">stackless_coroutine</a>::<a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine11result_typeE" title="hpx::threads::coroutines::stackless_coroutine::result_type">result_type</a> <code class="sig-name descname">operator()</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine8arg_typeE" title="hpx::threads::coroutines::stackless_coroutine::arg_type">arg_type</a> <em>arg</em> = <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine8arg_typeE" title="hpx::threads::coroutines::stackless_coroutine::arg_type">arg_type</a>()<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineclE8arg_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads10coroutines19stackless_coroutinecvbEv">
+<span id="_CPPv3NK3hpx7threads10coroutines19stackless_coroutinecvbEv"></span><span id="_CPPv2NK3hpx7threads10coroutines19stackless_coroutinecvbEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::castto-b-operatorC"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a3d2cf11874e3cf5f2e9270025ca64148"></span><code class="sig-name descname">operator bool</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads10coroutines19stackless_coroutinecvbEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads10coroutines19stackless_coroutine8is_readyEv">
+<span id="_CPPv3NK3hpx7threads10coroutines19stackless_coroutine8is_readyEv"></span><span id="_CPPv2NK3hpx7threads10coroutines19stackless_coroutine8is_readyEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::is_readyC"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a5e981796e94916d1b55b4f04d39e8536"></span>bool <code class="sig-name descname">is_ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads10coroutines19stackless_coroutine8is_readyEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine25get_available_stack_spaceEv">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine25get_available_stack_spaceEv"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine25get_available_stack_spaceEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::get_available_stack_space"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1ac99001b45c89b74772cbea5274805a31"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ptrdiff_t <code class="sig-name descname">get_available_stack_space</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine25get_available_stack_spaceEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine32get_continuation_recursion_countEv">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine32get_continuation_recursion_countEv"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine32get_continuation_recursion_countEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::get_continuation_recursion_count"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a1eb1ec0b1873a677f72c7656b6a4d54e"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t &amp;<code class="sig-name descname">get_continuation_recursion_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine32get_continuation_recursion_countEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Protected Attributes</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine2f_E">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine2f_E"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine2f_E"></span><span id="hpx::threads::coroutines::stackless_coroutine::f___functor_type"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1ac16ea36e067f4c6bbfca677dfc12a0c7"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine12functor_typeE" title="hpx::threads::coroutines::stackless_coroutine::functor_type">functor_type</a> <code class="sig-name descname">f_</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine2f_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine6state_E">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine6state_E"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine6state_E"></span><span id="hpx::threads::coroutines::stackless_coroutine::state___context_state"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a4f5a0c529f893e0d909e61f1ad7b3afc"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines13context_stateE" title="hpx::threads::coroutines::context_state">context_state</a> <code class="sig-name descname">state_</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine6state_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine3id_E">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine3id_E"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine3id_E"></span><span id="hpx::threads::coroutines::stackless_coroutine::id___thread_id_type"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1ae4b364bdfdcc30b733a68cd6e84f38f3"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine14thread_id_typeE" title="hpx::threads::coroutines::stackless_coroutine::thread_id_type">thread_id_type</a> <code class="sig-name descname">id_</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine3id_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine12thread_data_E">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine12thread_data_E"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine12thread_data_E"></span><span id="hpx::threads::coroutines::stackless_coroutine::thread_data___std::s"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a682b4ba4d7066ea26e7d8ed38c95d19d"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">thread_data_</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine12thread_data_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine29continuation_recursion_count_E">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine29continuation_recursion_count_E"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine29continuation_recursion_count_E"></span><span id="hpx::threads::coroutines::stackless_coroutine::continuation_recursion_count___std::s"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a3fc874f62b928051d9ea8695cccbe666"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">continuation_recursion_count_</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine29continuation_recursion_count_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="enum">
+<dt id="_CPPv4N3hpx7threads10coroutines13context_stateE">
+<span id="_CPPv3N3hpx7threads10coroutines13context_stateE"></span><span id="_CPPv2N3hpx7threads10coroutines13context_stateE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a8e62f4876a93746ecce38028d74a9e72"></span><em class="property">enum </em><code class="sig-name descname">context_state</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines13context_stateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads10coroutines11ctx_runningE">
+<span id="_CPPv3N3hpx7threads10coroutines11ctx_runningE"></span><span id="_CPPv2N3hpx7threads10coroutines11ctx_runningE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a8e62f4876a93746ecce38028d74a9e72ae2aa2d5f3e2443b7c4da6e9737c6bd10"></span><code class="sig-name descname">ctx_running</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines11ctx_runningE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads10coroutines9ctx_readyE">
+<span id="_CPPv3N3hpx7threads10coroutines9ctx_readyE"></span><span id="_CPPv2N3hpx7threads10coroutines9ctx_readyE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a8e62f4876a93746ecce38028d74a9e72a4600c124ddb04729992757db17ba5e1b"></span><code class="sig-name descname">ctx_ready</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9ctx_readyE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads10coroutines10ctx_exitedE">
+<span id="_CPPv3N3hpx7threads10coroutines10ctx_exitedE"></span><span id="_CPPv2N3hpx7threads10coroutines10ctx_exitedE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a8e62f4876a93746ecce38028d74a9e72accb3b8ff8cd91b33034b13e75430bb4c"></span><code class="sig-name descname">ctx_exited</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines10ctx_exitedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads10coroutines19stackless_coroutine7runningEv">
+<span id="_CPPv3NK3hpx7threads10coroutines19stackless_coroutine7runningEv"></span><span id="_CPPv2NK3hpx7threads10coroutines19stackless_coroutine7runningEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::runningC"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1ab8431f2ea0efd96dd781ffc5deaed43e"></span>bool <code class="sig-name descname">running</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads10coroutines19stackless_coroutine7runningEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads10coroutines19stackless_coroutine6exitedEv">
+<span id="_CPPv3NK3hpx7threads10coroutines19stackless_coroutine6exitedEv"></span><span id="_CPPv2NK3hpx7threads10coroutines19stackless_coroutine6exitedEv"></span><span id="hpx::threads::coroutines::stackless_coroutine::exitedC"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a9bdc820fb447d6649562b424157efff9"></span>bool <code class="sig-name descname">exited</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads10coroutines19stackless_coroutine6exitedEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt>
+<span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a5175770c8244a013464118af9367b5f3"></span><code class="sig-name descname">HPX_STATIC_CONSTEXPR std::ptrdiff_t hpx::threads::coroutines::stackless_coroutine::default_stack_size = -1</code></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1a767c9029b785b5ee3d5c4d3a0be53184"></span><em class="property">friend </em><code class="sig-name descname">hpx::threads::coroutines::reset_on_exit</code></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine13reset_on_exitE">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine13reset_on_exitE"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine13reset_on_exitE"></span><span id="hpx::threads::coroutines::stackless_coroutine::reset_on_exit"></span><span class="target" id="structhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1_1reset__on__exit"></span><em class="property">struct </em><code class="sig-name descname">reset_on_exit</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine13reset_on_exitE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine13reset_on_exit13reset_on_exitER19stackless_coroutine">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine13reset_on_exit13reset_on_exitER19stackless_coroutine"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine13reset_on_exit13reset_on_exitER19stackless_coroutine"></span><span id="hpx::threads::coroutines::stackless_coroutine::reset_on_exit::reset_on_exit__stackless_coroutineR"></span><span class="target" id="structhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1_1reset__on__exit_1ad0c42bea87488c92eb19479d4bd7b113"></span><code class="sig-name descname">reset_on_exit</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineE" title="hpx::threads::coroutines::stackless_coroutine">stackless_coroutine</a> &amp;<em>this__</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine13reset_on_exit13reset_on_exitER19stackless_coroutine" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine13reset_on_exitD0Ev">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine13reset_on_exitD0Ev"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine13reset_on_exitD0Ev"></span><span id="hpx::threads::coroutines::stackless_coroutine::reset_on_exit::~reset_on_exit"></span><span class="target" id="structhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1_1reset__on__exit_1ae7a211499febca565fd554b3fdf661a2"></span><code class="sig-name descname">~reset_on_exit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine13reset_on_exitD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads10coroutines19stackless_coroutine13reset_on_exit5this_E">
+<span id="_CPPv3N3hpx7threads10coroutines19stackless_coroutine13reset_on_exit5this_E"></span><span id="_CPPv2N3hpx7threads10coroutines19stackless_coroutine13reset_on_exit5this_E"></span><span id="hpx::threads::coroutines::stackless_coroutine::reset_on_exit::this___stackless_coroutineR"></span><span class="target" id="structhpx_1_1threads_1_1coroutines_1_1stackless__coroutine_1_1reset__on__exit_1a9039942edfc9fcb9e35cc523f772545b"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutineE" title="hpx::threads::coroutines::stackless_coroutine">stackless_coroutine</a> &amp;<code class="sig-name descname">this_</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines19stackless_coroutine13reset_on_exit5this_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-coroutines-thread-id-type-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/thread_id_type.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-coroutines-thread-id-type-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx7threadsE">
+<span id="_CPPv3N3hpx7threadsE"></span><span id="_CPPv2N3hpx7threadsE"></span><span class="target" id="namespacehpx_1_1threads"></span><em class="property">namespace </em><code class="sig-name descname">threads</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Variables</p>
+<dl class="member">
+<dt>
+<span class="target" id="hpx_2coroutines_2thread__id__type_8hpp_1a1d0bc1fac092863792e7dab494af2c0b"></span><code class="sig-name descname">HPX_CONSTEXPR_OR_CONST thread_id hpx::threads::invalid_thread_id</code></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx7threads9thread_idE">
+<span id="_CPPv3N3hpx7threads9thread_idE"></span><span id="_CPPv2N3hpx7threads9thread_idE"></span><span id="hpx::threads::thread_id"></span><span class="target" id="structhpx_1_1threads_1_1thread__id"></span><em class="property">struct </em><code class="sig-name descname">thread_id</code><a class="headerlink" href="#_CPPv4N3hpx7threads9thread_idE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads9thread_id9thread_idEv">
+<span id="_CPPv3N3hpx7threads9thread_id9thread_idEv"></span><span id="_CPPv2N3hpx7threads9thread_id9thread_idEv"></span><span id="hpx::threads::thread_id::thread_idCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1ae0a61b401d34a2c3fbef3a3b49919a00"></span><em class="property">constexpr</em> <code class="sig-name descname">thread_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads9thread_id9thread_idEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads9thread_id9thread_idE14thread_id_repr">
+<span id="_CPPv3N3hpx7threads9thread_id9thread_idE14thread_id_repr"></span><span id="_CPPv2N3hpx7threads9thread_id9thread_idE14thread_id_repr"></span><span id="hpx::threads::thread_id::thread_id__thread_id_reprCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1a164eaf000c524cea327b9a7c0f06887e"></span><em class="property">constexpr</em> <code class="sig-name descname">thread_id</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads9thread_id14thread_id_reprE" title="hpx::threads::thread_id::thread_id_repr">thread_id_repr</a> <em>thrd</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads9thread_id9thread_idE14thread_id_repr" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads9thread_id9thread_idERK9thread_id">
+<span id="_CPPv3N3hpx7threads9thread_id9thread_idERK9thread_id"></span><span id="_CPPv2N3hpx7threads9thread_id9thread_idERK9thread_id"></span><span id="hpx::threads::thread_id::thread_id__thread_idCR"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1a532cf41adee919a38c31991ba392acde"></span><code class="sig-name descname">thread_id</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads9thread_id9thread_idEv" title="hpx::threads::thread_id::thread_id">thread_id</a> <em class="property">const</em>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads9thread_id9thread_idERK9thread_id" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads9thread_idaSERK9thread_id">
+<span id="_CPPv3N3hpx7threads9thread_idaSERK9thread_id"></span><span id="_CPPv2N3hpx7threads9thread_idaSERK9thread_id"></span><span id="hpx::threads::thread_id::assign-operator__thread_idCR"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1a841160806b5fe2637414436ebbe7d80d"></span><a class="reference internal" href="#_CPPv4N3hpx7threads9thread_idE" title="hpx::threads::thread_id">thread_id</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads9thread_idE" title="hpx::threads::thread_id">thread_id</a> <em class="property">const</em>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads9thread_idaSERK9thread_id" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads9thread_idcvbEv">
+<span id="_CPPv3NK3hpx7threads9thread_idcvbEv"></span><span id="_CPPv2NK3hpx7threads9thread_idcvbEv"></span><span id="hpx::threads::thread_id::castto-b-operatorCCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1ad1800eebec3907aa719b36787beafdbf"></span><em class="property">constexpr</em> <code class="sig-name descname">operator bool</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads9thread_idcvbEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads9thread_id3getEv">
+<span id="_CPPv3NK3hpx7threads9thread_id3getEv"></span><span id="_CPPv2NK3hpx7threads9thread_id3getEv"></span><span id="hpx::threads::thread_id::getCCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1aa716d1d82af3ec17909af4bf9bff0593"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv4N3hpx7threads9thread_id14thread_id_reprE" title="hpx::threads::thread_id::thread_id_repr">thread_id_repr</a> <code class="sig-name descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads9thread_id3getEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="structhpx_1_1threads_1_1thread__id_1a42e82d9fab3c04f9a6e1753e884f927e"></span><code class="sig-name descname">HPX_CXX14_CONSTEXPR void hpx::threads::thread_id::reset()</code></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads9thread_id14thread_id_reprE">
+<span id="_CPPv3N3hpx7threads9thread_id14thread_id_reprE"></span><span id="_CPPv2N3hpx7threads9thread_id14thread_id_reprE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1acfe6600a125b930d68f5d55874bc28b6"></span><em class="property">using </em><code class="sig-name descname">thread_id_repr</code> = void *<a class="headerlink" href="#_CPPv4N3hpx7threads9thread_id14thread_id_reprE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads9thread_id5thrd_E">
+<span id="_CPPv3N3hpx7threads9thread_id5thrd_E"></span><span id="_CPPv2N3hpx7threads9thread_id5thrd_E"></span><span id="hpx::threads::thread_id::thrd___thread_id_repr"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1a966ef9417541d2d986166934dc27516a"></span><a class="reference internal" href="#_CPPv4N3hpx7threads9thread_id14thread_id_reprE" title="hpx::threads::thread_id::thread_id_repr">thread_id_repr</a> <code class="sig-name descname">thrd_</code><a class="headerlink" href="#_CPPv4N3hpx7threads9thread_id5thrd_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt id="_CPPv4eqNSt9nullptr_tERK9thread_id">
+<span id="_CPPv3eqNSt9nullptr_tERK9thread_id"></span><span id="_CPPv2eqNSt9nullptr_tERK9thread_id"></span><span id="eq-operator__std::nullptr_t.thread_idCRCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1af9297ef865697f9a3ff4d2c46aec0e9c"></span><em class="property">constexpr</em> bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t, thread_id <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4eqNSt9nullptr_tERK9thread_id" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4neNSt9nullptr_tERK9thread_id">
+<span id="_CPPv3neNSt9nullptr_tERK9thread_id"></span><span id="_CPPv2neNSt9nullptr_tERK9thread_id"></span><span id="neq-operator__std::nullptr_t.thread_idCRCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1a8ff4797533e1ab099849a79014933af3"></span><em class="property">constexpr</em> bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t, thread_id <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4neNSt9nullptr_tERK9thread_id" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4eqRK9thread_idNSt9nullptr_tE">
+<span id="_CPPv3eqRK9thread_idNSt9nullptr_tE"></span><span id="_CPPv2eqRK9thread_idNSt9nullptr_tE"></span><span id="eq-operator__thread_idCR.std::nullptr_tCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1a949ddc76ee1fabdcee92a343d4bbf094"></span><em class="property">constexpr</em> bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span>thread_id <em class="property">const</em> &amp;<em>lhs</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4eqRK9thread_idNSt9nullptr_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4neRK9thread_idNSt9nullptr_tE">
+<span id="_CPPv3neRK9thread_idNSt9nullptr_tE"></span><span id="_CPPv2neRK9thread_idNSt9nullptr_tE"></span><span id="neq-operator__thread_idCR.std::nullptr_tCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1ac64006ad5e0a608d5dcdd297d8675614"></span><em class="property">constexpr</em> bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span>thread_id <em class="property">const</em> &amp;<em>lhs</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4neRK9thread_idNSt9nullptr_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4eqRK9thread_idRK9thread_id">
+<span id="_CPPv3eqRK9thread_idRK9thread_id"></span><span id="_CPPv2eqRK9thread_idRK9thread_id"></span><span id="eq-operator__thread_idCR.thread_idCRCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1a5ead85c46bb93a574f228ab806df533e"></span><em class="property">constexpr</em> bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span>thread_id <em class="property">const</em> &amp;<em>lhs</em>, thread_id <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4eqRK9thread_idRK9thread_id" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4neRK9thread_idRK9thread_id">
+<span id="_CPPv3neRK9thread_idRK9thread_id"></span><span id="_CPPv2neRK9thread_idRK9thread_id"></span><span id="neq-operator__thread_idCR.thread_idCRCE"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1af9a46f67ee8e17c07c53a554090be7c1"></span><em class="property">constexpr</em> bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span>thread_id <em class="property">const</em> &amp;<em>lhs</em>, thread_id <em class="property">const</em> &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4neRK9thread_idRK9thread_id" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="structhpx_1_1threads_1_1thread__id_1adfe567273a4104a8da92f357cc75dd53"></span><code class="sig-name descname">HPX_CXX14_CONSTEXPR bool operator&lt;(thread_id  const &amp; lhs, thread_id  const &amp; rhs)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="structhpx_1_1threads_1_1thread__id_1ad195f0d490b7f73d9511b0fa5561977a"></span><code class="sig-name descname">HPX_CXX14_CONSTEXPR bool operator&gt;(thread_id  const &amp; lhs, thread_id  const &amp; rhs)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="structhpx_1_1threads_1_1thread__id_1abae9b8c046d2b4d5187261d238c81b66"></span><code class="sig-name descname">HPX_CXX14_CONSTEXPR bool operator&lt;=(thread_id  const &amp; lhs, thread_id  const &amp; rhs)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="structhpx_1_1threads_1_1thread__id_1a0cf6adf75660e8e6e4dbd1b6295d018f"></span><code class="sig-name descname">HPX_CXX14_CONSTEXPR bool operator&gt;=(thread_id  const &amp; lhs, thread_id  const &amp; rhs)</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I00ElsRNSt13basic_ostreamI4Char6TraitsEERNSt13basic_ostreamI4Char6TraitsEERK9thread_id">
+<span id="_CPPv3I00ElsRNSt13basic_ostreamI4Char6TraitsEERK9thread_id"></span><span id="_CPPv2I00ElsRNSt13basic_ostreamI4Char6TraitsEERK9thread_id"></span><span class="target" id="structhpx_1_1threads_1_1thread__id_1a3b98666a873791f591d17732a9bbbdce"></span>template&lt;typename <code class="sig-name descname">Char</code>, typename <code class="sig-name descname">Traits</code>&gt;<br /><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::basic_ostream&lt;<a class="reference internal" href="#_CPPv4I00ElsRNSt13basic_ostreamI4Char6TraitsEERNSt13basic_ostreamI4Char6TraitsEERK9thread_id" title="operator&lt;&lt;::Char">Char</a>, <a class="reference internal" href="#_CPPv4I00ElsRNSt13basic_ostreamI4Char6TraitsEERNSt13basic_ostreamI4Char6TraitsEERK9thread_id" title="operator&lt;&lt;::Traits">Traits</a>&gt; &amp;<code class="sig-name descname">operator&lt;&lt;</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::basic_ostream&lt;<a class="reference internal" href="#_CPPv4I00ElsRNSt13basic_ostreamI4Char6TraitsEERNSt13basic_ostreamI4Char6TraitsEERK9thread_id" title="operator&lt;&lt;::Char">Char</a>, <a class="reference internal" href="#_CPPv4I00ElsRNSt13basic_ostreamI4Char6TraitsEERNSt13basic_ostreamI4Char6TraitsEERK9thread_id" title="operator&lt;&lt;::Traits">Traits</a>&gt; &amp;<em>os</em>, thread_id <em class="property">const</em> &amp;<em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00ElsRNSt13basic_ostreamI4Char6TraitsEERNSt13basic_ostreamI4Char6TraitsEERK9thread_id" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-coroutines-coroutine-fwd-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/coroutine_fwd.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-coroutines-coroutine-fwd-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-hpx-coroutines-coroutine-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/coroutine.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-coroutines-coroutine-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx7threadsE">
+<span id="_CPPv3N3hpx7threadsE"></span><span class="target" id="namespacehpx_1_1threads"></span><em class="property">namespace </em><code class="sig-name descname">threads</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutinesE">
+<span id="_CPPv3N3hpx7threads10coroutinesE"></span><span id="_CPPv2N3hpx7threads10coroutinesE"></span><span class="target" id="namespacehpx_1_1threads_1_1coroutines"></span><em class="property">namespace </em><code class="sig-name descname">coroutines</code><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutineE">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutineE"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutineE"></span><span id="hpx::threads::coroutines::coroutine"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine"></span><em class="property">class </em><code class="sig-name descname">coroutine</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutineE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Types</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine9impl_typeE">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine9impl_typeE"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine9impl_typeE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1a8d94733345ef5fc25956cdb235f2166e"></span><em class="property">using </em><code class="sig-name descname">impl_type</code> = detail::coroutine_impl<a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine9impl_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine14thread_id_typeE">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine14thread_id_typeE"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine14thread_id_typeE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1acda38bf4b2a128896b6df704ff8956a6"></span><em class="property">using </em><code class="sig-name descname">thread_id_type</code> = <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine9impl_typeE" title="hpx::threads::coroutines::coroutine::impl_type">impl_type</a>::thread_id_type<a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine14thread_id_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine11result_typeE">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine11result_typeE"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine11result_typeE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1ad3ffd9cc5d20a851728a2c136ea328b0"></span><em class="property">using </em><code class="sig-name descname">result_type</code> = <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine9impl_typeE" title="hpx::threads::coroutines::coroutine::impl_type">impl_type</a>::result_type<a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine11result_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine8arg_typeE">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine8arg_typeE"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine8arg_typeE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1a5d47268691ae250e2fb0bfcf39271d04"></span><em class="property">using </em><code class="sig-name descname">arg_type</code> = <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine9impl_typeE" title="hpx::threads::coroutines::coroutine::impl_type">impl_type</a>::arg_type<a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine8arg_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine12functor_typeE">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine12functor_typeE"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine12functor_typeE"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1aa6a99557cd3eebbb09d3fdc68e38d90e"></span><em class="property">using </em><code class="sig-name descname">functor_type</code> = <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../functional/api.html#_CPPv4N3hpx4util22unique_function_nonserE" title="hpx::util::unique_function_nonser">unique_function_nonser</a>&lt;<a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine11result_typeE" title="hpx::threads::coroutines::coroutine::result_type">result_type</a><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine8arg_typeE" title="hpx::threads::coroutines::coroutine::arg_type">arg_type</a><span class="sig-paren">)</span>&gt;<a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine12functor_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine9coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine9coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine9coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE"></span><span id="hpx::threads::coroutines::coroutine::coroutine__functor_typeRR.thread_id_type.std::ptrdiff_t"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1ad1e4109ea47ed3493d3c44ca428d9f32"></span><code class="sig-name descname">coroutine</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine12functor_typeE" title="hpx::threads::coroutines::coroutine::functor_type">functor_type</a> &amp;&amp;<em>f</em>, <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine14thread_id_typeE" title="hpx::threads::coroutines::coroutine::thread_id_type">thread_id_type</a> <em>id</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ptrdiff_t <em>stack_size</em> = detail::default_stack_size<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine9coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine9coroutineERK9coroutine">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine9coroutineERK9coroutine"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine9coroutineERK9coroutine"></span><span id="hpx::threads::coroutines::coroutine::coroutine__coroutineCR"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1aa99dd232a20d5a9d85c8c6f9d2443a10"></span><code class="sig-name descname">coroutine</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine9coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE" title="hpx::threads::coroutines::coroutine::coroutine">coroutine</a> <em class="property">const</em> &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine9coroutineERK9coroutine" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutineaSERK9coroutine">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutineaSERK9coroutine"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutineaSERK9coroutine"></span><span id="hpx::threads::coroutines::coroutine::assign-operator__coroutineCR"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1a4fd491fb82965587a0aba381e03e2215"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutineE" title="hpx::threads::coroutines::coroutine">coroutine</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutineE" title="hpx::threads::coroutines::coroutine">coroutine</a> <em class="property">const</em> &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutineaSERK9coroutine" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine9coroutineERR9coroutine">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine9coroutineERR9coroutine"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine9coroutineERR9coroutine"></span><span id="hpx::threads::coroutines::coroutine::coroutine__coroutineRR"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1ac8e207cf16cb1a25be32cf5a13c821ea"></span><code class="sig-name descname">coroutine</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine9coroutineERR12functor_type14thread_id_typeNSt9ptrdiff_tE" title="hpx::threads::coroutines::coroutine::coroutine">coroutine</a> &amp;&amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine9coroutineERR9coroutine" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutineaSERR9coroutine">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutineaSERR9coroutine"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutineaSERR9coroutine"></span><span id="hpx::threads::coroutines::coroutine::assign-operator__coroutineRR"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1a4d5e0271a2276b96ea80e91dab728903"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutineE" title="hpx::threads::coroutines::coroutine">coroutine</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutineE" title="hpx::threads::coroutines::coroutine">coroutine</a> &amp;&amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutineaSERR9coroutine" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads10coroutines9coroutine13get_thread_idEv">
+<span id="_CPPv3NK3hpx7threads10coroutines9coroutine13get_thread_idEv"></span><span id="_CPPv2NK3hpx7threads10coroutines9coroutine13get_thread_idEv"></span><span id="hpx::threads::coroutines::coroutine::get_thread_idC"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1aaa7c7ea5ed555f249fb103d93dbe8704"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine14thread_id_typeE" title="hpx::threads::coroutines::coroutine::thread_id_type">thread_id_type</a> <code class="sig-name descname">get_thread_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads10coroutines9coroutine13get_thread_idEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads10coroutines9coroutine15get_thread_dataEv">
+<span id="_CPPv3NK3hpx7threads10coroutines9coroutine15get_thread_dataEv"></span><span id="_CPPv2NK3hpx7threads10coroutines9coroutine15get_thread_dataEv"></span><span id="hpx::threads::coroutines::coroutine::get_thread_dataC"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1abfd58f19ee1c4b9825d49fe0abb56f91"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_thread_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads10coroutines9coroutine15get_thread_dataEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine15set_thread_dataENSt6size_tE">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine15set_thread_dataENSt6size_tE"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine15set_thread_dataENSt6size_tE"></span><span id="hpx::threads::coroutines::coroutine::set_thread_data__std::s"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1aaaa09dfa37eef9494c93a1b4049932d1"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">set_thread_data</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine15set_thread_dataENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine6rebindERR12functor_type14thread_id_type">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine6rebindERR12functor_type14thread_id_type"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine6rebindERR12functor_type14thread_id_type"></span><span id="hpx::threads::coroutines::coroutine::rebind__functor_typeRR.thread_id_type"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1a7bcef72947abd485d4dcc6631ba764e2"></span>void <code class="sig-name descname">rebind</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine12functor_typeE" title="hpx::threads::coroutines::coroutine::functor_type">functor_type</a> &amp;&amp;<em>f</em>, <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine14thread_id_typeE" title="hpx::threads::coroutines::coroutine::thread_id_type">thread_id_type</a> <em>id</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine6rebindERR12functor_type14thread_id_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutineclE8arg_type">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutineclE8arg_type"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutineclE8arg_type"></span><span id="hpx::threads::coroutines::coroutine::call-operator__arg_type"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1a4ff4e34e645a465ee8afa71cda410716"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine11result_typeE" title="hpx::threads::coroutines::coroutine::result_type">result_type</a> <code class="sig-name descname">operator()</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine8arg_typeE" title="hpx::threads::coroutines::coroutine::arg_type">arg_type</a> <em>arg</em> = <a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine8arg_typeE" title="hpx::threads::coroutines::coroutine::arg_type">arg_type</a>()<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutineclE8arg_type" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx7threads10coroutines9coroutine8is_readyEv">
+<span id="_CPPv3NK3hpx7threads10coroutines9coroutine8is_readyEv"></span><span id="_CPPv2NK3hpx7threads10coroutines9coroutine8is_readyEv"></span><span id="hpx::threads::coroutines::coroutine::is_readyC"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1ab9a244ce9268e97a4cd5062e8be061c8"></span>bool <code class="sig-name descname">is_ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx7threads10coroutines9coroutine8is_readyEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine25get_available_stack_spaceEv">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine25get_available_stack_spaceEv"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine25get_available_stack_spaceEv"></span><span id="hpx::threads::coroutines::coroutine::get_available_stack_space"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1ac381aa3f3c513d28b2d991752eeaa849"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ptrdiff_t <code class="sig-name descname">get_available_stack_space</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine25get_available_stack_spaceEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine4implEv">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine4implEv"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine4implEv"></span><span id="hpx::threads::coroutines::coroutine::impl"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1abae19d6f8940a3303229cb4b5460ddc6"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine9impl_typeE" title="hpx::threads::coroutines::coroutine::impl_type">impl_type</a> *<code class="sig-name descname">impl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine4implEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads10coroutines9coroutine5impl_E">
+<span id="_CPPv3N3hpx7threads10coroutines9coroutine5impl_E"></span><span id="_CPPv2N3hpx7threads10coroutines9coroutine5impl_E"></span><span id="hpx::threads::coroutines::coroutine::impl___impl_type"></span><span class="target" id="classhpx_1_1threads_1_1coroutines_1_1coroutine_1a283198cf2eea8c848c078c528419c8eb"></span><a class="reference internal" href="#_CPPv4N3hpx7threads10coroutines9coroutine9impl_typeE" title="hpx::threads::coroutines::coroutine::impl_type">impl_type</a> <code class="sig-name descname">impl_</code><a class="headerlink" href="#_CPPv4N3hpx7threads10coroutines9coroutine5impl_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-coroutines-thread-enums-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/coroutines/thread_enums.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-coroutines-thread-enums-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx7threadsE">
+<span class="target" id="namespacehpx_1_1threads"></span><em class="property">namespace </em><code class="sig-name descname">threads</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Enums</p>
+<dl class="enum">
+<dt id="_CPPv4N3hpx7threads17thread_state_enumE">
+<span id="_CPPv3N3hpx7threads17thread_state_enumE"></span><span id="_CPPv2N3hpx7threads17thread_state_enumE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48"></span><em class="property">enum </em><code class="sig-name descname">thread_state_enum</code><a class="headerlink" href="#_CPPv4N3hpx7threads17thread_state_enumE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The <em>thread_state_enum</em> enumerator encodes the current state of a <em>thread</em> instance </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads7unknownE">
+<span id="_CPPv3N3hpx7threads7unknownE"></span><span id="_CPPv2N3hpx7threads7unknownE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48a2135a317d33934cd66ad0d96dba0f150"></span><code class="sig-name descname">unknown</code> = 0<a class="headerlink" href="#_CPPv4N3hpx7threads7unknownE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads6activeE">
+<span id="_CPPv3N3hpx7threads6activeE"></span><span id="_CPPv2N3hpx7threads6activeE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48a922f599d07a942666c6d08b3cf99231f"></span><code class="sig-name descname">active</code> = 1<a class="headerlink" href="#_CPPv4N3hpx7threads6activeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>thread is currently active (running, has resources) </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads7pendingE">
+<span id="_CPPv3N3hpx7threads7pendingE"></span><span id="_CPPv2N3hpx7threads7pendingE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48a01123b12d896b13ced81cf85b67191e2"></span><code class="sig-name descname">pending</code> = 2<a class="headerlink" href="#_CPPv4N3hpx7threads7pendingE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>thread is pending (ready to run, but no hardware resource available) </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads9suspendedE">
+<span id="_CPPv3N3hpx7threads9suspendedE"></span><span id="_CPPv2N3hpx7threads9suspendedE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48a85673dcf8be2d61669feaa92f606ffa9"></span><code class="sig-name descname">suspended</code> = 3<a class="headerlink" href="#_CPPv4N3hpx7threads9suspendedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>thread has been suspended (waiting for synchronization event, but still known and under control of the thread-manager) </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads8depletedE">
+<span id="_CPPv3N3hpx7threads8depletedE"></span><span id="_CPPv2N3hpx7threads8depletedE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48a93e1b8029202384f295ab5633639679c"></span><code class="sig-name descname">depleted</code> = 4<a class="headerlink" href="#_CPPv4N3hpx7threads8depletedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>thread has been depleted (deeply suspended, it is not known to the thread-manager) </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads10terminatedE">
+<span id="_CPPv3N3hpx7threads10terminatedE"></span><span id="_CPPv2N3hpx7threads10terminatedE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48a3ab34aedce40dce0acc6676ac803d63b"></span><code class="sig-name descname">terminated</code> = 5<a class="headerlink" href="#_CPPv4N3hpx7threads10terminatedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>thread has been stopped an may be garbage collected </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads6stagedE">
+<span id="_CPPv3N3hpx7threads6stagedE"></span><span id="_CPPv2N3hpx7threads6stagedE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48a8ae6ae113316304f00d965608f06d537"></span><code class="sig-name descname">staged</code> = 6<a class="headerlink" href="#_CPPv4N3hpx7threads6stagedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>this is not a real thread state, but allows to reference staged task descriptions, which eventually will be converted into thread objects </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads23pending_do_not_scheduleE">
+<span id="_CPPv3N3hpx7threads23pending_do_not_scheduleE"></span><span id="_CPPv2N3hpx7threads23pending_do_not_scheduleE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48af71c5d1ed8040fc740b99a27632d3ede"></span><code class="sig-name descname">pending_do_not_schedule</code> = 7<a class="headerlink" href="#_CPPv4N3hpx7threads23pending_do_not_scheduleE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads13pending_boostE">
+<span id="_CPPv3N3hpx7threads13pending_boostE"></span><span id="_CPPv2N3hpx7threads13pending_boostE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2b4f23e851fbe362ea23cbd39233ae48afc1ecfae2fd50a84bb0e9d753ff65b11"></span><code class="sig-name descname">pending_boost</code> = 8<a class="headerlink" href="#_CPPv4N3hpx7threads13pending_boostE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="enum">
+<dt id="_CPPv4N3hpx7threads15thread_priorityE">
+<span id="_CPPv3N3hpx7threads15thread_priorityE"></span><span id="_CPPv2N3hpx7threads15thread_priorityE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ac9ea71df1a6e7c564da9d1724432790a"></span><em class="property">enum </em><code class="sig-name descname">thread_priority</code><a class="headerlink" href="#_CPPv4N3hpx7threads15thread_priorityE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This enumeration lists all possible thread-priorities for HPX threads. </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads23thread_priority_unknownE">
+<span id="_CPPv3N3hpx7threads23thread_priority_unknownE"></span><span id="_CPPv2N3hpx7threads23thread_priority_unknownE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ac9ea71df1a6e7c564da9d1724432790aab2db1a3cde0ff35d502e08bb63b8084c"></span><code class="sig-name descname">thread_priority_unknown</code> = -1<a class="headerlink" href="#_CPPv4N3hpx7threads23thread_priority_unknownE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads23thread_priority_defaultE">
+<span id="_CPPv3N3hpx7threads23thread_priority_defaultE"></span><span id="_CPPv2N3hpx7threads23thread_priority_defaultE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ac9ea71df1a6e7c564da9d1724432790aae41645acc119ecf695886dbcf849e916"></span><code class="sig-name descname">thread_priority_default</code> = 0<a class="headerlink" href="#_CPPv4N3hpx7threads23thread_priority_defaultE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Will assign the priority of the task to the default (normal) priority. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads19thread_priority_lowE">
+<span id="_CPPv3N3hpx7threads19thread_priority_lowE"></span><span id="_CPPv2N3hpx7threads19thread_priority_lowE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ac9ea71df1a6e7c564da9d1724432790aab5e93f0663cdaf0753451c9c2a529715"></span><code class="sig-name descname">thread_priority_low</code> = 1<a class="headerlink" href="#_CPPv4N3hpx7threads19thread_priority_lowE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Task goes onto a special low priority queue and will not be executed until all high/normal priority tasks are done, even if they are added after the low priority task. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads22thread_priority_normalE">
+<span id="_CPPv3N3hpx7threads22thread_priority_normalE"></span><span id="_CPPv2N3hpx7threads22thread_priority_normalE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ac9ea71df1a6e7c564da9d1724432790aa345d08359faca000dfb7cbe377a9b1c3"></span><code class="sig-name descname">thread_priority_normal</code> = 2<a class="headerlink" href="#_CPPv4N3hpx7threads22thread_priority_normalE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Task will be executed when it is taken from the normal priority queue, this is usually a first in-first-out ordering of tasks (depending on scheduler choice). This is the default priority. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads30thread_priority_high_recursiveE">
+<span id="_CPPv3N3hpx7threads30thread_priority_high_recursiveE"></span><span id="_CPPv2N3hpx7threads30thread_priority_high_recursiveE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ac9ea71df1a6e7c564da9d1724432790aa2b2cb407a0b3a67a9ff832508164e828"></span><code class="sig-name descname">thread_priority_high_recursive</code> = 3<a class="headerlink" href="#_CPPv4N3hpx7threads30thread_priority_high_recursiveE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The task is a high priority task and any child tasks spawned by this task will be made high priority as well - unless they are specifically flagged as non default priority. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads21thread_priority_boostE">
+<span id="_CPPv3N3hpx7threads21thread_priority_boostE"></span><span id="_CPPv2N3hpx7threads21thread_priority_boostE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ac9ea71df1a6e7c564da9d1724432790aae13b992c06fa1c29118be87a5890aa47"></span><code class="sig-name descname">thread_priority_boost</code> = 4<a class="headerlink" href="#_CPPv4N3hpx7threads21thread_priority_boostE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Same as <em>thread_priority_high</em> except that the thread will fall back to <em>thread_priority_normal</em> if resumed after being suspended. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads20thread_priority_highE">
+<span id="_CPPv3N3hpx7threads20thread_priority_highE"></span><span id="_CPPv2N3hpx7threads20thread_priority_highE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ac9ea71df1a6e7c564da9d1724432790aa63c6ba6959ac255ab0723cdc4c74f035"></span><code class="sig-name descname">thread_priority_high</code> = 5<a class="headerlink" href="#_CPPv4N3hpx7threads20thread_priority_highE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Task goes onto a special high priority queue and will be executed before normal/low priority tasks are taken (some schedulers modify the behavior slightly and the documentation for those should be consulted). </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads21thread_priority_boundE">
+<span id="_CPPv3N3hpx7threads21thread_priority_boundE"></span><span id="_CPPv2N3hpx7threads21thread_priority_boundE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ac9ea71df1a6e7c564da9d1724432790aa0311bc17816917abf2b49c1eb4699f6c"></span><code class="sig-name descname">thread_priority_bound</code> = 6<a class="headerlink" href="#_CPPv4N3hpx7threads21thread_priority_boundE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Task goes onto a special high priority queue and will never be stolen by another thread after initial assignment. This should be used for thread placement tasks such as OpenMP type for loops. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="enum">
+<dt id="_CPPv4N3hpx7threads20thread_state_ex_enumE">
+<span id="_CPPv3N3hpx7threads20thread_state_ex_enumE"></span><span id="_CPPv2N3hpx7threads20thread_state_ex_enumE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1aa55297caca57a2d7beaa2e818bf5f147"></span><em class="property">enum </em><code class="sig-name descname">thread_state_ex_enum</code><a class="headerlink" href="#_CPPv4N3hpx7threads20thread_state_ex_enumE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The <em>thread_state_ex_enum</em> enumerator encodes the reason why a thread is being restarted </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads12wait_unknownE">
+<span id="_CPPv3N3hpx7threads12wait_unknownE"></span><span id="_CPPv2N3hpx7threads12wait_unknownE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1aa55297caca57a2d7beaa2e818bf5f147a5643e425f64f406816265d381c98705a"></span><code class="sig-name descname">wait_unknown</code> = 0<a class="headerlink" href="#_CPPv4N3hpx7threads12wait_unknownE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads13wait_signaledE">
+<span id="_CPPv3N3hpx7threads13wait_signaledE"></span><span id="_CPPv2N3hpx7threads13wait_signaledE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1aa55297caca57a2d7beaa2e818bf5f147afc84b95e86a3ccc7cde28f1447e97333"></span><code class="sig-name descname">wait_signaled</code> = 1<a class="headerlink" href="#_CPPv4N3hpx7threads13wait_signaledE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The thread has been signaled. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads12wait_timeoutE">
+<span id="_CPPv3N3hpx7threads12wait_timeoutE"></span><span id="_CPPv2N3hpx7threads12wait_timeoutE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1aa55297caca57a2d7beaa2e818bf5f147aec03d6be9d8d622e06b7b446c68dbc7f"></span><code class="sig-name descname">wait_timeout</code> = 2<a class="headerlink" href="#_CPPv4N3hpx7threads12wait_timeoutE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The thread has been reactivated after a timeout </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads14wait_terminateE">
+<span id="_CPPv3N3hpx7threads14wait_terminateE"></span><span id="_CPPv2N3hpx7threads14wait_terminateE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1aa55297caca57a2d7beaa2e818bf5f147a0c3c663d8770b1023c0409bda54d15b2"></span><code class="sig-name descname">wait_terminate</code> = 3<a class="headerlink" href="#_CPPv4N3hpx7threads14wait_terminateE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The thread needs to be terminated. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads10wait_abortE">
+<span id="_CPPv3N3hpx7threads10wait_abortE"></span><span id="_CPPv2N3hpx7threads10wait_abortE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1aa55297caca57a2d7beaa2e818bf5f147a2f4fbf42015f5e18ee5c6e516afd6442"></span><code class="sig-name descname">wait_abort</code> = 4<a class="headerlink" href="#_CPPv4N3hpx7threads10wait_abortE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The thread needs to be aborted. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="enum">
+<dt id="_CPPv4N3hpx7threads16thread_stacksizeE">
+<span id="_CPPv3N3hpx7threads16thread_stacksizeE"></span><span id="_CPPv2N3hpx7threads16thread_stacksizeE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843"></span><em class="property">enum </em><code class="sig-name descname">thread_stacksize</code><a class="headerlink" href="#_CPPv4N3hpx7threads16thread_stacksizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A <em>thread_stacksize</em> references any of the possible stack-sizes for HPX threads. </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads24thread_stacksize_unknownE">
+<span id="_CPPv3N3hpx7threads24thread_stacksize_unknownE"></span><span id="_CPPv2N3hpx7threads24thread_stacksize_unknownE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843a604203d40547e54fb84e628808dac362"></span><code class="sig-name descname">thread_stacksize_unknown</code> = -1<a class="headerlink" href="#_CPPv4N3hpx7threads24thread_stacksize_unknownE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads22thread_stacksize_smallE">
+<span id="_CPPv3N3hpx7threads22thread_stacksize_smallE"></span><span id="_CPPv2N3hpx7threads22thread_stacksize_smallE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843aacc8bea53b4543a6f56403f3e210945b"></span><code class="sig-name descname">thread_stacksize_small</code> = 1<a class="headerlink" href="#_CPPv4N3hpx7threads22thread_stacksize_smallE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>use small stack size </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads23thread_stacksize_mediumE">
+<span id="_CPPv3N3hpx7threads23thread_stacksize_mediumE"></span><span id="_CPPv2N3hpx7threads23thread_stacksize_mediumE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843ad14cce033e7ed81272037e737af91096"></span><code class="sig-name descname">thread_stacksize_medium</code> = 2<a class="headerlink" href="#_CPPv4N3hpx7threads23thread_stacksize_mediumE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>use medium sized stack size </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads22thread_stacksize_largeE">
+<span id="_CPPv3N3hpx7threads22thread_stacksize_largeE"></span><span id="_CPPv2N3hpx7threads22thread_stacksize_largeE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843aaac53c9592d3a5079ff8ee4fa5164e38"></span><code class="sig-name descname">thread_stacksize_large</code> = 3<a class="headerlink" href="#_CPPv4N3hpx7threads22thread_stacksize_largeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>use large stack size </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads21thread_stacksize_hugeE">
+<span id="_CPPv3N3hpx7threads21thread_stacksize_hugeE"></span><span id="_CPPv2N3hpx7threads21thread_stacksize_hugeE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843a724aa61b92e010079a83f2dc8e194b71"></span><code class="sig-name descname">thread_stacksize_huge</code> = 4<a class="headerlink" href="#_CPPv4N3hpx7threads21thread_stacksize_hugeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>use very large stack size </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads24thread_stacksize_nostackE">
+<span id="_CPPv3N3hpx7threads24thread_stacksize_nostackE"></span><span id="_CPPv2N3hpx7threads24thread_stacksize_nostackE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843acecfb2cde45229e89f82ef834dd3e133"></span><code class="sig-name descname">thread_stacksize_nostack</code> = 5<a class="headerlink" href="#_CPPv4N3hpx7threads24thread_stacksize_nostackE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>this thread does not suspend (does not need a stack) </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads24thread_stacksize_currentE">
+<span id="_CPPv3N3hpx7threads24thread_stacksize_currentE"></span><span id="_CPPv2N3hpx7threads24thread_stacksize_currentE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843a5ca2fa74f7541ea321942fece4c91aa1"></span><code class="sig-name descname">thread_stacksize_current</code> = 6<a class="headerlink" href="#_CPPv4N3hpx7threads24thread_stacksize_currentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>use size of current thread’s stack </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads24thread_stacksize_defaultE">
+<span id="_CPPv3N3hpx7threads24thread_stacksize_defaultE"></span><span id="_CPPv2N3hpx7threads24thread_stacksize_defaultE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843a3b7b00ec88e7e39e9db689b34d26d551"></span><code class="sig-name descname">thread_stacksize_default</code> = <a class="reference internal" href="#_CPPv4N3hpx7threads22thread_stacksize_smallE" title="hpx::threads::thread_stacksize_small">thread_stacksize_small</a><a class="headerlink" href="#_CPPv4N3hpx7threads24thread_stacksize_defaultE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>use default stack size </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads24thread_stacksize_minimalE">
+<span id="_CPPv3N3hpx7threads24thread_stacksize_minimalE"></span><span id="_CPPv2N3hpx7threads24thread_stacksize_minimalE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843a2293daddc8f3fae60371ca181a03703b"></span><code class="sig-name descname">thread_stacksize_minimal</code> = <a class="reference internal" href="#_CPPv4N3hpx7threads22thread_stacksize_smallE" title="hpx::threads::thread_stacksize_small">thread_stacksize_small</a><a class="headerlink" href="#_CPPv4N3hpx7threads24thread_stacksize_minimalE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>use minimally stack size </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads24thread_stacksize_maximalE">
+<span id="_CPPv3N3hpx7threads24thread_stacksize_maximalE"></span><span id="_CPPv2N3hpx7threads24thread_stacksize_maximalE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a27eef609b06d5b8b1f47c9a7c33a3843ac7ee34b10ff26d61028f5d1abcf7a4b9"></span><code class="sig-name descname">thread_stacksize_maximal</code> = <a class="reference internal" href="#_CPPv4N3hpx7threads21thread_stacksize_hugeE" title="hpx::threads::thread_stacksize_huge">thread_stacksize_huge</a><a class="headerlink" href="#_CPPv4N3hpx7threads24thread_stacksize_maximalE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>use maximally stack size </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="enum">
+<dt id="_CPPv4N3hpx7threads25thread_schedule_hint_modeE">
+<span id="_CPPv3N3hpx7threads25thread_schedule_hint_modeE"></span><span id="_CPPv2N3hpx7threads25thread_schedule_hint_modeE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a74bebf9391ba5e2676a520fea30b90af"></span><em class="property">enum </em><code class="sig-name descname">thread_schedule_hint_mode</code><a class="headerlink" href="#_CPPv4N3hpx7threads25thread_schedule_hint_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The type of hint given when creating new tasks. </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads30thread_schedule_hint_mode_noneE">
+<span id="_CPPv3N3hpx7threads30thread_schedule_hint_mode_noneE"></span><span id="_CPPv2N3hpx7threads30thread_schedule_hint_mode_noneE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a74bebf9391ba5e2676a520fea30b90afa351634c4b0688a2467c4fd5dfa4c8100"></span><code class="sig-name descname">thread_schedule_hint_mode_none</code> = 0<a class="headerlink" href="#_CPPv4N3hpx7threads30thread_schedule_hint_mode_noneE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads32thread_schedule_hint_mode_threadE">
+<span id="_CPPv3N3hpx7threads32thread_schedule_hint_mode_threadE"></span><span id="_CPPv2N3hpx7threads32thread_schedule_hint_mode_threadE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a74bebf9391ba5e2676a520fea30b90afaf8333ff101f76ef368cb11475086177b"></span><code class="sig-name descname">thread_schedule_hint_mode_thread</code> = 1<a class="headerlink" href="#_CPPv4N3hpx7threads32thread_schedule_hint_mode_threadE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx7threads30thread_schedule_hint_mode_numaE">
+<span id="_CPPv3N3hpx7threads30thread_schedule_hint_mode_numaE"></span><span id="_CPPv2N3hpx7threads30thread_schedule_hint_mode_numaE"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a74bebf9391ba5e2676a520fea30b90afa3537f33fec757e35f90dbd35a0a40999"></span><code class="sig-name descname">thread_schedule_hint_mode_numa</code> = 2<a class="headerlink" href="#_CPPv4N3hpx7threads30thread_schedule_hint_mode_numaE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads21get_thread_state_nameE17thread_state_enum">
+<span id="_CPPv3N3hpx7threads21get_thread_state_nameE17thread_state_enum"></span><span id="_CPPv2N3hpx7threads21get_thread_state_nameE17thread_state_enum"></span><span id="hpx::threads::get_thread_state_name__thread_state_enum"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1aa4c18c4cf981c5c6817544b1097f98b6"></span>char <em class="property">const</em> *<code class="sig-name descname">get_thread_state_name</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads17thread_state_enumE" title="hpx::threads::thread_state_enum">thread_state_enum</a> <em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads21get_thread_state_nameE17thread_state_enum" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the name of the given state. </p>
+<p>Get the readable string representing the name of the given thread_state constant.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code>: this represents the thread state. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads24get_thread_priority_nameE15thread_priority">
+<span id="_CPPv3N3hpx7threads24get_thread_priority_nameE15thread_priority"></span><span id="_CPPv2N3hpx7threads24get_thread_priority_nameE15thread_priority"></span><span id="hpx::threads::get_thread_priority_name__thread_priority"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a2681da0f43a6b72b8b15bf56fe201392"></span>char <em class="property">const</em> *<code class="sig-name descname">get_thread_priority_name</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads15thread_priorityE" title="hpx::threads::thread_priority">thread_priority</a> <em>priority</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads24get_thread_priority_nameE15thread_priority" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the thread priority name. </p>
+<p>Get the readable string representing the name of the given thread_priority constant.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">this</span></code>: represents the thread priority. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads24get_thread_state_ex_nameE20thread_state_ex_enum">
+<span id="_CPPv3N3hpx7threads24get_thread_state_ex_nameE20thread_state_ex_enum"></span><span id="_CPPv2N3hpx7threads24get_thread_state_ex_nameE20thread_state_ex_enum"></span><span id="hpx::threads::get_thread_state_ex_name__thread_state_ex_enum"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a58f56602091632657e6d73c7ffb040c5"></span>char <em class="property">const</em> *<code class="sig-name descname">get_thread_state_ex_name</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads20thread_state_ex_enumE" title="hpx::threads::thread_state_ex_enum">thread_state_ex_enum</a> <em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads24get_thread_state_ex_nameE20thread_state_ex_enum" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the readable string representing the name of the given thread_state_ex_enum constant. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads21get_thread_state_nameE12thread_state">
+<span id="_CPPv3N3hpx7threads21get_thread_state_nameE12thread_state"></span><span id="_CPPv2N3hpx7threads21get_thread_state_nameE12thread_state"></span><span id="hpx::threads::get_thread_state_name__thread_state"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1ad53166e46d411744e5fccce9dfee4672"></span>char <em class="property">const</em> *<code class="sig-name descname">get_thread_state_name</code><span class="sig-paren">(</span>thread_state <em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads21get_thread_state_nameE12thread_state" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the readable string representing the name of the given thread_state constant. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads19get_stack_size_nameENSt9ptrdiff_tE">
+<span id="_CPPv3N3hpx7threads19get_stack_size_nameENSt9ptrdiff_tE"></span><span id="_CPPv2N3hpx7threads19get_stack_size_nameENSt9ptrdiff_tE"></span><span id="hpx::threads::get_stack_size_name__std::ptrdiff_t"></span><span class="target" id="hpx_2coroutines_2thread__enums_8hpp_1a1f3d452ebf962e499d2d86c8686bb455"></span>char <em class="property">const</em> *<code class="sig-name descname">get_stack_size_name</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::ptrdiff_t <em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads19get_stack_size_nameENSt9ptrdiff_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the stack size name. </p>
+<p>Get the readable string representing the given stack size constant.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">size</span></code>: this represents the stack size </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv4N3hpx7threads20thread_schedule_hintE">
+<span id="_CPPv3N3hpx7threads20thread_schedule_hintE"></span><span id="_CPPv2N3hpx7threads20thread_schedule_hintE"></span><span id="hpx::threads::thread_schedule_hint"></span><span class="target" id="structhpx_1_1threads_1_1thread__schedule__hint"></span><em class="property">struct </em><code class="sig-name descname">thread_schedule_hint</code><a class="headerlink" href="#_CPPv4N3hpx7threads20thread_schedule_hintE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads20thread_schedule_hint20thread_schedule_hintEv">
+<span id="_CPPv3N3hpx7threads20thread_schedule_hint20thread_schedule_hintEv"></span><span id="_CPPv2N3hpx7threads20thread_schedule_hint20thread_schedule_hintEv"></span><span id="hpx::threads::thread_schedule_hint::thread_schedule_hint"></span><span class="target" id="structhpx_1_1threads_1_1thread__schedule__hint_1a62a25d092755ec8b1fc3f2570e342c94"></span><code class="sig-name descname">thread_schedule_hint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads20thread_schedule_hint20thread_schedule_hintEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads20thread_schedule_hint20thread_schedule_hintENSt7int16_tE">
+<span id="_CPPv3N3hpx7threads20thread_schedule_hint20thread_schedule_hintENSt7int16_tE"></span><span id="_CPPv2N3hpx7threads20thread_schedule_hint20thread_schedule_hintENSt7int16_tE"></span><span id="hpx::threads::thread_schedule_hint::thread_schedule_hint__std::int16_t"></span><span class="target" id="structhpx_1_1threads_1_1thread__schedule__hint_1a3061741bc7a205932c5df42d41a4ae26"></span><code class="sig-name descname">thread_schedule_hint</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int16_t <em>thread_hint</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads20thread_schedule_hint20thread_schedule_hintENSt7int16_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx7threads20thread_schedule_hint20thread_schedule_hintE25thread_schedule_hint_modeNSt7int16_tE">
+<span id="_CPPv3N3hpx7threads20thread_schedule_hint20thread_schedule_hintE25thread_schedule_hint_modeNSt7int16_tE"></span><span id="_CPPv2N3hpx7threads20thread_schedule_hint20thread_schedule_hintE25thread_schedule_hint_modeNSt7int16_tE"></span><span id="hpx::threads::thread_schedule_hint::thread_schedule_hint__thread_schedule_hint_mode.std::int16_t"></span><span class="target" id="structhpx_1_1threads_1_1thread__schedule__hint_1a86a52584d9b969a682a01bb18d85e087"></span><code class="sig-name descname">thread_schedule_hint</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3hpx7threads25thread_schedule_hint_modeE" title="hpx::threads::thread_schedule_hint_mode">thread_schedule_hint_mode</a> <em>mode</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int16_t <em>hint</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx7threads20thread_schedule_hint20thread_schedule_hintE25thread_schedule_hint_modeNSt7int16_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads20thread_schedule_hint4modeE">
+<span id="_CPPv3N3hpx7threads20thread_schedule_hint4modeE"></span><span id="_CPPv2N3hpx7threads20thread_schedule_hint4modeE"></span><span id="hpx::threads::thread_schedule_hint::mode__thread_schedule_hint_mode"></span><span class="target" id="structhpx_1_1threads_1_1thread__schedule__hint_1a7e362378c52f387824151f5ff4e97503"></span><a class="reference internal" href="#_CPPv4N3hpx7threads25thread_schedule_hint_modeE" title="hpx::threads::thread_schedule_hint_mode">thread_schedule_hint_mode</a> <code class="sig-name descname">mode</code><a class="headerlink" href="#_CPPv4N3hpx7threads20thread_schedule_hint4modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx7threads20thread_schedule_hint4hintE">
+<span id="_CPPv3N3hpx7threads20thread_schedule_hint4hintE"></span><span id="_CPPv2N3hpx7threads20thread_schedule_hint4hintE"></span><span id="hpx::threads::thread_schedule_hint::hint__std::int16_t"></span><span class="target" id="structhpx_1_1threads_1_1thread__schedule__hint_1abd8195cf6b0f718c1aab2214fdecfdf6"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::int16_t <code class="sig-name descname">hint</code><a class="headerlink" href="#_CPPv4N3hpx7threads20thread_schedule_hint4hintE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-compatibility-hpx-runtime-threads-thread-id-type-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/thread_id_type.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-runtime-threads-thread-id-type-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-runtime-threads-thread-enums-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/thread_enums.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-runtime-threads-thread-enums-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-runtime-threads-coroutines-coroutine-fwd-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/coroutines/coroutine_fwd.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-runtime-threads-coroutines-coroutine-fwd-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-runtime-threads-coroutines-coroutine-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/threads/coroutines/coroutine.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-runtime-threads-coroutines-coroutine-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../config/api.html" class="btn btn-neutral float-right" title="config" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../thread_support/api.html" class="btn btn-neutral float-left" title="thread_support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

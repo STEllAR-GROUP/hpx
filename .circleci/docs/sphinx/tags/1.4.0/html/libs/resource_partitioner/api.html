@@ -1,0 +1,793 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>resource_partitioner &mdash; HPX 1.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="checkpoint" href="../checkpoint/api.html" />
+    <link rel="prev" title="timing" href="../timing/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> HPX
+          
+
+          
+            
+            <img src="../../_static/HPX_STELLAR.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../why_hpx.html">Why <em>HPX</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../terminology.html">Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual.html">Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../additional_material.html">Additional material</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../all_modules.html">All modules</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#main-hpx-library-reference">Main <em>HPX</em> library reference</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../api.html#modules-reference">Modules reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../synchronization/api.html">synchronization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../datastructures/api.html">datastructures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logging/api.html">logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute_cuda/api.html">compute_cuda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../static_reinit/api.html">static_reinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iterator_support/api.html">iterator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../local_lcos/api.html">local_lcos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../affinity/api.html">affinity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../topology/api.html">topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cache/api.html">cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../thread_support/api.html">thread_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coroutines/api.html">coroutines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../config/api.html">config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../format/api.html">format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugging/api.html">debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithms/api.html">algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugin/api.html">plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../program_options/api.html">program_options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../timing/api.html">timing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">resource_partitioner</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-resource-partitioner-partitioner-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/resource_partitioner/partitioner.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-hpx-resource-partitioner-partitioner-fwd-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/resource_partitioner/partitioner_fwd.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-runtime-resource-partitioner-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/resource/partitioner.hpp&gt;</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#include-compatibility-hpx-runtime-resource-partitioner-fwd-hpp"><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/resource/partitioner_fwd.hpp&gt;</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../checkpoint/api.html">checkpoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../filesystem/api.html">filesystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serialization/api.html">serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../resiliency/api.html">resiliency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../allocator_support/api.html">allocator_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../batch_environments/api.html">batch_environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testing/api.html">testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../errors/api.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../preprocessor/api.html">preprocessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../segmented_algorithms/api.html">segmented_algorithms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../type_support/api.html">type_support</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compute/api.html">compute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../memory/api.html">memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concurrency/api.html">concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../functional/api.html">functional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hashing/api.html">hashing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../collectives/api.html">collectives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../basic_execution/api.html">basic_execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../threadmanager/api.html">threadmanager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../concepts/api.html">concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../assertion/api.html">assertion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../statistics/api.html">statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../execution/api.html">execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util/api.html">util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hardware/api.html">hardware</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to <em>HPX</em></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Other</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about_hpx.html">About <em>HPX</em></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HPX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../api.html">API reference</a> &raquo;</li>
+        
+      <li>resource_partitioner</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/STEllAR-GROUP/hpx/blob/master/docs/sphinx/libs/resource_partitioner/api.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="resource-partitioner">
+<span id="libs-resource-partitioner-api"></span><h1>resource_partitioner<a class="headerlink" href="#resource-partitioner" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="include-hpx-resource-partitioner-partitioner-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/resource_partitioner/partitioner.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-resource-partitioner-partitioner-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span id="hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx8resourceE">
+<span id="_CPPv3N3hpx8resourceE"></span><span id="_CPPv2N3hpx8resourceE"></span><span id="hpx::resource"></span><span class="target" id="namespacehpx_1_1resource"></span><em class="property">namespace </em><code class="sig-name descname">resource</code><a class="headerlink" href="#_CPPv4N3hpx8resourceE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv4N3hpx8resource4coreE">
+<span id="_CPPv3N3hpx8resource4coreE"></span><span id="_CPPv2N3hpx8resource4coreE"></span><span id="hpx::resource::core"></span><span class="target" id="classhpx_1_1resource_1_1core"></span><em class="property">class </em><code class="sig-name descname">core</code><a class="headerlink" href="#_CPPv4N3hpx8resource4coreE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource4core4coreENSt6size_tEP11numa_domain">
+<span id="_CPPv3N3hpx8resource4core4coreENSt6size_tEP11numa_domain"></span><span id="_CPPv2N3hpx8resource4core4coreENSt6size_tEP11numa_domain"></span><span id="hpx::resource::core::core__std::s.numa_domainP"></span><span class="target" id="classhpx_1_1resource_1_1core_1aee20d4928d153287fe597eb4d56043a9"></span><code class="sig-name descname">core</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>id</em> = <a class="reference internal" href="#_CPPv4N3hpx8resource4core15invalid_core_idE" title="hpx::resource::core::invalid_core_id">invalid_core_id</a>, <a class="reference internal" href="#_CPPv4N3hpx8resource11numa_domainE" title="hpx::resource::numa_domain">numa_domain</a> *<em>domain</em> = nullptr<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource4core4coreENSt6size_tEP11numa_domain" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx8resource4core3pusEv">
+<span id="_CPPv3NK3hpx8resource4core3pusEv"></span><span id="_CPPv2NK3hpx8resource4core3pusEv"></span><span id="hpx::resource::core::pusC"></span><span class="target" id="classhpx_1_1resource_1_1core_1aff875466d87a989eec14c465892c6bba"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4N3hpx8resource2puE" title="hpx::resource::pu">pu</a>&gt; <em class="property">const</em> &amp;<code class="sig-name descname">pus</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx8resource4core3pusEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx8resource4core2idEv">
+<span id="_CPPv3NK3hpx8resource4core2idEv"></span><span id="_CPPv2NK3hpx8resource4core2idEv"></span><span id="hpx::resource::core::idC"></span><span class="target" id="classhpx_1_1resource_1_1core_1aed0e7517a61415910ae7d35c9afa837e"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">id</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx8resource4core2idEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource4core25cores_sharing_numa_domainEv">
+<span id="_CPPv3N3hpx8resource4core25cores_sharing_numa_domainEv"></span><span id="_CPPv2N3hpx8resource4core25cores_sharing_numa_domainEv"></span><span id="hpx::resource::core::cores_sharing_numa_domain"></span><span class="target" id="classhpx_1_1resource_1_1core_1a3d2f1913d546c4a5ea956f747249ba83"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4N3hpx8resource4coreE" title="hpx::resource::core">core</a>&gt; <code class="sig-name descname">cores_sharing_numa_domain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource4core25cores_sharing_numa_domainEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource4core3id_E">
+<span id="_CPPv3N3hpx8resource4core3id_E"></span><span id="_CPPv2N3hpx8resource4core3id_E"></span><span id="hpx::resource::core::id___std::s"></span><span class="target" id="classhpx_1_1resource_1_1core_1ab0b9747641fdb76d6be9aadd67cd0007"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">id_</code><a class="headerlink" href="#_CPPv4N3hpx8resource4core3id_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource4core7domain_E">
+<span id="_CPPv3N3hpx8resource4core7domain_E"></span><span id="_CPPv2N3hpx8resource4core7domain_E"></span><span id="hpx::resource::core::domain___numa_domainP"></span><span class="target" id="classhpx_1_1resource_1_1core_1ae397ca48f982e79146ba27650385b624"></span><a class="reference internal" href="#_CPPv4N3hpx8resource11numa_domainE" title="hpx::resource::numa_domain">numa_domain</a> *<code class="sig-name descname">domain_</code><a class="headerlink" href="#_CPPv4N3hpx8resource4core7domain_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource4core4pus_E">
+<span id="_CPPv3N3hpx8resource4core4pus_E"></span><span id="_CPPv2N3hpx8resource4core4pus_E"></span><span id="hpx::resource::core::pus___std::vector:pu:"></span><span class="target" id="classhpx_1_1resource_1_1core_1a7afdab94ea3a5c58b612ae5623c8f7d3"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4N3hpx8resource2puE" title="hpx::resource::pu">pu</a>&gt; <code class="sig-name descname">pus_</code><a class="headerlink" href="#_CPPv4N3hpx8resource4core4pus_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Static Attributes</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource4core15invalid_core_idE">
+<span id="_CPPv3N3hpx8resource4core15invalid_core_idE"></span><span id="_CPPv2N3hpx8resource4core15invalid_core_idE"></span><span id="hpx::resource::core::invalid_core_id__std::sC"></span><span class="target" id="classhpx_1_1resource_1_1core_1abaa4bbf29ca17417b14951e393907694"></span><em class="property">const</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">invalid_core_id</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t(-1)<a class="headerlink" href="#_CPPv4N3hpx8resource4core15invalid_core_idE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1resource_1_1core_1a3d1082481a9a21aecb71d04b3fe4f657"></span><em class="property">friend </em><code class="sig-name descname">hpx::resource::pu</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1resource_1_1core_1a2cd848189ba1a47ca3c3150ad45e974c"></span><em class="property">friend </em><code class="sig-name descname">hpx::resource::numa_domain</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4N3hpx8resource11numa_domainE">
+<span id="_CPPv3N3hpx8resource11numa_domainE"></span><span id="_CPPv2N3hpx8resource11numa_domainE"></span><span id="hpx::resource::numa_domain"></span><span class="target" id="classhpx_1_1resource_1_1numa__domain"></span><em class="property">class </em><code class="sig-name descname">numa_domain</code><a class="headerlink" href="#_CPPv4N3hpx8resource11numa_domainE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11numa_domain11numa_domainENSt6size_tE">
+<span id="_CPPv3N3hpx8resource11numa_domain11numa_domainENSt6size_tE"></span><span id="_CPPv2N3hpx8resource11numa_domain11numa_domainENSt6size_tE"></span><span id="hpx::resource::numa_domain::numa_domain__std::s"></span><span class="target" id="classhpx_1_1resource_1_1numa__domain_1adcd381c136649d2ee2f9adfff0536288"></span><code class="sig-name descname">numa_domain</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>id</em> = <a class="reference internal" href="#_CPPv4N3hpx8resource11numa_domain22invalid_numa_domain_idE" title="hpx::resource::numa_domain::invalid_numa_domain_id">invalid_numa_domain_id</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11numa_domain11numa_domainENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx8resource11numa_domain5coresEv">
+<span id="_CPPv3NK3hpx8resource11numa_domain5coresEv"></span><span id="_CPPv2NK3hpx8resource11numa_domain5coresEv"></span><span id="hpx::resource::numa_domain::coresC"></span><span class="target" id="classhpx_1_1resource_1_1numa__domain_1a887012d81bbcc7b8f993d23a56c073b6"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4N3hpx8resource4coreE" title="hpx::resource::core">core</a>&gt; <em class="property">const</em> &amp;<code class="sig-name descname">cores</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx8resource11numa_domain5coresEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx8resource11numa_domain2idEv">
+<span id="_CPPv3NK3hpx8resource11numa_domain2idEv"></span><span id="_CPPv2NK3hpx8resource11numa_domain2idEv"></span><span id="hpx::resource::numa_domain::idC"></span><span class="target" id="classhpx_1_1resource_1_1numa__domain_1a93254aa4367755d08f9d0da12283fb00"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">id</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx8resource11numa_domain2idEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource11numa_domain3id_E">
+<span id="_CPPv3N3hpx8resource11numa_domain3id_E"></span><span id="_CPPv2N3hpx8resource11numa_domain3id_E"></span><span id="hpx::resource::numa_domain::id___std::s"></span><span class="target" id="classhpx_1_1resource_1_1numa__domain_1a9494fa169931eb0f94ada3d056dd8de8"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">id_</code><a class="headerlink" href="#_CPPv4N3hpx8resource11numa_domain3id_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource11numa_domain6cores_E">
+<span id="_CPPv3N3hpx8resource11numa_domain6cores_E"></span><span id="_CPPv2N3hpx8resource11numa_domain6cores_E"></span><span id="hpx::resource::numa_domain::cores___std::vector:core:"></span><span class="target" id="classhpx_1_1resource_1_1numa__domain_1ad21b3d8db2e9c657d7a6c59f1fdb69ae"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4N3hpx8resource4coreE" title="hpx::resource::core">core</a>&gt; <code class="sig-name descname">cores_</code><a class="headerlink" href="#_CPPv4N3hpx8resource11numa_domain6cores_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Static Attributes</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource11numa_domain22invalid_numa_domain_idE">
+<span id="_CPPv3N3hpx8resource11numa_domain22invalid_numa_domain_idE"></span><span id="_CPPv2N3hpx8resource11numa_domain22invalid_numa_domain_idE"></span><span id="hpx::resource::numa_domain::invalid_numa_domain_id__std::sC"></span><span class="target" id="classhpx_1_1resource_1_1numa__domain_1af73bd91f3e3b5bd332781f1fa0a01eab"></span><em class="property">const</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">invalid_numa_domain_id</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t(-1)<a class="headerlink" href="#_CPPv4N3hpx8resource11numa_domain22invalid_numa_domain_idE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1resource_1_1numa__domain_1a3d1082481a9a21aecb71d04b3fe4f657"></span><em class="property">friend </em><code class="sig-name descname">hpx::resource::pu</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1resource_1_1numa__domain_1af764561c544bacc1b90b526ee8d3c708"></span><em class="property">friend </em><code class="sig-name descname">hpx::resource::core</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4N3hpx8resource11partitionerE">
+<span id="_CPPv3N3hpx8resource11partitionerE"></span><span id="_CPPv2N3hpx8resource11partitionerE"></span><span id="hpx::resource::partitioner"></span><span class="target" id="classhpx_1_1resource_1_1partitioner"></span><em class="property">class </em><code class="sig-name descname">partitioner</code><a class="headerlink" href="#_CPPv4N3hpx8resource11partitionerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiRN3hpx15program_options13variables_mapEEEERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiRN3hpx15program_options13variables_mapEEEERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiRN3hpx15program_options13variables_mapEEEERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a8b45a5fce8415a70d7a3910da13b38cf"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../functional/api.html#_CPPv4N3hpx4util15function_nonserE" title="hpx::util::function_nonser">function_nonser</a>&lt;int<span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_optionsE" title="hpx::program_options">program_options</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_options13variables_mapE" title="hpx::program_options::variables_map">variables_map</a> &amp;vm<span class="sig-paren">)</span>&gt; <em class="property">const</em> &amp;<em>f</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_optionsE" title="hpx::program_options">program_options</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_options19options_descriptionE" title="hpx::program_options::options_description">options_description</a> <em class="property">const</em> &amp;<em>desc_cmdline</em>, int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; <em>ini_config</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a>, <span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiRN3hpx15program_options13variables_mapEEEERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiiPPcEEEiPPcN8resource16partitioner_modeEN3hpx12runtime_modeE">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiiPPcEEEiPPcN8resource16partitioner_modeEN3hpx12runtime_modeE"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiiPPcEEEiPPcN8resource16partitioner_modeEN3hpx12runtime_modeE"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a4bba6633f3ccaecd918dbd48e8f060e5"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../functional/api.html#_CPPv4N3hpx4util15function_nonserE" title="hpx::util::function_nonser">function_nonser</a>&lt;int<span class="sig-paren">(</span>int, char **<span class="sig-paren">)</span>&gt; <em class="property">const</em> &amp;<em>f</em>, int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a>, <span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiiPPcEEEiPPcN8resource16partitioner_modeEN3hpx12runtime_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiiPPcEEEiPPcRKNSt6vectorINSt6stringEEEN8resource16partitioner_modeEN3hpx12runtime_modeE">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiiPPcEEEiPPcRKNSt6vectorINSt6stringEEEN8resource16partitioner_modeEN3hpx12runtime_modeE"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiiPPcEEEiPPcRKNSt6vectorINSt6stringEEEN8resource16partitioner_modeEN3hpx12runtime_modeE"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1af9ca64e26b029246a4de28fe255eac53"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../functional/api.html#_CPPv4N3hpx4util15function_nonserE" title="hpx::util::function_nonser">function_nonser</a>&lt;int<span class="sig-paren">(</span>int, char **<span class="sig-paren">)</span>&gt; <em class="property">const</em> &amp;<em>f</em>, int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; <em class="property">const</em> &amp;<em>cfg</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a>, <span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerERKN4util15function_nonserIFiiPPcEEEiPPcRKNSt6vectorINSt6stringEEEN8resource16partitioner_modeEN3hpx12runtime_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerEiPPcN8resource16partitioner_modeE12runtime_mode">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerEiPPcN8resource16partitioner_modeE12runtime_mode"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerEiPPcN8resource16partitioner_modeE12runtime_mode"></span><span id="hpx::resource::partitioner::partitioner__i.cPP.resource::partitioner_mode.runtime_mode"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1af11403a34747e93d4a78daf21436398f"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span>int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerEiPPcN8resource16partitioner_modeE12runtime_mode" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode"></span><span id="hpx::resource::partitioner::partitioner__i.cPP.std::vector:ss:.resource::partitioner_mode.runtime_mode"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1aacf20a9cc6b352458c0c663984e34cbe"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span>int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; <em>ini_config</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerERKN3hpx15program_options19options_descriptionEiPPcN8resource16partitioner_modeE12runtime_mode">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerERKN3hpx15program_options19options_descriptionEiPPcN8resource16partitioner_modeE12runtime_mode"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerERKN3hpx15program_options19options_descriptionEiPPcN8resource16partitioner_modeE12runtime_mode"></span><span id="hpx::resource::partitioner::partitioner__hpx::program_options::options_descriptionCR.i.cPP.resource::partitioner_mode.runtime_mode"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1ad960f89e82c4b0d5dd10e55319f8fc79"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_optionsE" title="hpx::program_options">program_options</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_options19options_descriptionE" title="hpx::program_options::options_description">options_description</a> <em class="property">const</em> &amp;<em>desc_cmdline</em>, int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerERKN3hpx15program_options19options_descriptionEiPPcN8resource16partitioner_modeE12runtime_mode" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode"></span><span id="hpx::resource::partitioner::partitioner__hpx::program_options::options_descriptionCR.i.cPP.std::vector:ss:.resource::partitioner_mode.runtime_mode"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a76876b92d609e301b36dc55a838c2b44"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_optionsE" title="hpx::program_options">program_options</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_options19options_descriptionE" title="hpx::program_options::options_description">options_description</a> <em class="property">const</em> &amp;<em>desc_cmdline</em>, int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; <em>ini_config</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerENSt9nullptr_tEiPPcN8resource16partitioner_modeEN3hpx12runtime_modeE">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerENSt9nullptr_tEiPPcN8resource16partitioner_modeEN3hpx12runtime_modeE"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerENSt9nullptr_tEiPPcN8resource16partitioner_modeEN3hpx12runtime_modeE"></span><span id="hpx::resource::partitioner::partitioner__std::nullptr_t.i.cPP.resource::partitioner_mode.hpx::runtime_mode"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a26d9487a4e3a1d09a1e31f6b52371852"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t <em>f</em>, int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerENSt9nullptr_tEiPPcN8resource16partitioner_modeEN3hpx12runtime_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerENSt9nullptr_tEiPPcRKNSt6vectorINSt6stringEEEN8resource16partitioner_modeEN3hpx12runtime_modeE">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerENSt9nullptr_tEiPPcRKNSt6vectorINSt6stringEEEN8resource16partitioner_modeEN3hpx12runtime_modeE"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerENSt9nullptr_tEiPPcRKNSt6vectorINSt6stringEEEN8resource16partitioner_modeEN3hpx12runtime_modeE"></span><span id="hpx::resource::partitioner::partitioner__std::nullptr_t.i.cPP.std::vector:ss:CR.resource::partitioner_mode.hpx::runtime_mode"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1ada5cb4e70ee5a55bd8e5a395f8933bf6"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t <em>f</em>, int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; <em class="property">const</em> &amp;<em>cfg</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerENSt9nullptr_tEiPPcRKNSt6vectorINSt6stringEEEN8resource16partitioner_modeEN3hpx12runtime_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner11partitionerENSt9nullptr_tERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode">
+<span id="_CPPv3N3hpx8resource11partitioner11partitionerENSt9nullptr_tERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode"></span><span id="_CPPv2N3hpx8resource11partitioner11partitionerENSt9nullptr_tERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode"></span><span id="hpx::resource::partitioner::partitioner__std::nullptr_t.hpx::program_options::options_descriptionCR.i.cPP.std::vector:ss:.resource::partitioner_mode.runtime_mode"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a4a4b7a89b96cabc733279433e483fe27"></span><code class="sig-name descname">partitioner</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::nullptr_t <em>f</em>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_optionsE" title="hpx::program_options">program_options</a>::<a class="reference internal" href="../program_options/api.html#_CPPv4N3hpx15program_options19options_descriptionE" title="hpx::program_options::options_description">options_description</a> <em class="property">const</em> &amp;<em>desc_cmdline</em>, int <em>argc</em>, char **<em>argv</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string&gt; <em>ini_config</em>, <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="hpx::resource::partitioner_mode">partitioner_mode</a> <em>rpmode</em> = <a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource12mode_defaultE" title="hpx::resource::mode_default">mode_default</a>, <a class="reference internal" href="../../api.html#_CPPv4N3hpx12runtime_modeE" title="hpx::runtime_mode">runtime_mode</a> <em>mode</em> = <a class="reference internal" href="../../api.html#_CPPv4N3hpx20runtime_mode_defaultE" title="hpx::runtime_mode_default">runtime_mode_default</a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner11partitionerENSt9nullptr_tERKN3hpx15program_options19options_descriptionEiPPcNSt6vectorINSt6stringEEEN8resource16partitioner_modeE12runtime_mode" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner18create_thread_poolERKNSt6stringE17scheduling_policyN3hpx7threads8policies14scheduler_modeE">
+<span id="_CPPv3N3hpx8resource11partitioner18create_thread_poolERKNSt6stringE17scheduling_policyN3hpx7threads8policies14scheduler_modeE"></span><span id="_CPPv2N3hpx8resource11partitioner18create_thread_poolERKNSt6stringE17scheduling_policyN3hpx7threads8policies14scheduler_modeE"></span><span id="hpx::resource::partitioner::create_thread_pool__ssCR.scheduling_policy.hpx::threads::policies::scheduler_mode"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a4497d2cbafa68fb886ba2045e3cbd6d3"></span>void <code class="sig-name descname">create_thread_pool</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>name</em>, <a class="reference internal" href="#_CPPv4N3hpx8resource17scheduling_policyE" title="hpx::resource::scheduling_policy">scheduling_policy</a> <em>sched</em> = <a class="reference internal" href="#_CPPv4N3hpx8resource17scheduling_policyE" title="hpx::resource::scheduling_policy">scheduling_policy</a>::unspecified, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policies14scheduler_modeE" title="hpx::threads::policies::scheduler_mode">scheduler_mode</a> = <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policies14scheduler_modeE" title="hpx::threads::policies::scheduler_mode">scheduler_mode</a>::default_mode<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner18create_thread_poolERKNSt6stringE17scheduling_policyN3hpx7threads8policies14scheduler_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner18create_thread_poolERKNSt6stringE18scheduler_function">
+<span id="_CPPv3N3hpx8resource11partitioner18create_thread_poolERKNSt6stringE18scheduler_function"></span><span id="_CPPv2N3hpx8resource11partitioner18create_thread_poolERKNSt6stringE18scheduler_function"></span><span id="hpx::resource::partitioner::create_thread_pool__ssCR.scheduler_function"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1ad559caef93ea53bdf561ef5b0893c578"></span>void <code class="sig-name descname">create_thread_pool</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>name</em>, <a class="reference internal" href="#_CPPv4N3hpx8resource18scheduler_functionE" title="hpx::resource::scheduler_function">scheduler_function</a> <em>scheduler_creation</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner18create_thread_poolERKNSt6stringE18scheduler_function" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner21set_default_pool_nameERKNSt6stringE">
+<span id="_CPPv3N3hpx8resource11partitioner21set_default_pool_nameERKNSt6stringE"></span><span id="_CPPv2N3hpx8resource11partitioner21set_default_pool_nameERKNSt6stringE"></span><span id="hpx::resource::partitioner::set_default_pool_name__ssCR"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a3a44f4397fd710a74b1ab29ace8b12bc"></span>void <code class="sig-name descname">set_default_pool_name</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner21set_default_pool_nameERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx8resource11partitioner21get_default_pool_nameEv">
+<span id="_CPPv3NK3hpx8resource11partitioner21get_default_pool_nameEv"></span><span id="_CPPv2NK3hpx8resource11partitioner21get_default_pool_nameEv"></span><span id="hpx::resource::partitioner::get_default_pool_nameC"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a4724e82f36f222fe5a4967b765e4d9b4"></span><em class="property">const</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string &amp;<code class="sig-name descname">get_default_pool_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx8resource11partitioner21get_default_pool_nameEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner12add_resourceERKN3hpx8resource2puERKNSt6stringENSt6size_tE">
+<span id="_CPPv3N3hpx8resource11partitioner12add_resourceERKN3hpx8resource2puERKNSt6stringENSt6size_tE"></span><span id="_CPPv2N3hpx8resource11partitioner12add_resourceERKN3hpx8resource2puERKNSt6stringENSt6size_tE"></span><span id="hpx::resource::partitioner::add_resource__hpx::resource::puCR.ssCR.std::s"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1ae994b2afde4fe9414c8e0b158615387b"></span>void <code class="sig-name descname">add_resource</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource2puE" title="hpx::resource::pu">pu</a> <em class="property">const</em> &amp;<em>p</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_threads</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner12add_resourceERKN3hpx8resource2puERKNSt6stringENSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner12add_resourceERKN3hpx8resource2puERKNSt6stringEbNSt6size_tE">
+<span id="_CPPv3N3hpx8resource11partitioner12add_resourceERKN3hpx8resource2puERKNSt6stringEbNSt6size_tE"></span><span id="_CPPv2N3hpx8resource11partitioner12add_resourceERKN3hpx8resource2puERKNSt6stringEbNSt6size_tE"></span><span id="hpx::resource::partitioner::add_resource__hpx::resource::puCR.ssCR.b.std::s"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a869f50bc0b69968d465cb77248d7e174"></span>void <code class="sig-name descname">add_resource</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource2puE" title="hpx::resource::pu">pu</a> <em class="property">const</em> &amp;<em>p</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em>, bool <em>exclusive</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>num_threads</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner12add_resourceERKN3hpx8resource2puERKNSt6stringEbNSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner12add_resourceERKNSt6vectorIN3hpx8resource2puEEERKNSt6stringEb">
+<span id="_CPPv3N3hpx8resource11partitioner12add_resourceERKNSt6vectorIN3hpx8resource2puEEERKNSt6stringEb"></span><span id="_CPPv2N3hpx8resource11partitioner12add_resourceERKNSt6vectorIN3hpx8resource2puEEERKNSt6stringEb"></span><span id="hpx::resource::partitioner::add_resource__std::vector:hpx::resource::pu:CR.ssCR.b"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a05ba911a49ab6864ceb0a9d0b38cf866"></span>void <code class="sig-name descname">add_resource</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource2puE" title="hpx::resource::pu">pu</a>&gt; <em class="property">const</em> &amp;<em>pv</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em>, bool <em>exclusive</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner12add_resourceERKNSt6vectorIN3hpx8resource2puEEERKNSt6stringEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner12add_resourceERKN3hpx8resource4coreERKNSt6stringEb">
+<span id="_CPPv3N3hpx8resource11partitioner12add_resourceERKN3hpx8resource4coreERKNSt6stringEb"></span><span id="_CPPv2N3hpx8resource11partitioner12add_resourceERKN3hpx8resource4coreERKNSt6stringEb"></span><span id="hpx::resource::partitioner::add_resource__hpx::resource::coreCR.ssCR.b"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a73ca88b3e2be88f01b41b5729a04ec9f"></span>void <code class="sig-name descname">add_resource</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource4coreE" title="hpx::resource::core">core</a> <em class="property">const</em> &amp;<em>c</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em>, bool <em>exclusive</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner12add_resourceERKN3hpx8resource4coreERKNSt6stringEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner12add_resourceERNSt6vectorIN3hpx8resource4coreEEERKNSt6stringEb">
+<span id="_CPPv3N3hpx8resource11partitioner12add_resourceERNSt6vectorIN3hpx8resource4coreEEERKNSt6stringEb"></span><span id="_CPPv2N3hpx8resource11partitioner12add_resourceERNSt6vectorIN3hpx8resource4coreEEERKNSt6stringEb"></span><span id="hpx::resource::partitioner::add_resource__std::vector:hpx::resource::core:R.ssCR.b"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a7938d8bb4d31c1ca8886c83f23c3121c"></span>void <code class="sig-name descname">add_resource</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource4coreE" title="hpx::resource::core">core</a>&gt; &amp;<em>cv</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em>, bool <em>exclusive</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner12add_resourceERNSt6vectorIN3hpx8resource4coreEEERKNSt6stringEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner12add_resourceERKN3hpx8resource11numa_domainERKNSt6stringEb">
+<span id="_CPPv3N3hpx8resource11partitioner12add_resourceERKN3hpx8resource11numa_domainERKNSt6stringEb"></span><span id="_CPPv2N3hpx8resource11partitioner12add_resourceERKN3hpx8resource11numa_domainERKNSt6stringEb"></span><span id="hpx::resource::partitioner::add_resource__hpx::resource::numa_domainCR.ssCR.b"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a59e1cb220f7a395a7863c48091b08036"></span>void <code class="sig-name descname">add_resource</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource11numa_domainE" title="hpx::resource::numa_domain">numa_domain</a> <em class="property">const</em> &amp;<em>nd</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em>, bool <em>exclusive</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner12add_resourceERKN3hpx8resource11numa_domainERKNSt6stringEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner12add_resourceERKNSt6vectorIN3hpx8resource11numa_domainEEERKNSt6stringEb">
+<span id="_CPPv3N3hpx8resource11partitioner12add_resourceERKNSt6vectorIN3hpx8resource11numa_domainEEERKNSt6stringEb"></span><span id="_CPPv2N3hpx8resource11partitioner12add_resourceERKNSt6vectorIN3hpx8resource11numa_domainEEERKNSt6stringEb"></span><span id="hpx::resource::partitioner::add_resource__std::vector:hpx::resource::numa_domain:CR.ssCR.b"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a539605633e7c948c737da90438642f2a"></span>void <code class="sig-name descname">add_resource</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="#_CPPv4N3hpx8resourceE" title="hpx::resource">resource</a>::<a class="reference internal" href="#_CPPv4N3hpx8resource11numa_domainE" title="hpx::resource::numa_domain">numa_domain</a>&gt; <em class="property">const</em> &amp;<em>ndv</em>, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::string <em class="property">const</em> &amp;<em>pool_name</em>, bool <em>exclusive</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner12add_resourceERKNSt6vectorIN3hpx8resource11numa_domainEEERKNSt6stringEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx8resource11partitioner12numa_domainsEv">
+<span id="_CPPv3NK3hpx8resource11partitioner12numa_domainsEv"></span><span id="_CPPv2NK3hpx8resource11partitioner12numa_domainsEv"></span><span id="hpx::resource::partitioner::numa_domainsC"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1ac6c0f5620c6f45f3a9a811d0113997e0"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4N3hpx8resource11numa_domainE" title="hpx::resource::numa_domain">numa_domain</a>&gt; <em class="property">const</em> &amp;<code class="sig-name descname">numa_domains</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx8resource11partitioner12numa_domainsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource11partitioner28get_number_requested_threadsEv">
+<span id="_CPPv3N3hpx8resource11partitioner28get_number_requested_threadsEv"></span><span id="_CPPv2N3hpx8resource11partitioner28get_number_requested_threadsEv"></span><span id="hpx::resource::partitioner::get_number_requested_threads"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a0f0d299d7ba09e46e8cb6e3745cb61da"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">get_number_requested_threads</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner28get_number_requested_threadsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx8resource11partitioner12get_topologyEv">
+<span id="_CPPv3NK3hpx8resource11partitioner12get_topologyEv"></span><span id="_CPPv2NK3hpx8resource11partitioner12get_topologyEv"></span><span id="hpx::resource::partitioner::get_topologyC"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a7649870f715111dbc2327e2b5378a479"></span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../topology/api.html#_CPPv4N3hpx7threads8topologyE" title="hpx::threads::topology">topology</a> <em class="property">const</em> &amp;<code class="sig-name descname">get_topology</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx8resource11partitioner12get_topologyEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource11partitioner12partitioner_E">
+<span id="_CPPv3N3hpx8resource11partitioner12partitioner_E"></span><span id="_CPPv2N3hpx8resource11partitioner12partitioner_E"></span><span id="hpx::resource::partitioner::partitioner___detail::partitionerR"></span><span class="target" id="classhpx_1_1resource_1_1partitioner_1a66bbd4414489502a29b959f602dbb6ae"></span>detail::partitioner &amp;<code class="sig-name descname">partitioner_</code><a class="headerlink" href="#_CPPv4N3hpx8resource11partitioner12partitioner_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv4N3hpx8resource2puE">
+<span id="_CPPv3N3hpx8resource2puE"></span><span id="_CPPv2N3hpx8resource2puE"></span><span id="hpx::resource::pu"></span><span class="target" id="classhpx_1_1resource_1_1pu"></span><em class="property">class </em><code class="sig-name descname">pu</code><a class="headerlink" href="#_CPPv4N3hpx8resource2puE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource2pu2puENSt6size_tEP4coreNSt6size_tE">
+<span id="_CPPv3N3hpx8resource2pu2puENSt6size_tEP4coreNSt6size_tE"></span><span id="_CPPv2N3hpx8resource2pu2puENSt6size_tEP4coreNSt6size_tE"></span><span id="hpx::resource::pu::pu__std::s.coreP.std::s"></span><span class="target" id="classhpx_1_1resource_1_1pu_1a537ffb359aa977fbdb2f42f3515fc8bf"></span><code class="sig-name descname">pu</code><span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>id</em> = <a class="reference internal" href="#_CPPv4N3hpx8resource2pu13invalid_pu_idE" title="hpx::resource::pu::invalid_pu_id">invalid_pu_id</a>, <a class="reference internal" href="#_CPPv4N3hpx8resource2pu2puENSt6size_tEP4coreNSt6size_tE" title="hpx::resource::pu::pu::core">core</a> *<em>core</em> = nullptr, <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <em>thread_occupancy</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource2pu2puENSt6size_tEP4coreNSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK3hpx8resource2pu2idEv">
+<span id="_CPPv3NK3hpx8resource2pu2idEv"></span><span id="_CPPv2NK3hpx8resource2pu2idEv"></span><span id="hpx::resource::pu::idC"></span><span class="target" id="classhpx_1_1resource_1_1pu_1a2e55d79cc3b4e94e3295e9590197a6bf"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">id</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK3hpx8resource2pu2idEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource2pu16pus_sharing_coreEv">
+<span id="_CPPv3N3hpx8resource2pu16pus_sharing_coreEv"></span><span id="_CPPv2N3hpx8resource2pu16pus_sharing_coreEv"></span><span id="hpx::resource::pu::pus_sharing_core"></span><span class="target" id="classhpx_1_1resource_1_1pu_1a65a6facef703935b9f73b467ff50ad3c"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4N3hpx8resource2puE" title="hpx::resource::pu">pu</a>&gt; <code class="sig-name descname">pus_sharing_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource2pu16pus_sharing_coreEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource2pu23pus_sharing_numa_domainEv">
+<span id="_CPPv3N3hpx8resource2pu23pus_sharing_numa_domainEv"></span><span id="_CPPv2N3hpx8resource2pu23pus_sharing_numa_domainEv"></span><span id="hpx::resource::pu::pus_sharing_numa_domain"></span><span class="target" id="classhpx_1_1resource_1_1pu_1a4151c464568440e038fa3ae5fb020f36"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::vector&lt;<a class="reference internal" href="#_CPPv4N3hpx8resource2puE" title="hpx::resource::pu">pu</a>&gt; <code class="sig-name descname">pus_sharing_numa_domain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource2pu23pus_sharing_numa_domainEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource2pu3id_E">
+<span id="_CPPv3N3hpx8resource2pu3id_E"></span><span id="_CPPv2N3hpx8resource2pu3id_E"></span><span id="hpx::resource::pu::id___std::s"></span><span class="target" id="classhpx_1_1resource_1_1pu_1aef608faedbbedb5363ce8b2fa3459902"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">id_</code><a class="headerlink" href="#_CPPv4N3hpx8resource2pu3id_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource2pu5core_E">
+<span id="_CPPv3N3hpx8resource2pu5core_E"></span><span id="_CPPv2N3hpx8resource2pu5core_E"></span><span id="hpx::resource::pu::core___coreP"></span><span class="target" id="classhpx_1_1resource_1_1pu_1a60cce22f6aa567e2b4a5ed0be8fe4595"></span><a class="reference internal" href="#_CPPv4N3hpx8resource4coreE" title="hpx::resource::core">core</a> *<code class="sig-name descname">core_</code><a class="headerlink" href="#_CPPv4N3hpx8resource2pu5core_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource2pu17thread_occupancy_E">
+<span id="_CPPv3N3hpx8resource2pu17thread_occupancy_E"></span><span id="_CPPv2N3hpx8resource2pu17thread_occupancy_E"></span><span id="hpx::resource::pu::thread_occupancy___std::s"></span><span class="target" id="classhpx_1_1resource_1_1pu_1ab803fb8ed0c174879646f06d4150e0f1"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">thread_occupancy_</code><a class="headerlink" href="#_CPPv4N3hpx8resource2pu17thread_occupancy_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource2pu23thread_occupancy_count_E">
+<span id="_CPPv3N3hpx8resource2pu23thread_occupancy_count_E"></span><span id="_CPPv2N3hpx8resource2pu23thread_occupancy_count_E"></span><span id="hpx::resource::pu::thread_occupancy_count___std::s"></span><span class="target" id="classhpx_1_1resource_1_1pu_1a857b41b2c93d17256d46632ba31362ea"></span><a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">thread_occupancy_count_</code><a class="headerlink" href="#_CPPv4N3hpx8resource2pu23thread_occupancy_count_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Static Attributes</p>
+<dl class="member">
+<dt id="_CPPv4N3hpx8resource2pu13invalid_pu_idE">
+<span id="_CPPv3N3hpx8resource2pu13invalid_pu_idE"></span><span id="_CPPv2N3hpx8resource2pu13invalid_pu_idE"></span><span id="hpx::resource::pu::invalid_pu_id__std::sC"></span><span class="target" id="classhpx_1_1resource_1_1pu_1aea1c75ef951ef3603fb488d78f23d19a"></span><em class="property">const</em> <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t <code class="sig-name descname">invalid_pu_id</code> = <a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::size_t(-1)<a class="headerlink" href="#_CPPv4N3hpx8resource2pu13invalid_pu_idE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1resource_1_1pu_1af764561c544bacc1b90b526ee8d3c708"></span><em class="property">friend </em><code class="sig-name descname">hpx::resource::core</code></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<span class="target" id="classhpx_1_1resource_1_1pu_1a2cd848189ba1a47ca3c3150ad45e974c"></span><em class="property">friend </em><code class="sig-name descname">hpx::resource::numa_domain</code></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-hpx-resource-partitioner-partitioner-fwd-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;hpx/resource_partitioner/partitioner_fwd.hpp&gt;</span></code><a class="headerlink" href="#include-hpx-resource-partitioner-partitioner-fwd-hpp" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv43hpx">
+<span id="_CPPv33hpx"></span><span id="_CPPv23hpx"></span><span class="target" id="namespacehpx"></span><em class="property">namespace </em><code class="sig-name descname">hpx</code><br /></dt>
+<dd><dl class="type">
+<dt id="_CPPv4N3hpx8resourceE">
+<span id="_CPPv3N3hpx8resourceE"></span><span id="_CPPv2N3hpx8resourceE"></span><span class="target" id="namespacehpx_1_1resource"></span><em class="property">namespace </em><code class="sig-name descname">resource</code><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv4N3hpx8resource18scheduler_functionE">
+<span id="_CPPv3N3hpx8resource18scheduler_functionE"></span><span id="_CPPv2N3hpx8resource18scheduler_functionE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a6781cb4d07e60232fbbaf1e285630b01"></span><em class="property">using </em><code class="sig-name descname">scheduler_function</code> = <a class="reference internal" href="../../api.html#_CPPv4N3hpx4utilE" title="hpx::util">util</a>::<a class="reference internal" href="../functional/api.html#_CPPv4N3hpx4util15function_nonserE" title="hpx::util::function_nonser">function_nonser</a>&lt;<a class="reference internal" href="../../api.html#_CPPv4St" title="std">std</a>::unique_ptr&lt;<a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads16thread_pool_baseE" title="hpx::threads::thread_pool_base">thread_pool_base</a>&gt;<span class="sig-paren">(</span><a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads27thread_pool_init_parametersE" title="hpx::threads::thread_pool_init_parameters">thread_pool_init_parameters</a>, <a class="reference internal" href="../../api.html#_CPPv43hpx" title="hpx">hpx</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threadsE" title="hpx::threads">threads</a>::<a class="reference internal" href="../../api.html#_CPPv4N3hpx7threads8policiesE" title="hpx::threads::policies">policies</a>::thread_queue_init_parameters<span class="sig-paren">)</span>&gt;<a class="headerlink" href="#_CPPv4N3hpx8resource18scheduler_functionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Enums</p>
+<dl class="enum">
+<dt id="_CPPv4N3hpx8resource16partitioner_modeE">
+<span id="_CPPv3N3hpx8resource16partitioner_modeE"></span><span id="_CPPv2N3hpx8resource16partitioner_modeE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a6f61180f54b5c833bf76bf7651ee5e17"></span><em class="property">enum </em><code class="sig-name descname">partitioner_mode</code><a class="headerlink" href="#_CPPv4N3hpx8resource16partitioner_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This enumeration describes the modes available when creating a resource partitioner. </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource12mode_defaultE">
+<span id="_CPPv3N3hpx8resource12mode_defaultE"></span><span id="_CPPv2N3hpx8resource12mode_defaultE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a6f61180f54b5c833bf76bf7651ee5e17aecd54760e4c2642805f16b31aad818e0"></span><code class="sig-name descname">mode_default</code> = 0<a class="headerlink" href="#_CPPv4N3hpx8resource12mode_defaultE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Default mode. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource27mode_allow_oversubscriptionE">
+<span id="_CPPv3N3hpx8resource27mode_allow_oversubscriptionE"></span><span id="_CPPv2N3hpx8resource27mode_allow_oversubscriptionE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a6f61180f54b5c833bf76bf7651ee5e17a7a903af8bec1ef0cdd0978b8af71f352"></span><code class="sig-name descname">mode_allow_oversubscription</code> = 1<a class="headerlink" href="#_CPPv4N3hpx8resource27mode_allow_oversubscriptionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Allow processing units to be oversubscribed, i.e. multiple worker threads to share a single processing unit. </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource24mode_allow_dynamic_poolsE">
+<span id="_CPPv3N3hpx8resource24mode_allow_dynamic_poolsE"></span><span id="_CPPv2N3hpx8resource24mode_allow_dynamic_poolsE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a6f61180f54b5c833bf76bf7651ee5e17a390b02a8c5b07d6293b844fa8f459431"></span><code class="sig-name descname">mode_allow_dynamic_pools</code> = 2<a class="headerlink" href="#_CPPv4N3hpx8resource24mode_allow_dynamic_poolsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Allow worker threads to be added and removed from thread pools. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="enum">
+<dt id="_CPPv4N3hpx8resource17scheduling_policyE">
+<span id="_CPPv3N3hpx8resource17scheduling_policyE"></span><span id="_CPPv2N3hpx8resource17scheduling_policyE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50"></span><em class="property">enum </em><code class="sig-name descname">scheduling_policy</code><a class="headerlink" href="#_CPPv4N3hpx8resource17scheduling_policyE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This enumeration lists the available scheduling policies (or schedulers) when creating thread pools. </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource12user_definedE">
+<span id="_CPPv3N3hpx8resource12user_definedE"></span><span id="_CPPv2N3hpx8resource12user_definedE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50ae7f5e4f7ce2920a53215324d5eb19a20"></span><code class="sig-name descname">user_defined</code> = -2<a class="headerlink" href="#_CPPv4N3hpx8resource12user_definedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource11unspecifiedE">
+<span id="_CPPv3N3hpx8resource11unspecifiedE"></span><span id="_CPPv2N3hpx8resource11unspecifiedE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50aaaa1db2d00638fe119ab1108290efbaa"></span><code class="sig-name descname">unspecified</code> = -1<a class="headerlink" href="#_CPPv4N3hpx8resource11unspecifiedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource5localE">
+<span id="_CPPv3N3hpx8resource5localE"></span><span id="_CPPv2N3hpx8resource5localE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50ab1576160f2dccb8e0e3ee8df403ab652"></span><code class="sig-name descname">local</code> = 0<a class="headerlink" href="#_CPPv4N3hpx8resource5localE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource19local_priority_fifoE">
+<span id="_CPPv3N3hpx8resource19local_priority_fifoE"></span><span id="_CPPv2N3hpx8resource19local_priority_fifoE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50a5091f42000a2c161ecca1298f3e3f981"></span><code class="sig-name descname">local_priority_fifo</code> = 1<a class="headerlink" href="#_CPPv4N3hpx8resource19local_priority_fifoE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource19local_priority_lifoE">
+<span id="_CPPv3N3hpx8resource19local_priority_lifoE"></span><span id="_CPPv2N3hpx8resource19local_priority_lifoE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50a61d5c91c74c4ab67be1921469e32923b"></span><code class="sig-name descname">local_priority_lifo</code> = 2<a class="headerlink" href="#_CPPv4N3hpx8resource19local_priority_lifoE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource7static_E">
+<span id="_CPPv3N3hpx8resource7static_E"></span><span id="_CPPv2N3hpx8resource7static_E"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50a7b8b21789851c7957beafdbfc9804773"></span><code class="sig-name descname">static_</code> = 3<a class="headerlink" href="#_CPPv4N3hpx8resource7static_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource15static_priorityE">
+<span id="_CPPv3N3hpx8resource15static_priorityE"></span><span id="_CPPv2N3hpx8resource15static_priorityE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50afdabcc9635bf8ac27c3d7810f3cc1d03"></span><code class="sig-name descname">static_priority</code> = 4<a class="headerlink" href="#_CPPv4N3hpx8resource15static_priorityE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource17abp_priority_fifoE">
+<span id="_CPPv3N3hpx8resource17abp_priority_fifoE"></span><span id="_CPPv2N3hpx8resource17abp_priority_fifoE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50a23d8e17519771e45c0b2200b687fcafa"></span><code class="sig-name descname">abp_priority_fifo</code> = 5<a class="headerlink" href="#_CPPv4N3hpx8resource17abp_priority_fifoE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource17abp_priority_lifoE">
+<span id="_CPPv3N3hpx8resource17abp_priority_lifoE"></span><span id="_CPPv2N3hpx8resource17abp_priority_lifoE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50a0fb77b319d1058d533412930cddce22a"></span><code class="sig-name descname">abp_priority_lifo</code> = 6<a class="headerlink" href="#_CPPv4N3hpx8resource17abp_priority_lifoE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv4N3hpx8resource15shared_priorityE">
+<span id="_CPPv3N3hpx8resource15shared_priorityE"></span><span id="_CPPv2N3hpx8resource15shared_priorityE"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a5a5a53174b67a94ce5249fa22f6d9b50a290e905215af96b8623f6083a65160da"></span><code class="sig-name descname">shared_priority</code> = 7<a class="headerlink" href="#_CPPv4N3hpx8resource15shared_priorityE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource15get_partitionerEv">
+<span id="_CPPv3N3hpx8resource15get_partitionerEv"></span><span id="_CPPv2N3hpx8resource15get_partitionerEv"></span><span id="hpx::resource::get_partitioner"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1af9f5edcd5a638906e9142b7ffbc297ce"></span>detail::partitioner &amp;<code class="sig-name descname">get_partitioner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource15get_partitionerEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>May be used anywhere in code and returns a reference to the single, global resource partitioner. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N3hpx8resource20is_partitioner_validEv">
+<span id="_CPPv3N3hpx8resource20is_partitioner_validEv"></span><span id="_CPPv2N3hpx8resource20is_partitioner_validEv"></span><span id="hpx::resource::is_partitioner_valid"></span><span class="target" id="hpx_2resource__partitioner_2partitioner__fwd_8hpp_1a074877fd09122474c614d3c58eefa606"></span>bool <code class="sig-name descname">is_partitioner_valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3hpx8resource20is_partitioner_validEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns true if the resource partitioner has been initialized. Returns false otherwise. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="include-compatibility-hpx-runtime-resource-partitioner-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/resource/partitioner.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-runtime-resource-partitioner-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="include-compatibility-hpx-runtime-resource-partitioner-fwd-hpp">
+<h2><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;compatibility/hpx/runtime/resource/partitioner_fwd.hpp&gt;</span></code><a class="headerlink" href="#include-compatibility-hpx-runtime-resource-partitioner-fwd-hpp" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <!-- Copyright (c) 2018 Mikael Simberg
+
+     Distributed under the Boost Software License, Version 1.0. (See accompanying
+     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) -->
+<!-- Make HPX inspect tool happy: hpxinspect:nounlinked -->
+
+<footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../checkpoint/api.html" class="btn btn-neutral float-right" title="checkpoint" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../timing/api.html" class="btn btn-neutral float-left" title="timing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, The STE||AR Group
+      
+        <span class="commit">
+          Revision <code>1e2a841</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+ 
+
+SPDX-License-Identifier: BSL-1.0
+Distributed under the Boost Software License, Version 1.0. (See accompanying file
+LICENSE_1_0.txt or copy at
+<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>)
+
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
