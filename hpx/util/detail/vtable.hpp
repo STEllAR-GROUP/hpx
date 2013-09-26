@@ -63,16 +63,15 @@ namespace hpx { namespace util { namespace detail {
                 reinterpret_cast<Functor*>(f)->~Functor();
             }
 
-            static void clone(void *const* src, void ** dest)
+            static void clone(void *const* f, void ** dest)
             {
-                new (dest) Functor(*reinterpret_cast<Functor const*>(src));
+                new (dest) Functor(*reinterpret_cast<Functor const*>(f));
             }
 
             static void copy(void *const* f, void ** dest)
             {
                 reinterpret_cast<Functor*>(dest)->~Functor();
-                *reinterpret_cast<Functor*>(dest) =
-                    *reinterpret_cast<Functor const *>(f);
+                new (dest) Functor(*reinterpret_cast<Functor const*>(f));
             }
         };
 
@@ -152,16 +151,15 @@ namespace hpx { namespace util { namespace detail {
                 (*reinterpret_cast<Functor**>(f))->~Functor();
             }
 
-            static void clone(void *const* src, void ** dest)
+            static void clone(void *const* f, void ** dest)
             {
-                *dest = new Functor(**reinterpret_cast<Functor *const*>(src));
+                *dest = new Functor(**reinterpret_cast<Functor *const*>(f));
             }
 
             static void copy(void *const* f, void ** dest)
             {
                 (*reinterpret_cast<Functor**>(dest))->~Functor();
-                **reinterpret_cast<Functor**>(dest) =
-                    **reinterpret_cast<Functor * const *>(f);
+                *dest = new Functor(**reinterpret_cast<Functor *const*>(f));
             }
         };
 

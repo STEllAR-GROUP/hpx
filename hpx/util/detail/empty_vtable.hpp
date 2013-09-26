@@ -32,7 +32,7 @@ namespace hpx { namespace util { namespace detail
 
         static void static_delete(void ** f) {}
         static void destruct(void ** f) {}
-        static void clone(void *const* src, void ** dest) {}
+        static void clone(void *const* f, void ** dest) {}
         static void copy(void *const* f, void ** dest) {}
 
         // we can safely return an int here as those function will never
