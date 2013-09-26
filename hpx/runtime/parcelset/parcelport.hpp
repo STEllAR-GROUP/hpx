@@ -165,6 +165,12 @@ namespace hpx { namespace parcelset
             return 0;
         }
 
+        /// Return the name of this locality 
+        virtual std::string get_locality_name() const
+        {
+            return "<unknown>";
+        }
+
         /// Register an event handler to be called whenever a parcel has been
         /// received.
         ///

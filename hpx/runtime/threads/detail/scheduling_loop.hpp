@@ -168,7 +168,7 @@ namespace hpx { namespace threads { namespace detail
         util::function_nonser<void()> const& cb = util::function_nonser<void()>())
     {
         util::itt::stack_context ctx;        // helper for itt support
-        util::itt::domain domain(get_thread_name()->data());
+        util::itt::domain domain(get_thread_name().data());
 //         util::itt::id threadid(domain, this);
         util::itt::frame_context fctx(domain);
 

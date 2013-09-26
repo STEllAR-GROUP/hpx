@@ -130,7 +130,7 @@ namespace hpx
         }
 
         /// \brief Return the name of the calling thread.
-        static std::string const* get_thread_name();
+        static std::string get_thread_name();
 
         /// \brief Return the system uptime measure on the thread executing this call
         static boost::uint64_t get_system_uptime();

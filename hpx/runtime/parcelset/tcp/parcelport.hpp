@@ -144,6 +144,9 @@ namespace hpx { namespace parcelset { namespace tcp
                 parcelset::parcelport::shared_from_this());
         }
 
+        /// Return the name of this locality 
+        std::string get_locality_name() const;
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,

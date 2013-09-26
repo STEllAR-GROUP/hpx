@@ -30,6 +30,7 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/host_name.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 
@@ -76,6 +77,12 @@ namespace hpx { namespace parcelset { namespace tcp
             acceptor_->close(ec);
             delete acceptor_;
         }
+    }
+
+    /// Return the name of this locality 
+    std::string parcelport::get_locality_name() const
+    {
+        return boost::asio::ip::host_name();
     }
 
     util::io_service_pool* parcelport::get_thread_pool(char const* name)

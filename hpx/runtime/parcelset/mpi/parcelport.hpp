@@ -116,6 +116,9 @@ namespace hpx { namespace parcelset { namespace mpi
         /// Make sure all pending requests are handled
         void do_background_work();
 
+        /// Return the name of this locality 
+        std::string get_locality_name() const;
+        
     private:
         /// support enable_shared_from_this
         boost::shared_ptr<parcelport> shared_from_this()

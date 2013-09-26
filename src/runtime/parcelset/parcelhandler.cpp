@@ -530,6 +530,16 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    std::string parcelhandler::get_locality_name() const
+    {
+        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        {
+            if (pp) return pp->get_locality_name();
+        }
+        return "<unknown>";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // Performance counter data
 
     // number of parcels sent

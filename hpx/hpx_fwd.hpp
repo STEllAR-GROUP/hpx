@@ -1158,8 +1158,8 @@ namespace hpx
     ///
     /// This function returns the name of the calling thread. This name uniquely
     /// identifies the thread in the context of HPX. If the function is called
-    /// while no HPX runtime system is active, it will return zero.
-    HPX_API_EXPORT std::string const* get_thread_name();
+    /// while no HPX runtime system is active, the result will be "<unknown>".
+    HPX_API_EXPORT std::string get_thread_name();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of worker OS- threads used to execute HPX
@@ -1196,15 +1196,32 @@ namespace hpx
     ///           hpx::exception.
     ///
     /// \see    \a hpx::get_colocation_id()
-    HPX_API_EXPORT naming::id_type get_colocation_id_sync(naming::id_type id,
-        error_code& ec = throws);
+    HPX_API_EXPORT naming::id_type get_colocation_id_sync(
+        naming::id_type const& id, error_code& ec = throws);
 
     /// \brief Asynchronously return the id of the locality where the object
     ///        referenced by the given id is currently located on
     ///
     /// \see    \a hpx::get_colocation_id_sync()
     HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id(
-        naming::id_type id);
+        naming::id_type const& id);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the name of the calling thread.
+    ///
+    /// This function returns the name of the calling thread. This name uniquely
+    /// identifies the thread in the context of HPX. If the function is called
+    /// while no HPX runtime system is active, it will return zero.
+    ///
+    /// \param id [in] The global id of the locality for which the name should
+    ///           be retrievd
+    ///
+    /// \returns  This function returns the name for the locality of the given 
+    ///           id. The name is retrieved from the underlying networking layer
+    ///           and may be different for different parcelports.
+    ///
+    HPX_API_EXPORT future<std::string> get_locality_name(
+        naming::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Trigger the LCO referenced by the given id

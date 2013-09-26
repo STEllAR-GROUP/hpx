@@ -290,32 +290,30 @@ namespace hpx { namespace naming
             return "invalid";
         return management_type_names[m + 1];
     }
+}}
 
+namespace hpx 
+{
     ///////////////////////////////////////////////////////////////////////////
-    inline naming::id_type get_colocation_id_sync(naming::id_type id, error_code& ec)
+    inline naming::id_type 
+    get_colocation_id_sync(naming::id_type const& id, error_code& ec)
     {
         // FIXME: Resolve the locality instead of deducing it from the target 
         //        GID, otherwise this will break once we start moving objects.
-        boost::uint32_t locality_id = get_locality_id_from_gid(id.get_gid());
-        return get_id_from_locality_id(locality_id);
+        boost::uint32_t locality_id = naming::get_locality_id_from_gid(id.get_gid());
+        return naming::get_id_from_locality_id(locality_id);
     }
 
-    inline lcos::future<naming::id_type> get_colocation_id(naming::id_type id)
+    inline lcos::future<naming::id_type> 
+    get_colocation_id(naming::id_type const& id)
     {
-        return lcos::make_ready_future(naming::get_colocation_id_sync(id, throws));
-    }
-}}
-
-namespace hpx
-{
-    naming::id_type get_colocation_id_sync(naming::id_type id, error_code& ec)
-    {
-        return naming::get_colocation_id(id).get(ec);
-    }
-
-    lcos::future<naming::id_type> get_colocation_id(naming::id_type id)
-    {
-        return naming::get_colocation_id(id);
+        return lcos::make_ready_future(get_colocation_id_sync(id, throws));
     }
 }
+
+namespace hpx { namespace naming
+{
+    using hpx::get_colocation_id_sync;
+    using hpx::get_colocation_id;
+}}
 
