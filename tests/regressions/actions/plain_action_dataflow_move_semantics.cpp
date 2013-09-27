@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2012 Hartmut Kaiser
+//  Copyright (c) 2011-2013 Hartmut Kaiser
 //  Copyright (c) 2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -218,7 +218,7 @@ int hpx_main(variables_map&)
                 pass_object_void<
                     pass_non_movable_object_void_action, non_movable_object
                 >()
-            ), 5u);
+            ), 3u);
 
             /* TODO: Make this compile
             HPX_TEST_EQ((
@@ -246,7 +246,7 @@ int hpx_main(variables_map&)
                 move_object_void<
                     pass_non_movable_object_void_action, non_movable_object
                 >()
-            ), 5u);
+            ), 3u);
 
             /* TODO: Make this compile
             HPX_TEST_EQ((
@@ -272,7 +272,7 @@ int hpx_main(variables_map&)
         // test for a non-movable object ('normal' actions)
         HPX_TEST_EQ((
             pass_object<pass_non_movable_object_action, non_movable_object>(id)
-        ), is_local ? 5u : 5u);
+        ), is_local ? 3u : 3u);
 
         /* TODO: Make this compile
         // test for a non-movable object (direct actions)
@@ -296,7 +296,7 @@ int hpx_main(variables_map&)
         // test for a non-movable object ('normal' actions)
         HPX_TEST_EQ((
             move_object<pass_non_movable_object_action, non_movable_object>(id)
-        ), is_local ? 5u : 5u);
+        ), is_local ? 3u : 3u);
 
         /* TODO: Make this compile
         // test for a non-movable object (direct actions)
@@ -353,7 +353,7 @@ int hpx_main(variables_map&)
                 return_non_movable_object_action, non_movable_object
             >(id)
         ),
-        is_local ? 11u : 10u);      // gcc V4.4 is special
+        is_local ? 11u : 13u);      // gcc V4.4 is special
 #else
         HPX_TEST_LTE((
             return_move_object<
