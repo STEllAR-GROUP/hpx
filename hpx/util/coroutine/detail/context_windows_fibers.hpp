@@ -60,13 +60,13 @@ namespace hpx { namespace util { namespace coroutines
       {
           LPVOID result = ConvertThreadToFiber(0);
           BOOST_ASSERT(0 != result);
-          (void)result;
+          HPX_UNUSED(result);
       }
       ~prepare_main_thread()
       {
           BOOL result = ConvertFiberToThread();
           BOOST_ASSERT(FALSE != result);
-          (void)result;
+          HPX_UNUSED(result);
       }
   };
 
@@ -145,7 +145,7 @@ namespace hpx { namespace util { namespace coroutines
 #endif
           BOOL result = ConvertFiberToThread();
           BOOST_ASSERT(result);
-          (void)result;
+          HPX_UNUSED(result);
           from.m_ctx = 0;
         } else {
           bool call_from_main = from.m_ctx == 0;

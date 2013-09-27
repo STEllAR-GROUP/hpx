@@ -207,7 +207,6 @@ if(HPX_NATIVE_MIC)
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
   hpx_add_config_define(HPX_NATIVE_MIC)
-  set(HPX_MALLOC "tbbmalloc")
 else()
   hpx_option(HPX_MAX_CPU_COUNT STRING
     "HPX applications will not use more than this amount of OS-threads (default: 64)."
@@ -545,14 +544,12 @@ find_package(HPX_APEX)
 ################################################################################
 # hwloc
 ################################################################################
-if(NOT HPX_DISABLE_HWLOC)
-  find_package(HPX_Hwloc)
-  if(HWLOC_FOUND)
-    hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
-    hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
-    hpx_add_config_define(HPX_HAVE_HWLOC)
-    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
-  endif()
+find_package(HPX_Hwloc)
+if(HWLOC_FOUND)
+  hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
+  hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
+  hpx_add_definitions(-DHPX_HAVE_HWLOC)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
 endif()
 
 ################################################################################
@@ -836,12 +833,17 @@ if(HPX_GOOGLE_PERFTOOLS)
   endif()
 endif()
 
-if(NOT HPX_MALLOC)
-  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-    set(HPX_MALLOC "TCMalloc")
+# On Linux, the system allocator has a bad performance for multi-threaded applications. We thus use tcmalloc by default.
+# If tcmalloc is not present, this will fail. It is intentional that overriding this default requires an explicit
+# "-DHPX_MALLOC=system"
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+  if(HPX_NATIVE_MIC)
+      set(HPX_MALLOC_DEFAULT "tbbmalloc")
   else()
-    set(HPX_MALLOC "system")
+    set(HPX_MALLOC_DEFAULT "TCMalloc")
   endif()
+else()
+  set(HPX_MALLOC_DEFAULT "system")
 endif()
 set(hpx_MALLOC_LIBRARY "")
 hpx_include(SetAllocator)
@@ -1445,6 +1447,8 @@ endif()
 
 if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
+  add_custom_target(git_docs COMMAND cmake -DHPX_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake)
+  add_dependencies(git_docs docs)
 endif()
 
 if(${BOOST_MINOR_VERSION} GREATER 50)

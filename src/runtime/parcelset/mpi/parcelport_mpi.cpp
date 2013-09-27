@@ -127,6 +127,12 @@ namespace hpx { namespace parcelset { namespace mpi
         io_service.post(HPX_STD_BIND(&parcelport::handle_messages, this->shared_from_this()));
     }
 
+    /// Return the name of this locality 
+    std::string parcelport::get_locality_name() const
+    {
+        return util::mpi_environment::get_processor_name();
+    }
+
     namespace detail
     {
         struct handling_messages

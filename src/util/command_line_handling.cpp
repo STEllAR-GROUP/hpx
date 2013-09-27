@@ -105,6 +105,21 @@ namespace hpx { namespace util
                 << "), the application might not run properly."
                 << std::endl;
         }
+
+        std::string convert_to_log_file(std::string const& dest)
+        {
+            if (dest.empty())
+                return "cout";
+
+            if (dest == "cout" || dest == "cerr" || dest == "console")
+                return dest;
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (dest == "android_log")
+                return dest;
+#endif
+            // everything else is assumed to be a file name
+            return "file(" + dest + ")";
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -472,7 +487,8 @@ namespace hpx { namespace util
             ini_config += "hpx.logging.console.destination=" +
                 vm["hpx:debug-hpx-log"].as<std::string>();
             ini_config += "hpx.logging.destination=" +
-                vm["hpx:debug-hpx-log"].as<std::string>();
+                detail::convert_to_log_file(
+                    vm["hpx:debug-hpx-log"].as<std::string>());
             ini_config += "hpx.logging.console.level=5";
             ini_config += "hpx.logging.level=5";
         }
@@ -481,7 +497,8 @@ namespace hpx { namespace util
             ini_config += "hpx.logging.console.agas.destination=" +
                 vm["hpx:debug-agas-log"].as<std::string>();
             ini_config += "hpx.logging.agas.destination=" +
-                vm["hpx:debug-agas-log"].as<std::string>();
+                detail::convert_to_log_file(
+                    vm["hpx:debug-hpx-log"].as<std::string>());
             ini_config += "hpx.logging.console.agas.level=5";
             ini_config += "hpx.logging.agas.level=5";
         }
@@ -775,7 +792,6 @@ namespace hpx { namespace util
                 threads::print_affinity_options(std::cout, num_threads_,
                     affinity_desc);
             }
-            return 1;
         }
 #endif
 

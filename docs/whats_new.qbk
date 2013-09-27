@@ -16,12 +16,31 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 891] - The documentation for get_locality_name is wrong
+* [issue 890] - `--hpx:print-bind` should not exit
+* [issue 889] - `--hpx:debug-hpx-log=FILE` does not work
+* [issue 885] - Two threads are slower than one 
+* [issue 883] - Need help with is_callable_test
+* [issue 881] - tests/regressions/block_matrix/matrix.hh won't compile with GCC
+				4.8.1 
+* [issue 878] - `future::unwrap` triggers assertion
+* [issue 877] - "make tests" has build errors on Ubuntu 12.10 
+* [issue 876] - tcmalloc is used by default, even if it is not present
+* [issue 875] - global_fixture is defined in a header file
+* [issue 873] - Add block-matrix code as regression test
+* [issue 872] - HPX documentation does not say how to run tests with detailed
+				output
+* [issue 871] - All tests fail with "make test"
+* [issue 870] - Please explicitly disable serialization in classes that don't
+				support it
+* [issue 867] - Reduce the number of copies of hpx::function arguments
 * [issue 863] - Futures should not require a default constructor
 * [issue 862] - value_or_error shall not default construct its result
 * [issue 859] - hpx::endl should flush
 * [issue 858] - Create hpx::get_ptr<>() allowing to access component implementation
 * [issue 854] - hpx/hpx.hpp does not include hpx/include/iostreams.hpp
 * [issue 853] - Feature request: null future
+* [issue 852] - Feature request: Locality names
 * [issue 851] - hpx::cout output does not appear on screen
 * [issue 848] - Update OS X build instructions
 * [issue 846] - Update hpx_external_example

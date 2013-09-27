@@ -108,7 +108,7 @@ namespace boost { namespace container { namespace container_detail
             }
             //This function should never called with a count different to zero
             BOOST_ASSERT(new_count == 0);
-            (void)new_count;
+            HPX_UNUSED(new_count);
         }
 
     private:

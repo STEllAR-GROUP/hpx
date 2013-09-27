@@ -23,6 +23,9 @@ namespace hpx { namespace util {
 
         static int rank();
         static int size();
+
+        static std::string get_processor_name();
+
     private:
         static bool enabled_;
     };

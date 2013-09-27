@@ -387,17 +387,13 @@ namespace hpx
             strm << thread_prefix << *shepherd;
             thread_info = true;
         }
-        std::string const* thread_name = runtime::get_thread_name();
-        if (thread_name) {
-            if (!thread_info)
-                strm << thread_prefix;
-            else
-                strm << ", ";
-            strm << *thread_name;
-            thread_info = true;
-        }
-        if (thread_info)
-            strm << "\n";
+
+        std::string thread_name = runtime::get_thread_name();
+        if (!thread_info)
+            strm << thread_prefix;
+        else
+            strm << ", ";
+        strm << thread_name << "\n";
 
         std::size_t const* thread_id =
             boost::get_error_info<hpx::detail::throw_thread_id>(e);

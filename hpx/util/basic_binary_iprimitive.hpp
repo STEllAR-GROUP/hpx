@@ -45,6 +45,7 @@
 
 #include <hpx/util/binary_filter.hpp>
 #include <hpx/util/ichunk_manager.hpp>
+#include <hpx/util/unused.hpp>
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
@@ -118,7 +119,7 @@ namespace hpx { namespace util
             load_binary(&t, sizeof(t));
             int i = t;
             BOOST_ASSERT(0 == i || 1 == i);
-            (void)i;    // warning suppression for release builds.
+            HPX_UNUSED(i);    // warning suppression for release builds.
         }
 
         void load(std::string& s)

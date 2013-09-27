@@ -28,6 +28,7 @@ get_worker_thread_num                 "" "hpx\.get_worker_thread_num.*"
 get_locality_id                       "" "hpx\.get_locality_id.*"
 is_running                            "" "hpx\.is_running.*"
 get_thread_name                       "" "hpx\.get_thread_name.*"
+get_locality_name                     "" "hpx\.get_locality_name.*"
 get_num_worker_threads                "" "hpx\.get_num_worker_threads.*"
 get_system_uptime                     "" "hpx\.get_system_uptime.*"
 get_colocation_id                     "" "hpx\.get_colocation_id.*"
@@ -43,6 +44,9 @@ evaluate_active_counters              "" "hpx\.evaluate_active_counters.*"
 
 # hpx/runtime/components/new.hpp
 new_                                  "" "hpx\.components\.new_.*"
+
+# hpx/runtime/components/copy_component.hpp
+copy                                  "" "hpx\.components\.copy.*"
 
 # hpx/exception.hpp
 HPX_THROW_EXCEPTION                   "" "HPX_THROW_EXCEPTION"

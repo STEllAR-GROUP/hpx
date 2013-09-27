@@ -243,7 +243,7 @@ namespace hpx { namespace threads { namespace policies
 
                     --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) ? true : false;
-                    (void)deleted;
+                    HPX_UNUSED(deleted);
                     BOOST_ASSERT(deleted);
                 }
             }

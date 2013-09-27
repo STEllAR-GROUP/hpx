@@ -60,8 +60,9 @@ namespace hpx { namespace components
     /// component instance.
     ///
     /// \param to_copy         [in] The global id of the component to copy
-    /// \param target_locality [in, optional] The locality to create the copy 
-    ///                        to (default is same locality as source).
+    /// \param target_locality [in, optional] The locality where the copy 
+    ///                        should be created (default is same locality 
+    ///                        as source).
     ///
     /// \tparam  The only template argument specifies the component type to 
     ///          create.
@@ -74,9 +75,13 @@ namespace hpx { namespace components
     ///       component instance which is to be copied.
     ///
     template <typename Component>
+#if defined(DOXYGEN)
+    future<naming::id_type>
+#else
     inline typename boost::enable_if<
-        traits::is_component<Component>, lcos::future<naming::id_type>
+        traits::is_component<Component>, future<naming::id_type>
     >::type 
+#endif
     copy(naming::id_type const& to_copy,
         naming::id_type const& target_locality = naming::invalid_id)
     {

@@ -490,9 +490,10 @@ namespace hpx
         runtime::runtime_.reset();
     }
 
-    std::string const* runtime::get_thread_name()
+    std::string runtime::get_thread_name()
     {
-        return runtime::thread_name_.get();
+        std::string const* str = runtime::thread_name_.get();
+        return str ? *str : "<unknown>";
     }
 
     boost::uint64_t runtime::get_system_uptime()
@@ -1204,7 +1205,7 @@ namespace hpx
         return agas::get_locality_id(ec);
     }
 
-    std::string const* get_thread_name()
+    std::string get_thread_name()
     {
         return runtime::get_thread_name();
     }

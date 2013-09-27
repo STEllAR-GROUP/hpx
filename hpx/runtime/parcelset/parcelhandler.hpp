@@ -342,6 +342,10 @@ namespace hpx { namespace parcelset
             return find_parcelport(connection_tcpip)->here();
         }
 
+        /// Return the name of this locality as retrieved from the 
+        /// active parcel port.
+        std::string get_locality_name() const;
+
         ///////////////////////////////////////////////////////////////////////
         /// The function register_counter_types() is called during startup to
         /// allow the registration of all performance counter types for this

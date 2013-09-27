@@ -192,6 +192,8 @@ CMake docs or execute `cmake --help-variable VARIABLE_NAME`.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_variables HPX specific CMake Variables]
 
+[section:cmake_frequently_used Frequently used HPX specific CMake Variables]
+
 Here are listed the most frequently used CMake variables specific to __hpx__,
 along with a brief explanation.
 
@@ -246,6 +248,10 @@ along with a brief explanation.
     ]
 ]
 
+[endsect]
+
+[section:cmake_hpx_malloc Setting the memory Allocator]
+
 The following list is about the default memory allocator used by __hpx__. We currently
 support the regular system allocator, tcmalloc, jemalloc and tbbmalloc. The allocator is
 crucial in getting an application to scale with __hpx__. The default system allocator
@@ -270,28 +276,9 @@ Blocks.
      [Specifies where to look at for tbb. tbbmalloc is part of tbb]]
 ]
 
-Here is a list of options controlling the parcelports available for all applications built
-with __hpx__.
+[endsect]
 
-[variablelist Enable HPX Parcelports
-    [[`HPX_HAVE_PARCELPORT_SHMEM:BOOL`]
-     [Enable parcelport based on shared memory. This is only available if you use a boost
-     version greater than 1.51 (default: OFF)]
-    ]
-    [[`HPX_HAVE_PARCELPORT_IBVERBS:BOOL`]
-     [Enable parcelport based on rdma ibverbs operations. We use rdmacm to establish our
-     connections. In order use the parcelport, please set `IBVERBS_ROOT` and `RDMACM_ROOT`
-     to point to the appropriate locations of your ofed stack. (default: OFF)]
-    ]
-    [[`HPX_HAVE_PARCELPORT_MPI:BOOL`]
-     [Enable parcelport based on MPI. Please set `MPI_CXX_COMPILER` and `MPI_C_COMPILER`
-      to point to the correct location of your MPI compiler wrappers (default: OFF)]
-    ]
-    [[`HPX_PARCELPORT_MPI_ENV:LIST`]
-     [Additional environment variable names for automatic MPI detection. By default HPX
-     checks for PMI_RANK (Intel MPI and MVAPICH2) and OMPI_COMM_WORLD_SIZE (OpenMPI)]
-    ]
-]
+[section:cmake_threading Variables concerning Thread Scheduling Policies]
 
 Here is a list of options controlling the scheduling policies available for
 all applications built with __hpx__. For more information about the
@@ -317,6 +304,50 @@ avalable scheduling policies see the section __scheduling__.
      [Enable periodic priority scheduling policy (default: `OFF`)]
     ]
 ]
+
+[endsect]
+
+[section:cmake_parcelports Variables concerning Parcelports]
+
+Here is a list of options controlling the parcelports available for all applications built
+with __hpx__.
+
+[variablelist Enable HPX Parcelports
+    [[`HPX_HAVE_PARCELPORT_SHMEM:BOOL`]
+     [Enable parcelport based on shared memory. This is only available if you use a boost
+     version greater than 1.51 (default: OFF)]
+    ]
+    [[`HPX_HAVE_PARCELPORT_IBVERBS:BOOL`]
+     [Enable parcelport based on rdma ibverbs operations. We use rdmacm to establish our
+     connections. In order use the parcelport, please set `IBVERBS_ROOT` and `RDMACM_ROOT`
+     to point to the appropriate locations of your ofed stack. (default: OFF)]
+    ]
+    [[`HPX_HAVE_PARCELPORT_MPI:BOOL`]
+     [Enable parcelport based on MPI. Please set `MPI_CXX_COMPILER` and `MPI_C_COMPILER`
+      to point to the correct location of your MPI compiler wrappers (default: OFF)]
+    ]
+    [[`HPX_PARCELPORT_MPI_ENV:LIST`]
+     [Additional environment variable names for automatic MPI detection. By default HPX
+     checks for PMI_RANK (Intel MPI and MVAPICH2) and OMPI_COMM_WORLD_SIZE (OpenMPI)]
+    ]
+]
+
+[variablelist Search Paths for the ibverbs parcelport
+    [[`IBVERBS_ROOT`]
+     [Path to the root directory where the ibverbs libraries and headers can be found]
+    ]
+    [[`RDMACM_ROOT`]
+     [Path to the root directory where the rdmacm library and headers can be found]
+    ]
+]
+
+[variablelist Search Paths for the MPI parcelport
+    [[`MPI_CXX_COMPILER`]
+     [Path to the mpi C++ wrapper compiler script]
+    ]
+]
+
+[endsect]
 
 Here is a more complete list of CMake variables specific to __hpx__. These
 variables are used more seldom and are mainly useful for debugging purposes.
@@ -345,17 +376,6 @@ variables are used more seldom and are mainly useful for debugging purposes.
       partially preprocessed files that are part of __hpx__. The default value
       for this option is `OFF`. This option can be enabled only if the
       __boost_wave__ tool is available (see CMake variable `BOOSTWAVE` below).]
-    ]
-    [[`HPX_HAVE_PARCELPORT_SHMEM:BOOL`]
-     [Sets whether the experimental implementation of a parcelport communicating
-      over shared memory will be enabled or not. This variable is set to `OFF`
-      by default.]
-    ]
-    [[`HPX_HAVE_PARCELPORT_IBVERBS:BOOL`]
-     [Sets whether the experimental implementation of a parcelport communicating
-      over Infiniband will be enabled or not. This variable is set to `OFF`
-      by default. In order to use this option the IBVERBS and RDMACM libraries
-      must be found and configured by cmake.]
     ]
     [[`HPX_HAVE_COMPRESSION_ZLIB:BOOL`]
      [Sets whether support for compressing parcels using the __zlib__ library will
@@ -386,6 +406,8 @@ variables are used more seldom and are mainly useful for debugging purposes.
       invocations.]
     ]
 ]
+
+[section:cmake_additional_tools Additional Tools and Libraries used by HPX]
 
 Here is a list of additional libraries and tools which are either optionally
 supported by the build system or are optionally required for certain examples
@@ -442,6 +464,8 @@ directory for `BOOST`, specify `BOOST_ROOT=/custom/boost/root`.
       `HPX_HAVE_SECURITY`).]
     ]
 ]
+
+[endsect]
 
 [variablelist Additional Tools and Libraries Required by some of the Examples
     [[`HDF5_ROOT:PATH`]
