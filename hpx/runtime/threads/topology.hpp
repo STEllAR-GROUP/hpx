@@ -14,6 +14,7 @@
 #include <hpx/runtime/naming/address.hpp>
 
 #include <boost/thread.hpp>
+#include <boost/variant.hpp>
 #include <boost/dynamic_bitset.hpp>
 
 #include <string>
@@ -264,6 +265,9 @@ namespace hpx { namespace threads
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_thread_affinity_mask_from_lva(
             naming::address::address_type, error_code& ec = throws) const = 0;
+        
+        /// \brief Prints the \param m to os in a human readable form
+        virtual void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const = 0;
 
         /// \brief Reduce thread priority of the current thread.
         ///
@@ -282,6 +286,14 @@ namespace hpx { namespace threads
     namespace detail
     {
         typedef std::vector<boost::int64_t> bounds_type;
+
+        BOOST_SCOPED_ENUM_START(distribution_type)
+        {
+            compact  = 0x01,
+            scatter  = 0x02,
+            balanced = 0x04
+        };
+        BOOST_SCOPED_ENUM_END
 
         struct spec_type
         {
@@ -331,7 +343,8 @@ namespace hpx { namespace threads
 
         typedef std::vector<spec_type> mapping_type;
         typedef std::pair<spec_type, mapping_type> full_mapping_type;
-        typedef std::vector<full_mapping_type> mappings_type;
+        typedef std::vector<full_mapping_type> mappings_spec_type;
+        typedef boost::variant<distribution_type, mappings_spec_type> mappings_type;
 
         HPX_API_EXPORT bounds_type extract_bounds(spec_type& m,
             std::size_t default_last, error_code& ec);

@@ -391,7 +391,7 @@ namespace hpx { namespace threads
         if (std::size_t(-1) == num_thread)
             return std::size_t(-1);
 
-        std::size_t num_pu = num_thread % num_of_pus_;
+        std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
 
         {
             hwloc_obj_t obj;
@@ -488,6 +488,21 @@ namespace hpx { namespace threads
 
         return count;
     } // }}}
+
+    std::size_t hwloc_topology::get_number_of_sockets() const
+    {
+        return socket_numbers_.size();
+    }
+
+    std::size_t hwloc_topology::get_number_of_numa_nodes() const
+    {
+        return numa_node_numbers_.size();
+    }
+
+    std::size_t hwloc_topology::get_number_of_cores() const
+    {
+        return core_numbers_.size();
+    }
 
     std::size_t hwloc_topology::get_number_of_socket_pus(
         std::size_t num_socket
@@ -592,6 +607,41 @@ namespace hpx { namespace threads
         }
 
         return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE));
+    }
+
+    void hwloc_topology::print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const
+    {
+        std::size_t idx = find_first(m);
+        hwloc_obj_t obj;
+        
+        for(std::size_t i = 0; i < hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU); ++i)
+        {
+            obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU, i);
+            // on Windows os_index is always -1
+            if (obj->os_index != ~0x0u)
+            {
+                if(obj->os_index == idx) break;
+            }
+            else
+            {
+                if(obj->logical_index == idx) break;
+            }
+        }
+
+        os << num_thread << ": " << std::setfill(' ');
+    
+        char obj_string[1000] = {0};
+        os << "PU L#" << obj->logical_index << "(P#" << obj->os_index << ")";
+
+        while(obj->parent)
+        {
+            char parent_obj_string[1000] = {0};
+            hwloc_obj_snprintf(parent_obj_string, sizeof(parent_obj_string), topo, obj->parent, "#", 0);
+            os << " " << parent_obj_string;
+            obj = obj->parent;
+        }
+
+        os << std::endl;
     }
 
     mask_type hwloc_topology::init_machine_affinity_mask() const
@@ -713,7 +763,7 @@ namespace hpx { namespace threads
             return get_core_affinity_mask(num_thread, false);
         }
 
-        std::size_t num_pu = num_thread % num_of_pus_;
+        std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
 
         hwloc_obj_t obj;
 
@@ -732,6 +782,36 @@ namespace hpx { namespace threads
         resize(mask, hardware_concurrency());
 
         set(mask, obj->os_index); //-V106
+
+        return mask;
+    } // }}}
+
+    mask_type hwloc_topology::init_thread_affinity_mask(
+        std::size_t num_core,
+        std::size_t num_pu
+        ) const
+    { // {{{
+        hwloc_obj_t obj;
+
+        {
+            scoped_lock lk(topo_mtx);
+            std::size_t num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+            num_core = (num_core + core_offset) % num_cores;
+            obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_CORE,
+                    static_cast<unsigned>(num_core));
+        }
+
+        if (!obj)
+        {
+            return empty_mask;//get_core_affinity_mask(num_thread, false);
+        }
+
+        num_pu = num_pu % obj->arity;
+
+        mask_type mask = mask_type();
+        resize(mask, hardware_concurrency());
+
+        set(mask, obj->children[num_pu]->os_index); //-V106
 
         return mask;
     } // }}}

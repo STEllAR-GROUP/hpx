@@ -120,6 +120,9 @@ public:
 
         return empty_mask;
     }
+        
+    void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const
+    {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
