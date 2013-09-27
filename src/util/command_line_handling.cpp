@@ -299,7 +299,7 @@ namespace hpx { namespace util
             num_localities_ = localities;
         }
 
-        bool run_agas_server = vm.count("hpx:run-agas-server") ? true : false;
+        bool run_agas_server = vm.count("hpx:run-agas-server");
         if (node == std::size_t(-1))
             node = env.retrieve_node_number();
 
@@ -418,13 +418,13 @@ namespace hpx { namespace util
             // and no additional option (--hpx:agas or --hpx:node) has been
             // specified. That simplifies running small standalone
             // applications on one locality.
-            run_agas_server = (mode_ != runtime_mode_connect) ? true : false;
+            run_agas_server = mode_ != runtime_mode_connect;
         }
 
         if (hpx_host == agas_host && hpx_port == agas_port) {
             // we assume that we need to run the agas server if the user
             // asked for the same network addresses for HPX and AGAS
-            run_agas_server = (mode_ != runtime_mode_connect) ? true : false;
+            run_agas_server = mode_ != runtime_mode_connect;
         }
         else if (run_agas_server) {
             // otherwise, if the user instructed us to run the AGAS server,
