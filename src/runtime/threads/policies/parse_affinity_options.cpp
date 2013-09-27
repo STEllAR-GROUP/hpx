@@ -524,13 +524,9 @@ namespace hpx { namespace threads { namespace detail
             ec = make_success_code();
     }
 
-    void decode_mappings(full_mapping_type& m,
+    void decode_mappings(hwloc_topology const& t, full_mapping_type& m,
         std::vector<mask_type>& affinities, error_code& ec)
     {
-        // We need to instantiate a new topology object as the runtime has not
-        // been initialized yet
-        hwloc_topology t;
-
         // repeat for each of the threads in the affinity specification
         std::size_t size = affinities.size();
         bounds_type b = extract_bounds(m.first, size, ec);
@@ -565,12 +561,9 @@ namespace hpx { namespace threads { namespace detail
         }
     }
     
-    void decode_compact_distribution(std::vector<mask_type>& affinities, error_code& ec)
+    void decode_compact_distribution(hwloc_topology& t,
+        std::vector<mask_type>& affinities, error_code& ec)
     {
-        // We need to instantiate a new topology object as the runtime has not
-        // been initialized yet
-        hwloc_topology t;
-
         std::size_t num_threads = affinities.size();
         for(std::size_t i = 0; i != num_threads; ++i)
         {
@@ -585,11 +578,9 @@ namespace hpx { namespace threads { namespace detail
         }
     }
     
-    void decode_scatter_distribution(std::vector<mask_type>& affinities, error_code& ec)
+    void decode_scatter_distribution(hwloc_topology& t,
+        std::vector<mask_type>& affinities, error_code& ec)
     {
-        // We need to instantiate a new topology object as the runtime has not
-        // been initialized yet
-        hwloc_topology t;
         std::size_t num_threads = affinities.size();
         std::vector<std::size_t> num_pus(t.get_number_of_cores(), 0);
         std::size_t num_pu = 0;
@@ -612,11 +603,9 @@ namespace hpx { namespace threads { namespace detail
         }
     }
     
-    void decode_balanced_distribution(std::vector<mask_type>& affinities, error_code& ec)
+    void decode_balanced_distribution(hwloc_topology& t, 
+        std::vector<mask_type>& affinities, error_code& ec)
     {
-        // We need to instantiate a new topology object as the runtime has not
-        // been initialized yet
-        hwloc_topology t;
         std::size_t num_threads = affinities.size();
         for(std::size_t i = 0; i != num_threads; ++i)
         {
@@ -632,26 +621,25 @@ namespace hpx { namespace threads { namespace detail
     }
 
 
-    void decode_distribution(distribution_type d,
+    void decode_distribution(distribution_type d, hwloc_topology& t,
         std::vector<mask_type>& affinities, error_code& ec)
     {
-        if (d == distribution_type::compact)
-        {
-            decode_compact_distribution(affinities, ec);
-            if (ec) return;
-        }
-        else if (d == distribution_type::scatter)
-        {
-            decode_scatter_distribution(affinities, ec);
-            if (ec) return;
-        }
-        else if (d == distribution_type::balanced)
-        {
-            decode_balanced_distribution(affinities, ec);
-            if (ec) return;
-        }
-        else
+        switch (d) {
+        case distribution_type::compact:
+            decode_compact_distribution(t, affinities, ec);
+            break;
+
+        case distribution_type::scatter:
+            decode_scatter_distribution(t, affinities, ec);
+            break;
+
+        case distribution_type::balanced:
+            decode_balanced_distribution(t, affinities, ec);
+            break;
+
+        default:
             BOOST_ASSERT(false);
+        }
     }
 }}}
 
@@ -663,56 +651,61 @@ namespace hpx { namespace threads
     {
         detail::mappings_type mappings;
         detail::parse_mappings(spec, mappings, ec);
-        if (!ec) {
-            switch (mappings.which())
+        if (ec) return;
+
+        // We need to instantiate a new topology object as the runtime has not
+        // been initialized yet
+        hwloc_topology t;
+
+        switch (mappings.which())
+        {
+        case 0:
             {
-            case 0:
+                detail::decode_distribution(
+                    boost::get<detail::distribution_type>(mappings),
+                    t, affinities, ec);
+                if (ec) return;
+            }
+            break;
+        case 1:
+            {
+//                    std::cout << "got mappings " << spec << " ...\n";
+                detail::mappings_spec_type mappings_specs(
+                    boost::get<detail::mappings_spec_type>(mappings));
+
+                BOOST_FOREACH(detail::full_mapping_type& m, mappings_specs)
                 {
-                    detail::decode_distribution(
-                        boost::get<detail::distribution_type>(mappings)
-                      , affinities
-                      , ec);
+                    if (m.first.type_ != detail::spec_type::thread)
+                    {
+                        HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                            boost::str(boost::format("bind specification (%1%) is "
+                                "ill formatted") % spec));
+                        return;
+                    }
+
+                    if (m.second.size() != 3)
+                    {
+                        HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                            boost::str(boost::format("bind specification (%1%) is "
+                                "ill formatted") % spec));
+                        return;
+                    }
+
+                    if (m.second[0].type_ == detail::spec_type::unknown &&
+                        m.second[1].type_ == detail::spec_type::unknown &&
+                        m.second[2].type_ == detail::spec_type::unknown)
+                    {
+                        HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                            boost::str(boost::format("bind specification (%1%) is "
+                                "ill formatted") % spec));
+                        return;
+                    }
+
+                    detail::decode_mappings(t, m, affinities, ec);
                     if (ec) return;
                 }
-                break;
-            case 1:
-                {
-                    std::cout << "got mappings " << spec << " ...\n";
-                    detail::mappings_spec_type mappings_specs(boost::get<detail::mappings_spec_type>(mappings));
-                    BOOST_FOREACH(detail::full_mapping_type& m, mappings_specs)
-                    {
-                        if (m.first.type_ != detail::spec_type::thread)
-                        {
-                            HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
-                                boost::str(boost::format("bind specification (%1%) is "
-                                    "ill formatted") % spec));
-                            return;
-                        }
-
-                        if (m.second.size() != 3)
-                        {
-                            HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
-                                boost::str(boost::format("bind specification (%1%) is "
-                                    "ill formatted") % spec));
-                            return;
-                        }
-
-                        if (m.second[0].type_ == detail::spec_type::unknown &&
-                            m.second[1].type_ == detail::spec_type::unknown &&
-                            m.second[2].type_ == detail::spec_type::unknown)
-                        {
-                            HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
-                                boost::str(boost::format("bind specification (%1%) is "
-                                    "ill formatted") % spec));
-                            return;
-                        }
-
-                        detail::decode_mappings(m, affinities, ec);
-                        if (ec) return;
-                    }
-                }
-                break;
             }
+            break;
         }
     }
 
