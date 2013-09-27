@@ -142,14 +142,14 @@ public:
     void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const
     {
     }
+
+    struct noop_topology_tag {};
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 inline topology& create_topology()
 {
-    struct noop_topology_tag {};
-
-    util::static_<noop_topology, noop_topology_tag> topo;
+    util::static_<noop_topology, noop_topology::noop_topology_tag> topo;
     return topo.get();
 }
 

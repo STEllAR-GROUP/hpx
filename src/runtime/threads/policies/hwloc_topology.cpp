@@ -370,7 +370,7 @@ namespace hpx { namespace threads
 //                 hwloc_bitmap_free(nodeset);
 // 
 //                 mask_type mask = mask_type();
-//                 resize(mask, hardware_concurrency());
+//                 resize(mask, get_number_of_pus());
 // 
 //                 for (unsigned int i = 0; i != num_of_pus_; ++i)
 //                 {
@@ -669,7 +669,7 @@ namespace hpx { namespace threads
     mask_type hwloc_topology::init_machine_affinity_mask() const
     { // {{{
         mask_type machine_affinity_mask = mask_type();
-        resize(machine_affinity_mask, hardware_concurrency());
+        resize(machine_affinity_mask, get_number_of_pus());
 
         hwloc_obj_t machine_obj;
         {
@@ -708,7 +708,7 @@ namespace hpx { namespace threads
         if (socket_obj)
         {
             mask_type socket_affinity_mask = mask_type();
-            resize(socket_affinity_mask, hardware_concurrency());
+            resize(socket_affinity_mask, get_number_of_pus());
 
             extract_node_mask(socket_obj, socket_affinity_mask);
             return socket_affinity_mask;
@@ -739,7 +739,7 @@ namespace hpx { namespace threads
         if (numa_node_obj)
         {
             mask_type node_affinity_mask = mask_type();
-            resize(node_affinity_mask, hardware_concurrency());
+            resize(node_affinity_mask, get_number_of_pus());
 
             extract_node_mask(numa_node_obj, node_affinity_mask);
             return node_affinity_mask;
@@ -766,7 +766,7 @@ namespace hpx { namespace threads
         if (core_obj)
         {
             mask_type core_affinity_mask = mask_type();
-            resize(core_affinity_mask, hardware_concurrency());
+            resize(core_affinity_mask, get_number_of_pus());
 
             extract_node_mask(core_obj, core_affinity_mask);
             return core_affinity_mask;
@@ -801,7 +801,7 @@ namespace hpx { namespace threads
         }
 
         mask_type mask = mask_type();
-        resize(mask, hardware_concurrency());
+        resize(mask, get_number_of_pus());
 
         set(mask, obj->os_index); //-V106
 
@@ -831,7 +831,7 @@ namespace hpx { namespace threads
         num_pu = num_pu % obj->arity;
 
         mask_type mask = mask_type();
-        resize(mask, hardware_concurrency());
+        resize(mask, get_number_of_pus());
 
         set(mask, obj->children[num_pu]->os_index); //-V106
 
@@ -851,7 +851,7 @@ namespace hpx { namespace threads
         }
     }
 
-    std::size_t hwloc_topology::hardware_concurrency() const
+    std::size_t hwloc_topology::get_number_of_pus() const
     {
         return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU));
     }

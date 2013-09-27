@@ -37,7 +37,7 @@ namespace hpx { namespace threads { namespace detail
     std::size_t hwloc_hardware_concurrency()
     {
         threads::topology& top = threads::create_topology();
-        return top.hardware_concurrency();
+        return top.get_number_of_pus();
     }
 }}}
 #endif

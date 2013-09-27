@@ -124,6 +124,8 @@ namespace hpx { namespace threads
 
         void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const;
 
+        struct hwloc_topology_tag {};
+
     private:
         static mask_type empty_mask;
 
@@ -209,9 +211,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     inline hwloc_topology& create_topology()
     {
-        struct hw_topology_tag {};
-
-        util::static_<hwloc_topology, hw_topology_tag> topo;
+        util::static_<hwloc_topology, hwloc_topology::hwloc_topology_tag> topo;
         return topo.get();
     }
 }}
