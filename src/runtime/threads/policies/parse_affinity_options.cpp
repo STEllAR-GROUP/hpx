@@ -106,9 +106,9 @@ namespace hpx { namespace threads { namespace detail
             mapping =  thread_spec >> '=' >> pu_spec;
 
             distribution =
-                    (partlit("compact") >> qi::attr(distribution_type::compact))
-                |   (partlit("scatter") >> qi::attr(distribution_type::scatter))
-                |   (partlit("balanced") >> qi::attr(distribution_type::scatter))
+                    (partlit("compact") >> qi::attr(compact))
+                |   (partlit("scatter") >> qi::attr(scatter))
+                |   (partlit("balanced") >> qi::attr(balanced))
                 ;
 
             thread_spec =
@@ -625,15 +625,15 @@ namespace hpx { namespace threads { namespace detail
         std::vector<mask_type>& affinities, error_code& ec)
     {
         switch (d) {
-        case distribution_type::compact:
+        case compact:
             decode_compact_distribution(t, affinities, ec);
             break;
 
-        case distribution_type::scatter:
+        case scatter:
             decode_scatter_distribution(t, affinities, ec);
             break;
 
-        case distribution_type::balanced:
+        case balanced:
             decode_balanced_distribution(t, affinities, ec);
             break;
 
