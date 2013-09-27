@@ -670,7 +670,7 @@ namespace detail
 
         // run in a separate thread
         void apply(threads::thread_priority priority,
-            threads::thread_stacksize stacksize)
+            threads::thread_stacksize stacksize, error_code& ec)
         {
             check_started();
             future_base_type this_(this);

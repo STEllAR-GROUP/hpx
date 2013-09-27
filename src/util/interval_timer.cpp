@@ -181,18 +181,39 @@ namespace hpx { namespace util
     {
         using namespace hpx::threads;
 
+        error_code ec;
+
         // create a new suspended thread
-        id_ = hpx::applier::register_thread_plain(
+        threads::thread_id_type id = hpx::applier::register_thread_plain(
             boost::bind(&interval_timer::evaluate, this, _1),
             description_.c_str(), threads::suspended, true,
-            threads::thread_priority_critical);
+            threads::thread_priority_critical, std::size_t(-1),
+            threads::thread_stacksize_default, ec);
+
+        if (ec) {
+            is_terminated_ = true;
+            is_started_ = false;
+            return;
+        }
 
         // schedule this thread to be run after the given amount of seconds
-        threads::set_thread_state(id_,
+        threads::set_thread_state(id,
             boost::posix_time::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
-            threads::thread_priority_critical);
+            threads::thread_priority_critical, ec);
 
+        if (ec) {
+            is_terminated_ = true;
+            is_started_ = false;
+
+            // abort the newly created thread
+            threads::set_thread_state(id, threads::pending, threads::wait_abort,
+                threads::thread_priority_critical, ec);
+
+            return;
+        }
+
+        id_ = id;
         is_started_ = true;
     }
 }}

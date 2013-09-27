@@ -685,11 +685,9 @@ inline std::size_t get_number_of_bootstrap_connections(
 big_boot_barrier::big_boot_barrier(
     parcelset::parcelport& pp_
   , util::runtime_configuration const& ini_
-  , runtime_mode runtime_type_
 ):
     pp(pp_)
   , service_type(ini_.get_agas_service_mode())
-  , runtime_type(runtime_type_)
   , bootstrap_agas(ini_.get_agas_locality())
   , cond()
   , mtx()
@@ -783,7 +781,6 @@ struct bbb_tag;
 void create_big_boot_barrier(
     parcelset::parcelport& pp_
   , util::runtime_configuration const& ini_
-  , runtime_mode runtime_type_
 ) {
     util::reinitializable_static<boost::shared_ptr<big_boot_barrier>, bbb_tag> bbb;
     if (bbb.get())
@@ -792,7 +789,7 @@ void create_big_boot_barrier(
             "create_big_boot_barrier",
             "create_big_boot_barrier was called more than once");
     }
-    bbb.get().reset(new big_boot_barrier(pp_, ini_, runtime_type_));
+    bbb.get().reset(new big_boot_barrier(pp_, ini_));
 }
 
 void destroy_big_boot_barrier()

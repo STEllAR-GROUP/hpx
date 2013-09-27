@@ -16,6 +16,8 @@
 
 #include <boost/move/move.hpp>
 
+#include <boost/type_traits/add_const.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_FWD_ARGS(z, n, d)                                                 \
     BOOST_FWD_REF(BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 0, d), n))              \
@@ -115,6 +117,36 @@ namespace hpx { namespace util { namespace detail
         call(BOOST_FWD_REF(A) t)
         {
             return boost::move(t);
+        }
+    };
+    
+    ///////////////////////////////////////////////////////////////////////////
+    // See class.copy [12.8]/5
+    template <typename T, typename U = typename boost::add_const<T>::type>
+    struct copy_construct
+    {
+        template <typename A>
+        static T call(BOOST_FWD_REF(A) u)
+        {
+            return boost::forward<A>(u);
+        }
+    };
+
+    template <typename T, typename U>
+    struct copy_construct<T&, U&>
+    {
+        static T& call(U& u)
+        {
+            return u;
+        }
+    };
+
+    template <typename T, typename U>
+    struct copy_construct<BOOST_RV_REF(T), BOOST_RV_REF(U)>
+    {
+        static BOOST_RV_REF(T) call(U& u)
+        {
+            return boost::move(u);
         }
     };
 }}}

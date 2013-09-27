@@ -96,6 +96,13 @@ namespace hpx { namespace threads
             std::size_t num_core, mask_cref_type default_mask
             ) const;
         mask_type init_thread_affinity_mask(std::size_t num_thread) const;
+        mask_type init_thread_affinity_mask(std::size_t num_core, std::size_t num_pu) const;
+
+        ///////////////////////////////////////////////////////////////////////
+        std::size_t get_number_of_sockets() const;
+        std::size_t get_number_of_numa_nodes() const;
+        std::size_t get_number_of_cores() const;
+        std::size_t get_number_of_pus() const;
 
         ///////////////////////////////////////////////////////////////////////
         std::size_t get_number_of_socket_pus(
@@ -114,6 +121,10 @@ namespace hpx { namespace threads
         std::size_t get_number_of_numa_node_cores(
             std::size_t numa_node
             ) const;
+
+        void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const;
+
+        struct hwloc_topology_tag {};
 
     private:
         static mask_type empty_mask;
@@ -170,6 +181,16 @@ namespace hpx { namespace threads
         void init_num_of_pus();
 
         hwloc_topology_t topo;
+        // We need to define a constant pu offset.
+        // This is mainly to skip the first Core on the Xeon Phi
+        // which is reserved for OS related tasks
+#if !defined(HPX_NATIVE_MIC)
+        static const std::size_t pu_offset = 0;
+        static const std::size_t core_offset = 0;
+#else
+        static const std::size_t pu_offset = 4;
+        static const std::size_t core_offset = 1;
+#endif
 
         std::size_t num_of_pus_;
 
@@ -188,9 +209,10 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline topology* create_topology()
+    inline hwloc_topology& create_topology()
     {
-        return new hwloc_topology;
+        util::static_<hwloc_topology, hwloc_topology::hwloc_topology_tag> topo;
+        return topo.get();
     }
 }}
 

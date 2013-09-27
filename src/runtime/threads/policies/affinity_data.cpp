@@ -146,12 +146,6 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         // The resulting pu number has to be smaller than the available
         // number of processing units.
-#if !defined(HPX_NATIVE_MIC)
         return (num_pu + offset) % hardware_concurrency;
-#else
-        // the MIC pu numbers are rotated by one (thread 4 of the last core
-        // is pu 0)
-        return (num_pu + offset + 1) % hardware_concurrency;
-#endif
     }
 }}}}

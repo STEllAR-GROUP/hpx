@@ -213,7 +213,7 @@ addressing_service::addressing_service(
   , state_(starting)
   , locality_()
 { // {{{
-    create_big_boot_barrier(pp, ini_, runtime_type_);
+    create_big_boot_barrier(pp, ini_);
 
     if (caching_)
         gva_cache_->reserve(ini_.get_agas_local_cache_size());

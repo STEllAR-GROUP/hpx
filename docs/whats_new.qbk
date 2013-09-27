@@ -16,9 +16,15 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 897] - HWLOC causes failures on Mac
+* [issue 896] - pu-offset leads to startup error
+* [issue 895] - hpx::get_locality_name not defined
+* [issue 893] - `--hpx:print-bind` switches std::cout to hexadecimal mode
+* [issue 892] - hwloc_topology_load can be expensive -- don't call multiple times 
 * [issue 891] - The documentation for get_locality_name is wrong
 * [issue 890] - `--hpx:print-bind` should not exit
 * [issue 889] - `--hpx:debug-hpx-log=FILE` does not work
+* [issue 888] - MPI parcelport does not exit cleanly for --hpx:print-bind 
 * [issue 885] - Two threads are slower than one 
 * [issue 883] - Need help with is_callable_test
 * [issue 881] - tests/regressions/block_matrix/matrix.hh won't compile with GCC

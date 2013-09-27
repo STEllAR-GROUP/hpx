@@ -542,14 +542,18 @@ find_package(HPX_TAU)
 find_package(HPX_APEX)
 
 ################################################################################
-# hwloc
+# hwloc (don't use it on MacOS as it make runs fail and is useless anyways.)
 ################################################################################
-find_package(HPX_Hwloc)
-if(HWLOC_FOUND)
-  hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
-  hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
-  hpx_add_definitions(-DHPX_HAVE_HWLOC)
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
+if(NOT APPLE)
+  find_package(HPX_Hwloc)
+  if(HWLOC_FOUND)
+    hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
+    hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
+    hpx_add_definitions(-DHPX_HAVE_HWLOC)
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
+  endif()
+elseif(HWLOC_FOUND)
+  unset(HWLOC_FOUND)
 endif()
 
 ################################################################################

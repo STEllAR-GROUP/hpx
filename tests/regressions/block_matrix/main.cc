@@ -29,7 +29,7 @@ void output_hpx_info()
   int nthreads = hpx::get_num_worker_threads();
   std::cout << "There are " << nthreads << " threads overall" << std::endl;
   hpx::threads::thread_id_type self = hpx::threads::get_self_id();
-  std::string name = *hpx::get_thread_name();
+  std::string name = hpx::get_thread_name();
   std::cout << "   self=" << self << " name=" << name << std::endl;
   
   std::cout << std::endl;

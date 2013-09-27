@@ -531,8 +531,8 @@ namespace hpx {
             threads::mask_cref_type used_processing_units =
                 thread_manager_->get_used_processing_units();
 
-            this->topology_->set_thread_affinity_mask(
-                this->topology_->get_service_affinity_mask(
+            this->topology_.set_thread_affinity_mask(
+                this->topology_.get_service_affinity_mask(
                     used_processing_units));
         }
     }

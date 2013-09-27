@@ -25,7 +25,7 @@
 
 namespace hpx { namespace threads
 {
-    mask_type noop_topology::empty_mask = mask_type(hardware_concurrency());
+    mask_type noop_topology::empty_mask = mask_type(noop_topology::hardware_concurrency());
 }}
 
 #else
@@ -36,31 +36,8 @@ namespace hpx { namespace threads { namespace detail
 {
     std::size_t hwloc_hardware_concurrency()
     {
-        hwloc_topology_t topo;
-        int err = hwloc_topology_init(&topo);
-        if (err != 0)
-        {
-            HPX_THROW_EXCEPTION(hpx::no_success, "hwloc_hardware_concurrency",
-                "Failed to init hwloc hwloc_topology");
-        }
-
-        err = hwloc_topology_load(topo);
-        if (err != 0)
-        {
-            hwloc_topology_destroy(topo);
-            HPX_THROW_EXCEPTION(hpx::no_success, "hwloc_hardware_concurrency",
-                "Failed to load hwloc topology");
-        }
-        int num_of_pus = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
-        if(num_of_pus < 0)
-        {
-            hwloc_topology_destroy(topo);
-            HPX_THROW_EXCEPTION(hpx::no_success, "hwloc_hardware_concurrency",
-                "Failed to get number of PUs");
-        }
-
-        hwloc_topology_destroy(topo);
-        return std::size_t(num_of_pus);
+        threads::topology& top = threads::create_topology();
+        return top.get_number_of_pus();
     }
 }}}
 #endif

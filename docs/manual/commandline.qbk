@@ -296,7 +296,13 @@ if multiple affinities are specified, they are added.
 Here is a full grammar describing the possible format of mappings:
 
     mappings:
+		distribution
         mapping(;mapping)*
+
+	distribution:  
+		'compact'
+		'scatter
+		'balanced'
 
     mapping:
         thread-spec=pu-specs
@@ -335,10 +341,10 @@ Here is a full grammar describing the possible format of mappings:
       ``
       will cause this output to be printed:
       ``
-          0: 0x0000000000000001
-          1: 0x0000000000000004
-          2: 0x0000000000000010
-          3: 0x0000000000000040
+	      0: PU L#0(P#0) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
+		  1: PU L#2(P#2) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
+		  2: PU L#4(P#4) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
+		  3: PU L#6(P#6) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
       ``
       [c++]where each bit in the bitmasks corresponds to a processing unit the listed
       worker thread will be bound to run on.]

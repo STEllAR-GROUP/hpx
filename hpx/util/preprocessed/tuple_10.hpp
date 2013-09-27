@@ -48,20 +48,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0))
+          : a0(boost::forward<A0>( other.a0))
         {}
         template <typename T0>
         tuple(tuple<T0> const& other)
-          : a0(other.a0)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0))
         {}
         template <typename T0>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0))
+          : a0(boost::forward<T0>( other.a0))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -71,7 +71,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0);;
+            a0 = boost::forward<A0>( other.a0);;
             return *this;
         }
         template <typename T0>
@@ -87,7 +87,7 @@ namespace hpx { namespace util
                 tuple<T0>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0);;
+            a0 = boost::forward<T0>( other.a0);;
             return *this;
         }
         void swap(tuple& other)
@@ -116,10 +116,10 @@ namespace hpx { namespace util
     
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
-        typedef tuple<typename detail::env_value_type<Arg0>::type> result_type;
+        typedef tuple<typename detail::add_rvalue_reference<Arg0>::type> result_type;
         return result_type(boost::forward<Arg0>(arg0), detail::forwarding_tag());
     }
     
@@ -188,20 +188,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1))
         {}
         template <typename T0 , typename T1>
         tuple(tuple<T0 , T1> const& other)
-          : a0(other.a0) , a1(other.a1)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1))
         {}
         template <typename T0 , typename T1>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1))
         {}
         template <typename U1, typename U2>
         tuple(std::pair<U1, U2> const& other)
@@ -221,7 +221,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1);;
             return *this;
         }
         template <typename T0 , typename T1>
@@ -237,7 +237,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1);;
             return *this;
         }
         template <typename U1, typename U2>
@@ -284,11 +284,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     
@@ -302,7 +302,7 @@ namespace hpx { namespace util
             arg0 , arg1);
     }
     
-    template <typename T0, typename T1> typename boost::lazy_enable_if_c< 0 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 1 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 2 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 3 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 4 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 5 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 6 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 7 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 8 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 9 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 8, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 10 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 8, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 9, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 11 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 8, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 9, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 10, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 12 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result< typename util::decay<T0>::type , typename util::decay<T1>::type > >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { return make_tuple(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 8, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 9, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 10, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 11, T0, T1>::call(t0, t1)); }
+    template <typename T0, typename T1> typename boost::lazy_enable_if_c< 0 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 1 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 2 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 3 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 4 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 5 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 6 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 7 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 8 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 9 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 8, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 10 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 8, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 9, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 11 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 8, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 9, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 10, T0, T1>::call(t0, t1)); } template <typename T0, typename T1> typename boost::lazy_enable_if_c< 12 == util::decay<T0>::type::size_value + util::decay<T1>::type::size_value , detail::tuple_cat_result<T0, T1> >::type tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1) { typedef typename detail::tuple_cat_result<T0, T1>::type result_type; return result_type(detail::tuple_cat_element< 0, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 1, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 2, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 3, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 4, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 5, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 6, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 7, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 8, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 9, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 10, T0, T1>::call(t0, t1) , detail::tuple_cat_element< 11, T0, T1>::call(t0, t1)); }
 }}
 namespace boost { namespace fusion { namespace traits { template< typename A0, typename A1 > struct tag_of<hpx::util::tuple<A0, A1> > { typedef struct_tag type; }; template< typename A0, typename A1 > struct tag_of<hpx::util::tuple<A0, A1> const> { typedef struct_tag type; }; } namespace extension { template< typename A0, typename A1 > struct access::struct_member< hpx::util::tuple<A0, A1> , 0 > { typedef A0 attribute_type; BOOST_FUSION_ADAPT_STRUCT_MSVC_REDEFINE_TEMPLATE_PARAMS( (1) (A0) (A1)) typedef attribute_type type; template<typename Seq> struct apply { typedef typename add_reference< typename mpl::eval_if< is_const<Seq> , add_const<attribute_type> , mpl::identity<attribute_type> >::type >::type type; static type call(Seq& seq) { return seq. a0; } }; }; template< typename A0, typename A1 > struct struct_member_name< hpx::util::tuple<A0, A1> , 0 > { typedef char const* type; static type call() { return "a0"; } }; template< typename A0, typename A1 > struct access::struct_member< hpx::util::tuple<A0, A1> , 1 > { typedef A1 attribute_type; BOOST_FUSION_ADAPT_STRUCT_MSVC_REDEFINE_TEMPLATE_PARAMS( (1) (A0) (A1)) typedef attribute_type type; template<typename Seq> struct apply { typedef typename add_reference< typename mpl::eval_if< is_const<Seq> , add_const<attribute_type> , mpl::identity<attribute_type> >::type >::type type; static type call(Seq& seq) { return seq. a1; } }; }; template< typename A0, typename A1 > struct struct_member_name< hpx::util::tuple<A0, A1> , 1 > { typedef char const* type; static type call() { return "a1"; } }; template< typename A0, typename A1 > struct struct_size<hpx::util::tuple<A0, A1> > : mpl::int_<2> {}; template< typename A0, typename A1 > struct struct_is_view< hpx::util::tuple<A0, A1> > : mpl::false_ {}; } } namespace mpl { template<typename> struct sequence_tag; template< typename A0, typename A1 > struct sequence_tag<hpx::util::tuple<A0, A1> > { typedef fusion::fusion_sequence_tag type; }; template< typename A0, typename A1 > struct sequence_tag< hpx::util::tuple<A0, A1> const > { typedef fusion::fusion_sequence_tag type; }; } }
 namespace boost { namespace serialization
@@ -353,20 +353,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2))
         {}
         template <typename T0 , typename T1 , typename T2>
         tuple(tuple<T0 , T1 , T2> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2))
         {}
         template <typename T0 , typename T1 , typename T2>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -376,7 +376,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2>
@@ -392,7 +392,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2);;
             return *this;
         }
         void swap(tuple& other)
@@ -421,11 +421,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     
@@ -447,9 +447,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -506,20 +504,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3>
         tuple(tuple<T0 , T1 , T2 , T3> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -529,7 +527,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3>
@@ -545,7 +543,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3);;
             return *this;
         }
         void swap(tuple& other)
@@ -574,11 +572,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     
@@ -600,9 +598,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -659,20 +655,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<A4>::type >::call(other.a4))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3)) , a4(detail::move_if_no_ref<A4>::call( other.a4))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3)) , a4(boost::forward<A4>( other.a4))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
         tuple(tuple<T0 , T1 , T2 , T3 , T4> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<T4>::type >::call(other.a4))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3 , T4>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3)) , a4(detail::move_if_no_ref<T4>::call( other.a4))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3)) , a4(boost::forward<T4>( other.a4))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -682,7 +678,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3); a4 = boost::forward<A4>( other.a4);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
@@ -698,7 +694,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3 , T4>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3); a4 = boost::forward<T4>( other.a4);;
             return *this;
         }
         void swap(tuple& other)
@@ -727,11 +723,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
     
@@ -753,9 +749,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -812,20 +806,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<A4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<A5>::type >::call(other.a5))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3)) , a4(detail::move_if_no_ref<A4>::call( other.a4)) , a5(detail::move_if_no_ref<A5>::call( other.a5))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3)) , a4(boost::forward<A4>( other.a4)) , a5(boost::forward<A5>( other.a5))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
         tuple(tuple<T0 , T1 , T2 , T3 , T4 , T5> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<T4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<T5>::type >::call(other.a5))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3 , T4 , T5>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3)) , a4(detail::move_if_no_ref<T4>::call( other.a4)) , a5(detail::move_if_no_ref<T5>::call( other.a5))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3)) , a4(boost::forward<T4>( other.a4)) , a5(boost::forward<T5>( other.a5))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -835,7 +829,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3); a4 = boost::forward<A4>( other.a4); a5 = boost::forward<A5>( other.a5);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
@@ -851,7 +845,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3 , T4 , T5>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3); a4 = boost::forward<T4>( other.a4); a5 = boost::forward<T5>( other.a5);;
             return *this;
         }
         void swap(tuple& other)
@@ -880,11 +874,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
     }
     
@@ -906,9 +900,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -965,20 +957,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<A4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<A5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<A6>::type >::call(other.a6))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3)) , a4(detail::move_if_no_ref<A4>::call( other.a4)) , a5(detail::move_if_no_ref<A5>::call( other.a5)) , a6(detail::move_if_no_ref<A6>::call( other.a6))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3)) , a4(boost::forward<A4>( other.a4)) , a5(boost::forward<A5>( other.a5)) , a6(boost::forward<A6>( other.a6))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
         tuple(tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<T4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<T5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<T6>::type >::call(other.a6))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3)) , a4(detail::move_if_no_ref<T4>::call( other.a4)) , a5(detail::move_if_no_ref<T5>::call( other.a5)) , a6(detail::move_if_no_ref<T6>::call( other.a6))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3)) , a4(boost::forward<T4>( other.a4)) , a5(boost::forward<T5>( other.a5)) , a6(boost::forward<T6>( other.a6))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -988,7 +980,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3); a4 = boost::forward<A4>( other.a4); a5 = boost::forward<A5>( other.a5); a6 = boost::forward<A6>( other.a6);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
@@ -1004,7 +996,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5); a6 = detail::move_if_no_ref<T6>::call( other.a6);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3); a4 = boost::forward<T4>( other.a4); a5 = boost::forward<T5>( other.a5); a6 = boost::forward<T6>( other.a6);;
             return *this;
         }
         void swap(tuple& other)
@@ -1033,11 +1025,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
     }
     
@@ -1059,9 +1051,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -1118,20 +1108,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<A4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<A5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<A6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<A7>::type >::call(other.a7))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3)) , a4(detail::move_if_no_ref<A4>::call( other.a4)) , a5(detail::move_if_no_ref<A5>::call( other.a5)) , a6(detail::move_if_no_ref<A6>::call( other.a6)) , a7(detail::move_if_no_ref<A7>::call( other.a7))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3)) , a4(boost::forward<A4>( other.a4)) , a5(boost::forward<A5>( other.a5)) , a6(boost::forward<A6>( other.a6)) , a7(boost::forward<A7>( other.a7))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
         tuple(tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<T4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<T5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<T6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<T7>::type >::call(other.a7))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3)) , a4(detail::move_if_no_ref<T4>::call( other.a4)) , a5(detail::move_if_no_ref<T5>::call( other.a5)) , a6(detail::move_if_no_ref<T6>::call( other.a6)) , a7(detail::move_if_no_ref<T7>::call( other.a7))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3)) , a4(boost::forward<T4>( other.a4)) , a5(boost::forward<T5>( other.a5)) , a6(boost::forward<T6>( other.a6)) , a7(boost::forward<T7>( other.a7))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -1141,7 +1131,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6); a7 = detail::move_if_no_ref<A7>::call( other.a7);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3); a4 = boost::forward<A4>( other.a4); a5 = boost::forward<A5>( other.a5); a6 = boost::forward<A6>( other.a6); a7 = boost::forward<A7>( other.a7);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
@@ -1157,7 +1147,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5); a6 = detail::move_if_no_ref<T6>::call( other.a6); a7 = detail::move_if_no_ref<T7>::call( other.a7);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3); a4 = boost::forward<T4>( other.a4); a5 = boost::forward<T5>( other.a5); a6 = boost::forward<T6>( other.a6); a7 = boost::forward<T7>( other.a7);;
             return *this;
         }
         void swap(tuple& other)
@@ -1186,11 +1176,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
     }
     
@@ -1212,9 +1202,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -1271,20 +1259,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<A4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<A5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<A6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<A7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<A8>::type >::call(other.a8))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3)) , a4(detail::move_if_no_ref<A4>::call( other.a4)) , a5(detail::move_if_no_ref<A5>::call( other.a5)) , a6(detail::move_if_no_ref<A6>::call( other.a6)) , a7(detail::move_if_no_ref<A7>::call( other.a7)) , a8(detail::move_if_no_ref<A8>::call( other.a8))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3)) , a4(boost::forward<A4>( other.a4)) , a5(boost::forward<A5>( other.a5)) , a6(boost::forward<A6>( other.a6)) , a7(boost::forward<A7>( other.a7)) , a8(boost::forward<A8>( other.a8))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
         tuple(tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<T4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<T5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<T6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<T7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<T8>::type >::call(other.a8))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3)) , a4(detail::move_if_no_ref<T4>::call( other.a4)) , a5(detail::move_if_no_ref<T5>::call( other.a5)) , a6(detail::move_if_no_ref<T6>::call( other.a6)) , a7(detail::move_if_no_ref<T7>::call( other.a7)) , a8(detail::move_if_no_ref<T8>::call( other.a8))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3)) , a4(boost::forward<T4>( other.a4)) , a5(boost::forward<T5>( other.a5)) , a6(boost::forward<T6>( other.a6)) , a7(boost::forward<T7>( other.a7)) , a8(boost::forward<T8>( other.a8))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -1294,7 +1282,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6); a7 = detail::move_if_no_ref<A7>::call( other.a7); a8 = detail::move_if_no_ref<A8>::call( other.a8);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3); a4 = boost::forward<A4>( other.a4); a5 = boost::forward<A5>( other.a5); a6 = boost::forward<A6>( other.a6); a7 = boost::forward<A7>( other.a7); a8 = boost::forward<A8>( other.a8);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
@@ -1310,7 +1298,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5); a6 = detail::move_if_no_ref<T6>::call( other.a6); a7 = detail::move_if_no_ref<T7>::call( other.a7); a8 = detail::move_if_no_ref<T8>::call( other.a8);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3); a4 = boost::forward<T4>( other.a4); a5 = boost::forward<T5>( other.a5); a6 = boost::forward<T6>( other.a6); a7 = boost::forward<T7>( other.a7); a8 = boost::forward<T8>( other.a8);;
             return *this;
         }
         void swap(tuple& other)
@@ -1339,11 +1327,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
     }
     
@@ -1365,9 +1353,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -1424,20 +1410,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8) , a9(other.a9)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<A4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<A5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<A6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<A7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<A8>::type >::call(other.a8)) , a9( detail::copy_construct< A9 , typename boost::add_const<A9>::type >::call(other.a9))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3)) , a4(detail::move_if_no_ref<A4>::call( other.a4)) , a5(detail::move_if_no_ref<A5>::call( other.a5)) , a6(detail::move_if_no_ref<A6>::call( other.a6)) , a7(detail::move_if_no_ref<A7>::call( other.a7)) , a8(detail::move_if_no_ref<A8>::call( other.a8)) , a9(detail::move_if_no_ref<A9>::call( other.a9))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3)) , a4(boost::forward<A4>( other.a4)) , a5(boost::forward<A5>( other.a5)) , a6(boost::forward<A6>( other.a6)) , a7(boost::forward<A7>( other.a7)) , a8(boost::forward<A8>( other.a8)) , a9(boost::forward<A9>( other.a9))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
         tuple(tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8) , a9(other.a9)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<T4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<T5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<T6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<T7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<T8>::type >::call(other.a8)) , a9( detail::copy_construct< A9 , typename boost::add_const<T9>::type >::call(other.a9))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3)) , a4(detail::move_if_no_ref<T4>::call( other.a4)) , a5(detail::move_if_no_ref<T5>::call( other.a5)) , a6(detail::move_if_no_ref<T6>::call( other.a6)) , a7(detail::move_if_no_ref<T7>::call( other.a7)) , a8(detail::move_if_no_ref<T8>::call( other.a8)) , a9(detail::move_if_no_ref<T9>::call( other.a9))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3)) , a4(boost::forward<T4>( other.a4)) , a5(boost::forward<T5>( other.a5)) , a6(boost::forward<T6>( other.a6)) , a7(boost::forward<T7>( other.a7)) , a8(boost::forward<T8>( other.a8)) , a9(boost::forward<T9>( other.a9))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -1447,7 +1433,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6); a7 = detail::move_if_no_ref<A7>::call( other.a7); a8 = detail::move_if_no_ref<A8>::call( other.a8); a9 = detail::move_if_no_ref<A9>::call( other.a9);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3); a4 = boost::forward<A4>( other.a4); a5 = boost::forward<A5>( other.a5); a6 = boost::forward<A6>( other.a6); a7 = boost::forward<A7>( other.a7); a8 = boost::forward<A8>( other.a8); a9 = boost::forward<A9>( other.a9);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
@@ -1463,7 +1449,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5); a6 = detail::move_if_no_ref<T6>::call( other.a6); a7 = detail::move_if_no_ref<T7>::call( other.a7); a8 = detail::move_if_no_ref<T8>::call( other.a8); a9 = detail::move_if_no_ref<T9>::call( other.a9);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3); a4 = boost::forward<T4>( other.a4); a5 = boost::forward<T5>( other.a5); a6 = boost::forward<T6>( other.a6); a7 = boost::forward<T7>( other.a7); a8 = boost::forward<T8>( other.a8); a9 = boost::forward<T9>( other.a9);;
             return *this;
         }
         void swap(tuple& other)
@@ -1492,11 +1478,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
     }
     
@@ -1518,9 +1504,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -1577,20 +1561,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8) , a9(other.a9) , a10(other.a10)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<A4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<A5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<A6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<A7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<A8>::type >::call(other.a8)) , a9( detail::copy_construct< A9 , typename boost::add_const<A9>::type >::call(other.a9)) , a10( detail::copy_construct< A10 , typename boost::add_const<A10>::type >::call(other.a10))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3)) , a4(detail::move_if_no_ref<A4>::call( other.a4)) , a5(detail::move_if_no_ref<A5>::call( other.a5)) , a6(detail::move_if_no_ref<A6>::call( other.a6)) , a7(detail::move_if_no_ref<A7>::call( other.a7)) , a8(detail::move_if_no_ref<A8>::call( other.a8)) , a9(detail::move_if_no_ref<A9>::call( other.a9)) , a10(detail::move_if_no_ref<A10>::call( other.a10))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3)) , a4(boost::forward<A4>( other.a4)) , a5(boost::forward<A5>( other.a5)) , a6(boost::forward<A6>( other.a6)) , a7(boost::forward<A7>( other.a7)) , a8(boost::forward<A8>( other.a8)) , a9(boost::forward<A9>( other.a9)) , a10(boost::forward<A10>( other.a10))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
         tuple(tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8) , a9(other.a9) , a10(other.a10)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<T4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<T5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<T6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<T7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<T8>::type >::call(other.a8)) , a9( detail::copy_construct< A9 , typename boost::add_const<T9>::type >::call(other.a9)) , a10( detail::copy_construct< A10 , typename boost::add_const<T10>::type >::call(other.a10))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3)) , a4(detail::move_if_no_ref<T4>::call( other.a4)) , a5(detail::move_if_no_ref<T5>::call( other.a5)) , a6(detail::move_if_no_ref<T6>::call( other.a6)) , a7(detail::move_if_no_ref<T7>::call( other.a7)) , a8(detail::move_if_no_ref<T8>::call( other.a8)) , a9(detail::move_if_no_ref<T9>::call( other.a9)) , a10(detail::move_if_no_ref<T10>::call( other.a10))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3)) , a4(boost::forward<T4>( other.a4)) , a5(boost::forward<T5>( other.a5)) , a6(boost::forward<T6>( other.a6)) , a7(boost::forward<T7>( other.a7)) , a8(boost::forward<T8>( other.a8)) , a9(boost::forward<T9>( other.a9)) , a10(boost::forward<T10>( other.a10))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -1600,7 +1584,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6); a7 = detail::move_if_no_ref<A7>::call( other.a7); a8 = detail::move_if_no_ref<A8>::call( other.a8); a9 = detail::move_if_no_ref<A9>::call( other.a9); a10 = detail::move_if_no_ref<A10>::call( other.a10);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3); a4 = boost::forward<A4>( other.a4); a5 = boost::forward<A5>( other.a5); a6 = boost::forward<A6>( other.a6); a7 = boost::forward<A7>( other.a7); a8 = boost::forward<A8>( other.a8); a9 = boost::forward<A9>( other.a9); a10 = boost::forward<A10>( other.a10);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
@@ -1616,7 +1600,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5); a6 = detail::move_if_no_ref<T6>::call( other.a6); a7 = detail::move_if_no_ref<T7>::call( other.a7); a8 = detail::move_if_no_ref<T8>::call( other.a8); a9 = detail::move_if_no_ref<T9>::call( other.a9); a10 = detail::move_if_no_ref<T10>::call( other.a10);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3); a4 = boost::forward<T4>( other.a4); a5 = boost::forward<T5>( other.a5); a6 = boost::forward<T6>( other.a6); a7 = boost::forward<T7>( other.a7); a8 = boost::forward<T8>( other.a8); a9 = boost::forward<T9>( other.a9); a10 = boost::forward<T10>( other.a10);;
             return *this;
         }
         void swap(tuple& other)
@@ -1645,11 +1629,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
     }
     
@@ -1671,9 +1655,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -1730,20 +1712,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8) , a9(other.a9) , a10(other.a10) , a11(other.a11)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<A4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<A5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<A6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<A7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<A8>::type >::call(other.a8)) , a9( detail::copy_construct< A9 , typename boost::add_const<A9>::type >::call(other.a9)) , a10( detail::copy_construct< A10 , typename boost::add_const<A10>::type >::call(other.a10)) , a11( detail::copy_construct< A11 , typename boost::add_const<A11>::type >::call(other.a11))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3)) , a4(detail::move_if_no_ref<A4>::call( other.a4)) , a5(detail::move_if_no_ref<A5>::call( other.a5)) , a6(detail::move_if_no_ref<A6>::call( other.a6)) , a7(detail::move_if_no_ref<A7>::call( other.a7)) , a8(detail::move_if_no_ref<A8>::call( other.a8)) , a9(detail::move_if_no_ref<A9>::call( other.a9)) , a10(detail::move_if_no_ref<A10>::call( other.a10)) , a11(detail::move_if_no_ref<A11>::call( other.a11))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3)) , a4(boost::forward<A4>( other.a4)) , a5(boost::forward<A5>( other.a5)) , a6(boost::forward<A6>( other.a6)) , a7(boost::forward<A7>( other.a7)) , a8(boost::forward<A8>( other.a8)) , a9(boost::forward<A9>( other.a9)) , a10(boost::forward<A10>( other.a10)) , a11(boost::forward<A11>( other.a11))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
         tuple(tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8) , a9(other.a9) , a10(other.a10) , a11(other.a11)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<T4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<T5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<T6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<T7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<T8>::type >::call(other.a8)) , a9( detail::copy_construct< A9 , typename boost::add_const<T9>::type >::call(other.a9)) , a10( detail::copy_construct< A10 , typename boost::add_const<T10>::type >::call(other.a10)) , a11( detail::copy_construct< A11 , typename boost::add_const<T11>::type >::call(other.a11))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3)) , a4(detail::move_if_no_ref<T4>::call( other.a4)) , a5(detail::move_if_no_ref<T5>::call( other.a5)) , a6(detail::move_if_no_ref<T6>::call( other.a6)) , a7(detail::move_if_no_ref<T7>::call( other.a7)) , a8(detail::move_if_no_ref<T8>::call( other.a8)) , a9(detail::move_if_no_ref<T9>::call( other.a9)) , a10(detail::move_if_no_ref<T10>::call( other.a10)) , a11(detail::move_if_no_ref<T11>::call( other.a11))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3)) , a4(boost::forward<T4>( other.a4)) , a5(boost::forward<T5>( other.a5)) , a6(boost::forward<T6>( other.a6)) , a7(boost::forward<T7>( other.a7)) , a8(boost::forward<T8>( other.a8)) , a9(boost::forward<T9>( other.a9)) , a10(boost::forward<T10>( other.a10)) , a11(boost::forward<T11>( other.a11))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -1753,7 +1735,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6); a7 = detail::move_if_no_ref<A7>::call( other.a7); a8 = detail::move_if_no_ref<A8>::call( other.a8); a9 = detail::move_if_no_ref<A9>::call( other.a9); a10 = detail::move_if_no_ref<A10>::call( other.a10); a11 = detail::move_if_no_ref<A11>::call( other.a11);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3); a4 = boost::forward<A4>( other.a4); a5 = boost::forward<A5>( other.a5); a6 = boost::forward<A6>( other.a6); a7 = boost::forward<A7>( other.a7); a8 = boost::forward<A8>( other.a8); a9 = boost::forward<A9>( other.a9); a10 = boost::forward<A10>( other.a10); a11 = boost::forward<A11>( other.a11);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
@@ -1769,7 +1751,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5); a6 = detail::move_if_no_ref<T6>::call( other.a6); a7 = detail::move_if_no_ref<T7>::call( other.a7); a8 = detail::move_if_no_ref<T8>::call( other.a8); a9 = detail::move_if_no_ref<T9>::call( other.a9); a10 = detail::move_if_no_ref<T10>::call( other.a10); a11 = detail::move_if_no_ref<T11>::call( other.a11);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3); a4 = boost::forward<T4>( other.a4); a5 = boost::forward<T5>( other.a5); a6 = boost::forward<T6>( other.a6); a7 = boost::forward<T7>( other.a7); a8 = boost::forward<T8>( other.a8); a9 = boost::forward<T9>( other.a9); a10 = boost::forward<T10>( other.a10); a11 = boost::forward<T11>( other.a11);;
             return *this;
         }
         void swap(tuple& other)
@@ -1798,11 +1780,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type , typename detail::env_value_type<Arg11>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type , typename detail::add_rvalue_reference<Arg11>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type , typename detail::env_value_type<Arg11>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type , typename detail::add_rvalue_reference<Arg11>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
     }
     
@@ -1824,9 +1806,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
@@ -1883,20 +1863,20 @@ namespace hpx { namespace util
         {}
         
         tuple(tuple const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8) , a9(other.a9) , a10(other.a10) , a11(other.a11) , a12(other.a12)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<A0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<A1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<A2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<A3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<A4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<A5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<A6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<A7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<A8>::type >::call(other.a8)) , a9( detail::copy_construct< A9 , typename boost::add_const<A9>::type >::call(other.a9)) , a10( detail::copy_construct< A10 , typename boost::add_const<A10>::type >::call(other.a10)) , a11( detail::copy_construct< A11 , typename boost::add_const<A11>::type >::call(other.a11)) , a12( detail::copy_construct< A12 , typename boost::add_const<A12>::type >::call(other.a12))
         {}
         tuple(BOOST_RV_REF(tuple) other)
-          : a0(detail::move_if_no_ref<A0>::call( other.a0)) , a1(detail::move_if_no_ref<A1>::call( other.a1)) , a2(detail::move_if_no_ref<A2>::call( other.a2)) , a3(detail::move_if_no_ref<A3>::call( other.a3)) , a4(detail::move_if_no_ref<A4>::call( other.a4)) , a5(detail::move_if_no_ref<A5>::call( other.a5)) , a6(detail::move_if_no_ref<A6>::call( other.a6)) , a7(detail::move_if_no_ref<A7>::call( other.a7)) , a8(detail::move_if_no_ref<A8>::call( other.a8)) , a9(detail::move_if_no_ref<A9>::call( other.a9)) , a10(detail::move_if_no_ref<A10>::call( other.a10)) , a11(detail::move_if_no_ref<A11>::call( other.a11)) , a12(detail::move_if_no_ref<A12>::call( other.a12))
+          : a0(boost::forward<A0>( other.a0)) , a1(boost::forward<A1>( other.a1)) , a2(boost::forward<A2>( other.a2)) , a3(boost::forward<A3>( other.a3)) , a4(boost::forward<A4>( other.a4)) , a5(boost::forward<A5>( other.a5)) , a6(boost::forward<A6>( other.a6)) , a7(boost::forward<A7>( other.a7)) , a8(boost::forward<A8>( other.a8)) , a9(boost::forward<A9>( other.a9)) , a10(boost::forward<A10>( other.a10)) , a11(boost::forward<A11>( other.a11)) , a12(boost::forward<A12>( other.a12))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
         tuple(tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12> const& other)
-          : a0(other.a0) , a1(other.a1) , a2(other.a2) , a3(other.a3) , a4(other.a4) , a5(other.a5) , a6(other.a6) , a7(other.a7) , a8(other.a8) , a9(other.a9) , a10(other.a10) , a11(other.a11) , a12(other.a12)
+          : a0( detail::copy_construct< A0 , typename boost::add_const<T0>::type >::call(other.a0)) , a1( detail::copy_construct< A1 , typename boost::add_const<T1>::type >::call(other.a1)) , a2( detail::copy_construct< A2 , typename boost::add_const<T2>::type >::call(other.a2)) , a3( detail::copy_construct< A3 , typename boost::add_const<T3>::type >::call(other.a3)) , a4( detail::copy_construct< A4 , typename boost::add_const<T4>::type >::call(other.a4)) , a5( detail::copy_construct< A5 , typename boost::add_const<T5>::type >::call(other.a5)) , a6( detail::copy_construct< A6 , typename boost::add_const<T6>::type >::call(other.a6)) , a7( detail::copy_construct< A7 , typename boost::add_const<T7>::type >::call(other.a7)) , a8( detail::copy_construct< A8 , typename boost::add_const<T8>::type >::call(other.a8)) , a9( detail::copy_construct< A9 , typename boost::add_const<T9>::type >::call(other.a9)) , a10( detail::copy_construct< A10 , typename boost::add_const<T10>::type >::call(other.a10)) , a11( detail::copy_construct< A11 , typename boost::add_const<T11>::type >::call(other.a11)) , a12( detail::copy_construct< A12 , typename boost::add_const<T12>::type >::call(other.a12))
         {}
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
         tuple(BOOST_RV_REF(HPX_UTIL_STRIP((
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12>
             ))) other)
-          : a0(detail::move_if_no_ref<T0>::call( other.a0)) , a1(detail::move_if_no_ref<T1>::call( other.a1)) , a2(detail::move_if_no_ref<T2>::call( other.a2)) , a3(detail::move_if_no_ref<T3>::call( other.a3)) , a4(detail::move_if_no_ref<T4>::call( other.a4)) , a5(detail::move_if_no_ref<T5>::call( other.a5)) , a6(detail::move_if_no_ref<T6>::call( other.a6)) , a7(detail::move_if_no_ref<T7>::call( other.a7)) , a8(detail::move_if_no_ref<T8>::call( other.a8)) , a9(detail::move_if_no_ref<T9>::call( other.a9)) , a10(detail::move_if_no_ref<T10>::call( other.a10)) , a11(detail::move_if_no_ref<T11>::call( other.a11)) , a12(detail::move_if_no_ref<T12>::call( other.a12))
+          : a0(boost::forward<T0>( other.a0)) , a1(boost::forward<T1>( other.a1)) , a2(boost::forward<T2>( other.a2)) , a3(boost::forward<T3>( other.a3)) , a4(boost::forward<T4>( other.a4)) , a5(boost::forward<T5>( other.a5)) , a6(boost::forward<T6>( other.a6)) , a7(boost::forward<T7>( other.a7)) , a8(boost::forward<T8>( other.a8)) , a9(boost::forward<T9>( other.a9)) , a10(boost::forward<T10>( other.a10)) , a11(boost::forward<T11>( other.a11)) , a12(boost::forward<T12>( other.a12))
         {}
         
         tuple& operator=(BOOST_COPY_ASSIGN_REF(tuple) other)
@@ -1906,7 +1886,7 @@ namespace hpx { namespace util
         }
         tuple& operator=(BOOST_RV_REF(tuple) other)
         {
-            a0 = detail::move_if_no_ref<A0>::call( other.a0); a1 = detail::move_if_no_ref<A1>::call( other.a1); a2 = detail::move_if_no_ref<A2>::call( other.a2); a3 = detail::move_if_no_ref<A3>::call( other.a3); a4 = detail::move_if_no_ref<A4>::call( other.a4); a5 = detail::move_if_no_ref<A5>::call( other.a5); a6 = detail::move_if_no_ref<A6>::call( other.a6); a7 = detail::move_if_no_ref<A7>::call( other.a7); a8 = detail::move_if_no_ref<A8>::call( other.a8); a9 = detail::move_if_no_ref<A9>::call( other.a9); a10 = detail::move_if_no_ref<A10>::call( other.a10); a11 = detail::move_if_no_ref<A11>::call( other.a11); a12 = detail::move_if_no_ref<A12>::call( other.a12);;
+            a0 = boost::forward<A0>( other.a0); a1 = boost::forward<A1>( other.a1); a2 = boost::forward<A2>( other.a2); a3 = boost::forward<A3>( other.a3); a4 = boost::forward<A4>( other.a4); a5 = boost::forward<A5>( other.a5); a6 = boost::forward<A6>( other.a6); a7 = boost::forward<A7>( other.a7); a8 = boost::forward<A8>( other.a8); a9 = boost::forward<A9>( other.a9); a10 = boost::forward<A10>( other.a10); a11 = boost::forward<A11>( other.a11); a12 = boost::forward<A12>( other.a12);;
             return *this;
         }
         template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
@@ -1922,7 +1902,7 @@ namespace hpx { namespace util
                 tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12>
             ))) other)
         {
-            a0 = detail::move_if_no_ref<T0>::call( other.a0); a1 = detail::move_if_no_ref<T1>::call( other.a1); a2 = detail::move_if_no_ref<T2>::call( other.a2); a3 = detail::move_if_no_ref<T3>::call( other.a3); a4 = detail::move_if_no_ref<T4>::call( other.a4); a5 = detail::move_if_no_ref<T5>::call( other.a5); a6 = detail::move_if_no_ref<T6>::call( other.a6); a7 = detail::move_if_no_ref<T7>::call( other.a7); a8 = detail::move_if_no_ref<T8>::call( other.a8); a9 = detail::move_if_no_ref<T9>::call( other.a9); a10 = detail::move_if_no_ref<T10>::call( other.a10); a11 = detail::move_if_no_ref<T11>::call( other.a11); a12 = detail::move_if_no_ref<T12>::call( other.a12);;
+            a0 = boost::forward<T0>( other.a0); a1 = boost::forward<T1>( other.a1); a2 = boost::forward<T2>( other.a2); a3 = boost::forward<T3>( other.a3); a4 = boost::forward<T4>( other.a4); a5 = boost::forward<T5>( other.a5); a6 = boost::forward<T6>( other.a6); a7 = boost::forward<T7>( other.a7); a8 = boost::forward<T8>( other.a8); a9 = boost::forward<T9>( other.a9); a10 = boost::forward<T10>( other.a10); a11 = boost::forward<T11>( other.a11); a12 = boost::forward<T12>( other.a12);;
             return *this;
         }
         void swap(tuple& other)
@@ -1951,11 +1931,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     BOOST_FORCEINLINE
-    tuple<typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type , typename detail::env_value_type<Arg11>::type , typename detail::env_value_type<Arg12>::type>
+    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type , typename detail::add_rvalue_reference<Arg11>::type , typename detail::add_rvalue_reference<Arg12>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::env_value_type<Arg0>::type , typename detail::env_value_type<Arg1>::type , typename detail::env_value_type<Arg2>::type , typename detail::env_value_type<Arg3>::type , typename detail::env_value_type<Arg4>::type , typename detail::env_value_type<Arg5>::type , typename detail::env_value_type<Arg6>::type , typename detail::env_value_type<Arg7>::type , typename detail::env_value_type<Arg8>::type , typename detail::env_value_type<Arg9>::type , typename detail::env_value_type<Arg10>::type , typename detail::env_value_type<Arg11>::type , typename detail::env_value_type<Arg12>::type>(
+                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type , typename detail::add_rvalue_reference<Arg11>::type , typename detail::add_rvalue_reference<Arg12>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
     }
     
@@ -1977,9 +1957,7 @@ namespace hpx { namespace util
     tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12)
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
         head_type head =
             tuple_cat(boost::forward<T0>(t0), boost::forward<T1>(t1));
