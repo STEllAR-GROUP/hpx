@@ -102,6 +102,7 @@ namespace hpx { namespace threads
         std::size_t get_number_of_sockets() const;
         std::size_t get_number_of_numa_nodes() const;
         std::size_t get_number_of_cores() const;
+        std::size_t get_number_of_pus() const;
 
         ///////////////////////////////////////////////////////////////////////
         std::size_t get_number_of_socket_pus(
@@ -120,8 +121,6 @@ namespace hpx { namespace threads
         std::size_t get_number_of_numa_node_cores(
             std::size_t numa_node
             ) const;
-
-        std::size_t hardware_concurrency() const;
 
         void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const;
 

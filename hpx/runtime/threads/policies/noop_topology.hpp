@@ -125,13 +125,18 @@ public:
         return empty_mask;
     }
 
-    std::size_t hardware_concurrency() const
+    static std::size_t hardware_concurrency()
     {
 #if defined(__ANDROID__) && defined(ANDROID)
         return std::size_t(::android_getCpuCount());
 #else
         return std::size_t(boost::thread::hardware_concurrency());
 #endif
+    }
+        
+    std::size_t get_number_of_pus() const
+    {
+        return noop_topology::hardware_concurrency();
     }
         
     void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const

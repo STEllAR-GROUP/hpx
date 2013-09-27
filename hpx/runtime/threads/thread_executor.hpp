@@ -47,6 +47,8 @@ namespace hpx { namespace threads
         // interact with the executor.
         struct manage_executor
         {
+            virtual ~manage_executor() {}
+
             // Return the requested policy element
             virtual std::size_t get_policy_element(executor_parameter p,
                 error_code& ec) const = 0;

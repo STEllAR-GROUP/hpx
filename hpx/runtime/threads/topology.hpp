@@ -277,7 +277,7 @@ namespace hpx { namespace threads
         virtual bool reduce_thread_priority(error_code& ec = throws) const;
 
         /// \brief return the number of available hardware processing units
-        virtual std::size_t hardware_concurrency() const = 0;
+        virtual std::size_t get_number_of_pus() const = 0;
     };
 
     HPX_API_EXPORT std::size_t hardware_concurrency();

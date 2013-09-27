@@ -31,9 +31,8 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
   private:
     parcelset::parcelport& pp;
 
-    const service_mode service_type;
-    const runtime_mode runtime_type;
-    const naming::address bootstrap_agas;
+    service_mode const service_type;
+    naming::address const bootstrap_agas;
 
     boost::condition_variable cond;
     boost::mutex mtx;
@@ -69,7 +68,6 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     big_boot_barrier(
         parcelset::parcelport& pp_
       , util::runtime_configuration const& ini_
-      , runtime_mode runtime_type_
         );
 
     ~big_boot_barrier()
@@ -102,7 +100,6 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 HPX_EXPORT void create_big_boot_barrier(
     parcelset::parcelport& pp_
   , util::runtime_configuration const& ini_
-  , runtime_mode runtime_type_
     );
 
 HPX_EXPORT void destroy_big_boot_barrier();
