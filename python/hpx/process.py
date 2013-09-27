@@ -17,7 +17,7 @@ from subprocess import Popen, STDOUT, PIPE
 from types import StringType
 from shlex import split
 from signal import SIGKILL
-from os import kill, waitpid, WNOHANG
+from os import killpg, waitpid, WNOHANG
 from platform import system
 from Queue import Queue, Empty
 from errno import ESRCH
@@ -33,37 +33,16 @@ if platform.startswith('darwin'):
 if platform.startswith('linux'):
   OS_LIN = True
 
-
  
-if "Linux" == system():
-  def kill_process_tree(parent_pid, signal=SIGKILL):
-    cmd = "ps -o pid --ppid %d --noheaders" % parent_pid
-    ps_command = Popen(cmd, shell=True, stdout=PIPE)
-    ps_output = ps_command.stdout.read()
-    retcode = ps_command.wait()
-
-    if 0 == ps_command.wait():
-      for pid in ps_output.split("\n")[:-1]:
-        kill(int(pid), signal)
-
-    try: 
-      kill(parent_pid, signal)
-      return True
-    except OSError, err:
-      if ESRCH != err.errno:
-        raise err
-      else:
-        return False
-else:
-  def kill_process_tree(parent_pid, signal=SIGKILL):
-    try: 
-      kill(parent_pid, signal)
-      return True
-    except OSError, err:
-      if ESRCH != err.errno:
-        raise err
-      else:
-        return False
+def kill_process_tree(parent_pid, signal=SIGKILL):
+  try: 
+    killpg(parent_pid, signal)
+    return True
+  except OSError, err:
+    if ESRCH != err.errno:
+      raise err
+    else:
+      return False
 
 class process(object):
   _proc = None
