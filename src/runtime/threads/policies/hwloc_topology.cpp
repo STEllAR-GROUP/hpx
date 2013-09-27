@@ -614,16 +614,16 @@ namespace hpx { namespace threads
         std::size_t idx = find_first(m);
         hwloc_obj_t obj;
 
-        std::size_t const nbobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+        int const nbobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
 
-        if (nbobjs == ~0x0u)
+        if (0 > nbobjs) 
         {
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::hwloc_topology::print_affinity_mask"
               , "hwloc_get_nbobjs_by_type failed");
         }
 
-        for(std::size_t i = 0; i < nbobjs; ++i)
+        for(std::size_t i = 0; i < std::size_t(nbobjs); ++i)
         {
             obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU, i);
             // on Windows os_index is always -1
@@ -637,9 +637,15 @@ namespace hpx { namespace threads
             }
         }
 
+        if (!obj)
+        {
+            HPX_THROW_EXCEPTION(kernel_error
+              , "hpx::threads::hwloc_topology::print_affinity_mask"
+              , "object not found");
+        }
+
         os << num_thread << ": " << std::setfill(' ');
     
-        char obj_string[1000] = {0};
         os << "PU L#" << obj->logical_index << "(P#" << obj->os_index << ")";
 
         while(obj->parent)

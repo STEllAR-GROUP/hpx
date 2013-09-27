@@ -635,27 +635,23 @@ namespace hpx { namespace threads { namespace detail
     void decode_distribution(distribution_type d,
         std::vector<mask_type>& affinities, error_code& ec)
     {
-        switch (d)
+        if (d == distribution_type::compact)
         {
-        case distribution_type::compact:
-            {
-                decode_compact_distribution(affinities, ec);
-                if (ec) return;
-            }
-            break;
-        case distribution_type::scatter:
-            {
-                decode_scatter_distribution(affinities, ec);
-                if (ec) return;
-            }
-            break;
-        case distribution_type::balanced:
-            {
-                decode_scatter_distribution(affinities, ec);
-                if (ec) return;
-            }
-            break;
+            decode_compact_distribution(affinities, ec);
+            if (ec) return;
         }
+        else if (d == distribution_type::scatter)
+        {
+            decode_scatter_distribution(affinities, ec);
+            if (ec) return;
+        }
+        else if (d == distribution_type::balanced)
+        {
+            decode_balanced_distribution(affinities, ec);
+            if (ec) return;
+        }
+        else
+            BOOST_ASSERT(false);
     }
 }}}
 
