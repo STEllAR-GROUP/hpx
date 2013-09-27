@@ -1207,11 +1207,10 @@ namespace hpx
         naming::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the name of the calling thread.
+    /// \brief Return the name of the referenced locality.
     ///
-    /// This function returns the name of the calling thread. This name uniquely
-    /// identifies the thread in the context of HPX. If the function is called
-    /// while no HPX runtime system is active, it will return zero.
+    /// This function returns a future referring to the name for the locality 
+    /// of the given id.
     ///
     /// \param id [in] The global id of the locality for which the name should
     ///           be retrievd
