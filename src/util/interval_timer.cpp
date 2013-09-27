@@ -197,7 +197,7 @@ namespace hpx { namespace util
         }
 
         // schedule this thread to be run after the given amount of seconds
-        threads::set_thread_state(id_,
+        threads::set_thread_state(id,
             boost::posix_time::microseconds(microsecs_),
             threads::pending, threads::wait_signaled,
             threads::thread_priority_critical, ec);
@@ -207,7 +207,7 @@ namespace hpx { namespace util
             is_started_ = false;
 
             // abort the newly created thread
-            threads::set_thread_state(id_, threads::pending, threads::wait_abort,
+            threads::set_thread_state(id, threads::pending, threads::wait_abort,
                 threads::thread_priority_critical, ec);
 
             return;

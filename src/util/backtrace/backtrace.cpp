@@ -393,9 +393,11 @@ namespace hpx { namespace util {
 
         lcos::local::futures_factory<std::string()> p(
             util::bind(stack_trace::get_symbols, &frames_.front(), frames_.size()));
-        p.apply(threads::thread_priority_default, threads::thread_stacksize_medium);
 
         error_code ec(lightweight);
+        p.apply(threads::thread_priority_default, threads::thread_stacksize_medium, ec);
+        if (ec) return "<couldn't retrieve stack backtrace>";
+
         return p.get_future().get(ec);
     }
 }} // hpx::util

@@ -642,7 +642,8 @@ namespace hpx { namespace lcos { namespace local
         // asynchronous execution
         void apply(
             threads::thread_priority priority = threads::thread_priority_default,
-            threads::thread_stacksize stacksize = threads::thread_stacksize_default) const
+            threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+            error_code& ec = throws) const
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
@@ -650,7 +651,7 @@ namespace hpx { namespace lcos { namespace local
                     "futures_factory invalid (has it been moved?)");
                 return;
             }
-            task_->apply(priority, stacksize);
+            task_->apply(priority, stacksize, ec);
         }
 
         // Result retrieval
