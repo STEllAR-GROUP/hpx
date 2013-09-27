@@ -122,7 +122,8 @@ namespace hpx { namespace threads
             std::size_t numa_node
             ) const;
 
-        void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const;
+        void print_affinity_mask(std::ostream& os, std::size_t num_thread,
+            mask_type const& m) const;
 
         struct hwloc_topology_tag {};
 
