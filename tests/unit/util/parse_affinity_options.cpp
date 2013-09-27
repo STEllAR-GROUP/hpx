@@ -941,16 +941,24 @@ namespace test
         HPX_TEST(!ec);
 
         int i = 0;
-        BOOST_FOREACH(hpx::threads::detail::full_mapping_type const& m, mappings)
+
+        HPX_TEST_EQ(mappings.which(), 1);
+        if (mappings.which() == 1)
         {
-            HPX_TEST_EQ(t->t[i].thread, m.first);
-            HPX_TEST_EQ(m.second.size(), 3u);
-            if (m.second.size() == 3u) {
-                HPX_TEST_EQ(t->t[i].socket, m.second[0]);
-                HPX_TEST_EQ(t->t[i].core, m.second[1]);
-                HPX_TEST_EQ(t->t[i].pu, m.second[2]);
+            hpx::threads::detail::mappings_spec_type mappings_specs(
+                boost::get<hpx::threads::detail::mappings_spec_type>(mappings));
+
+            BOOST_FOREACH(hpx::threads::detail::full_mapping_type const& m, mappings_specs)
+            {
+                HPX_TEST_EQ(t->t[i].thread, m.first);
+                HPX_TEST_EQ(m.second.size(), 3u);
+                if (m.second.size() == 3u) {
+                    HPX_TEST_EQ(t->t[i].socket, m.second[0]);
+                    HPX_TEST_EQ(t->t[i].core, m.second[1]);
+                    HPX_TEST_EQ(t->t[i].pu, m.second[2]);
+                }
+                ++i;
             }
-            ++i;
         }
 
 #if defined(VERIFY_AFFINITY_MASKS)
