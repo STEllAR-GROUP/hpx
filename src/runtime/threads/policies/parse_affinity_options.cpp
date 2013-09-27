@@ -106,9 +106,9 @@ namespace hpx { namespace threads { namespace detail
             mapping =  thread_spec >> '=' >> pu_spec;
 
             distribution =
-                (partlit("compact") >> qi::attr(distribution_type::compact))
-                | (partlit("scatter") >> qi::attr(distribution_type::scatter))
-                | (partlit("balanced") >> qi::attr(distribution_type::scatter))
+                    (partlit("compact") >> qi::attr(distribution_type::compact))
+                |   (partlit("scatter") >> qi::attr(distribution_type::scatter))
+                |   (partlit("balanced") >> qi::attr(distribution_type::scatter))
                 ;
 
             thread_spec =
