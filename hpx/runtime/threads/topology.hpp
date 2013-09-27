@@ -287,13 +287,12 @@ namespace hpx { namespace threads
     {
         typedef std::vector<boost::int64_t> bounds_type;
 
-        BOOST_SCOPED_ENUM_START(distribution_type)
+        enum distribution_type
         {
             compact  = 0x01,
             scatter  = 0x02,
             balanced = 0x04
         };
-        BOOST_SCOPED_ENUM_END
 
         struct spec_type
         {
