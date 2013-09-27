@@ -491,17 +491,17 @@ namespace hpx { namespace threads
 
     std::size_t hwloc_topology::get_number_of_sockets() const
     {
-        return socket_numbers_.size();
+        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET);
     }
 
     std::size_t hwloc_topology::get_number_of_numa_nodes() const
     {
-        return numa_node_numbers_.size();
+        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
     }
 
     std::size_t hwloc_topology::get_number_of_cores() const
     {
-        return core_numbers_.size();
+        return hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
     }
 
     std::size_t hwloc_topology::get_number_of_socket_pus(
