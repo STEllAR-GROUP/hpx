@@ -615,7 +615,7 @@ namespace hpx { namespace threads
         mask_type const& m) const
     {
         std::size_t idx = find_first(m);
-        hwloc_obj_t obj;
+        hwloc_obj_t obj = 0;
 
         int const nbobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
 
