@@ -18,6 +18,7 @@
 
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/io/ios_state.hpp>
 
 namespace hpx { namespace threads
 {
@@ -645,6 +646,8 @@ namespace hpx { namespace threads
               , "hpx::threads::hwloc_topology::print_affinity_mask"
               , "object not found");
         }
+
+        boost::io::ios_flags_saver ifs(os);
 
         os << num_thread << ": " << std::setfill(' ');
         os << "PU L#" << obj->logical_index << "(P#" << obj->os_index << ")";
