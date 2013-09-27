@@ -17,6 +17,7 @@
 #include <hwloc.h>
 
 #include <boost/format.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace hpx { namespace threads
 {
@@ -609,7 +610,8 @@ namespace hpx { namespace threads
         return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE));
     }
 
-    void hwloc_topology::print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const
+    void hwloc_topology::print_affinity_mask(std::ostream& os, std::size_t num_thread,
+        mask_type const& m) const
     {
         std::size_t idx = find_first(m);
         hwloc_obj_t obj;
@@ -625,7 +627,7 @@ namespace hpx { namespace threads
 
         for(std::size_t i = 0; i < std::size_t(nbobjs); ++i)
         {
-            obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU, i);
+            obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU, unsigned(i));
             // on Windows os_index is always -1
             if (obj->os_index != ~0x0u)
             {
@@ -645,14 +647,16 @@ namespace hpx { namespace threads
         }
 
         os << num_thread << ": " << std::setfill(' ');
-    
         os << "PU L#" << obj->logical_index << "(P#" << obj->os_index << ")";
 
+        std::size_t const buffer_size = 1000;
+        boost::scoped_ptr<char> parent_obj_string(new char[buffer_size]);
         while(obj->parent)
         {
-            char parent_obj_string[1000] = {0};
-            hwloc_obj_snprintf(parent_obj_string, sizeof(parent_obj_string), topo, obj->parent, "#", 0);
-            os << " " << parent_obj_string;
+            char *ptr = parent_obj_string.get();
+            hwloc_obj_snprintf(ptr, buffer_size, topo, obj->parent, "#", 0);
+
+            os << " " << ptr;
             obj = obj->parent;
         }
 
