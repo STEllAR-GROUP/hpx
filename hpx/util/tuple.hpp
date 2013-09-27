@@ -194,17 +194,24 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 (N < util::decay<T0>::type::size_value)>::type>
         {
+            typedef typename util::decay<T0>::type tuple0_type;
+            typedef typename util::decay<T1>::type tuple1_type;
+
             typedef
-                typename detail::tuple_element<
-                    N
-                  , typename util::decay<T0>::type
-                >::type
+                typename detail::tuple_element<N, tuple0_type>::type
                 type;
 
-            static BOOST_FORCEINLINE type const&
-            call(T0 const& t0, T1 const& t1)
+            static BOOST_FORCEINLINE
+            type
+            call(tuple0_type const& t0, tuple1_type const& t1)
             {
                 return t0.template get<N>();
+            }
+            static BOOST_FORCEINLINE
+            typename util::detail::add_rvalue_reference<type>::type
+            call(BOOST_RV_REF(tuple0_type) t0, tuple1_type const& t1)
+            {
+                return boost::forward<type>(t0.template get<N>());
             }
         };
 
@@ -217,18 +224,25 @@ namespace hpx { namespace util
         {
             static const std::size_t offset =
                 util::decay<T0>::type::size_value;
+            
+            typedef typename util::decay<T0>::type tuple0_type;
+            typedef typename util::decay<T1>::type tuple1_type;
 
             typedef
-                typename detail::tuple_element<
-                    N - offset
-                  , typename util::decay<T1>::type
-                >::type
+                typename detail::tuple_element<N - offset, tuple1_type>::type
                 type;
 
-            static BOOST_FORCEINLINE type const&
-            call(T0 const& t0, T1 const& t1)
+            static BOOST_FORCEINLINE
+            type
+            call(tuple0_type const& t0, tuple1_type const& t1)
             {
                 return t1.template get<N - offset>();
+            }
+            static BOOST_FORCEINLINE
+            typename util::detail::add_rvalue_reference<type>::type
+            call(tuple0_type const& t0, BOOST_RV_REF(tuple1_type) t1)
+            {
+                return boost::forward<type>(t1.template get<N - offset>());
             }
         };
 
@@ -352,9 +366,17 @@ namespace boost
             {
                 template<typename Seq> struct apply;
             };
+            template<>
+            struct access::struct_member<hpx::util::tuple<>, 0>
+            {
+                template<typename Seq> struct apply;
+            };
 
             template<int I>
             struct struct_member_name<hpx::util::tuple<>, I>
+            {};
+            template<>
+            struct struct_member_name<hpx::util::tuple<>, 0>
             {};
 
             template<>
@@ -458,17 +480,21 @@ namespace hpx { namespace util { namespace detail
     BOOST_PP_CAT(a, N)(HPX_FORWARD_ARGS(Z, N, D))                             \
 /**/
 #define HPX_UTIL_TUPLE_INIT_COPY_MEMBER(Z, N, D)                              \
-    BOOST_PP_CAT(a, N)(BOOST_PP_CAT(other.a, N))                              \
+    BOOST_PP_CAT(a, N)(                                                       \
+        detail::copy_construct<                                               \
+            BOOST_PP_CAT(A, N)                                                \
+          , typename boost::add_const<BOOST_PP_CAT(D, N)>::type               \
+        >::call(BOOST_PP_CAT(other.a, N)))                                    \
 /**/
 #define HPX_UTIL_TUPLE_INIT_MOVE_MEMBER(Z, N, D)                              \
-    BOOST_PP_CAT(a, N)(detail::move_if_no_ref<BOOST_PP_CAT(D, N)>::call(      \
+    BOOST_PP_CAT(a, N)(boost::forward<BOOST_PP_CAT(D, N)>(                    \
         BOOST_PP_CAT(other.a, N)))                                            \
 /**/
 #define HPX_UTIL_TUPLE_ASSIGN_COPY_MEMBER(Z, N, D)                            \
     BOOST_PP_CAT(a, N) = BOOST_PP_CAT(other.a, N);                            \
 /**/
 #define HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER(Z, N, D)                            \
-    BOOST_PP_CAT(a, N) = detail::move_if_no_ref<BOOST_PP_CAT(D, N)>::call(    \
+    BOOST_PP_CAT(a, N) = boost::forward<BOOST_PP_CAT(D, N)>(                  \
         BOOST_PP_CAT(other.a, N));                                            \
 /**/
 #define HPX_UTIL_TUPLE_SWAP_MEMBER(Z, N, D)                                   \
@@ -634,15 +660,9 @@ namespace hpx { namespace util
 #define HPX_UTIL_TUPLE_TRAILING_FWD_ARG(Z, N, D)                              \
     , boost::forward<BOOST_PP_CAT(T, N)>(BOOST_PP_CAT(D, N))                  \
 /**/
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
-#define HPX_UTIL_MAKE_ARGUMENT_PACK(Z, N, D)                                  \
-    typename detail::env_value_type<BOOST_PP_CAT(D, N)>::type                 \
+#define HPX_UTIL_MAKE_FWD_TUPLE_ARG(Z, N, D)                                  \
+    typename detail::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type           \
 /**/
-#else
-#define HPX_UTIL_MAKE_ARGUMENT_PACK(Z, N, D)                                  \
-    BOOST_FWD_REF(BOOST_PP_CAT(D, N))                                         \
-/**/
-#endif
 #define HPX_UTIL_TUPLE_CAT_ELEM_CALL(Z, N, D)                                 \
     detail::tuple_cat_element<N, T0, T1>::call(t0, t1)                        \
 /**/
@@ -661,10 +681,10 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)>
+    tuple<HPX_UTIL_MAKE_FWD_TUPLE_ARG(_, 0, Arg)>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
-        typedef tuple<HPX_UTIL_MAKE_ARGUMENT_PACK(_, 0, Arg)> result_type;
+        typedef tuple<HPX_UTIL_MAKE_FWD_TUPLE_ARG(_, 0, Arg)> result_type;
         return result_type(boost::forward<Arg0>(arg0), detail::forwarding_tag());
     }
 
@@ -699,11 +719,11 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     BOOST_FORCEINLINE
-    tuple<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>
+    tuple<BOOST_PP_ENUM(N, HPX_UTIL_MAKE_FWD_TUPLE_ARG, Arg)>
     forward_as_tuple(HPX_ENUM_FWD_ARGS(N, Arg, arg)) BOOST_NOEXCEPT
     {
         return tuple<
-                BOOST_PP_ENUM(N, HPX_UTIL_MAKE_ARGUMENT_PACK, Arg)>(
+                BOOST_PP_ENUM(N, HPX_UTIL_MAKE_FWD_TUPLE_ARG, Arg)>(
             HPX_ENUM_FORWARD_ARGS(N , Arg, arg));
     }
 
@@ -725,14 +745,12 @@ namespace hpx { namespace util
     typename boost::lazy_enable_if_c<                                         \
         N == util::decay<T0>::type::size_value                                \
            + util::decay<T1>::type::size_value                                \
-      , detail::tuple_cat_result<                                             \
-            typename util::decay<T0>::type                                    \
-          , typename util::decay<T1>::type                                    \
-        >                                                                     \
+      , detail::tuple_cat_result<T0, T1>                                      \
     >::type                                                                   \
     tuple_cat(BOOST_FWD_REF(T0) t0, BOOST_FWD_REF(T1) t1)                     \
     {                                                                         \
-        return make_tuple(BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CAT_ELEM_CALL, _)); \
+        typedef typename detail::tuple_cat_result<T0, T1>::type result_type;  \
+        return result_type(BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CAT_ELEM_CALL, _));\
     }                                                                         \
     /**/
 
@@ -748,9 +766,7 @@ namespace hpx { namespace util
     tuple_cat(HPX_ENUM_FWD_ARGS(N, T, t))
     {
         typedef
-            typename detail::tuple_cat_result<
-                typename util::decay<T0>::type, typename util::decay<T1>::type
-            >::type
+            typename detail::tuple_cat_result<T0, T1>::type
             head_type;
 
         head_type head =
@@ -764,7 +780,7 @@ namespace hpx { namespace util
 
 #undef HPX_UTIL_MAKE_TUPLE_ARG
 #undef HPX_UTIL_TUPLE_TRAILING_FWD_ARG
-#undef HPX_UTIL_MAKE_ARGUMENT_PACK
+#undef HPX_UTIL_MAKE_FWD_TUPLE_ARG
 #undef HPX_UTIL_TUPLE_CAT_ELEM_CALL
 }}
 
