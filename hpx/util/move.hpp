@@ -16,6 +16,8 @@
 
 #include <boost/move/move.hpp>
 
+#include <boost/type_traits/add_const.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_FWD_ARGS(z, n, d)                                                 \
     BOOST_FWD_REF(BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 0, d), n))              \
