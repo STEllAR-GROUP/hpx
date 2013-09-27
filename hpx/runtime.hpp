@@ -158,7 +158,7 @@ namespace hpx
 
         threads::topology const& get_topology() const
         {
-            return *topology_;
+            return topology_;
         }
 
         /// \brief Install all performance counters related to this runtime
@@ -360,7 +360,7 @@ namespace hpx
         // registered with the library
         boost::scoped_ptr<util::thread_mapper> thread_support_;
 
-        boost::scoped_ptr<threads::topology> topology_;
+        threads::topology& topology_;
 
         state state_;
 

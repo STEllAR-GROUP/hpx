@@ -760,10 +760,10 @@ namespace hpx { namespace util
                     pu_offset, pu_step, affinity_domain, "");
 
                 bool numa_sensitive = vm_.count("hpx:numa-sensitive") ? true : false;
-                HPX_STD_UNIQUE_PTR<threads::topology> top(threads::create_topology());
+                threads::topology& top = threads::create_topology();
                 for (std::size_t i = 0; i != num_threads; ++i)
                 {
-                    top->print_affinity_mask(std::cout, i, aff.get_pu_mask(*top, i, numa_sensitive));
+                    top.print_affinity_mask(std::cout, i, aff.get_pu_mask(top, i, numa_sensitive));
                 }
             }
             else {

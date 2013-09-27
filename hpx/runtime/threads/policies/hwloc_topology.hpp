@@ -208,9 +208,12 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline topology* create_topology()
+    inline hwloc_topology& create_topology()
     {
-        return new hwloc_topology;
+        struct hw_topology_tag {};
+
+        util::static_<hwloc_topology, hw_topology_tag> topo;
+        return topo.get();
     }
 }}
 

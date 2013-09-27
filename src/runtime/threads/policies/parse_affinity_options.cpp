@@ -655,7 +655,7 @@ namespace hpx { namespace threads
 
         // We need to instantiate a new topology object as the runtime has not
         // been initialized yet
-        hwloc_topology t;
+        threads::hwloc_topology& t = threads::create_topology();
 
         switch (mappings.which())
         {
@@ -717,7 +717,7 @@ namespace hpx { namespace threads
         parse_affinity_options(affinity_options, affinities, ec);
         if (ec) return;
         
-        hwloc_topology topo;
+        threads::hwloc_topology& topo = threads::create_topology();
 
         int i = 0;
         BOOST_FOREACH(mask_type const& m, affinities)

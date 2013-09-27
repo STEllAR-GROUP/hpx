@@ -28,6 +28,18 @@ namespace hpx { namespace threads
     mask_type noop_topology::empty_mask = mask_type(hardware_concurrency());
 }}
 
+#else
+#include <hwloc.h>
+#include <hpx/exception.hpp>
+
+namespace hpx { namespace threads { namespace detail
+{
+    std::size_t hwloc_hardware_concurrency()
+    {
+        threads::topology& top = threads::create_topology();
+        return top.hardware_concurrency();
+    }
+}}}
 #endif
 
 namespace hpx { namespace threads
@@ -92,7 +104,7 @@ namespace hpx { namespace threads
 #if defined(__ANDROID__) && defined(ANDROID)
           : num_of_cores_(::android_getCpuCount())
 #elif defined(HPX_HAVE_HWLOC)
-          : num_of_cores_(get_topology().hardware_concurrency())
+          : num_of_cores_(detail::hwloc_hardware_concurrency())
 #else
           : num_of_cores_(boost::thread::hardware_concurrency())
 #endif

@@ -140,9 +140,12 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-inline topology* create_topology()
+inline topology& create_topology()
 {
-    return new noop_topology;
+    struct noop_topology_tag {};
+
+    util::static_<noop_topology, noop_topology_tag> topo;
+    return topo.get();
 }
 
 }}
