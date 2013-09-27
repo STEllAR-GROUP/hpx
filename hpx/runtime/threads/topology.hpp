@@ -275,6 +275,9 @@ namespace hpx { namespace threads
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         virtual bool reduce_thread_priority(error_code& ec = throws) const;
+
+        /// \brief return the number of available hardware processing units
+        virtual std::size_t hardware_concurrency() const = 0;
     };
 
     HPX_API_EXPORT std::size_t hardware_concurrency();

@@ -121,6 +121,8 @@ namespace hpx { namespace threads
             std::size_t numa_node
             ) const;
 
+        std::size_t hardware_concurrency() const;
+
         void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const;
 
     private:

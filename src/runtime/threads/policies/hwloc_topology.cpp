@@ -843,6 +843,11 @@ namespace hpx { namespace threads
                 num_of_pus_ = static_cast<std::size_t>(num_of_pus);
         }
     }
+
+    std::size_t hwloc_topology::hardware_concurrency() const
+    {
+        return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU));
+    }
 }}
 
 #endif

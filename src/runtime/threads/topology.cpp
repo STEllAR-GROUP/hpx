@@ -127,7 +127,7 @@ namespace hpx { namespace threads
 #if defined(__ANDROID__) && defined(ANDROID)
           : num_of_cores_(::android_getCpuCount())
 #elif defined(HPX_HAVE_HWLOC)
-          : num_of_cores_(detail::hwloc_hardware_concurrency())
+          : num_of_cores_(get_topology().hardware_concurrency())
 #else
           : num_of_cores_(boost::thread::hardware_concurrency())
 #endif

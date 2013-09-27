@@ -13,7 +13,11 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/exception.hpp>
 
-namespace hpx { namespace threads 
+#if defined(__ANDROID__) && defined(ANDROID)
+#include <cpu-features.h>
+#endif
+
+namespace hpx { namespace threads
 {
 
 struct noop_topology : topology
@@ -120,9 +124,19 @@ public:
 
         return empty_mask;
     }
+
+    std::size_t hardware_concurrency() const
+    {
+#if defined(__ANDROID__) && defined(ANDROID)
+        return std::size_t(::android_getCpuCount());
+#else
+        return std::size_t(boost::thread::hardware_concurrency());
+#endif
+    }
         
     void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const
-    {}
+    {
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
