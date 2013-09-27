@@ -299,18 +299,6 @@ namespace hpx { namespace util {
                 : f(boost::move(other.f))
             {}
 
-            bound_functor0 & operator=(BOOST_COPY_ASSIGN_REF(bound_functor0) other)
-            {
-                f = other.f;
-                return *this;
-            }
-
-            bound_functor0 & operator=(BOOST_RV_REF(bound_functor0) other)
-            {
-                f = boost::move(other.f);
-                return *this;
-            }
-
             bound_functor0(BOOST_RV_REF(F) f_)
                 : f(boost::move(f_))
             {}
@@ -497,22 +485,6 @@ namespace hpx { namespace util
                 , BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MOVE_MEMBER, _)
             {}
 
-            BOOST_PP_CAT(bound_function, N) & operator=(
-                BOOST_COPY_ASSIGN_REF(BOOST_PP_CAT(bound_function, N)) other)
-            {
-                f = other.f;
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_ASSIGN_MEMBER, _)
-                return *this;
-            }
-
-            BOOST_PP_CAT(bound_function, N) & operator=(
-                BOOST_RV_REF(BOOST_PP_CAT(bound_function, N)) other)
-            {
-                f = boost::move(other.f);
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MOVE_MEMBER, _)
-                return *this;
-            }
-
             template <BOOST_PP_ENUM_PARAMS(N, typename A)>
             BOOST_PP_CAT(bound_function, N)(
                 function_pointer_type f
@@ -660,22 +632,6 @@ namespace hpx { namespace util
                 , BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MOVE_MEMBER, _)
             {}
 
-            BOOST_PP_CAT(bound_member_function, N) & operator=(
-                BOOST_COPY_ASSIGN_REF(BOOST_PP_CAT(bound_member_function, N)) other)
-            {
-                f = other.f;
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_ASSIGN_MEMBER, _)
-                return *this;
-            }
-
-            BOOST_PP_CAT(bound_member_function, N) & operator=(
-                BOOST_RV_REF(BOOST_PP_CAT(bound_member_function, N)) other)
-            {
-                f = boost::move(other.f);
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MOVE_MEMBER, _)
-                return *this;
-            }
-
             BOOST_FORCEINLINE R operator()() const
             {
                 using detail::get_pointer;
@@ -748,22 +704,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MOVE_MEMBER, _)
             {}
-
-            BOOST_PP_CAT(bound_member_function, N) & operator=(
-                BOOST_COPY_ASSIGN_REF(BOOST_PP_CAT(bound_member_function, N)) other)
-            {
-                f = other.f;
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_ASSIGN_MEMBER, _)
-                return *this;
-            }
-
-            BOOST_PP_CAT(bound_member_function, N) & operator=(
-                BOOST_RV_REF(BOOST_PP_CAT(bound_member_function, N)) other)
-            {
-                f = boost::move(other.f);
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MOVE_MEMBER, _)
-                return *this;
-            }
 
             BOOST_FORCEINLINE R operator()() const
             {
@@ -1110,22 +1050,6 @@ namespace hpx { namespace util
                 : f(boost::move(other.f))
                 , BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MOVE_MEMBER, _)
             {}
-
-            BOOST_PP_CAT(bound_functor, N) & operator=(
-                BOOST_COPY_ASSIGN_REF(BOOST_PP_CAT(bound_functor, N)) other)
-            {
-                f = other.f;
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_ASSIGN_MEMBER, _)
-                return *this;
-            }
-
-            BOOST_PP_CAT(bound_functor, N) & operator=(
-                BOOST_RV_REF(BOOST_PP_CAT(bound_functor, N)) other)
-            {
-                f = boost::move(other.f);
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MOVE_MEMBER, _)
-                return *this;
-            }
 
             BOOST_FORCEINLINE
             typename result_of::BOOST_PP_CAT(bound_functor, N)<
