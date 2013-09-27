@@ -613,8 +613,17 @@ namespace hpx { namespace threads
     {
         std::size_t idx = find_first(m);
         hwloc_obj_t obj;
-        
-        for(std::size_t i = 0; i < std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU)); ++i)
+
+        std::size_t const nbobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+
+        if (nbobjs == ~0x0u)
+        {
+            HPX_THROW_EXCEPTION(kernel_error
+              , "hpx::threads::hwloc_topology::print_affinity_mask"
+              , "hwloc_get_nbobjs_by_type failed");
+        }
+
+        for(std::size_t i = 0; i < nbobjs; ++i)
         {
             obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU, i);
             // on Windows os_index is always -1
