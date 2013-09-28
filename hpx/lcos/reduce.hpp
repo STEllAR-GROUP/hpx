@@ -13,9 +13,9 @@ namespace hpx { namespace lcos
     ///
     /// The function hpx::lcos::reduce performs a distributed reduction
     /// operation over results returned from action invocations on a given set
-    /// of global identifiers. The actions can be either plain actions (in
-    /// which case the global identifiers have to refer to localities) or 
-    /// component actions (in which case the global identifiers have to refer
+    /// of global identifiers. The action can be either a plain action (in
+    /// which case the global identifiers have to refer to localities) or a
+    /// component action (in which case the global identifiers have to refer
     /// to instances of a component type which exposes the action.
     ///
     /// \param ids       [in] A list of global identifiers identifying the
@@ -43,9 +43,9 @@ namespace hpx { namespace lcos
     ///
     /// The function hpx::lcos::reduce_with_index performs a distributed reduction
     /// operation over results returned from action invocations on a given set
-    /// of global identifiers. The actions can be either plain actions (in
-    /// which case the global identifiers have to refer to localities) or 
-    /// component actions (in which case the global identifiers have to refer
+    /// of global identifiers. The action can be either plain action (in
+    /// which case the global identifiers have to refer to localities) or a
+    /// component action (in which case the global identifiers have to refer
     /// to instances of a component type which exposes the action.
     ///
     /// The function passes the index of the global identifier in the given
