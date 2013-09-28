@@ -16,6 +16,8 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 900] - Web documentation for trunk has no index
+* [issue 897] - Some tests fail with GCC 4.8.1 and MPI parcel port
 * [issue 897] - HWLOC causes failures on Mac
 * [issue 896] - pu-offset leads to startup error
 * [issue 895] - hpx::get_locality_name not defined
@@ -28,17 +30,17 @@ Here is a list of the important tickets we closed for this release.
 * [issue 885] - Two threads are slower than one 
 * [issue 883] - Need help with is_callable_test
 * [issue 881] - tests/regressions/block_matrix/matrix.hh won't compile with GCC
-				4.8.1 
+                4.8.1 
 * [issue 878] - `future::unwrap` triggers assertion
 * [issue 877] - "make tests" has build errors on Ubuntu 12.10 
 * [issue 876] - tcmalloc is used by default, even if it is not present
 * [issue 875] - global_fixture is defined in a header file
 * [issue 873] - Add block-matrix code as regression test
 * [issue 872] - HPX documentation does not say how to run tests with detailed
-				output
+                output
 * [issue 871] - All tests fail with "make test"
 * [issue 870] - Please explicitly disable serialization in classes that don't
-				support it
+                support it
 * [issue 867] - Reduce the number of copies of hpx::function arguments
 * [issue 863] - Futures should not require a default constructor
 * [issue 862] - value_or_error shall not default construct its result
