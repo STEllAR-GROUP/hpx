@@ -25,34 +25,33 @@
 <div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../header/hpx/error_hpp.html" title="Header &lt;hpx/error.hpp&gt;">hpx/error.hpp</a>&gt;
 
 </span>
-<span class="keyword">enum</span> <span class="identifier">error</span> <span class="special">{</span> <a class="link" href="error.html#hpx.error.success">success</a> = = 0, <a class="link" href="error.html#hpx.error.no_success">no_success</a> = = 1, <a class="link" href="error.html#hpx.error.not_implemented">not_implemented</a> = = 2, 
-             <a class="link" href="error.html#hpx.error.out_of_memory">out_of_memory</a> = = 3, bad_action_code = = 4, 
-             <a class="link" href="error.html#hpx.error.bad_component_type">bad_component_type</a> = = 5, <a class="link" href="error.html#hpx.error.network_error">network_error</a> = = 6, 
-             <a class="link" href="error.html#hpx.error.version_too_new">version_too_new</a> = = 7, <a class="link" href="error.html#hpx.error.version_too_old">version_too_old</a> = = 8, 
-             <a class="link" href="error.html#hpx.error.version_unknown">version_unknown</a> = = 9, unknown_component_address = = 10, 
-             <a class="link" href="error.html#hpx.error.duplicate_component_address">duplicate_component_address</a> = = 11, <a class="link" href="error.html#hpx.error.invalid_status">invalid_status</a> = = 12, 
-             <a class="link" href="error.html#hpx.error.bad_parameter">bad_parameter</a> = = 13, internal_server_error = = 14, 
-             service_unavailable = = 15, bad_request = = 16, 
-             repeated_request = = 17, lock_error = = 18, 
-             <a class="link" href="error.html#hpx.error.duplicate_console">duplicate_console</a> = = 19, <a class="link" href="error.html#hpx.error.no_registered_console">no_registered_console</a> = = 20, 
-             startup_timed_out = = 21, uninitialized_value = = 22, 
-             bad_response_type = = 23, deadlock = = 24, 
-             assertion_failure = = 25, <a class="link" href="error.html#hpx.error.null_thread_id">null_thread_id</a> = = 26, 
-             invalid_data = = 27, <a class="link" href="error.html#hpx.error.yield_aborted">yield_aborted</a> = = 28, 
-             dynamic_link_failure = = 29, <a class="link" href="error.html#hpx.error.commandline_option_error">commandline_option_error</a> = = 30, 
-             <a class="link" href="error.html#hpx.error.serialization_error">serialization_error</a> = = 31, <a class="link" href="error.html#hpx.error.unhandled_exception">unhandled_exception</a> = = 32, 
-             <a class="link" href="error.html#hpx.error.kernel_error">kernel_error</a> = = 33, <a class="link" href="error.html#hpx.error.broken_task">broken_task</a> = = 34, <a class="link" href="error.html#hpx.error.task_moved">task_moved</a> = = 35, 
-             <a class="link" href="error.html#hpx.error.task_already_started">task_already_started</a> = = 36, <a class="link" href="error.html#hpx.error.future_already_retrieved">future_already_retrieved</a> = = 37, 
-             <a class="link" href="error.html#hpx.error.future_already_satisfied">future_already_satisfied</a> = = 38, 
-             <a class="link" href="error.html#hpx.error.future_does_not_support_cancellation">future_does_not_support_cancellation</a> = = 39, 
-             <a class="link" href="error.html#hpx.error.future_can_not_be_cancelled">future_can_not_be_cancelled</a> = = 40, <a class="link" href="error.html#hpx.error.future_uninitialized">future_uninitialized</a> = = 41, 
-             <a class="link" href="error.html#hpx.error.broken_promise">broken_promise</a> = = 42, thread_resource_error = = 43, 
-             thread_interrupted = = 44, thread_not_interruptable = = 45, 
-             <a class="link" href="error.html#hpx.error.duplicate_component_id">duplicate_component_id</a> = = 46, <a class="link" href="error.html#hpx.error.unknown_error">unknown_error</a> = = 47, 
-             <a class="link" href="error.html#hpx.error.bad_plugin_type">bad_plugin_type</a> = = 48, <a class="link" href="error.html#hpx.error.security_error">security_error</a> = = 49, 
-             <a class="link" href="error.html#hpx.error.filesystem_error">filesystem_error</a> = = 50, <a class="link" href="error.html#hpx.error.bad_function_call">bad_function_call</a> = = 51 <span class="special">}</span><span class="special">;</span></pre></div>
+<span class="keyword">enum</span> <span class="identifier">error</span> <span class="special">{</span> <a class="link" href="error.html#hpx.error.success">success</a> =  0, <a class="link" href="error.html#hpx.error.no_success">no_success</a> =  1, <a class="link" href="error.html#hpx.error.not_implemented">not_implemented</a> =  2, 
+             <a class="link" href="error.html#hpx.error.out_of_memory">out_of_memory</a> =  3, bad_action_code =  4, 
+             <a class="link" href="error.html#hpx.error.bad_component_type">bad_component_type</a> =  5, <a class="link" href="error.html#hpx.error.network_error">network_error</a> =  6, 
+             <a class="link" href="error.html#hpx.error.version_too_new">version_too_new</a> =  7, <a class="link" href="error.html#hpx.error.version_too_old">version_too_old</a> =  8, <a class="link" href="error.html#hpx.error.version_unknown">version_unknown</a> =  9, 
+             unknown_component_address =  10, 
+             <a class="link" href="error.html#hpx.error.duplicate_component_address">duplicate_component_address</a> =  11, <a class="link" href="error.html#hpx.error.invalid_status">invalid_status</a> =  12, 
+             <a class="link" href="error.html#hpx.error.bad_parameter">bad_parameter</a> =  13, internal_server_error =  14, 
+             service_unavailable =  15, bad_request =  16, 
+             repeated_request =  17, lock_error =  18, 
+             <a class="link" href="error.html#hpx.error.duplicate_console">duplicate_console</a> =  19, <a class="link" href="error.html#hpx.error.no_registered_console">no_registered_console</a> =  20, 
+             startup_timed_out =  21, uninitialized_value =  22, 
+             bad_response_type =  23, deadlock =  24, assertion_failure =  25, 
+             <a class="link" href="error.html#hpx.error.null_thread_id">null_thread_id</a> =  26, invalid_data =  27, <a class="link" href="error.html#hpx.error.yield_aborted">yield_aborted</a> =  28, 
+             dynamic_link_failure =  29, <a class="link" href="error.html#hpx.error.commandline_option_error">commandline_option_error</a> =  30, 
+             <a class="link" href="error.html#hpx.error.serialization_error">serialization_error</a> =  31, <a class="link" href="error.html#hpx.error.unhandled_exception">unhandled_exception</a> =  32, 
+             <a class="link" href="error.html#hpx.error.kernel_error">kernel_error</a> =  33, <a class="link" href="error.html#hpx.error.broken_task">broken_task</a> =  34, <a class="link" href="error.html#hpx.error.task_moved">task_moved</a> =  35, 
+             <a class="link" href="error.html#hpx.error.task_already_started">task_already_started</a> =  36, <a class="link" href="error.html#hpx.error.future_already_retrieved">future_already_retrieved</a> =  37, 
+             <a class="link" href="error.html#hpx.error.future_already_satisfied">future_already_satisfied</a> =  38, 
+             <a class="link" href="error.html#hpx.error.future_does_not_support_cancellation">future_does_not_support_cancellation</a> =  39, 
+             <a class="link" href="error.html#hpx.error.future_can_not_be_cancelled">future_can_not_be_cancelled</a> =  40, <a class="link" href="error.html#hpx.error.future_uninitialized">future_uninitialized</a> =  41, 
+             <a class="link" href="error.html#hpx.error.broken_promise">broken_promise</a> =  42, thread_resource_error =  43, 
+             thread_interrupted =  44, thread_not_interruptable =  45, 
+             <a class="link" href="error.html#hpx.error.duplicate_component_id">duplicate_component_id</a> =  46, <a class="link" href="error.html#hpx.error.unknown_error">unknown_error</a> =  47, 
+             <a class="link" href="error.html#hpx.error.bad_plugin_type">bad_plugin_type</a> =  48, <a class="link" href="error.html#hpx.error.security_error">security_error</a> =  49, 
+             <a class="link" href="error.html#hpx.error.filesystem_error">filesystem_error</a> =  50, <a class="link" href="error.html#hpx.error.bad_function_call">bad_function_call</a> =  51 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idp14127744"></a><h2>Description</h2>
+<a name="idp98420432"></a><h2>Description</h2>
 <p>This enumeration lists all possible error conditions which can be reported from any of the API functions. </p>
 <div class="variablelist"><dl class="variablelist compact">
 <dt><span class="term"><code class="computeroutput">success</code><a name="hpx.error.success"></a></span></dt>

@@ -25,28 +25,28 @@
 <div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../header/hpx/exception_hpp.html" title="Header &lt;hpx/exception.hpp&gt;">hpx/exception.hpp</a>&gt;
 
 </span>
-<span class="keyword">class</span> <a class="link" href="error_code.html" title="Class error_code">error_code</a> <span class="special">:</span> <span class="keyword">public</span> <span class="identifier">error_code</span> <span class="special">{</span>
+<span class="keyword">class</span> <a class="link" href="error_code.html" title="Class error_code">error_code</a> <span class="special">{</span>
 <span class="keyword">public</span><span class="special">:</span>
   <span class="comment">// <a class="link" href="error_code.html#hpx.error_codeconstruct-copy-destruct">construct/copy/destruct</a></span>
-  <span class="keyword">explicit</span> <a class="link" href="error_code.html#idp15479744-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
-  <span class="keyword">explicit</span> <a class="link" href="error_code.html#idp15486704-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="error_code.html#idp15495264-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">long</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="error_code.html#idp15506976-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="error_code.html#idp15516896-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">long</span><span class="special">,</span> 
+  <span class="keyword">explicit</span> <a class="link" href="error_code.html#idp14841184-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">explicit</span> <a class="link" href="error_code.html#idp14848016-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="error_code.html#idp14856416-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">long</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="error_code.html#idp14868128-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="error_code.html#idp14878048-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">long</span><span class="special">,</span> 
              <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="error_code.html#idp15530240-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="error_code.html#idp15540160-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">long</span><span class="special">,</span> 
+  <a class="link" href="error_code.html#idp14891392-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="error_code.html#idp14901312-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="keyword">long</span><span class="special">,</span> 
              <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="error_code.html#idp15556816-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="keyword">int</span><span class="special">,</span> <a class="link" href="exception.html" title="Class exception">hpx::exception</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
-  <span class="keyword">explicit</span> <a class="link" href="error_code.html#idp15558608-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">exception_ptr</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
-  error_code&amp; <a class="link" href="error_code.html#idp15553504-bb"><span class="keyword">operator</span><span class="special">=</span></a><span class="special">(</span><a class="link" href="error_code.html" title="Class error_code">error_code</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="error_code.html#idp14917968-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="keyword">int</span><span class="special">,</span> <a class="link" href="exception.html" title="Class exception">hpx::exception</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">explicit</span> <a class="link" href="error_code.html#idp14919760-bb"><span class="identifier">error_code</span></a><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">exception_ptr</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  error_code&amp; <a class="link" href="error_code.html#idp14914656-bb"><span class="keyword">operator</span><span class="special">=</span></a><span class="special">(</span><a class="link" href="error_code.html" title="Class error_code">error_code</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
 
-  <span class="comment">// <a class="link" href="error_code.html#idp15473040-bb">public member functions</a></span>
-  <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <a class="link" href="error_code.html#idp15473440-bb"><span class="identifier">get_message</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <span class="keyword">void</span> <a class="link" href="error_code.html#idp15476560-bb"><span class="identifier">clear</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="error_code.html#idp14834480-bb">public member functions</a></span>
+  <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <a class="link" href="error_code.html#idp14834880-bb"><span class="identifier">get_message</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">void</span> <a class="link" href="error_code.html#idp14838000-bb"><span class="identifier">clear</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idp14629264"></a><h2>Description</h2>
+<a name="idp98919696"></a><h2>Description</h2>
 <p>The class <a class="link" href="error_code.html" title="Class error_code">hpx::error_code</a> describes an object used to hold error code values, such as those originating from the operating system or other low-level application program interfaces.</p>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -58,13 +58,13 @@
 <p>
 </p>
 <div class="refsect2">
-<a name="idp14632480"></a><h3>
+<a name="idp98922912"></a><h3>
 <a name="hpx.error_codeconstruct-copy-destruct"></a><code class="computeroutput">error_code</code> 
         public
        construct/copy/destruct</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp15479744-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp14841184-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Construct an object of type <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code>.</p>
 <p>
 
@@ -96,7 +96,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp15486704-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp14848016-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Construct an object of type <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code>.</p>
 <p>
 
@@ -134,7 +134,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp15495264-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> func<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> file<span class="special">,</span> <span class="keyword">long</span> line<span class="special">,</span> 
+<pre class="literallayout"><a name="idp14856416-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> func<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> file<span class="special">,</span> <span class="keyword">long</span> line<span class="special">,</span> 
            <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Construct an object of type <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code>.</p>
 <p>
@@ -185,7 +185,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp15506976-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> msg<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><a name="idp14868128-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> msg<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Construct an object of type <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code>.</p>
 <p>
 
@@ -227,7 +227,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp15516896-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> msg<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> func<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> file<span class="special">,</span> 
+<pre class="literallayout"><a name="idp14878048-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> msg<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> func<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> file<span class="special">,</span> 
            <span class="keyword">long</span> line<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Construct an object of type <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code>.</p>
 <p>
@@ -282,7 +282,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp15530240-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span> msg<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><a name="idp14891392-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span> msg<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Construct an object of type <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code>.</p>
 <p>
 
@@ -324,7 +324,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp15540160-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span> msg<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> func<span class="special">,</span> 
+<pre class="literallayout"><a name="idp14901312-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span> msg<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> func<span class="special">,</span> 
            <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> file<span class="special">,</span> <span class="keyword">long</span> line<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Construct an object of type <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code>.</p>
 <p>
@@ -378,10 +378,10 @@
 </tbody>
 </table></div>
 </li>
-<li class="listitem"><pre class="literallayout"><a name="idp15556816-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="keyword">int</span> err<span class="special">,</span> <a class="link" href="exception.html" title="Class exception">hpx::exception</a> <span class="keyword">const</span> <span class="special">&amp;</span> e<span class="special">)</span><span class="special">;</span></pre></li>
-<li class="listitem"><pre class="literallayout"><span class="keyword">explicit</span> <a name="idp15558608-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">exception_ptr</span> <span class="keyword">const</span> <span class="special">&amp;</span> e<span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><a name="idp14917968-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="keyword">int</span> err<span class="special">,</span> <a class="link" href="exception.html" title="Class exception">hpx::exception</a> <span class="keyword">const</span> <span class="special">&amp;</span> e<span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">explicit</span> <a name="idp14919760-bb"></a><span class="identifier">error_code</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">exception_ptr</span> <span class="keyword">const</span> <span class="special">&amp;</span> e<span class="special">)</span><span class="special">;</span></pre></li>
 <li class="listitem">
-<pre class="literallayout">error_code&amp; <a name="idp15553504-bb"></a><span class="keyword">operator</span><span class="special">=</span><span class="special">(</span><a class="link" href="error_code.html" title="Class error_code">error_code</a> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout">error_code&amp; <a name="idp14914656-bb"></a><span class="keyword">operator</span><span class="special">=</span><span class="special">(</span><a class="link" href="error_code.html" title="Class error_code">error_code</a> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
 <p>Assignment operator for <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code></p>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -396,11 +396,11 @@
 </ol></div>
 </div>
 <div class="refsect2">
-<a name="idp14835856"></a><h3>
-<a name="idp15473040-bb"></a><code class="computeroutput">error_code</code> public member functions</h3>
+<a name="idp99126480"></a><h3>
+<a name="idp14834480-bb"></a><code class="computeroutput">error_code</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <a name="idp15473440-bb"></a><span class="identifier">get_message</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <a name="idp14834880-bb"></a><span class="identifier">get_message</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
 <p>Return a reference to the error message stored in the <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">hpx::error_code</a></code>.</p>
 <p>
 </p>
@@ -416,7 +416,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">void</span> <a name="idp15476560-bb"></a><span class="identifier">clear</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>Clear this <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code> object. The postconditions of invoking this method are. <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>value() == hpx::success and category() == hpx::get_hpx_category() </p></li></ul></div>
+<pre class="literallayout"><span class="keyword">void</span> <a name="idp14838000-bb"></a><span class="identifier">clear</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>Clear this <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">error_code</a></code> object. The postconditions of invoking this method are. <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>value() == hpx::success and category() == hpx::get_hpx_category() </p></li></ul></div>
 <p>
 </p>
 </li>
