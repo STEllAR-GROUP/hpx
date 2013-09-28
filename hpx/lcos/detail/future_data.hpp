@@ -677,13 +677,14 @@ namespace detail
 
             if (sched_) {
                 sched_->add(HPX_STD_BIND(&task_base::run_impl, this_),
-                    "task_base::apply", threads::pending, false);
+                    "task_base::apply", threads::pending, false,
+                    stacksize, ec);
             }
             else {
                 threads::register_thread_plain(
                     HPX_STD_BIND(&task_base::run_impl, this_),
                     "task_base::apply", threads::pending, false,
-                    priority, std::size_t(-1), stacksize);
+                    priority, std::size_t(-1), stacksize, ec);
             }
         }
 
