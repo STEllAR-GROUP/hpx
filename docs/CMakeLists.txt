@@ -103,7 +103,7 @@ if(BOOSTAUTOINDEX_FOUND)
 endif()
 
 set(image
-    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}.png)
+    images/hpx_${HPX_MAJOR_VERSION}_${HPX_MINOR_VERSION}_${HPX_PATCH_LEVEL}_draft.png)
 
 hpx_quickbook_to_html(hpx
   SOURCE hpx.qbk
@@ -116,8 +116,8 @@ hpx_quickbook_to_html(hpx
                 --stringparam toc.max.depth 4
                 --stringparam generate.section.toc.level 4
                 --stringparam boost.image.src ${image}
-                --stringparam boost.image.w 322
-                --stringparam boost.image.h 101
+                --stringparam boost.image.w 470
+                --stringparam boost.image.h 120
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
