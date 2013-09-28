@@ -4,6 +4,76 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file get_ptr.hpp
+
+#if defined(DOXYGEN)
+namespace hpx { namespace lcos
+{
+    /// \brief Perform a distributed reduction operation
+    ///
+    /// The function hpx::lcos::reduce performs a distributed reduction
+    /// operation over results returned from action invocations on a given set
+    /// of global identifiers. The actions can be either plain actions (in
+    /// which case the global identifiers have to refer to localities) or 
+    /// component actions (in which case the global identifiers have to refer
+    /// to instances of a component type which exposes the action.
+    ///
+    /// \param ids       [in] A list of global identifiers identifying the
+    ///                  target objects for which the given action will be
+    ///                  invoked.
+    /// \param reduce_op [in] A binary function expecting two results as
+    ///                  returned from the action invocations. The function
+    ///                  (or function object) is expected to return the result
+    ///                  of the reduction operation performed on its arguments.
+    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    ///                  value, by const reference or by rvalue reference)
+    ///                  which will be forwarded to the action invocation.
+    ///
+    /// \returns         This function returns a future representing the result
+    ///                  of the overall reduction operation.
+    ///
+    template <typename Action, typename ReduceOp, typename ArgN, ...>
+    hpx::future<decltype(Action(hpx::id_type, ArgN, ...))>
+    reduce(
+        std::vector<hpx::id_type> const & ids
+      , ReduceOp&& reduce_op
+      , ArgN argN, ...);
+
+    /// \brief Perform a distributed reduction operation
+    ///
+    /// The function hpx::lcos::reduce_with_index performs a distributed reduction
+    /// operation over results returned from action invocations on a given set
+    /// of global identifiers. The actions can be either plain actions (in
+    /// which case the global identifiers have to refer to localities) or 
+    /// component actions (in which case the global identifiers have to refer
+    /// to instances of a component type which exposes the action.
+    ///
+    /// The function passes the index of the global identifier in the given
+    /// list of identifiers as the last argument to the action.
+    ///
+    /// \param ids       [in] A list of global identifiers identifying the
+    ///                  target objects for which the given action will be
+    ///                  invoked.
+    /// \param reduce_op [in] A binary function expecting two results as
+    ///                  returned from the action invocations. The function
+    ///                  (or function object) is expected to return the result
+    ///                  of the reduction operation performed on its arguments.
+    /// \param argN      [in] Any number of arbitrary arguments (passed by
+    ///                  value, by const reference or by rvalue reference)
+    ///                  which will be forwarded to the action invocation.
+    ///
+    /// \returns         This function returns a future representing the result
+    ///                  of the overall reduction operation.
+    ///
+    template <typename Action, typename ReduceOp, typename ArgN, ...>
+    hpx::future<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))>
+    reduce_with_index(
+        std::vector<hpx::id_type> const & ids
+      , ReduceOp&& reduce_op
+      , ArgN argN, ...);
+}}
+#else
+
 #if !BOOST_PP_IS_ITERATING
 
 #if !defined(HPX_LCOS_REDUCE_SEP_28_2013_1105AM)
@@ -512,3 +582,5 @@ namespace hpx { namespace lcos
 }}
 
 #endif
+
+#endif // DOXYGEN

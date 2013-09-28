@@ -137,6 +137,10 @@ security_error                        "" "hpx\.error"
 # hpx/runtime/get_ptr.hpp
 get_ptr                               "" "hpx\.get_ptr.*"
 
+# hpx/lcos/reduce.hpp
+reduce                                "" "header\.hpx\.lcos\.reduce.*"
+reduce_with_index                     "" "header\.hpx\.lcos\.reduce.*"
+
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"
 terminate                             "" "hpx\.terminate.*"

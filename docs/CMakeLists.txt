@@ -44,6 +44,7 @@ set(doxygen_dependencies
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_non_const_action.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/new.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/copy_component.hpp
+    ${hpx_SOURCE_DIR}/hpx/lcos/reduce.hpp
     ${hpx_SOURCE_DIR}/hpx/performance_counters/manage_counter_type.hpp)
 
 foreach(doxygen_input ${doxygen_dependencies})
