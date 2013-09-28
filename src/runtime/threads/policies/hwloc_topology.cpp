@@ -681,10 +681,10 @@ namespace hpx { namespace threads
 
             if (first) {
                 first = false;
-                os << std::setw(6) << num_thread << ": ";
+                os << std::setw(4) << num_thread << ": ";
             }
             else {
-                os << "        ";
+                os << "      ";
             }
 
             detail::print_info(os, obj);

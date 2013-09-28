@@ -101,7 +101,7 @@ namespace hpx { namespace util
     {
         find_counters();
 
-        for (std::size_t i = 0; i < ids_.size(); ++i)
+        for (std::size_t i = 0; i != ids_.size(); ++i)
         {
             // start the performance counter
             using performance_counters::stubs::performance_counter;
@@ -145,6 +145,7 @@ namespace hpx { namespace util
 
     void query_counters::terminate()
     {
+        mutex_type::scoped_lock l(mtx_);
         ids_.clear();      // give up control over all performance counters
     }
 
@@ -171,7 +172,7 @@ namespace hpx { namespace util
         std::vector<future<bool> > started;
 
         started.reserve(ids_.size());
-        for (std::size_t i = 0; i < ids_.size(); ++i)
+        for (std::size_t i = 0; i != ids_.size(); ++i)
             started.push_back(performance_counter::start_async(ids_[i]));
 
         // wait for all counters to be started
@@ -200,7 +201,7 @@ namespace hpx { namespace util
         std::vector<future<bool> > stopped;
 
         stopped.reserve(ids_.size());
-        for (std::size_t i = 0; i < ids_.size(); ++i)
+        for (std::size_t i = 0; i != ids_.size(); ++i)
             stopped.push_back(performance_counter::stop_async(ids_[i]));
 
         // wait for all counters to be started
@@ -229,7 +230,7 @@ namespace hpx { namespace util
         std::vector<future<void> > reset;
 
         reset.reserve(ids_.size());
-        for (std::size_t i = 0; i < ids_.size(); ++i)
+        for (std::size_t i = 0; i != ids_.size(); ++i)
             reset.push_back(performance_counter::reset_async(ids_[i]));
 
         // wait for all counters to be started
@@ -263,13 +264,22 @@ namespace hpx { namespace util
             return false;
         }
 
+        std::vector<id_type> ids;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            ids = ids_;
+        }
+
+        if (ids.empty())
+            return false;
+
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
         std::vector<future<performance_counters::counter_value> > values;
 
-        values.reserve(ids_.size());
-        for (std::size_t i = 0; i < ids_.size(); ++i)
-            values.push_back(performance_counter::get_value_async(ids_[i], reset));
+        values.reserve(ids.size());
+        for (std::size_t i = 0; i != ids.size(); ++i)
+            values.push_back(performance_counter::get_value_async(ids[i], reset));
 
         util::osstream output;
         if (description)

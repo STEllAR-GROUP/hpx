@@ -7,6 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/state.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/base_object.hpp>
@@ -84,11 +85,24 @@ namespace hpx { namespace naming
                 // FIXME: The address should still be in the cache, but it could
                 // be evicted. It would be nice to have a way to pass the address
                 // directly to free_component_sync.
-                components::stubs::runtime_support::free_component_sync(t, *p, 1);
+                try {
+                    using components::stubs::runtime_support;
+                    runtime_support::free_component_sync(t, *p, 1);
+                }
+                catch (hpx::exception const& e) {
+                    // This request might come in too late and the thread manager
+                    // was already stopped. We ignore the request if that's the
+                    // case.
+                    if (e.get_error() != invalid_status) {
+                        throw;      // rethrow if not invalid_status
+                    }
+                    else if (!threads::threadmanager_is(hpx::stopping)) {
+                        throw;      // rethrow if not stopping
+                    }
+                }
             }
             delete p;   // delete local gid representation in any case
         }
-
 
         // custom deleter for managed gid_types, will be called when the last
         // copy of the corresponding naming::id_type goes out of scope
