@@ -611,91 +611,92 @@ namespace hpx { namespace threads
         return std::size_t(hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE));
     }
 
-    void print_info(std::ostream& os, hwloc_obj_t obj, bool comma = false)
+    namespace detail
     {
-        switch (obj->type) {
-        case HWLOC_OBJ_PU:
+        void print_info(std::ostream& os, hwloc_obj_t obj, char const* name, bool comma)
+        {
             if (comma)
                 os << ", ";
-            os << "PU ";
-            break;
+            os << name;
 
-        case HWLOC_OBJ_CORE:
-            if (comma)
-                os << ", ";
-            os << "Core ";
-            break;
-
-        case HWLOC_OBJ_SOCKET:
-            if (comma)
-                os << ", ";
-            os << "Socket ";
-            break;
-
-        case HWLOC_OBJ_NODE:
-            if (comma)
-                os << ", ";
-            os << "Node ";
-            break;
-
-        default:
-            return;
+            if (obj->logical_index != ~0x0u)
+                os << "L#" << obj->logical_index;
+            if (obj->os_index != ~0x0u)
+                os << "(P#" << obj->os_index << ")";
         }
 
-        if (obj->logical_index != ~0x0u)
-            os << "L#" << obj->logical_index;
-        if (obj->os_index != ~0x0u)
-            os << "(P#" << obj->os_index << ")";
+        void print_info(std::ostream& os, hwloc_obj_t obj, bool comma = false)
+        {
+            switch (obj->type) {
+            case HWLOC_OBJ_PU:
+                print_info(os, obj, "PU ", comma);
+                break;
+
+            case HWLOC_OBJ_CORE:
+                print_info(os, obj, "Core ", comma);
+                break;
+
+            case HWLOC_OBJ_SOCKET:
+                print_info(os, obj, "Socket ", comma);
+                break;
+
+            case HWLOC_OBJ_NODE:
+                print_info(os, obj, "Node ", comma);
+                break;
+
+            default:
+                break;
+            }
+        }
     }
 
-    void hwloc_topology::print_affinity_mask(std::ostream& os, std::size_t num_thread,
-        mask_type const& m) const
+    void hwloc_topology::print_affinity_mask(std::ostream& os,
+        std::size_t num_thread, mask_type const& m) const
     {
-        std::size_t idx = find_first(m);
-        hwloc_obj_t obj = 0;
-
         int const nbobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
-
-        if (0 > nbobjs) 
+        if (0 > nbobjs)
         {
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::hwloc_topology::print_affinity_mask"
               , "hwloc_get_nbobjs_by_type failed");
-        }
-
-        for(std::size_t i = 0; i < std::size_t(nbobjs); ++i)
-        {
-            obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU, unsigned(i));
-            // on Windows os_index is always -1
-            if (obj->os_index != ~0x0u)
-            {
-                if(obj->os_index == idx) break;
-            }
-            else
-            {
-                if(obj->logical_index == idx) break;
-            }
-        }
-
-        if (!obj)
-        {
-            HPX_THROW_EXCEPTION(kernel_error
-              , "hpx::threads::hwloc_topology::print_affinity_mask"
-              , "object not found");
+            return;
         }
 
         boost::io::ios_flags_saver ifs(os);
+        bool first = true;
 
-        os << num_thread << ": " << std::setfill(' ');
-        print_info(os, obj);
-
-        while(obj->parent)
+        for(std::size_t i = 0; i != std::size_t(nbobjs); ++i)
         {
-            print_info(os, obj->parent, true);
-            obj = obj->parent;
-        }
+            if (!test(m, i))
+                continue;
 
-        os << std::endl;
+            hwloc_obj_t obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU, unsigned(i));
+            if (!obj)
+            {
+                HPX_THROW_EXCEPTION(kernel_error
+                  , "hpx::threads::hwloc_topology::print_affinity_mask"
+                  , "object not found");
+                return;
+            }
+
+            if (first) {
+                first = false;
+                os << std::setw(6) << num_thread << ": ";
+            }
+            else {
+                os << "        ";
+            }
+
+            detail::print_info(os, obj);
+
+            while(obj->parent)
+            {
+                detail::print_info(os, obj->parent, true);
+                obj = obj->parent;
+            }
+
+            os << std::endl;
+        }
     }
 
     mask_type hwloc_topology::init_machine_affinity_mask() const

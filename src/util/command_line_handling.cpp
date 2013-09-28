@@ -753,8 +753,18 @@ namespace hpx { namespace util
                     pu_step = vm_["hpx:pu-step"].as<std::size_t>();
 
                 std::string affinity_domain;
-                if (vm_.count("hpx:affinity"))
+                if (vm_.count("hpx:affinity")) {
                     affinity_domain = vm_["hpx:affinity"].as<std::string>();
+                    if (0 != std::string("pu").find(affinity_domain) &&
+                        0 != std::string("core").find(affinity_domain) &&
+                        0 != std::string("numa").find(affinity_domain) &&
+                        0 != std::string("machine").find(affinity_domain))
+                    {
+                        throw std::logic_error("Invalid command line option "
+                            "--hpx:affinity, value must be one of: pu, core, numa, "
+                            "or machine.");
+                    }
+                }
 
                 threads::policies::detail::affinity_data aff(num_threads,
                     pu_offset, pu_step, affinity_domain, "");
