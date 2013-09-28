@@ -176,7 +176,7 @@ namespace hpx { namespace lcos
     }
 }}
 
-/*
+
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/preprocessed/reduce.hpp>
 #else
@@ -184,7 +184,6 @@ namespace hpx { namespace lcos
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
 #  pragma wave option(preserve: 1, line: 0, output: "preprocessed/reduce_" HPX_LIMIT_STR ".hpp")
 #endif
-*/
 
 #define HPX_LCOS_REDUCE_EXTRACT_ACTION_ARGUMENTS(Z, N, D)                     \
     typename boost::fusion::result_of::value_at_c<                            \
@@ -202,13 +201,11 @@ namespace hpx { namespace lcos
 
 #undef HPX_LCOS_REDUCE_EXTRACT_ACTION_ARGUMENTS
 
-/*
 #if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
 #  pragma wave option(output: null)
 #endif
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-*/
 
 #define HPX_REGISTER_REDUCE_ACTION_DECLARATION(Action, ReduceOp)              \
     HPX_REGISTER_ACTION_DECLARATION(                                          \

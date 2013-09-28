@@ -45,6 +45,7 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/async_continue.hpp"
   "hpx/lcos/async_continue_fwd.hpp"
   "hpx/lcos/broadcast.hpp"
+  "hpx/lcos/reduce.hpp"
   "hpx/lcos/packaged_action_constructors.hpp"
   "hpx/lcos/packaged_action_constructors_direct.hpp"
   "hpx/lcos/deferred_packaged_task_constructors.hpp"

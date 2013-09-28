@@ -112,7 +112,6 @@ namespace hpx { namespace lcos {
     }
 }}
 
-/*
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/preprocessed/broadcast.hpp>
 #else
@@ -120,7 +119,6 @@ namespace hpx { namespace lcos {
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
 #  pragma wave option(preserve: 1, line: 0, output: "preprocessed/broadcast_" HPX_LIMIT_STR ".hpp")
 #endif
-*/
 
 #define HPX_LCOS_BROADCAST_EXTRACT_ACTION_ARGUMENTS(Z, N, D)                  \
     typename boost::fusion::result_of::value_at_c<                            \
@@ -138,13 +136,11 @@ namespace hpx { namespace lcos {
 
 #undef HPX_LCOS_BROADCAST_EXTRACT_ACTION_ARGUMENTS
 
-/*
 #if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
 #  pragma wave option(output: null)
 #endif
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-*/
 
 #define HPX_REGISTER_BROADCAST_ACTION_DECLARATION(Action)                     \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
