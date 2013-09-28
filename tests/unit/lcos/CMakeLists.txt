@@ -31,11 +31,12 @@ if(GCC_VERSION)
   set(gcc_version ${GCC_VERSION})
 endif()
 
-if(040500 EQUAL ${gcc_version} OR 040500 LESS ${gcc_version} OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+if((040500 EQUAL ${gcc_version}) OR (040500 LESS ${gcc_version}) OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
   set(tests
       ${tests}
       broadcast
       for_each
+      reduce
      )
 endif()
 
@@ -61,6 +62,8 @@ set(local_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(promise_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(reduce_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources
