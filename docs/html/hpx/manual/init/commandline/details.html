@@ -105,40 +105,40 @@
 <p>
             Here is a full grammar describing the possible format of mappings:
           </p>
-<pre class="programlisting">   mappings:
-	distribution
-       mapping(;mapping)*
+<pre class="programlisting">mappings:
+    distribution
+    mapping(;mapping)*
 
 distribution:
-	'compact'
-	'scatter
-	'balanced'
+    'compact'
+    'scatter
+    'balanced'
 
-   mapping:
-       thread-spec=pu-specs
+mapping:
+    thread-spec=pu-specs
 
-   thread-spec:
-       'thread':range-specs
+thread-spec:
+    'thread':range-specs
 
-   pu-specs:
-       pu-spec(.pu-spec)*
+pu-specs:
+    pu-spec(.pu-spec)*
 
-   pu-spec:
-       type:range-specs
-       ~pu-spec
+pu-spec:
+    type:range-specs
+    ~pu-spec
 
-   range-specs:
-       range-spec(,range-spec)*
+range-specs:
+    range-spec(,range-spec)*
 
-   range-spec:
-       int
-       int-int
-       'all'
+range-spec:
+    int
+    int-int
+    'all'
 
-   type:
-       'socket' | 'numanode'
-       'core'
-       'pu'
+type:
+    'socket' | 'numanode'
+    'core'
+    'pu'
 </pre>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -157,7 +157,7 @@ distribution:
 <p>
               will cause this output to be printed:
             </p>
-<pre class="programlisting">   0: PU L#0(P#0) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
+<pre class="programlisting">0: PU L#0(P#0) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
 1: PU L#2(P#2) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
 2: PU L#4(P#4) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
 3: PU L#6(P#6) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
@@ -168,6 +168,27 @@ distribution:
             </p>
 </td></tr>
 </table></div>
+<p>
+            The difference between the three possible predefined distribution schemes
+            (<code class="computeroutput"><span class="identifier">compact</span></code>, <code class="computeroutput"><span class="identifier">scatter</span></code>, and <code class="computeroutput"><span class="identifier">balanced</span></code>)
+            is best explained with an example. Imagine that we have a system with
+            4 cores and 4 hardware threads per core. If we place 8 threads the assignments
+            produced by the <code class="computeroutput"><span class="identifier">compact</span></code>,
+            <code class="computeroutput"><span class="identifier">scatter</span></code>, and <code class="computeroutput"><span class="identifier">balanced</span></code> types are shown in eh figure
+            below. Notice that <code class="computeroutput"><span class="identifier">compact</span></code>
+            does not fully utilize all the cores in the system. For this reason it
+            is recommended that applications are run using the <code class="computeroutput"><span class="identifier">scatter</span></code>
+            or <code class="computeroutput"><span class="identifier">balanced</span></code> options in
+            most cases.
+          </p>
+<p>
+            </p>
+<div class="figure">
+<a name="commandline.affinities"></a><p class="title"><b>Figure&#160;2.&#160;Schematic of thread affinity type distributions</b></p>
+<div class="figure-contents"><span class="inlinemediaobject"><img src="../../../.././images/affinities.png" alt="Schematic of thread affinity type distributions"></span></div>
+</div>
+<p><br class="figure-break">
+          </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
