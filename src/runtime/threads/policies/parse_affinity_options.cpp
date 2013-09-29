@@ -106,9 +106,9 @@ namespace hpx { namespace threads { namespace detail
             mapping =  thread_spec >> '=' >> pu_spec;
 
             distribution =
-                    (partlit("compact") >> qi::attr(compact))
-                |   (partlit("scatter") >> qi::attr(scatter))
-                |   (partlit("balanced") >> qi::attr(balanced))
+                    partlit("compact") >> qi::attr(compact)
+                |   partlit("scatter") >> qi::attr(scatter)
+                |   partlit("balanced") >> qi::attr(balanced)
                 ;
 
             thread_spec =
@@ -130,13 +130,13 @@ namespace hpx { namespace threads { namespace detail
                 ;
 
             core_spec =
-                    -qi::lit('.') >> partlit("core") >> ':'
+                   -qi::lit('.') >> partlit("core") >> ':'
                     >> specs >> qi::attr(spec_type::core)
                 |   qi::attr(spec_type::unknown)
                 ;
 
             processing_unit_spec =
-                    -qi::lit('.') >> partlit("pu") >> ':'
+                   -qi::lit('.') >> partlit("pu") >> ':'
                     >> specs >> qi::attr(spec_type::pu)
                 |   qi::attr(spec_type::unknown)
                 ;
@@ -149,8 +149,8 @@ namespace hpx { namespace threads { namespace detail
                 ;
 
             BOOST_SPIRIT_DEBUG_NODES(
-                (start)(mapping)(thread_spec)(pu_spec)(specs)(spec)
-                (socket_spec)(core_spec)(processing_unit_spec)
+                (start)(mapping)(distribution)(thread_spec)(pu_spec)(specs)
+                (spec)(socket_spec)(core_spec)(processing_unit_spec)
             );
         }
 

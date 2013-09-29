@@ -296,13 +296,13 @@ if multiple affinities are specified, they are added.
 Here is a full grammar describing the possible format of mappings:
 
     mappings:
-		distribution
+        distribution
         mapping(;mapping)*
 
-	distribution:  
-		'compact'
-		'scatter
-		'balanced'
+    distribution:
+        'compact'
+        'scatter
+        'balanced'
 
     mapping:
         thread-spec=pu-specs
@@ -341,13 +341,22 @@ Here is a full grammar describing the possible format of mappings:
       ``
       will cause this output to be printed:
       ``
-	      0: PU L#0(P#0) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
-		  1: PU L#2(P#2) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
-		  2: PU L#4(P#4) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
-		  3: PU L#6(P#6) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
+          0: PU L#0(P#0) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
+          1: PU L#2(P#2) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
+          2: PU L#4(P#4) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
+          3: PU L#6(P#6) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
       ``
       [c++]where each bit in the bitmasks corresponds to a processing unit the listed
       worker thread will be bound to run on.]
+
+The difference between the three possible predefined distribution schemes (`compact`,
+`scatter`, and `balanced`) is best explained with an example. Imagine that we have a system with 4
+cores and 4 hardware threads per core. If we place 8 threads the assignments produced by the `compact`,
+`scatter`, and `balanced` types are shown in eh figure below. Notice that `compact` does not fully
+utilize all the cores in the system. For this reason it is recommended that applications are run using
+the `scatter` or `balanced` options in most cases.
+
+[fig affinities.png..Schematic of thread affinity type distributions..commandline.affinities]
 
 [endsect]
 
