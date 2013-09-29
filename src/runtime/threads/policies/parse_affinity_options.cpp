@@ -560,7 +560,7 @@ namespace hpx { namespace threads { namespace detail
                 ++index;
         }
     }
-    
+
     void decode_compact_distribution(hwloc_topology& t,
         std::vector<mask_type>& affinities, error_code& ec)
     {
@@ -577,17 +577,18 @@ namespace hpx { namespace threads { namespace detail
             affinities[i] = t.init_thread_affinity_mask(i);
         }
     }
-    
+
     void decode_scatter_distribution(hwloc_topology& t,
         std::vector<mask_type>& affinities, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        std::vector<std::size_t> num_pus(t.get_number_of_cores(), 0);
-        std::size_t num_pu = 0;
+        std::size_t num_cores = t.get_number_of_cores();
+        std::size_t num_pus = t.get_number_of_pus();
 
+        std::vector<std::size_t> num_pus_cores(num_cores, 0);
         while(num_threads != 0)
         {
-            for(std::size_t core = 0; core != num_pus.size(); ++core)
+            for(std::size_t num_pu = 0; num_pu != num_pus; ++num_pu)
             {
                 if (any(affinities[num_pu]))
                 {
@@ -596,31 +597,52 @@ namespace hpx { namespace threads { namespace detail
                             "already been set") % num_pu));
                     return;
                 }
-                affinities[num_pu++] = t.init_thread_affinity_mask(core, num_pus[core]++);
-                --num_threads;
-                if(num_threads == 0) break;
+
+                std::size_t current_core = num_pu / num_cores;
+                std::size_t num_pus_core = t.get_number_of_core_pus(current_core);
+
+                affinities[num_pu] = t.init_thread_affinity_mask(
+                    current_core, num_pus_cores[current_core]++ % num_pus_core);
+
+                if(--num_threads == 0)
+                    break;
             }
         }
     }
-    
-    void decode_balanced_distribution(hwloc_topology& t, 
+
+    void decode_balanced_distribution(hwloc_topology& t,
         std::vector<mask_type>& affinities, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        for(std::size_t i = 0; i != num_threads; ++i)
+        std::size_t num_cores = t.get_number_of_cores();
+        std::size_t num_pus = t.get_number_of_pus();
+
+        std::vector<std::size_t> num_pus_cores(num_cores, 0);
+        while(num_threads != 0)
         {
-            if (any(affinities[i]))
+            for(std::size_t num_pu = 0; num_pu != num_pus; ++num_pu)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "decode_balanced_distribution",
-                    boost::str(boost::format("affinity mask for thread %1% has "
-                        "already been set") % i));
-                return;
+                if (any(affinities[num_pu]))
+                {
+                    HPX_THROWS_IF(ec, bad_parameter, "decode_balanced_distribution",
+                        boost::str(boost::format("affinity mask for thread %1% has "
+                            "already been set") % num_pu));
+                    return;
+                }
+
+                std::size_t current_core = num_pu % num_cores;
+                std::size_t num_pus_core = t.get_number_of_core_pus(current_core);
+
+                affinities[num_pu] = t.init_thread_affinity_mask(
+                    current_core, num_pus_cores[current_core]++ % num_pus_core);
+
+                if(--num_threads == 0)
+                    break;
             }
-            affinities[i] = t.init_thread_affinity_mask(i);
         }
     }
 
-
+    ///////////////////////////////////////////////////////////////////////////
     void decode_distribution(distribution_type d, hwloc_topology& t,
         std::vector<mask_type>& affinities, error_code& ec)
     {
