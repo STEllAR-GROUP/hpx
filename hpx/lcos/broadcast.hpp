@@ -15,10 +15,13 @@
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
-
-#include <boost/serialization/vector.hpp>
+#include <hpx/util/detail/count_num_args.hpp>
 
 #include <vector>
+
+#include <boost/serialization/vector.hpp>
+#include <boost/preprocessor/enum_params.hpp>
+#include <boost/preprocessor/cat.hpp>
 
 namespace hpx { namespace lcos {
     namespace detail
@@ -142,20 +145,23 @@ namespace hpx { namespace lcos {
 
 #endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
-#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION(Action)                     \
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION(...)                        \
+    HPX_REGISTER_BROADCAST_ACTION_DECLARATION_(__VA_ARGS__)                   \
+/**/
+#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_(...)                       \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_BROADCAST_ACTION_DECLARATION_,                           \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_1(Action)                   \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
       , BOOST_PP_CAT(broadcast_, Action)                                      \
     )                                                                         \
 /**/
-
-#define HPX_REGISTER_BROADCAST_ACTION(Action)                                 \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
-        ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
-      , BOOST_PP_CAT(broadcast_, Action)                                      \
-    )                                                                         \
-/**/
-
 #define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_2(Action, Name)             \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
@@ -163,6 +169,22 @@ namespace hpx { namespace lcos {
     )                                                                         \
 /**/
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BROADCAST_ACTION(...)                                    \
+    HPX_REGISTER_BROADCAST_ACTION_(__VA_ARGS__)                               \
+/**/
+#define HPX_REGISTER_BROADCAST_ACTION_(...)                                   \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_BROADCAST_ACTION_, HPX_UTIL_PP_NARG(__VA_ARGS__)         \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_BROADCAST_ACTION_1(Action)                               \
+    HPX_REGISTER_PLAIN_ACTION(                                                \
+        ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
+      , BOOST_PP_CAT(broadcast_, Action)                                      \
+    )                                                                         \
+/**/
 #define HPX_REGISTER_BROADCAST_ACTION_2(Action, Name)                         \
     HPX_REGISTER_PLAIN_ACTION(                                                \
         ::hpx::lcos::detail::make_broadcast_action<Action>::type              \
@@ -170,7 +192,18 @@ namespace hpx { namespace lcos {
     )                                                                         \
 /**/
 
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(Action)          \
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(...)             \
+    HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_(__VA_ARGS__)        \
+/**/
+#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_(...)            \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_,                \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_1(Action)        \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_broadcast_action<                           \
             ::hpx::lcos::detail::broadcast_with_index<Action>                 \
@@ -178,16 +211,6 @@ namespace hpx { namespace lcos {
       , BOOST_PP_CAT(broadcast_, Action)                                      \
     )                                                                         \
 /**/
-
-#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(Action)                      \
-    HPX_REGISTER_PLAIN_ACTION(                                                \
-        ::hpx::lcos::detail::make_broadcast_action<                           \
-            ::hpx::lcos::detail::broadcast_with_index<Action>                 \
-        >::type                                                               \
-      , BOOST_PP_CAT(broadcast_, Action)                                      \
-    )                                                                         \
-/**/
-
 #define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION_2(Action, Name)  \
     HPX_REGISTER_ACTION_DECLARATION(                                          \
         ::hpx::lcos::detail::make_broadcast_action<                           \
@@ -197,6 +220,25 @@ namespace hpx { namespace lcos {
     )                                                                         \
 /**/
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(...)                         \
+    HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_(__VA_ARGS__)                    \
+/**/
+#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_(...)                        \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_,                            \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_1(Action)                    \
+    HPX_REGISTER_PLAIN_ACTION(                                                \
+        ::hpx::lcos::detail::make_broadcast_action<                           \
+            ::hpx::lcos::detail::broadcast_with_index<Action>                 \
+        >::type                                                               \
+      , BOOST_PP_CAT(broadcast_, Action)                                      \
+    )                                                                         \
+/**/
 #define HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_2(Action, Name)              \
     HPX_REGISTER_PLAIN_ACTION(                                                \
         ::hpx::lcos::detail::make_broadcast_action<                           \
