@@ -595,7 +595,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
     hpx::future<
@@ -606,6 +605,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > /* act */
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return reduce<detail::reduce_with_index<Derived> >(
