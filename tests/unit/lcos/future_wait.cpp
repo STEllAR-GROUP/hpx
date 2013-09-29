@@ -39,10 +39,10 @@ using hpx::naming::id_type;
 struct callback
 {
   private:
-    mutable std::size_t * calls_;
+    mutable boost::atomic<std::size_t> * calls_;
 
   public:
-    callback(std::size_t & calls) : calls_(&calls) {} 
+    callback(boost::atomic<std::size_t> & calls) : calls_(&calls) {} 
 
     template <
         typename T
@@ -104,7 +104,7 @@ int hpx_main(
     )
 {
     {
-        std::size_t count = 0;
+        boost::atomic<std::size_t> count = 0;
         callback cb(count);
 
         ///////////////////////////////////////////////////////////////////////
