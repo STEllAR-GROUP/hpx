@@ -35,6 +35,7 @@ if((040500 EQUAL ${gcc_version}) OR (040500 LESS ${gcc_version}) OR ("${CMAKE_CX
   set(tests
       ${tests}
       broadcast
+      fold
       for_each
       reduce
      )
