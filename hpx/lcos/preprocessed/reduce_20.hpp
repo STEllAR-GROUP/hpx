@@ -257,7 +257,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       
     >
     hpx::future<
@@ -268,6 +267,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       )
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -526,7 +526,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0
     >
     hpx::future<
@@ -537,6 +536,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -795,7 +795,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1
     >
     hpx::future<
@@ -806,6 +805,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -1064,7 +1064,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2
     >
     hpx::future<
@@ -1075,6 +1074,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -1333,7 +1333,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3
     >
     hpx::future<
@@ -1344,6 +1343,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -1602,7 +1602,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
     hpx::future<
@@ -1613,6 +1612,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -1871,7 +1871,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
     hpx::future<
@@ -1882,6 +1881,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -2140,7 +2140,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
     hpx::future<
@@ -2151,6 +2150,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -2409,7 +2409,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
     hpx::future<
@@ -2420,6 +2419,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -2678,7 +2678,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
     hpx::future<
@@ -2689,6 +2688,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -2947,7 +2947,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
     hpx::future<
@@ -2958,6 +2957,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -3216,7 +3216,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
     >
     hpx::future<
@@ -3227,6 +3226,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -3485,7 +3485,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
     >
     hpx::future<
@@ -3496,6 +3495,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -3754,7 +3754,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
     >
     hpx::future<
@@ -3765,6 +3764,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -4023,7 +4023,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
     >
     hpx::future<
@@ -4034,6 +4033,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -4292,7 +4292,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
     >
     hpx::future<
@@ -4303,6 +4302,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -4561,7 +4561,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
     >
     hpx::future<
@@ -4572,6 +4571,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -4830,7 +4830,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
     >
     hpx::future<
@@ -4841,6 +4840,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -5099,7 +5099,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
     >
     hpx::future<
@@ -5110,6 +5109,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -5368,7 +5368,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
     >
     hpx::future<
@@ -5379,6 +5378,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18)
     {
         return reduce<detail::reduce_with_index<Derived> >(
@@ -5637,7 +5637,6 @@ namespace hpx { namespace lcos
       , typename Arguments
       , typename Derived
       , typename ReduceOp
-      , BOOST_FWD_REF(ReduceOp) reduce_op
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
     >
     hpx::future<
@@ -5648,6 +5647,7 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
+      , BOOST_FWD_REF(ReduceOp) reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18 , A19 const & a19)
     {
         return reduce<detail::reduce_with_index<Derived> >(
