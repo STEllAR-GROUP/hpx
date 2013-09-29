@@ -276,7 +276,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -638,7 +638,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -1000,7 +1000,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -1362,7 +1362,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -1724,7 +1724,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -2086,7 +2086,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -2448,7 +2448,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -2810,7 +2810,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -3172,7 +3172,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -3534,7 +3534,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -3896,7 +3896,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -4258,7 +4258,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -4620,7 +4620,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -4982,7 +4982,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -5344,7 +5344,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -5706,7 +5706,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -6068,7 +6068,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -6430,7 +6430,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -6792,7 +6792,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -7154,7 +7154,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -7516,7 +7516,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }

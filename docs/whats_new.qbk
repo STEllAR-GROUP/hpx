@@ -16,8 +16,9 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 902] - Add `hpx::lcos::reduce` collective operation
 * [issue 900] - Web documentation for trunk has no index
-* [issue 897] - Some tests fail with GCC 4.8.1 and MPI parcel port
+* [issue 898] - Some tests fail with GCC 4.8.1 and MPI parcel port
 * [issue 897] - HWLOC causes failures on Mac
 * [issue 896] - pu-offset leads to startup error
 * [issue 895] - hpx::get_locality_name not defined
