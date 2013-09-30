@@ -463,6 +463,8 @@ namespace hpx { namespace threads
     { // {{{
         hwloc_obj_t obj;
 
+        if(parent == NULL) return count;
+
         {
             scoped_lock lk(topo_mtx);
             obj = hwloc_get_next_child(topo, parent, NULL);
@@ -472,6 +474,7 @@ namespace hpx { namespace threads
         {
             if (hwloc_compare_types(type, obj->type) == 0)
             {
+                /*
                 do {
                     ++count;
                     {
@@ -480,6 +483,8 @@ namespace hpx { namespace threads
                     }
                 } while (obj != NULL && hwloc_compare_types(type, obj->type) == 0);
                 return count;
+                */
+                ++count;
             }
 
             count = extract_node_count(obj, type, count);

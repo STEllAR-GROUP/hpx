@@ -600,7 +600,7 @@ namespace hpx { namespace threads { namespace detail
                 // Check if we exceed the number of PUs on the current core.
                 // If yes, we need to proceed with the next one.
                 std::size_t num_pus_core = t.get_number_of_core_pus(num_core);
-                if(num_pus_cores[num_core] + 1 == num_pus_core) continue;
+                if(num_pus_cores[num_core] == num_pus_core) continue;
 
                 affinities[num_thread] = t.init_thread_affinity_mask(
                     num_core, num_pus_cores[num_core]++);
@@ -627,7 +627,7 @@ namespace hpx { namespace threads { namespace detail
                 // Check if we exceed the number of PUs on the current core.
                 // If yes, we need to proceed with the next one.
                 std::size_t num_pus_core = t.get_number_of_core_pus(num_core);
-                if(num_pus_cores[num_core] + 1 == num_pus_core) continue;
+                if(num_pus_cores[num_core] == num_pus_core) continue;
 
                 num_pus_cores[num_core]++;
                 if(++num_thread == num_threads)
