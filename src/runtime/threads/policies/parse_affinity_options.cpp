@@ -586,25 +586,23 @@ namespace hpx { namespace threads { namespace detail
         std::size_t num_pus = t.get_number_of_pus();
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
-        while(num_threads != 0)
+        for (std::size_t num_thread = 0; num_thread != num_threads; /**/)
         {
-            for(std::size_t num_pu = 0; num_pu != num_pus; ++num_pu)
+            for(std::size_t num_core = 0; num_core != num_cores; ++num_core)
             {
-                if (any(affinities[num_pu]))
+                if (any(affinities[num_thread]))
                 {
                     HPX_THROWS_IF(ec, bad_parameter, "decode_scatter_distribution",
                         boost::str(boost::format("affinity mask for thread %1% has "
-                            "already been set") % num_pu));
+                            "already been set") % num_thread));
                     return;
                 }
 
-                std::size_t current_core = num_pu / num_cores;
-                std::size_t num_pus_core = t.get_number_of_core_pus(current_core);
+                std::size_t num_pus_core = t.get_number_of_core_pus(num_core);
+                affinities[num_thread] = t.init_thread_affinity_mask(
+                    num_core, num_pus_cores[num_core]++ % num_pus_core);
 
-                affinities[num_pu] = t.init_thread_affinity_mask(
-                    current_core, num_pus_cores[current_core]++ % num_pus_core);
-
-                if(--num_threads == 0)
+                if(++num_thread == num_threads)
                     break;
             }
         }
@@ -615,29 +613,33 @@ namespace hpx { namespace threads { namespace detail
     {
         std::size_t num_threads = affinities.size();
         std::size_t num_cores = t.get_number_of_cores();
-        std::size_t num_pus = t.get_number_of_pus();
+        std::size_t num_pus_core_used = num_cores / num_threads;
+
+        while (num_pus_core_used * num_cores < num_threads)
+            ++num_pus_core_used;
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
-        while(num_threads != 0)
+        for (std::size_t num_thread = 0; num_thread != num_threads; /**/)
         {
-            for(std::size_t num_pu = 0; num_pu != num_pus; ++num_pu)
+            for(std::size_t num_core = 0; num_core != num_cores; ++num_core)
             {
-                if (any(affinities[num_pu]))
+                std::size_t num_pus_core = t.get_number_of_core_pus(num_core);
+                for (std::size_t num_pus = 0; num_pus != num_pus_core_used; ++num_pus)
                 {
-                    HPX_THROWS_IF(ec, bad_parameter, "decode_balanced_distribution",
-                        boost::str(boost::format("affinity mask for thread %1% has "
-                            "already been set") % num_pu));
-                    return;
+                    if (any(affinities[num_thread]))
+                    {
+                        HPX_THROWS_IF(ec, bad_parameter, "decode_balanced_distribution",
+                            boost::str(boost::format("affinity mask for thread %1% has "
+                                "already been set") % num_thread));
+                        return;
+                    }
+
+                    affinities[num_thread] = t.init_thread_affinity_mask(
+                        num_core, num_pus_cores[num_core]++ % num_pus_core);
+
+                    if (++num_thread == num_threads)
+                        return;
                 }
-
-                std::size_t current_core = num_pu % num_cores;
-                std::size_t num_pus_core = t.get_number_of_core_pus(current_core);
-
-                affinities[num_pu] = t.init_thread_affinity_mask(
-                    current_core, num_pus_cores[current_core]++ % num_pus_core);
-
-                if(--num_threads == 0)
-                    break;
             }
         }
     }
