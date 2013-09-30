@@ -443,7 +443,10 @@ namespace hpx { namespace traits
 ///       // The following macro expands to a series of definitions of global objects
 ///       // which are needed for proper serialization and initialization support
 ///       // enabling the remote invocation of the function `app::some_global_function`.
-///       HPX_REGISTER_PLAIN_ACTION(app::some_global_action);
+///       //
+///       // The second argument used has to be the same as used for the 
+///       // HPX_DEFINE_PLAIN_ACTION above.
+///       HPX_REGISTER_PLAIN_ACTION(app::some_global_action, some_global_action);
 /// \endcode
 ///
 /// \note Usually this macro will not be used in user code unless the intend is
@@ -519,7 +522,10 @@ namespace hpx { namespace traits
 ///       // The following macro expands to a series of definitions of global objects
 ///       // which are needed for proper serialization and initialization support
 ///       // enabling the remote invocation of the function `app::some_global_function`.
-///       HPX_REGISTER_PLAIN_ACTION(app::some_global_action);
+///       //
+///       // The second argument used has to be the same as used for the 
+///       // HPX_DEFINE_PLAIN_ACTION above.
+///       HPX_REGISTER_PLAIN_ACTION(app::some_global_action, some_global_action);
 /// \endcode
 ///
 /// \note Usually this macro will not be used in user code unless the intend is
