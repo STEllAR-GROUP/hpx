@@ -69,7 +69,7 @@ struct callback
 
     void reset()
     {
-        *calls_.store(0);
+        calls_->store(0);
     } 
 };
 
