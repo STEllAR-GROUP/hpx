@@ -26,7 +26,7 @@
 
 </span>HPX_REGISTER_PLAIN_ACTION(...)</pre></div>
 <div class="refsect1">
-<a name="idp20496880"></a><h2>Description</h2>
+<a name="idp103616256"></a><h2>Description</h2>
 <p>The macro <span class="emphasis"><em>HPX_REGISTER_PLAIN_ACTION</em></span> can be used to register an existing free function as a plain action. It additionally defines an action type named <span class="emphasis"><em>action_type</em></span>.</p>
 <p>The parameter <code class="computeroutput">action_type</code> is the name of the action type to register with HPX.</p>
 <p><b>Example:&#160;</b></p>
@@ -47,7 +47,10 @@
 <span class="comment">// The following macro expands to a series of definitions of global objects</span>
 <span class="comment">// which are needed for proper serialization and initialization support</span>
 <span class="comment">// enabling the remote invocation of the function `app::some_global_function`.</span>
-<span class="identifier">HPX_REGISTER_PLAIN_ACTION</span><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">some_global_action</span><span class="special">)</span><span class="special">;</span>
+<span class="comment">//</span>
+<span class="comment">// The second argument used has to be the same as used for the </span>
+<span class="comment">// HPX_DEFINE_PLAIN_ACTION above.</span>
+<span class="identifier">HPX_REGISTER_PLAIN_ACTION</span><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">some_global_action</span><span class="special">,</span> <span class="identifier">some_global_action</span><span class="special">)</span><span class="special">;</span>
 </pre>
 <div class="note"><table border="0" summary="Note">
 <tr>
