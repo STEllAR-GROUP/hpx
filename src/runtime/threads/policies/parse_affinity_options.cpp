@@ -106,9 +106,9 @@ namespace hpx { namespace threads { namespace detail
             mapping =  thread_spec >> '=' >> pu_spec;
 
             distribution =
-                    (partlit("compact") >> qi::attr(compact))
-                |   (partlit("scatter") >> qi::attr(scatter))
-                |   (partlit("balanced") >> qi::attr(balanced))
+                    partlit("compact") >> qi::attr(compact)
+                |   partlit("scatter") >> qi::attr(scatter)
+                |   partlit("balanced") >> qi::attr(balanced)
                 ;
 
             thread_spec =
@@ -130,13 +130,13 @@ namespace hpx { namespace threads { namespace detail
                 ;
 
             core_spec =
-                    -qi::lit('.') >> partlit("core") >> ':'
+                   -qi::lit('.') >> partlit("core") >> ':'
                     >> specs >> qi::attr(spec_type::core)
                 |   qi::attr(spec_type::unknown)
                 ;
 
             processing_unit_spec =
-                    -qi::lit('.') >> partlit("pu") >> ':'
+                   -qi::lit('.') >> partlit("pu") >> ':'
                     >> specs >> qi::attr(spec_type::pu)
                 |   qi::attr(spec_type::unknown)
                 ;
@@ -149,8 +149,8 @@ namespace hpx { namespace threads { namespace detail
                 ;
 
             BOOST_SPIRIT_DEBUG_NODES(
-                (start)(mapping)(thread_spec)(pu_spec)(specs)(spec)
-                (socket_spec)(core_spec)(processing_unit_spec)
+                (start)(mapping)(distribution)(thread_spec)(pu_spec)(specs)
+                (spec)(socket_spec)(core_spec)(processing_unit_spec)
             );
         }
 
@@ -560,7 +560,7 @@ namespace hpx { namespace threads { namespace detail
                 ++index;
         }
     }
-    
+
     void decode_compact_distribution(hwloc_topology& t,
         std::vector<mask_type>& affinities, error_code& ec)
     {
@@ -577,50 +577,85 @@ namespace hpx { namespace threads { namespace detail
             affinities[i] = t.init_thread_affinity_mask(i);
         }
     }
-    
+
     void decode_scatter_distribution(hwloc_topology& t,
         std::vector<mask_type>& affinities, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        std::vector<std::size_t> num_pus(t.get_number_of_cores(), 0);
-        std::size_t num_pu = 0;
+        std::size_t num_cores = t.get_number_of_cores();
 
-        while(num_threads != 0)
+        std::vector<std::size_t> num_pus_cores(num_cores, 0);
+        for (std::size_t num_thread = 0; num_thread != num_threads; /**/)
         {
-            for(std::size_t core = 0; core != num_pus.size(); ++core)
+            for(std::size_t num_core = 0; num_core != num_cores; ++num_core)
             {
-                if (any(affinities[num_pu]))
+                if (any(affinities[num_thread]))
                 {
                     HPX_THROWS_IF(ec, bad_parameter, "decode_scatter_distribution",
                         boost::str(boost::format("affinity mask for thread %1% has "
-                            "already been set") % num_pu));
+                            "already been set") % num_thread));
                     return;
                 }
-                affinities[num_pu++] = t.init_thread_affinity_mask(core, num_pus[core]++);
-                --num_threads;
-                if(num_threads == 0) break;
+
+                // Check if we exceed the number of PUs on the current core.
+                // If yes, we need to proceed with the next one.
+                std::size_t num_pus_core = t.get_number_of_core_pus(num_core);
+                if(num_pus_cores[num_core] == num_pus_core) continue;
+
+                affinities[num_thread] = t.init_thread_affinity_mask(
+                    num_core, num_pus_cores[num_core]++);
+
+                if(++num_thread == num_threads)
+                    return;
             }
         }
     }
-    
-    void decode_balanced_distribution(hwloc_topology& t, 
+
+    void decode_balanced_distribution(hwloc_topology& t,
         std::vector<mask_type>& affinities, error_code& ec)
     {
         std::size_t num_threads = affinities.size();
-        for(std::size_t i = 0; i != num_threads; ++i)
+        std::size_t num_cores = t.get_number_of_cores();
+
+        std::vector<std::size_t> num_pus_cores(num_cores, 0);
+        // At first, calculate the number of used pus per core.
+        // This needs to be done to make sure that we occupy all the available cores
+        for (std::size_t num_thread = 0; num_thread != num_threads; /**/)
         {
-            if (any(affinities[i]))
+            for(std::size_t num_core = 0; num_core != num_cores; ++num_core)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "decode_balanced_distribution",
-                    boost::str(boost::format("affinity mask for thread %1% has "
-                        "already been set") % i));
-                return;
+                // Check if we exceed the number of PUs on the current core.
+                // If yes, we need to proceed with the next one.
+                std::size_t num_pus_core = t.get_number_of_core_pus(num_core);
+                if(num_pus_cores[num_core] == num_pus_core) continue;
+
+                num_pus_cores[num_core]++;
+                if(++num_thread == num_threads)
+                    break;
             }
-            affinities[i] = t.init_thread_affinity_mask(i);
+        }
+        // Iterate over the cores and assigned pus per core. this additional loop
+        // is needed so that we have consecutive worker thread numbers
+        std::size_t num_thread = 0;
+        for(std::size_t num_core = 0; num_core != num_cores; ++num_core)
+        {
+            for(std::size_t num_pu = 0; num_pu != num_pus_cores[num_core]; ++num_pu)
+            {
+                if (any(affinities[num_thread]))
+                {
+                    HPX_THROWS_IF(ec, bad_parameter, "decode_balanced_distribution",
+                        boost::str(boost::format("affinity mask for thread %1% has "
+                            "already been set") % num_thread));
+                    return;
+                }
+                affinities[num_thread] = t.init_thread_affinity_mask(
+                    num_core, num_pu);
+                ++num_thread;
+            }
         }
     }
 
-
+    ///////////////////////////////////////////////////////////////////////////
     void decode_distribution(distribution_type d, hwloc_topology& t,
         std::vector<mask_type>& affinities, error_code& ec)
     {

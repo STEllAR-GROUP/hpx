@@ -137,6 +137,16 @@ security_error                        "" "hpx\.error"
 # hpx/runtime/get_ptr.hpp
 get_ptr                               "" "hpx\.get_ptr.*"
 
+# hpx/lcos/reduce.hpp
+reduce                                "" "header\.hpx\.lcos\.reduce.*"
+reduce_with_index                     "" "header\.hpx\.lcos\.reduce.*"
+
+# hpx/lcos/fold.hpp
+fold                                  "" "header\.hpx\.lcos\.fold.*"
+fold_with_index                       "" "header\.hpx\.lcos\.fold.*"
+inverse_fold                          "" "header\.hpx\.lcos\.fold.*"
+inverse_fold_with_index               "" "header\.hpx\.lcos\.fold.*"
+
 # hpx/hpx_finalize.hpp
 finalize                              "" "hpx\.finalize.*"
 terminate                             "" "hpx\.terminate.*"

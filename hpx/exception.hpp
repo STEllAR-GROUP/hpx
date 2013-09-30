@@ -1484,6 +1484,19 @@ namespace boost
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
+#define HPX_GET_EXCEPTION_(except, errcode, func, msg, mode, file, line)      \
+    hpx::detail::get_exception(                                               \
+        except(static_cast<hpx::error>(errcode), msg, mode),                  \
+        func, file, line)                                                    \
+/**/
+
+#define HPX_GET_EXCEPTION(errcode, f, msg)                                    \
+    HPX_GET_EXCEPTION_(hpx::exception, errcode, f, msg, hpx::plain,           \
+        boost::filesystem::path(hpx::util::create_path(__FILE__)).string(),   \
+        __LINE__)                                                             \
+/**/
+
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_THROW_IN_CURRENT_FUNC(errcode, msg)                               \
     HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg)                 \
     /**/

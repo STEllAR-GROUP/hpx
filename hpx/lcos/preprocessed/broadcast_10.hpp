@@ -13,25 +13,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
            
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+           
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                   
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+           
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+           
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                   
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+           
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+           
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                   
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+           
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+           
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                   
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+           
+        >
+        
+        void
         broadcast_impl0(
             Action const & act
           , std::vector<hpx::id_type> const & ids
            
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                   
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+               
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -45,41 +126,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                       
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                           
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                            
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
            
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl0(
             Action const & act
           , std::vector<hpx::id_type> const & ids
            
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -89,18 +178,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                   
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+               
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -114,32 +202,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                       
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                           
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                            
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -149,11 +242,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker0
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
                
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -162,13 +257,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                        
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 0>
         {
             typedef
@@ -182,7 +276,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -198,7 +292,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
        )
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -210,7 +304,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                 
+               
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -225,13 +320,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-           )
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+       )
     {
         return broadcast<Derived>(
+                ids
+               
+            );
+    }
+    template <
+        typename Action
+       
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+       )
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+               
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+       
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+       )
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
                
             );
@@ -242,25 +375,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0
+        >
+        
+        void
         broadcast_impl1(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -274,41 +488,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl1(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -318,18 +540,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -343,32 +564,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -378,11 +604,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker1
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -391,13 +619,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 1>
         {
             typedef
@@ -411,7 +638,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -427,7 +654,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -439,7 +666,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0
+              , a0
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -454,13 +682,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0)
     {
         return broadcast<Derived>(
+                ids
+              , a0
+            );
+    }
+    template <
+        typename Action
+      , typename A0
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0
             );
@@ -471,25 +737,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0 , typename A1
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0 , typename A1
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1
+        >
+        
+        void
         broadcast_impl2(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0 , a1
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -503,41 +850,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0 , typename A1
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl2(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -547,18 +902,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0 , a1
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -572,32 +926,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -607,11 +966,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker2
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -620,13 +981,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 2>
         {
             typedef
@@ -640,7 +1000,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -656,7 +1016,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -668,7 +1028,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0 , a1
+              , a0 , a1
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -683,13 +1044,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0 , A1 const & a1)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1)
     {
         return broadcast<Derived>(
+                ids
+              , a0 , a1
+            );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0 , a1
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0 , a1
             );
@@ -700,25 +1099,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0 , typename A1 , typename A2
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0 , typename A1 , typename A2
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2
+        >
+        
+        void
         broadcast_impl3(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0 , a1 , a2
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -732,41 +1212,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0 , typename A1 , typename A2
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl3(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -776,18 +1264,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0 , a1 , a2
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -801,32 +1288,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -836,11 +1328,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker3
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -849,13 +1343,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 3>
         {
             typedef
@@ -869,7 +1362,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -885,7 +1378,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -897,7 +1390,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0 , a1 , a2
+              , a0 , a1 , a2
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -912,13 +1406,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0 , A1 const & a1 , A2 const & a2)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
         return broadcast<Derived>(
+                ids
+              , a0 , a1 , a2
+            );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0 , a1 , a2
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0 , a1 , a2
             );
@@ -929,25 +1461,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0 , typename A1 , typename A2 , typename A3
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0 , typename A1 , typename A2 , typename A3
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3
+        >
+        
+        void
         broadcast_impl4(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0 , a1 , a2 , a3
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -961,41 +1574,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl4(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -1005,18 +1626,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0 , a1 , a2 , a3
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -1030,32 +1650,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -1065,11 +1690,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker4
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -1078,13 +1705,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2 , a3
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 4>
         {
             typedef
@@ -1098,7 +1724,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -1114,7 +1740,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -1126,7 +1752,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0 , a1 , a2 , a3
+              , a0 , a1 , a2 , a3
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -1141,13 +1768,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
         return broadcast<Derived>(
+                ids
+              , a0 , a1 , a2 , a3
+            );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0 , a1 , a2 , a3
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0 , a1 , a2 , a3
             );
@@ -1158,25 +1823,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+        >
+        
+        void
         broadcast_impl5(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -1190,41 +1936,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl5(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -1234,18 +1988,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -1259,32 +2012,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -1294,11 +2052,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker5
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -1307,13 +2067,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2 , a3 , a4
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 5>
         {
             typedef
@@ -1327,7 +2086,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -1343,7 +2102,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -1355,7 +2114,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0 , a1 , a2 , a3 , a4
+              , a0 , a1 , a2 , a3 , a4
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -1370,13 +2130,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
         return broadcast<Derived>(
+                ids
+              , a0 , a1 , a2 , a3 , a4
+            );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0 , a1 , a2 , a3 , a4
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0 , a1 , a2 , a3 , a4
             );
@@ -1387,25 +2185,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+        >
+        
+        void
         broadcast_impl6(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -1419,41 +2298,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl6(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -1463,18 +2350,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -1488,32 +2374,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -1523,11 +2414,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker6
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -1536,13 +2429,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2 , a3 , a4 , a5
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 6>
         {
             typedef
@@ -1556,7 +2448,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -1572,7 +2464,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -1584,7 +2476,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0 , a1 , a2 , a3 , a4 , a5
+              , a0 , a1 , a2 , a3 , a4 , a5
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -1599,13 +2492,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
     {
         return broadcast<Derived>(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5
+            );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5
             );
@@ -1616,25 +2547,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+        >
+        
+        void
         broadcast_impl7(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5 , a6
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -1648,41 +2660,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5 , a6
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl7(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -1692,18 +2712,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5 , a6
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -1717,32 +2736,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5 , a6
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -1752,11 +2776,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker7
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -1765,13 +2791,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2 , a3 , a4 , a5 , a6
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 7>
         {
             typedef
@@ -1785,7 +2810,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -1801,7 +2826,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -1813,7 +2838,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0 , a1 , a2 , a3 , a4 , a5 , a6
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -1828,13 +2854,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
     {
         return broadcast<Derived>(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6
+            );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6
             );
@@ -1845,25 +2909,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+        >
+        
+        void
         broadcast_impl8(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -1877,41 +3022,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl8(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -1921,18 +3074,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -1946,32 +3098,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -1981,11 +3138,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker8
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -1994,13 +3153,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 8>
         {
             typedef
@@ -2014,7 +3172,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -2030,7 +3188,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -2042,7 +3200,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -2057,13 +3216,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
     {
         return broadcast<Derived>(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+            );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
             );
@@ -2074,25 +3271,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+        >
+        
+        void
         broadcast_impl9(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -2106,41 +3384,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl9(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -2150,18 +3436,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -2175,32 +3460,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -2210,11 +3500,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker9
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -2223,13 +3515,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 9>
         {
             typedef
@@ -2243,7 +3534,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -2259,7 +3550,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -2271,7 +3562,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -2286,13 +3578,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
     {
         return broadcast<Derived>(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+            );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
             );
@@ -2303,25 +3633,106 @@ namespace hpx { namespace lcos {
     {
         template <
             typename Action
+          , typename Futures
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
         >
-        hpx::future<void>
+        void
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                  , global_idx
+                )
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+        >
+        void
+        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
+          , std::size_t)
+        {
+            futures.push_back(
+                hpx::async(
+                    act
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename Futures
+          , typename Cont
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+        >
+        void
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures
+          , BOOST_FWD_REF(Cont) cont
+          , hpx::id_type id
+          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
+          , std::size_t global_idx)
+        {
+            futures.push_back(
+                hpx::async(
+                    Action()
+                  , id
+                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                  , global_idx
+                ).then(boost::forward<Cont>(cont))
+            );
+        }
+        template <
+            typename Action
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+        >
+        
+        void
         broadcast_impl10(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
+          , std::size_t global_idx
           , boost::mpl::true_
         )
         {
-            if(ids.empty()) return hpx::lcos::make_ready_future();
+            if(ids.empty()) return;
             std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -2335,41 +3746,49 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-                      , boost::integral_constant<bool, true>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                          , global_idx + 1
+                          , boost::integral_constant<bool, true>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                          , global_idx + half
                           , boost::integral_constant<bool, true>::type()
                         )
                     );
                 }
             }
-            return hpx::when_all(broadcast_futures).then(&return_void);
+            
+            hpx::when_all(broadcast_futures).then(&return_void).get();
         }
         template <
             typename Action
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
         >
-        hpx::future<typename broadcast_result<Action>::type>
+        
+        typename broadcast_result<Action>::type
         broadcast_impl10(
             Action const & act
           , std::vector<hpx::id_type> const & ids
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
+          , std::size_t global_idx
           , boost::mpl::false_
         )
         {
@@ -2379,18 +3798,17 @@ namespace hpx { namespace lcos {
             typedef
                 typename broadcast_result<Action>::type
                 result_type;
-            if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
+            
+            if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
-            broadcast_futures.push_back(
-                hpx::async(
-                    act
-                  , ids[0]
-                  , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-                )
-                .then(
-                    &wrap_into_vector<action_result>
-                )
+            broadcast_invoke(
+                act
+              , broadcast_futures
+              , &wrap_into_vector<action_result>
+              , ids[0]
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+              , global_idx
             );
             if(ids.size() > 1)
             {
@@ -2404,32 +3822,37 @@ namespace hpx { namespace lcos {
                         Action
                     >::type
                     broadcast_impl_action;
-                hpx::id_type id = hpx::get_colocation_id(ids_first[0]);
-                broadcast_futures.push_back(
-                    hpx::async<broadcast_impl_action>(
-                        id
-                      , act
-                      , boost::move(ids_first)
-                      , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-                      , boost::integral_constant<bool, false>::type()
-                    )
-                );
+                if(!ids_first.empty())
+                {
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
+                    broadcast_futures.push_back(
+                        hpx::async<broadcast_impl_action>(
+                            id
+                          , act
+                          , boost::move(ids_first)
+                          , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                          , global_idx + 1
+                          , boost::integral_constant<bool, false>::type()
+                        )
+                    );
+                }
                 if(!ids_second.empty())
                 {
-                    id = hpx::get_colocation_id(ids_second[0]);
+                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
                           , boost::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                          , global_idx + half
                           , boost::integral_constant<bool, false>::type()
                         )
                     );
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>);
+                then(&return_result_type<action_result>).move();
         }
         
         template <
@@ -2439,11 +3862,13 @@ namespace hpx { namespace lcos {
         >
         struct broadcast_invoker10
         {
-            static hpx::future<typename broadcast_result<Action>::type>
+            
+            static typename broadcast_result<Action>::type
             call(
                 Action const & act
               , std::vector<hpx::id_type> const & ids
               , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
+              , std::size_t global_idx
               , IsVoid
             )
             {
@@ -2452,13 +3877,12 @@ namespace hpx { namespace lcos {
                         act
                       , ids
                       , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+                      , global_idx
                       , IsVoid()
                     );
             }
         };
-        template <
-            typename Action
-        >
+        template <typename Action>
         struct make_broadcast_action_impl<Action, 10>
         {
             typedef
@@ -2472,7 +3896,7 @@ namespace hpx { namespace lcos {
                     >
                     broadcast_invoker_type;
             typedef
-                typename hpx::actions::make_action<decltype(&broadcast_invoker_type::call), &broadcast_invoker_type::call>::type
+                typename HPX_MAKE_ACTION_TPL(broadcast_invoker_type::call)::type
                 type;
         };
     }
@@ -2488,7 +3912,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
     {
-        hpx::id_type dest = hpx::get_colocation_id(ids[0]);
+        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -2500,7 +3924,8 @@ namespace hpx { namespace lcos {
                 dest
               , Action()
               , ids
-                , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+              , 0
               , typename boost::is_same<void, action_result>::type()
             );
     }
@@ -2515,13 +3940,51 @@ namespace hpx { namespace lcos {
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
-            hpx::actions::action<
-                Component, Result, Arguments, Derived
-            > 
-          , std::vector<hpx::id_type> const & ids
-          , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
     {
         return broadcast<Derived>(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+            );
+    }
+    template <
+        typename Action
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+    >
+    hpx::future<
+        typename detail::broadcast_result<Action>::type
+    >
+    broadcast_with_index(
+        std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
+    {
+        return broadcast<detail::broadcast_with_index<Action> >(
+                ids
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+            );
+    }
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
+    >
+    hpx::future<
+        typename detail::broadcast_result<Derived>::type
+    >
+    broadcast_with_index(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > 
+      , std::vector<hpx::id_type> const & ids
+      , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
+    {
+        return broadcast<detail::broadcast_with_index<Derived> >(
                 ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
             );
