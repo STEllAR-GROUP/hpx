@@ -104,7 +104,7 @@ int hpx_main(
     )
 {
     {
-        boost::atomic<std::size_t> count = 0;
+        boost::atomic<std::size_t> count(0);
         callback cb(count);
 
         ///////////////////////////////////////////////////////////////////////
