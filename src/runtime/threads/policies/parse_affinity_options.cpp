@@ -583,7 +583,6 @@ namespace hpx { namespace threads { namespace detail
     {
         std::size_t num_threads = affinities.size();
         std::size_t num_cores = t.get_number_of_cores();
-        std::size_t num_pus = t.get_number_of_pus();
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
         for (std::size_t num_thread = 0; num_thread != num_threads; /**/)
@@ -598,12 +597,16 @@ namespace hpx { namespace threads { namespace detail
                     return;
                 }
 
+                // Check if we exceed the number of PUs on the current core.
+                // If yes, we need to proceed with the next one.
                 std::size_t num_pus_core = t.get_number_of_core_pus(num_core);
+                if(num_pus_cores[num_core] + 1 == num_pus_core) continue;
+
                 affinities[num_thread] = t.init_thread_affinity_mask(
-                    num_core, num_pus_cores[num_core]++ % num_pus_core);
+                    num_core, num_pus_cores[num_core]++);
 
                 if(++num_thread == num_threads)
-                    break;
+                    return;
             }
         }
     }
@@ -613,33 +616,41 @@ namespace hpx { namespace threads { namespace detail
     {
         std::size_t num_threads = affinities.size();
         std::size_t num_cores = t.get_number_of_cores();
-        std::size_t num_pus_core_used = num_cores / num_threads;
-
-        while (num_pus_core_used * num_cores < num_threads)
-            ++num_pus_core_used;
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
+        // At first, calculate the number of used pus per core.
+        // This needs to be done to make sure that we occupy all the available cores
         for (std::size_t num_thread = 0; num_thread != num_threads; /**/)
         {
             for(std::size_t num_core = 0; num_core != num_cores; ++num_core)
             {
+                // Check if we exceed the number of PUs on the current core.
+                // If yes, we need to proceed with the next one.
                 std::size_t num_pus_core = t.get_number_of_core_pus(num_core);
-                for (std::size_t num_pus = 0; num_pus != num_pus_core_used; ++num_pus)
+                if(num_pus_cores[num_core] + 1 == num_pus_core) continue;
+
+                num_pus_cores[num_core]++;
+                if(++num_thread == num_threads)
+                    break;
+            }
+        }
+        // Iterate over the cores and assigned pus per core. this additional loop
+        // is needed so that we have consecutive worker thread numbers
+        std::size_t num_thread = 0;
+        for(std::size_t num_core = 0; num_core != num_cores; ++num_core)
+        {
+            for(std::size_t num_pu = 0; num_pu != num_pus_cores[num_core]; ++num_pu)
+            {
+                if (any(affinities[num_thread]))
                 {
-                    if (any(affinities[num_thread]))
-                    {
-                        HPX_THROWS_IF(ec, bad_parameter, "decode_balanced_distribution",
-                            boost::str(boost::format("affinity mask for thread %1% has "
-                                "already been set") % num_thread));
-                        return;
-                    }
-
-                    affinities[num_thread] = t.init_thread_affinity_mask(
-                        num_core, num_pus_cores[num_core]++ % num_pus_core);
-
-                    if (++num_thread == num_threads)
-                        return;
+                    HPX_THROWS_IF(ec, bad_parameter, "decode_balanced_distribution",
+                        boost::str(boost::format("affinity mask for thread %1% has "
+                            "already been set") % num_thread));
+                    return;
                 }
+                affinities[num_thread] = t.init_thread_affinity_mask(
+                    num_core, num_pu);
+                ++num_thread;
             }
         }
     }

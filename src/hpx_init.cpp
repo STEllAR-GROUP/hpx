@@ -1050,7 +1050,7 @@ namespace hpx
         int result = 0;
         set_error_handlers();
 
-#ifdef HPX_NATIVE_MIC
+#if defined(HPX_NATIVE_MIC)
         unsetenv("LC_ALL");
         unsetenv("LANG");
 #endif
