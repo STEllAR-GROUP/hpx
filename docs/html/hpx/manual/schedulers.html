@@ -1,0 +1,199 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>HPX Thread Scheduling Policies</title>
+<link rel="stylesheet" href="../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../manual.html" title="Manual">
+<link rel="prev" href="performance_counters/counters.html" title="Existing HPX Performance Counters">
+<link rel="next" href="../../index/s05.html" title="Index">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="performance_counters/counters.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manual.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../index/s05.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_schedulers">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="hpx.manual.schedulers"></a><a class="link" href="schedulers.html" title="HPX Thread Scheduling Policies"><span class="emphasis"><em>HPX</em></span> Thread
+      Scheduling Policies</a>
+</h3></div></div></div>
+<p>
+        The HPX runtime has seven thread scheduling policies: priority_local, local,
+        global, abp, abp-priority, hierarchy and periodic priority. These policies
+        can be specified from the command line using the command line option <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">queuing</span></code></a>.
+        In order to use a particular scheduling policy, the runtime system must be
+        built with the appropriate scheduler flag turned on (e.g. <code class="computeroutput"><span class="identifier">cmake</span>
+        <span class="special">-</span><span class="identifier">DHPX_LOCAL_SCHEDULER</span><span class="special">=</span><span class="identifier">ON</span></code>, see
+        <a class="link" href="cmake/options.html" title="Options and Variables">Options and Variables</a> for
+        more information).
+      </p>
+<h5>
+<a name="hpx.manual.schedulers.h0"></a>
+        <span class="phrase"><a name="hpx.manual.schedulers.priority_local_scheduling_policy"></a></span><a class="link" href="schedulers.html#hpx.manual.schedulers.priority_local_scheduling_policy">Priority
+        Local Scheduling Policy (default policy)</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+            default or invoke using: <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">queuing</span><span class="special">=</span><span class="identifier">priority_local</span></code></a>
+            (or <code class="computeroutput"><span class="special">-</span><span class="identifier">qpr</span></code>)
+          </li></ul></div>
+<p>
+        The priority local scheduling policy maintains one queue per operating system
+        (OS) thread. The OS thread pulls its work from this queue. By default the
+        number of high priority queues is equal to the number of OS threads; the
+        number of high priority queues can be specified on the command line using
+        <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">high</span><span class="special">-</span><span class="identifier">priority</span><span class="special">-</span><span class="identifier">threads</span></code></a>.
+        High priority threads are executed by any of the OS threads before any other
+        work is executed. When a queue is empty work will be taken from high priority
+        queues first. There is one low priority queue from which threads will be
+        scheduled only when there is no other work.
+      </p>
+<p>
+        For this scheduling policy there is an option to turn on NUMA sensitivity
+        using the command line option <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">numa</span><span class="special">-</span><span class="identifier">sensitive</span></code></a>.
+        When NUMA sensitivity is turned on work stealing is done from queues associated
+        with the same NUMA domain first, only after that work is stolen from other
+        NUMA domains.
+      </p>
+<h5>
+<a name="hpx.manual.schedulers.h1"></a>
+        <span class="phrase"><a name="hpx.manual.schedulers.local_scheduling_policy"></a></span><a class="link" href="schedulers.html#hpx.manual.schedulers.local_scheduling_policy">Local
+        Scheduling Policy</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            invoke using: <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">queuing</span><span class="special">=</span><span class="identifier">local</span></code></a>
+            (or <code class="computeroutput"><span class="special">-</span><span class="identifier">ql</span></code>)
+          </li>
+<li class="listitem">
+            flag to turn on for build: <code class="computeroutput"><span class="identifier">HPX_LOCAL_SCHEDULER</span></code>
+          </li>
+</ul></div>
+<p>
+        The local scheduling policy maintains one queue per OS thread from which
+        each OS thread pulls its tasks (user threads).
+      </p>
+<h5>
+<a name="hpx.manual.schedulers.h2"></a>
+        <span class="phrase"><a name="hpx.manual.schedulers.global_scheduling_policy"></a></span><a class="link" href="schedulers.html#hpx.manual.schedulers.global_scheduling_policy">Global
+        Scheduling Policy</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            invoke using: <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">queuing</span>
+            <span class="identifier">global</span></code></a> or -qg
+          </li>
+<li class="listitem">
+            flag to turn on for build: <code class="computeroutput"><span class="identifier">HPX_GLOBAL_SCHEDULER</span></code>
+          </li>
+</ul></div>
+<p>
+        The global scheduling policy maintains one shared queue from which all OS
+        threads pull tasks.
+      </p>
+<h5>
+<a name="hpx.manual.schedulers.h3"></a>
+        <span class="phrase"><a name="hpx.manual.schedulers.abp_scheduling_policy"></a></span><a class="link" href="schedulers.html#hpx.manual.schedulers.abp_scheduling_policy">ABP
+        Scheduling Policy</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            invoke using: <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">queuing</span><span class="special">=</span><span class="identifier">abp</span></code></a>
+            (or <code class="computeroutput"><span class="special">-</span><span class="identifier">qa</span></code>)
+          </li>
+<li class="listitem">
+            flag to turn on for build: <code class="computeroutput"><span class="identifier">HPX_ABP_SCHEDULER</span></code>
+          </li>
+</ul></div>
+<p>
+        The ABP scheduling policy maintains a double ended lock free queue for each
+        OS thread. Threads are pushed on the top of the queue, and during work stealing
+        threads are taken from the bottom of the queue.
+      </p>
+<h5>
+<a name="hpx.manual.schedulers.h4"></a>
+        <span class="phrase"><a name="hpx.manual.schedulers.priority_abp_scheduling_policy"></a></span><a class="link" href="schedulers.html#hpx.manual.schedulers.priority_abp_scheduling_policy">Priority ABP
+        Scheduling Policy</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            invoke using: <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">queuing</span><span class="special">=</span><span class="identifier">priority_abp</span></code></a>
+          </li>
+<li class="listitem">
+            flag to turn on for build: <code class="computeroutput"><span class="identifier">HPX_ABP_PRIORITY_SCHEDULER</span></code>
+          </li>
+</ul></div>
+<p>
+        Priority ABP policy maintains a double ended lock free queue for each OS
+        thread. By default the number of high priority queues is equal to the number
+        of OS threads; the number of high priority queues can be specified on the
+        command line using <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">high</span><span class="special">-</span><span class="identifier">priority</span><span class="special">-</span><span class="identifier">threads</span></code></a>.
+        High priority threads are executed by the first OS threads before any other
+        work is executed. When a queue is empty work will be taken from high priority
+        queues first. There is one low priority queue from which threads will be
+        scheduled only when there is no other work. For this scheduling policy there
+        is an option to turn on NUMA sensitivity using the command line option <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">numa</span><span class="special">-</span><span class="identifier">senstive</span></code></a>.
+        When NUMA sensitivity is turned on work stealing is done from queues associated
+        with the same NUMA domain first, only after that work is stolen from other
+        NUMA domains.
+      </p>
+<h5>
+<a name="hpx.manual.schedulers.h5"></a>
+        <span class="phrase"><a name="hpx.manual.schedulers.hierarchy_scheduling_policy"></a></span><a class="link" href="schedulers.html#hpx.manual.schedulers.hierarchy_scheduling_policy">Hierarchy
+        Scheduling Policy</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            invoke using: <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">queuing</span><span class="special">=</span><span class="identifier">hierarchy</span></code></a>
+            (or <code class="computeroutput"><span class="special">-</span><span class="identifier">qh</span></code>)
+          </li>
+<li class="listitem">
+            flag to turn on for build: <code class="computeroutput"><span class="identifier">HPX_HIERARCHY_SCHEDULER</span></code>
+          </li>
+</ul></div>
+<p>
+        The hierarchy policy maintains a tree of work items. Every OS thread walks
+        the tree to obtain new work. Arity of the thread queue tree can be specified
+        on the command line using <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">hierarchy</span><span class="special">-</span><span class="identifier">arity</span></code></a> (default is 2). Work stealing
+        is done from the parent queue in that tree.
+      </p>
+<h5>
+<a name="hpx.manual.schedulers.h6"></a>
+        <span class="phrase"><a name="hpx.manual.schedulers.periodic_priority_scheduling_pol"></a></span><a class="link" href="schedulers.html#hpx.manual.schedulers.periodic_priority_scheduling_pol">Periodic
+        Priority Scheduling Policy</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            invoke using: <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">queuing</span><span class="special">=</span><span class="identifier">periodic</span></code></a>
+            (or <code class="computeroutput"><span class="special">-</span><span class="identifier">qpe</span></code>)
+          </li>
+<li class="listitem">
+            flag to turn on for build: <code class="computeroutput"><span class="identifier">HPX_PERIODIC_PRIORITY_SCHEDULER</span></code>
+          </li>
+</ul></div>
+<p>
+        Maintains one queue of work items (user threads) for each OS thread. Maintains
+        a number of high priority queues (specified by <a class="link" href="init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">high</span><span class="special">-</span><span class="identifier">priority</span><span class="special">-</span><span class="identifier">threads</span></code></a>)
+        and one low priority queue. High priority threads are executed by the specified
+        number of OS threads before any other work is executed. Low priority threads
+        are executed when no other work is available.
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="performance_counters/counters.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manual.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../../index/s05.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

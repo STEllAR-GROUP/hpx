@@ -1,0 +1,145 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Type error</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 1.0.0">
+<link rel="up" href="../header/hpx/error_hpp.html" title="Header &lt;hpx/error.hpp&gt;">
+<link rel="prev" href="../header/hpx/error_hpp.html" title="Header &lt;hpx/error.hpp&gt;">
+<link rel="next" href="../header/hpx/exception_hpp.html" title="Header &lt;hpx/exception.hpp&gt;">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../header/hpx/error_hpp.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/error_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="../header/hpx/exception_hpp.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="hpx.error"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Type error</span></h2>
+<p>hpx::error &#8212; Possible error conditions. </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../header/hpx/error_hpp.html" title="Header &lt;hpx/error.hpp&gt;">hpx/error.hpp</a>&gt;
+
+</span>
+<span class="keyword">enum</span> <span class="identifier">error</span> <span class="special">{</span> <a class="link" href="error.html#hpx.error.success">success</a> =  0, <a class="link" href="error.html#hpx.error.no_success">no_success</a> =  1, <a class="link" href="error.html#hpx.error.not_implemented">not_implemented</a> =  2, 
+             <a class="link" href="error.html#hpx.error.out_of_memory">out_of_memory</a> =  3, bad_action_code =  4, 
+             <a class="link" href="error.html#hpx.error.bad_component_type">bad_component_type</a> =  5, <a class="link" href="error.html#hpx.error.network_error">network_error</a> =  6, 
+             <a class="link" href="error.html#hpx.error.version_too_new">version_too_new</a> =  7, <a class="link" href="error.html#hpx.error.version_too_old">version_too_old</a> =  8, <a class="link" href="error.html#hpx.error.version_unknown">version_unknown</a> =  9, 
+             unknown_component_address =  10, 
+             <a class="link" href="error.html#hpx.error.duplicate_component_address">duplicate_component_address</a> =  11, <a class="link" href="error.html#hpx.error.invalid_status">invalid_status</a> =  12, 
+             <a class="link" href="error.html#hpx.error.bad_parameter">bad_parameter</a> =  13, internal_server_error =  14, 
+             service_unavailable =  15, bad_request =  16, 
+             repeated_request =  17, lock_error =  18, 
+             <a class="link" href="error.html#hpx.error.duplicate_console">duplicate_console</a> =  19, <a class="link" href="error.html#hpx.error.no_registered_console">no_registered_console</a> =  20, 
+             startup_timed_out =  21, uninitialized_value =  22, 
+             bad_response_type =  23, deadlock =  24, assertion_failure =  25, 
+             <a class="link" href="error.html#hpx.error.null_thread_id">null_thread_id</a> =  26, invalid_data =  27, <a class="link" href="error.html#hpx.error.yield_aborted">yield_aborted</a> =  28, 
+             dynamic_link_failure =  29, <a class="link" href="error.html#hpx.error.commandline_option_error">commandline_option_error</a> =  30, 
+             <a class="link" href="error.html#hpx.error.serialization_error">serialization_error</a> =  31, <a class="link" href="error.html#hpx.error.unhandled_exception">unhandled_exception</a> =  32, 
+             <a class="link" href="error.html#hpx.error.kernel_error">kernel_error</a> =  33, <a class="link" href="error.html#hpx.error.broken_task">broken_task</a> =  34, <a class="link" href="error.html#hpx.error.task_moved">task_moved</a> =  35, 
+             <a class="link" href="error.html#hpx.error.task_already_started">task_already_started</a> =  36, <a class="link" href="error.html#hpx.error.future_already_retrieved">future_already_retrieved</a> =  37, 
+             <a class="link" href="error.html#hpx.error.future_already_satisfied">future_already_satisfied</a> =  38, 
+             <a class="link" href="error.html#hpx.error.future_does_not_support_cancellation">future_does_not_support_cancellation</a> =  39, 
+             <a class="link" href="error.html#hpx.error.future_can_not_be_cancelled">future_can_not_be_cancelled</a> =  40, <a class="link" href="error.html#hpx.error.future_uninitialized">future_uninitialized</a> =  41, 
+             <a class="link" href="error.html#hpx.error.broken_promise">broken_promise</a> =  42, thread_resource_error =  43, 
+             thread_interrupted =  44, thread_not_interruptable =  45, 
+             <a class="link" href="error.html#hpx.error.duplicate_component_id">duplicate_component_id</a> =  46, <a class="link" href="error.html#hpx.error.unknown_error">unknown_error</a> =  47, 
+             <a class="link" href="error.html#hpx.error.bad_plugin_type">bad_plugin_type</a> =  48, <a class="link" href="error.html#hpx.error.security_error">security_error</a> =  49, 
+             <a class="link" href="error.html#hpx.error.filesystem_error">filesystem_error</a> =  50, <a class="link" href="error.html#hpx.error.bad_function_call">bad_function_call</a> =  51 <span class="special">}</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp14546416"></a><h2>Description</h2>
+<p>This enumeration lists all possible error conditions which can be reported from any of the API functions. </p>
+<div class="variablelist"><dl class="variablelist compact">
+<dt><span class="term"><code class="computeroutput">success</code><a name="hpx.error.success"></a></span></dt>
+<dd>The operation was successful. </dd>
+<dt><span class="term"><code class="computeroutput">no_success</code><a name="hpx.error.no_success"></a></span></dt>
+<dd><p>The operation was successful, but additional conditions apply </p></dd>
+<dt><span class="term"><code class="computeroutput">not_implemented</code><a name="hpx.error.not_implemented"></a></span></dt>
+<dd>The operation is not implemented. </dd>
+<dt><span class="term"><code class="computeroutput">out_of_memory</code><a name="hpx.error.out_of_memory"></a></span></dt>
+<dd>The operation caused a out of memory condition. </dd>
+<dt><span class="term"><code class="computeroutput">bad_component_type</code><a name="hpx.error.bad_component_type"></a></span></dt>
+<dd>The specified component type is not known or otherwise invalid. </dd>
+<dt><span class="term"><code class="computeroutput">network_error</code><a name="hpx.error.network_error"></a></span></dt>
+<dd>A generic network error occurred. </dd>
+<dt><span class="term"><code class="computeroutput">version_too_new</code><a name="hpx.error.version_too_new"></a></span></dt>
+<dd>The version of the network representation for this object is too new. </dd>
+<dt><span class="term"><code class="computeroutput">version_too_old</code><a name="hpx.error.version_too_old"></a></span></dt>
+<dd>The version of the network representation for this object is too old. </dd>
+<dt><span class="term"><code class="computeroutput">version_unknown</code><a name="hpx.error.version_unknown"></a></span></dt>
+<dd>The version of the network representation for this object is unknown. </dd>
+<dt><span class="term"><code class="computeroutput">duplicate_component_address</code><a name="hpx.error.duplicate_component_address"></a></span></dt>
+<dd>The given global id has already been registered. </dd>
+<dt><span class="term"><code class="computeroutput">invalid_status</code><a name="hpx.error.invalid_status"></a></span></dt>
+<dd>The operation was executed in an invalid status. </dd>
+<dt><span class="term"><code class="computeroutput">bad_parameter</code><a name="hpx.error.bad_parameter"></a></span></dt>
+<dd>One of the supplied parameters is invalid. </dd>
+<dt><span class="term"><code class="computeroutput">duplicate_console</code><a name="hpx.error.duplicate_console"></a></span></dt>
+<dd>There is more than one console locality. </dd>
+<dt><span class="term"><code class="computeroutput">no_registered_console</code><a name="hpx.error.no_registered_console"></a></span></dt>
+<dd>There is no registered console locality available. </dd>
+<dt><span class="term"><code class="computeroutput">null_thread_id</code><a name="hpx.error.null_thread_id"></a></span></dt>
+<dd>Attempt to invoke a API function from a non-HPX thread. </dd>
+<dt><span class="term"><code class="computeroutput">yield_aborted</code><a name="hpx.error.yield_aborted"></a></span></dt>
+<dd>The yield operation was aborted. </dd>
+<dt><span class="term"><code class="computeroutput">commandline_option_error</code><a name="hpx.error.commandline_option_error"></a></span></dt>
+<dd>One of the options given on the command line is erroneous. </dd>
+<dt><span class="term"><code class="computeroutput">serialization_error</code><a name="hpx.error.serialization_error"></a></span></dt>
+<dd>There was an error during serialization of this object. </dd>
+<dt><span class="term"><code class="computeroutput">unhandled_exception</code><a name="hpx.error.unhandled_exception"></a></span></dt>
+<dd>An unhandled exception has been caught. </dd>
+<dt><span class="term"><code class="computeroutput">kernel_error</code><a name="hpx.error.kernel_error"></a></span></dt>
+<dd>The OS kernel reported an error. </dd>
+<dt><span class="term"><code class="computeroutput">broken_task</code><a name="hpx.error.broken_task"></a></span></dt>
+<dd>The task associated with this future object is not available anymore. </dd>
+<dt><span class="term"><code class="computeroutput">task_moved</code><a name="hpx.error.task_moved"></a></span></dt>
+<dd>The task associated with this future object has been moved. </dd>
+<dt><span class="term"><code class="computeroutput">task_already_started</code><a name="hpx.error.task_already_started"></a></span></dt>
+<dd>The task associated with this future object has already been started. </dd>
+<dt><span class="term"><code class="computeroutput">future_already_retrieved</code><a name="hpx.error.future_already_retrieved"></a></span></dt>
+<dd>The future object has already been retrieved. </dd>
+<dt><span class="term"><code class="computeroutput">future_already_satisfied</code><a name="hpx.error.future_already_satisfied"></a></span></dt>
+<dd>The value for this future object has already been set. </dd>
+<dt><span class="term"><code class="computeroutput">future_does_not_support_cancellation</code><a name="hpx.error.future_does_not_support_cancellation"></a></span></dt>
+<dd>The future object does not support cancellation. </dd>
+<dt><span class="term"><code class="computeroutput">future_can_not_be_cancelled</code><a name="hpx.error.future_can_not_be_cancelled"></a></span></dt>
+<dd>The future can't be canceled at this time. </dd>
+<dt><span class="term"><code class="computeroutput">future_uninitialized</code><a name="hpx.error.future_uninitialized"></a></span></dt>
+<dd>The future object has not been initialized. </dd>
+<dt><span class="term"><code class="computeroutput">broken_promise</code><a name="hpx.error.broken_promise"></a></span></dt>
+<dd>The promise has been deleted. </dd>
+<dt><span class="term"><code class="computeroutput">duplicate_component_id</code><a name="hpx.error.duplicate_component_id"></a></span></dt>
+<dd>The component type has already been registered. </dd>
+<dt><span class="term"><code class="computeroutput">unknown_error</code><a name="hpx.error.unknown_error"></a></span></dt>
+<dd>An unknown error occurred. </dd>
+<dt><span class="term"><code class="computeroutput">bad_plugin_type</code><a name="hpx.error.bad_plugin_type"></a></span></dt>
+<dd>The specified plugin type is not known or otherwise invalid. </dd>
+<dt><span class="term"><code class="computeroutput">security_error</code><a name="hpx.error.security_error"></a></span></dt>
+<dd>An error occurred in the security component. </dd>
+<dt><span class="term"><code class="computeroutput">filesystem_error</code><a name="hpx.error.filesystem_error"></a></span></dt>
+<dd>The specified file does not exist or other filesystem related error. </dd>
+<dt><span class="term"><code class="computeroutput">bad_function_call</code><a name="hpx.error.bad_function_call"></a></span></dt>
+<dd>equivalent of std::bad_function_call </dd>
+</dl></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../header/hpx/error_hpp.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/error_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="../header/hpx/exception_hpp.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

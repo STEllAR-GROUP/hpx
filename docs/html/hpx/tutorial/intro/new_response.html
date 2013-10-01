@@ -1,0 +1,95 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Technology Demands New Response</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../intro.html" title="Introduction">
+<link rel="prev" href="slow.html" title="What makes our Systems Slow?">
+<link rel="next" href="principles.html" title="Governing Principles applied while Developing HPX">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="slow.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../intro.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="principles.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_tutorial_intro_new_response">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.tutorial.intro.new_response"></a><a class="link" href="new_response.html" title="Technology Demands New Response">Technology Demands
+        New Response</a>
+</h4></div></div></div>
+<p>
+          Today's computer systems are designed based on the initial ideas of <a href="http://qss.stanford.edu/~godfrey/vonNeumann/vnedvac.pdf" target="_top">John von
+          Neumann</a>, as published back in 1945, and later extended by the
+          <a href="http://en.wikipedia.org/wiki/Harvard_architecture" target="_top">Harvard
+          architecture</a>. These ideas form the foundation, the execution model
+          of computer systems we use currently. But apparently a new response is
+          required in the light of the demands created by today's technology.
+        </p>
+<p>
+          So, what are the overarching objectives for designing systems allowing
+          for applications to scale as they should? In our opinion, the main objectives
+          are:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <span class="emphasis"><em>Performance</em></span>: as mentioned, scalable and efficiency
+              are the main criteria people are interested in
+            </li>
+<li class="listitem">
+              <span class="emphasis"><em>Fault tolerance</em></span>: the low expected mean time between
+              failures (<a href="http://en.wikipedia.org/wiki/Mean_time_between_failures" target="_top">MTBF</a>)
+              of future systems requires to embrace faults, not trying to avoid them
+            </li>
+<li class="listitem">
+              <span class="emphasis"><em>Power</em></span>: minimizing energy consumption is a must
+              as it is one of the major cost factors today, even more so in the future
+            </li>
+<li class="listitem">
+              <span class="emphasis"><em>Generality</em></span>: any system should be usable for a
+              broad set of use cases
+            </li>
+<li class="listitem">
+              <span class="emphasis"><em>Programmability</em></span>: for me as a programmer this is
+              a very important objective, ensuring long term platform stability and
+              portability
+            </li>
+</ul></div>
+<p>
+          What needs to be done to meet those objectives, to make applications scale
+          better on tomorrow's architectures? Well, the answer is almost obvious:
+          we need to devise a new execution model - a set of governing principles
+          for the holistic design of future systems - targeted at minimizing the
+          effect of the outlined <span class="bold"><strong>SLOW</strong></span> factors. Everything
+          we create for future systems, every design decision we make, every criteria
+          we apply, has to be validated against this single, uniform metric. This
+          includes changes in the hardware architecture we prevalently use today,
+          and it certainly involves new ways of writing software, starting from the
+          operating system, runtime system, compilers, and at the application level.
+          However the key point is that all those layers have to be co-designed,
+          they are interdependent and cannot be seen as separate facets. The systems
+          we have today have been evolving for over 50 years now. All layers function
+          in a certain way relying on the other layers to do so as well. However,
+          we do not have the time to wait for a coherent system to evolve for another
+          50 years. The new paradigms are needed now - therefore, co-design is the
+          key.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="slow.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../intro.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="principles.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

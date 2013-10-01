@@ -1,0 +1,220 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>How to Use HPX Applications with PBS</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../getting_started.html" title="Getting Started">
+<link rel="prev" href="intel_mic_installation.html" title="How to Install HPX on the Xeon Phi">
+<link rel="next" href="unix_slurm.html" title="How to Use HPX Applications with SLURM">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="intel_mic_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="unix_slurm.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_tutorial_getting_started_unix_pbs">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.tutorial.getting_started.unix_pbs"></a><a class="link" href="unix_pbs.html" title="How to Use HPX Applications with PBS">How to Use
+        <span class="emphasis"><em>HPX</em></span> Applications with PBS</a>
+</h4></div></div></div>
+<p>
+          Most <span class="emphasis"><em>HPX</em></span> applications are executed on parallel computers.
+          These platforms typically provide integrated job management services that
+          facilitate the allocation of computing resources for each parallel program.
+          <span class="emphasis"><em>HPX</em></span> includes out of the box support for one of the
+          most common job management systems, the Portable Batch System (PBS).
+        </p>
+<p>
+          All PBS jobs require a script to specify the resource requirements and
+          other parameters associated with a parallel job. The PBS script is basically
+          a shell script with PBS directives placed within commented sections at
+          the beginning of the file. The remaining (not commented-out) portions of
+          the file executes just like any other regular shell script. While the description
+          of all available PBS options is outside the scope of this tutorial (the
+          interested reader may refer to in-depth <a href="http://www.clusterresources.com/torquedocs21/" target="_top">documentation</a>
+          for more information), below is a minimal example to illustrate the approach.
+          As a test application we will use the multithreaded <code class="literal">hello_world</code>
+          program, explained in the section <a class="link" href="../examples/hello_world.html" title="Hello World">Hello
+          World Example</a>.
+        </p>
+<pre class="programlisting">#!/bin/bash
+#
+#PBS -l nodes=2:ppn=4
+
+APP_PATH=~/packages/hpx/bin/hello_world
+APP_OPTIONS=
+
+<a href="http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml" target="_top">pbsdsh</a> -u $APP_PATH $APP_OPTIONS <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options">--hpx:nodes</a>=`cat $PBS_NODEFILE`
+</pre>
+<div class="caution"><table border="0" summary="Caution">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Caution]" src="../../../images/caution.png"></td>
+<th align="left">Caution</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+            If the first application specific argument (inside <code class="computeroutput">$APP_OPTIONS</code>)
+            is a non-option (i.e. does not start with a '<code class="computeroutput">-</code>' or a '<code class="computeroutput">--</code>',
+            then those have to be placed before the option <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options">--hpx:nodes</a>,
+            which in this case should be the last option on the command line.
+          </p>
+<p>
+            Alternatively, use the option <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options">--hpx:endnodes</a>
+            to explicitly mark the end of the list of node names:
+          </p>
+<pre class="programlisting"><a href="http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml" target="_top">pbsdsh</a> -u $APP_PATH <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options">--hpx:nodes</a>=`cat $PBS_NODEFILE` <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options">--hpx:endnodes</a> $APP_OPTIONS
+</pre>
+</td></tr>
+</table></div>
+<p>
+          The <code class="literal">#PBS -l nodes=2:ppn=4</code> directive will cause two compute
+          nodes to be allocated for the application, as specified in the option
+          <code class="literal">nodes</code>. Each of the nodes will dedicate four cores to
+          the program, as per the option <code class="literal">ppn</code>, short for "processors
+          per node" (PBS does not distinguish between processors and cores).
+          Note that requesting more cores per node than physically available is pointless
+          and may prevent PBS from accepting the script.
+        </p>
+<p>
+          <code class="literal">APP_PATH</code> and <code class="literal">APP_OPTIONS</code> are shell
+          variables that respectively specify the correct path to the executable
+          (<code class="literal">hello_world</code> in this case) and the command line options.
+          Since the <code class="literal">hello_world</code> application doesn't need any command
+          line options, <code class="literal">APP_OPTIONS</code> has been left empty. Unlike
+          in other execution environments, there is no need to use the <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options"><code class="literal">--hpx:threads</code></a>
+          option to indicate the required number of OS threads per node; the <span class="emphasis"><em>HPX</em></span>
+          library will derive this parameter automatically from PBS.
+        </p>
+<p>
+          Finally, <a href="http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml" target="_top">pbsdsh</a>
+          is a PBS command that starts tasks to the resources allocated to the current
+          job. It is recommended to leave this line as shown and modify only the
+          PBS options and shell variables as needed for a specific application.
+        </p>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            A script invoked by <a href="http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml" target="_top">pbsdsh</a>
+            starts in a very basic environment: the user's <code class="computeroutput">$HOME</code> directory
+            is defined and is the current directory, the <code class="computeroutput">LANG</code> variable
+            is set to <code class="computeroutput">C</code>, and the <code class="computeroutput">PATH</code> is set to the basic
+            <code class="computeroutput">/usr/local/bin:/usr/bin:/bin</code> as defined in a system-wide
+            file pbs_environment. Nothing that would normally be set up by a system
+            shell profile or user shell profile is defined, unlike the environment
+            for the main job script.
+          </p></td></tr>
+</table></div>
+<p>
+          Another choice is for the <a href="http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml" target="_top">pbsdsh</a>
+          command in your main job script to invoke your program via a shell, like
+          <code class="computeroutput">sh</code> or <code class="computeroutput">bash</code>, so that it gives an initialized environment
+          for each instance. We create a small script <code class="computeroutput">runme.sh</code> which
+          is used to invoke the program:
+        </p>
+<pre class="programlisting">#!/bin/bash
+# Small script which invokes the program based on what was passed on its
+# command line.
+#
+# This script is executed by the bash shell which will initialize all
+# environment variables as usual.
+$@
+</pre>
+<p>
+          Now, we invoke this script using the <a href="http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml" target="_top">pbsdsh</a>
+          tool:
+        </p>
+<pre class="programlisting">#!/bin/bash
+#
+#PBS -l nodes=2:ppn=4
+
+APP_PATH=~/packages/hpx/bin/hello_world
+APP_OPTIONS=
+
+<a href="http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml" target="_top">pbsdsh</a> -u runme.sh $APP_PATH $APP_OPTIONS <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options">--hpx:nodes</a>=`cat $PBS_NODEFILE`
+</pre>
+<p>
+          All that remains now is submitting the job to the queuing system. Assuming
+          that the contents of the PBS script were saved in file <code class="literal">pbs_hello_world.sh</code>
+          in the current directory, this is accomplished by typing:
+        </p>
+<pre class="programlisting">$ <a href="http://www.clusterresources.com/torquedocs21/commands/qsub.shtml" target="_top">qsub</a> ./pbs_hello_world_pbs.sh
+</pre>
+<p>
+          If the job is accepted, <a href="http://www.clusterresources.com/torquedocs21/commands/qsub.shtml" target="_top">qsub</a>
+          will print out the assigned job ID, which may look like:
+        </p>
+<pre class="programlisting">$ 42.supercomputer.some.university.edu
+</pre>
+<p>
+          To check the status of your job, issue the following command:
+        </p>
+<pre class="programlisting">$ <a href="http://www.clusterresources.com/torquedocs21/commands/qstat.shtml" target="_top">qstat</a> 42.supercomputer.some.university.edu
+</pre>
+<p>
+          and look for a single-letter job status symbol. The common cases include:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <span class="bold"><strong>Q</strong></span> - signifies that the job is queued
+              and awaiting its turn to be executed.
+            </li>
+<li class="listitem">
+              <span class="bold"><strong>R</strong></span> - indicates that the job is currently
+              running.
+            </li>
+<li class="listitem">
+              <span class="bold"><strong>C</strong></span> - means that the job has completed.
+            </li>
+</ul></div>
+<p>
+          The example <a href="http://www.clusterresources.com/torquedocs21/commands/qstat.shtml" target="_top">qstat</a>
+          output below shows a job waiting for execution resources to become available:
+        </p>
+<pre class="programlisting">Job id                    Name             User            Time Use S Queue
+------------------------- ---------------- --------------- -------- - -----
+42.supercomputer          ...ello_world.sh joe_user               0 Q batch
+</pre>
+<p>
+          After the job completes, PBS will place two files, <code class="literal">pbs_hello_world.sh.o42</code>
+          and <code class="literal">pbs_hello_world.sh.e42</code>, in the directory where the
+          job was submitted. The first contains the standard output and the second
+          contains the standard error from all the nodes on which the application
+          executed. In our example, the error output file should be empty and standard
+          output file should contain something similar to:
+        </p>
+<pre class="programlisting">hello world from OS-thread 3 on locality 0
+hello world from OS-thread 2 on locality 0
+hello world from OS-thread 1 on locality 1
+hello world from OS-thread 0 on locality 0
+hello world from OS-thread 3 on locality 1
+hello world from OS-thread 2 on locality 1
+hello world from OS-thread 1 on locality 0
+hello world from OS-thread 0 on locality 1
+</pre>
+<p>
+          Congratulations! You have just run your first distributed <span class="emphasis"><em>HPX</em></span>
+          application!
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="intel_mic_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="unix_slurm.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

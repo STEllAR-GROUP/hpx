@@ -1,0 +1,78 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Setting the memory Allocator</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../hpx_variables.html" title="HPX specific CMake Variables">
+<link rel="prev" href="cmake_frequently_used.html" title="Frequently used HPX specific CMake Variables">
+<link rel="next" href="cmake_threading.html" title="Variables concerning Thread Scheduling Policies">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="cmake_frequently_used.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_variables.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="cmake_threading.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_cmake_hpx_variables_cmake_hpx_malloc">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.cmake.hpx_variables.cmake_hpx_malloc"></a><a class="link" href="cmake_hpx_malloc.html" title="Setting the memory Allocator">Setting
+          the memory Allocator</a>
+</h5></div></div></div>
+<p>
+            The following list is about the default memory allocator used by <span class="emphasis"><em>HPX</em></span>.
+            We currently support the regular system allocator, tcmalloc, jemalloc
+            and tbbmalloc. The allocator is crucial in getting an application to
+            scale with <span class="emphasis"><em>HPX</em></span>. The default system allocator is
+            usually a point of heavy contention due to syscalls and locks in the
+            operating system. This can be avoided by using the above custom allocators.
+            For using <span class="emphasis"><em>HPX</em></span> on the Xeon Phi we only support system
+            and tbbmalloc. tbbmalloc is part of the Intel Thread Building Blocks.
+          </p>
+<div class="variablelist">
+<p class="title"><b>Affecting the default memory allocator</b></p>
+<dl class="variablelist">
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_MALLOC</span><span class="special">:</span><span class="identifier">STRING</span></code></span></dt>
+<dd><p>
+                  Set the memory allocator to use. Defaults to tcmalloc on regular
+                  systems and to tbbmalloc if HPX_NATIVE_MIC is set to On. If the
+                  specific memory allocator isn't found we silently fall back to
+                  the system allocator.
+                </p></dd>
+</dl>
+</div>
+<div class="variablelist">
+<p class="title"><b>Locations for memory allocators</b></p>
+<dl class="variablelist">
+<dt><span class="term"><code class="computeroutput"><span class="identifier">TCMALLOC_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                  Specifies where to look at for tcmalloc
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">JEMALLOC_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                  Specifies where to look at for jemalloc
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">TBB_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                  Specifies where to look at for tbb. tbbmalloc is part of tbb
+                </p></dd>
+</dl>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="cmake_frequently_used.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_variables.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="cmake_threading.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

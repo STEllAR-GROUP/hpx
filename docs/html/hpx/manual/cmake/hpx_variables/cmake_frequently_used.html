@@ -1,0 +1,117 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Frequently used HPX specific CMake Variables</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../hpx_variables.html" title="HPX specific CMake Variables">
+<link rel="prev" href="../hpx_variables.html" title="HPX specific CMake Variables">
+<link rel="next" href="cmake_hpx_malloc.html" title="Setting the memory Allocator">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../hpx_variables.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_variables.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="cmake_hpx_malloc.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_cmake_hpx_variables_cmake_frequently_used">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.cmake.hpx_variables.cmake_frequently_used"></a><a class="link" href="cmake_frequently_used.html" title="Frequently used HPX specific CMake Variables">Frequently
+          used HPX specific CMake Variables</a>
+</h5></div></div></div>
+<p>
+            Here are listed the most frequently used CMake variables specific to
+            <span class="emphasis"><em>HPX</em></span>, along with a brief explanation.
+          </p>
+<div class="variablelist">
+<p class="title"><b>Frequently used HPX specific CMake Variables</b></p>
+<dl class="variablelist">
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_BUILD_DOCUMENTATION</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  Build the <span class="emphasis"><em>HPX</em></span> documentation if the documentation
+                  toolchain is available (default: <code class="computeroutput"><span class="identifier">OFF</span></code>).
+                  For more information about how to set up the documentation tool
+                  chain please refer to the section <a class="link" href="../doc_tools.html" title="Setting up the HPX Documentation Tool Chain">Setting
+                  up the HPX Documentation Tool Chain</a>.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_BUILD_EXAMPLES</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  <span class="emphasis"><em>HPX</em></span> examples will be built (default: <code class="computeroutput"><span class="identifier">ON</span></code>). To actually build the examples
+                  execute <code class="computeroutput"><span class="identifier">make</span> <span class="identifier">examples</span></code>.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_BUILD_TESTS</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  <span class="emphasis"><em>HPX</em></span> tests will be built (default: <code class="computeroutput"><span class="identifier">ON</span></code>). To actually build the tests
+                  execute <code class="computeroutput"><span class="identifier">make</span> <span class="identifier">tests</span></code>.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_CMAKE_LOGLEVEL</span><span class="special">:</span><span class="identifier">STRING</span></code></span></dt>
+<dd><p>
+                  Sets the debugging level for the <span class="emphasis"><em>HPX</em></span> build
+                  system generation. Possible values are <code class="computeroutput"><span class="identifier">Error</span></code>,
+                  <code class="computeroutput"><span class="identifier">Warn</span></code>, <code class="computeroutput"><span class="identifier">Debug</span></code>, and <code class="computeroutput"><span class="identifier">Info</span></code>.
+                  The default is <code class="computeroutput"><span class="identifier">Warn</span></code>.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_NO_LOGGING</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  Sets whether <span class="emphasis"><em>HPX</em></span> should not support generating
+                  detailed logging output (default: <code class="computeroutput"><span class="identifier">OFF</span></code>).
+                  Even if this is set to <code class="computeroutput"><span class="identifier">OFF</span></code>
+                  (i.e. logging is supported) you need to enable logging when running
+                  any <span class="emphasis"><em>HPX</em></span> application. Logging support introduces
+                  a minimal runtime overhead which usually can be ignored. This option
+                  removes runtime overhead but also disables the capability to extract
+                  detailed runtime error information.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_CXX11</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  Sets whether <span class="emphasis"><em>HPX</em></span> should use C++11 support,
+                  if available (default: <code class="computeroutput"><span class="identifier">ON</span></code>).
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_STACKTRACES</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  Sets whether <span class="emphasis"><em>HPX</em></span> applications should support
+                  capturing stack back- traces (default: <code class="computeroutput"><span class="identifier">ON</span></code>).
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_NATIVE_TLS</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  Sets whether <span class="emphasis"><em>HPX</em></span> should use the native compiler
+                  support for thread local storage, if available (default: <code class="computeroutput"><span class="identifier">ON</span></code>).
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_THREAD_DEBUG_INFO</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  Sets whether <span class="emphasis"><em>HPX</em></span> threads should maintain detailed
+                  debugging information like the parent thread id, the phase execution
+                  count, the thread description, and the LCO description (while the
+                  thread is suspended). The default value for this variable is <code class="computeroutput"><span class="identifier">OFF</span></code> if <code class="computeroutput"><span class="identifier">CMAKE_BUILD_TYPE</span><span class="special">=</span><span class="identifier">Release</span></code>
+                  and <code class="computeroutput"><span class="identifier">ON</span></code> otherwise.
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_NO_INSTALL</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  Sets whether <span class="emphasis"><em>HPX</em></span> can be used directly from
+                  the build directory. (default: OFF)
+                </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_NATIVE_MIC</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                  Build <span class="emphasis"><em>HPX</em></span> to run natively on the Xeon Phi
+                  Coprocessor (default: OFF)
+                </p></dd>
+</dl>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../hpx_variables.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_variables.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="cmake_hpx_malloc.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

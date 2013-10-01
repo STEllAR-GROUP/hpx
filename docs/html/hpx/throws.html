@@ -1,0 +1,52 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Global throws</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 1.0.0">
+<link rel="up" href="../header/hpx/exception_hpp.html" title="Header &lt;hpx/exception.hpp&gt;">
+<link rel="prev" href="exception.html" title="Class exception">
+<link rel="next" href="diagnostic_information_idp15295648.html" title="Function diagnostic_information">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="exception.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/exception_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="diagnostic_information_idp15295648.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="hpx.throws"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Global throws</span></h2>
+<p>hpx::throws &#8212; Predefined <a class="link" href="error_code.html" title="Class error_code">error_code</a> object used as "throw on error" tag. </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../header/hpx/exception_hpp.html" title="Header &lt;hpx/exception.hpp&gt;">hpx/exception.hpp</a>&gt;
+
+</span><a class="link" href="error_code.html" title="Class error_code">error_code</a> throws<span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp15439312"></a><h2>Description</h2>
+<p>The predefined <a class="link" href="error_code.html" title="Class error_code">hpx::error_code</a> object <span class="emphasis"><em>hpx::throws</em></span> is supplied for use as a "throw on error" tag.</p>
+<p>Functions that specify an argument in the form '<a class="link" href="error_code.html" title="Class error_code">error_code</a>&amp; ec=throws' (with appropriate namespace qualifiers), have the following error handling semantics:</p>
+<p>If &amp;ec != &amp;throws and an error occurred: ec.value() returns the implementation specific error number for the particular error that occurred and ec.category() returns the error_category for ec.value().</p>
+<p>If &amp;ec != &amp;throws and an error did not occur, ec.clear().</p>
+<p>If an error occurs and &amp;ec == &amp;throws, the function throws an exception of type <span class="emphasis"><em><a class="link" href="exception.html" title="Class exception">hpx::exception</a></em></span> or of a type derived from it. The exception's <span class="emphasis"><em>get_errorcode()</em></span> member function returns a reference to an <span class="emphasis"><em><a class="link" href="error_code.html" title="Class error_code">hpx::error_code</a></em></span> object with the behavior as specified above. </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="exception.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/exception_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="diagnostic_information_idp15295648.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

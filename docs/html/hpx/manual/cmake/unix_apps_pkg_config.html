@@ -1,0 +1,99 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>How to Build HPX Applications with pkg-config</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../cmake.html" title="Building HPX with CMake">
+<link rel="prev" href="doc_tools.html" title="Setting up the HPX Documentation Tool Chain">
+<link rel="next" href="unix_comps_pkg_config.html" title="How to Build HPX Components with pkg-config">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="doc_tools.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="unix_comps_pkg_config.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_cmake_unix_apps_pkg_config">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.cmake.unix_apps_pkg_config"></a><a class="link" href="unix_apps_pkg_config.html" title="How to Build HPX Applications with pkg-config">How to Build
+        <span class="emphasis"><em>HPX</em></span> Applications with pkg-config</a>
+</h4></div></div></div>
+<p>
+          After you are done installing <span class="emphasis"><em>HPX</em></span>, you should be able
+          to build the following program. It prints <code class="literal">Hello HPX World!</code>
+          on the locality you run it on.
+        </p>
+<pre class="programlisting"><span class="comment">// Including 'hpx/hpx_main.hpp' instead of the usual 'hpx/hpx_init.hpp' enables </span>
+<span class="comment">// to use the plain C-main below as the direct main HPX entry point.</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">hpx_main</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">include</span><span class="special">/</span><span class="identifier">iostreams</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="comment">// Say hello to the world!</span>
+    <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Hello World!\n"</span> <span class="special">&lt;&lt;</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">flush</span><span class="special">;</span>
+    <span class="keyword">return</span> <span class="number">0</span><span class="special">;</span>
+<span class="special">}</span>
+</pre>
+<p>
+          Copy the text of this program into a file called hello_world.cpp.
+        </p>
+<p>
+          Now, in the directory where you put hello_world.cpp, issue the following
+          commands (where <code class="literal">$HPX_LOCATION</code> is the <code class="literal">CMAKE_INSTALL_PREFIX</code>
+          you used while building <span class="emphasis"><em>HPX</em></span>):
+        </p>
+<pre class="programlisting">$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+$ c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -liostreams -DHPX_APPLICATION_NAME=hello_world
+</pre>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            When using pkg-config with <span class="emphasis"><em>HPX</em></span>, the pkg-config flags
+            must go after the <code class="literal">-o</code> flag.
+          </p></td></tr>
+</table></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            If HPX was build in debug mode (<code class="computeroutput">cmake -DCMAKE_BUILD_TYPE=Debug</code>)
+            the pkg-config names have to be different. Instead of <code class="computeroutput">hpx_application</code>
+            or <code class="computeroutput">hpx_component</code> you will have to use <code class="computeroutput">hpx_application_debug</code>
+            or <code class="computeroutput">hpx_component_debug</code>. Moreover, all referenced HPX components
+            need to have a appended 'd' suffix, e.g. instead of <code class="computeroutput">-liostreams</code>
+            you will need to specify <code class="computeroutput">-liostreamsd</code>.
+          </p></td></tr>
+</table></div>
+<p>
+          To test the program, type:
+        </p>
+<pre class="programlisting">$ ./hello_world
+</pre>
+<p>
+          which should print <code class="literal">Hello World!</code> and exit.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="doc_tools.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="unix_comps_pkg_config.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

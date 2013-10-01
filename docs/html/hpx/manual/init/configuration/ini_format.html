@@ -1,0 +1,128 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>The HPX INI File Format</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../configuration.html" title="Configure HPX Applications">
+<link rel="prev" href="../configuration.html" title="Configure HPX Applications">
+<link rel="next" href="config_defaults.html" title="Built-in Default Configuration Settings">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../configuration.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../configuration.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="config_defaults.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_init_configuration_ini_format">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.init.configuration.ini_format"></a><a class="link" href="ini_format.html" title="The HPX INI File Format">The <span class="emphasis"><em>HPX</em></span>
+          INI File Format</a>
+</h5></div></div></div>
+<p>
+            All <span class="emphasis"><em>HPX</em></span> applications can be configured using a special
+            file format which is similar to the well known <a href="http://en.wikipedia.org/wiki/INI_file" target="_top">Windows
+            INI file format</a>. This is a structured text format allowing to
+            group key/value pairs (properties) into sections. The basic element contained
+            in an ini file is the property. Every property has a name and a value,
+            delimited by an equals sign (<code class="computeroutput"><span class="char">'='</span></code>).
+            The name appears to the left of the equals sign:
+          </p>
+<pre class="programlisting"><span class="identifier">name</span><span class="special">=</span><span class="identifier">value</span>
+</pre>
+<p>
+            The value may contain equal signs as only the first <code class="computeroutput"><span class="char">'='</span></code>
+            character is interpreted as the delimiter between <code class="computeroutput"><span class="identifier">name</span></code>
+            and <code class="computeroutput"><span class="identifier">value</span></code>. Whitespace
+            before the name, after the value and immediately before and after the
+            delimiting equal sign is ignored. Whitespace inside the value is retained.
+          </p>
+<p>
+            Properties may be grouped into arbitrarily named sections. The section
+            name appears on a line by itself, in square brackets (<code class="computeroutput"><span class="special">[</span></code>
+            and <code class="computeroutput"><span class="special">]</span></code>). All properties after
+            the section declaration are associated with that section. There is no
+            explicit "end of section" delimiter; sections end at the next
+            section declaration, or the end of the file
+          </p>
+<pre class="programlisting"><span class="special">[</span><span class="identifier">section</span><span class="special">]</span>
+</pre>
+<p>
+            In <span class="emphasis"><em>HPX</em></span> sections can be nested. A nested section
+            has a name composed of all section names it is embedded in. The section
+            names are concatenated using a dot (<code class="computeroutput"><span class="char">'.'</span></code>):
+          </p>
+<pre class="programlisting"><span class="special">[</span><span class="identifier">outer_section</span><span class="special">.</span><span class="identifier">inner_section</span><span class="special">]</span>
+</pre>
+<p>
+            Here <code class="computeroutput"><span class="identifier">inner_section</span></code> is
+            logically nested within <code class="computeroutput"><span class="identifier">outer_section</span></code>.
+          </p>
+<p>
+            It is possible to use the full section name concatenated with the property
+            name to refer to a particular property. For example in:
+          </p>
+<pre class="programlisting"><span class="special">[</span><span class="identifier">a</span><span class="special">.</span><span class="identifier">b</span><span class="special">.</span><span class="identifier">c</span><span class="special">]</span>
+<span class="identifier">d</span> <span class="special">=</span> <span class="identifier">e</span>
+</pre>
+<p>
+            the property value of <code class="computeroutput"><span class="identifier">d</span></code>
+            can be referred to as <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">b</span><span class="special">.</span><span class="identifier">c</span><span class="special">.</span><span class="identifier">d</span><span class="special">=</span><span class="identifier">e</span></code>.
+          </p>
+<p>
+            In <span class="emphasis"><em>HPX</em></span> ini files can contain comments. Hash signs
+            (<code class="computeroutput"><span class="char">'#'</span></code>) at the beginning of a
+            line indicate a comment. All characters starting with the <code class="computeroutput"><span class="char">'#'</span></code> until the end of line are ignored.
+          </p>
+<p>
+            If a property with the same name is reused inside a section, the second
+            occurrence of this property name will override the first occurrence (discard
+            the first value). Duplicate sections simply merge their properties together,
+            as if they occurred contiguously.
+          </p>
+<p>
+            In <span class="emphasis"><em>HPX</em></span> ini files, a property value <code class="computeroutput">${FOO:default}</code>
+            will use the environmental variable <code class="computeroutput">FOO</code> to extract the actual
+            value if it is set and <code class="computeroutput">default</code> otherwise. No default has
+            to be specified. Therefore <code class="computeroutput">${FOO}</code> refers to the environmental
+            variable <code class="computeroutput">FOO</code>. If <code class="computeroutput">FOO</code> is not set or empty the
+            overall expression will evaluate to an empty string. A property value
+            <code class="computeroutput">$[section.key:default]</code> refers to the value held by the property
+            <code class="computeroutput">section.key</code> if it exists and <code class="computeroutput">default</code> otherwise.
+            No default has to be specified. Therefore <code class="computeroutput">$[section.key]</code>
+            refers to the property <code class="computeroutput">section.key</code>. If the property <code class="computeroutput">section.key</code>
+            is not set or empty, the overall expression will evaluate to an empty
+            string.
+          </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              Any property <code class="computeroutput">$[section.key:default]</code> is evaluated whenever
+              it is queried and not when the configuration data is initialized. This
+              allows for lazy evaluation and relaxes initialization order of different
+              sections. The only exception are recursive property values, e.g. values
+              referring to the very key they are associated with. Those property
+              values are evaluated at initialization time to avoid infinite recursion.
+            </p></td></tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../configuration.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../configuration.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="config_defaults.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

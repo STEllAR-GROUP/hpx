@@ -1,0 +1,826 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Prerequisites</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../getting_started.html" title="Getting Started">
+<link rel="prev" href="../getting_started.html" title="Getting Started">
+<link rel="next" href="boost_installation.html" title="Installing Boost Libraries">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../getting_started.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="boost_installation.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_tutorial_getting_started_prereqs">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.tutorial.getting_started.prereqs"></a><a class="link" href="prereqs.html" title="Prerequisites">Prerequisites</a>
+</h4></div></div></div>
+<h6>
+<a name="hpx.tutorial.getting_started.prereqs.h0"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.prereqs.supported_platforms"></a></span><a class="link" href="prereqs.html#hpx.tutorial.getting_started.prereqs.supported_platforms">Supported
+          Platforms</a>
+        </h6>
+<p>
+          At this time, <span class="emphasis"><em>HPX</em></span> supports only the following platforms.
+          Other platforms may work, but we do not test <span class="emphasis"><em>HPX</em></span> with
+          other platforms, so please be warned.
+        </p>
+<div class="table">
+<a name="hpx.tutorial.getting_started.prereqs.supported_platforms_for_hpx"></a><p class="title"><b>Table&#160;3.&#160;Supported Platforms for <span class="emphasis"><em>HPX</em></span></b></p>
+<div class="table-contents"><table class="table" summary="Supported Platforms for HPX">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Recommended Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Minimum Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Architectures
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    Linux
+                  </p>
+                </td>
+<td>
+                  <p>
+                    3.2
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2.6
+                  </p>
+                </td>
+<td>
+                  <p>
+                    x86-32, x86-64, k1om
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    Windows
+                  </p>
+                </td>
+<td>
+                  <p>
+                    7, Server 2008 R2
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Any NT system
+                  </p>
+                </td>
+<td>
+                  <p>
+                    x86-64
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><h6>
+<a name="hpx.tutorial.getting_started.prereqs.h1"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.prereqs.software_and_libraries"></a></span><a class="link" href="prereqs.html#hpx.tutorial.getting_started.prereqs.software_and_libraries">Software
+          and Libraries</a>
+        </h6>
+<p>
+          In the simplest case, <span class="emphasis"><em>HPX</em></span> depends on one set of libraries:
+          <a href="http://www.boost.org/" target="_top">Boost</a>. So, before you read further,
+          please make sure you have a recent version of <a href="http://www.boost.org/" target="_top">Boost</a>
+          installed on your target machine. <span class="emphasis"><em>HPX</em></span> currently requires
+          at least Boost V1.47.0 to work properly. It may build and run with older
+          versions, but we do not test <span class="emphasis"><em>HPX</em></span> with those versions,
+          so please be warned.
+        </p>
+<p>
+          Installing the Boost libraries is described in detail in Boost's own <a href="http://www.boost.org/doc/libs/release/more/getting_started/index.html" target="_top">Getting
+          Started</a> document. It is often possible to download the Boost libraries
+          using the package manager of your distribution. Please refer to the corresponding
+          documentation for your system for more information.
+        </p>
+<p>
+          The installation of Boost is described in detail in Boost's own <a href="http://www.boost.org/doc/libs/release/more/getting_started/index.html" target="_top">Getting
+          Started</a> document. However, if you've never used the Boost libraries
+          (or even if you have), here's a quick primer: <a class="link" href="boost_installation.html" title="Installing Boost Libraries">Installing
+          Boost Libraries</a>.
+        </p>
+<p>
+          In addition, we urge every user to have a recent version of hwloc installed
+          on the target system in order to have proper support for thread pinning
+          and NUMA awareness.
+        </p>
+<p>
+          <span class="emphasis"><em>HPX</em></span> is written in 99% Standard C++. As such <span class="emphasis"><em>HPX</em></span>
+          is compilable with almost any standards compliant C++ compiler. A compiler
+          supporting the C++11 Standard is highly recommended. We are currently support
+          GCC, MSVC, ICPC and clang. For the status of your favorite compiler with
+          hpx visit <a href="http://hermione.cct.lsu.edu/" target="_top">HPX Buildbot Website</a>.
+        </p>
+<div class="table">
+<a name="hpx.tutorial.getting_started.prereqs.software_prerequisites_for_hpx_o"></a><p class="title"><b>Table&#160;4.&#160;Software Prerequisites for <span class="emphasis"><em>HPX</em></span> on Linux systems</b></p>
+<div class="table-contents"><table class="table" summary="Software Prerequisites for HPX on Linux systems">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Recommended Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Minimum Version
+                  </p>
+                </th>
+<td class="auto-generated">&#160;</td>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <span class="bold"><strong>Compilers</strong></span>
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://gcc.gnu.org" target="_top">GNU Compiler Collection (g++)</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    4.6.3
+                  </p>
+                </td>
+<td>
+                  <p>
+                    4.4.5
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://software.intel.com/en-us/intel-composer-xe/" target="_top">Intel
+                    Composer XE Suites</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2013
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2013
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="bold"><strong>Build System</strong></span>
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.cmake.org" target="_top">CMake</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2.8.4
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2.8.4
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="bold"><strong>Required Libraries</strong></span>
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.boost.org/" target="_top">Boost C++ Libraries</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.48.0 or newer
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.47.0
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.open-mpi.org/projects/hwloc/" target="_top">Portable
+                    Hardware Locality (HWLOC)</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.7
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.2
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Used for OS-thread pinning and NUMA awareness.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.tutorial.getting_started.prereqs.software_prerequisites_for_hpx_0"></a><p class="title"><b>Table&#160;5.&#160;Software Prerequisites for <span class="emphasis"><em>HPX</em></span> on Windows systems</b></p>
+<div class="table-contents"><table class="table" summary="Software Prerequisites for HPX on Windows systems">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Recommended Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Minimum Version
+                  </p>
+                </th>
+<td class="auto-generated">&#160;</td>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <span class="bold"><strong>Compilers</strong></span>
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://msdn.microsoft.com/en-us/visualc/default.aspx" target="_top">Visual
+                    C++</a> (x64)
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2010
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2010
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="bold"><strong>Build System</strong></span>
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.cmake.org" target="_top">CMake</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2.8.4
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2.8.4
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <span class="bold"><strong>Required Libraries</strong></span>
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.boost.org/" target="_top">Boost</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.48.0 or newer
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.43.0
+                  </p>
+                </td>
+<td class="auto-generated">&#160;</td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.open-mpi.org/projects/hwloc/" target="_top">Portable
+                    Hardware Locality (HWLOC)</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.7
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.5
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Used for OS-thread pinning and NUMA awareness.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            You need to build the following Boost libraries for <span class="emphasis"><em>HPX</em></span>:
+            Boost.DateTime, Boost.Filesystem, Boost.ProgramOptions, Boost.Regex,
+            Boost.Serialization, Boost.System, Boost.Thread, Boost.Chrono (starting
+            Boost 1.47.0), and Boost.Atomic (starting Boost 1.53.0).
+          </p></td></tr>
+</table></div>
+<p>
+          Depending on the options you chose while building and installing <span class="emphasis"><em>HPX</em></span>,
+          you will find that <span class="emphasis"><em>HPX</em></span> may depend on several other
+          libraries such as those listed below.
+        </p>
+<div class="table">
+<a name="hpx.tutorial.getting_started.prereqs.highly_recommended_optional_soft"></a><p class="title"><b>Table&#160;6.&#160;Highly Recommended Optional Software Prerequisites for <span class="emphasis"><em>HPX</em></span>
+          on Linux systems</b></p>
+<div class="table-contents"><table class="table" summary="Highly Recommended Optional Software Prerequisites for HPX
+          on Linux systems">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Recommended Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Minimum Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Notes
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <a href="http://code.google.com/p/gperftools" target="_top">google-perftools</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.7.1
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.7.1
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Used as a replacement for the system allocator, and for allocation
+                    diagnostics.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.nongnu.org/libunwind" target="_top">libunwind</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    0.99
+                  </p>
+                </td>
+<td>
+                  <p>
+                    0.97
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Dependency of google-perftools on x86-64, used for stack unwinding.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.hdfgroup.org/HDF5" target="_top">Hierarchical Data Format
+                    V5 (HDF5)</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.8.7
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.6.7
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
+                    and interpolate3d applications. See important note below.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.tutorial.getting_started.prereqs.optional_software_prerequisites_"></a><p class="title"><b>Table&#160;7.&#160;Optional Software Prerequisites for <span class="emphasis"><em>HPX</em></span> on
+          Linux systems</b></p>
+<div class="table-contents"><table class="table" summary="Optional Software Prerequisites for HPX on
+          Linux systems">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Recommended Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Minimum Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Notes
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <a href="http://icl.cs.utk.edu/papi/" target="_top">Networking and Cryptography
+                    library (NaCl)</a>
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    Used for accessing hardware performance data.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://math-atlas.sourceforge.net/" target="_top">Linear Algebra
+                    PACKage (LAPACK)</a>
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    Used in the neutron_star application.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://math-atlas.sourceforge.net/" target="_top">Basic Linear
+                    Algebra Subroutines 3 (BLAS)</a>
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    Used in the neutron_star application.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.gnu.org/software/gsl/" target="_top">GNU Scientific
+                    Library (GSL)</a>
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    Used in the neutron_star application.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.lorene.obspm.fr" target="_top">LORENE</a>
+                  </p>
+                </td>
+<td>
+                </td>
+<td>
+                </td>
+<td>
+                  <p>
+                    Used in the neutron_star application.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://relativity.phys.lsu.edu/postdocs/matt/software.html" target="_top">RNPL</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.11
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.11
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Used for data I/O in the adaptive1d and neutron_star applications.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <a href="http://www.canonware.com/jemalloc" target="_top">jemalloc</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2.1.2
+                  </p>
+                </td>
+<td>
+                  <p>
+                    2.1.0
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Used as a replacement for the system allocator.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.tutorial.getting_started.prereqs.highly_recommended_optional_sof0"></a><p class="title"><b>Table&#160;8.&#160;Highly Recommended Optional Software Prerequisites for <span class="emphasis"><em>HPX</em></span>
+          on Windows systems</b></p>
+<div class="table-contents"><table class="table" summary="Highly Recommended Optional Software Prerequisites for HPX
+          on Windows systems">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Name
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Recommended Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Minimum Version
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Notes
+                  </p>
+                </th>
+</tr></thead>
+<tbody><tr>
+<td>
+                  <p>
+                    <a href="http://www.hdfgroup.org/HDF5" target="_top">Hierarchical Data Format
+                    V5 (HDF5)</a>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.8.7
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.6.7
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
+                    and interpolate3d applications. See important note below.
+                  </p>
+                </td>
+</tr></tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+            The C++ HDF5 libraries must be compiled with enabled threadsafety support.
+            This has to be explicitly specified while configuring the HDF5 libraries
+            as it is not the default. Additionally, you must set the following environment
+            variables before configuring the HDF5 libraries (this part only needs
+            to be done on Linux):
+          </p>
+<pre class="programlisting">$ export CFLAGS='-DHDatexit=""'
+$ export CPPFLAGS='-DHDatexit=""'
+</pre>
+</td></tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../getting_started.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="boost_installation.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

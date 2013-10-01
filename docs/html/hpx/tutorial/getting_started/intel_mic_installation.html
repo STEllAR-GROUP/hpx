@@ -1,0 +1,130 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>How to Install HPX on the Xeon Phi</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../getting_started.html" title="Getting Started">
+<link rel="prev" href="windows_installation.html" title="How to Install HPX on Windows">
+<link rel="next" href="unix_pbs.html" title="How to Use HPX Applications with PBS">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="windows_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="unix_pbs.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_tutorial_getting_started_intel_mic_installation">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.tutorial.getting_started.intel_mic_installation"></a><a class="link" href="intel_mic_installation.html" title="How to Install HPX on the Xeon Phi">How
+        to Install <span class="emphasis"><em>HPX</em></span> on the Xeon Phi</a>
+</h4></div></div></div>
+<h6>
+<a name="hpx.tutorial.getting_started.intel_mic_installation.h0"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.intel_mic_installation.installation_of_the_boost_librar"></a></span><a class="link" href="intel_mic_installation.html#hpx.tutorial.getting_started.intel_mic_installation.installation_of_the_boost_librar">Installation
+          of the Boost Libraries</a>
+        </h6>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Download <a href="http://www.boost.org/users/download/" target="_top">Boost Downloads</a>
+              for Linux and unpack the retreived tarball.
+            </li>
+<li class="listitem">
+              <p>
+                Adapt your ~/user-config.jam to contain the following lines:
+              </p>
+<pre class="programlisting"><span class="error">#</span><span class="preprocessor"># Toolset</span> <span class="identifier">to</span> <span class="identifier">be</span> <span class="identifier">used</span> <span class="keyword">for</span> <span class="identifier">compiling</span> <span class="keyword">for</span> <span class="identifier">the</span> <span class="identifier">host</span>
+<span class="keyword">using</span> <span class="identifier">intel</span>
+    <span class="special">:</span> <span class="identifier">host</span>
+    <span class="special">:</span>
+    <span class="special">:</span> <span class="special">&lt;</span><span class="identifier">cxxflags</span><span class="special">&gt;</span><span class="string">"-std=c++0x"</span>
+    <span class="special">;</span>
+
+<span class="error">#</span><span class="preprocessor"># Toolset</span> <span class="identifier">to</span> <span class="identifier">be</span> <span class="identifier">used</span> <span class="keyword">for</span> <span class="identifier">compiling</span> <span class="keyword">for</span> <span class="identifier">the</span> <span class="identifier">Xeon</span> <span class="identifier">Phi</span>
+<span class="keyword">using</span> <span class="identifier">intel</span>
+    <span class="special">:</span> <span class="identifier">mic</span>
+    <span class="special">:</span>
+    <span class="special">:</span> <span class="special">&lt;</span><span class="identifier">cxxflags</span><span class="special">&gt;</span><span class="string">"-std=c++0x -mmic"</span>
+      <span class="special">&lt;</span><span class="identifier">linkflags</span><span class="special">&gt;</span><span class="string">"-std=c++0x -mmic"</span>
+    <span class="special">;</span>
+</pre>
+            </li>
+<li class="listitem">
+              <p>
+                Change to the directory you unpacked boost in (from now on referred
+                to as $BOOST_ROOT) and execute the following commands:
+              </p>
+<pre class="programlisting">$ ./bootstrap.sh
+$ ./b2 toolset=intel-mic -j&lt;N&gt;
+</pre>
+              You should now have all the required boost libraries.
+            </li>
+</ul></div>
+<h6>
+<a name="hpx.tutorial.getting_started.intel_mic_installation.h1"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.intel_mic_installation.installation_of_the_hwloc_librar"></a></span><a class="link" href="intel_mic_installation.html#hpx.tutorial.getting_started.intel_mic_installation.installation_of_the_hwloc_librar">Installation
+          of the hwloc Library</a>
+        </h6>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Download <a href="http://http://www.open-mpi.org/software/hwloc/v1.7/" target="_top">hwloc
+              Downloads</a>, unpack the retreived tarball and change to the newly
+              created directory
+            </li>
+<li class="listitem">
+              <p>
+                Run the configure-make-install procedure as follows:
+              </p>
+<pre class="programlisting">$ CC=icc CFLAGS=-mmic CXX=icpc CXXFLAGS=-mmic LDFLAGS=-mmic ./configure --host=k1om --prefix=$HWLOC_ROOT
+$ make
+$ make install
+</pre>
+              You now have a working hwloc installation in $HWLOC_ROOT.
+            </li>
+</ul></div>
+<h6>
+<a name="hpx.tutorial.getting_started.intel_mic_installation.h2"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.intel_mic_installation.building_hpx"></a></span><a class="link" href="intel_mic_installation.html#hpx.tutorial.getting_started.intel_mic_installation.building_hpx">Building
+          <span class="emphasis"><em>HPX</em></span></a>
+        </h6>
+<p>
+          After all the prerequistes have been succesfully installed, we can now
+          start building and installing <span class="emphasis"><em>HPX</em></span>. The build procedure
+          is almost the same as for <a class="link" href="unix_installation.html" title="How to Install HPX on Unix Variants">How
+          to Install <span class="emphasis"><em>HPX</em></span> on Unix Variants</a> with the sole
+          difference that you have to enable the Xeon Phi in the CMake Build system.
+          This is achieved by invoking CMake in the following way:
+        </p>
+<pre class="programlisting">cmake                         \
+    -DCMAKE_CXX_COMPILER=icpc \
+    -DCMAKE_C_COMPILER=icc    \
+    -DHPX_NATIVE_MIC=On       \
+    -DBOOST_ROOT=$BOOST_ROOT  \
+    -DHWLOC_ROOT=$HWLOC_ROOT  \
+    /path/to/hpx
+</pre>
+<p>
+          For more detailed information about using <a href="http://www.cmake.org" target="_top">CMake</a>
+          please refer its documentation and to the section <a class="link" href="../../manual/cmake.html" title="Building HPX with CMake">Building
+          <span class="emphasis"><em>HPX</em></span> with CMake</a>. Please pay special attention
+          to the section about HPX_MALLOC as this is crucial for getting decent performance
+          on the Xeon Phi.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="windows_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="unix_pbs.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

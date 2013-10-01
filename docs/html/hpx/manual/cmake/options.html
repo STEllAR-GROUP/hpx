@@ -1,0 +1,66 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Options and Variables</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../cmake.html" title="Building HPX with CMake">
+<link rel="prev" href="basic_usage.html" title="Basic CMake Usage">
+<link rel="next" href="variables.html" title="Frequently used CMake Variables">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="basic_usage.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="variables.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_manual_cmake_options">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.cmake.options"></a><a class="link" href="options.html" title="Options and Variables">Options and Variables</a>
+</h4></div></div></div>
+<p>
+          Variables customize how the build will be generated. Options are boolean
+          variables, with possible values ON/OFF. Options and variables are defined
+          on the CMake command line like this:
+        </p>
+<pre class="programlisting">$ cmake -DVARIABLE=value path/to/hpx
+</pre>
+<p>
+          You can set a variable after the initial CMake invocation for changing
+          its value. You can also undefine a variable:
+        </p>
+<pre class="programlisting">$ cmake -UVARIABLE path/to/hpx
+</pre>
+<p>
+          Variables are stored on the CMake cache. This is a file named CMakeCache.txt
+          on the root of the build directory. Do not hand-edit it.
+        </p>
+<p>
+          Variables are listed here appending its type after a colon. It is correct
+          to write the variable and the type on the CMake command line:
+        </p>
+<pre class="programlisting">$ cmake -DVARIABLE:TYPE=value path/to/llvm/source
+</pre>
+<p>
+          CMake supports the following variable types: <code class="computeroutput">BOOL</code> (options),
+          <code class="computeroutput">STRING</code> (arbitrary string), <code class="computeroutput">PATH</code> (directory name),
+          <code class="computeroutput">FILEPATH</code> (file name).
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="basic_usage.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="variables.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

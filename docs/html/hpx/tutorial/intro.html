@@ -1,0 +1,161 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Introduction</title>
+<link rel="stylesheet" href="../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../tutorial.html" title="Tutorial">
+<link rel="prev" href="getting_started/unix_slurm.html" title="How to Use HPX Applications with SLURM">
+<link rel="next" href="intro/slow.html" title="What makes our Systems Slow?">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="getting_started/unix_slurm.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tutorial.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="intro/slow.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section hpx_tutorial_intro">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="hpx.tutorial.intro"></a><a class="link" href="intro.html" title="Introduction">Introduction</a>
+</h3></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="intro/slow.html">What makes our Systems Slow?</a></span></dt>
+<dt><span class="section"><a href="intro/new_response.html">Technology Demands
+        New Response</a></span></dt>
+<dt><span class="section"><a href="intro/principles.html">Governing Principles
+        applied while Developing <span class="emphasis"><em>HPX</em></span></a></span></dt>
+</dl></div>
+<p>
+        Current advances in high performance computing (HPC) continue to suffer from
+        the issues plaguing parallel computation. These issues include, but are not
+        limited to, ease of programming, inability to handle dynamically changing
+        workloads, scalability, and efficient utilization of system resources. Emerging
+        technological trends such as multi-core processors further highlight limitations
+        of existing parallel computation models. To mitigate the aforementioned problems,
+        it is necessary to rethink the approach to parallelization models. ParalleX
+        contains mechanisms such as multi-threading, parcels, global name space support,
+        percolation and local control objects (LCO). By design, ParalleX overcomes
+        limitations of current models of parallelism by alleviating contention, latency,
+        overhead and starvation. With ParalleX, it is further possible to increase
+        performance by at least an order of magnitude on challenging parallel algorithms,
+        e.g., dynamic directed graph algorithms and adaptive mesh refinement methods
+        for astrophysics. An additional benefit of ParalleX is fine-grained control
+        of power usage, enabling reductions in power consumption.
+      </p>
+<h5>
+<a name="hpx.tutorial.intro.h0"></a>
+        <span class="phrase"><a name="hpx.tutorial.intro.parallex_a_new_execution_model_f"></a></span><a class="link" href="intro.html#hpx.tutorial.intro.parallex_a_new_execution_model_f">ParalleX
+        - a new Execution Model for Future Architectures</a>
+      </h5>
+<p>
+        ParalleX is a new parallel execution model that offers an alternative to
+        the conventional computation models, such as message passing. ParalleX distinguishes
+        itself by:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            Split-phase transaction model
+          </li>
+<li class="listitem">
+            Message-driven
+          </li>
+<li class="listitem">
+            Distributed shared memory (not cache coherent)
+          </li>
+<li class="listitem">
+            Multi-threaded
+          </li>
+<li class="listitem">
+            Futures synchronization
+          </li>
+<li class="listitem">
+            Local Control Objects (LCOs)
+          </li>
+<li class="listitem">
+            Synchronization for anonymous producer-consumer scenarios
+          </li>
+<li class="listitem">
+            Percolation (pre-staging of task data)
+          </li>
+</ul></div>
+<p>
+        The ParalleX model is intrinsically latency hiding, delivering an abundance
+        of variable-grained parallelism within a hierarchical namespace environment.
+        The goal of this innovative strategy is to enable future systems delivering
+        very high efficiency, increased scalability and ease of programming. ParalleX
+        can contribute to significant improvements in the design of all levels of
+        computing systems and their usage from application algorithms and their programming
+        languages to system architecture and hardware design together with their
+        supporting compilers and operating system software.
+      </p>
+<h5>
+<a name="hpx.tutorial.intro.h1"></a>
+        <span class="phrase"><a name="hpx.tutorial.intro.what_is_hpx"></a></span><a class="link" href="intro.html#hpx.tutorial.intro.what_is_hpx">What
+        is <span class="emphasis"><em>HPX</em></span></a>
+      </h5>
+<p>
+        High Performance ParalleX (<span class="emphasis"><em>HPX</em></span>) is the first runtime
+        system implementation of the ParalleX execution model. The <span class="emphasis"><em>HPX</em></span>
+        runtime software package is a modular, feature-complete, and performance
+        oriented representation of the ParalleX execution model targeted at conventional
+        parallel computing architectures such as SMP nodes and commodity clusters.
+        It is academically developed and freely available under an open source license.
+        We provide <span class="emphasis"><em>HPX</em></span> to the community for experimentation
+        and application to achieve high efficiency and scalability for dynamic adaptive
+        and irregular computational problems. <span class="emphasis"><em>HPX</em></span> is a C++ library
+        that supports a set of critical mechanisms for dynamic adaptive resource
+        management and lightweight task scheduling within the context of a global
+        address space. It is solidly based on many years of experience in writing
+        highly parallel applications for HPC systems.
+      </p>
+<p>
+        The two-decade success of the communicating sequential processes (CSP) execution
+        model and its message passing interface (MPI) programming model has been
+        seriously eroded by challenges of power, processor core complexity, multi-core
+        sockets, and heterogeneous structures of GPUs. Both efficiency and scalability
+        for some current (strong scaled) applications and future Exascale applications
+        demand new techniques to expose new sources of algorithm parallelism and
+        exploit unused resources through adaptive use of runtime information.
+      </p>
+<p>
+        The ParalleX execution model replaces CSP to provide a new computing paradigm
+        embodying the governing principles for organizing and conducting highly efficient
+        scalable computations greatly exceeding the capabilities of today's problems.
+        <span class="emphasis"><em>HPX</em></span> is the first practical, reliable, and performance-oriented
+        runtime system incorporating the principal concepts of the ParalleX model
+        publicly provided in open source release form.
+      </p>
+<p>
+        <span class="emphasis"><em>HPX</em></span> is designed by the <a href="http://stellar.cct.lsu.edu" target="_top">STE||AR</a>
+        Group (<span class="bold"><strong>S</strong></span>ystems <span class="bold"><strong>T</strong></span>echnologies,
+        <span class="bold"><strong>E</strong></span>mergent Para<span class="bold"><strong>ll</strong></span>elism,
+        and <span class="bold"><strong>A</strong></span>lgorithms <span class="bold"><strong>R</strong></span>esearch)
+        at <a href="http://www.lsu.edu" target="_top">Louisiana State University (LSU)</a>'s
+        <a href="http://www.cct.lsu.edu" target="_top">Center for Computation and Technology
+        (CCT)</a> to enable developers to exploit the full processing power of
+        many-core systems with an unprecedented degree of parallelism. <a href="http://stellar.cct.lsu.edu" target="_top">STE||AR</a>
+        is a research group focusing on system software solutions and scientific
+        application development for hybrid and many-core hardware architectures.
+      </p>
+<p>
+        For more information about the <a href="http://stellar.cct.lsu.edu" target="_top">STE||AR</a>
+        Group, see <a class="link" href="../people.html" title="People">People</a>.
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="getting_started/unix_slurm.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tutorial.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="intro/slow.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
