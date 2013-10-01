@@ -14,6 +14,25 @@ This information proves to be very useful for diagnosing problems or just for
 improving the understanding what is happening in __hpx__ as a consequence of
 invoking __hpx__ API functionality.
 
+[heading Default Logging]
+
+Enabling default logging is a simple process. The detailed description in the
+remainder of this section explains different ways to customize the defaults.
+Default logging can be enabled by using one of the following:
+
+* a command line switch [hpx_cmdline `--hpx:debug-hpx-log`], which will 
+  enable logging to the console terminal
+* the command line switch [hpx_cmdline `--hpx:debug-hpx-log=<filename>`],
+  which enables logging to a given file `<filename>`, or 
+* setting an environment variable `HPX_LOGLEVEL=<loglevel>` while running the __hpx__
+  application. In this case `<loglevel>` should be a number between (or equal
+  to) `1` and `5`, where `1` means minimal logging and `5` causes to log all available
+  messages. When setting a the environment variable the logs will be written to a file named
+  `hpx.<PID>.log`in the current working directory, where `<PID>` is the process id 
+  of the console instance of the application.
+
+[heading Customizing Logging]
+
 Generally, logging can be customized either using environment variable settings
 or using by an ini configuration file. Logging is generated in several
 categories, each of which can be customized independently. All customizable
@@ -70,9 +89,9 @@ default.
 
 Logs will be saved to destinations as configured by the user. By default, logging
 output is saved on the console instance of an application to
-`hpx.CATEGORY.PID.log` (where CATEGORY and PID are placeholders for the category
-shortcut and the OS process id). The output for
-the general logging category is saved to `hpx.PID.log`. The default settings for
+`hpx.<CATEGORY>.<PID>.log` (where `<CATEGORY>` and `<PID>` are placeholders for the
+category shortcut and the OS process id). The output for
+the general logging category is saved to `hpx.<PID>.log`. The default settings for
 the general logging category are shown here (the syntax is described in the
 section __iniformat__):
 
@@ -105,6 +124,8 @@ destination separated by whitespace.
     [[console]                  [Direct all output to the console instance of
                                  the application. The console instance has its
                                  logging destinations configured separately.]]
+    [[android_log]              [Direct all output to the (Android) system log
+                                 (available on Android systems only).]]
 ]
 
 The logging format is read from the environment variable `HPX_LOGFORMAT` and

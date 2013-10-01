@@ -123,11 +123,18 @@ hpx_quickbook_to_html(hpx
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
                 ${auto_index_xsl_param}
   QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
-  AUTOINDEX_ARGS --internal-index)
+  AUTOINDEX_ARGS --internal-index
+  SINGLEPAGE ${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
 
 add_custom_target(docs
   DEPENDS hpx_HTML.manifest
   SOURCES ${documentation_files})
+
+if(${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
+  add_custom_target(singlepage_docs
+    DEPENDS hpx_singlepage_HTML.manifest
+    SOURCES ${documentation_files})
+endif()
 
 source_group(Documentation FILES ${base_files})
 source_group("Documentation\\Manual" FILES ${manual_files})

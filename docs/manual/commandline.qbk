@@ -341,10 +341,10 @@ Here is a full grammar describing the possible format of mappings:
       ``
       will cause this output to be printed:
       ``
-          0: PU L#0(P#0) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
-          1: PU L#2(P#2) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
-          2: PU L#4(P#4) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
-          3: PU L#6(P#6) Core L1d(32KB) L2(256KB) L3(12MB) Socket NUMANode#0(1356MB) Machine#0(7123MB)
+          0: PU L#0(P#0), Core L#0, Socket L#0, Node L#0(P#0)
+          1: PU L#2(P#2), Core L#1, Socket L#0, Node L#0(P#0)
+          2: PU L#4(P#4), Core L#2, Socket L#0, Node L#0(P#0)
+          3: PU L#6(P#6), Core L#3, Socket L#0, Node L#0(P#0)
       ``
       [c++]where each bit in the bitmasks corresponds to a processing unit the listed
       worker thread will be bound to run on.]

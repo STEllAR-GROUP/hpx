@@ -17,11 +17,10 @@ from subprocess import Popen, STDOUT, PIPE
 from types import StringType
 from shlex import split
 from signal import SIGKILL
-from os import killpg, waitpid, WNOHANG
+from os import kill, killpg, waitpid, WNOHANG
 from platform import system
 from Queue import Queue, Empty
 from errno import ESRCH
-import select
 # TODO: implement for Windows
 
 OS_MAC = False
@@ -29,20 +28,55 @@ OS_LIN = False
 
 if platform.startswith('darwin'):
   OS_MAC = True
+  from select import kqueue, kevent
+  from select import KQ_FILTER_READ, KQ_EV_ADD, KQ_EV_DELETE, KQ_NOTE_LOWAT
 
 if platform.startswith('linux'):
   OS_LIN = True
+  from select import epoll, EPOLLHUP
 
- 
-def kill_process_tree(parent_pid, signal=SIGKILL):
-  try: 
-    killpg(parent_pid, signal)
-    return True
-  except OSError, err:
-    if ESRCH != err.errno:
-      raise err
-    else:
-      return False
+if OS_LIN: 
+  def kill_process_tree(parent_pid, signal=SIGKILL):
+    def find_process_tree(pid):
+      cmd = "ps -o pid --ppid %d --noheaders" % pid
+      ps_command = Popen(cmd, shell=True, stdout=PIPE)
+      ps_output = ps_command.stdout.read()
+      retcode = ps_command.wait()
+
+      if 0 == ps_command.wait():
+        list = [pid]
+
+        for pid in ps_output.split("\n")[:-1]:
+          list = list + find_process_tree(int(pid))
+
+        return list
+
+      else:
+        return [pid]
+
+    r = True
+
+    for pid in find_process_tree(parent_pid):
+      try: 
+        kill(int(pid), signal)
+      except OSError, err:
+        if ESRCH != err.errno:
+          raise err
+        else:
+          r = False
+
+    return r
+
+elif OS_MAC:
+  def kill_process_tree(parent_pid, signal=SIGKILL):
+    try: 
+      kill(parent_pid, signal)
+      return True
+    except OSError, err:
+      if ESRCH != err.errno:
+        raise err
+      else:
+        return False
 
 class process(object):
   _proc = None
@@ -159,9 +193,9 @@ class process_group(object):
     self._lock = Lock()
     self._members = {}
     if OS_MAC:
-      self._poller = select.kqueue()
+      self._poller = kqueue()
     if OS_LIN:
-      self._poller = select.epoll()
+      self._poller = epoll()
           
     for cmd in cmds:
       self.create_process(cmd)
@@ -173,11 +207,10 @@ class process_group(object):
     with self._lock:
       self._members[job.fileno()] = job 
       if OS_MAC:
-          self._poller.control([select.kevent(job._proc.stdout,
-                                              select.KQ_FILTER_READ, select.KQ_EV_ADD,
-                                              select.KQ_NOTE_LOWAT,0)],0)
+        self._poller.control([kevent(job._proc.stdout,
+          KQ_FILTER_READ, KQ_EV_ADD, KQ_NOTE_LOWAT, 0)], 0)
       if OS_LIN:
-          self._poller.register(job._proc.stdout, select.EPOLLHUP)
+        self._poller.register(job._proc.stdout, EPOLLHUP)
 
   def join_all(self, timeout=None, callback=None):
     with self._lock:
@@ -201,8 +234,7 @@ class process_group(object):
           if OS_MAC:
             for fd in ready:
               fd = fd.ident
-              self._poller.control([select.kevent(fd,select.KQ_FILTER_READ,
-                                                  select.KQ_EV_DELETE)],0)
+              self._poller.control([kevent(fd, KQ_FILTER_READ, KQ_EV_DELETE)], 0)
               not_done.pop(fd)
             
             if callable(callback):

@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace stubs
                     "stubs::runtime_support::create_component_async",
                     "The id passed as the first argument is not representing"
                         " a locality");
-                return make_ready_future(naming::invalid_id);
+                return lcos::make_ready_future(naming::invalid_id);
             }
 
             // Create a future, execute the required action,
@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace stubs
                     "stubs::runtime_support::create_component_async",         \
                     "The id passed as the first argument is not representing" \
                         " a locality");                                       \
-                return make_ready_future(naming::invalid_id);                 \
+                return lcos::make_ready_future(naming::invalid_id);           \
             }                                                                 \
                                                                               \
             typedef typename                                                  \
@@ -136,7 +136,7 @@ namespace hpx { namespace components { namespace stubs
                     "stubs::runtime_support::copy_create_component_async",
                     "The id passed as the first argument is not representing"
                         " a locality");
-                return make_ready_future(naming::invalid_id);
+                return lcos::make_ready_future(naming::invalid_id);
             }
 
             typedef typename server::copy_create_component_action<Component>

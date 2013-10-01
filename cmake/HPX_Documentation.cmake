@@ -210,7 +210,7 @@ else()
 
   # DocBook -> HTML
   macro(hpx_docbook_to_html name)
-    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS" "" ${ARGN})
+    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;SINGLEPAGE" "" ${ARGN})
 
     if(NOT BOOST_ROOT)
       set(BOOST_ROOT_FOR_DOCS ".")
@@ -218,36 +218,55 @@ else()
       set(BOOST_ROOT_FOR_DOCS ${BOOST_ROOT})
     endif()
 
+    hpx_debug("hpx_docbook_to_html.${name}" "SINGLEPAGE:${${name}_SINGLEPAGE}")
+
     if(WIN32)
-      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/html/")
-      add_custom_command(OUTPUT ${name}_HTML.manifest
+      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/html")
+    else()
+      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
+    endif()
+
+    if(${${name}_SINGLEPAGE})
+      set(main_xsl_script "html-single.xsl")
+      set(main_xsl_script_output "${DOCS_OUTPUT_DIR}/${name}.html")
+      set(main_xsl_script_manifest ${name}_singlepage_HTML.manifest)
+    else()
+      set(main_xsl_script "html.xsl")
+      set(main_xsl_script_output "${DOCS_OUTPUT_DIR}/")
+      set(main_xsl_script_manifest ${name}_HTML.manifest)
+    endif()
+
+    hpx_debug("hpx_docbook_to_html.${name}" "main_xsl_script:${main_xsl_script}")
+    hpx_debug("hpx_docbook_to_html.${name}" "main_xsl_script_output:${main_xsl_script_output}")
+
+    if(WIN32)
+      add_custom_command(OUTPUT ${main_xsl_script_manifest}
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
                 "--stringparam" "html.stylesheet" "src/boostbook.css"
-                "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${name}_HTML.manifest"
+                "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${main_xsl_script_manifest}"
                 "--xinclude"
-                "-o" "${DOCS_OUTPUT_DIR}"
+                "-o" "${main_xsl_script_output}"
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/html.xsl ${${name}_SOURCE}
+                ${BOOSTBOOK_XSL_PATH}/${main_xsl_script} ${${name}_SOURCE}
         COMMENT "Generating HTML from ${${name}_SOURCE}."
         DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
     else()
-      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html/")
-      add_custom_command(OUTPUT ${name}_HTML.manifest
+      add_custom_command(OUTPUT ${main_xsl_script_manifest}
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
                 "--stringparam" "html.stylesheet" "src/boostbook.css"
-                "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${name}_HTML.manifest"
+                "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${main_xsl_script_manifest}"
                 "--xinclude"
-                "-o" "${DOCS_OUTPUT_DIR}"
+                "-o" "${main_xsl_script_output}"
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
-                ${BOOSTBOOK_XSL_PATH}/html.xsl ${${name}_SOURCE}
+                ${BOOSTBOOK_XSL_PATH}/${main_xsl_script} ${${name}_SOURCE}
         COMMENT "Generating HTML from ${${name}_SOURCE}."
         DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
     endif()
@@ -256,7 +275,7 @@ else()
   # Quickbook -> BoostBook XML -> DocBook -> HTML, AutoIndex (if available)
   macro(hpx_quickbook_to_html name)
     hpx_parse_arguments(${name}
-      "SOURCE;INDEX;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET;QUICKBOOK_ARGS;AUTOINDEX_ARGS"
+      "SOURCE;INDEX;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET;QUICKBOOK_ARGS;AUTOINDEX_ARGS;SINGLEPAGE"
       "" ${ARGN})
 
     hpx_print_list("DEBUG"
@@ -282,14 +301,32 @@ else()
       set(docbook_source ${name}.auto_index.dbk)
     endif()
 
+    hpx_debug("hpx_quickbook_to_html.${name}" "SINGLEPAGE:${${name}_SINGLEPAGE}")
+
+    if(${${name}_SINGLEPAGE})
+      hpx_docbook_to_html(${name}
+        SOURCE ${docbook_source}
+        CATALOG ${${name}_CATALOG}
+        XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS}
+        SINGLEPAGE ON)
+    endif()
+
     hpx_docbook_to_html(${name}
       SOURCE ${docbook_source}
       CATALOG ${${name}_CATALOG}
-      XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
+      XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS}
+      SINGLEPAGE OFF)
 
     if(${name}_TARGET)
-      add_custom_target(${${name}_TARGET} DEPENDS ${name}_HTML.manifest
+      add_custom_target(${${name}_TARGET}
+        DEPENDS ${name}_HTML.manifest
         DEPENDENCIES ${${name}_DEPENDENCIES})
+
+      if(${name}_SINGLEPAGE)
+        add_custom_target(${${name}_TARGET}
+          DEPENDS ${name}_singlepage_HTML.manifest
+          DEPENDENCIES ${${name}_DEPENDENCIES})
+      endif()
     endif()
   endmacro()
 

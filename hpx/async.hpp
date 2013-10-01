@@ -56,7 +56,7 @@ namespace hpx { namespace detail
     BOOST_FORCEINLINE typename detail::create_future<F()>::type
     call_sync(BOOST_FWD_REF(F) f, boost::mpl::false_)
     {
-        return make_ready_future(f());
+        return lcos::make_ready_future(f());
     }
 
     template <typename F>
@@ -64,7 +64,7 @@ namespace hpx { namespace detail
     call_sync(BOOST_FWD_REF(F) f, boost::mpl::true_)
     {
         f();
-        return make_ready_future();
+        return lcos::make_ready_future();
     }
 }}
 

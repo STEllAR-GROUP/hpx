@@ -178,18 +178,6 @@ hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 if(${BOOST_MINOR_VERSION} LESS 49)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
 endif()
-# If we compile natively for the MIC, we need some workarounds for certain
-# boost headers
-# FIXME: push changes upstream
-if(HPX_NATIVE_MIC)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/asio)
-endif()
-
-if(UNIX)
-  hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
-else()
-  hpx_link_directories(${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx)
-endif()
 
 ###############################################################################
 # Configure option to automatically set all required settings to use the
@@ -198,6 +186,13 @@ endif()
 hpx_option(HPX_NATIVE_MIC BOOL
   "Build HPX to run natively on the Intel MIC coprocessor (default: OFF)."
   OFF ADVANCED)
+
+# If we compile natively for the MIC, we need some workarounds for certain
+# boost headers
+# FIXME: push changes upstream
+if(HPX_NATIVE_MIC)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/asio)
+endif()
 
 if(HPX_NATIVE_MIC)
   hpx_option(HPX_MAX_CPU_COUNT STRING
@@ -211,6 +206,13 @@ else()
   hpx_option(HPX_MAX_CPU_COUNT STRING
     "HPX applications will not use more than this amount of OS-threads (default: 64)."
     "64" ADVANCED)
+endif()
+
+###############################################################################
+if(UNIX)
+  hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+else()
+  hpx_link_directories(${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx)
 endif()
 
 ###############################################################################
@@ -541,6 +543,14 @@ find_package(HPX_PAPI)
 find_package(HPX_TAU)
 find_package(HPX_APEX)
 
+
+################################################################################
+# Valgrind support
+################################################################################
+if(NOT HPX_NATIVE_MIC)
+  find_package(HPX_Valgrind)
+endif()
+
 ################################################################################
 # hwloc (don't use it on MacOS as it make runs fail and is useless anyways.)
 ################################################################################
@@ -735,6 +745,10 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
+  if(HPX_HAVE_VALGRIND)
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNVALGRIND")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNVALGRIND")
+  endif()
 else()
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     hpx_add_definitions(-DDEBUG)
@@ -747,12 +761,19 @@ else()
     hpx_add_definitions(-DNDEBUG)
     hpx_add_definitions(-DBOOST_DISABLE_ASSERTS)
     hpx_add_config_define(HPX_BUILD_TYPE minsizerel)
+    if(HPX_HAVE_VALGRIND)
+      hpx_add_definitions(-DNVALGRIND)
+    endif()
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     hpx_add_definitions(-DNDEBUG)
     hpx_add_definitions(-DBOOST_DISABLE_ASSERTS)
     hpx_add_config_define(HPX_BUILD_TYPE release)
+    if(HPX_HAVE_VALGRIND)
+      hpx_add_definitions(-DNVALGRIND)
+    endif()
   endif()
 endif()
+
 
 # Debug library postfix
 set(CMAKE_DEBUG_POSTFIX "d")
@@ -1449,10 +1470,19 @@ if(HPX_BUILD_TOOLS)
   add_subdirectory(tools)
 endif()
 
+hpx_option(HPX_BUILD_DOCUMENTATION BOOL "The HPX documentation toolchain is available (default OFF)." OFF)
 if(HPX_BUILD_DOCUMENTATION)
+  hpx_option(HPX_BUILD_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be build as a single page HTML (default OFF)." OFF)
+
   add_subdirectory(docs)
-  add_custom_target(git_docs COMMAND cmake -DHPX_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake)
+
+  add_custom_target(git_docs
+    COMMAND ${CMAKE_COMMAND} -DHPX_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake)
+
   add_dependencies(git_docs docs)
+  if(${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
+    add_dependencies(git_docs singlepage_docs)
+  endif()
 endif()
 
 if(${BOOST_MINOR_VERSION} GREATER 50)
