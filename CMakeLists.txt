@@ -545,7 +545,9 @@ find_package(HPX_APEX)
 ################################################################################
 # Valgrind support
 ################################################################################
-find_package(HPX_Valgrind)
+if(NOT HPX_NATIVE_MIC)
+  find_package(HPX_Valgrind)
+endif()
 
 ################################################################################
 # hwloc (don't use it on MacOS as it make runs fail and is useless anyways.)
