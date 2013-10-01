@@ -26,6 +26,16 @@ else()
   endif()
 endif()
 
+# first delete all html files
+execute_process(
+  COMMAND ${GIT_EXECUTABLE} rm *.html
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
+  RESULT_VARIABLE git_rm_result)
+if(NOT "${git_rm_result}" EQUAL "0")
+    message(FATAL_ERROR "Removing stale html files from the GitHub pages branch failed.")
+endif()
+
+# copy all documentation files to target branch
 file(
   COPY ${HPX_SOURCE_DIR}/docs/html
   DESTINATION ${CMAKE_BINARY_DIR}/gh-pages/docs)
@@ -34,6 +44,7 @@ file(
   COPY ${CMAKE_BINARY_DIR}/share/hpx/docs/html
   DESTINATION ${CMAKE_BINARY_DIR}/gh-pages/docs)
 
+# add all newly generated file
 execute_process(
   COMMAND ${GIT_EXECUTABLE} add *
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
@@ -42,6 +53,7 @@ if(NOT "${git_add_result}" EQUAL "0")
     message(FATAL_ERROR "Adding files to the GitHub pages branch failed.")
 endif()
 
+# commit changes
 execute_process(
   COMMAND ${GIT_EXECUTABLE} commit -am "Updating docs"
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
@@ -50,6 +62,7 @@ if(NOT "${git_commit_result}" EQUAL "0")
   message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
 endif()
 
+# push everything up to github
 execute_process(
   COMMAND ${GIT_EXECUTABLE} push
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
