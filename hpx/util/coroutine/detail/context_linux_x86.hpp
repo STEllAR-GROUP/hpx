@@ -29,6 +29,12 @@
 #include <hpx/util/get_and_reset_value.hpp>
 
 #if defined(HPX_HAVE_VALGRIND)
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wpointer-arith"
+#endif
 #include <valgrind/valgrind.h>
 #endif
 
@@ -202,18 +208,7 @@ namespace hpx { namespace util { namespace coroutines
         *--m_sp = 0;       // edi
 #endif
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wpointer-arith"
-#endif
         valgrind_id = VALGRIND_STACK_REGISTER(m_stack, m_stack + m_stack_size);
-#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-#endif
 #endif
       }
 
@@ -347,6 +342,14 @@ namespace hpx { namespace util { namespace coroutines
   }
 
 }}}}
+
+#if defined(HPX_HAVE_VALGRIND)
+#if defined(__GNUG__) && !defined(__INTEL_COMPILER)
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
+#pragma GCC diagnostic pop
+#endif
+#endif
+#endif
 
 #else
 
