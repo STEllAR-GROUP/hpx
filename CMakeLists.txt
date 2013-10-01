@@ -1449,9 +1449,9 @@ if(HPX_BUILD_TOOLS)
   add_subdirectory(tools)
 endif()
 
-hpx_option(HPX_BUILD_DOCUMENTATION BOOL "The HPX documentation toolchain is available (default OFF)." OFF ADVANCED)
+hpx_option(HPX_BUILD_DOCUMENTATION BOOL "The HPX documentation toolchain is available (default OFF)." OFF)
 if(HPX_BUILD_DOCUMENTATION)
-  hpx_option(HPX_BUILD_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be build as a single page HTML (default OFF)." OFF ADVANCED)
+  hpx_option(HPX_BUILD_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be build as a single page HTML (default OFF)." OFF)
 
   add_subdirectory(docs)
 
