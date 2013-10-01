@@ -28,7 +28,7 @@ Default logging can be enabled by using one of the following:
   application. In this case `<loglevel>` should be a number between (or equal
   to) `1` and `5`, where `1` means minimal logging and `5` causes to log all available
   messages. When setting a the environment variable the logs will be written to a file named
-  `hpx.<pid>.log`in the current working directory, where `<pid>` is the process id 
+  `hpx.<PID>.log`in the current working directory, where `<PID>` is the process id 
   of the console instance of the application.
 
 [heading Customizing Logging]
@@ -89,9 +89,9 @@ default.
 
 Logs will be saved to destinations as configured by the user. By default, logging
 output is saved on the console instance of an application to
-`hpx.CATEGORY.PID.log` (where CATEGORY and PID are placeholders for the category
-shortcut and the OS process id). The output for
-the general logging category is saved to `hpx.PID.log`. The default settings for
+`hpx.<CATEGORY>.<PID>.log` (where `<CATEGORY>` and `<PID>` are placeholders for the
+category shortcut and the OS process id). The output for
+the general logging category is saved to `hpx.<PID>.log`. The default settings for
 the general logging category are shown here (the syntax is described in the
 section __iniformat__):
 
@@ -124,6 +124,8 @@ destination separated by whitespace.
     [[console]                  [Direct all output to the console instance of
                                  the application. The console instance has its
                                  logging destinations configured separately.]]
+    [[android_log]              [Direct all output to the (Android) system log
+                                 (available on Android systems only).]]
 ]
 
 The logging format is read from the environment variable `HPX_LOGFORMAT` and
