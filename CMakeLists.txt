@@ -178,18 +178,6 @@ hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
 if(${BOOST_MINOR_VERSION} LESS 49)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
 endif()
-# If we compile natively for the MIC, we need some workarounds for certain
-# boost headers
-# FIXME: push changes upstream
-if(HPX_NATIVE_MIC)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/asio)
-endif()
-
-if(UNIX)
-  hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
-else()
-  hpx_link_directories(${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx)
-endif()
 
 ###############################################################################
 # Configure option to automatically set all required settings to use the
@@ -198,6 +186,13 @@ endif()
 hpx_option(HPX_NATIVE_MIC BOOL
   "Build HPX to run natively on the Intel MIC coprocessor (default: OFF)."
   OFF ADVANCED)
+
+# If we compile natively for the MIC, we need some workarounds for certain
+# boost headers
+# FIXME: push changes upstream
+if(HPX_NATIVE_MIC)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/asio)
+endif()
 
 if(HPX_NATIVE_MIC)
   hpx_option(HPX_MAX_CPU_COUNT STRING
@@ -211,6 +206,13 @@ else()
   hpx_option(HPX_MAX_CPU_COUNT STRING
     "HPX applications will not use more than this amount of OS-threads (default: 64)."
     "64" ADVANCED)
+endif()
+
+###############################################################################
+if(UNIX)
+  hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+else()
+  hpx_link_directories(${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib/hpx)
 endif()
 
 ###############################################################################
