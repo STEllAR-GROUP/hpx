@@ -541,6 +541,12 @@ find_package(HPX_PAPI)
 find_package(HPX_TAU)
 find_package(HPX_APEX)
 
+
+################################################################################
+# Valgrind support
+################################################################################
+find_package(HPX_Valgrind)
+
 ################################################################################
 # hwloc (don't use it on MacOS as it make runs fail and is useless anyways.)
 ################################################################################
@@ -735,6 +741,10 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
+  if(HPX_HAVE_VALGRIND)
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNVALGRIND")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNVALGRIND")
+  endif()
 else()
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     hpx_add_definitions(-DDEBUG)
@@ -747,12 +757,19 @@ else()
     hpx_add_definitions(-DNDEBUG)
     hpx_add_definitions(-DBOOST_DISABLE_ASSERTS)
     hpx_add_config_define(HPX_BUILD_TYPE minsizerel)
+    if(HPX_HAVE_VALGRIND)
+      hpx_add_definitions(-DNVALGRIND)
+    endif()
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     hpx_add_definitions(-DNDEBUG)
     hpx_add_definitions(-DBOOST_DISABLE_ASSERTS)
     hpx_add_config_define(HPX_BUILD_TYPE release)
+    if(HPX_HAVE_VALGRIND)
+      hpx_add_definitions(-DNVALGRIND)
+    endif()
   endif()
 endif()
+
 
 # Debug library postfix
 set(CMAKE_DEBUG_POSTFIX "d")

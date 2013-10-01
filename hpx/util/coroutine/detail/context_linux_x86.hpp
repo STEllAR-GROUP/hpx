@@ -28,6 +28,10 @@
 #include <hpx/util/coroutine/detail/swap_context.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
+#if defined(HPX_HAVE_VALGRIND)
+#include <valgrind/valgrind.h>
+#endif
+
 /*
  * Defining HPX_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
  * invoke, yield and yield_to swap_context functions. Separate calls sites
@@ -197,12 +201,20 @@ namespace hpx { namespace util { namespace coroutines
         *--m_sp = 0;       // esi
         *--m_sp = 0;       // edi
 #endif
+#if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
+        valgrind_id = VALGRIND_STACK_REGISTER(m_stack, m_stack + m_stack_size);
+#endif
       }
 
       ~x86_linux_context_impl()
       {
         if(m_stack)
+        {
           posix::free_stack(m_stack, static_cast<std::size_t>(m_stack_size));
+#if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
+          VALGRIND_STACK_DEREGISTER(valgrind_id);
+#endif
+        }
       }
 
       // Return the size of the reserved stack address space.
@@ -277,6 +289,9 @@ namespace hpx { namespace util { namespace coroutines
     private:
       std::ptrdiff_t m_stack_size;
       void * m_stack;
+#if !defined(NVALGRIND)
+      unsigned valgrind_id;
+#endif
     };
 
     typedef x86_linux_context_impl context_impl;

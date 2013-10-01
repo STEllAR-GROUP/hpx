@@ -1,0 +1,223 @@
+{
+       hwloc_topology_load_cond
+       Memcheck:Cond
+       ...
+       fun:hwloc_topology_load
+       ...
+}
+{
+       hwloc_topology_destroy_cond
+       Memcheck:Cond
+       ...
+       fun:hwloc_topology_destroy
+       ...
+}
+{
+       hwloc_topology_destroy_value8
+       Memcheck:Value8
+       ...
+       fun:hwloc_topology_destroy
+       ...
+}
+{
+       hwloc_topology_load_value8
+       Memcheck:Value8
+       ...
+       fun:hwloc_topology_load
+       ...
+}
+{
+       hwloc_topology_load_param
+       Memcheck:Param
+       getdents(dirp)
+       ...
+       fun:hwloc_topology_load
+       ...
+}
+{
+       hwloc_discover_cond
+       Memcheck:Cond
+       ...
+       fun:propagate_nodesets
+}
+{
+       hwloc_discover_param
+    Memcheck:Param
+    brk(end_data_segment)
+       ...
+       fun:propagate_nodesets
+}
+{
+       __intel_sse2_strspn_value8
+       Memcheck:Value8
+       fun:__intel_sse2_strspn
+}
+{
+       __intel_sse2_strdup_cond
+       Memcheck:Cond
+       ...
+       fun:__intel_sse2_strdup
+}
+{
+       __intel_sse2_strdup_value8
+       Memcheck:Value8
+       ...
+       fun:__intel_sse2_strdup
+}
+{
+    std_string_dtor_cond
+    Memcheck:Cond
+    ...
+    fun:_ZNSsD1Ev
+    ...
+}
+{
+    allocate_tls_cond
+    Memcheck:Cond
+    ...
+    fun:_dl_allocate_tls
+    fun:pthread_create@@GLIBC_2.2.5
+    ...
+}
+{
+    allocate_tls_value8
+    Memcheck:Value8
+    ...
+    fun:_dl_allocate_tls
+    fun:pthread_create@@GLIBC_2.2.5
+    ...
+}
+{
+    allocate_tls_param
+    Memcheck:Param
+    brk(end_data_segment)
+    ...
+    fun:_dl_allocate_tls
+    fun:pthread_create@@GLIBC_2.2.5
+    ...
+}
+
+{
+       fixed_mallocator_init_pool_cond
+       Memcheck:Cond
+       ...
+       fun:_ZN3hpx10components6detail24one_size_heap_allocators16fixed_mallocator5allocEm
+       fun:_ZN3hpx10components6detail12wrapper_heapINS0_17managed_componentINS_4lcos6detail7promiseIbbEENS1_9this_typeEEENS1_24one_size_heap_allocators16fixed_mallocatorENS4_5local8spinlockEE9init_poolEv
+       ...
+}
+
+{
+       fixed_mallocator_init_pool_param
+       Memcheck:Param
+       brk(end_data_segment)
+       ...
+       fun:_ZN3hpx10components6detail24one_size_heap_allocators16fixed_mallocator5allocEm
+       fun:_ZN3hpx10components6detail12wrapper_heapINS0_17managed_componentINS_4lcos6detail7promiseIbbEENS1_9this_typeEEENS1_24one_size_heap_allocators16fixed_mallocatorENS4_5local8spinlockEE9init_poolEv
+       ...
+}
+{
+    load_plugin_addr8
+    Memcheck:Addr8
+    ...
+    fun:_ZN3hpx4util21runtime_configuration15load_componentsERSt3mapISsNS0_6plugin3dllESt4lessISsESaISt4pairIKSsS4_EEE
+    fun:_ZN3hpx10components6server15runtime_support15load_componentsEv
+    ...
+}
+{
+    load_plugin_addr4
+    Memcheck:Addr4
+    ...
+    fun:_ZN3hpx4util21runtime_configuration15load_componentsERSt3mapISsNS0_6plugin3dllESt4lessISsESaISt4pairIKSsS4_EEE
+    fun:_ZN3hpx10components6server15runtime_support15load_componentsEv
+    ...
+}
+{
+       plugin_LoadLibrary_cond
+       Memcheck:Cond
+       ...
+       fun:_ZN3hpx4util6plugin3dll11LoadLibraryERNS_10error_codeEb
+       ...
+}
+{
+       plugin_LoadLibrary_value8
+       Memcheck:Value8
+       ...
+       fun:_ZN3hpx4util6plugin3dll11LoadLibraryERNS_10error_codeEb
+       ...
+}
+{
+       plugin_LoadLibrary_addr8
+       Memcheck:Addr8
+       ...
+       fun:_ZN3hpx4util6plugin3dll11LoadLibraryERNS_10error_codeEb
+       ...
+}
+{
+    load_component_factory_cond
+    Memcheck:Cond
+    ...
+    fun:_ZN3hpx4util22load_component_factoryERNS0_6plugin3dllERNS0_7sectionERKSsSsRNS_10error_codeE
+}
+{
+    load_plugin_factory_cond
+    Memcheck:Cond
+    ...
+    fun:_ZN3hpx4util19load_plugin_factoryERNS0_6plugin3dllERNS0_7sectionERKSsS7_RNS_10error_codeE
+}
+{
+    dynamic_library_loading_cond
+    Memcheck:Cond
+    ...
+    fun:dl*
+    ...
+}
+{
+    load_component_cond
+    Memcheck:Cond
+    ...
+    fun:_ZN3hpx10components6server15runtime_support15load_componentsEv
+}
+{
+    fixed_mallocator_value8
+    Memcheck:Value8
+    ...
+    fun:_ZN3hpx10components6detail24one_size_heap_allocators16fixed_mallocator5allocEm
+}
+{
+    fixed_mallocator_cond
+    Memcheck:Cond
+    ...
+    fun:_ZN3hpx10components6detail24one_size_heap_allocators16fixed_mallocator*
+}
+{
+    dll_handle_holder_deleter_cond
+    Memcheck:Cond
+    ...
+    fun:_ZN3hpx4util6plugin6detail17dll_handle_holderD1Ev
+}
+{
+    runtime_impl_dtor_cond
+    Memcheck:Cond
+    ...
+    fun:_ZN3hpx12runtime_implINS_7threads8policies30local_priority_queue_schedulerIN5boost5mutexEEENS2_17callback_notifierEED1Ev
+}
+{
+    reset_stack
+    Memcheck:Addr8
+    fun:_ZN3hpx4util10coroutines6detail5posix11reset_stackEPvm
+}
+{
+    ignore_exit_cond
+    Memcheck:Cond
+    ...
+    fun:exit
+    ...
+}
+{
+    ignore_exit_value8
+    Memcheck:Value8
+    ...
+    fun:exit
+    ...
+}
+
