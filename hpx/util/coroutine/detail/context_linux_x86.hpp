@@ -289,7 +289,7 @@ namespace hpx { namespace util { namespace coroutines
     private:
       std::ptrdiff_t m_stack_size;
       void * m_stack;
-#if !defined(NVALGRIND)
+#if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
       unsigned valgrind_id;
 #endif
     };
