@@ -31,9 +31,6 @@ execute_process(
   COMMAND ${GIT_EXECUTABLE} rm *.html
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
   RESULT_VARIABLE git_rm_result)
-if(NOT "${git_rm_result}" EQUAL "0")
-    message(FATAL_ERROR "Removing stale html files from the GitHub pages branch failed.")
-endif()
 
 # copy all documentation files to target branch
 file(
@@ -41,8 +38,8 @@ file(
   DESTINATION ${CMAKE_BINARY_DIR}/gh-pages/docs)
 
 file(
-  COPY ${CMAKE_BINARY_DIR}/share/hpx/docs/html
-  DESTINATION ${CMAKE_BINARY_DIR}/gh-pages/docs)
+  COPY ${CMAKE_BINARY_DIR}/share/hpx/docs
+  DESTINATION ${CMAKE_BINARY_DIR}/gh-pages)
 
 # add all newly generated file
 execute_process(

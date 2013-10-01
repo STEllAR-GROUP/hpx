@@ -221,9 +221,9 @@ else()
     hpx_debug("hpx_docbook_to_html.${name}" "SINGLEPAGE:${${name}_SINGLEPAGE}")
 
     if(WIN32)
-      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/")
+      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/html")
     else()
-      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/")
+      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html")
     endif()
 
     if(${${name}_SINGLEPAGE})
@@ -232,7 +232,7 @@ else()
       set(main_xsl_script_manifest ${name}_singlepage_HTML.manifest)
     else()
       set(main_xsl_script "html.xsl")
-      set(main_xsl_script_output "${DOCS_OUTPUT_DIR}/html/")
+      set(main_xsl_script_output "${DOCS_OUTPUT_DIR}/")
       set(main_xsl_script_manifest ${name}_HTML.manifest)
     endif()
 
@@ -264,7 +264,7 @@ else()
                 "--stringparam" "html.stylesheet" "src/boostbook.css"
                 "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${main_xsl_script_manifest}"
                 "--xinclude"
-                "-o" "${DOCS_OUTPUT_DIR}"
+                "-o" "${main_xsl_script_output}"
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/${main_xsl_script} ${${name}_SOURCE}
         COMMENT "Generating HTML from ${${name}_SOURCE}."
