@@ -27,6 +27,41 @@
           in <span class="emphasis"><em>HPX</em></span> as a consequence of invoking <span class="emphasis"><em>HPX</em></span>
           API functionality.
         </p>
+<h6>
+<a name="hpx.manual.init.logging.h0"></a>
+          <span class="phrase"><a name="hpx.manual.init.logging.default_logging"></a></span><a class="link" href="logging.html#hpx.manual.init.logging.default_logging">Default
+          Logging</a>
+        </h6>
+<p>
+          Enabling default logging is a simple process. The detailed description
+          in the remainder of this section explains different ways to customize the
+          defaults. Default logging can be enabled by using one of the following:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              a command line switch <a class="link" href="commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">debug</span><span class="special">-</span><span class="identifier">hpx</span><span class="special">-</span><span class="identifier">log</span></code></a>,
+              which will enable logging to the console terminal
+            </li>
+<li class="listitem">
+              the command line switch <a class="link" href="commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">debug</span><span class="special">-</span><span class="identifier">hpx</span><span class="special">-</span><span class="identifier">log</span><span class="special">=&lt;</span><span class="identifier">filename</span><span class="special">&gt;</span></code></a>, which enables logging to
+              a given file <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">filename</span><span class="special">&gt;</span></code>, or
+            </li>
+<li class="listitem">
+              setting an environment variable <code class="computeroutput"><span class="identifier">HPX_LOGLEVEL</span><span class="special">=&lt;</span><span class="identifier">loglevel</span><span class="special">&gt;</span></code> while running the <span class="emphasis"><em>HPX</em></span>
+              application. In this case <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">loglevel</span><span class="special">&gt;</span></code>
+              should be a number between (or equal to) <code class="computeroutput"><span class="number">1</span></code>
+              and <code class="computeroutput"><span class="number">5</span></code>, where <code class="computeroutput"><span class="number">1</span></code> means minimal logging and <code class="computeroutput"><span class="number">5</span></code> causes to log all available messages.
+              When setting a the environment variable the logs will be written to
+              a file named <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.&lt;</span><span class="identifier">pid</span><span class="special">&gt;.</span><span class="identifier">log</span></code>in the current working directory,
+              where <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">pid</span><span class="special">&gt;</span></code> is the process id of the console
+              instance of the application.
+            </li>
+</ul></div>
+<h6>
+<a name="hpx.manual.init.logging.h1"></a>
+          <span class="phrase"><a name="hpx.manual.init.logging.customizing_logging"></a></span><a class="link" href="logging.html#hpx.manual.init.logging.customizing_logging">Customizing
+          Logging</a>
+        </h6>
 <p>
           Generally, logging can be customized either using environment variable
           settings or using by an ini configuration file. Logging is generated in
@@ -151,7 +186,7 @@
           of the categories at the console instance of an application.
         </p>
 <h6>
-<a name="hpx.manual.init.logging.h0"></a>
+<a name="hpx.manual.init.logging.h2"></a>
           <span class="phrase"><a name="hpx.manual.init.logging.levels"></a></span><a class="link" href="logging.html#hpx.manual.init.logging.levels">Levels</a>
         </h6>
 <p>
@@ -272,7 +307,7 @@
           </p></td></tr>
 </table></div>
 <h6>
-<a name="hpx.manual.init.logging.h1"></a>
+<a name="hpx.manual.init.logging.h3"></a>
           <span class="phrase"><a name="hpx.manual.init.logging.configuration"></a></span><a class="link" href="logging.html#hpx.manual.init.logging.configuration">Configuration</a>
         </h6>
 <p>
