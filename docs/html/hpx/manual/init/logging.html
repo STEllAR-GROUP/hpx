@@ -52,8 +52,8 @@
               should be a number between (or equal to) <code class="computeroutput"><span class="number">1</span></code>
               and <code class="computeroutput"><span class="number">5</span></code>, where <code class="computeroutput"><span class="number">1</span></code> means minimal logging and <code class="computeroutput"><span class="number">5</span></code> causes to log all available messages.
               When setting a the environment variable the logs will be written to
-              a file named <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.&lt;</span><span class="identifier">pid</span><span class="special">&gt;.</span><span class="identifier">log</span></code>in the current working directory,
-              where <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">pid</span><span class="special">&gt;</span></code> is the process id of the console
+              a file named <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.&lt;</span><span class="identifier">PID</span><span class="special">&gt;.</span><span class="identifier">log</span></code>in the current working directory,
+              where <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">PID</span><span class="special">&gt;</span></code> is the process id of the console
               instance of the application.
             </li>
 </ul></div>
@@ -312,12 +312,13 @@
         </h6>
 <p>
           Logs will be saved to destinations as configured by the user. By default,
-          logging output is saved on the console instance of an application to <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">CATEGORY</span><span class="special">.</span><span class="identifier">PID</span><span class="special">.</span><span class="identifier">log</span></code> (where CATEGORY and PID are placeholders
-          for the category shortcut and the OS process id). The output for the general
-          logging category is saved to <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">PID</span><span class="special">.</span><span class="identifier">log</span></code>.
-          The default settings for the general logging category are shown here (the
-          syntax is described in the section <a class="link" href="configuration/ini_format.html" title="The HPX INI File Format">The
-          <span class="emphasis"><em>HPX</em></span> INI File Format</a>):
+          logging output is saved on the console instance of an application to <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.&lt;</span><span class="identifier">CATEGORY</span><span class="special">&gt;.&lt;</span><span class="identifier">PID</span><span class="special">&gt;.</span><span class="identifier">log</span></code> (where <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">CATEGORY</span><span class="special">&gt;</span></code>
+          and <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">PID</span><span class="special">&gt;</span></code> are placeholders for the category shortcut
+          and the OS process id). The output for the general logging category is
+          saved to <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.&lt;</span><span class="identifier">PID</span><span class="special">&gt;.</span><span class="identifier">log</span></code>. The default settings for the general
+          logging category are shown here (the syntax is described in the section
+          <a class="link" href="configuration/ini_format.html" title="The HPX INI File Format">The <span class="emphasis"><em>HPX</em></span>
+          INI File Format</a>):
         </p>
 <pre class="programlisting">[hpx.logging]
 level = ${HPX_LOGLEVEL:0}
@@ -403,6 +404,19 @@ format = ${HPX_LOGFORMAT:(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) P%p
                     Direct all output to the console instance of the application.
                     The console instance has its logging destinations configured
                     separately.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    android_log
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Direct all output to the (Android) system log (available on Android
+                    systems only).
                   </p>
                 </td>
 </tr>
