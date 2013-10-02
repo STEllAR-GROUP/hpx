@@ -39,8 +39,8 @@
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/remove_reference.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
 /// \namespace hpx

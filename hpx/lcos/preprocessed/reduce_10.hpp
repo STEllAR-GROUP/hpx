@@ -72,13 +72,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -119,6 +113,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -341,13 +342,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -388,6 +383,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -610,13 +612,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0 , a1
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -657,6 +653,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0 , a1
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -879,13 +882,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0 , a1 , a2
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -926,6 +923,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0 , a1 , a2
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -1148,13 +1152,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -1195,6 +1193,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0 , a1 , a2 , a3
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -1417,13 +1422,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -1464,6 +1463,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0 , a1 , a2 , a3 , a4
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -1686,13 +1692,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -1733,6 +1733,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0 , a1 , a2 , a3 , a4 , a5
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -1955,13 +1962,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -2002,6 +2003,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -2224,13 +2232,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -2271,6 +2273,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -2493,13 +2502,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -2540,6 +2543,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();
@@ -2762,13 +2772,7 @@ namespace hpx { namespace lcos
             if(ids.empty()) return result_type();
             std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
-            reduce_invoke(
-                act
-              , reduce_futures
-              , ids[0]
-              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-              , global_idx
-            );
+            id_type id_first = ids[0];
             if(ids.size() > 1)
             {
                 std::size_t half = (ids.size() / 2) + 1;
@@ -2809,6 +2813,13 @@ namespace hpx { namespace lcos
                     );
                 }
             }
+            reduce_invoke(
+                act
+              , reduce_futures
+              , id_first
+              , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
+              , global_idx
+            );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
                 move();

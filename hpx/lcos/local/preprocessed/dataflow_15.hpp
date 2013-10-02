@@ -16,14 +16,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_1
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type;
             typedef
@@ -174,7 +174,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -357,14 +357,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_2
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type;
             typedef
@@ -515,7 +515,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -698,14 +698,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_3
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type;
             typedef
@@ -856,7 +856,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -1039,14 +1039,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_4
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type;
             typedef
@@ -1197,7 +1197,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -1380,14 +1380,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_5
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type;
             typedef
@@ -1538,7 +1538,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -1721,14 +1721,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_6
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type;
             typedef
@@ -1879,7 +1879,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -2062,14 +2062,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_7
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type;
             typedef
@@ -2220,7 +2220,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -2403,14 +2403,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_8
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type;
             typedef
@@ -2561,7 +2561,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -2744,14 +2744,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_9
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type;
             typedef
@@ -2902,7 +2902,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -3085,14 +3085,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_10
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type , typename util::decay<F9>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type;
             typedef
@@ -3243,7 +3243,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -3426,14 +3426,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_11
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type , typename util::decay<F9>::type , typename util::decay<F10>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type;
             typedef
@@ -3584,7 +3584,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -3767,14 +3767,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_12
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type , typename util::decay<F9>::type , typename util::decay<F10>::type , typename util::decay<F11>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type;
             typedef
@@ -3925,7 +3925,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -4108,14 +4108,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_13
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type , typename util::decay<F9>::type , typename util::decay<F10>::type , typename util::decay<F11>::type , typename util::decay<F12>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type;
             typedef
@@ -4266,7 +4266,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -4449,14 +4449,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_14
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type , typename util::decay<F9>::type , typename util::decay<F10>::type , typename util::decay<F11>::type , typename util::decay<F12>::type , typename util::decay<F13>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type; typedef typename util::decay<F13>::type f13_type;
             typedef
@@ -4607,7 +4607,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
@@ -4790,14 +4790,14 @@ namespace hpx { namespace lcos { namespace local
         struct dataflow_frame_15
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         typename util::decay<F0>::type , typename util::decay<F1>::type , typename util::decay<F2>::type , typename util::decay<F3>::type , typename util::decay<F4>::type , typename util::decay<F5>::type , typename util::decay<F6>::type , typename util::decay<F7>::type , typename util::decay<F8>::type , typename util::decay<F9>::type , typename util::decay<F10>::type , typename util::decay<F11>::type , typename util::decay<F12>::type , typename util::decay<F13>::type , typename util::decay<F14>::type
                     )
                 >::type
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
             typedef typename util::decay<F0>::type f0_type; typedef typename util::decay<F1>::type f1_type; typedef typename util::decay<F2>::type f2_type; typedef typename util::decay<F3>::type f3_type; typedef typename util::decay<F4>::type f4_type; typedef typename util::decay<F5>::type f5_type; typedef typename util::decay<F6>::type f6_type; typedef typename util::decay<F7>::type f7_type; typedef typename util::decay<F8>::type f8_type; typedef typename util::decay<F9>::type f9_type; typedef typename util::decay<F10>::type f10_type; typedef typename util::decay<F11>::type f11_type; typedef typename util::decay<F12>::type f12_type; typedef typename util::decay<F13>::type f13_type; typedef typename util::decay<F14>::type f14_type;
             typedef
@@ -4948,7 +4948,7 @@ namespace hpx { namespace lcos { namespace local
                     typename boost::fusion::result_of::next<Iter>::type
                     next_type;
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;

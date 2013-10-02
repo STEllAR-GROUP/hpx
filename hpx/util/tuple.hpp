@@ -16,6 +16,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/tuple_helper.hpp>
+#include <hpx/util/add_rvalue_reference.hpp>
 
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/facilities/intercept.hpp>
@@ -208,7 +209,7 @@ namespace hpx { namespace util
                 return t0.template get<N>();
             }
             static BOOST_FORCEINLINE
-            typename util::detail::add_rvalue_reference<type>::type
+            typename util::add_rvalue_reference<type>::type
             call(BOOST_RV_REF(tuple0_type) t0, tuple1_type const& t1)
             {
                 return boost::forward<type>(t0.template get<N>());
@@ -239,7 +240,7 @@ namespace hpx { namespace util
                 return t1.template get<N - offset>();
             }
             static BOOST_FORCEINLINE
-            typename util::detail::add_rvalue_reference<type>::type
+            typename util::add_rvalue_reference<type>::type
             call(tuple0_type const& t0, BOOST_RV_REF(tuple1_type) t1)
             {
                 return boost::forward<type>(t1.template get<N - offset>());
@@ -661,7 +662,7 @@ namespace hpx { namespace util
     , boost::forward<BOOST_PP_CAT(T, N)>(BOOST_PP_CAT(D, N))                  \
 /**/
 #define HPX_UTIL_MAKE_FWD_TUPLE_ARG(Z, N, D)                                  \
-    typename detail::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type           \
+    typename util::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type             \
 /**/
 #define HPX_UTIL_TUPLE_CAT_ELEM_CALL(Z, N, D)                                 \
     detail::tuple_cat_element<N, T0, T1>::call(t0, t1)                        \

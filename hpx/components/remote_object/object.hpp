@@ -27,7 +27,7 @@ namespace hpx { namespace components
         {
 
             typedef
-                typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
+                typename boost::result_of<typename hpx::util::remove_reference<F>::type(T &)>::type
                 result_type;
 
             invoke_apply_fun() {}
@@ -97,7 +97,7 @@ namespace hpx { namespace components
         naming::id_type gid_;
         template <typename F>
         lcos::future<
-            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
+            typename boost::result_of<typename hpx::util::remove_reference<F>::type(T &)>::type
         >
         operator<=(BOOST_FWD_REF(F) f) const
         {
@@ -110,7 +110,7 @@ namespace hpx { namespace components
 
         template <typename F>
         lcos::future<
-            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
+            typename boost::result_of<typename hpx::util::remove_reference<F>::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f) const
         {

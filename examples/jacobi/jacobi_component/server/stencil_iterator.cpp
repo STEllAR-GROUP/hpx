@@ -7,7 +7,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/async.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
 
 #include "stencil_iterator.hpp"
 

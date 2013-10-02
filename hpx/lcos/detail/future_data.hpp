@@ -249,8 +249,8 @@ namespace detail
             if (!f2_.empty()) f2_(f);
         }
 
-        typename util::detail::remove_reference<F1>::type f1_;
-        typename util::detail::remove_reference<F2>::type f2_;
+        typename util::remove_reference<F1>::type f1_;
+        typename util::remove_reference<F2>::type f2_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

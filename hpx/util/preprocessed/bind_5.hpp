@@ -112,7 +112,7 @@ namespace hpx { namespace util
     detail::bound_function1<
         R
       , T0
-      , typename detail::remove_reference<A0>::type
+      , typename util::remove_reference<A0>::type
     >
     bind(
         R(*f)(T0)
@@ -123,7 +123,7 @@ namespace hpx { namespace util
             detail::bound_function1<
                 R
               , T0
-              , typename detail::remove_reference<A0>::type
+              , typename util::remove_reference<A0>::type
             >
             (f, boost::forward<A0>( a0 ));
     }
@@ -528,7 +528,7 @@ namespace hpx { namespace util
       , C
       , 
       
-        typename detail::remove_reference<A0>::type
+        typename util::remove_reference<A0>::type
     >
     bind(
         R(C::*f)()
@@ -541,7 +541,7 @@ namespace hpx { namespace util
               , C
               , 
                 
-                typename detail::remove_reference<A0>::type
+                typename util::remove_reference<A0>::type
             >
             (f, boost::forward<A0>( a0 ));
     }
@@ -556,7 +556,7 @@ namespace hpx { namespace util
       , C const
       , 
       
-        typename detail::remove_reference<A0>::type
+        typename util::remove_reference<A0>::type
     >
     bind(
         R(C::*f)() const
@@ -569,7 +569,7 @@ namespace hpx { namespace util
               , C const
               , 
               
-                  typename detail::remove_reference<A0>::type
+                  typename util::remove_reference<A0>::type
             >
             (f, boost::forward<A0>( a0 ));
     }
@@ -766,10 +766,10 @@ namespace hpx { namespace util
       , typename A0
     >
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>
+        hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor1<
-            typename detail::remove_reference<F>::type
-          , typename detail::remove_reference<A0>::type
+            typename util::remove_reference<F>::type
+          , typename util::remove_reference<A0>::type
         >
     >::type
     bind(
@@ -779,8 +779,8 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor1<
-                typename detail::remove_reference<F>::type
-              , typename detail::remove_reference<A0>::type
+                typename util::remove_reference<F>::type
+              , typename util::remove_reference<A0>::type
             >(
                 boost::forward<F>(f)
               , boost::forward<A0>( a0 )
@@ -979,7 +979,7 @@ namespace hpx { namespace util
     detail::bound_function2<
         R
       , T0 , T1
-      , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
     >
     bind(
         R(*f)(T0 , T1)
@@ -990,7 +990,7 @@ namespace hpx { namespace util
             detail::bound_function2<
                 R
               , T0 , T1
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
     }
@@ -1395,7 +1395,7 @@ namespace hpx { namespace util
       , C
       , T0
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
     >
     bind(
         R(C::*f)(T0)
@@ -1408,7 +1408,7 @@ namespace hpx { namespace util
               , C
               , T0
                 ,
-                typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type
+                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
     }
@@ -1423,7 +1423,7 @@ namespace hpx { namespace util
       , C const
       , T0
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
     >
     bind(
         R(C::*f)(T0) const
@@ -1436,7 +1436,7 @@ namespace hpx { namespace util
               , C const
               , T0
               ,
-                  typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type
+                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
     }
@@ -1633,10 +1633,10 @@ namespace hpx { namespace util
       , typename A0 , typename A1
     >
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>
+        hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor2<
-            typename detail::remove_reference<F>::type
-          , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type
+            typename util::remove_reference<F>::type
+          , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
         >
     >::type
     bind(
@@ -1646,8 +1646,8 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor2<
-                typename detail::remove_reference<F>::type
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type
+                typename util::remove_reference<F>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
             >(
                 boost::forward<F>(f)
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
@@ -1846,7 +1846,7 @@ namespace hpx { namespace util
     detail::bound_function3<
         R
       , T0 , T1 , T2
-      , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
     >
     bind(
         R(*f)(T0 , T1 , T2)
@@ -1857,7 +1857,7 @@ namespace hpx { namespace util
             detail::bound_function3<
                 R
               , T0 , T1 , T2
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
     }
@@ -2262,7 +2262,7 @@ namespace hpx { namespace util
       , C
       , T0 , T1
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
     >
     bind(
         R(C::*f)(T0 , T1)
@@ -2275,7 +2275,7 @@ namespace hpx { namespace util
               , C
               , T0 , T1
                 ,
-                typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type
+                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
     }
@@ -2290,7 +2290,7 @@ namespace hpx { namespace util
       , C const
       , T0 , T1
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
     >
     bind(
         R(C::*f)(T0 , T1) const
@@ -2303,7 +2303,7 @@ namespace hpx { namespace util
               , C const
               , T0 , T1
               ,
-                  typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type
+                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
     }
@@ -2500,10 +2500,10 @@ namespace hpx { namespace util
       , typename A0 , typename A1 , typename A2
     >
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>
+        hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor3<
-            typename detail::remove_reference<F>::type
-          , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type
+            typename util::remove_reference<F>::type
+          , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
         >
     >::type
     bind(
@@ -2513,8 +2513,8 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor3<
-                typename detail::remove_reference<F>::type
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type
+                typename util::remove_reference<F>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
             >(
                 boost::forward<F>(f)
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )
@@ -2713,7 +2713,7 @@ namespace hpx { namespace util
     detail::bound_function4<
         R
       , T0 , T1 , T2 , T3
-      , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
     >
     bind(
         R(*f)(T0 , T1 , T2 , T3)
@@ -2724,7 +2724,7 @@ namespace hpx { namespace util
             detail::bound_function4<
                 R
               , T0 , T1 , T2 , T3
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
     }
@@ -3129,7 +3129,7 @@ namespace hpx { namespace util
       , C
       , T0 , T1 , T2
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2)
@@ -3142,7 +3142,7 @@ namespace hpx { namespace util
               , C
               , T0 , T1 , T2
                 ,
-                typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type
+                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
     }
@@ -3157,7 +3157,7 @@ namespace hpx { namespace util
       , C const
       , T0 , T1 , T2
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2) const
@@ -3170,7 +3170,7 @@ namespace hpx { namespace util
               , C const
               , T0 , T1 , T2
               ,
-                  typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type
+                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
     }
@@ -3367,10 +3367,10 @@ namespace hpx { namespace util
       , typename A0 , typename A1 , typename A2 , typename A3
     >
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>
+        hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor4<
-            typename detail::remove_reference<F>::type
-          , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type
+            typename util::remove_reference<F>::type
+          , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
         >
     >::type
     bind(
@@ -3380,8 +3380,8 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor4<
-                typename detail::remove_reference<F>::type
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type
+                typename util::remove_reference<F>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
             >(
                 boost::forward<F>(f)
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
@@ -3580,7 +3580,7 @@ namespace hpx { namespace util
     detail::bound_function5<
         R
       , T0 , T1 , T2 , T3 , T4
-      , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
     >
     bind(
         R(*f)(T0 , T1 , T2 , T3 , T4)
@@ -3591,7 +3591,7 @@ namespace hpx { namespace util
             detail::bound_function5<
                 R
               , T0 , T1 , T2 , T3 , T4
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
     }
@@ -3996,7 +3996,7 @@ namespace hpx { namespace util
       , C
       , T0 , T1 , T2 , T3
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2 , T3)
@@ -4009,7 +4009,7 @@ namespace hpx { namespace util
               , C
               , T0 , T1 , T2 , T3
                 ,
-                typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type
+                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
     }
@@ -4024,7 +4024,7 @@ namespace hpx { namespace util
       , C const
       , T0 , T1 , T2 , T3
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2 , T3) const
@@ -4037,7 +4037,7 @@ namespace hpx { namespace util
               , C const
               , T0 , T1 , T2 , T3
               ,
-                  typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type
+                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
     }
@@ -4234,10 +4234,10 @@ namespace hpx { namespace util
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>
+        hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor5<
-            typename detail::remove_reference<F>::type
-          , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type
+            typename util::remove_reference<F>::type
+          , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
         >
     >::type
     bind(
@@ -4247,8 +4247,8 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor5<
-                typename detail::remove_reference<F>::type
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type
+                typename util::remove_reference<F>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
             >(
                 boost::forward<F>(f)
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )
@@ -4447,7 +4447,7 @@ namespace hpx { namespace util
     detail::bound_function6<
         R
       , T0 , T1 , T2 , T3 , T4 , T5
-      , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
     >
     bind(
         R(*f)(T0 , T1 , T2 , T3 , T4 , T5)
@@ -4458,7 +4458,7 @@ namespace hpx { namespace util
             detail::bound_function6<
                 R
               , T0 , T1 , T2 , T3 , T4 , T5
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
     }
@@ -4863,7 +4863,7 @@ namespace hpx { namespace util
       , C
       , T0 , T1 , T2 , T3 , T4
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2 , T3 , T4)
@@ -4876,7 +4876,7 @@ namespace hpx { namespace util
               , C
               , T0 , T1 , T2 , T3 , T4
                 ,
-                typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type
+                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
     }
@@ -4891,7 +4891,7 @@ namespace hpx { namespace util
       , C const
       , T0 , T1 , T2 , T3 , T4
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2 , T3 , T4) const
@@ -4904,7 +4904,7 @@ namespace hpx { namespace util
               , C const
               , T0 , T1 , T2 , T3 , T4
               ,
-                  typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type
+                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
     }
@@ -5101,10 +5101,10 @@ namespace hpx { namespace util
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>
+        hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor6<
-            typename detail::remove_reference<F>::type
-          , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type
+            typename util::remove_reference<F>::type
+          , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
         >
     >::type
     bind(
@@ -5114,8 +5114,8 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor6<
-                typename detail::remove_reference<F>::type
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type
+                typename util::remove_reference<F>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
             >(
                 boost::forward<F>(f)
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )
@@ -5314,7 +5314,7 @@ namespace hpx { namespace util
     detail::bound_function7<
         R
       , T0 , T1 , T2 , T3 , T4 , T5 , T6
-      , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
     >
     bind(
         R(*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
@@ -5325,7 +5325,7 @@ namespace hpx { namespace util
             detail::bound_function7<
                 R
               , T0 , T1 , T2 , T3 , T4 , T5 , T6
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
     }
@@ -5730,7 +5730,7 @@ namespace hpx { namespace util
       , C
       , T0 , T1 , T2 , T3 , T4 , T5
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5)
@@ -5743,7 +5743,7 @@ namespace hpx { namespace util
               , C
               , T0 , T1 , T2 , T3 , T4 , T5
                 ,
-                typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type
+                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
     }
@@ -5758,7 +5758,7 @@ namespace hpx { namespace util
       , C const
       , T0 , T1 , T2 , T3 , T4 , T5
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5) const
@@ -5771,7 +5771,7 @@ namespace hpx { namespace util
               , C const
               , T0 , T1 , T2 , T3 , T4 , T5
               ,
-                  typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type
+                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
     }
@@ -5968,10 +5968,10 @@ namespace hpx { namespace util
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>
+        hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor7<
-            typename detail::remove_reference<F>::type
-          , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type
+            typename util::remove_reference<F>::type
+          , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
         >
     >::type
     bind(
@@ -5981,8 +5981,8 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor7<
-                typename detail::remove_reference<F>::type
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type
+                typename util::remove_reference<F>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
             >(
                 boost::forward<F>(f)
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )
@@ -6181,7 +6181,7 @@ namespace hpx { namespace util
     detail::bound_function8<
         R
       , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
-      , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type , typename detail::remove_reference<A7>::type
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
     >
     bind(
         R(*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7)
@@ -6192,7 +6192,7 @@ namespace hpx { namespace util
             detail::bound_function8<
                 R
               , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type , typename detail::remove_reference<A7>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
     }
@@ -6597,7 +6597,7 @@ namespace hpx { namespace util
       , C
       , T0 , T1 , T2 , T3 , T4 , T5 , T6
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type , typename detail::remove_reference<A7>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
@@ -6610,7 +6610,7 @@ namespace hpx { namespace util
               , C
               , T0 , T1 , T2 , T3 , T4 , T5 , T6
                 ,
-                typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type , typename detail::remove_reference<A7>::type
+                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
     }
@@ -6625,7 +6625,7 @@ namespace hpx { namespace util
       , C const
       , T0 , T1 , T2 , T3 , T4 , T5 , T6
       ,
-        typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type , typename detail::remove_reference<A7>::type
+        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
     >
     bind(
         R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const
@@ -6638,7 +6638,7 @@ namespace hpx { namespace util
               , C const
               , T0 , T1 , T2 , T3 , T4 , T5 , T6
               ,
-                  typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type , typename detail::remove_reference<A7>::type
+                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
             >
             (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
     }
@@ -6835,10 +6835,10 @@ namespace hpx { namespace util
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>
+        hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor8<
-            typename detail::remove_reference<F>::type
-          , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type , typename detail::remove_reference<A7>::type
+            typename util::remove_reference<F>::type
+          , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
         >
     >::type
     bind(
@@ -6848,8 +6848,8 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor8<
-                typename detail::remove_reference<F>::type
-              , typename detail::remove_reference<A0>::type , typename detail::remove_reference<A1>::type , typename detail::remove_reference<A2>::type , typename detail::remove_reference<A3>::type , typename detail::remove_reference<A4>::type , typename detail::remove_reference<A5>::type , typename detail::remove_reference<A6>::type , typename detail::remove_reference<A7>::type
+                typename util::remove_reference<F>::type
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
             >(
                 boost::forward<F>(f)
               , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 )

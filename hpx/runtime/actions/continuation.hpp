@@ -15,7 +15,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/serialize_empty_type.hpp>
 #include <hpx/util/demangle_helper.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/remove_reference.hpp>
 #include <hpx/traits/is_callable.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
@@ -71,7 +71,7 @@ namespace hpx
     void set_lco_value(naming::id_type const& id, BOOST_FWD_REF(T) t)
     {
         typename lcos::base_lco_with_value<
-            typename util::detail::remove_reference<T>::type
+            typename util::remove_reference<T>::type
         >::set_value_action set;
         apply(set, id, boost::move(t));
     }
@@ -252,7 +252,7 @@ namespace hpx { namespace actions
             ar & cont_ & target_;
         }
 
-        typedef typename hpx::util::detail::remove_reference<Cont>::type cont_type;
+        typedef typename hpx::util::remove_reference<Cont>::type cont_type;
         cont_type cont_;
         hpx::id_type target_;
     };
@@ -290,8 +290,8 @@ namespace hpx { namespace actions
             ar & cont_ & target_ & f_;
         }
 
-        typedef typename hpx::util::detail::remove_reference<Cont>::type cont_type;
-        typedef typename hpx::util::detail::remove_reference<F>::type function_type;
+        typedef typename hpx::util::remove_reference<Cont>::type cont_type;
+        typedef typename hpx::util::remove_reference<F>::type function_type;
 
         cont_type cont_;        // continuation type
         hpx::id_type target_;
@@ -537,22 +537,22 @@ namespace hpx
 
     template <typename Cont>
     inline hpx::actions::continuation_impl<
-        typename hpx::util::detail::remove_reference<Cont>::type
+        typename hpx::util::remove_reference<Cont>::type
     >
     make_continuation(BOOST_FWD_REF(Cont) cont)
     {
-        typedef typename hpx::util::detail::remove_reference<Cont>::type cont_type;
+        typedef typename hpx::util::remove_reference<Cont>::type cont_type;
         return hpx::actions::continuation_impl<cont_type>(
             boost::forward<Cont>(cont), hpx::find_here());
     }
 
     template <typename Cont>
     inline hpx::actions::continuation_impl<
-        typename hpx::util::detail::remove_reference<Cont>::type
+        typename hpx::util::remove_reference<Cont>::type
     >
     make_continuation(BOOST_FWD_REF(Cont) f, hpx::id_type const& target)
     {
-        typedef typename hpx::util::detail::remove_reference<Cont>::type cont_type;
+        typedef typename hpx::util::remove_reference<Cont>::type cont_type;
         return hpx::actions::continuation_impl<cont_type>(
             boost::forward<Cont>(f), target);
     }
@@ -560,18 +560,18 @@ namespace hpx
     template <typename Cont, typename F>
     inline typename boost::disable_if<
         boost::is_same<
-            typename hpx::util::detail::remove_reference<F>::type,
+            typename hpx::util::remove_reference<F>::type,
             hpx::naming::id_type
         >,
         hpx::actions::continuation2_impl<
-            typename hpx::util::detail::remove_reference<Cont>::type,
-            typename hpx::util::detail::remove_reference<F>::type
+            typename hpx::util::remove_reference<Cont>::type,
+            typename hpx::util::remove_reference<F>::type
         >
     >::type
     make_continuation(BOOST_FWD_REF(Cont) cont, BOOST_FWD_REF(F) f)
     {
-        typedef typename hpx::util::detail::remove_reference<Cont>::type cont_type;
-        typedef typename hpx::util::detail::remove_reference<F>::type function_type;
+        typedef typename hpx::util::remove_reference<Cont>::type cont_type;
+        typedef typename hpx::util::remove_reference<F>::type function_type;
 
         return hpx::actions::continuation2_impl<cont_type, function_type>(
             boost::forward<Cont>(cont), hpx::find_here(), boost::forward<F>(f));
@@ -579,14 +579,14 @@ namespace hpx
 
     template <typename Cont, typename F>
     inline hpx::actions::continuation2_impl<
-        typename hpx::util::detail::remove_reference<Cont>::type,
-        typename hpx::util::detail::remove_reference<F>::type
+        typename hpx::util::remove_reference<Cont>::type,
+        typename hpx::util::remove_reference<F>::type
     >
     make_continuation(BOOST_FWD_REF(Cont) cont, hpx::id_type const& target,
         BOOST_FWD_REF(F) f)
     {
-        typedef typename hpx::util::detail::remove_reference<Cont>::type cont_type;
-        typedef typename hpx::util::detail::remove_reference<F>::type function_type;
+        typedef typename hpx::util::remove_reference<Cont>::type cont_type;
+        typedef typename hpx::util::remove_reference<F>::type function_type;
 
         return hpx::actions::continuation2_impl<cont_type, function_type>(
             boost::forward<Cont>(cont), target, boost::forward<F>(f));

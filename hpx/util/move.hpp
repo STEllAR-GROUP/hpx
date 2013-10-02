@@ -7,7 +7,7 @@
 #define HPX_UTIL_MOVE_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/add_rvalue_reference.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
@@ -112,8 +112,7 @@ namespace hpx { namespace util { namespace detail
     struct move_if_no_ref<T, true>
     {
         template <typename A>
-        static BOOST_RV_REF(
-            typename hpx::util::detail::remove_reference<T>::type)
+        static typename hpx::util::add_rvalue_reference<T>::type
         call(BOOST_FWD_REF(A) t)
         {
             return boost::move(t);

@@ -14,7 +14,7 @@
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/remove_reference.hpp>
 
 #include <boost/get_pointer.hpp>
 
@@ -185,7 +185,7 @@ namespace hpx { namespace util {
 /**/
 
 #define HPX_UTIL_BIND_REMOVE_REFERENCE(Z, N, D)                                 \
-        typename detail::remove_reference<BOOST_PP_CAT(D, N)>::type             \
+        typename util::remove_reference<BOOST_PP_CAT(D, N)>::type               \
 /**/
 
 #define HPX_UTIL_BIND_REFERENCE(Z, N, D)                                        \
@@ -343,7 +343,7 @@ namespace hpx { namespace util {
 
     template <typename F>
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>,
+        hpx::traits::is_action<typename util::remove_reference<F>::type>,
         detail::bound_functor0<F>
     >::type
     bind(BOOST_FWD_REF(F) f)
@@ -1189,9 +1189,9 @@ namespace hpx { namespace util
       , BOOST_PP_ENUM_PARAMS(N, typename A)
     >
     typename boost::disable_if<
-        hpx::traits::is_action<typename detail::remove_reference<F>::type>
+        hpx::traits::is_action<typename util::remove_reference<F>::type>
       , BOOST_PP_CAT(detail::bound_functor, N)<
-            typename detail::remove_reference<F>::type
+            typename util::remove_reference<F>::type
           , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
         >
     >::type
@@ -1202,7 +1202,7 @@ namespace hpx { namespace util
     {
         return
             BOOST_PP_CAT(detail::bound_functor, N)<
-                typename detail::remove_reference<F>::type
+                typename util::remove_reference<F>::type
               , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
             >(
                 boost::forward<F>(f)

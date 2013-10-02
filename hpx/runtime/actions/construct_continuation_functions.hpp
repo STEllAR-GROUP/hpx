@@ -27,7 +27,7 @@
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
     BOOST_PP_COMMA_IF(n)                                                      \
     util::detail::move_if_no_ref<                                             \
-        typename util::detail::remove_reference<Arguments_>::type::           \
+        typename util::remove_reference<Arguments_>::type::                   \
             BOOST_PP_CAT(member_type, n)>::call(data. BOOST_PP_CAT(a, n))     \
     /**/
 

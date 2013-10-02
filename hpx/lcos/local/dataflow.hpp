@@ -16,7 +16,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/remove_reference.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 
@@ -106,7 +106,7 @@ namespace hpx { namespace lcos { namespace local
         struct BOOST_PP_CAT(dataflow_frame_, N)
           : hpx::lcos::detail::future_data<
                 typename boost::result_of<
-                    typename hpx::util::detail::remove_reference<Func>::type(
+                    typename hpx::util::remove_reference<Func>::type(
                         BOOST_PP_ENUM(
                             N
                           , HPX_LCOS_LOCAL_DATAFLOW_FRAME_RESULT_OF
@@ -117,7 +117,7 @@ namespace hpx { namespace lcos { namespace local
             >
         {
             typedef
-                typename hpx::util::detail::remove_reference<Func>::type
+                typename hpx::util::remove_reference<Func>::type
                 func_type;
 
             BOOST_PP_REPEAT(N, HPX_LCOS_LOCAL_DATAFLOW_FRAME_MEMBER_TYPES, _)
@@ -301,7 +301,7 @@ namespace hpx { namespace lcos { namespace local
                     next_type;
 
                 typedef
-                    typename util::detail::remove_reference<
+                    typename util::remove_reference<
                         typename boost::fusion::result_of::deref<Iter>::type
                     >::type
                     future_type;
