@@ -72,7 +72,7 @@
         template<> HPX_ALWAYS_EXPORT                                          \
         char const* get_function_name<Vtable>()                               \
         {                                                                     \
-            return BOOST_PP_STRINGIZE(name);                                  \
+            return BOOST_PP_STRINGIZE(Name);                                  \
         }                                                                     \
     }}}                                                                       \
 /**/
