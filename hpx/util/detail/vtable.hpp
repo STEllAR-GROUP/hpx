@@ -12,7 +12,7 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/detail/add_rvalue_reference.hpp>
+#include <hpx/util/add_rvalue_reference.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/punctuation/comma_if.hpp>
@@ -79,7 +79,7 @@ namespace hpx { namespace util { namespace detail {
         struct type;
 
 #       define BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF(Z, N, D)                 \
-        typename util::detail::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type   \
+        typename util::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type           \
         BOOST_PP_CAT(a, N)                                                      \
         /**/
 

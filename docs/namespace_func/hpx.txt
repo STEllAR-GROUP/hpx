@@ -98,7 +98,7 @@ inline error_code make_success_code(throwmode mode = plain);
     /// \brief Return the number of the current OS-thread running in the
     ///        runtime instance the current HPX-thread is associated with.
     ///
-    /// \note   The returned value is zero based and it's maximum value is
+    /// \note   The returned value is zero based and its maximum value is
     ///         smaller than the overall number of OS-threads executed (as
     ///         returned by \a get_os_thread_count().
     /// \note   This function needs to be executed on a HPX-thread. It will

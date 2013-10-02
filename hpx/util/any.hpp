@@ -21,7 +21,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/remove_reference.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
 #include <hpx/util/binary_filter.hpp>
@@ -1050,7 +1050,7 @@ namespace hpx { namespace util
     template <typename T, typename IArchive, typename OArchive, typename Char>
     T any_cast(basic_any<IArchive, OArchive, Char>& operand)
     {
-        typedef BOOST_DEDUCED_TYPENAME detail::remove_reference<T>::type nonref;
+        typedef BOOST_DEDUCED_TYPENAME remove_reference<T>::type nonref;
 
 #ifdef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
         // If 'nonref' is still reference type, it means the user has not
@@ -1071,7 +1071,7 @@ namespace hpx { namespace util
     template <typename T, typename IArchive, typename OArchive, typename Char>
     T const& any_cast(basic_any<IArchive, OArchive, Char> const& operand)
     {
-        typedef BOOST_DEDUCED_TYPENAME detail::remove_reference<T>::type nonref;
+        typedef BOOST_DEDUCED_TYPENAME remove_reference<T>::type nonref;
 
 #ifdef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
         // The comment in the above version of 'any_cast' explains when this

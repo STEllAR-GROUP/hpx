@@ -20,7 +20,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type>,
             Derived>
     {
     public:
@@ -28,7 +28,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type> arguments_type;
+            typename util::decay<T0>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -95,7 +95,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0)), lva));
         }
         
         
@@ -120,7 +120,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 1
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0));
         }
     };
     
@@ -196,14 +196,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type>
+            hpx::util::tuple<typename util::decay<T0>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -271,7 +271,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0)), lva));
         }
         
         
@@ -296,7 +296,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 1
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0));
             return util::unused;
         }
     };
@@ -423,7 +423,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type>,
             Derived>
     {
     public:
@@ -431,7 +431,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type> arguments_type;
+            typename util::decay<T0>::type , typename util::decay<T1>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -498,7 +498,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1)), lva));
         }
         
         
@@ -523,7 +523,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 2
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1));
         }
     };
     
@@ -599,14 +599,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type>
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -674,7 +674,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1)), lva));
         }
         
         
@@ -699,7 +699,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 2
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1));
             return util::unused;
         }
     };
@@ -826,7 +826,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>,
             Derived>
     {
     public:
@@ -834,7 +834,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type> arguments_type;
+            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -901,7 +901,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2)), lva));
         }
         
         
@@ -926,7 +926,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 3
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2));
         }
     };
     
@@ -1002,14 +1002,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type>
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -1077,7 +1077,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2)), lva));
         }
         
         
@@ -1102,7 +1102,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 3
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2));
             return util::unused;
         }
     };
@@ -1229,7 +1229,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>,
             Derived>
     {
     public:
@@ -1237,7 +1237,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type> arguments_type;
+            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -1304,7 +1304,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3)), lva));
         }
         
         
@@ -1329,7 +1329,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 4
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3));
         }
     };
     
@@ -1405,14 +1405,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type>
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -1480,7 +1480,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3)), lva));
         }
         
         
@@ -1505,7 +1505,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 4
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3));
             return util::unused;
         }
     };
@@ -1632,7 +1632,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>,
             Derived>
     {
     public:
@@ -1640,7 +1640,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type> arguments_type;
+            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -1707,7 +1707,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4)), lva));
         }
         
         
@@ -1732,7 +1732,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 5
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4));
         }
     };
     
@@ -1808,14 +1808,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type>
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -1883,7 +1883,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4)), lva));
         }
         
         
@@ -1908,7 +1908,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 5
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4));
             return util::unused;
         }
     };
@@ -2035,7 +2035,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>,
             Derived>
     {
     public:
@@ -2043,7 +2043,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type> arguments_type;
+            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -2110,7 +2110,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5)), lva));
         }
         
         
@@ -2135,7 +2135,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 6
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5));
         }
     };
     
@@ -2211,14 +2211,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type>
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -2286,7 +2286,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5)), lva));
         }
         
         
@@ -2311,7 +2311,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 6
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5));
             return util::unused;
         }
     };
@@ -2438,7 +2438,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>,
             Derived>
     {
     public:
@@ -2446,7 +2446,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type> arguments_type;
+            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -2513,7 +2513,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6)), lva));
         }
         
         
@@ -2538,7 +2538,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 7
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6));
         }
     };
     
@@ -2614,14 +2614,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type>
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -2689,7 +2689,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6)), lva));
         }
         
         
@@ -2714,7 +2714,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 7
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6));
             return util::unused;
         }
     };
@@ -2841,7 +2841,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>,
             Derived>
     {
     public:
@@ -2849,7 +2849,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type> arguments_type;
+            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -2916,7 +2916,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7)), lva));
         }
         
         
@@ -2941,7 +2941,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 8
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7));
         }
     };
     
@@ -3017,14 +3017,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type>
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -3092,7 +3092,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7)), lva));
         }
         
         
@@ -3117,7 +3117,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 8
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7));
             return util::unused;
         }
     };
@@ -3244,7 +3244,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type>,
             Derived>
     {
     public:
@@ -3252,7 +3252,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type> arguments_type;
+            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -3319,7 +3319,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8)), lva));
         }
         
         
@@ -3344,7 +3344,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 9
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8));
         }
     };
     
@@ -3420,14 +3420,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type>
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -3495,7 +3495,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8)), lva));
         }
         
         
@@ -3520,7 +3520,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 9
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8));
             return util::unused;
         }
     };
@@ -3647,7 +3647,7 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             Result,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type>,
             Derived>
     {
     public:
@@ -3655,7 +3655,7 @@ namespace hpx { namespace actions
         typedef typename detail::remote_action_result<Result>::type
             remote_result_type;
         typedef hpx::util::tuple<
-            typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type> arguments_type;
+            typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type> arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
             arguments_type, Derived> base_type;
@@ -3722,7 +3722,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type9>( args. a9)), lva));
         }
         
         
@@ -3747,7 +3747,7 @@ namespace hpx { namespace actions
                 << "plain_base_result_action" << 10
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9));
+            return F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type9>( args. a9));
         }
     };
     
@@ -3823,14 +3823,14 @@ namespace hpx { namespace actions
       : public action<
             components::server::plain_function<Derived>,
             util::unused_type,
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type>,
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type>,
             Derived>
     {
     public:
         typedef util::unused_type result_type;
         typedef util::unused_type remote_result_type;
         typedef
-            hpx::util::tuple<typename detail::remove_qualifiers<T0>::type , typename detail::remove_qualifiers<T1>::type , typename detail::remove_qualifiers<T2>::type , typename detail::remove_qualifiers<T3>::type , typename detail::remove_qualifiers<T4>::type , typename detail::remove_qualifiers<T5>::type , typename detail::remove_qualifiers<T6>::type , typename detail::remove_qualifiers<T7>::type , typename detail::remove_qualifiers<T8>::type , typename detail::remove_qualifiers<T9>::type>
+            hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type>
         arguments_type;
         typedef action<
             components::server::plain_function<Derived>, remote_result_type,
@@ -3898,7 +3898,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9)), lva));
+                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type9>( args. a9)), lva));
         }
         
         
@@ -3923,7 +3923,7 @@ namespace hpx { namespace actions
                 << "plain_base_action" << 10
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type4>::call( args. a4) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type5>::call( args. a5) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type6>::call( args. a6) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type7>::call( args. a7) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type8>::call( args. a8) , util::detail::move_if_no_ref< typename util::detail::remove_reference<Arguments>::type:: member_type9>::call( args. a9));
+            F(boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type9>( args. a9));
             return util::unused;
         }
     };

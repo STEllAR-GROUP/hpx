@@ -46,7 +46,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0>))) args)
@@ -94,7 +94,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1>))) args)
@@ -142,7 +142,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2>))) args)
@@ -190,7 +190,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3>))) args)
@@ -238,7 +238,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>))) args)
@@ -286,7 +286,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>))) args)
@@ -334,7 +334,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>))) args)
@@ -382,7 +382,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>))) args)
@@ -430,7 +430,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8>))) args)
@@ -478,7 +478,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9>))) args)
@@ -526,7 +526,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10>))) args)
@@ -574,7 +574,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type , typename util::detail::add_rvalue_reference<Arg11>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11>))) args)
@@ -622,7 +622,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type , typename util::detail::add_rvalue_reference<Arg11>::type , typename util::detail::add_rvalue_reference<Arg12>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12>))) args)
@@ -670,7 +670,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type , typename util::detail::add_rvalue_reference<Arg11>::type , typename util::detail::add_rvalue_reference<Arg12>::type , typename util::detail::add_rvalue_reference<Arg13>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type , typename util::add_rvalue_reference<Arg13>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13>))) args)
@@ -718,7 +718,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type , typename util::detail::add_rvalue_reference<Arg11>::type , typename util::detail::add_rvalue_reference<Arg12>::type , typename util::detail::add_rvalue_reference<Arg13>::type , typename util::detail::add_rvalue_reference<Arg14>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type , typename util::add_rvalue_reference<Arg13>::type , typename util::add_rvalue_reference<Arg14>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14>))) args)
@@ -766,7 +766,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type , typename util::detail::add_rvalue_reference<Arg11>::type , typename util::detail::add_rvalue_reference<Arg12>::type , typename util::detail::add_rvalue_reference<Arg13>::type , typename util::detail::add_rvalue_reference<Arg14>::type , typename util::detail::add_rvalue_reference<Arg15>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type , typename util::add_rvalue_reference<Arg13>::type , typename util::add_rvalue_reference<Arg14>::type , typename util::add_rvalue_reference<Arg15>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15>))) args)
@@ -814,7 +814,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type , typename util::detail::add_rvalue_reference<Arg11>::type , typename util::detail::add_rvalue_reference<Arg12>::type , typename util::detail::add_rvalue_reference<Arg13>::type , typename util::detail::add_rvalue_reference<Arg14>::type , typename util::detail::add_rvalue_reference<Arg15>::type , typename util::detail::add_rvalue_reference<Arg16>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type , typename util::add_rvalue_reference<Arg13>::type , typename util::add_rvalue_reference<Arg14>::type , typename util::add_rvalue_reference<Arg15>::type , typename util::add_rvalue_reference<Arg16>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16>))) args)
@@ -862,7 +862,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type , typename util::detail::add_rvalue_reference<Arg11>::type , typename util::detail::add_rvalue_reference<Arg12>::type , typename util::detail::add_rvalue_reference<Arg13>::type , typename util::detail::add_rvalue_reference<Arg14>::type , typename util::detail::add_rvalue_reference<Arg15>::type , typename util::detail::add_rvalue_reference<Arg16>::type , typename util::detail::add_rvalue_reference<Arg17>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type , typename util::add_rvalue_reference<Arg13>::type , typename util::add_rvalue_reference<Arg14>::type , typename util::add_rvalue_reference<Arg15>::type , typename util::add_rvalue_reference<Arg16>::type , typename util::add_rvalue_reference<Arg17>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17>))) args)
@@ -910,7 +910,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type , typename util::detail::add_rvalue_reference<Arg11>::type , typename util::detail::add_rvalue_reference<Arg12>::type , typename util::detail::add_rvalue_reference<Arg13>::type , typename util::detail::add_rvalue_reference<Arg14>::type , typename util::detail::add_rvalue_reference<Arg15>::type , typename util::detail::add_rvalue_reference<Arg16>::type , typename util::detail::add_rvalue_reference<Arg17>::type , typename util::detail::add_rvalue_reference<Arg18>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type , typename util::add_rvalue_reference<Arg13>::type , typename util::add_rvalue_reference<Arg14>::type , typename util::add_rvalue_reference<Arg15>::type , typename util::add_rvalue_reference<Arg16>::type , typename util::add_rvalue_reference<Arg17>::type , typename util::add_rvalue_reference<Arg18>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18>))) args)
@@ -958,7 +958,7 @@ namespace hpx { namespace util
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17 , typename Arg18 , typename Arg19>
     BOOST_FORCEINLINE
     typename invoke_result_of<
-        F(typename util::detail::add_rvalue_reference<Arg0>::type , typename util::detail::add_rvalue_reference<Arg1>::type , typename util::detail::add_rvalue_reference<Arg2>::type , typename util::detail::add_rvalue_reference<Arg3>::type , typename util::detail::add_rvalue_reference<Arg4>::type , typename util::detail::add_rvalue_reference<Arg5>::type , typename util::detail::add_rvalue_reference<Arg6>::type , typename util::detail::add_rvalue_reference<Arg7>::type , typename util::detail::add_rvalue_reference<Arg8>::type , typename util::detail::add_rvalue_reference<Arg9>::type , typename util::detail::add_rvalue_reference<Arg10>::type , typename util::detail::add_rvalue_reference<Arg11>::type , typename util::detail::add_rvalue_reference<Arg12>::type , typename util::detail::add_rvalue_reference<Arg13>::type , typename util::detail::add_rvalue_reference<Arg14>::type , typename util::detail::add_rvalue_reference<Arg15>::type , typename util::detail::add_rvalue_reference<Arg16>::type , typename util::detail::add_rvalue_reference<Arg17>::type , typename util::detail::add_rvalue_reference<Arg18>::type , typename util::detail::add_rvalue_reference<Arg19>::type)
+        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type , typename util::add_rvalue_reference<Arg13>::type , typename util::add_rvalue_reference<Arg14>::type , typename util::add_rvalue_reference<Arg15>::type , typename util::add_rvalue_reference<Arg16>::type , typename util::add_rvalue_reference<Arg17>::type , typename util::add_rvalue_reference<Arg18>::type , typename util::add_rvalue_reference<Arg19>::type)
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
         hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17 , Arg18 , Arg19>))) args)

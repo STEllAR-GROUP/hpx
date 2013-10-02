@@ -31,8 +31,8 @@
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 
@@ -101,15 +101,6 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        // Helper template meta function removing any 'const' qualifier or
-        // reference from the given type (i.e. const& T --> T)
-        template <typename T>
-        struct remove_qualifiers
-        {
-            typedef typename hpx::util::detail::remove_reference<T>::type no_ref_type;
-            typedef typename boost::remove_const<no_ref_type>::type type;
-        };
-
         template <typename Action>
         char const* get_action_name()
 #ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION

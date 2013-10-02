@@ -24,7 +24,7 @@ namespace hpx { namespace util
 #endif
         struct env_value_type
         {
-            typedef typename hpx::util::detail::remove_reference<T>::type type;
+            typedef typename hpx::util::remove_reference<T>::type type;
         };
 
         template <typename T>
@@ -42,13 +42,13 @@ namespace hpx { namespace util
         template <typename T>
         struct env_value_type<T &, false>
         {
-            typedef typename hpx::util::detail::remove_reference<T>::type & type;
+            typedef typename hpx::util::remove_reference<T>::type & type;
         };
 
         template <typename T>
         struct env_value_type<T const &, false>
         {
-            typedef typename hpx::util::detail::remove_reference<T>::type const & type;
+            typedef typename hpx::util::remove_reference<T>::type const & type;
         };
 
         struct ignore_type

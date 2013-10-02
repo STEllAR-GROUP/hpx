@@ -401,8 +401,8 @@ if(HPX_HAVE_PARCELPORT_MPI)
     endif()
   else()
     hpx_error("parcelport"
-        "HPX_HAVE_PARCELPORT_MPI is set but MPI could not be found."
-        "Please set MPI_CXX_COMPILER, MPI_C_COMPILER and"
+        "HPX_HAVE_PARCELPORT_MPI is set but MPI could not be found. "
+        "Please set MPI_CXX_COMPILER, MPI_C_COMPILER and "
         "MPI_FORTRAN_COMPILER to the appropraite mpi compiler wrapper")
   endif()
 endif()

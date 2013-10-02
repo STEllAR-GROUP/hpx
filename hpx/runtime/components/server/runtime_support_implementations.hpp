@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace server
                 BOOST_PP_CAT(component_constructor_functor, N)<
                     typename Component::wrapping_type,
                     BOOST_PP_ENUM_PARAMS(N, A)>(
-                        HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a)));
+                        HPX_ENUM_FORWARD_ARGS(N, A, a)));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);

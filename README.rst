@@ -228,6 +228,8 @@ required libraries via MacPorts:
 
 4) Build HPX as described above in the ``Linux'' section.
 
+For more information and additional options, please see the corresponding
+`documentation <http://stellar-group.github.io/hpx/docs/html/hpx/tutorial/getting_started/macos_installation.html>`_.
 
 Windows
 -------

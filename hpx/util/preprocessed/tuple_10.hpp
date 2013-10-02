@@ -116,10 +116,10 @@ namespace hpx { namespace util
     
     template <typename Arg0>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0) BOOST_NOEXCEPT
     {
-        typedef tuple<typename detail::add_rvalue_reference<Arg0>::type> result_type;
+        typedef tuple<typename util::add_rvalue_reference<Arg0>::type> result_type;
         return result_type(boost::forward<Arg0>(arg0), detail::forwarding_tag());
     }
     
@@ -284,11 +284,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     
@@ -421,11 +421,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     
@@ -572,11 +572,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     
@@ -723,11 +723,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
     
@@ -874,11 +874,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
     }
     
@@ -1025,11 +1025,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
     }
     
@@ -1176,11 +1176,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
     }
     
@@ -1327,11 +1327,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
     }
     
@@ -1478,11 +1478,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
     }
     
@@ -1629,11 +1629,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
     }
     
@@ -1780,11 +1780,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type , typename detail::add_rvalue_reference<Arg11>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type , typename detail::add_rvalue_reference<Arg11>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
     }
     
@@ -1931,11 +1931,11 @@ namespace hpx { namespace util
     
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     BOOST_FORCEINLINE
-    tuple<typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type , typename detail::add_rvalue_reference<Arg11>::type , typename detail::add_rvalue_reference<Arg12>::type>
+    tuple<typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type>
     forward_as_tuple(BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) BOOST_NOEXCEPT
     {
         return tuple<
-                typename detail::add_rvalue_reference<Arg0>::type , typename detail::add_rvalue_reference<Arg1>::type , typename detail::add_rvalue_reference<Arg2>::type , typename detail::add_rvalue_reference<Arg3>::type , typename detail::add_rvalue_reference<Arg4>::type , typename detail::add_rvalue_reference<Arg5>::type , typename detail::add_rvalue_reference<Arg6>::type , typename detail::add_rvalue_reference<Arg7>::type , typename detail::add_rvalue_reference<Arg8>::type , typename detail::add_rvalue_reference<Arg9>::type , typename detail::add_rvalue_reference<Arg10>::type , typename detail::add_rvalue_reference<Arg11>::type , typename detail::add_rvalue_reference<Arg12>::type>(
+                typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type , typename util::add_rvalue_reference<Arg8>::type , typename util::add_rvalue_reference<Arg9>::type , typename util::add_rvalue_reference<Arg10>::type , typename util::add_rvalue_reference<Arg11>::type , typename util::add_rvalue_reference<Arg12>::type>(
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
     }
     

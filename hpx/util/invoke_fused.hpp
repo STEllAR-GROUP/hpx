@@ -9,6 +9,7 @@
 #define HPX_UTIL_INVOKE_FUSED_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/util/add_rvalue_reference.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
@@ -52,7 +53,7 @@ namespace hpx { namespace util
     /**/
 
 #define HPX_UTIL_INVOKE_FUSED_FWD_ARG_RESULT(Z, N, D)                         \
-    typename util::detail::add_rvalue_reference<BOOST_PP_CAT(Arg, N)>::type   \
+    typename util::add_rvalue_reference<BOOST_PP_CAT(Arg, N)>::type           \
     /**/
 
 #define HPX_UTIL_INVOKE_FUSED_FWD_ARG(Z, N, D)                                \

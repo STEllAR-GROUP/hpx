@@ -74,7 +74,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor1<
                     typename Component::wrapping_type,
                     A0>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0)));
+                        boost::forward<A0>( a0 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -144,7 +144,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor2<
                     typename Component::wrapping_type,
                     A0 , A1>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0) , hpx::util::detail::move_if_no_ref< A1> ::call(a1)));
+                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -214,7 +214,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor3<
                     typename Component::wrapping_type,
                     A0 , A1 , A2>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0) , hpx::util::detail::move_if_no_ref< A1> ::call(a1) , hpx::util::detail::move_if_no_ref< A2> ::call(a2)));
+                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -284,7 +284,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor4<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0) , hpx::util::detail::move_if_no_ref< A1> ::call(a1) , hpx::util::detail::move_if_no_ref< A2> ::call(a2) , hpx::util::detail::move_if_no_ref< A3> ::call(a3)));
+                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -354,7 +354,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor5<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0) , hpx::util::detail::move_if_no_ref< A1> ::call(a1) , hpx::util::detail::move_if_no_ref< A2> ::call(a2) , hpx::util::detail::move_if_no_ref< A3> ::call(a3) , hpx::util::detail::move_if_no_ref< A4> ::call(a4)));
+                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -424,7 +424,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor6<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0) , hpx::util::detail::move_if_no_ref< A1> ::call(a1) , hpx::util::detail::move_if_no_ref< A2> ::call(a2) , hpx::util::detail::move_if_no_ref< A3> ::call(a3) , hpx::util::detail::move_if_no_ref< A4> ::call(a4) , hpx::util::detail::move_if_no_ref< A5> ::call(a5)));
+                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -494,7 +494,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor7<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5 , A6>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0) , hpx::util::detail::move_if_no_ref< A1> ::call(a1) , hpx::util::detail::move_if_no_ref< A2> ::call(a2) , hpx::util::detail::move_if_no_ref< A3> ::call(a3) , hpx::util::detail::move_if_no_ref< A4> ::call(a4) , hpx::util::detail::move_if_no_ref< A5> ::call(a5) , hpx::util::detail::move_if_no_ref< A6> ::call(a6)));
+                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -564,7 +564,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor8<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0) , hpx::util::detail::move_if_no_ref< A1> ::call(a1) , hpx::util::detail::move_if_no_ref< A2> ::call(a2) , hpx::util::detail::move_if_no_ref< A3> ::call(a3) , hpx::util::detail::move_if_no_ref< A4> ::call(a4) , hpx::util::detail::move_if_no_ref< A5> ::call(a5) , hpx::util::detail::move_if_no_ref< A6> ::call(a6) , hpx::util::detail::move_if_no_ref< A7> ::call(a7)));
+                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -634,7 +634,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor9<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0) , hpx::util::detail::move_if_no_ref< A1> ::call(a1) , hpx::util::detail::move_if_no_ref< A2> ::call(a2) , hpx::util::detail::move_if_no_ref< A3> ::call(a3) , hpx::util::detail::move_if_no_ref< A4> ::call(a4) , hpx::util::detail::move_if_no_ref< A5> ::call(a5) , hpx::util::detail::move_if_no_ref< A6> ::call(a6) , hpx::util::detail::move_if_no_ref< A7> ::call(a7) , hpx::util::detail::move_if_no_ref< A8> ::call(a8)));
+                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -704,7 +704,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor10<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9>(
-                        hpx::util::detail::move_if_no_ref< A0> ::call(a0) , hpx::util::detail::move_if_no_ref< A1> ::call(a1) , hpx::util::detail::move_if_no_ref< A2> ::call(a2) , hpx::util::detail::move_if_no_ref< A3> ::call(a3) , hpx::util::detail::move_if_no_ref< A4> ::call(a4) , hpx::util::detail::move_if_no_ref< A5> ::call(a5) , hpx::util::detail::move_if_no_ref< A6> ::call(a6) , hpx::util::detail::move_if_no_ref< A7> ::call(a7) , hpx::util::detail::move_if_no_ref< A8> ::call(a8) , hpx::util::detail::move_if_no_ref< A9> ::call(a9)));
+                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);

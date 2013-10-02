@@ -7,7 +7,7 @@
 #ifndef HPX_UTIL_DECAY_HPP
 #define HPX_UTIL_DECAY_HPP
 
-#include <hpx/util/detail/remove_reference.hpp>
+#include <hpx/util/remove_reference.hpp>
 
 #include <boost/type_traits/config.hpp>
 #include <boost/type_traits/is_array.hpp>
@@ -23,7 +23,7 @@ namespace hpx { namespace util {
     template <typename T>
     struct decay
     {
-        typedef typename detail::remove_reference<T>::type Ty;
+        typedef typename util::remove_reference<T>::type Ty;
 
         typedef
             typename boost::mpl::eval_if<

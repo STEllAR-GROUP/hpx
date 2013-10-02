@@ -18,7 +18,6 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
-#include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/function_types/components.hpp>
 #include <boost/function_types/function_pointer.hpp>

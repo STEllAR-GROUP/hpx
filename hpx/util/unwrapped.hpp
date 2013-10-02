@@ -35,7 +35,7 @@ namespace hpx { namespace util {
                     boost::is_void<
                         typename hpx::lcos::detail::future_traits<
                             typename boost::remove_const<
-                                typename detail::remove_reference<
+                                typename util::remove_reference<
                                     Future
                                 >::type
                             >::type::value_type
@@ -282,10 +282,10 @@ namespace hpx { namespace util {
     }
 
     template <typename F>
-    detail::unwrapped_impl<typename detail::remove_reference<F>::type >
+    detail::unwrapped_impl<typename util::remove_reference<F>::type >
     unwrapped(BOOST_FWD_REF(F) f)
     {
-        detail::unwrapped_impl<typename detail::remove_reference<F>::type >
+        detail::unwrapped_impl<typename util::remove_reference<F>::type >
             res = {boost::forward<F>(f)};
 
         return boost::move(res);

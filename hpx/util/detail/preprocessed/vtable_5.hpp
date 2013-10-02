@@ -72,7 +72,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type a0)
+                , typename util::add_rvalue_reference<A0>::type a0)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , boost::forward<A0>( a0 ));
@@ -107,7 +107,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1)
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
@@ -142,7 +142,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2)
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
@@ -177,7 +177,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3)
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
@@ -212,7 +212,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4)
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
@@ -247,7 +247,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5)
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
@@ -282,7 +282,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6)
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
@@ -317,7 +317,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::detail::add_rvalue_reference<A0>::type a0 , typename util::detail::add_rvalue_reference<A1>::type a1 , typename util::detail::add_rvalue_reference<A2>::type a2 , typename util::detail::add_rvalue_reference<A3>::type a3 , typename util::detail::add_rvalue_reference<A4>::type a4 , typename util::detail::add_rvalue_reference<A5>::type a5 , typename util::detail::add_rvalue_reference<A6>::type a6 , typename util::detail::add_rvalue_reference<A7>::type a7)
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
