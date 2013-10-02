@@ -207,11 +207,11 @@ $ sudo port select gcc mp-gcc48
 <pre class="programlisting">wget http://sourceforge.net/projects/boost/files/boost/1.54.0/boost_1_54_0.tar.bz2
 tar xjf boost_1_54_0.tar.bz2
 pushd boost_1_54_0
-export BOOST_DIR=$HOME/boost_1_54_0
+export BOOST_ROOT=$HOME/boost_1_54_0
 ./bootstrap.sh --prefix=$BOOST_DIR
 ./b2 -j8
 ./b2 -j8 install
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$BOOST_DIR/lib
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$BOOST_ROOT/lib
 popd
 </pre>
             </li>
@@ -222,8 +222,16 @@ popd
 <pre class="programlisting">git clone https://github.com/STEllAR-GROUP/hpx.git
 mkdir hpx-build
 pushd hpx-build
-export HPX_DIR=$HOME/hpx
-cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_FORTRAN_COMPILER=gfortran -DCMAKE_C_FLAGS="-Wno-unused-local-typedefs" -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" -DBOOST_ROOT=$BOOST_DIR -DHWLOC_ROOT=/opt/local -DCMAKE_INSTALL_PREFIX=$HOME/hpx $(pwd)/../hpx
+export HPX_ROOT=$HOME/hpx
+cmake -DCMAKE_C_COMPILER=gcc \
+    -DCMAKE_CXX_COMPILER=g++ \
+    -DCMAKE_FORTRAN_COMPILER=gfortran \
+    -DCMAKE_C_FLAGS="-Wno-unused-local-typedefs" \
+    -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" \
+    -DBOOST_ROOT=$BOOST_ROOT \
+    -DHWLOC_ROOT=/opt/local \
+    -DCMAKE_INSTALL_PREFIX=$HOME/hpx \
+         $(pwd)/../hpx
 make -j8
 make -j8 install
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$HPX_DIR/lib/hpx
@@ -231,20 +239,31 @@ popd
 </pre>
             </li>
 <li class="listitem">
-              Note that you need to set BOOST_DIR, HPX_DIR, and DYLD_LIBRARY_PATH
-              (for both BOOST_DIR and HPX_DIR) every time you configure, build, or
-              run an HPX application.
+              Note that you need to set <code class="computeroutput">BOOST_ROOT</code>, <code class="computeroutput">HPX_ROOT</code>,
+              and <code class="computeroutput">DYLD_LIBRARY_PATH</code> (for both <code class="computeroutput">BOOST_ROOT</code>
+              and <code class="computeroutput">HPX_ROOT</code>) every time you configure, build, or run
+              an HPX application.
             </li>
 <li class="listitem">
-              <p>
-                If you want to use HPX with MPI, you need to enable the MPI parcelport,
-                and also specify the location of the MPI wrapper scripts. This can
-                be done e.g. with the following command:
-              </p>
-<pre class="programlisting">cmake -DHPX_HAVE_PARCELPORT_MPI=ON -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_FORTRAN_COMPILER=gfortran -DMPI_C_COMPILER=openmpicc -DMPI_CXX_COMPILER=openmpic++ -DMPI_FORTRAN_COMPILER=openmpif90 -DCMAKE_C_FLAGS="-Wno-unused-local-typedefs" -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" -DBOOST_ROOT=$BOOST_DIR -DHWLOC_ROOT=/opt/local -DCMAKE_INSTALL_PREFIX=$HOME/hpx $(pwd)/../hpx
-</pre>
+              If you want to use HPX with MPI, you need to enable the MPI parcelport,
+              and also specify the location of the MPI wrapper scripts. This can
+              be done e.g. with the following command:
             </li>
 </ol></div>
+<pre class="programlisting">cmake -DHPX_HAVE_PARCELPORT_MPI=ON \
+     -DCMAKE_C_COMPILER=gcc \
+     -DCMAKE_CXX_COMPILER=g++ \
+     -DCMAKE_FORTRAN_COMPILER=gfortran \
+     -DMPI_C_COMPILER=openmpicc \
+     -DMPI_CXX_COMPILER=openmpic++ \
+     -DMPI_FORTRAN_COMPILER=openmpif90 \
+     -DCMAKE_C_FLAGS="-Wno-unused-local-typedefs" \
+     -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" \
+     -DBOOST_ROOT=$BOOST_DIR \
+     -DHWLOC_ROOT=/opt/local \
+     -DCMAKE_INSTALL_PREFIX=$HOME/hpx
+         $(pwd)/../hpx
+</pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
