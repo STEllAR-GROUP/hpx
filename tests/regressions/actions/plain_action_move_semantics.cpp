@@ -350,12 +350,12 @@ int hpx_main(variables_map&)
             // test for a non-movable object ('normal' actions)
             HPX_TEST_EQ((
                 pass_object<pass_non_movable_object_action, non_movable_object>(id)
-            ), is_local ? 2u : 4u);
+            ), is_local ? 2u : 3u);
 
             // test for a non-movable object (direct actions)
             HPX_TEST_EQ((
                 pass_object<pass_non_movable_object_direct_action, non_movable_object>(id)
-            ), is_local ? 0u : 4u);
+            ), is_local ? 0u : 3u);
 
             // test for movable object ('normal' actions)
             HPX_TEST_EQ((
@@ -370,12 +370,12 @@ int hpx_main(variables_map&)
             // test for a non-movable object ('normal' actions)
             HPX_TEST_EQ((
                 move_object<pass_non_movable_object_action, non_movable_object>(id)
-            ), is_local ? 2u : 4u);
+            ), is_local ? 2u : 3u);
 
             // test for a non-movable object (direct actions)
             HPX_TEST_EQ((
                 move_object<pass_non_movable_object_direct_action, non_movable_object>(id)
-            ), is_local ? 0u : 4u);
+            ), is_local ? 0u : 3u);
 
         }
         {
@@ -392,12 +392,12 @@ int hpx_main(variables_map&)
             // test for a non-movable object ('normal' actions)
             HPX_TEST_EQ((
                 pass_object<pass_non_movable_object_value_action, non_movable_object>(id)
-            ), is_local ? 3u : 5u);
+            ), is_local ? 3u : 4u);
 
             // test for a non-movable object (direct actions)
             HPX_TEST_EQ((
                 pass_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
-            ), is_local ? 1u : 5u);
+            ), is_local ? 1u : 3u);
 
             // test for movable object ('normal' actions)
             HPX_TEST_EQ((
@@ -412,12 +412,12 @@ int hpx_main(variables_map&)
             // test for a non-movable object ('normal' actions)
             HPX_TEST_EQ((
                 move_object<pass_non_movable_object_value_action, non_movable_object>(id)
-            ), is_local ? 3u : 5u);
+            ), is_local ? 3u : 4u);
 
             // test for a non-movable object (direct actions)
             HPX_TEST_EQ((
                 move_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
-            ), is_local ? 1u : 5u);
+            ), is_local ? 1u : 4u);
         }
 
         HPX_TEST_EQ((
@@ -436,13 +436,13 @@ int hpx_main(variables_map&)
             return_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 3u : 7u);
+        ), is_local ? 3u : 6u);
 
         HPX_TEST_EQ((
             return_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), is_local ? 3u : 7u);
+        ), is_local ? 3u : 6u);
 
         HPX_TEST_EQ((
             return_move_object<
@@ -469,7 +469,7 @@ int hpx_main(variables_map&)
                 return_non_movable_object_action, non_movable_object
             >(id)
         ),
-        is_local ? 4u : 8u);
+        is_local ? 4u : 7u);
 #endif
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 40500)
@@ -485,7 +485,7 @@ int hpx_main(variables_map&)
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
         ),
-        is_local ? 4u : 8u);
+        is_local ? 4u : 7u);
 #endif
     }
 
