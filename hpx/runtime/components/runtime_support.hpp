@@ -59,11 +59,11 @@ namespace hpx { namespace components
 
 #define HPX_RUNTIME_SUPPORT_CLIENT_CREATE(Z, N, D)                           \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
-        lcos::future<naming::id_type>                      \
+        lcos::future<naming::id_type>                                        \
         create_component_async(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))         \
         {                                                                    \
             return this->base_type::template create_component_async<Component>\
-                (gid_, HPX_ENUM_MOVE_IF_NO_REF_ARGS(N, A, a));               \
+                (gid_, HPX_ENUM_FORWARD_ARGS(N, A, a));                      \
         }                                                                    \
                                                                              \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \

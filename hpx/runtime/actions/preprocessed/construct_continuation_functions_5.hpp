@@ -248,7 +248,7 @@
             continuation_thread_object_function_void_1(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0));
     }
     template <typename Object, typename Arguments_
         , typename FArg0>
@@ -262,7 +262,7 @@
             continuation_thread_object_function_void_1(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0));
     }
     
     struct continuation_thread_object_function_1
@@ -334,7 +334,7 @@
             continuation_thread_object_function_1(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0));
     }
     template <typename Object, typename Arguments_
         , typename FArg0>
@@ -348,7 +348,7 @@
             continuation_thread_object_function_1(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0));
     }
     
     
@@ -419,7 +419,7 @@
             continuation_thread_object_function_void_2(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1>
@@ -433,7 +433,7 @@
             continuation_thread_object_function_void_2(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1));
     }
     
     struct continuation_thread_object_function_2
@@ -505,7 +505,7 @@
             continuation_thread_object_function_2(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1>
@@ -519,7 +519,7 @@
             continuation_thread_object_function_2(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1));
     }
     
     
@@ -590,7 +590,7 @@
             continuation_thread_object_function_void_3(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2>
@@ -604,7 +604,7 @@
             continuation_thread_object_function_void_3(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2));
     }
     
     struct continuation_thread_object_function_3
@@ -676,7 +676,7 @@
             continuation_thread_object_function_3(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2>
@@ -690,7 +690,7 @@
             continuation_thread_object_function_3(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2));
     }
     
     
@@ -761,7 +761,7 @@
             continuation_thread_object_function_void_4(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type3>::call( args. a3));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type3>( args. a3));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
@@ -775,7 +775,7 @@
             continuation_thread_object_function_void_4(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type3>::call( args. a3));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type3>( args. a3));
     }
     
     struct continuation_thread_object_function_4
@@ -847,7 +847,7 @@
             continuation_thread_object_function_4(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type3>::call( args. a3));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type3>( args. a3));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
@@ -861,7 +861,7 @@
             continuation_thread_object_function_4(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type3>::call( args. a3));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type3>( args. a3));
     }
     
     
@@ -932,7 +932,7 @@
             continuation_thread_object_function_void_5(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type4>::call( args. a4));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type4>( args. a4));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
@@ -946,7 +946,7 @@
             continuation_thread_object_function_void_5(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type4>::call( args. a4));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type4>( args. a4));
     }
     
     struct continuation_thread_object_function_5
@@ -1018,7 +1018,7 @@
             continuation_thread_object_function_5(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type4>::call( args. a4));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type4>( args. a4));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
@@ -1032,5 +1032,5 @@
             continuation_thread_object_function_5(),
             cont, func, obj
           ,
-                util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type0>::call( args. a0) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type1>::call( args. a1) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type2>::call( args. a2) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type3>::call( args. a3) , util::detail::move_if_no_ref< typename util::remove_reference<Arguments_>::type:: member_type4>::call( args. a4));
+                boost::forward< typename util::remove_reference<Arguments_>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments_>::type:: member_type4>( args. a4));
     }
