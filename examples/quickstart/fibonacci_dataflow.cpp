@@ -67,14 +67,14 @@ int hpx_main(boost::program_options::variables_map& vm)
     boost::uint64_t max_runs = vm["n-runs"].as<boost::uint64_t>();
 
     if (max_runs == 0) {
-        std::cerr << "fibonacci_futures: wrong command line argument value for "
+        std::cerr << "fibonacci_dataflow: wrong command line argument value for "
             "option 'n-runs', should not be zero" << std::endl;
         return hpx::finalize(); // Handles HPX shutdown
     }
 
     threshold = vm["threshold"].as<unsigned int>();
     if (threshold < 2 || threshold > n) {
-        std::cerr << "fibonacci_futures: wrong command line argument value for "
+        std::cerr << "fibonacci_dataflow: wrong command line argument value for "
             "option 'threshold', should be in between 2 and n-value"
             ", value specified: " << threshold << std::endl;
         return hpx::finalize(); // Handles HPX shutdown
@@ -126,7 +126,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     if (!executed_one)
     {
-        std::cerr << "fibonacci_futures: wrong command line argument value for "
+        std::cerr << "fibonacci_dataflow: wrong command line argument value for "
             "option 'tests', should be either 'all' or a number between zero "
             "and 1, value specified: " << test << std::endl;
     }
