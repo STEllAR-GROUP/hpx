@@ -52,7 +52,7 @@ The documentation for the latest release of HPX (currently V0.9.6) can be
 Additionally, we regularily upload the current status of the documentation
 (which is being worked on as we speak)
 `here <http://stellar-group.github.io/hpx/docs/html/>`_. We also have a
-single-page version of the documentation `here: <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
+single-page version of the documentation `here <http://stellar-group.github.io/hpx/docs/html/hpx.html>`_.
 
 If you plan to use HPX we suggest to start with the latest released version
 (currently HPX V0.9.6) which can be `downloaded here <http://stellar.cct.lsu.edu/downloads/>`_.
