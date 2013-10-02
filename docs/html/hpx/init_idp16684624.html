@@ -1,0 +1,102 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Function init</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 1.0.0">
+<link rel="up" href="../header/hpx/hpx_init_hpp.html" title="Header &lt;hpx/hpx_init.hpp&gt;">
+<link rel="prev" href="init_idp16664944.html" title="Function init">
+<link rel="next" href="init_idp16698016.html" title="Function init">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="init_idp16664944.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/hpx_init_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="init_idp16698016.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="hpx.init_idp16684624"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Function init</span></h2>
+<p>hpx::init &#8212; Main entry point for launching the HPX runtime system. </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../header/hpx/hpx_init_hpp.html" title="Header &lt;hpx/hpx_init.hpp&gt;">hpx/hpx_init.hpp</a>&gt;
+
+</span>
+<span class="keyword">int</span> <span class="identifier">init</span><span class="special">(</span><span class="keyword">int</span> argc<span class="special">,</span> <span class="keyword">char</span> <span class="special">*</span> argv<span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span> cfg<span class="special">,</span> 
+         <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">runtime_mode</span> mode <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">runtime_mode_default</span><span class="special">)</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp17905904"></a><h2>Description</h2>
+<p>This is a simplified main entry point, which can be used to set up the runtime for an HPX application (the runtime system will be set up in console mode or worker mode depending on the command line settings).</p>
+<p>In console mode it will execute the user supplied function <code class="computeroutput">hpx_main</code>, in worker mode it will execute an empty <code class="computeroutput">hpx_main</code>.</p>
+<p>
+
+</p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>The created runtime system instance will be executed in console or worker mode depending on the command line arguments passed in <code class="computeroutput">argc</code>/<code class="computeroutput">argv</code>. </p></td></tr>
+</table></div>
+<p>
+</p>
+<div class="variablelist"><table border="0" class="variablelist compact">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td><p><span class="term">Parameters:</span></p></td>
+<td><div class="variablelist"><table border="0" class="variablelist compact">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td><p><span class="term"><code class="computeroutput">argc</code></span></p></td>
+<td><p>[in] The number of command line arguments passed in <code class="computeroutput">argv</code>. This is usually the unchanged value as passed by the operating system (to <code class="computeroutput">main()</code>). </p></td>
+</tr>
+<tr>
+<td><p><span class="term"><code class="computeroutput">argv</code></span></p></td>
+<td><p>[in] The command line arguments for this application, usually that is the value as passed by the operating system (to <code class="computeroutput">main()</code>). </p></td>
+</tr>
+<tr>
+<td><p><span class="term"><code class="computeroutput">cfg</code></span></p></td>
+<td><p>A list of configuration settings which will be added to the system configuration before the runtime instance is run. Each of the entries in this list must have the format of a fully defined key/value pair from an ini-file (for instance 'hpx.component.enabled=1') </p></td>
+</tr>
+<tr>
+<td><p><span class="term"><code class="computeroutput">mode</code></span></p></td>
+<td><p>[in] The mode the created runtime environment should be initialized in. There has to be exactly one locality in each HPX application which is executed in console mode (<span class="emphasis"><em>hpx::runtime_mode_console</em></span>), all other localities have to be run in worker mode (<span class="emphasis"><em>hpx::runtime_mode_worker</em></span>). Normally this is set up automatically, but sometimes it is necessary to explicitly specify the mode.</p></td>
+</tr>
+</tbody>
+</table></div></td>
+</tr>
+<tr>
+<td><p><span class="term">Returns:</span></p></td>
+<td><p>The function returns the value, which has been returned from <code class="computeroutput">hpx_main</code> (or 0 when executed in worker mode).</p></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="init_idp16664944.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/hpx_init_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="init_idp16698016.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
