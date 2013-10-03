@@ -40,7 +40,7 @@ HPX_EXPORT bool parse_sed_expression(
   , std::string& replace
     );
 
-/// An unary function object which applies a sed command to it's subject and
+/// An unary function object which applies a sed command to its subject and
 /// returns the resulting string.
 ///
 /// \note Currently, only supports search and replace syntax (s/search/replace/)

@@ -1110,7 +1110,7 @@ namespace hpx
     /// This function returns the zero based index of the OS-thread which
     /// executes the current HPX-thread.
     ///
-    /// \note   The returned value is zero based and it's maximum value is
+    /// \note   The returned value is zero based and its maximum value is
     ///         smaller than the overall number of OS-threads executed (as
     ///         returned by \a get_os_thread_count().
     ///
@@ -1128,7 +1128,7 @@ namespace hpx
     ///           is pre-initialized to \a hpx#throws the function will throw
     ///           on error instead.
     ///
-    /// \note     The returned value is zero based and it's maximum value is
+    /// \note     The returned value is zero based and its maximum value is
     ///           smaller than the overall number of localities the current
     ///           application is running on (as returned by
     ///           \a get_num_localities()).
