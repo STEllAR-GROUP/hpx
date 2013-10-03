@@ -397,7 +397,7 @@ int hpx_main(variables_map&)
             // test for a non-movable object (direct actions)
             HPX_TEST_EQ((
                 pass_object<pass_non_movable_object_value_direct_action, non_movable_object>(id)
-            ), is_local ? 1u : 3u);
+            ), is_local ? 1u : 4u);
 
             // test for movable object ('normal' actions)
             HPX_TEST_EQ((

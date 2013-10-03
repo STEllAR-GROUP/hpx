@@ -45,6 +45,44 @@
       </xsl:with-param>
       <xsl:with-param name="text">
         <xsl:apply-templates select="description"/>
+
+        <xsl:if test="macro-parameter/description">
+          <variablelist spacing="compact">
+            <xsl:processing-instruction name="dbhtml">
+              list-presentation="table"
+            </xsl:processing-instruction>
+
+            <!-- Document parameters -->
+            <xsl:if test="macro-parameter/description">
+              <varlistentry>
+                <term>Parameters:</term>
+                <listitem>
+                  <variablelist spacing="compact">
+                    <xsl:processing-instruction name="dbhtml">
+                      list-presentation="table"
+                    </xsl:processing-instruction>
+                    <xsl:for-each select="macro-parameter">
+                      <xsl:sort select="attribute::name"/>
+                      <xsl:if test="description">
+                        <varlistentry>
+                          <term>
+                            <xsl:call-template name="monospaced">
+                              <xsl:with-param name="text" select="@name"/>
+                            </xsl:call-template>
+                          </term>
+                          <listitem>
+                            <xsl:apply-templates select="description/*"/>
+                          </listitem>
+                        </varlistentry>
+                      </xsl:if>
+                    </xsl:for-each>
+                  </variablelist>
+                </listitem>
+              </varlistentry>
+            </xsl:if>
+          </variablelist>
+        </xsl:if>
+        
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
