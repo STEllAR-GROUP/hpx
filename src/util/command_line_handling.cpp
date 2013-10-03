@@ -614,7 +614,7 @@ namespace hpx { namespace util
 #if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
         if(vm_.count("hpx:attach-debugger")) {
 #if defined(_POSIX_VERSION)
-            int i = 0;
+            volatile int i = 0;
             std::cerr
                 << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
                 << " ready for attaching debugger. Once attached set i = 1 and continue"
