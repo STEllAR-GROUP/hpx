@@ -21,7 +21,7 @@ set(TBBMALLOC_LIB_SEARCH_PATH "")
 if(HPX_NATIVE_MIC)
   set(TBBMALLOC_LIB_SEARCH_PATH "lib/mic")
 else()
-  set(TBBMALLOC_LIB_SEARCH_PATH "lib/intel64")
+  set(TBBMALLOC_LIB_SEARCH_PATH "lib/intel64" "lib/intel64/gcc4.4")
 endif()
 
 hpx_find_package(TBBMALLOC_PROXY
