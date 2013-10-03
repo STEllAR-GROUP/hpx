@@ -29,7 +29,7 @@
   <xsl:variable name="digits" select="'1234567890'"/>
   <xsl:variable name="number-chars" select="'1234567890abcdefABCDEFxX.'"/>
   <xsl:variable name="keywords"
-    select="' asm auto bool break case catch char class const const_cast continue default delete do double dynamic_cast else enum explicit export extern false float for friend goto if inline int long mutable namespace new operator private protected public register reinterpret_cast return short signed sizeof static static_cast struct switch template this throw true try typedef typeid typename union unsigned using virtual void volatile wchar_t while '"/>
+    select="' alignas ailgnof asm auto bool break case catch char char16_t char32_t class const const_cast constexpr continue decltype default delete do double dynamic_cast else enum explicit export extern false float for friend goto if inline int long mutable namespace new noexcept nullptr operator private protected public register reinterpret_cast return short signed sizeof static static_cast struct switch template this thread_local throw true try typedef typeid typename union unsigned using virtual void volatile wchar_t while '"/>
   <xsl:variable name="operators4" select="'%:%:'"/>
   <xsl:variable name="operators3" select="'&gt;&gt;= &lt;&lt;= -&gt;* ...'"/>
   <xsl:variable name="operators2" select="'.* :: ## &lt;: :&gt; &lt;% %&gt; %: += -= *= /= %= ^= &amp;= |= &lt;&lt; &gt;&gt; == != &lt;= &gt;= &amp;&amp; || ++ -- -&gt;'"/>
@@ -435,6 +435,92 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- Jam syntax highlighting -->
+
+  <xsl:variable name="jam-keywords" select="' actions bind case class default else for if ignore in include local module on piecemeal quietly return rule switch together updated while '"/>
+  <xsl:variable name="jam-operators" select="' ! != &amp; &amp;&amp; ( ) += : ; &lt; &lt;= = &gt; &gt;= ?= [ ] { | || } '"/>
+
+  <xsl:template name="highlight-jam-word">
+    <xsl:param name="text"/>
+    <xsl:choose>
+      <xsl:when test="contains($jam-keywords, concat(' ', $text, ' '))">
+        <xsl:call-template name="highlight-keyword">
+          <xsl:with-param name="keyword" select="$text"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($jam-operators, concat(' ', $text, ' '))">
+        <xsl:call-template name="highlight-special">
+          <xsl:with-param name="text" select="$text"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="jam-word-length">
+    <xsl:param name="text"/>
+    <xsl:param name="pos" select="1"/>
+    <xsl:choose>
+      <xsl:when test="string-length($text) + 1= $pos">
+        <xsl:value-of select="$pos - 1"/>
+      </xsl:when>
+      <xsl:when test="contains(' &#xA;&#xD;&#x9;', substring($text, $pos, 1))">
+        <xsl:value-of select="$pos - 1"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="jam-word-length">
+          <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="pos" select="$pos + 1"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="highlight-jam-text">
+    <xsl:param name="text"/>
+    <xsl:choose>
+      <xsl:when test="string-length($text) = 0"/>
+      <xsl:when test="contains(' &#xA;&#xD;&#x9;', substring($text, 1, 1))">
+        <xsl:value-of select="substring($text, 1, 1)"/>
+        <xsl:call-template name="highlight-jam-text">
+          <xsl:with-param name="text" select="substring($text, 2)"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="substring($text, 1, 1) = '#'">
+        <xsl:choose>
+          <xsl:when test="contains($text, '&#xA;')">
+            <xsl:call-template name="highlight-comment">
+              <xsl:with-param name="text" select="substring-before($text, '&#xA;')"/>
+            </xsl:call-template>
+            <xsl:call-template name="highlight-jam-text">
+              <xsl:with-param name="text" select="concat('&#xA;', substring-after($text, '&#xA;'))"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="highlight-comment">
+              <xsl:with-param name="text" select="$text"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="length">
+          <xsl:call-template name="jam-word-length">
+            <xsl:with-param name="text" select="$text"/>
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:call-template name="highlight-jam-word">
+          <xsl:with-param name="text" select="substring($text, 1, $length)"/>
+        </xsl:call-template>
+        <xsl:call-template name="highlight-jam-text">
+          <xsl:with-param name="text" select="substring($text, $length + 1)"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!-- Perform C++ syntax highlighting on the given text -->
   <xsl:template name="highlight-text">
     <xsl:param name="text" select="."/>
@@ -456,9 +542,7 @@
             </xsl:attribute>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:attribute name="{name(.)}">
-              <xsl:value-of select="."/>
-            </xsl:attribute>
+            <xsl:copy-of select="."/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
@@ -479,6 +563,16 @@
 
   <xsl:template match="type" mode="highlight">
     <xsl:apply-templates mode="highlight"/>
+  </xsl:template>
+
+  <xsl:template match="*" mode="highlight-jam">
+    <xsl:apply-templates select="." mode="annotation"/>
+  </xsl:template>
+
+  <xsl:template match="text()" mode="highlight-jam">
+    <xsl:call-template name="highlight-jam-text">
+      <xsl:with-param name="text" select="."/>
+    </xsl:call-template>
   </xsl:template>
 
 </xsl:stylesheet>

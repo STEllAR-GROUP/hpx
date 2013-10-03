@@ -78,9 +78,9 @@
   <xsl:template name="format.svn.revision">
     <xsl:param name="text"/>
 
-    <!-- Remove the "$Date: " -->
+    <!-- Remove the "$Date: " or "$Date:: " -->
     <xsl:variable name="text.noprefix"
-      select="substring-after($text, '$Date: ')"/>
+      select="substring-after($text, ': ')"/>
 
     <!-- Grab the year -->
     <xsl:variable name="year" select="substring-before($text.noprefix, '-')"/>
@@ -122,8 +122,10 @@
       </xsl:choose>
     </xsl:variable>
 
-    <xsl:value-of select="concat($month.name, ' ', $day, ', ', $year, ' at ',
-                                 $time, ' ', $timezone)"/>
+    <xsl:value-of select="concat($month.name, ' ', $day, ', ', $year)"/>
+    <xsl:if test="$time != ''">
+      <xsl:value-of select="concat(' at ', $time, ' ', $timezone)"/>
+    </xsl:if>
   </xsl:template>
 
   <!-- We don't want refentry's to show up in the TOC because they

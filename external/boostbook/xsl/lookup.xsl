@@ -236,7 +236,7 @@
         <xsl:variable name="normalized" select="translate(normalize-space(translate($part, '.&lt;&gt;;\:*?&quot;|_', '            ')), ' ', '_')"/>
         <xsl:value-of select =
           "concat(
-            substring($normalized, 1, $boost.max.id.part.length - string-length(generate-id(.) - 1)),
+            substring($normalized, 1, $boost.max.id.part.length - string-length(generate-id(.)) - 1),
             concat('_', generate-id(.)))"/>
       </xsl:when>
       <xsl:otherwise>
