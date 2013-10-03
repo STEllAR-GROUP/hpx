@@ -11,13 +11,13 @@
 if(NOT HPX_MALLOC)
   set(HPX_MALLOC ${HPX_MALLOC_DEFAULT})
   set(allocator_error
-      "The default allocator for your system is ${HPX_MALLOC_DEFAULT}, but ${HPX_MALLOC_DEFAULT} could not be found."
-      "The system allocator has poor performance. As such ${HPX_MALLOC_DEFAULT} is a strong optional requirement."
-      "Being aware of the performance hit, you can override this default and get rid of this dependency by setting -DHPX_MALLOC=system"
+      "The default allocator for your system is ${HPX_MALLOC_DEFAULT}, but ${HPX_MALLOC_DEFAULT} could not be found. "
+      "The system allocator has poor performance. As such ${HPX_MALLOC_DEFAULT} is a strong optional requirement. "
+      "Being aware of the performance hit, you can override this default and get rid of this dependency by setting -DHPX_MALLOC=system. "
       "Other valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
 else()
   set(allocator_error
-      "HPX_MALLOC was set to ${HPX_MALLOC}, but ${HPX_MALLOC} could not be found."
+      "HPX_MALLOC was set to ${HPX_MALLOC}, but ${HPX_MALLOC} could not be found. "
       "Other valid options for HPX_MALLOC are: system, tcmalloc, jemalloc, tbbmalloc")
 endif()
 
