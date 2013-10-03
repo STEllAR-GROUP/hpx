@@ -769,7 +769,7 @@ namespace hpx { namespace util
                 threads::policies::detail::affinity_data aff(num_threads,
                     pu_offset, pu_step, affinity_domain, "");
 
-                bool numa_sensitive = vm_.count("hpx:numa-sensitive") ? true : false;
+                bool numa_sensitive = vm_.count("hpx:numa-sensitive");
                 threads::topology& top = threads::create_topology();
                 for (std::size_t i = 0; i != num_threads; ++i)
                 {
