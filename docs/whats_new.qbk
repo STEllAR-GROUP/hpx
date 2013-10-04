@@ -16,6 +16,23 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 922] - Cannot link against BLAS
+* [issue 921] - Implement hpx::mem_fn
+* [issue 920] - Output locality with --hpx:print-bind
+* [issue 919] - Correct grammar; simplify boolean expressions
+* [issue 917] - adapt cmake file to new boostbook version
+* [issue 916] - fix problem building documentation with xsltproc >= 1.1.27
+* [issue 915] - Add another TBBMalloc library search path
+* [issue 914] - Build problem with Intel compiler on Stampede (TACC)
+* [issue 913] - fix error messages in fibonacci examples
+* [issue 911] - Update OS X build instructions
+* [issue 910] - Want like to specify MPI_ROOT instead of compiler wrapper script
+* [issue 909] - Warning about void* arithmetic
+* [issue 908] - Buildbot for MIC is broken
+* [issue 906] - Can't use --hpx:bind=balanced with multiple MPI processes
+* [issue 904] - Add hpx::lcos::fold and hpx::lcos::inverse_fold collective
+                operation
+* [issue 903] - Add hpx::when_any_swapped()
 * [issue 902] - Add `hpx::lcos::reduce` collective operation
 * [issue 900] - Web documentation for trunk has no index
 * [issue 898] - Some tests fail with GCC 4.8.1 and MPI parcel port
