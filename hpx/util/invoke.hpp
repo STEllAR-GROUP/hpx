@@ -15,7 +15,7 @@
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
 
-#include <boost/mem_fn.hpp>
+#include <boost/get_pointer.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/or.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -23,8 +23,11 @@
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/ref.hpp>
+#include <boost/shared_ptr.hpp> // for get_pointer(shared_ptr<X>)
 #include <boost/type_traits/is_function.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_member_function_pointer.hpp>
 #include <boost/type_traits/is_member_object_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
@@ -46,10 +49,9 @@ namespace hpx { namespace util
                 typename detail::qualify_as<
                     typename get_member_pointer_object<T>::type
                   , typename boost::mpl::if_<
-                        boost::is_pointer<
-                            typename boost::remove_reference<Q>::type>
+                        boost::is_pointer<typename util::decay<Q>::type>
                       , typename boost::remove_pointer<
-                            typename boost::remove_reference<Q>::type>::type&
+                            typename util::decay<Q>::type>::type&
                       , Q
                     >::type
                 >::type
@@ -59,15 +61,9 @@ namespace hpx { namespace util
         template <typename T, typename Q>
         struct get_member_pointer_object<T, Q
           , typename boost::enable_if<
-                boost::is_reference_wrapper<typename util::decay<Q>::type>>::type
+                boost::is_reference_wrapper<typename util::decay<Q>::type> >::type
         > : get_member_pointer_object<T
               , typename boost::unwrap_reference<typename util::decay<Q>::type>::type&>
-        {};
-
-        // Note: boost::mem_fn is not rvref-aware
-        template <typename T, typename Q>
-        struct get_member_pointer_object<T, Q&&>
-          : get_member_pointer_object<T, Q const&>
         {};
 
         template <typename T, typename C>
@@ -86,7 +82,7 @@ namespace hpx { namespace util
         template <typename FD                                                 \
           , typename F BOOST_PP_ENUM_TRAILING_PARAMS(n, typename Arg)>        \
         struct invoke_result_of_impl<FD, F(BOOST_PP_ENUM_PARAMS(n, Arg))      \
-          , typename boost::enable_if<boost::is_reference_wrapper<FD>>::type  \
+          , typename boost::enable_if<boost::is_reference_wrapper<FD> >::type \
         > : boost::result_of<                                                 \
                 typename boost::unwrap_reference<FD>::type&                   \
                     (BOOST_PP_ENUM_PARAMS(n, Arg))                            \
@@ -120,7 +116,7 @@ namespace hpx { namespace util
         // ignoring member-object-ptrs
         template <typename FD, typename F, typename Class>
         struct invoke_result_of_impl<FD, F(Class)
-          , typename boost::enable_if<boost::is_member_object_pointer<FD>>::type
+          , typename boost::enable_if<boost::is_member_object_pointer<FD> >::type
         > : detail::get_member_pointer_object<FD, Class>
         {};
     }
@@ -147,30 +143,78 @@ namespace hpx { namespace util
 #   undef HPX_UTIL_INVOKE_RESULT_OF
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename F>
+    template <typename R, typename FR>
     BOOST_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_member_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
-      , R
-    >::type
-    invoke_r(BOOST_FWD_REF(F) f)
+    R
+    invoke_r(FR (*f)())
     {
-        return util::void_guard<R>(), boost::forward<F>(f)();
-    };
+        return util::void_guard<R>(), f();
+    }
 
-    template <typename R, typename F>
+    template <typename R, typename FR, typename C, typename T>
     BOOST_FORCEINLINE
     typename boost::enable_if<
-        boost::is_member_pointer<typename util::decay<F>::type>
+        boost::is_base_of<C, typename util::decay<T>::type>
       , R
     >::type
-    invoke_r(BOOST_FWD_REF(F) f)
+    invoke_r(FR C::*f, BOOST_FWD_REF(T) t)
     {
-        return util::void_guard<R>(), boost::mem_fn(boost::forward<F>(f))();
-    };
+        return util::void_guard<R>(), (boost::forward<T>(t).*f);
+    }
+    template <typename R, typename FR, typename C, typename T>
+    BOOST_FORCEINLINE
+    typename boost::disable_if<
+        boost::is_base_of<C, typename util::decay<T>::type>
+      , R
+    >::type
+    invoke_r(FR C::*f, BOOST_FWD_REF(T) t)
+    {
+        using boost::get_pointer;
+        return util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f);
+    }
+
+    template <typename R, typename FR, typename C, typename T>
+    BOOST_FORCEINLINE
+    typename boost::enable_if<
+        boost::is_base_of<C, typename util::decay<T>::type>
+      , R
+    >::type
+    invoke_r(FR (C::*f)(), BOOST_FWD_REF(T) t)
+    {
+        return util::void_guard<R>(), (boost::forward<T>(t).*f)();
+    }
+    template <typename R, typename FR, typename C, typename T>
+    BOOST_FORCEINLINE
+    typename boost::disable_if<
+        boost::is_base_of<C, typename util::decay<T>::type>
+      , R
+    >::type
+    invoke_r(FR (C::*f)(), BOOST_FWD_REF(T) t)
+    {
+        using boost::get_pointer;
+        return util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f)();
+    }
+    template <typename R, typename FR, typename C, typename T>
+    BOOST_FORCEINLINE
+    typename boost::enable_if<
+        boost::is_base_of<C, typename util::decay<T>::type>
+      , R
+    >::type
+    invoke_r(FR (C::*f)() const, BOOST_FWD_REF(T) t)
+    {
+        return util::void_guard<R>(), (boost::forward<T>(t).*f)();
+    }
+    template <typename R, typename FR, typename C, typename T>
+    BOOST_FORCEINLINE
+    typename boost::disable_if<
+        boost::is_base_of<C, typename util::decay<T>::type>
+      , R
+    >::type
+    invoke_r(FR (C::*f)() const, BOOST_FWD_REF(T) t)
+    {
+        using boost::get_pointer;
+        return util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f)();
+    }
 
     template <typename R, typename F>
     BOOST_FORCEINLINE
@@ -181,11 +225,68 @@ namespace hpx { namespace util
     invoke_r(BOOST_FWD_REF(F) f)
     {
         return util::void_guard<R>(), (f.get())();
-    };
+    }
+
+    template <typename R, typename F>
+    BOOST_FORCEINLINE
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
+          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_reference_wrapper<typename util::decay<F>::type>
+        >
+      , R
+    >::type
+    invoke_r(BOOST_FWD_REF(F) f)
+    {
+        return util::void_guard<R>(), boost::forward<F>(f)();
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename R>
+    BOOST_FORCEINLINE
+    R
+    invoke(R (*f)())
+    {
+        return util::invoke_r<R>(f);
+    }
+
+    template <typename R, typename C, typename T>
+    BOOST_FORCEINLINE
+    typename invoke_result_of<R C::*(T)>::type
+    invoke(R C::*f, BOOST_FWD_REF(T) t)
+    {
+        typedef
+            typename invoke_result_of<R C::*(T)>::type
+            result_type;
+
+        return util::invoke_r<result_type>(f, boost::forward<T>(t));
+    }
+    
+    template <typename R, typename C, typename T>
+    BOOST_FORCEINLINE
+    R
+    invoke(R (C::*f)(), BOOST_FWD_REF(T) t)
+    {
+        return util::invoke_r<R>(f, boost::forward<T>(t));
+    }
+    template <typename R, typename C, typename T>
+    BOOST_FORCEINLINE
+    R
+    invoke(R (C::*f)() const, BOOST_FWD_REF(T) t)
+    {
+        return util::invoke_r<R>(f, boost::forward<T>(t));
+    }
 
     template <typename F>
     BOOST_FORCEINLINE
-    typename invoke_result_of<F()>::type
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
+          , boost::is_member_pointer<typename util::decay<F>::type>
+        >
+      , typename invoke_result_of<F()>::type
+    >::type
     invoke(BOOST_FWD_REF(F) f)
     {
         typedef
@@ -193,7 +294,7 @@ namespace hpx { namespace util
             result_type;
 
         return util::invoke_r<result_type>(boost::forward<F>(f));
-    };
+    }
 }}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -232,34 +333,82 @@ namespace hpx { namespace util
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    template <typename R, typename FR, BOOST_PP_ENUM_PARAMS(N, typename A)
+      , BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     BOOST_FORCEINLINE
-    typename boost::disable_if<
-        boost::mpl::or_<
-            boost::is_member_pointer<typename util::decay<F>::type>
-          , boost::is_reference_wrapper<typename util::decay<F>::type>
-        >
-      , R
-    >::type
-    invoke_r(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    R
+    invoke_r(FR (*f)(BOOST_PP_ENUM_PARAMS(N, A))
+      , HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return
-            util::void_guard<R>(), boost::forward<F>(f)
+            util::void_guard<R>(), f
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    };
-
-    template <typename R, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    }
+    
+#   if N < HPX_FUNCTION_ARGUMENT_LIMIT
+    template <typename R, typename FR
+      , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     BOOST_FORCEINLINE
     typename boost::enable_if<
-        boost::is_member_pointer<typename util::decay<F>::type>
+        boost::is_base_of<C, typename util::decay<T>::type>
       , R
     >::type
-    invoke_r(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    invoke_r(FR (C::*f)(BOOST_PP_ENUM_PARAMS(N, A))
+      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return
-            util::void_guard<R>(), boost::mem_fn(boost::forward<F>(f))
+            util::void_guard<R>(), (boost::forward<T>(t).*f)
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    };
+    }
+    template <typename R, typename FR
+      , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE
+    typename boost::disable_if<
+        boost::is_base_of<C, typename util::decay<T>::type>
+      , R
+    >::type
+    invoke_r(FR (C::*f)(BOOST_PP_ENUM_PARAMS(N, A))
+      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        using boost::get_pointer;
+        return
+            util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f)
+                (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+    }
+    template <typename R, typename FR
+      , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE
+    typename boost::enable_if<
+        boost::is_base_of<C, typename util::decay<T>::type>
+      , R
+    >::type
+    invoke_r(FR (C::*f)(BOOST_PP_ENUM_PARAMS(N, A)) const
+      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        return
+            util::void_guard<R>(), (boost::forward<T>(t).*f)
+                (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+    }
+    template <typename R, typename FR
+      , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE
+    typename boost::disable_if<
+        boost::is_base_of<C, typename util::decay<T>::type>
+      , R
+    >::type
+    invoke_r(FR (C::*f)(BOOST_PP_ENUM_PARAMS(N, A)) const
+      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        using boost::get_pointer;
+        return
+            util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f)
+                (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+    }
+#   endif /*N < HPX_FUNCTION_ARGUMENT_LIMIT*/
 
     template <typename R, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     BOOST_FORCEINLINE
@@ -272,11 +421,78 @@ namespace hpx { namespace util
         return
             util::void_guard<R>(), (f.get())
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    };
+    }
+
+    template <typename R, typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
+          , boost::is_member_pointer<typename util::decay<F>::type>
+          , boost::is_reference_wrapper<typename util::decay<F>::type>
+        >
+      , R
+    >::type
+    invoke_r(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        return
+            util::void_guard<R>(), boost::forward<F>(f)
+                (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename R, BOOST_PP_ENUM_PARAMS(N, typename A)
+      , BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE
+    R
+    invoke(R (*f)(BOOST_PP_ENUM_PARAMS(N, A))
+      , HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        return
+            util::invoke_r<R>(
+                f
+              , HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
+            );
+    }
+    
+#   if N < HPX_FUNCTION_ARGUMENT_LIMIT
+    template <typename R, typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE
+    R
+    invoke(R (C::*f)(BOOST_PP_ENUM_PARAMS(N, A))
+      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        return
+            util::invoke_r<R>(
+                f, boost::forward<T>(t)
+              , HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
+            );
+    }
+    template <typename R, typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    BOOST_FORCEINLINE
+    R
+    invoke(R (C::*f)(BOOST_PP_ENUM_PARAMS(N, A)) const
+      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    {
+        return
+            util::invoke_r<R>(
+                f, boost::forward<T>(t)
+              , HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
+            );
+    }
+#   endif /*N < HPX_FUNCTION_ARGUMENT_LIMIT*/
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     BOOST_FORCEINLINE
-    typename invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
+    typename boost::disable_if<
+        boost::mpl::or_<
+            boost::is_function<typename boost::remove_pointer<typename util::decay<F>::type>::type>
+          , boost::is_member_pointer<typename util::decay<F>::type>
+        >
+      , typename invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
+    >::type
     invoke(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
@@ -288,7 +504,7 @@ namespace hpx { namespace util
                 boost::forward<F>(f)
               , HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
             );
-    };
+    }
 }}
 
 #undef N
