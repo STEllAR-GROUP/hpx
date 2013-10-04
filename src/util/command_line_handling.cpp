@@ -630,6 +630,7 @@ namespace hpx { namespace util
 #endif
     }
 
+#if defined(HPX_HAVE_HWLOC)
     ///////////////////////////////////////////////////////////////////////////
     void handle_print_bind(boost::program_options::variables_map const& vm_,
         std::size_t num_threads)
@@ -691,6 +692,7 @@ namespace hpx { namespace util
                 affinity_desc);
         }
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(

@@ -55,8 +55,10 @@ namespace hpx { namespace util
         void handle_attach_debugger();
     };
 
+#if defined(HPX_HAVE_HWLOC)
     void handle_print_bind(boost::program_options::variables_map const& vm,
         std::size_t num_threads);
+#endif
 }}
 
 #endif
