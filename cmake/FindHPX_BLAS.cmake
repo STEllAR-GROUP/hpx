@@ -10,6 +10,6 @@ endif()
 hpx_find_package(BLAS
   LIBRARIES blas libblas
   LIBRARY_PATHS lib64 lib 
-  HEADERS cblas.h bbhutil.h
+  HEADERS cblas.h
   HEADER_PATHS include)
 
