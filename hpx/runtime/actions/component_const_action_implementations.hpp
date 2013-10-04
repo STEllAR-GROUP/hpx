@@ -81,9 +81,7 @@ namespace hpx { namespace actions { namespace detail
 
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
     BOOST_PP_COMMA_IF(n)                                                      \
-    boost::forward<                                                           \
-        typename util::remove_reference<Arguments>::type::                    \
-            BOOST_PP_CAT(member_type, n)>(data. BOOST_PP_CAT(a, n))           \
+    util::get<n>(boost::forward<Arguments>(data))                             \
     /**/
 #define HPX_REMOVE_QUALIFIERS(z, n, data)                                     \
         BOOST_PP_COMMA_IF(n)                                                  \

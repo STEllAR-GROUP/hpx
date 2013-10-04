@@ -49,7 +49,7 @@ namespace hpx { namespace util
     /**/
 
 #define HPX_UTIL_INVOKE_FUSED_ARG(Z, N, D)                                    \
-    args.BOOST_PP_CAT(a, N)                                                   \
+    util::get<N>(args)                                                        \
     /**/
 
 #define HPX_UTIL_INVOKE_FUSED_FWD_ARG_RESULT(Z, N, D)                         \
@@ -57,7 +57,7 @@ namespace hpx { namespace util
     /**/
 
 #define HPX_UTIL_INVOKE_FUSED_FWD_ARG(Z, N, D)                                \
-    boost::forward<BOOST_PP_CAT(Arg, N)>(args.BOOST_PP_CAT(a, N))             \
+    util::get<N>(boost::move(args))                                           \
     /**/
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)

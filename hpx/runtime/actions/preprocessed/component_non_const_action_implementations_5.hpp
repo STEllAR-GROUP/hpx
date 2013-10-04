@@ -94,7 +94,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    lva, boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0)), lva));
+                    lva, util::get< 0>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -123,7 +123,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0));
+                util::get< 0>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -284,7 +284,7 @@ namespace hpx { namespace actions
             
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0)), lva));
+                    util::get< 0>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -313,7 +313,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0));
+                util::get< 0>(boost::forward<Arguments>( args)));
             return util::unused;
         }
     };
@@ -488,7 +488,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    lva, boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1)), lva));
+                    lva, util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -517,7 +517,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1));
+                util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -678,7 +678,7 @@ namespace hpx { namespace actions
             
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1)), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -707,7 +707,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1));
+                util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)));
             return util::unused;
         }
     };
@@ -882,7 +882,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    lva, boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2)), lva));
+                    lva, util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -911,7 +911,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2));
+                util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -1072,7 +1072,7 @@ namespace hpx { namespace actions
             
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2)), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -1101,7 +1101,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2));
+                util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)));
             return util::unused;
         }
     };
@@ -1276,7 +1276,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    lva, boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3)), lva));
+                    lva, util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -1305,7 +1305,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3));
+                util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -1466,7 +1466,7 @@ namespace hpx { namespace actions
             
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3)), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -1495,7 +1495,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3));
+                util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)));
             return util::unused;
         }
     };
@@ -1670,7 +1670,7 @@ namespace hpx { namespace actions
         {
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(),
-                    lva, boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4)), lva));
+                    lva, util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -1699,7 +1699,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4));
+                util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -1860,7 +1860,7 @@ namespace hpx { namespace actions
             
             return boost::move(Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4)), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva));
         }
         
         
@@ -1889,7 +1889,7 @@ namespace hpx { namespace actions
                 << ") lva(" << reinterpret_cast<void const*>(
                     get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)(
-                boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4));
+                util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)));
             return util::unused;
         }
     };
