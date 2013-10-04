@@ -140,7 +140,7 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-        /// Write the given \a memory_block_data back to it's original source
+        /// Write the given \a memory_block_data back to its original source
         template <typename T>
         void checkin(components::access_memory_block<T> const& data)
         {

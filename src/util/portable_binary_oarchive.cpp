@@ -150,7 +150,7 @@ void portable_binary_oarchive::init(util::binary_filter* filter, unsigned int fl
     save(static_cast<boost::uint16_t>(this->flags() >> CHAR_BIT));
 
     // handle filter and compression in the archive separately
-    bool has_filter = filter ? true : false;
+    bool has_filter = filter;
     save(has_filter);
 
     if (has_filter && (this->flags() & enable_compression)) {

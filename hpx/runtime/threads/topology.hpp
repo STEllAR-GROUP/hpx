@@ -29,29 +29,15 @@ namespace hpx { namespace threads
     typedef boost::uint64_t mask_type;
     typedef boost::uint64_t mask_cref_type;
 
-    static boost::uint64_t const bits[] =
+    inline boost::uint64_t bits(std::size_t idx)
     {
-        0x0000000000000001ull, 0x0000000000000002ull, 0x0000000000000004ull, 0x0000000000000008ull,
-        0x0000000000000010ull, 0x0000000000000020ull, 0x0000000000000040ull, 0x0000000000000080ull,
-        0x0000000000000100ull, 0x0000000000000200ull, 0x0000000000000400ull, 0x0000000000000800ull,
-        0x0000000000001000ull, 0x0000000000002000ull, 0x0000000000004000ull, 0x0000000000008000ull,
-        0x0000000000010000ull, 0x0000000000020000ull, 0x0000000000040000ull, 0x0000000000080000ull,
-        0x0000000000100000ull, 0x0000000000200000ull, 0x0000000000400000ull, 0x0000000000800000ull,
-        0x0000000001000000ull, 0x0000000002000000ull, 0x0000000004000000ull, 0x0000000008000000ull,
-        0x0000000010000000ull, 0x0000000020000000ull, 0x0000000040000000ull, 0x0000000080000000ull,
-        0x0000000100000000ull, 0x0000000200000000ull, 0x0000000400000000ull, 0x0000000800000000ull,
-        0x0000001000000000ull, 0x0000002000000000ull, 0x0000004000000000ull, 0x0000008000000000ull,
-        0x0000010000000000ull, 0x0000020000000000ull, 0x0000040000000000ull, 0x0000080000000000ull,
-        0x0000100000000000ull, 0x0000200000000000ull, 0x0000400000000000ull, 0x0000800000000000ull,
-        0x0001000000000000ull, 0x0002000000000000ull, 0x0004000000000000ull, 0x0008000000000000ull,
-        0x0010000000000000ull, 0x0020000000000000ull, 0x0040000000000000ull, 0x0080000000000000ull,
-        0x0100000000000000ull, 0x0200000000000000ull, 0x0400000000000000ull, 0x0800000000000000ull,
-        0x1000000000000000ull, 0x2000000000000000ull, 0x4000000000000000ull, 0x8000000000000000ull
-    };
+       BOOST_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
+       return boost::uint64_t(1) << idx;
+    }
 
     inline bool any(mask_cref_type mask)
     {
-        return (mask != 0) ? true : false;
+        return mask != 0;
     }
 
     inline mask_type not_(mask_cref_type mask)
@@ -61,24 +47,24 @@ namespace hpx { namespace threads
 
     inline bool test(mask_cref_type mask, std::size_t idx)
     {
-        BOOST_ASSERT(idx < sizeof(bits)/sizeof(bits[0]));
-        return (bits[idx] & mask) ? true : false;
+        BOOST_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
+        return (bits(idx) & mask) != 0;
     }
 
     inline void set(mask_type& mask, std::size_t idx)
     {
-        BOOST_ASSERT(idx < sizeof(bits)/sizeof(bits[0]));
-        mask |= bits[idx];
+        BOOST_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
+        mask |= bits(idx);
     }
 
     inline std::size_t mask_size(mask_cref_type mask)
     {
-        return sizeof(bits)/sizeof(bits[0]);
+        return CHAR_BIT * sizeof(mask_type);
     }
 
     inline void resize(mask_type& mask, std::size_t s)
     {
-        BOOST_ASSERT(s <= sizeof(bits)/sizeof(bits[0]));
+        BOOST_ASSERT(s <= CHAR_BIT * sizeof(mask_type));
     }
 
     inline std::size_t find_first(mask_cref_type mask)
@@ -93,7 +79,7 @@ namespace hpx { namespace threads
 
             return c;
         }
-        return std::size_t(-1);
+        return ~std::size_t(0);
     }
 #else
 # if defined(HPX_MAX_CPU_COUNT)
@@ -141,15 +127,15 @@ namespace hpx { namespace threads
     inline std::size_t find_first(mask_cref_type mask)
     {
 # if defined(HPX_MAX_CPU_COUNT)
-        if(mask.any())
+        if (mask.any())
         {
-            for(std::size_t i = 0; i != HPX_MAX_CPU_COUNT; ++i)
+            for (std::size_t i = 0; i != HPX_MAX_CPU_COUNT; ++i)
             {
-                if(mask[i])
+                if (mask[i])
                     return i;
             }
         }
-        return std::size_t(-1);
+        return ~std::size_t(0);
 # else
         return mask.find_first();
 # endif

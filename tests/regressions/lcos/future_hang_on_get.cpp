@@ -152,7 +152,7 @@ int hpx_main(
         double d = 0.;
 
         for ( boost::uint64_t i = 0
-            ; ((test_runs == 0) ? true : (i < test_runs))
+            ; (test_runs == 0) || (i < test_runs)
             ; ++i) 
         {
             d += hpx::async<null_tree_action>(here, 0, 1

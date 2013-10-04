@@ -252,7 +252,7 @@ namespace hpx { namespace util
         {
             mutex_type::scoped_lock l(mtx_);
             has_been_started = !ids_.empty();
-            destination_is_cout = (destination_ == "cout") ? true : false;
+            destination_is_cout = destination_ == "cout";
         }
 
         if (!has_been_started)

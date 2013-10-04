@@ -126,9 +126,9 @@ std::size_t concurrency = 1;
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    bool print_header = (vm.count("no-header") == 0) ? true : false;
-    bool continuation = (vm.count("continuation") != 0) ? true : false;
-    bool zerocopy = (vm.count("zerocopy") != 0) ? true : false;
+    bool print_header = vm.count("no-header") == 0;
+    bool continuation = vm.count("continuation") != 0;
+    bool zerocopy = vm.count("zerocopy") != 0;
 
     std::vector<hpx::future<double> > timings;
     for (std::size_t i = 0; i != concurrency; ++i)

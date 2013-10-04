@@ -629,7 +629,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
-                    sec->get_entry("use_caching", "1")) ? true : false;
+                    sec->get_entry("use_caching", "1")) != 0;
             }
         }
         return false;
@@ -641,7 +641,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
-                    sec->get_entry("use_range_caching", "1")) ? true : false;
+                    sec->get_entry("use_range_caching", "1")) != 0;
             }
         }
         return false;
@@ -670,7 +670,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
-                    sec->get_entry("dedicated_server", 0)) ? true : false;
+                    sec->get_entry("dedicated_server", 0)) != 0;
             }
         }
         return false;
@@ -683,7 +683,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
-                    sec->get_entry("use_itt_notify", "0")) ? true : false;
+                    sec->get_entry("use_itt_notify", "0")) != 0;
             }
         }
 #endif
@@ -698,7 +698,7 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
-                    sec->get_entry("lock_detection", "0")) ? true : false;
+                    sec->get_entry("lock_detection", "0")) != 0;
             }
         }
 #endif
@@ -714,10 +714,10 @@ namespace hpx { namespace util
             if (NULL != sec) {
 #if HPX_DEBUG
                 return boost::lexical_cast<int>(
-                    sec->get_entry("minimal_deadlock_detection", "1")) ? true : false;
+                    sec->get_entry("minimal_deadlock_detection", "1")) != 0;
 #else
                 return boost::lexical_cast<int>(
-                    sec->get_entry("minimal_deadlock_detection", "0")) ? true : false;
+                    sec->get_entry("minimal_deadlock_detection", "0")) != 0;
 #endif
             }
         }
@@ -815,8 +815,8 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx.stacks");
             if (NULL != sec) {
-                std::string entry = sec->get_entry("use_guard_pages", "1");
-                return (entry != "0") ? true : false;
+                return boost::lexical_cast<int>(
+                    sec->get_entry("use_guard_pages", "1")) != 0;
             }
         }
         return true;    // default is true
