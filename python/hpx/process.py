@@ -1,4 +1,4 @@
-#! /usr/bin/env python 
+#! /usr/bin/env python
 #
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
@@ -35,7 +35,7 @@ if platform.startswith('linux'):
   OS_LIN = True
   from select import epoll, EPOLLHUP
 
-if OS_LIN: 
+if OS_LIN:
   def kill_process_tree(parent_pid, signal=SIGKILL):
     def find_process_tree(pid):
       cmd = "ps -o pid --ppid %d --noheaders" % pid
@@ -57,7 +57,7 @@ if OS_LIN:
     r = True
 
     for pid in find_process_tree(parent_pid):
-      try: 
+      try:
         kill(int(pid), signal)
       except OSError, err:
         if ESRCH != err.errno:
@@ -69,7 +69,7 @@ if OS_LIN:
 
 elif OS_MAC:
   def kill_process_tree(parent_pid, signal=SIGKILL):
-    try: 
+    try:
       kill(parent_pid, signal)
       return True
     except OSError, err:
@@ -115,7 +115,7 @@ class process(object):
 
       self._timed_out = True
 
-    # if an exception happened, re-raise it here in the master thread 
+    # if an exception happened, re-raise it here in the master thread
     if self._error is not None:
       raise self._error
 
@@ -126,7 +126,7 @@ class process(object):
 
   def poll(self):
     return self._proc.poll()
-      
+
   def pid(self):
     return self._proc.pid
 
@@ -161,9 +161,9 @@ class process(object):
 
       read_queue.put('')
 
-    thread = Thread(target=enqueue_output) 
+    thread = Thread(target=enqueue_output)
     thread.daemon = True
-    thread.start() 
+    thread.start()
 
     output = ''
 
@@ -171,7 +171,7 @@ class process(object):
       started = time()
 
       while timeout is None or not float_info.epsilon > timeout:
-        s = read_queue.get(timeout=timeout) 
+        s = read_queue.get(timeout=timeout)
 
         if s:
           output += s
@@ -181,12 +181,12 @@ class process(object):
         if not timeout is None:
           timeout -= (time() - started)
     except Empty:
-      return output 
+      return output
 
 # modelled after Boost.Thread's boost::thread_group class
 class process_group(object):
-  _lock = None 
-  _members = None 
+  _lock = None
+  _members = None
   _poller = None
 
   def __init__(self, *cmds):
@@ -196,16 +196,16 @@ class process_group(object):
       self._poller = kqueue()
     if OS_LIN:
       self._poller = epoll()
-          
+
     for cmd in cmds:
       self.create_process(cmd)
 
   def create_process(self, cmd):
     return process(cmd, self)
-    
+
   def add_process(self, job):
     with self._lock:
-      self._members[job.fileno()] = job 
+      self._members[job.fileno()] = job
       if OS_MAC:
         self._poller.control([kevent(job._proc.stdout,
           KQ_FILTER_READ, KQ_EV_ADD, KQ_NOTE_LOWAT, 0)], 0)
@@ -214,20 +214,20 @@ class process_group(object):
 
   def join_all(self, timeout=None, callback=None):
     with self._lock:
-      not_done = self._members.copy()  
-  
+      not_done = self._members.copy()
+
       started = time()
 
       while timeout is None or not float_info.epsilon > timeout:
           if OS_MAC:
-               
+
             if timeout == None:
               timeout=-1.0
-        
+
             ready = self._poller.control(None,1,timeout)
           if OS_LIN:
             ready = self._poller.poll(timeout=-1.0 if timeout is None else timeout)
-                
+
           if not timeout is None:
             timeout -= (time() - started)
 
@@ -236,22 +236,22 @@ class process_group(object):
               fd = fd.ident
               self._poller.control([kevent(fd, KQ_FILTER_READ, KQ_EV_DELETE)], 0)
               not_done.pop(fd)
-            
-            if callable(callback):
-              callback(fd, self._members[fd])
+
+              if callable(callback):
+                callback(fd, self._members[fd])
 
           if OS_LIN:
             for fd, flags in ready:
               self._poller.unregister(fd)
               not_done.pop(fd)
-            
-            if callable(callback):
-              callback(fd, self._members[fd])
+
+              if callable(callback):
+                callback(fd, self._members[fd])
 
           if 0 == len(not_done):
             return
 
-      # some of the jobs are not done, we'll have to forcefully stop them 
+      # some of the jobs are not done, we'll have to forcefully stop them
       for fd in not_done:
         if self._members[fd].terminate():
           self._members[fd]._timed_out = True
