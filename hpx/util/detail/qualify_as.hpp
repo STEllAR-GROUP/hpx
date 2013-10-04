@@ -6,8 +6,9 @@
 #ifndef HPX_UTIL_DETAIL_QUALIFY_AS_HPP
 #define HPX_UTIL_DETAIL_QUALIFY_AS_HPP
 
+#include <hpx/util/add_lvalue_reference.hpp>
+#include <hpx/util/add_rvalue_reference.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/move/move.hpp>
 
@@ -16,7 +17,6 @@
 #include <boost/type_traits/add_const.hpp>
 #include <boost/type_traits/add_cv.hpp>
 #include <boost/type_traits/add_volatile.hpp>
-#include <boost/type_traits/add_reference.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -45,14 +45,13 @@ namespace hpx { namespace util { namespace detail
 
     template <typename T, typename U>
     struct qualify_as_impl<T, U&>
-      : boost::add_reference<typename qualify_as_impl<T, U>::type>
+      : util::add_lvalue_reference<typename qualify_as_impl<T, U>::type>
     {};
 
     template <typename T, typename U>
     struct qualify_as_impl<T, BOOST_FWD_REF(U)>
-    {
-        typedef BOOST_FWD_REF(HPX_UTIL_STRIP((typename qualify_as_impl<T, U>::type))) type;
-    };
+      : util::add_rvalue_reference<typename qualify_as_impl<T, U>::type>
+    {};
     
     ///////////////////////////////////////////////////////////////////////////
     /// creates a type `T` with the (cv-ref)qualifiers of `U`

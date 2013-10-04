@@ -26,12 +26,23 @@
 namespace hpx
 {
     /// The function \a when_all is a operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects stored in the
-    /// given vector and returns a new future object representing the same
-    /// list of futures after they finished executing.
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after they finished executing.
     ///
-    /// \return   The returned future holds the same list of futures as has
+    /// \note There are three variations of when_all. The first takes a pair
+    ///       of InputIterators. The second takes an std::vector of future<R>.
+    ///       The third takes any arbitrary number of future<R>, where R need
+    ///       not be the same type.
+    ///
+    /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_all.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type.
+    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
+    ///             inputs are fixed in number and are of heterogeneous types.
+    ///             The inputs can be any arbitrary number of future objects.
 
     template <typename R>
     lcos::future<std::vector<lcos::future<R> > >
@@ -81,11 +92,23 @@ namespace hpx
     }
 
     /// The function \a wait_all is a operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects stored in the
-    /// given vector and returns a new future object representing the same
-    /// list of futures after they finished executing.
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns the same list of futures after they finished executing.
     ///
     /// \a wait_all returns after all futures have been triggered.
+    ///
+    /// \note There are three variations of wait_all. The first takes a pair
+    ///       of InputIterators. The second takes an std::vector of future<R>.
+    ///       The third takes any arbitrary number of future<R>, where R need
+    ///       not be the same type.
+    ///
+    /// \return   The same list of futures as has been passed to wait_all.
+    ///           - future<vector<future<R>>>: If the input cardinality is
+    ///             unknown at compile time and the futures are all of the
+    ///             same type.
+    ///           - future<tuple<future<R0>, future<R1>, future<R2>...>>: If
+    ///             inputs are fixed in number and are of heterogeneous types.
+    ///             The inputs can be any arbitrary number of future objects.
 
     template <typename R>
     std::vector<lcos::future<R> >

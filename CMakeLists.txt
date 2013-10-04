@@ -1092,19 +1092,19 @@ else()
     hpx_use_flag_if_available(-g LANGUAGES CXX C Fortran)
 
     # Don't inline functions
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
+#    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
 
     # No tail call optimizations
-    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX C Fortran)
+#    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX C Fortran)
 
     # Don't allocate registers for wide types (e.g. 128bit ints) independently
-    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX C Fortran)
+#    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX C Fortran)
 
     # Disable register allocation webs, which make debugging impossible
-    hpx_use_flag_if_available(-fno-web LANGUAGES CXX C Fortran)
+#    hpx_use_flag_if_available(-fno-web LANGUAGES CXX C Fortran)
 
     # Disable register renaming
-    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX C Fortran)
+#    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     # Optimize for size
     hpx_use_flag_if_available(-Os LANGUAGES CXX C Fortran)
