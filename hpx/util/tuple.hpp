@@ -335,11 +335,9 @@ namespace hpx { namespace util
     >::type
     get(BOOST_RV_REF(Tuple) t) BOOST_NOEXCEPT
     {
-        typedef
-            typename detail::tuple_element<N, Tuple>::type
-            element_type;
-
-        return boost::forward<element_type>(t.template get<N>());
+        return
+            boost::forward<typename detail::tuple_element<N, Tuple>::type>
+                (t.template get<N>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
