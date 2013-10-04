@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    ///
+    ///////////////////////////////////////////////////////////////////////////
     struct command_line_handling
     {
         command_line_handling(hpx::runtime_mode mode, hpx_main_type const& f,
@@ -54,6 +54,9 @@ namespace hpx { namespace util
 
         void handle_attach_debugger();
     };
+
+    void handle_print_bind(boost::program_options::variables_map const& vm,
+        std::size_t num_threads);
 }}
 
 #endif

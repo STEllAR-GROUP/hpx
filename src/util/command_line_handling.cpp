@@ -631,6 +631,68 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void handle_print_bind(boost::program_options::variables_map const& vm_,
+        std::size_t num_threads)
+    {
+        if (!vm_.count("hpx:bind")) {
+            std::size_t num_threads = 1;
+            if (vm_.count("hpx:threads")) {
+                std::string threads = vm_["hpx:threads"].as<std::string>();
+                if (threads == "all")
+                    num_threads = threads::hardware_concurrency();
+                else
+                    num_threads = boost::lexical_cast<std::size_t>(threads);
+            }
+
+            std::size_t pu_offset = 0;
+            if (vm_.count("hpx:pu-offset"))
+                pu_offset = vm_["hpx:pu-offset"].as<std::size_t>();
+
+            std::size_t pu_step = 1;
+            if (vm_.count("hpx:pu-step"))
+                pu_step = vm_["hpx:pu-step"].as<std::size_t>();
+
+            std::string affinity_domain;
+            if (vm_.count("hpx:affinity")) {
+                affinity_domain = vm_["hpx:affinity"].as<std::string>();
+                if (0 != std::string("pu").find(affinity_domain) &&
+                    0 != std::string("core").find(affinity_domain) &&
+                    0 != std::string("numa").find(affinity_domain) &&
+                    0 != std::string("machine").find(affinity_domain))
+                {
+                    throw std::logic_error("Invalid command line option "
+                        "--hpx:affinity, value must be one of: pu, core, numa, "
+                        "or machine.");
+                }
+            }
+
+            threads::policies::detail::affinity_data aff(num_threads,
+                pu_offset, pu_step, affinity_domain, "");
+
+            bool numa_sensitive = vm_.count("hpx:numa-sensitive") != 0;
+            threads::topology& top = threads::create_topology();
+            for (std::size_t i = 0; i != num_threads; ++i)
+            {
+                top.print_affinity_mask(std::cout, i, aff.get_pu_mask(top, i, numa_sensitive));
+            }
+        }
+        else {
+            std::string affinity_desc;
+            std::vector<std::string> bind_affinity =
+                vm_["hpx:bind"].as<std::vector<std::string> >();
+            BOOST_FOREACH(std::string const& s, bind_affinity)
+            {
+                if (!affinity_desc.empty())
+                    affinity_desc += ";";
+                affinity_desc += s;
+            }
+
+            threads::print_affinity_options(std::cout, num_threads,
+                affinity_desc);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(
         boost::program_options::options_description const& desc_cmdline,
         int argc, char* argv[])
@@ -731,67 +793,6 @@ namespace hpx { namespace util
                 detail::print_info(std::cout);
             return 1;
         }
-
-#if defined(HPX_HAVE_HWLOC)
-        if (vm_.count("hpx:print-bind")) {
-            if (!vm_.count("hpx:bind")) {
-                std::size_t num_threads = 1;
-                if (vm_.count("hpx:threads")) {
-                    std::string threads = vm_["hpx:threads"].as<std::string>();
-                    if (threads == "all")
-                        num_threads = threads::hardware_concurrency();
-                    else
-                        num_threads = boost::lexical_cast<std::size_t>(threads);
-                }
-
-                std::size_t pu_offset = 0;
-                if (vm_.count("hpx:pu-offset"))
-                    pu_offset = vm_["hpx:pu-offset"].as<std::size_t>();
-
-                std::size_t pu_step = 1;
-                if (vm_.count("hpx:pu-step"))
-                    pu_step = vm_["hpx:pu-step"].as<std::size_t>();
-
-                std::string affinity_domain;
-                if (vm_.count("hpx:affinity")) {
-                    affinity_domain = vm_["hpx:affinity"].as<std::string>();
-                    if (0 != std::string("pu").find(affinity_domain) &&
-                        0 != std::string("core").find(affinity_domain) &&
-                        0 != std::string("numa").find(affinity_domain) &&
-                        0 != std::string("machine").find(affinity_domain))
-                    {
-                        throw std::logic_error("Invalid command line option "
-                            "--hpx:affinity, value must be one of: pu, core, numa, "
-                            "or machine.");
-                    }
-                }
-
-                threads::policies::detail::affinity_data aff(num_threads,
-                    pu_offset, pu_step, affinity_domain, "");
-
-                bool numa_sensitive = vm_.count("hpx:numa-sensitive") != 0;
-                threads::topology& top = threads::create_topology();
-                for (std::size_t i = 0; i != num_threads; ++i)
-                {
-                    top.print_affinity_mask(std::cout, i, aff.get_pu_mask(top, i, numa_sensitive));
-                }
-            }
-            else {
-                std::string affinity_desc;
-                std::vector<std::string> bind_affinity =
-                    vm_["hpx:bind"].as<std::vector<std::string> >();
-                BOOST_FOREACH(std::string const& s, bind_affinity)
-                {
-                    if (!affinity_desc.empty())
-                        affinity_desc += ";";
-                    affinity_desc += s;
-                }
-
-                threads::print_affinity_options(std::cout, num_threads_,
-                    affinity_desc);
-            }
-        }
-#endif
 
         // all is good
         return 0;

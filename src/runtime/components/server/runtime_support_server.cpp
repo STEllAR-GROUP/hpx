@@ -31,6 +31,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/parse_command_line.hpp>
+#include <hpx/util/command_line_handling.hpp>
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
@@ -40,6 +41,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -998,7 +1000,8 @@ namespace hpx { namespace components { namespace server
                 return false;
             }
 
-            // secondary command line handling, looking for --exit option
+            // secondary command line handling, looking for --exit and --hpx:print-bind
+            // option
             std::string cmd_line(ini.get_entry("hpx.cmd_line", ""));
             if (!cmd_line.empty()) {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
@@ -1006,6 +1009,14 @@ namespace hpx { namespace components { namespace server
 
                 util::parse_commandline(ini, options, cmd_line, vm, std::size_t(-1),
                     util::allow_unregistered, get_runtime_mode_from_name(runtime_mode));
+
+#if defined(HPX_HAVE_HWLOC)
+                if (vm.count("hpx:print-bind")) {
+                    std::size_t num_threads = boost::lexical_cast<std::size_t>(
+                        ini.get_entry("hpx.os_threads", 1));
+                    util::handle_print_bind(vm, num_threads);
+                }
+#endif
 
                 if (vm.count("hpx:exit"))
                     return false;
