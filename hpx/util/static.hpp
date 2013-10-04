@@ -32,6 +32,54 @@
 
 namespace hpx { namespace util
 {
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40300 || BOOST_INTEL
+    //
+    // C++11 requires thread-safe initialization of function-scope statics.
+    // For conforming compilers, we utilize this feature.
+    //
+    template <typename T, typename Tag = T>
+    struct HPX_EXPORT_STATIC_ static_ : boost::noncopyable
+    {
+    public:
+        typedef T value_type;
+    
+        typedef typename boost::call_traits<T>::reference reference;
+        typedef typename boost::call_traits<T>::const_reference const_reference;
+    
+        static_()
+        {
+            get_reference();
+        }
+    
+        operator reference()
+        {
+            return get();
+        }
+    
+        operator const_reference() const
+        {
+            return get();
+        }
+    
+        reference get()
+        {
+            return get_reference();
+        }
+    
+        const_reference get() const
+        {
+            return get_reference();
+        }
+    
+    private:
+        static reference get_reference()
+        {
+            static T t;
+            return t; 
+        }
+    };
+
+#else
     //
     //  Provides thread-safe initialization of a single static instance of T.
     //
@@ -43,7 +91,7 @@ namespace hpx { namespace util
     //      T::T() MUST not throw!
     //          this is a requirement of boost::call_once.
     //
-    template <typename T, typename Tag = T, std::size_t N = 1>
+    template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_ : boost::noncopyable
     {
     public:
@@ -54,8 +102,7 @@ namespace hpx { namespace util
         {
             ~destructor()
             {
-                for (std::size_t i = 0; i < N; ++i)
-                    static_::get_address(i)->~value_type();
+                static_::get_address()->~value_type();
             }
         };
 
@@ -63,22 +110,22 @@ namespace hpx { namespace util
         {
             static void construct()
             {
-                for (std::size_t i = 0; i < N; ++i)
-                    new (static_::get_address(i)) value_type();
+                new (static_::get_address()) value_type();
                 static destructor d;
             }
         };
 
+/*
         template <typename U>
         struct copy_constructor
         {
             static void construct(U const* pv)
             {
-                for (std::size_t i = 0; i < N; ++i)
-                    new (static_::get_address(i)) value_type(*pv);
+                new (static_::get_address()) value_type(*pv);
                 static destructor d;
             }
         };
+*/
 
     public:
         typedef typename boost::call_traits<T>::reference reference;
@@ -89,12 +136,14 @@ namespace hpx { namespace util
             boost::call_once(&default_constructor::construct, constructed_);
         }
 
+/*
         template <typename U>
         static_(U const& val)
         {
             boost::call_once(constructed_,
                 boost::bind(&copy_constructor<U>::construct, boost::addressof(val)));
         }
+*/
 
         operator reference()
         {
@@ -106,37 +155,37 @@ namespace hpx { namespace util
             return this->get();
         }
 
-        reference get(std::size_t item = 0)
+        reference get()
         {
-            return *this->get_address(item);
+            return *this->get_address();
         }
 
-        const_reference get(std::size_t item = 0) const
+        const_reference get() const
         {
-            return *this->get_address(item);
+            return *this->get_address();
         }
 
     private:
         typedef typename boost::add_pointer<value_type>::type pointer;
 
-        static pointer get_address(std::size_t item)
+        static pointer get_address()
         {
-            BOOST_ASSERT(item < N);
-            return static_cast<pointer>(data_[item].address());
+            return static_cast<pointer>(data_.address());
         }
 
         typedef boost::aligned_storage<sizeof(value_type),
             boost::alignment_of<value_type>::value> storage_type;
 
-        static storage_type data_[N];
+        static storage_type data_;
         static boost::once_flag constructed_;
     };
 
-    template <typename T, typename Tag, std::size_t N>
-    typename static_<T, Tag, N>::storage_type static_<T, Tag, N>::data_[N];
+    template <typename T, typename Tag>
+    typename static_<T, Tag>::storage_type static_<T, Tag>::data_;
 
-    template <typename T, typename Tag, std::size_t N>
-    boost::once_flag static_<T, Tag, N>::constructed_ = BOOST_ONCE_INIT;
+    template <typename T, typename Tag>
+    boost::once_flag static_<T, Tag>::constructed_ = BOOST_ONCE_INIT;
+#endif
 }}
 
 #endif // include guard

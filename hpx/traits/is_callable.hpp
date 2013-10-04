@@ -14,35 +14,27 @@
  || defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) // C++03
 
 #include <hpx/traits/is_action.hpp>
-
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
 
 #include <boost/function_types/components.hpp>
 #include <boost/function_types/function_pointer.hpp>
-
 #include <boost/move/move.hpp>
-
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/placeholders.hpp>
-
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
-
 #include <boost/ref.hpp>
-
 #include <boost/smart_ptr/intrusive_ptr.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <boost/type_traits/is_class.hpp>
-
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/declval.hpp>
 
@@ -97,7 +89,7 @@ namespace hpx { namespace traits
           , typename boost::enable_if<
                 boost::mpl::and_<
                     boost::is_class<T>
-                  , boost::mpl::not_<boost::is_reference_wrapper<T>>
+                  , boost::mpl::not_<boost::is_reference_wrapper<T> >
                 >
             >::type
         > : T
@@ -220,16 +212,16 @@ namespace hpx { namespace traits
 
 #include <hpx/util/always_void.hpp>
 
-#include <boost/mem_fn.hpp>
-
+#include <boost/get_pointer.hpp>
 #include <boost/mpl/bool.hpp>
-
 #include <boost/utility/declval.hpp>
 
 namespace hpx { namespace traits
 {
     namespace detail
     {
+        using boost::get_pointer;
+
         template <typename T, typename Args, typename Enable = void>
         struct is_callable_impl
           : boost::mpl::false_
@@ -237,17 +229,41 @@ namespace hpx { namespace traits
 
         template <typename T, typename... A>
         struct is_callable_impl<T, void(A...)
-          , typename util::always_void<
-                decltype(boost::declval<T>()(boost::declval<A>()...))
-            >::type
+          , typename util::always_void<decltype(
+                boost::declval<T>()(boost::declval<A>()...)
+            )>::type
         > : boost::mpl::true_
         {};
 
-        template <typename T, typename... A>
-        struct is_callable_impl<T, void(A...)
-            , typename util::always_void<
-                  decltype(boost::mem_fn(boost::declval<T>())(boost::declval<A>()...))
-              >::type
+        template <typename T, typename C>
+        struct is_callable_impl<T, void(C)
+          , typename util::always_void<decltype(
+                boost::declval<C>().*boost::declval<T>()
+            )>::type
+        > : boost::mpl::true_
+        {};
+        template <typename T, typename C>
+        struct is_callable_impl<T, void(C)
+          , typename util::always_void<decltype(
+                (*get_pointer(boost::declval<C>())).*boost::declval<T>()
+            )>::type
+        > : boost::mpl::true_
+        {};
+
+        template <typename T, typename C, typename... A>
+        struct is_callable_impl<T, void(C, A...)
+          , typename util::always_void<decltype(
+                (boost::declval<C>().*boost::declval<T>())
+                    (boost::declval<A>()...)
+            )>::type
+        > : boost::mpl::true_
+        {};
+        template <typename T, typename C, typename... A>
+        struct is_callable_impl<T, void(C, A...)
+          , typename util::always_void<decltype(
+                ((*get_pointer(boost::declval<C>())).*boost::declval<T>())
+                    (boost::declval<A>()...)
+            )>::type
         > : boost::mpl::true_
         {};
     }
@@ -285,7 +301,7 @@ namespace hpx { namespace traits { namespace detail
       : boost::mpl::and_<                                                       \
             is_callable<T BOOST_PP_ENUM_TRAILING_PARAMS(n, A)>                  \
           , boost::mpl::not_<traits::is_action<                                 \
-                typename util::decay<T>::type>>                                 \
+                typename util::decay<T>::type> >                                \
         >                                                                       \
     {};                                                                         \
     /**/

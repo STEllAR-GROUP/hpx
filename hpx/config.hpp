@@ -7,12 +7,13 @@
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
-#include <hpx/config/defines.hpp>
-
-#if defined(__INTEL_COMPILER) && !defined(BOOST_COMPILER_CONFIG)
-#  error Boost.Config does not detect C++11 mode for this compiler. Please set BOOST_COMPILER_CONFIG="hpx/config/boost/compiler/intel.hpp"
+// We need to detect if user code include boost/config.hpp before including hpx/config.hpp
+// Everything else might lead to hard compile errors and possible very subtile bugs.
+#if defined(BOOST_CONFIG_HPP)
+#error Boost.Config was included before the hpx config header. This might lead to subtile failures and compile errors. Please include <hpx/config.hpp> before any other boost header
 #endif
 
+#include <hpx/config/defines.hpp>
 #include <hpx/version.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
