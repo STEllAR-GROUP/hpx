@@ -20,7 +20,7 @@ endif()
 hpx_find_package(RNPL
   LIBRARIES bbhutil libbbhutil
   LIBRARY_PATHS lib64 lib
-  HEADERS sdf.h
+  HEADERS bbhutil.h sdf.h
   HEADER_PATHS include)
 
 if(RNPL_FOUND AND NOT HPX_SET_RNPL_MACRO)
