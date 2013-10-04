@@ -395,7 +395,7 @@ struct merging_map : boost::noncopyable
             BOOST_ASSERT(!boost::icl::is_empty(ac));
 
             // Add a new node with an updated version of the existing mapping. 
-            // There is no point in trying to merge this new node, because it's
+            // There is no point in trying to merge this new node, because its
             // value hasn't changed.
             insert_before(cpos, ac, pos->data_);
 
@@ -516,7 +516,7 @@ struct merging_map : boost::noncopyable
             BOOST_ASSERT(!boost::icl::is_empty(ac));
 
             // Add a new node with an updated version of the existing mapping. 
-            // There is no point in trying to merge this new node, because it's
+            // There is no point in trying to merge this new node, because its
             // value hasn't changed.
             insert_before(cpos, ac, pos->data_);
 

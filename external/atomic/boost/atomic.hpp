@@ -168,7 +168,7 @@ public:
 
     bool test_and_set(memory_order order=memory_order_seq_cst)
     {
-        return super::exchange(1, order) ? true : false;
+        return super::exchange(1, order) != 0;
     }
     void clear(memory_order order=memory_order_seq_cst)
     {

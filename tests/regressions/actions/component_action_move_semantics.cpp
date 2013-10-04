@@ -81,7 +81,7 @@ int hpx_main(boost::program_options::variables_map&)
     std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
     BOOST_FOREACH(hpx::naming::id_type id, localities)
     {
-        bool is_local = (id == hpx::find_here()) ? true : false;
+        bool is_local = id == hpx::find_here();
 
         // test for movable object ('normal' actions)
         HPX_TEST_EQ((

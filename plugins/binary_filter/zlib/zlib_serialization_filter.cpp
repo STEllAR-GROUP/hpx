@@ -54,7 +54,7 @@ namespace hpx { namespace plugins { namespace compression
             int result = this->xdeflate(flush ? finish : no_flush);
             this->after(src_begin, dest_begin, true);
             (zlib_error::check)(result);
-            return !(eof_ = (result == stream_end ? true : false));
+            return !(eof_ = result == stream_end);
         }
 
         bool zlib_compdecomp::load(char const*& src_begin, char const* src_end,
@@ -67,7 +67,7 @@ namespace hpx { namespace plugins { namespace compression
             int result = this->xinflate(sync_flush);
             this->after(src_begin, dest_begin, false);
             (zlib_error::check)(result);
-            return !(eof_ = (result == stream_end ? true : false));
+            return !(eof_ = result == stream_end);
         }
 
         void zlib_compdecomp::close()

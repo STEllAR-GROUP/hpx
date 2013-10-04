@@ -302,6 +302,7 @@ namespace hpx { namespace lcos
 
         bool valid() const BOOST_NOEXCEPT
         {
+            // avoid warning about conversion to bool
             return future_data_.get() ? true : false;
         }
 
@@ -602,6 +603,7 @@ namespace hpx { namespace lcos
 
         bool valid() const BOOST_NOEXCEPT
         {
+            // avoid warning about conversion to bool
             return future_data_.get() ? true : false;
         }
 

@@ -141,7 +141,7 @@ int hpx_main(
 
         null_tree_action null_act;
         for ( boost::uint64_t i = 0
-            ; ((test_runs == 0) ? true : (i < test_runs))
+            ; (test_runs == 0) || (i < test_runs)
             ; ++i)
         {
             d += null_act(here, 0, children, 1, max_depth, delay_iterations);

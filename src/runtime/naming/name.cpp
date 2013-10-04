@@ -259,7 +259,7 @@ namespace hpx { namespace naming
     template <class Archive>
     void id_type::save(Archive& ar, const unsigned int version) const
     {
-        bool isvalid = gid_ ? true : false;
+        bool isvalid = gid_ != 0;
         ar.save(isvalid);
         if (isvalid)
             gid_->save(ar);

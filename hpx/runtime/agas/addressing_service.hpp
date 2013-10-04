@@ -262,7 +262,7 @@ public:
       , error_code& ec = throws
         );
 
-    /// \brief Resolve a locality to it's prefix.
+    /// \brief Resolve a locality to its prefix.
     ///
     /// \returns Returns 0 if the locality is not registered.
     boost::uint32_t resolve_locality(
@@ -548,7 +548,7 @@ public:
     /// Every element in the HPX namespace has a unique global address
     /// (global id). This global address has to be associated with a concrete
     /// local address to be able to address an instance of a component using
-    /// it's global address.
+    /// its global address.
     ///
     /// \param id         [in] The global address which has to be bound to
     ///                   the local address.

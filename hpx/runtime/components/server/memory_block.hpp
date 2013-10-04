@@ -302,7 +302,7 @@ namespace hpx { namespace components
         template <class Archive>
         void save(Archive & ar, const unsigned int version) const
         {
-            bool has_config = config_ ? true : false;
+            bool has_config = config_ != 0;
             ar << has_config;
             if (has_config)
                 save_(ar, version, config_.get());

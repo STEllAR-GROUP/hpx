@@ -98,7 +98,7 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
         // stop/restart the counter referenced by id1 after 5 seconds of
         // evaluation
         bool should_run =
-            (int((value2.time_ - start_time) * 1e-9) / 5) % 2 ? true : false;
+            (int((value2.time_ - start_time) * 1e-9) / 5) % 2 != 0;
         if (should_run == started) {
             if (started) {
                 performance_counter::stop(id1);
