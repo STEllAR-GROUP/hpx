@@ -135,7 +135,7 @@ static void
     // Construction from another function (that is empty)
     v1.clear();
     func_void_type v2(v1);
-    HPX_TEST(v2 != 0);
+    HPX_TEST(v2 == 0);
 
     // Assignment to an empty function
     v2 = three;
