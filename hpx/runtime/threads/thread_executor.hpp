@@ -174,6 +174,7 @@ namespace hpx { namespace threads
 
         operator util::safe_bool<executor>::result_type() const
         {
+            // avoid compiler warning about conversion to bool
             return util::safe_bool<executor>()(executor_data_.get() ? true : false);
         }
 

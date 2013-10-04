@@ -135,7 +135,7 @@ static void
     // Construction from another function (that is empty)
     v1.clear();
     func_void_type v2(v1);
-    HPX_TEST(!v2? true : false);
+    HPX_TEST(v2 != 0);
 
     // Assignment to an empty function
     v2 = three;
@@ -159,7 +159,7 @@ static void
 
     // Assignment to an empty function from a free function
     v2 = (write_five);
-    HPX_TEST(v2? true : false);
+    HPX_TEST(v2 != 0);
 
     // Invocation
     global_int = 0;
@@ -243,7 +243,7 @@ static void
 
     // clear() method
     v3.clear();
-    HPX_TEST(!v3? true : false);
+    HPX_TEST(!v3);
 
     // Assignment to an empty function
     v3 = three;
@@ -505,9 +505,9 @@ static void
     HPX_TEST(i0() == 5);
     i0 = &generate_three;
     HPX_TEST(i0() == 3);
-    HPX_TEST(i0? true : false);
+    HPX_TEST(i0 != 0);
     i0.clear();
-    HPX_TEST(!i0? true : false);
+    HPX_TEST(!i0);
 
     // Test return values with compatible types
     typedef hpx::util::function_nonser<long ()> func_long_type;
@@ -520,9 +520,9 @@ static void
     HPX_TEST(i1() == 5);
     i1 = &generate_three;
     HPX_TEST(i1() == 3);
-    HPX_TEST(i1? true : false);
+    HPX_TEST(i1 != 0);
     i1.clear();
-    HPX_TEST(!i1? true : false);
+    HPX_TEST(!i1);
 }
 
 static void

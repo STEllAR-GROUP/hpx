@@ -42,7 +42,7 @@ namespace hpx { namespace threads
             if (std::size_t(-1) != result)
             {
                 if (numa_sensitive)
-                    *numa_sensitive = (result & (std::size_t(0x1) << 31)) ? true : false;
+                    *numa_sensitive = (result & (std::size_t(0x1) << 31)) != 0;
                 return result & ~(std::size_t(0x1) << 31);
             }
         }

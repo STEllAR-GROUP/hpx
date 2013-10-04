@@ -240,7 +240,7 @@ public:
         T prev = *(__m128i*)(&i);
         bool success = BOOST_INTERLOCKED_COMPARE_EXCHANGE128(
             (boost::int64_t volatile *)(&i),
-            desired_raw[1], desired_raw[0], (boost::int64_t*)&expected) ? true : false;
+            desired_raw[1], desired_raw[0], (boost::int64_t*)&expected) != 0;
         if (!success)
             expected = prev;
         return success;

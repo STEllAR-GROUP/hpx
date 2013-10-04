@@ -252,6 +252,7 @@ namespace hpx { namespace lcos { namespace local
         bool valid() const BOOST_NOEXCEPT
         {
             typename mutex_type::scoped_lock l(mtx_);
+            // avoid warning about conversion to bool
             return task_.get() ? true : false;
         }
 
@@ -395,6 +396,7 @@ namespace hpx { namespace lcos { namespace local
         bool valid() const BOOST_NOEXCEPT
         {
             mutex_type::scoped_lock l(mtx_);
+            // avoid warning about conversion to bool
             return task_.get() ? true : false;
         }
 

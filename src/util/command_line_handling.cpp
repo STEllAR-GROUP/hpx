@@ -299,7 +299,7 @@ namespace hpx { namespace util
             num_localities_ = localities;
         }
 
-        bool run_agas_server = vm.count("hpx:run-agas-server");
+        bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
             node = env.retrieve_node_number();
 
@@ -769,7 +769,7 @@ namespace hpx { namespace util
                 threads::policies::detail::affinity_data aff(num_threads,
                     pu_offset, pu_step, affinity_domain, "");
 
-                bool numa_sensitive = vm_.count("hpx:numa-sensitive");
+                bool numa_sensitive = vm_.count("hpx:numa-sensitive") != 0;
                 threads::topology& top = threads::create_topology();
                 for (std::size_t i = 0; i != num_threads; ++i)
                 {

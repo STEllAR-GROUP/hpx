@@ -50,7 +50,7 @@ struct buffer
       , const unsigned int
         ) const
     {
-        bool isvalid = data_ ? true : false;
+        bool isvalid = data_ != NULL;
         ar << isvalid;
 
         if (isvalid)

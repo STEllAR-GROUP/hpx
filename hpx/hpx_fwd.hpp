@@ -659,7 +659,7 @@ namespace hpx
     inline bool
     operator&(BOOST_SCOPED_ENUM(launch) lhs, BOOST_SCOPED_ENUM(launch) rhs)
     {
-        return static_cast<int>(lhs) & static_cast<int>(rhs) ? true : false;
+        return (static_cast<int>(lhs) & static_cast<int>(rhs)) != 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
