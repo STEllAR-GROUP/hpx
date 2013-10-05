@@ -1473,16 +1473,7 @@ endif()
 hpx_option(HPX_BUILD_DOCUMENTATION BOOL "The HPX documentation toolchain is available (default OFF)." OFF)
 if(HPX_BUILD_DOCUMENTATION)
   hpx_option(HPX_BUILD_DOCUMENTATION_SINGLEPAGE BOOL "The HPX documentation should be build as a single page HTML (default OFF)." OFF)
-
   add_subdirectory(docs)
-
-  add_custom_target(git_docs
-    COMMAND ${CMAKE_COMMAND} -DHPX_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake)
-
-  add_dependencies(git_docs docs)
-  if(${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
-    add_dependencies(git_docs singlepage_docs)
-  endif()
 endif()
 
 if(${BOOST_MINOR_VERSION} GREATER 50)
