@@ -17,7 +17,7 @@ macro(hpx_make_python_list input output)
   set(${output} "${${output}}]")
 endmacro()
 
-macro(add_hpx_test name category)
+macro(add_hpx_test category name)
   hpx_parse_arguments(${name} "TIMEOUT;LOCALITIES;THREADS_PER_LOCALITY;ARGS"
                               "FAILURE_EXPECTED" ${ARGN})
 
@@ -66,10 +66,10 @@ macro(add_hpx_test name category)
 endmacro()
 
 macro(add_hpx_unit_test category name)
-  add_hpx_test(${name} "tests.unit.${category}" ${ARGN})
+  add_hpx_test("tests.unit.${category}" ${name} ${ARGN})
 endmacro()
 
 macro(add_hpx_regression_test category name)
-  add_hpx_test(${name} "tests.regressions.${category}" ${ARGN})
+  add_hpx_test("tests.regressions.${category}" ${name} ${ARGN})
 endmacro()
 
