@@ -51,12 +51,14 @@ Here is a list of the important tickets we closed for this release.
 * [issue 885] - Two threads are slower than one
 * [issue 884] - is_callable failing with member pointers in C++11
 * [issue 883] - Need help with is_callable_test
+* [issue 882] - tests.regressions.lcos.future_hang_on_get does not terminate
 * [issue 881] - tests/regressions/block_matrix/matrix.hh won't compile with GCC
                 4.8.1 
 * [issue 878] - `future::unwrap` triggers assertion
 * [issue 877] - "make tests" has build errors on Ubuntu 12.10 
 * [issue 876] - tcmalloc is used by default, even if it is not present
 * [issue 875] - global_fixture is defined in a header file
+* [issue 874] - Some tests take very long
 * [issue 873] - Add block-matrix code as regression test
 * [issue 872] - HPX documentation does not say how to run tests with detailed
                 output
@@ -116,14 +118,19 @@ Here is a list of the important tickets we closed for this release.
 * [issue 807] - Create performance counters exposing overall AGAS statistics
 * [issue 795] - Create timed make_ready_future
 * [issue 721] - Make HPX usable for Xeon Phi
+* [issue 694] - CMake should complain if you attempt to build an example without
+                its dependencies
 * [issue 683] - python/hpx/process.py imports epoll on all platforms
 * [issue 600] - GTC performance broken
 * [issue 577] - Allow for zero copy serialization/networking
+* [issue 554] - Write a custom .lib file on Windows pulling in hpx_init and
+                hpx.dll, phase out hpx_init
 * [issue 551] - Change executable names to have debug postfix in Debug builds
 * [issue 445] - Significant performance mismatch between MPI and HPX in SMP
                 for allgather example
 * [issue 316] - Add message size limitation
 * [issue 249] - Clean up locking code in big boot barrier
+* [issue 136] - Persistent CMake variables need to be marked as cache variables
 
 [endsect]
 
