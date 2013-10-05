@@ -51,8 +51,8 @@ def kill_process_tree(parent_pid, signal=SIGKILL):
     if 0 == ps_command.wait():
       list = [pid]
 
-      for pid in ps_output.split("\n")[:-1]:
-        list = list + find_process_tree(int(pid))
+      for child_pid in ps_output.split("\n")[:-1]:
+        list = list + find_process_tree(int(child_pid))
 
       return list
 
