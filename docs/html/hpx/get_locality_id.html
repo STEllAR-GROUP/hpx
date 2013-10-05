@@ -27,7 +27,7 @@
 </span>
 <span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint32_t</span> <span class="identifier">get_locality_id</span><span class="special">(</span><a class="link" href="error_code.html" title="Class error_code">error_code</a> <span class="special">&amp;</span> ec <span class="special">=</span> <span class="identifier">throws</span><span class="special">)</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idp17851072"></a><h2>Description</h2>
+<a name="idp17344880"></a><h2>Description</h2>
 <p>This function returns the id of the current locality.</p>
 <p>
 </p>
@@ -37,7 +37,7 @@
 <th align="left">Note</th>
 </tr>
 <tr><td align="left" valign="top">
-<p>The returned value is zero based and it's maximum value is smaller than the overall number of localities the current application is running on (as returned by <span class="emphasis"><em>get_num_localities()</em></span>).</p>
+<p>The returned value is zero based and its maximum value is smaller than the overall number of localities the current application is running on (as returned by <span class="emphasis"><em>get_num_localities()</em></span>).</p>
 <p>As long as <span class="emphasis"><em>ec</em></span> is not pre-initialized to <span class="emphasis"><em>hpx::throws</em></span> this function doesn't throw but returns the result code using the parameter <span class="emphasis"><em>ec</em></span>. Otherwise it throws an instance of <code class="computeroutput"><a class="link" href="exception.html" title="Class exception">hpx::exception</a></code>.</p>
 <p>This function needs to be executed on a HPX-thread. It will fail otherwise (it will return -1). </p>
 </td></tr>
